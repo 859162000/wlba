@@ -10,4 +10,5 @@ urlpatterns = patterns(
     url(r'^share/end/$', views.WeixinShareEndView.as_view(), name='weixin_share_end'),
 
     url(r'^weixin/bonus/$', views.WeixinAnnualBonusView.as_view(), name='weixin_annual_bonus'),
+    url(r'^weixin/bonus/from_regist/$', views.WeixinAnnualBonusView.as_view(), name='weixin_annual_bonus_from_regist'),
 )

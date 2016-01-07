@@ -1218,8 +1218,10 @@ class WeixinAnnualBonusView(TemplateView):
     url_name = ''
     wx_classify = 'fwh'
     url_name = "weixin_annual_bonus"
+    url_path = ""
     url_query = ""
     template_name = 'app_praise_reward.jade'
+    is_from_regist = False
 
     def __init__(self):
         self.from_openid = ''
@@ -1243,6 +1245,7 @@ class WeixinAnnualBonusView(TemplateView):
             #self.nick_name = wxid
             #self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
 
+        self.url_path = self.request.path
         self.url_query = self.request.META.get('QUERY_STRING', None)
 
         if not self.from_openid:
@@ -1263,6 +1266,10 @@ class WeixinAnnualBonusView(TemplateView):
         from wanglibao_rest.utils import get_client_ip
         self.ipaddr = get_client_ip(request)
 
+        if self.url_path == u'/weixin_activity/weixin/bonus/from_regist/':
+            self.is_from_regist = True
+            return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
+
         self.action = self.request.GET.get('act', 'view')
         if self.action=='view':
             return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
@@ -1281,18 +1288,26 @@ class WeixinAnnualBonusView(TemplateView):
         if not self.to_openid:
             self.template_name = 'app_praise_reward.jade'
             return { 'err_code':101, 'err_messege':u'获取受评用户失败' }
+
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         #wx_bonus = None
         if wx_bonus:
             #wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
-            follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid)
+            follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=1).order_by('-create_time')
             self.template_name = 'app_praise_reward.jade'
+            if self.is_myself:
+                ###share_all = u'我领到一份年终奖，%s元噢！你也为自己一年的努力另一份吧！'%wx_bonus.annual_bonus
+                share_all = u'我只想安安静静地领个年终奖，点赞给我赏500！'
+            else:
+                share_all = u'我只想安安静静地领个年终奖，点赞给我赏500！'
             return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows,
                      'share_name':u'我的努力需要你的一个肯定，谢谢你',
                      'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                      'share_link':settings.CALLBACK_HOST + reverse(self.url_name) + "?uid=" + self.to_openid,
                      'share_title':u'我的努力需要你的一个肯定，谢谢你',
-                     'share_body':u'您的好友正在领取他的年终奖，随手一赞，助他多拿500！'
+                     'share_body':u'您的好友正在领取他的年终奖，随手一赞，助他多拿500！',
+                     'share_all': share_all,
+                     'is_from_regist' : self.is_from_regist,
                     }
         else:
             if self.is_myself:
@@ -1302,7 +1317,7 @@ class WeixinAnnualBonusView(TemplateView):
                         'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                         'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
                         'share_title':u'您的好友邀请您参加分享领取年终奖活动',
-                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！'
+                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！',
                         }
             else:
                 self.template_name = 'app_praise_reward.jade'
@@ -1342,9 +1357,10 @@ class WeixinAnnualBonusView(TemplateView):
 #               'user_id' : user_profile.user.id if user_profile else None,
                 'user' : user_profile.user if user_profile else None,
                 'is_new' : is_new,
-                'annual_bonus' : 28888 if is_new else 1000,
-                'min_annual_bonus' : 28888 if is_new else 1000,
-                'max_annual_bonus' : 36888 if is_new else 8000,
+                'annual_bonus' : 500 if is_new else 500,
+                'min_annual_bonus' : 500 if is_new else 500,
+                'max_annual_bonus' : 8000 if is_new else 8000,
+                'create_time' : timezone.now(),
             })
         except Exception, ex :
             logger.exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
@@ -1359,10 +1375,14 @@ class WeixinAnnualBonusView(TemplateView):
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def vote_bonus(self):
-        vote_type = self.request.GET.get('type', None)
-        if not self.to_openid or not vote_type:
+        str_vote_type = self.request.GET.get('type', None)
+        if not self.to_openid or not str_vote_type:
             rep = { 'err_code':301, 'err_messege':u'缺少参数' }
             return HttpResponse(json.dumps(rep), content_type='application/json')
+
+        vote_type = 1
+        if str_vote_type==u'0':
+            vote_type = 0
 
         if self.to_openid==self.from_openid:
             rep = { 'err_code':302, 'err_messege':u'不能评价自己' }
@@ -1374,59 +1394,58 @@ class WeixinAnnualBonusView(TemplateView):
                 if not wx_bonus:
                     rep = { 'err_code':303, 'err_messege':u'查询受评用户出错' }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
-                if wx_bonus.is_pay:
-                    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
-                    return HttpResponse(json.dumps(rep), content_type='application/json')
-                wx_bonus.is_max = False
-                if vote_type:
-                    wx_bonus.good_vote += 1
-                    wx_bonus.annual_bonus += 500
-                    if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
-                        wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
-                        wx_bonus.is_max = True
-                else:
-                    wx_bonus.bad_vode += 1
-                    if not wx_bonus.is_max:
-                        wx_bonus.annual_bonus -= 500
-                        if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
-                            wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
-                wx_bonus.update_time = timezone.now()
+                #if wx_bonus.is_pay:
+                #    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
+                #    return HttpResponse(json.dumps(rep), content_type='application/json')
 
-                wx_vote = WeixinAnnulBonusVote.objects.create(
-                    from_openid = self.from_openid,
-                    from_nickname = self.nick_name,
-                    from_headimgurl = self.head_img,
-                    from_ipaddr = self.ipaddr,
-                    to_openid = self.to_openid,
-                    is_good_vote = vote_type,
-                    current_good_vote = wx_bonus.good_vote,
-                    current_bad_vote = wx_bonus.bad_vote,
-                    current_annual_bonus = wx_bonus.annual_bonus,
-                    create_time = timezone.now(),
+                if vote_type==1:
+                    wx_bonus.good_vote += 1
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
+                        wx_bonus.annual_bonus += 500
+                        if wx_bonus.annual_bonus >= wx_bonus.max_annual_bonus:
+                            wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
+                            wx_bonus.is_max = True
+                else:
+                    wx_bonus.bad_vote += 1
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
+                        wx_bonus.annual_bonus -= 500
+                        if wx_bonus.annual_bonus <= wx_bonus.min_annual_bonus:
+                            wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
+
+                wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
+                    defaults={
+                        'from_openid' : self.from_openid,
+                        'from_nickname' : self.nick_name,
+                        'from_headimgurl' : self.head_img,
+                        'from_ipaddr' : self.ipaddr,
+                        'to_openid' : self.to_openid,
+                        'is_good_vote' : vote_type,
+                        'current_good_vote' : wx_bonus.good_vote,
+                        'current_bad_vote' : wx_bonus.bad_vote,
+                        'current_annual_bonus' : wx_bonus.annual_bonus,
+                        'create_time' : timezone.now(),
+                    }
                 )
 
+                if not flag:
+                    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
+                    return HttpResponse(json.dumps(rep), content_type='application/json')
+
+                wx_bonus.update_time = timezone.now()
                 wx_bonus.save()
 
-            except IntegrityError, ex:
-                logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
-                rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
-                return HttpResponse(json.dumps(rep), content_type='application/json')
+            #except IntegrityError, ex:
+            #    logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
+            #    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价(305)', }
+            #    return HttpResponse(json.dumps(rep), content_type='application/json')
             except Exception, ex:
                 logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
                 rep = { 'err_code':306, 'err_messege':'系统繁忙，请稍后重试', }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
-        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid).order_by('-create_time')
-        vote_list = [
-            {
-                "from_nickname": vote.from_nickname,
-                "from_headimgurl": vote.from_headimgurl,
-                "is_good_vote": vote.is_good_vote,
-                "create_time": str(vote.create_time),
-            } for vote in wx_votes
-        ]
-        rep = { 'err_code':0, 'err_messege':'评价成功', 'wx_user':wx_bonus, 'follow':vote_list }
+
+        rep = { 'err_code':0, 'err_messege':'评价成功', 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def pay_bonus(self):
@@ -1452,8 +1471,9 @@ class WeixinAnnualBonusView(TemplateView):
 
             # 以体验金形式发放年终奖
             bonus = wx_bonus.annual_bonus
-            if wx_bonus.is_new:
-                bonus = wx_bonus.annual_bonus - wx_bonus.min_annual_bonus
+            ## by hb : remove 28888 from bonus
+            ##if wx_bonus.is_new:
+            ##    bonus = wx_bonus.annual_bonus - wx_bonus.min_annual_bonus
             event = ExperienceEvent.objects.filter(description=u'2015年终奖体验金').filter(amount=bonus).first()
             if not event:
                 rep = { 'err_code':405, 'err_messege':u'领取失败，请联系客服(405)' }
@@ -1470,9 +1490,9 @@ class WeixinAnnualBonusView(TemplateView):
             wx_bonus.pay_time = timezone.now()
             wx_bonus.save()
 
-            wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
+            wx_bonus_json = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-            rep = { 'err_code':0, 'err_messege':u'年终奖领取成功', 'wx_user':wx_bonus, }
+            rep = { 'err_code':0, 'err_messege':u'年终奖已存入网利宝账户：%s 中，登录后才可以使用哦'%wx_bonus.phone, 'wx_user':wx_bonus_json, }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def query_bonus(self):
@@ -1483,7 +1503,17 @@ class WeixinAnnualBonusView(TemplateView):
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid).order_by('-create_time')
+        rep = { 'err_code':0, 'err_messege':'', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
+        return HttpResponse(json.dumps(rep), content_type='application/json')
+
+    def share_bonus(self):
+        pass
+
+    def visit_bonus(self):
+        pass
+
+    def getGoodvoteToJson(self):
+        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=1).order_by('-create_time')
         vote_list = [
             {
                 "from_nickname": vote.from_nickname,
@@ -1493,14 +1523,15 @@ class WeixinAnnualBonusView(TemplateView):
             } for vote in wx_votes
         ]
 
-        rep = { 'err_code':0, 'err_messege':'', 'wx_user':wx_bonus, 'follow':vote_list }
-        return HttpResponse(json.dumps(rep), content_type='application/json')
+        leon_vote = {
+            "from_nickname": "leon",
+            "from_headimgurl": settings.CALLBACK_HOST + "/static/imgs/mobile_activity/app_praise_reward/people_6.png",
+            "is_good_vote": "True",
+            "create_time": "2018-01-08 00:00:00",
+        }
+        vote_list.insert(0,leon_vote)
 
-    def share_bonus(self):
-        pass
-
-    def visit_bonus(self):
-        pass
+        return vote_list
 
     def getAccountid(self):
         m = Misc.objects.filter(key='weixin_qrcode_info').first()
@@ -1511,7 +1542,7 @@ class WeixinAnnualBonusView(TemplateView):
 
     def getOpenid(self, request, *args, **kwargs):
         account_id = self.getAccountid()
-        redirect_uri = settings.CALLBACK_HOST + reverse(self.url_name) + "?" + self.url_query
+        redirect_uri = settings.CALLBACK_HOST + self.url_path + "?" + self.url_query
         #self.request.session['WECHAT_OPEN_ID'] = None
         self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
         if not self.openid:

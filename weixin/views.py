@@ -60,7 +60,7 @@ from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEven
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
-from weixin.util import sendTemplate, redirectToJumpPage
+from weixin.util import sendTemplate, redirectToJumpPage, filter_emoji
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -450,6 +450,7 @@ def getOrCreateWeixinUser(openid, weixin_account):
             w_user.subscribe = user_info.get('subscribe', 0)
             # if not w_user.subscribe_time:
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
+            w_user.nickname=filter_emoji(w_user.nickname, "*")
             w_user.save()
         except WeChatException, e:
             logger.debug(e.message)
@@ -1348,6 +1349,7 @@ class GetAuthUserInfo(APIView):
             w_user.province = user_info.get('province', "")
             w_user.subscribe = user_info.get('subscribe', 0)
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
+            w_user.nickname=filter_emoji(w_user.nickname, "*")
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
@@ -1379,6 +1381,7 @@ class GetUserInfo(APIView):
                 w_user.province = user_info.get('province', "")
                 w_user.subscribe = user_info.get('subscribe', 0)
                 w_user.subscribe_time = user_info.get('subscribe_time', 0)
+                w_user.nickname=filter_emoji(w_user.nickname, "*")
                 w_user.save()
         except Exception, e:
             logger.debug(e.message)
