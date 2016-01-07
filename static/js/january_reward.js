@@ -56,6 +56,37 @@
 			}
 		})
 
+        $('#see_rule_1').on('click',function(){
+            var ele = $('.rule_wrap_1');
+            var curHeight = ele.height();
+            var autoHeight = ele.css('height', 'auto').height();
+            if (!ele.hasClass('down')){
+                ele.height(curHeight).animate({height: autoHeight},500,function(){
+                    ele.addClass('down');
+                });
+            }else{
+                ele.height(curHeight).animate({height: 0},500,function(){
+                    ele.removeClass('down');
+                });
+            }
+        })
+        $('#see_rule_2').on('click',function(){
+            var ele = $('.rule_wrap_2');
+            var curHeight = ele.height();
+            var autoHeight = ele.css('height', 'auto').height();
+            if (!ele.hasClass('down')){
+                ele.height(curHeight).animate({height: autoHeight},500,function(){
+                    ele.addClass('down');
+                });
+            }else{
+                ele.height(curHeight).animate({height: 0},500,function(){
+                    ele.removeClass('down');
+                });
+            }
+        })
+
+
+
 		$('.recharge_button').click(function(){
 			window.location.href = '/p2p/list/'
 		});
@@ -64,13 +95,13 @@
 		    window.location.href = '/p2p/list/'
 		});
 
-        var see_rule_button_index;
-        $('.see_rule_button').click(function(){
-            see_rule_button_index = $(this).parent().next().hasClass('rule_wrap_show');
-            if(see_rule_button_index){
-                $(this).parent().next().removeClass('rule_wrap_show').hide();
+        var see_rule_index_1;
+        $('#see_rule_1').click(function(){
+            see_rule_index_1 = $('.rule_wrap_1').hasClass('rule_wrap_show');
+            if(see_rule_index_1){
+                $('.rule_wrap_1').removeClass('rule_wrap_show').hide();
             }else{
-                $(this).parent().next().addClass('rule_wrap_show').show();
+                $('.rule_wrap_1').addClass('rule_wrap_show').show();
             }
         });
     })

@@ -112,6 +112,7 @@
     line-height: 60px
     color: #a80017
     cursor: pointer
+    font-weight: bold
   .button:hover
     background: url("/static/imgs/pc_activity/january_reward/button.png") no-repeat left bottom
     padding: 2px 0
@@ -131,10 +132,13 @@
   width: 1062px
   background: #bc0a00
   border-radius: 10px
-  padding: 16px 15px 25px
+  padding: 0 15px
   display: block
   margin: 0 auto
+  height: 0
+  overflow: hidden
   .title
+    padding-top: 16px
     font-size: 18px
     color: #fff
     line-height: 26px
@@ -142,6 +146,8 @@
     font-size: 16px
     color: #fff
     line-height: 28px
+  .last
+    height: 25px
 .title_img
   width: 387px
   height: 95px
@@ -157,6 +163,7 @@
 .reward_wrap
   width: 100%
   height: 290px
+  margin-bottom: 50px
   .reward_box
     width: 260px
     height: 291px
@@ -164,6 +171,7 @@
     float: left
     background: #fff
     border-radius: 10px
+    margin-right: 20px
     .title
       line-height: 46px
       font-size: 18px
@@ -189,7 +197,7 @@
       position: relative
       .left
         position: absolute
-        left: 39px
+        left: 19px
         top: 47px
         z-index: 2
         width: 65px
@@ -197,9 +205,95 @@
         dt
           line-height: 26px
           color: #f6d564
-          font-size: 24px
+          font-size: 22px
           font-weight: bold
           width: 100%
           text-align: center
         dd
           line-height: 24px
+          color: #fff
+          font-size: 18px
+          font-weight: bold
+          width: 100%
+          text-align: center
+      .right
+        position: absolute
+        left: 136px
+        top: 60px
+        z-index: 2
+        width: 72px
+        text-align: center
+        dt
+          line-height: 26px
+          color: #f6d564
+          font-size: 22px
+          width: 100%
+          text-align: center
+        dd
+          line-height: 18px
+          color: #fff
+          font-size: 13px
+          width: 100%
+          text-align: center
+  .last
+    margin-right: 0px
+.act_rule
+  width: 100%
+  padding: 23px 0 50px
+  .title
+    width: 100%
+    text-align: center
+    font-size: 24px
+    color: #fff
+    font-weight: bold
+    padding-bottom: 21px
+  p
+    width: 100%
+    line-height: 24px
+    font-size: 16px
+    color: #fff
+.code_wrap
+  width: 100%
+  height: 245px
+  clear: both
+  position: relative
+  left: 0
+  top: 0
+  .bg
+    width: 100%
+    height: 245px
+    background: #333
+  .main
+    width: 1100px
+    display: block
+    height: 245px
+    margin: 0 auto
+    position: absolute
+    left: 50%
+    margin-left: -550px
+    top: 0
+    z-index: 2
+    background: url("/static/imgs/pc_activity/january_reward/code_wrap_bg.jpg") no-repeat
+  .code
+    position: absolute
+    right: 7px
+    top: 36px
+    width: 152px
+    height: 152px
+    z-index: 2
+    display: block
+  .text
+    width: 152px
+    height: 30px
+    line-height: 30px
+    position: absolute
+    right: 7px
+    top: 190px
+    z-index: 2
+    text-align: center
+    font-size: 12px
+    color: #fff
+.down
+  position: relative
+  top: 0
+  border: none
