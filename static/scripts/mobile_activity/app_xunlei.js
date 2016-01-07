@@ -218,14 +218,36 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;var boy = $(document.body).height();
-$('.xunmeng').css({'height': boy});
-$('.xunmeng2 ').css({'height': boy});
+$('.xunmeng,.xunmeng2').css({'height': boy});
 $('.xinlei-rule').click(function () {
     $('.xunmeng').show();
 });
 $('.xunjiang-zong span').click(function () {
     $('.xunmeng').hide();
 });
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+
+var token = getQueryString('promo_token'),
+    xid = getQueryString('xluserid')
+org.ajax({
+    url: '/api/has_binding/'+token+'/'+xid+'/',
+    type: 'GET',
+    success: function (data) {
+        console.log(data);
+        if (data.ret_code == 10001) {
+            $('.xunmeng3').show();
+            $('.maimai-form').hide();
+        }
+    }
+})
+;
 org.xunlei = (function (org) {
 
     var lib = {
@@ -345,14 +367,14 @@ org.xunlei = (function (org) {
                 }
 
                 if (!lib.checkState) return
-                function getQueryString(name) {
-                    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-                    var r = window.location.search.substr(1).match(reg);
-                    if (r != null) {
-                        return unescape(r[2]);
-                    }
-                    return null;
-                }
+                //function getQueryString(name) {
+                //    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+                //    var r = window.location.search.substr(1).match(reg);
+                //    if (r != null) {
+                //        return unescape(r[2]);
+                //    }
+                //    return null;
+                //}
 
                 var token = getQueryString('promo_token'),
                     xid = getQueryString('xluserid'),
@@ -380,9 +402,6 @@ org.xunlei = (function (org) {
                         }
                     }
                 }
-
-                //_self.$submit.attr('disabled',true).html('领取中，请稍后...');
-
                 ops = {
                     url: '/api/register/?promo_token=xunlei9',
                     type: 'POST',
@@ -394,7 +413,6 @@ org.xunlei = (function (org) {
                         'captcha_1': _self.$codeimg.val(),
                     },
                     success: function (data) {
-                        //console.log('11111')
                         if (data.ret_code == 0) {
 
                             org.ajax(get_ticket_ajax);
@@ -567,14 +585,11 @@ org.xunlei = (function (org) {
                 }
             })
         },
-    }
+    };
     return {
         init: lib.init
     }
 })(org);
-
-
-;
 (function (org) {
     $.each($('script'), function () {
         var src = $(this).attr('src');
