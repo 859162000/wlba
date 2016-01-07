@@ -238,7 +238,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		type: "GET",
 	}).done(function (xhr) {
 		if(xhr.err_code==0){
-			renovate_friends(xhr.follow.length,xhr.follow);
+			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
 			//$('.renovate').click();
 		}else{
 			//$('.friend_top span').text(xhr.err_messege);
@@ -277,10 +277,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				renovate_friends(xhr.follow.length,xhr.follow);
-				if(xhr.wx_user.is_max){
-					$('.num_top').show();
-				}
+				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
 				$('#zan_num').text(xhr.wx_user.good_vote);
 				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
@@ -293,7 +290,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*刷新数据结束*/
 
 	/*刷新朋友圈*/
-	function renovate_friends(friends_length,friends_img){
+	function renovate_friends(friends_length,friends_img,is_max){
 		var str='';
 		var follow_one='';
 		for(var i=0; i<friends_length; i++){
@@ -312,7 +309,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		swiper.appendSlide(str);
 		swiper.update();
 		swiper.slideTo(0, 100, false);
-
+		if(is_max){
+			$('.num_top').show();
+		}
 	}
 	/*刷新朋友圈结束*/
 	/*同意活动规则按钮*/
@@ -343,11 +342,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					renovate_friends(xhr.follow.length,xhr.follow);
+					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
 					$('#zan_num').text(xhr.wx_user.good_vote);
-					if(xhr.wx_user.is_max){
-						$('.num_top').show();
-					}
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -364,7 +360,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					renovate_friends(xhr.follow.length,xhr.follow);
+					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
 					$('#cha_num').text(xhr.wx_user.bad_vote);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
