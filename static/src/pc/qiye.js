@@ -111,6 +111,17 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
 
     if($('input[name="pageType"]').val() != 'edit'){
         new PCAS("deposit_bank_province","deposit_bank_city");
+    }else{
+        $.ajax({
+          url: '/qiye/profile/exists/',
+          type: "GET",
+          data: {
+          }
+        }).done(function(data) {
+
+        }).fail(function(data){
+            $('.notThrough').text('请完善信息')
+        })
     }
 
 
