@@ -489,8 +489,8 @@ org.weChatStart = (function(org){
                         dataType : 'json',
                         success: function(data){
                             if(data.has_gift == 'true'){
-                                org.ui.alert(data.message, function(){
-                                    window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                                org.ui.alert('用户已经领取过奖品', function(){
+                                    window.location.href = '/weixin_activity/share/'+ops            .phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
                                 });
                             }else if(data.has_gift == 'false'){
                                 window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
