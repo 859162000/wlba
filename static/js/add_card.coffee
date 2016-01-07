@@ -64,8 +64,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
 
   ###个人信息###
   $('#bindingBtn').click ->
-    btns = $('#bindingBtn')
-    _checkPerInfo(btns)
+    if !$(this).hasClass('bunsNo')
+      btns = $('#bindingBtn')
+      _checkPerInfo(btns)
 
   ###验证个人信息###
   _checkPerInfo = (btns)->
@@ -82,6 +83,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         return
       code.parent().find('span').html('<i class="dui"></i>')
       bankId = $('.bankId').text().replace(/[ ]/g,"")
+      $('#bindingBtn').addClass('bunsNo')
       $.ajax {
         url: '/api/pay/cnp/dynnum_new/'
         data: {
@@ -96,14 +98,15 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         type: 'post'
       }
       .done (xhr)->
-      #            location.reload()
         if xhr.ret_code == 0
           location.reload()
         else
          tool.modalAlert({title: '温馨提示', msg: xhr.message})
+         $('#bindingBtn').removeClass('bunsNo')
         return
       .fail (xhr)->
         tool.modalAlert({title: '温馨提示', msg: xhr.message})
+        $('#bindingBtn').removeClass('bunsNo')
         return
 
   $('.bankPhone').blur ->

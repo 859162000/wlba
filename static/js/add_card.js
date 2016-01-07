@@ -79,8 +79,10 @@
     /*个人信息 */
     $('#bindingBtn').click(function() {
       var btns;
-      btns = $('#bindingBtn');
-      return _checkPerInfo(btns);
+      if (!$(this).hasClass('bunsNo')) {
+        btns = $('#bindingBtn');
+        return _checkPerInfo(btns);
+      }
     });
 
     /*验证个人信息 */
@@ -104,6 +106,7 @@
         }
         code.parent().find('span').html('<i class="dui"></i>');
         bankId = $('.bankId').text().replace(/[ ]/g, "");
+        $('#bindingBtn').addClass('bunsNo');
         return $.ajax({
           url: '/api/pay/cnp/dynnum_new/',
           data: {
@@ -124,12 +127,14 @@
               title: '温馨提示',
               msg: xhr.message
             });
+            $('#bindingBtn').removeClass('bunsNo');
           }
         }).fail(function(xhr) {
           tool.modalAlert({
             title: '温馨提示',
             msg: xhr.message
           });
+          $('#bindingBtn').removeClass('bunsNo');
         });
       }
     };
