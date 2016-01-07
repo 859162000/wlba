@@ -162,6 +162,10 @@
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
 					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
+				}else if(xhr.err_code==202){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+					$('.apply_button').show();
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -183,8 +187,6 @@
 
 	/*领取我的年终奖*/
 	$('.now_use').click(function(){
-
-
 
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
@@ -211,6 +213,11 @@
 	$('.regist_button').hide();
 	$('.regist_button').click(function(){
 		window.location.href = '/weixin/regist/?next='+shareLink+'&promo_token=h5dianzan';
+	});
+
+	$('.apply_button').hide();
+	$('.apply_button').click(function(){
+		window.location.href = '/weixin_activity/weixin/bonus/';
 	});
 	/*领取我的年终奖结束*/
 
