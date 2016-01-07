@@ -7,6 +7,40 @@ $('.xinlei-rule').click(function () {
 $('.xunjiang-zong span').click(function () {
     $('.xunmeng').hide();
 });
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+
+//var token = getQueryString('promo_token'),
+//    xid = getQueryString('xluserid'),
+//    timer = getQueryString('time'),
+//    sig = getQueryString('sign'),
+//    name = getQueryString('nickname');
+//org.ajax({
+//    url: '/activity/thunder/binding/',
+//    type: 'POST',
+//    data: {
+//        'promo_token': token,
+//        'xluserid': xid,
+//        'time': timer,
+//        'sign': sig,
+//        'nickname': name
+//    },
+//    success: function (data) {
+//        console.log(data)
+//        if (data.ret_code == 10002) {
+//            $('.xunmeng3').show();
+//            $('.maimai-form').hide();
+//        } else {
+//        }
+//    }
+//})
+//;
 org.xunlei = (function (org) {
 
     var lib = {
