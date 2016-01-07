@@ -338,14 +338,14 @@ class EnterpriseProfileUpdateApi(APIView):
             else:
                 form_errors = form.errors
                 form_error_keys = form_errors.keys()
-                form_errors = []
+                form_errors_list = []
                 for key in form_error_keys:
                     value = form_errors[key]
                     form_error = u'、'.join(value)
-                    form_errors.append(form_error)
+                    form_errors_list.append(form_error)
 
                 response_data = {
-                    'message': u'表单错误：' + u'、'.join(form_errors),
+                    'message': u'表单错误：' + u'、'.join(form_errors_list),
                     'ret_code': 10001,
                 }
         else:
