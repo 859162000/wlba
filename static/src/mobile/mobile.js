@@ -845,6 +845,7 @@ org.buy = (function (org) {
         showAmount: $('.need-amount'),
         redPackAmount: 0,
         isBuy: true, //防止多次请求，后期可修改布局用button的disable，代码罗辑会少一点
+        buy_amount: null,
         init: function () {
             lib._checkRedpack();
             lib._calculate();
@@ -935,7 +936,7 @@ org.buy = (function (org) {
 
         },
         _buy: function () {
-            var $buyButton = $('.snap-up'),
+            var $buyButton = $('button[name=submit]'),
                 $redpack = $("#gifts-package");
             //红包select事件
             $redpack.on("change", function () {
@@ -965,57 +966,154 @@ org.buy = (function (org) {
                     redpackValue = null;
                 }
 
-                if (lib.isBuy) {
+                var post_data = {
+                    amount: amount,
+                    product: productID,
+                    redpack: redpackValue
 
-                    org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
+                }
+                org.ui.confirm("购买金额为" + amount, '确认投资', lib._trade_pwd_seach, post_data);
 
-                    function gobuy() {
-                        org.ajax({
-                            type: 'POST',
-                            url: '/api/p2p/purchase/',
-                            data: {product: productID, amount: amount, redpack: redpackValue},
-                            beforeSend: function () {
-                                $buyButton.text("抢购中...");
-                                lib.isBuy = false;
-                            },
-                            success: function(data){
-                               if(data.data){
-                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
-                                   $(".sign-main").css("display","-webkit-box");
-                               }
-                            },
-                            error: function (xhr) {
-                                var result;
-                                result = JSON.parse(xhr.responseText);
-                                if (xhr.status === 400) {
-                                    if (result.error_number === 1) {
-                                        org.ui.alert("登录超时，请重新登录！", function () {
-                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
-                                        });
-                                    } else if (result.error_number === 2) {
-                                        return org.ui.alert('必须实名认证！');
-                                    } else if (result.error_number === 4 && result.message === "余额不足") {
-                                        $(".buy-sufficient").show();
-                                        return;
-                                    } else {
-                                        return org.ui.alert(result.message);
-                                    }
-                                } else if (xhr.status === 403) {
-                                    if (result.detail) {
-                                        org.ui.alert("登录超时，请重新登录！", function () {
-                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
-                                        });
-                                    }
-                                }
-                            },
-                            complete: function () {
-                                $buyButton.text("立即投资");
-                                lib.isBuy = true;
+            })
+        },
+        _trade_pwd_seach: function(post_data){
+            org.ajax({
+                url: '/api/profile/',
+                type: 'GET',
+                success: function(result){
+                    result.trade_pwd_is_set ? lib._trade_pws_operation(true, post_data): lib._trade_pws_operation(false, post_data);
+                }
+            })
+
+        },
+        _trade_pws_operation: function(state, post_data){
+
+            if(state){
+                entry_ui()
+            }else{
+                set_ui()
+            }
+
+            function entry_ui(){
+                var entry_operation = new Deal({
+                    title: '请输入交易密码',
+                    sign: '投资金额<br>￥'+ post_data.amount,
+                    target: $('input[name=password1]'),
+                    done : function(pwd){
+                        entry_operation.show_loading()
+                        post_data.trade_pwd = pwd
+                        lib._buy_operation(entry_operation,post_data)
+
+                    }
+                })
+                entry_operation.init()
+                entry_operation.show()
+            }
+
+            var password_1 = null, password_2 = null ;
+
+            function set_ui(){
+                var operation_1 = new Deal({
+                    title: '设置交易密码',
+                    sign: '请设置6位数字作为交易密码',
+                    target: $('input[name=password1]'),
+                    done : function(pwd){
+                        password_1 = pwd;
+                        operation_1.clear()
+                        operation_1.hide();
+                        operation_2();
+                    }
+                })
+                operation_1.init()
+                operation_1.show()
+
+                function operation_2(){
+                    var operation_2 = new Deal({
+                        title: '设置交易密码',
+                        sign: '请再次确认交易密码',
+                        target: $('input[name=password2]'),
+                        done : function(pwd){
+                            password_2 = pwd;
+
+                            if(password_2 != password_1){
+                                operation_2.clear()
+                                operation_2.hide()
+                                return Deal_ui.show_alert('error', function(){
+                                    set_ui()
+                                })
                             }
+                            operation_2.show_loading()
+                            lib._trade_pws_set(operation_2, password_2)
+                        }
+                    })
+                    operation_2.init()
+                    operation_2.show()
+                }
+            }
+
+        },
+        _trade_pws_set: function(operation, new_trade_pwd){
+            org.ajax({
+                url: '/api/trade_pwd/',
+                type: 'post',
+                data: {
+                    action_type: 1,
+                    new_trade_pwd: new_trade_pwd
+                },
+                success: function(result){
+                    if(result.ret_code == 0){
+                        Deal_ui.show_alert('success', function(){
+                            window.location = window.location.href;
                         })
                     }
-                } else {
-                    org.ui.alert("购买中，请稍后")
+
+                    if(result.ret_code > 0 ){
+                        org.ui.alert(result.message);
+                    }
+                }
+            })
+        },
+        _buy_operation: function(entry_operation, post_data){
+            var $buyButton = $('button[name=submit]');
+            var balance = parseFloat($("#balance").attr("data-value"));
+            org.ajax({
+                type: 'POST',
+                url: '/api/p2p/purchase/mobile/',
+                data:  post_data,
+                beforeSend: function () {
+                    $buyButton.attr('disabled',true).text("抢购中...");
+                },
+                success: function(result){
+                    entry_operation.hide_loading()
+                    entry_operation.clear()
+                    entry_operation.hide();
+                    if(result.ret_code == 0){
+                        $('.balance-sign').text(balance - result.data + lib.redPackAmountNew + '元');
+                        $(".sign-main").css("display","-webkit-box");
+                        return
+                    }
+
+                    if(result.ret_code == 30047){
+                        Deal_ui.show_entry(result.retry_count, function(){
+                            entry_operation.show();
+                        })
+                        return
+                    }
+                    if(result.ret_code == 30048){
+                        Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
+                            window.location = '/weixin/trade-pwd/back/?next=/weixin/view/buy/'+post_data.product+ '/';
+                        })
+                        return
+                    }
+                    if(result.error_number > 0){
+                        return org.ui.alert(result.message);
+                    }
+                },
+                error: function (xhr) {
+                    org.ui.alert('服务器异常');
+                },
+                complete: function () {
+                    $buyButton.removeAttr('disabled').text("立即投资");
                 }
             })
         }
@@ -1069,7 +1167,6 @@ org.recharge = (function (org) {
         data: null,
         init: function () {
             lib.the_one_card();
-
         },
         /**
          * 判断有没有同卡进出的卡
@@ -1094,7 +1191,6 @@ org.recharge = (function (org) {
         on_card_operation: function(data){
             var _self = this,
             card = data.no.slice(0, 6) + '********' + data.no.slice(-4);
-
             _self.$load.hide();
             _self.$recharge_body.show();
             _self.data = data;
@@ -1151,12 +1247,29 @@ org.recharge = (function (org) {
                     beforeSend: function () {
                         _self.$recharge.attr('disabled', true).text("充值中..");
                     },
-                    success: function (data) {
-                        if (data.ret_code > 0) {
-                            return org.ui.alert(data.message);
-                        } else {
-                            $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
+                    success: function (entry_operation, result) {
+                        entry_operation.hide_loading()
+                        entry_operation.clear()
+                        entry_operation.hide();
+                        if(result.ret_code == 0){
+                            return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(result.amount);
                         }
+
+                        if(result.ret_code == 30047){
+                            return Deal_ui.show_entry(result.retry_count, function(){
+                                entry_operation.show();
+                            })
+                        }
+                        if(result.ret_code == 30048){
+                            return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
+                                window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/'
+                            })
+                        }
+                        if (result.ret_code > 0) {
+                            return org.ui.alert(result.message);
+                        }
+
+
                     },
                     error: function (data) {
                         if (data.status >= 403) {
@@ -1168,15 +1281,112 @@ org.recharge = (function (org) {
                     }
 
                 }
-                org.ui.confirm("充值金额为" + amount, '确认充值', lib._rechargeSingleStep, data)
+                org.ui.confirm("充值金额为" + amount, '确认充值', lib._trade_pwd_seach, data)
 
             });
         },
 
+        _trade_pwd_seach: function(post_data){
+            org.ajax({
+                url: '/api/profile/',
+                type: 'GET',
+                success: function(result){
+                    result.trade_pwd_is_set ? lib._trade_pws_operation(true, post_data): lib._trade_pws_operation(false, post_data);
+                }
+            })
+
+        },
+        _trade_pws_operation: function(state, post_data){
+
+            if(state){
+                entry_ui()
+            }else{
+                set_ui()
+            }
+
+            function entry_ui(){
+                var entry_operation = new Deal({
+                    title: '请输入交易密码',
+                    sign: '充值金额<br>￥'+ post_data.data.amount,
+                    target: $('input[name=password1]'),
+                    done : function(pwd){
+                        entry_operation.show_loading();
+                        post_data.data.trade_pwd = pwd
+                        lib._rechargeSingleStep(entry_operation,post_data)
+
+                    }
+                })
+                entry_operation.init()
+                entry_operation.show()
+            }
+
+            var password_1 = null, password_2 = null ;
+
+            function set_ui(){
+                var operation_1 = new Deal({
+                    title: '设置交易密码',
+                    sign: '请设置6位数字作为交易密码',
+                    target: $('input[name=password1]'),
+                    done : function(pwd){
+                        password_1 = pwd;
+                        operation_1.clear()
+                        operation_1.hide();
+                        operation_2();
+                    }
+                })
+                operation_1.init()
+                operation_1.show()
+
+                function operation_2(){
+                    var operation_2 = new Deal({
+                        title: '设置交易密码',
+                        sign: '请再次确认交易密码',
+                        target: $('input[name=password2]'),
+                        done : function(pwd){
+                            password_2 = pwd;
+
+                            if(password_2 != password_1){
+                                operation_2.clear()
+                                operation_2.hide()
+                                return Deal_ui.show_alert('error', function(){
+                                    set_ui()
+                                })
+                            }
+                            operation_2.show_loading()
+                            lib._trade_pws_set(operation_2, password_2)
+                        }
+                    })
+                    operation_2.init()
+                    operation_2.show()
+                }
+            }
+
+        },
+        _trade_pws_set: function(operation, new_trade_pwd){
+            org.ajax({
+                url: '/api/trade_pwd/',
+                type: 'post',
+                data: {
+                    action_type: 1,
+                    new_trade_pwd: new_trade_pwd
+                },
+                success: function(result){
+                    if(result.ret_code == 0){
+                        Deal_ui.show_alert('success', function(){
+                            window.location = window.location.href;
+                        })
+                    }
+
+                    if(result.ret_code > 0 ){
+                        org.ui.alert(result.message);
+                    }
+                }
+            })
+        },
         /**
-         * 快捷充值接口/短信验证码
+         * 绑定同卡进出的卡充值
          */
-        _rechargeSingleStep: function (data) {
+        _rechargeSingleStep: function (operation, data) {
             org.ajax({
                 type: 'POST',
                 url: '/api/pay/deposit_new/',
@@ -1185,13 +1395,13 @@ org.recharge = (function (org) {
                     data.beforeSend && data.beforeSend()
                 },
                 success: function (results) {
-                    data.success && data.success(results)
+                    data.success && data.success(operation, results)
                 },
                 error: function (results) {
                     data.error && data.error(results)
                 },
                 complete: function () {
-                    data.complete && data.complete()
+                    data.complete && data.complete(operation)
                 }
             })
         },
@@ -1610,71 +1820,286 @@ org.processSecond = (function (org) {
     }
 })(org);
 
-
-org.password_operation = (function (org) {
+org.trade_back = (function (org) {
     var lib = {
-        $input: $('input[name=password]'),
-        $digt : $('.six-digt-password'),
-        $blue : $('.blue'),
-        blue_width : Math.floor($('.blue').width()),
+        $submit : $('button[type=submit]'),
+        $id_number : $('input[name=id_number]'),
+        $bankcard : $('input[name=bankcard]'),
+        $cardname : $('input[name=cardname]'),
         init: function () {
-            lib._listen()
+            lib.the_one_card()
+            lib.listen_input();
         },
-        _listen: function(){
+        /**
+         * 判断有没有同卡进出的卡
+         */
+        the_one_card: function () {
             var _self = this;
-
-            _self.$digt.on('click', function(e){
-                e.stopPropagation();
-                _self.$input.focus()
-                _self.decide()
+            org.ajax({
+                type: 'get',
+                url: '/api/pay/the_one_card/',
+                success: function (data) {
+                    //同卡进出
+                    var CARDNAME = data.bank.name;
+                    var CARDNO = data.no.slice(-4);
+                    $('.bank-name').html(CARDNAME)
+                    $('.bank-card').html(CARDNO)
+                    lib.$bankcard.attr('placeholder', "**"+ CARDNO +"（请输入完整卡号）")
+                    $('.trade-warp').show()
+                },
+                error: function (data) {
+                    //没有同卡进出
+                    $('.unbankcard').show()
+                },
+                complete: function(){
+                    $('.recharge-loding').hide()
+                }
             })
-
-            _self.$input.on('input', function(){
-                $('.circle').hide()
-                _self.decide()
-            })
-           $(document).on('click', function(){
-               _self.$input.blur();
-               _self.$digt.find('i').removeClass('active')
-               _self.$blue.hide()
-               _self.$blue.css('visibility', 'hidden')
-           })
         },
-        decide: function(){
+        listen_input: function(){
             var _self = this;
-            var value_num = _self.$input.val().length;
+            org.ui.focusInput({
+                submit: _self.$submit,
+                inputList: [
+                    {target: _self.$id_number, required: true},
+                    {target: _self.$bankcard, required: true},
+                    {target: _self.$cardname, required: true},
+                ]
+            });
 
-            for(var i = 0; i< value_num; i++){
-                $('.six-digt-password i ').eq(i).find('.circle').show()
-            }
-            _self.move_blue(value_num)
-
-        },
-        move_blue: function(index){
-            var _self  = this;
-            _self.$blue.css('visibility', 'visible')
-            var move_space = _self.blue_width * index;
-
-            if(index == 6){
-                move_space = _self.blue_width * 5 ;
-            }
-            _self.$blue.on('webkitAnimationEnd', function(){
-                _self.$blue.animate({
-                    'translate3d': move_space + "px, 0 , 0"
-                },100)
+            _self.$submit.on('click', function(){
+                _self._trade_pws_operation()
             })
 
-            if(index ==6) {
-                return _self.$digt.find('i').removeClass('active')
+        },
+        _trade_pws_operation: function(){
+
+            var password_1 = null, password_2 = null ;
+            function set_ui(){
+                var operation_1 = new Deal({
+                    title: '请输入新交易密码',
+                    sign: '请设置6位数字作为新交易密码',
+                    target: $('input[name=password1]'),
+                    done : function(pwd){
+                        password_1 = pwd;
+                        operation_1.clear()
+                        operation_1.hide();
+                        operation_2();
+                    }
+                })
+                operation_1.init()
+                operation_1.show()
+
+                function operation_2(){
+                    var operation_2 = new Deal({
+                        title: '请输入新交易密码',
+                        sign: '请再次确认新交易密码',
+                        target: $('input[name=password2]'),
+                        done : function(pwd){
+                            password_2 = pwd;
+
+                            if(password_2 != password_1){
+                                operation_2.clear()
+                                operation_2.hide()
+                                return Deal_ui.show_alert('error', function(){
+                                    set_ui()
+                                })
+                            }
+                            operation_2.show_loading()
+                            lib._trade_pws_set(operation_2, password_2)
+                        }
+                    })
+                    operation_2.init()
+                    operation_2.show()
+                }
             }
-            _self.$digt.find('i').eq(index).addClass('active').siblings('i').removeClass('active')
-        }
-    }
+
+            set_ui()
+
+        },
+        _trade_pws_set: function(operation, new_trade_pwd){
+            var _self = this;
+            var card_id = _self.$bankcard.val(),
+                citizen_id = _self.$id_number.val();
+            org.ajax({
+                url: '/api/trade_pwd/',
+                type: 'post',
+                data: {
+                    action_type: 3,
+                    new_trade_pwd: new_trade_pwd,
+                    card_id : card_id,
+                    citizen_id: citizen_id
+                },
+                success: function(result){
+                    var next = org.getQueryStringByName('next') == '' ? '/weixin/list/' : org.getQueryStringByName('next');
+                    if(result.ret_code == 0){
+                        Deal_ui.show_alert('success', function(){
+                            window.location = next;
+                        })
+                    }
+
+                    if(result.ret_code > 0 ){
+                        org.ui.alert(result.message);
+                    }
+                },
+                complete: function(){
+                    operation.hide_loading()
+                    operation.clear()
+
+                    operation.hide()
+                }
+            })
+        },
+    };
     return {
         init: lib.init
     }
 })(org);
-;
+(function(){
+    function Deal(ops){
+        this.title = ops.title;
+        this.sign = ops.sign;
+        this.callback = ops.done;
+        this.$input = ops.target,
+        this.$body =  $('.tran-warp');
+        this.$blue = $('.blue');
+        this.$digt =  $('.six-digt-password');
+        this.$close = $('.tran-close');
+        this.blue_width = null
+        this.password = null;
+        this.reCreate()
+
+    }
+    Deal.prototype.init = function(){
+        var _self = this;
+
+        $('.head-title').html(this.title)
+        $('.tran-sign').html(this.sign)
+
+        this.$close.on('click', function(){
+            _self.hide()
+        })
+
+        this.$digt.on('click', function(e){
+            _self.$input.focus();
+            _self.decide('click')
+            e.stopPropagation();
+        })
+
+        this.$input.on('input', function(){
+            $('.circle').hide();
+            _self.decide('input')
+        });
+
+       $(document).on('click', function(){
+           _self.$digt.find('i').removeClass('active')
+           _self.hide_blue()
+       })
+
+    }
+    Deal.prototype.reCreate = function(){
+        this.$input.off('input');
+        this.$close.off('click');
+        $(document).off('click');
+        this.$digt.off('click').find('i').removeClass('active')
+        $('.six-digt-password i ').find('.circle').hide()
+    }
+    Deal.prototype.clear = function(){
+        this.$input.val('')
+        this.$digt.find('i').removeClass('active')
+        $('.six-digt-password i ').find('.circle').hide()
+    }
+    Deal.prototype.decide = function(type){
+        var value_num = this.$input.val().length;
+
+        for(var i = 0; i< value_num; i++){
+            $('.six-digt-password i ').eq(i).find('.circle').show()
+        }
+        this.password = this.$input.val();
+        this.show_blue();
+        this.move(value_num, type)
+    }
+    Deal.prototype.move = function(index, type){
+
+        var move_space = this.blue_width * index;
+
+        if(index == 6)  move_space = this.blue_width * 5 ;
+
+        this.$blue.animate({
+            'translate3d': move_space + "px, 0 , 0"
+        },0)
+
+        if(index == 6){
+            this.$digt.find('i').removeClass('active')
+            if(type == 'input'){
+                this.hide_blue();
+                this.$input.blur();
+                this.done()
+            }
+            return
+        }
+
+        this.$digt.find('i').eq(index).addClass('active').siblings('i').removeClass('active')
+    }
+    Deal.prototype.show_blue = function(){
+        return this.$blue.css('visibility', 'visible')
+    }
+    Deal.prototype.hide_blue = function(){
+        return this.$blue.css('visibility', 'hidden')
+    }
+    Deal.prototype.show = function(){
+        this.$body.show();
+        this.blue_width = Math.floor(this.$blue.width());
+        return ;
+    }
+    Deal.prototype.hide = function(){
+        return this.$body.hide();
+    }
+    Deal.prototype.show_loading = function(){
+        return $('.tran-loading').css('display','-webkit-box')
+    }
+    Deal.prototype.hide_loading = function(){
+        return $('.tran-loading').css('display','none')
+    }
+    Deal.prototype.done = function(){
+        return this.callback && this.callback(this.password);
+    }
+
+    Deal_ui = {
+        show_alert: function(state, callback){
+            $('.tran-alert-error').show().find('.'+state).show().siblings().hide()
+            $('.tran-alert-error').find('.alert-bottom').one('click', function(){
+                $('.tran-alert-error').hide()
+                callback && callback();
+            })
+            return
+        },
+        show_entry: function(count, callback){
+            $('.tran-alert-entry').show().find('.count_pwd').html(count)
+            $('.tran-alert-entry').find('.alert-bottom').one('click', function(){
+                $('.tran-alert-entry').hide()
+                callback && callback();
+            })
+            return
+        },
+        show_lock: function(left,right,dec, callback){
+            $('.tran-alert-lock').show()
+            $('.lock-close').html(left).one('click', function(){
+                $('.tran-alert-lock').hide()
+
+            });
+            $('.tran-alert-lock').find('.tran-dec-entry').html(dec)
+            $('.lock-back').html(right).one('click', function(){
+                callback && callback();
+            })
+        }
+
+
+    }
+    window.Deal = Deal;
+    window.Deal_ui = Deal_ui;
+})();
+
 (function (org) {
     $.each($('script'), function () {
         var src = $(this).attr('src');

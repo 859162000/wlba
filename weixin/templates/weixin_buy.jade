@@ -69,7 +69,7 @@ html
           .is_invested-sign 只有未进行投资的用户才可以购买
         else
           .buy-snap-up
-              a(href="#").snap-up 立即投资
+              button(type='submit',name='submit').snap-up 立即投资
         .buy-sufficient
           p
            |余额不足，
@@ -86,4 +86,4 @@ html
         include include/tran_password
         include include/confirm
         include include/tracking
-        script(data-init="password_operation", src="/static/scripts/mobile/mobile.js?v=20151202")
+        script(data-init="buy", src="/static/scripts/mobile/mobile.js?v=20151202")

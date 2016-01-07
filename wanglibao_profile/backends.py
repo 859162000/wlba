@@ -201,16 +201,18 @@ def _above_version(version_str, version_standard):
 def _is_version_satisfied(request):
         # return {"device_type":device_type, "app_version":arr[0],
         #     "channel_id":arr[2], "model":arr[1],
-        #     "os_version":arr[3], "network":arr[4]}
+        #     "os_version":arr[3], "network
+        # ":arr[4]}
     device = split_ua(request)
-    # logging.getLogger('django').error('trade request device %s'%device)
+    print(11111111111111111111)
+    print('trade request device %s'%device)
     if device['device_type'] == 'ios' and _above_version(device['app_version'], '2.6.0'):
         # 2.6.0版本起，支持交易密码
         return True
     if device['device_type'] == 'android' and _above_version(device['app_version'], '2.6.0'):
         #2.6.0版本起，支持交易密码
         return True
-    if device['device_type'] == 'pc' and device.get('app_version') != 'wlb_h5':
+    if device['device_type'] == 'pc':
         return True
     return False
 
