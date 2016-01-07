@@ -134,7 +134,7 @@
 
 	$('.praise_right').click(function(){
 			$.ajax({
-				url: '/weixin_activity/weixin/bonus/?act=vote&type=2&uid='+uid+'&wxid='+wxid,
+				url: '/weixin_activity/weixin/bonus/?act=vote&type=0&uid='+uid+'&wxid='+wxid,
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
