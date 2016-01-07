@@ -17,7 +17,6 @@ class Margin(models.Model):
     margin = models.DecimalField(verbose_name=u'用户余额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     freeze = models.DecimalField(verbose_name=u'冻结金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     withdrawing = models.DecimalField(verbose_name=u'提款中金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
-    exchanging = models.DecimalField(verbose_name=u'兑换冻结', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     invest = models.DecimalField(verbose_name=u'已投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     uninvested = models.DecimalField(verbose_name=u'充值未投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     uninvested_freeze = models.DecimalField(verbose_name=u'充值未投资冻结金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))

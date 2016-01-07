@@ -11,8 +11,8 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
-
-from weixin.common.decorators import weixin_api_error, is_check_id_verify
+from wechatpy.exceptions import WeChatException
+from weixin.common.decorators import is_check_id_verify
 from weixin.models import WeixinAccounts, WeixinUser
 from weixin.util import redirectToJumpPage, bindUser, unbindUser
 from marketing.utils import get_channel_record
@@ -26,6 +26,7 @@ from wanglibao_rest import utils
 from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL
 from wanglibao_pay.models import Bank
+
 logger = logging.getLogger("weixin")
 
 
@@ -33,7 +34,6 @@ class WXLoginRedirect(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         next = request.GET.get('next')
         login_url = get_fwh_login_url(next=next)
-        print '---------', login_url
         return HttpResponseRedirect(login_url)
 
 
@@ -51,29 +51,38 @@ class WXLogin(TemplateView):
             'next': next,
             }
 
-    @weixin_api_error
     def dispatch(self, request, *args, **kwargs):
-        code = request.GET.get('code')
-        state = request.GET.get('state')
+        self.openid = self.request.session.get('openid')
         error_msg = ""
-        if code and state:
-            account = WeixinAccounts.getByOriginalId(state)
-            request.session['account_key'] = account.key
-            oauth = WeChatOAuth(account.app_id, account.app_secret, )
-            res = oauth.fetch_access_token(code)
-            self.openid = res.get('openid')
-            form = OpenidAuthenticationForm(self.openid, data=request.GET)
-            if form.is_valid():
-                auth_login(request, form.get_user())
-                next = self.request.GET.get('next', '')
-                next = urllib.unquote(next.encode('utf-8'))
-                return redirectToJumpPage("自动登录成功", next=next)
+        if not self.openid:
+            code = request.GET.get('code')
+            state = request.GET.get('state')
+            if code and state:
+                try:
+                    account = WeixinAccounts.getByOriginalId(state)
+                    request.session['account_key'] = account.key
+                    oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                    user_info = oauth.fetch_access_token(code)
+                    self.openid = user_info.get('openid')
+                    w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
+                    if is_first:
+                        w_user.save()
+                except WeChatException, e:
+                    error_msg = e.message
             else:
-                return super(WXLogin, self).dispatch(request, *args, **kwargs)
+                error_msg = u"code or state is None"
+            if error_msg:
+                return redirectToJumpPage(error_msg)
+        form = OpenidAuthenticationForm(self.openid, data=request.GET)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            next = self.request.GET.get('next', '')
+            next = urllib.unquote(next.encode('utf-8'))
+            return redirectToJumpPage("自动登录成功", next=next)
         else:
-            error_msg = u"code or state is None"
-        if error_msg:
-            return redirectToJumpPage(error_msg)
+            return super(WXLogin, self).dispatch(request, *args, **kwargs)
+
+
 
 class WXLoginAPI(APIView):
     permission_classes = ()

@@ -76,6 +76,7 @@ urlpatterns = patterns(
     url(r'^damai-old/$', TemplateView.as_view(template_name="damai-old.jade")),
     url(r'^app_damai_old/$', TemplateView.as_view(template_name="app_damai_old.jade")),
     url(r'^send_reward/$', TemplateView.as_view(template_name="send_reward.jade")),
+    url(r'^january_reward/$', TemplateView.as_view(template_name="january_reward.jade")),
 )
 
 # app URL
@@ -163,7 +164,7 @@ urlpatterns += patterns(
     url(r'^app_damai/$', TemplateView.as_view(template_name="app_damai.jade")),
     url(r'^app_double_eggs/$', TemplateView.as_view(template_name="app_double_eggs.jade")),
     url(r'^app_praise_reward/$', TemplateView.as_view(template_name="app_praise_reward.jade")),
-    url(r'^app_xunlei/$', TemplateView.as_view(template_name="app_xunlei.jade")),
+    url(r'^app_xunlei/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunlei.jade")),
     url(r'^app_send_reward/$', TemplateView.as_view(template_name="app_send_reward.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 

@@ -332,11 +332,14 @@ def _send_message(user, event, end_time):
     give_time = timezone.localtime(unavailable_at).strftime(fmt_str)
     mtype = 'activity'
     rtype = u'元红包'
+    coupon_amount = event.amount
     if event.rtype == 'interest_coupon':
         rtype = u'%加息券'
+    if event.rtype == 'percent':
+        coupon_amount = event.highest_amount
     send_messages.apply_async(kwargs={
         'phones': [user.wanglibaouserprofile.phone],
-        'messages': [messages.red_packet_get_alert(event.amount, rtype)],
+        'messages': [messages.red_packet_get_alert(coupon_amount, rtype)],
         'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
     })
     if event.rtype == 'percent':
@@ -728,17 +731,15 @@ def commission(user, product, equity, start, end):
 
 def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at):
     if auto and auto_days > 0:
-        start_time = created_at
-        end_time = created_at + timezone.timedelta(days=int(auto_days))
-        # 如果加上延期天数后还小于截止时间,则还以截止时间为准
-        # if end_time < unavailable_at:
-        #     end_time = unavailable_at
+        start_tmp = created_at
+        end_tmp = created_at + timezone.timedelta(days=int(auto_days))
+
+        from marketing.utils import local_to_utc
+        start_time = local_to_utc(datetime.datetime(start_tmp.year, start_tmp.month, start_tmp.day), 'min')
+        end_time = local_to_utc(datetime.datetime(end_tmp.year, end_tmp.month, end_tmp.day), 'max')
     else:
         start_time = available_at
         end_time = unavailable_at
-    from marketing.utils import local_to_utc
-    start_time = local_to_utc(datetime.datetime(start_time.year, start_time.month, start_time.day), 'min')
-    end_time = local_to_utc(datetime.datetime(end_time.year, end_time.month, end_time.day), 'max')
     return start_time, end_time
 
 
