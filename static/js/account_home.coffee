@@ -11,6 +11,7 @@ require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
          'model/portfolio', 'tools',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
+
   #  判断是否是企业用户
   $.ajax
     url: "/qiye/profile/get/"

@@ -66,7 +66,7 @@ block main
                     tr
                         td.td-left 公司账户账号
                         td
-                            input(type='text', name="company_account", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}" )
+                            input(type='text', name="company_account", placeholder="请输入帐号", autocomplete='off', class="required isNumber {byteRangeLength:[10,20],messages:{required:'请输入帐号',byteRangeLength:'支持{0}-{1}位字符'}}" )
                     tr
                         td.td-left 公司开户行
                         td
@@ -86,7 +86,7 @@ block main
                     tr
                         td.td-left 交易密码
                         td
-                            input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}" )
+                            input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {messages:{required:'请输入交易密码'}}" )
             .qiye-btns
                 a(href='javascript:void(0)').save-btn 保存
                 a(href='/').cancel-btn 取消
