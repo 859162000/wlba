@@ -19,7 +19,7 @@
 		type: "GET",
 	}).done(function (xhr) {
 		if(xhr.err_code==0){
-			renovate_friends(xhr.follow.length,xhr.follow);
+			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
 			//$('.renovate').click();
 		}else{
 			//$('.friend_top span').text(xhr.err_messege);
@@ -58,7 +58,9 @@
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				renovate_friends(xhr.follow.length,xhr.follow);
+				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
+				$('#zan_num').text(xhr.wx_user.good_vote);
+				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
 				$('.renovate').removeClass('renovate_rotate');
 				$('.friend_top span').text(xhr.err_messege);
@@ -69,7 +71,7 @@
 	/*刷新数据结束*/
 
 	/*刷新朋友圈*/
-	function renovate_friends(friends_length,friends_img){
+	function renovate_friends(friends_length,friends_img,is_max){
 		var str='';
 		var follow_one='';
 		for(var i=0; i<friends_length; i++){
@@ -88,7 +90,9 @@
 		swiper.appendSlide(str);
 		swiper.update();
 		swiper.slideTo(0, 100, false);
-
+		if(is_max){
+			$('.num_top').show();
+		}
 	}
 	/*刷新朋友圈结束*/
 	/*同意活动规则按钮*/
@@ -118,9 +122,9 @@
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
-					$('.float').text('+100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					renovate_friends(xhr.follow.length,xhr.follow);
+					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
+					$('#zan_num').text(xhr.wx_user.good_vote);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -136,9 +140,9 @@
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
-					$('.float').text('-100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					renovate_friends(xhr.follow.length,xhr.follow);
+					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
+					$('#cha_num').text(xhr.wx_user.bad_vote);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
