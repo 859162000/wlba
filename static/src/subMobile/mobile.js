@@ -168,7 +168,7 @@ var org = (function(){
 org.ui = (function(){
     var lib = {
         _alert: function(txt, callback, btn){
-            if(typeof callback !="function"){
+            if(typeof callback !="function" && typeof callback !="object"){
                 btn = callback;
             }
             if(!btn){
@@ -190,12 +190,17 @@ org.ui = (function(){
                 alertFram.innerHTML = strHtml;
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
+                if(typeof callback == "object") {
+                    //alert(callback.url);
+                    $('.popub-footer').html('<a href="'+callback.url+'" style="display:block;">'+btn+'</a>');
+                }else{
+                   $('.popub-footer').on('click',function(){
+                        alertFram.style.display = "none";
+                        shield.style.display = "none";
+                        (typeof callback == "function") && callback();
+                    });
+                }
 
-                $('.popub-footer').on('click',function(){
-                    alertFram.style.display = "none";
-                    shield.style.display = "none";
-                    (typeof callback == "function") && callback();
-                })
             }
             document.body.onselectstart = function(){return false;};
         },
@@ -691,10 +696,10 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            //var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            var next = '/weixin/sub_regist_first/?phone='+$identifier.val();
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
-                            //var next = '/weixin/sub_code/?phone='+$identifier.val();
                             //console.log(next);
                             window.location.href = next;
                         }else if(data.ret_code > 0){
@@ -1648,9 +1653,10 @@ org.authentication = (function(org){
                         lib.$fromComplete.text("认证中，请等待...");
                     },
                     success:function(){
-                        org.ui.alert("实名认证成功!",function(){
-                           return window.location.href = '/weixin/account/';
-                        });
+                        //org.ui.alert("实名认证成功!",function(){
+                        //   return window.location.href = '/weixin/account/';
+                        //});
+                        org.ui.alert("实名认证成功!",{url:'/weixin/sub_account/'});
                     },
                     error:function(xhr){
                         result = JSON.parse(xhr.responseText);
@@ -1794,16 +1800,19 @@ org.processFirst = (function(org){
                 },
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
-                    org.ui.alert("实名认证成功!",function(){
-                        window.location.href = '/weixin/sub_regist_second/';
-                    });
+                    //org.ui.alert("实名认证成功!",function(){
+                    //    window.location.href = '/weixin/sub_regist_second/';
+                    //});
+                    //org.ui.alert("实名认证成功!",{url:'/weixin/sub_regist_second/'});
+                    $('.sign-main').css('display','-webkit-box');
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
                     if(result.error_number == 8){
-                        org.ui.alert(result.message,function(){
-                           window.location.href = '/weixin/sub_list/';
-                        });
+                        //org.ui.alert(result.message,function(){
+                        //   window.location.href = '/weixin/sub_list/';
+                        //});
+                        $('.sign-main-error').css('display','-webkit-box').find(".sign-tit").html(result.message);
                     }else{
                         return org.ui.alert(result.message);
                     }

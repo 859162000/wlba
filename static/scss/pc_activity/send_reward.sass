@@ -113,45 +113,44 @@
       color: #bfa1f1
 .code_wrap
   width: 100%
-  padding-top: 25px
-  height: 315px
+  height: 245px
   clear: both
   position: relative
   left: 0
   top: 0
   .bg
     width: 100%
-    height: 290px
+    height: 245px
     background: #333
   .main
-    width: 1110px
+    width: 1100px
     display: block
-    height: 315px
+    height: 245px
     margin: 0 auto
     position: absolute
     left: 50%
-    margin-left: -555px
+    margin-left: -550px
     top: 0
     z-index: 2
-    background: url("/static/imgs/pc_activity/double_eggs/code_wrap_bg.png") no-repeat
+    background: url("/static/imgs/pc_activity/send_reward/code_wrap_bg.jpg") no-repeat
   .code
     position: absolute
-    right: 95px
-    top: 122px
-    width: 110px
-    height: 110px
+    right: 7px
+    top: 36px
+    width: 152px
+    height: 152px
     z-index: 2
     display: block
   .text
-    width: 150px
+    width: 152px
     height: 30px
     line-height: 30px
     position: absolute
-    right: 75px
-    top: 232px
+    right: 7px
+    top: 190px
     z-index: 2
     text-align: center
-    font-size: 10px
+    font-size: 12px
     color: #fff
 .main_wrap_1
   background: url("/static/imgs/pc_activity/send_reward/main_wrap_1.jpg") no-repeat
@@ -172,6 +171,30 @@
       background: url("/static/imgs/pc_activity/send_reward/line_bg_1.png") no-repeat
       width: 87px
       height: 125px
+      display: block
+    .line_bg_2
+      position: absolute
+      right: -106px
+      top: -78px
+      background: url("/static/imgs/pc_activity/send_reward/line_bg_2.png") no-repeat
+      width: 127px
+      height: 170px
+      display: block
+    .line_bg_3
+      position: absolute
+      left: -68px
+      top: -31px
+      background: url("/static/imgs/pc_activity/send_reward/line_bg_3.png") no-repeat
+      width: 90px
+      height: 123px
+      display: block
+    .line_bg_4
+      position: absolute
+      right: -169px
+      top: -42px
+      background: url("/static/imgs/pc_activity/send_reward/line_bg_4.png") no-repeat
+      width: 107px
+      height: 143px
       display: block
     .title
       font-size: 22px
@@ -199,6 +222,37 @@
         width: 270px
         height: 218px
         margin-right: 130px
+        position: relative
+        .none
+          width: 100%
+          height: 100%
+          border-radius: 6px
+          position: absolute
+          left: 0
+          top: 0
+          z-index: 9
+          overflow: hidden
+          display: none
+          .main
+            width: 100%
+            height: 100%
+            position: relative
+            display: block
+            .bg
+              width: 100%
+              height: 100%
+              background: #26053c
+              opacity: 0.8
+            span
+              line-height: 198px
+              text-align: center
+              width: 100%
+              color: #fff
+              font-size: 36px
+              position: absolute
+              left: 0
+              top: 0
+              z-index: 10
         dl
           width: 185px
           height: 115px
@@ -246,23 +300,23 @@
             background-size: cover
             background-color: #ff7a73
           dt.seven
-            background-image: url("/static/imgs/pc_activity/send_reward/reward_1.png")
-            background-position: center
-            background-repeat: no-repeat
-            background-size: cover
-            background-color: #4e7cda
-          dt.eight
-            background-image: url("/static/imgs/pc_activity/send_reward/reward_2.png")
-            background-position: center
-            background-repeat: no-repeat
-            background-size: cover
-            background-color: #a3bd1b
-          dt.nine
             background-image: url("/static/imgs/pc_activity/send_reward/reward_7.png")
             background-position: center
             background-repeat: no-repeat
             background-size: cover
             background-color: #d86713
+          dt.eight
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_8.png")
+            background-position: center
+            background-repeat: no-repeat
+            background-size: cover
+            background-color: #2b9525
+          dt.nine
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_9.png")
+            background-position: center
+            background-repeat: no-repeat
+            background-size: cover
+            background-color: #f77eab
           dd
             background: #fff
             text-align: center
@@ -286,4 +340,147 @@
           background-image: url("/static/imgs/pc_activity/send_reward/button_hover.png")
       .box_three
         margin-right: 0
+.rule_reward_list
+  width: 890px
+  height: 300px
+  border: 2px #8b62af solid
+  margin: 0 auto 57px
+  display: block
+  .nav_left
+    float: left
+    width: 86px
+    height: 296px
+    display: block
+    .nav_button
+      width: 100%
+      height: 148px
+      display: block
+      background: #350e4d
+      cursor: pointer
+      span
+        width: 30px
+        height: 148px
+        font-size: 24px
+        line-height: 27px
+        display: block
+        position: relative
+        top: 22px
+        color: #fff
+        margin: 0 auto
+    .select
+      background: #27053d
+  .rule_wrap
+    width: 773px
+    float: left
+    height: 296px
+    padding: 27px 24px 0 64px
+    display: block
+    display: none
+    p
+      color: #bfa1f1
+      font-size: 14px
+      line-height: 30px
+  .take_reward_list
+    width: 773px
+    float: left
+    height: 296px
+    display: block
+    .title
+      width: 100%
+      text-align: center
+      line-height: 44px
+      font-size: 18px
+      color: #bfa1f1
+      padding-bottom: 15px
+      span
+        color: #ffe505
+        font-size: 20px
+        line-height: 44px
+    .user_list
+      width: 636px
+      height: 204px
+      margin-left: 110px
+      position: relative
+      overflow: hidden
+      .list_scroll
+        width: 636px
+        position: absolute
+        height: auto
+        p
+          height: 34px
+          font-size: 14px
+          line-height: 34px
+          text-align: left
+          span
+            font-size: 14px
+            color: #bfa1f1
+            line-height: 34px
+            display: block
+            width: 318px
+            float: left
+.popup_bg
+  width: 100%
+  height: 100%
+  position: fixed
+  left: 0
+  top: 0
+  z-index: 99
+  background: #000
+  opacity: 0.4
+  display: none
+.popup
+  position: fixed
+  left: 50%
+  top: 50%
+  width: 352px
+  min-height: 238px
+  margin: -119px 0 0 -176px
+  z-index: 100
+  background: #fff
+  border-radius: 25px
+  color: #3f3f41
+  text-align: center
+  .close
+    width: 20px
+    height: 20px
+    background: url("/static/imgs/pc_activity/send_reward/close.png") no-repeat left top
+    position: absolute
+    right: 12px
+    top: 12px
+    z-index: 2
+    display: block
+    cursor: pointer
+  .close:hover
+    background: url("/static/imgs/pc_activity/send_reward/close.png") no-repeat right top
+  .title
+    padding: 42px 0 25px
+    line-height: 28px
+    height: 95px
+    font-size: 24px
+    width: 100%
+  .text
+    width: 100%
+    line-height: 28px
+    font-size: 24px
+    padding-bottom: 40px
+    a
+      color: #f10081
+      border-bottom: 1px #f10081 solid
+    a:hover
+      opacity: 0.7
+  .button
+    width: 184px
+    height: 44px
+    background: url("/static/imgs/pc_activity/send_reward/popup_button.png") no-repeat left top
+    display: block
+    color: #fff
+    font-size: 18px
+    line-height: 44px
+    margin: 0 auto
+  .button:hover
+    background: url("/static/imgs/pc_activity/send_reward/popup_button.png") no-repeat left bottom
+.popup_1,.popup_2,.popup_3
+  display: none
+
+
 
