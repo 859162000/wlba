@@ -1,0 +1,43 @@
+doctype html
+html(style='background:#f5f5f5;')
+  head
+    title 实名认证
+    include include/service_head.jade
+  body
+    - with '1' as processnum
+    include include/service_registProcess
+    - endwith
+
+    //表单
+    section.form-box.regist-process-form
+      //表单单个模版
+      .form-list
+        .form-icon.authentication-name.name-icon
+        .form-input
+          input(type="text",name="name", placeholder="请输入您的姓名", data-target2='authentication-name', data-icon='name-icon', data-target="identifier-edit", data-empty='', data-val='input-clear').check-list
+          .form-edit-icon.identifier-edit
+
+      .form-list
+        .form-icon.authentication-card.idcard-icon
+        .form-input
+          input(type="tel",name='idcard',value=phoneValue, placeholder="请输您的身份证号", data-target2='authentication-card', data-icon='idcard-icon', data-target="identifier-edit", data-empty='', data-val='input-clear').check-list
+          .form-edit-icon.identifier-edit
+      .form-mg-first
+      section#shiming.login-submit
+        button(type="submit", disabled=true) 实名认证
+
+    section.sign-main
+      .sign-body
+        img(src="/static/imgs/sub_weixin/recharge/alt-ok.png")
+        p.sign-tit 恭喜您，实名认证成功！
+        a(href="/weixin/sub_regist_second/").next-btn 下一步
+    section.sign-main-error
+      .sign-body
+        img(src="/static/imgs/sub_weixin/recharge/alt-error.png")
+        p.sign-tit 错误
+        a(href="/weixin/sub_list/").next-btn 确定
+    //账户安全
+    section.regist-safe.regist-process-safe
+      span 账户资金安全由阳光保险承保
+
+    script(data-init='processFirst', src="/static/scripts/subMobile/mobile.js?201501062")

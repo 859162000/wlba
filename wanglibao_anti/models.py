@@ -14,10 +14,10 @@ class AntiDelayCallback(models.Model):
     uid = models.IntegerField()
     createtime = models.IntegerField()
     updatetime = models.IntegerField()
-    channel = models.CharField(max_length=32, verbose_name='渠道标号')
-    status = models.IntegerField(verbose_name='状态', default='正常用户', choices=STATUS)
+    channel = models.CharField(max_length=32, verbose_name='渠道标号', db_index=True)
+    status = models.IntegerField(verbose_name='状态', default='正常用户', choices=STATUS, db_index=True)
     device = models.CharField(max_length=1024)
-    ip = models.CharField(max_length=32, verbose_name='IP地址')
+    ip = models.CharField(max_length=32, verbose_name='IP地址', db_index=True)
 
     class Meta:
         verbose_name = u"渠道反作弊表"

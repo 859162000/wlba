@@ -102,16 +102,18 @@
         padding-left: 8px
         color: #fff
         .area-tiem-body
+          position: relative
           background: url("/static/imgs/pc/area/time.png") no-repeat left center
           line-height: 30px
           padding-left: 20px
+          z-index: 2
         .area-tiem-bg
           position: absolute
           top: 0
           left: 0
           width: 100%
           height: 100%
-          background: #fff
+          background: #000
           +opacity(0.25)
           border-bottom-right-radius: 15px
           border-top-right-radius: 15px
@@ -127,6 +129,7 @@
       width: 100%
       height: 220px
       text-align: center
+      z-index: 3
       .area-ac-bg
         width: 100%
         height: 100%
@@ -154,15 +157,12 @@
       .area-mask-link
         text-align: right
         color: #a7a7a7
-        a
-          display: inline-block
+        .btn-hide
           height: 40px
           line-height: 40px
           background: url("/static/imgs/pc/area/arrow.png") no-repeat right center
           padding: 0 20px
           color: #a7a7a7
-          &:hover,&:link, &:visited
-            color: inherit
 
       .area-mask-line
         width: 100%

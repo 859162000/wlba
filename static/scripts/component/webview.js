@@ -1,6 +1,5 @@
 // author wangxiaoqing
 // last update 2015-11-20
-
 var wlb = (function () {
 
     function Mixin(bridge) {
@@ -105,7 +104,6 @@ var wlb = (function () {
         authenticated: function (data, callback) {
             var options = this._setData(data, callback);
             this.bridge.callHandler('authenticated', options.post, function (response) {
-
                 var responseData  = Mixin.filterJSON(response);
                 options.callback && options.callback(responseData);
             });
@@ -115,7 +113,7 @@ var wlb = (function () {
          * @param data {title: 活动标题, content: 活动描述}
          */
         shareData: function (data) {
-            this.bridge.registerHandler('shareData', function (data, responseCallback) {
+            this.bridge.registerHandler('shareData', function (backdata, responseCallback) {
                 responseCallback(data);
             });
         },
@@ -137,17 +135,26 @@ var wlb = (function () {
 
 
     function ready(dics) {
-
-        if (window.WebViewJavascriptBridge) {
-            run({callback: 'app', data: WebViewJavascriptBridge})
-
-        } else {
-            document.addEventListener('WebViewJavascriptBridgeReady', function () {
-                run({callback: 'app', data: WebViewJavascriptBridge})
-            }, false)
-
-            run({callback: 'other', data: null})
+        /**
+         * 临时处理webview初始化问题
+         */
+        window.onload = function(){
+            setTimeout(function(){
+                listen();
+            },200);
         }
+
+        function listen(){
+            if (window.WebViewJavascriptBridge) {
+                run({callback: 'app', data: WebViewJavascriptBridge});
+            } else {
+                document.addEventListener('WebViewJavascriptBridgeReady', function () {
+                    run({callback: 'app', data: WebViewJavascriptBridge})
+                }, false)
+                run({callback: 'other', data: null})
+            }
+        }
+
 
         function run(target) {
             var mixins;
@@ -170,8 +177,6 @@ var wlb = (function () {
     }
 
 })();
-
-
 
  //wlb.ready({
  //    app: function(mixins){

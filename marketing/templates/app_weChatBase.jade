@@ -2,15 +2,20 @@
 
 doctype html
 
-html(style="background:#FFF6B7")
-	head
-		title 网利宝福袋
-		include include/app_head
-	body
-		section.weChat-head
-			img(src='/static/imgs/mobile_activity/app_wechat/super.png').super
-			img(src='/static/imgs/mobile_activity/app_wechat/secure.png').secure
+html(style="background:#FFF6B7;").wechat-html
+    head
+        title 网利宝福袋
+        include include/app_head
+    body
+        input(type="hidden",name="url",value="{{ share.url }}")
+        input(type="hidden",name="title",value="{{ share.title }}")
+        input(type="hidden",name="content",value="{{ share.content }}")
+        section.weChat-head
+            img(src='/static/imgs/mobile_activity/app_wechat/banner.png')
 
-		section.weChat-conent
-			block content
+        section.weChat-conent
+            block content
+
+        footer.weChat-footer
+            img(src='/static/imgs/mobile_activity/app_wechat/logo.png')
 

@@ -36,7 +36,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
-from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
+from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
@@ -44,17 +44,20 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI)
+                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
+                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
-                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
+                             RockFinanceAPIView, RockFinanceForOldUserAPIView, RockFinanceCheckAPIView,
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView,
+                             GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView
+from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView
 
 router = DefaultRouter()
 
@@ -184,7 +187,8 @@ urlpatterns = patterns(
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
-    url(r'^marketing/tv', Statistics.as_view()),
+    url(r'^marketing/tv/$', Statistics.as_view()),
+    url(r'^marketing/tv_inside/$', StatisticsInside.as_view()),
     url(r'^p2p/investrecord', InvestRecord.as_view()),
     url(r'^mobiledownload/$', MobileDownloadAPIView.as_view()),
     url(r'^kuaipan/purchaselist/$', KuaipanPurchaseListAPIView.as_view()),
@@ -217,6 +221,9 @@ urlpatterns = patterns(
     url(r'^trade_pwd/$', TradePasswordView.as_view()),
     url(r'^wechat/attention/(?P<phone>\d+)/$', WeixinRedPackView.as_view()),
     url(r'^distribute/redpack/(?P<phone>\d+)/$', DistributeRedpackView.as_view()),
+    url(r'^inner/send_sms/$', InnerSysSendSMS.as_view()),
+    url(r'^inner/validate_id/$', InnerSysValidateID.as_view()),
+    url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
 )
 
 urlpatterns += patterns('',
@@ -232,7 +239,6 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
     url(r'^investment_history/', InvestmentHistory.as_view()),
 )
-
 urlpatterns += patterns(
     '',
     url(r'^xunlei/join/$', ActivityJoinLogAPIView.as_view()),
@@ -250,7 +256,11 @@ urlpatterns += patterns(
     url(r'^weixin/share/has_gift/$', WeixinShareTools.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^weixin/distribute/redpack/$', RewardDistributeAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^activity/reward/$', DistributeRewardAPIView.as_view()),
-
+    #url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜发送入场二维码 , 测试用，上线时去掉
+    url(r'^check/qrcode/$', RockFinanceCheckAPIView.as_view(), name='rockfinance_checkresult'),  # 金融摇滚夜扫描接口
+    url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
+    url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
+    url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
 )
 
 
@@ -277,4 +287,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^experience/', include('experience_gold.urls')),
+)
+
+# 数据魔方接口
+urlpatterns += patterns(
+    '',
+    url(r'^datacube/$', DataCubeApiView.as_view()),
 )

@@ -63,7 +63,7 @@ class IndexView(ManageView):
         context = super(IndexView, self).get_context_data(**kwargs)
         WeixinAccounts.host_url = get_host_url(self.request)
         context['items'] = WeixinAccounts.all()
-        if False:
+        if True:
             WeixinAccounts.syncdb()
         return context
 

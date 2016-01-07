@@ -26,6 +26,7 @@ import json
 
 from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
+from weixin.tasks import sentTemplate
 
 
 
@@ -527,27 +528,6 @@ class AmortizationKeeper(KeeperBaseMixin):
                                                               amortization.product,
                                                               # sub_amo.settlement_time,
                                                               amo_amount))
-
-                weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
-    #             您好，您投资的项目还款完成
-                # 项目名称：宝马X5-HK20151112002
-                # 还款金额：1000元
-                # 还款时间：2015-11-12
-                # 详情请登录平台会员中心查看
-    #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
-                from weixin.tasks import sentTemplate
-                if weixin_user:
-                    now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
-                    sentTemplate.apply_async(kwargs={
-                                    "kwargs":json.dumps({
-                                                    "openid": weixin_user.openid,
-                                                    "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                                    "keyword1": product.name,
-                                                    "keyword2": str(amo_amount),
-                                                    "keyword3": now,
-                                                        })},
-                                                    queue='celery02')
-
                 title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": sub_amo.user.id,
@@ -555,7 +535,6 @@ class AmortizationKeeper(KeeperBaseMixin):
                     "content": content,
                     "mtype": "amortize"
                 })
-
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                               amortization, description, sub_amo.coupon_interest)
 
@@ -567,7 +546,24 @@ class AmortizationKeeper(KeeperBaseMixin):
                     logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
                         sub_amo.user, sub_amo.principal, product.id
                     ))
+                try:
+                    weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
+        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
+                    if weixin_user and weixin_user.subscribe:
+                        now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+                        sentTemplate.apply_async(kwargs={
+                                        "kwargs":json.dumps({
+                                                        "openid": weixin_user.openid,
+                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                                        "keyword1": product.name,
+                                                        "keyword2": "%s 元"%str(amo_amount),
+                                                        "keyword3": now,
+                                                            })},
+                                                        queue='celery02')
+
+                except Exception,e:
+                    pass
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'

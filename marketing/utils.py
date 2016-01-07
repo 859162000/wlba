@@ -70,18 +70,18 @@ def save_introducedBy_channel(user, channel):
     record.user = user
     record.save()
 
-
+# Modify by hb on 2015-12-18 : add return value
 def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
     # fix@chenweibi, add order_id
     if type(device) != dict:
-        return
+        return False
 
     if "device_type" not in device:
-        return
+        return False
 
     app_version = device.get('app_version', '')
     if device['device_type'] == "pc" and app_version != 'wlb_h5':
-        return
+        return False
 
     ci = ClientData()
     if atype=="register": action='R'
@@ -105,6 +105,8 @@ def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
     ci.action = action
     ci.order_id = order_id
     ci.save()
+
+    return True
 
 
 def local_to_utc(source_date, source_time='min'):
@@ -162,15 +164,15 @@ def pc_data_generator():
     yesterday_start = local_to_utc(yesterday, 'min')
     yesterday_end = local_to_utc(yesterday, 'max')
     # 累计交易金额
-    p2p_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))['amount__sum']
+    p2p_amount = P2PRecord.objects.filter(catalog='申购', create_time__lte=yesterday_end).aggregate(Sum('amount'))['amount__sum']
     # 昨日交易总额
-    p2p_amount_yesterday = P2PRecord.objects.filter(catalog='申购', create_time__gt=yesterday_start, create_time__lt=yesterday_end).aggregate(Sum('amount'))['amount__sum']
+    p2p_amount_yesterday = P2PRecord.objects.filter(catalog='申购', create_time__gte=yesterday_start, create_time__lte=yesterday_end).aggregate(Sum('amount'))['amount__sum']
     # 累计交易人数
-    user_number = P2PRecord.objects.filter(catalog='申购').values('id').count()
+    user_number = P2PRecord.objects.filter(catalog='申购', create_time__lte=yesterday_end).values('id').count()
     #累计注册人数
-    p2p_register_number = User.objects.all().values('id').count()
+    p2p_register_number = User.objects.filter(date_joined__lte=yesterday_end).all().values('id').count()
     # 提前还款的收益
-    income_pre = AmortizationRecord.objects.filter(catalog='提前还款').aggregate(Sum('interest'))['interest__sum']
+    income_pre = AmortizationRecord.objects.filter(catalog='提前还款', created_time__lte=yesterday_end).aggregate(Sum('interest'))['interest__sum']
     income_pre = income_pre if income_pre else 0
     # 非提前还款的收益（已发收益＋未发收益）
     sql = "select sum(a.interest) from wanglibao_p2p_useramortization as a left join wanglibao_p2p_productamortization as b on a.product_amortization_id=b.id LEFT JOIN (select distinct product_id from wanglibao_p2p_p2pequity where confirm=True and not exists (select distinct a.product_id from wanglibao_p2p_productamortization a, wanglibao_p2p_amortizationrecord b where a.id=b.amortization_id and b.catalog='提前还款') ) as c on b.product_id=c.product_id;"
@@ -180,6 +182,8 @@ def pc_data_generator():
     cursor.close()
     user_income = income[0] + income_pre
     key = 'pc_index_data'
+    p2p_amount = 0 if p2p_amount is None else p2p_amount
+    p2p_amount_yesterday = 0 if p2p_amount_yesterday is None else p2p_amount_yesterday
     return {
         'p2p_amount': float(p2p_amount) + down_line_amount,
         'user_number': user_number,

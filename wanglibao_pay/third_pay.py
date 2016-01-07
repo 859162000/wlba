@@ -13,7 +13,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from wanglibao_pay import util
-from wanglibao_pay.models import PayInfo, Bank, Card
+from wanglibao_pay.models import PayInfo, Bank, Card, BlackListCard, WhiteListCard
 from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -34,24 +34,24 @@ def add_bank_card(request):
     gate_id = request.DATA.get("gate_id", "")
 
     if not card_no or not gate_id:
-        return {"ret_code":20021, "message":"信息输入不完整"}
+        return {"ret_code": 20021, "message": u"信息输入不完整"}
 
     if len(card_no) > 25 or not card_no.isdigit():
-        return {"ret_code":20022, "message":"请输入正确的银行卡号"}
+        return {"ret_code": 20022, "message": u"请输入正确的银行卡号"}
     #if card_no[0] in ("3", "4", "5"):
     #    return {"ret_code":20023, "message":"不支持信用卡"}
 
     user = request.user
     bank = Bank.objects.filter(gate_id=gate_id).first()
     if not bank:
-        return {"ret_code":20025, "message":"不支持该银行"}
+        return {"ret_code": 20025, "message": u"不支持该银行"}
 
-    exist_cards = Card.objects.filter(no=card_no, user=user).first()
+    exist_cards = Card.objects.filter(no=card_no).first()
     if exist_cards:
-        return {"ret_code":20024, "message":"该银行卡已经存在"}
+        return {"ret_code": 20024, "message": u"您输入的银行卡号已绑定，请尝试其他银行卡号码，如非本人操作请联系客服"}
     exist_cards = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
     if exist_cards:
-        return {"ret_code":20026, "message":"该银行卡已经存在"}
+        return {"ret_code": 20026, "message": u"您输入的银行卡号已绑定，请尝试其他银行卡号码，如非本人操作请联系客服"}
 
     is_default = request.DATA.get("is_default", "false")
     if is_default.lower() in ("true", "1"):
@@ -182,6 +182,9 @@ def withdraw(request):
     if not user.wanglibaouserprofile.id_is_valid:
         return {"ret_code": 20062, "message": u"请先进行实名认证"}
 
+    if user.wanglibaouserprofile.frozen:
+        return {"ret_code": 20072, "message": u"用户账户已冻结,请联系客服"}
+
     try:
         float(amount)
     except:
@@ -204,6 +207,24 @@ def withdraw(request):
     card = Card.objects.filter(pk=card_id).first()
     if not card or card.user != user:
         return {"ret_code": 20067, "message": u"请选择有效的银行卡"}
+    # 检测银行卡是否在黑名单中
+    black_list = BlackListCard.objects.filter(card_no=card.no).first()
+    if black_list and black_list.user != user:
+        return {"ret_code": 20072, "message": u'银行卡号异常,请联系客服'}
+
+    # 检查白名单
+    white_list = WhiteListCard.objects.filter(user=user, card_no=card.no).first()
+    if not white_list:
+        # 增加银行卡号检测功能,检测多张卡
+        card_count = Card.objects.filter(no=card.no).count()
+        if card_count > 1:
+            return {"ret_code": 20073, "message": u'银行卡号有多张重复,请联系客服'}
+
+        # 检测银行卡在以前的提现记录中是否为同一个用户
+        payinfo_record = PayInfo.objects.filter(card_no=card.no).order_by('-create_time').first()
+        if payinfo_record:
+            if payinfo_record.user != user:
+                return {"ret_code": 20074, "message": u'银行卡号与身份信息不符,请联系客服'}
 
     # 计算提现费用 手续费 + 资金管理费
     bank = card.bank
@@ -303,7 +324,8 @@ def card_bind_list(request):
                 Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
 
         card_list = []
-        cards = Card.objects.filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
+        cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行']).filter(Q(user=user),
+                    Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
             bank_list = [card.bank.gate_id for card in cards]
@@ -342,15 +364,25 @@ def card_bind_list(request):
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
 
-                bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
-                bank_min_amount = bank_limit.get('bank_min_amount')
-                bank_max_amount = bank_limit.get('bank_max_amount')
-                bank_limit_amount = {
-                    "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
-                    "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
-                }
-                tmp.update(bank_limit_amount)
+                # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                # bank_min_amount = bank_limit.get('bank_min_amount')
+                # bank_max_amount = bank_limit.get('bank_max_amount')
+                # bank_limit_amount = {
+                #     "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                #     "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                # }
+                # tmp.update(bank_limit_amount)
                 if tmp:
+                    # 更新提现信息
+                    bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                    bank_min_amount = bank_limit.get('bank_min_amount')
+                    bank_max_amount = bank_limit.get('bank_max_amount')
+                    bank_limit_amount = {
+                        "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                        "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                    }
+                    tmp.update(bank_limit_amount)
+
                     card_list.append(tmp)
 
         return {"ret_code": 0, "message": "ok", "cards": card_list}
@@ -544,11 +576,20 @@ def bind_pay_dynnum(request):
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
-    if res.get('ret_code') == 0:
-        try:
+    # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
+    try:
+        bind_flag = 0;
+        if res.get('ret_code') == 0:
+            bind_flag = 1;
+        else:
+            card = Card.objects.filter(user=user, id=card.id).first()
+            if card and (card.is_bind_huifu or card.is_bind_kuai or card.is_bind_yee):
+                logger.error('=20151224= deposit failed but binding success: [%s] [%s]' % (card.user, card.no))
+                bind_flag = 1;
+        if bind_flag == 1:
             CoopRegister(request).process_for_binding_card(user)
-        except:
-            logger.exception('bind_card_callback_failed for %s' % str(user))
+    except Exception, ex:
+        logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card_no, ex))
 
     return res
 

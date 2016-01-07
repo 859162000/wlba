@@ -214,6 +214,7 @@ AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
+    'weixin.auth_backend.OpenidAuthBackend',
 )
 import django.contrib.auth.backends
 
@@ -500,7 +501,11 @@ LOGGING = {
         'experience_gold': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG'
-        }
+        },
+        'wanglibao_profile': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG'
+        },
     }
 }
 
@@ -683,11 +688,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'experience_gold.tasks.experience_repayment_plan',
         'schedule': timedelta(minutes=5),
     },
-    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
-    # 'redpack_status_task_check': {
-    #     'task': 'marketing.tools.check_redpack_status',
-    #     'schedule': crontab(minute=0, hour=11),
-    # },
+    # 定期检查还有3天到期的用户优惠券,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_unavailable_3_days',
+        'schedule': crontab(minute=0, hour=11),
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -1103,6 +1108,8 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
 ZGDX_QUERY_URL = 'http://182.140.241.47:8080/fps/ESBFlowService.do'
+# ZGDX_QUERY_KEY = 'hwDmXQLqdzJ4wozz'
+# ZGDX_QUERY_IV = '7988680669963722'
 if ENV == ENV_PRODUCTION:
     ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
     ZGDX_PARTNER_NO = '102139887'
@@ -1128,6 +1135,7 @@ WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_QUERY_URL = 'http://dynamic.vip.xunlei.com/xljinku/checkOrder'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
+XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
@@ -1198,7 +1206,7 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST='https://staging.wanglibao.com'
+    CALLBACK_HOST = 'https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
@@ -1209,3 +1217,9 @@ TOKEN_CLIENTS = {
 }
 
 APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
+
+
+# 数据魔方接口
+DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
+if ENV == ENV_PRODUCTION:
+    DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'

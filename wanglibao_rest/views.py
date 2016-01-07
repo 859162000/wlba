@@ -52,6 +52,7 @@ from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
+from marketing.utils import local_to_utc
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
@@ -59,6 +60,10 @@ from wanglibao_redpack.models import Income
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
+import requests
+from weixin.models import WeixinUser
+from weixin.util import bindUser
+
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -319,7 +324,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'【网利科技】用户名： '+identifier+u'; 登录密码:'+password,]
+                "messages": [u'您已成功注册网利宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
             })
 
             logger.debug("此次 channel:%s" %(channel))
@@ -362,7 +367,13 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-
+        try:
+            openid = request.session.get('openid')
+            if openid:
+                w_user = WeixinUser.objects.get(openid=openid)
+                bindUser(w_user, request.user)
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
@@ -982,36 +993,110 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': "false"}, status=status.HTTP_200_OK)
 
+def get_public_statistics():
+    today = datetime.now()
+    today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
+
+    today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
+    today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
+    today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
+
+    all_user = User.objects.all().aggregate(Count('id'))
+    all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
+    all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
+
+    data = {
+        'today_num': today_num,
+        'today_user': today_user['id__count'],
+        'today_amount': today_amount['amount__sum'],
+
+        'all_num': all_num,
+        'all_user': all_user['id__count'],
+        'all_amount': all_amount['amount__sum'],
+    }
+
+    return data
+
 
 class Statistics(APIView):
+    """
+        数据统计,今日注册,投资等,总计注册,投资等
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        today = datetime.now().date()
-        tomorrow = today + timedelta(1)
-        today_start = datetime.combine(today, time())
-        today_end = datetime.combine(tomorrow, time())
+        data = get_public_statistics()
 
-        today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
-            Sum('amount'))
+        return Response(data, status=status.HTTP_200_OK)
 
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购') \
-            .values('id').count()
 
-        all_user = User.objects.all().aggregate(Count('id'))
-        all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
-        all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
+class StatisticsInside(APIView):
+    """
+        昨日还款额 = 昨日还款本金 + 昨日还款利息
+        昨日资金净流入 = 昨日投资额 - 昨日还款本金
+        昨日新用户投资金额 = 昨日首次投资用户的全天投资总额
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
+        yesterday_start = local_to_utc(datetime(yesterday.year, yesterday.month, yesterday.day), 'min')
+        start_fmt = yesterday_start.strftime('%Y-%m-%d %H:%M:%S')
+        end_fmt = today_start.strftime('%Y-%m-%d %H:%M:%S')
+
+        # 昨日申购总额
+        yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
+            .filter(catalog='申购').aggregate(Sum('amount'))
+
+        # 昨日还款
+        today_repayment = ProductAmortization.objects.filter(settled=True)\
+            .filter(settlement_time__gte=today_start).aggregate(Sum('principal'), Sum('interest'))
+
+        # 今日还款
+        yesterday_repayment = ProductAmortization.objects.filter(settled=True)\
+            .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
+            .aggregate(Sum('principal'), Sum('interest'))
+
+        amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
+        principal_sum = yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else Decimal('0')
+        interest_sum = yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else Decimal('0')
+
+        # 昨日资金净流入
+        yesterday_inflow = amount_sum_yesterday - principal_sum - interest_sum
+
+        # 今日还款额
+        today_repayment_total = (today_repayment['principal__sum'] if today_repayment['principal__sum'] else 0) + \
+                                (today_repayment['interest__sum'] if today_repayment['interest__sum'] else 0)
+        # 昨日还款额
+        yesterday_repayment_total = (yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else 0) \
+                + (yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else 0)
+
+        # 昨日首投用户
+        from django.db import connection
+        cursor = connection.cursor()
+        sql = "SELECT SUM(a.amount) as amount_sum FROM wanglibao_p2p_p2precord a, " \
+              "(SELECT user_id, create_time FROM wanglibao_p2p_p2precord WHERE catalog='申购' GROUP BY user_id) b " \
+              "WHERE a.user_id = b.user_id " \
+              "AND b.create_time >= '{}' AND b.create_time < '{}' " \
+              "AND a.create_time >= '{}' AND a.create_time < '{}' " \
+              "AND a.catalog='申购';".format(start_fmt, end_fmt, start_fmt, end_fmt)
+        cursor.execute(sql)
+        fetchone = cursor.fetchone()
+
+        yesterday_new_amount = fetchone[0] if fetchone[0] else 0
+
+        # 公共数据
 
         data = {
-            'today_num': today_num,
-            'today_user': today_user['id__count'],
-            'today_amount': today_amount['amount__sum'],
-
-            'all_num': all_num,
-            'all_user': all_user['id__count'],
-            'all_amount': all_amount['amount__sum'],
+            'today_repayment_total': today_repayment_total,  # 今日还款额
+            'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
+            'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
+            'yesterday_new_amount': yesterday_new_amount  # 昨日新用户投资金额
         }
+
+        data.update(get_public_statistics())
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -1233,6 +1318,108 @@ class GuestCheckView(APIView):
         else:
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
 
+
+class InnerSysHandler(object):
+    def ip_valid(self, request):
+        INNER_IP = ("182.92.179.24", "10.171.37.235")
+        client_ip = get_client_ip(request)
+        return True if client_ip in INNER_IP else False
+
+    def judge_valid(self, request):
+        if not self.ip_valid(request):
+            return False, u'IP没有通过验证'
+
+        return True, u'通过验证'
+
+
+class InnerSysSendSMS(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def post(self, request):
+        phone = request.DATA.get("phone", None)
+        message = request.DATA.get("message", None)
+        logger.debug("phone:%s, message:%s" % (phone, message))
+        if phone is None or message is None:
+            return Response({"code": 1000, "message": u'传入的phone或message不全'})
+
+        status, invalid_msg = super(InnerSysSendSMS, self).judge_valid(request)
+        if not status:
+            return Response({"code": 1001, "message": invalid_msg})
+
+        send_messages.apply_async(kwargs={
+                "phones": [phone, ],
+                "messages": [message, ]
+            })
+
+        return Response({"code": 0, "message": u"短信发送成功"})
+
+
+class InnerSysValidateID(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def param_is_valid(self, name, id):
+        id_pattern = '\d{17}[0-9Xx]'
+        return True if id and len(id) == 18 and re.match(id_pattern, id).group() else False
+
+    def post(self, request):
+        """
+            要考虑已经做过验证的用户
+        """
+        name = request.DATA.get("name", None)
+        id = request.DATA.get("id", None)
+
+        if name is None or id is None:
+            return Response({"code": 1000, "message": u'请发送完整的姓名及身份证号'})
+
+        if not self.param_is_valid(name, id):
+            return Response({"code": 1001, "message": u'传递的参数不合法'})
+
+        status, message = self.judge_valid(request)
+        if not status:  # 此步目前跳过
+            return Response({"code": 1002, "message": message})
+
+        profile = WanglibaoUserProfile.objects.filter(name=name, id_number=id, id_is_valid=True)
+        if profile.exists():
+            return Response({"code": 0, "message": u'用户以前已经验证过且验证通过'})
+
+        try:
+            logger.debug('name:%s, id:%s' % (name, id))
+            verify_record, error = verify_id(name, id)
+            logger.debug('name:%s, id:%s, verifiy_record:%s, error:%s' % (name, id, verify_record, error))
+        except:
+            return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
+        else:
+            if error or not verify_record.is_valid:
+                return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
+            else:
+                return Response({"code": 0, "message": u"验证通过"})
+
+
+class InnerSysSaveChannel(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def post(self, request):
+        code = request.DATA.get("code", None)
+        description = request.DATA.get("description", None)
+        name = request.DATA.get("name", None)
+        if not code or not description:
+            return Response({"code": 1000, "message": u'渠道号或渠道描述为空值'})
+
+        status, message = super(InnerSysSaveChannel, self).judge_valid(request)
+        if not status:
+            return Response({"code": 1001, "message": message})
+
+        channel = Channels.objects.filter(code=code)
+        if channel.exists():
+            return Response({"code": 1002, "message": u'渠道号已经存在'})
+        try:
+            Channels.objects.create(name=name, code=code, description=description)
+        except Exception, reason:
+            return Response({"code": 1003, "message": u'创建渠道报异常,reason:{0}'.format(reason)})
+        else:
+            return Response({"code": 0, "message": u'创建渠道成功'})
+
+
 class DistributeRedpackView(APIView):
     permission_classes = ()
     def post(self, request, phone):
@@ -1293,3 +1480,32 @@ class DistributeRedpackView(APIView):
                         }
                         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+class DataCubeApiView(APIView):
+    """
+    数据魔方查询接口
+    chenweibin@20151208
+    """
+    permission_classes = ()
+
+    def __init__(self):
+        super(DataCubeApiView, self).__init__()
+        self.request_url = settings.DATACUBE_URL
+
+    def get(self, request):
+        try:
+            data = requests.get(url=self.request_url).json()
+            _response = {
+                'ret_code': 10000,
+                'message': 'success',
+                'result': data,
+            }
+        except Exception, e:
+            logger.exception('data cupe connect faild to %s' % self.request_url)
+            logger.exception(e)
+            _response = {
+                'ret_code': 50001,
+                'message': 'api error',
+            }
+
+        return HttpResponse(json.dumps(_response), content_type='application/json')

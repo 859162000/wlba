@@ -1,6 +1,6 @@
 # coding=utf-8
 import json
-import random
+import random, math
 from django.conf import settings
 import datetime
 from django.utils import timezone
@@ -96,7 +96,9 @@ def send_validation_code(phone, validate_code=None, ip=""):
     if validate_code is None:
         validate_code = generate_validate_code()
     if not check_rate(ip):
-        return 403, u"已达到最大发送限制"
+        #return 403, u"已达到最大发送限制"
+        return 403, u"操作太频繁了，休息一下"
+
 
     now = timezone.now()
     code = PhoneValidateCode.objects.filter(phone=phone).first()
@@ -110,17 +112,23 @@ def send_validation_code(phone, validate_code=None, ip=""):
     else:
         seconds = now - code.last_send_time
         seconds = seconds.total_seconds()
-        if code.code_send_count < 3 and seconds <= 60:
-            return 429, u'请60秒之后重试'
+
         if code.code_send_count >= 10:
             return 429, u'请联系客服进行验证'
         if code.code_send_count >= 6 and seconds < 86400:
-            return 429, u'请24小时后进行重试'
+            #return 429, u'3-请24小时后重试'
+            return 429, u'请{0}小时后重试'.format(int(((86400-seconds)//3600)+1))
         if code.code_send_count >= 3 and seconds < 3600:
-            return 429, u'请1小时后进行重试'
+            #return 429, u'4-请60分钟后重试'
+            return 429, u'请{0}分钟后重试'.format(int(((3600-seconds)//60)+1))
+        if seconds <= 60:
+            return 429, u'请60秒之后重试'
 
         valid_seconds = now - code.create_time
         valid_seconds = valid_seconds.total_seconds()
+        if valid_seconds<=60*10 and code.vcount>=5:
+            #return 429, u'5-请10分钟后重新获取'
+            return 429, u'请{0}分钟后重新获取'.format(int(((600-valid_seconds)//60)+1))
         if valid_seconds<=60*10 and not code.is_validated:
             validate_code = code.validate_code
         else:
@@ -133,10 +141,7 @@ def send_validation_code(phone, validate_code=None, ip=""):
     code.is_validated = False
     code.save()
 
-#    status, message = send_sms(phone, messages.validate_code(validate_code))
-    status = 200
-    message = ''
-
+    status, message = send_sms(phone, messages.validate_code(validate_code))
     if status != 200:
         return status, message
 
@@ -149,22 +154,26 @@ def validate_validation_code(phone, code):
     if not item:
         return status_code, message
 
-    if item.vcount >= 3:
-        return 410, u'短信码连续输入错误达到3次，请重新获取'
-    if item.validate_code != code:
-        item.vcount += 1
-        item.save()
-        return 410, u'短信验证码输入错误，请重新输入'
-
     now = timezone.now()
+    if (now - item.create_time) >= datetime.timedelta(minutes=30):
+        return 410, u'短信验证码错误，请重新获取'
     if (now - item.create_time) >= datetime.timedelta(minutes=10):
         return 410, u'短信验证码已经过期，请重新获取'
     if item.is_validated:
         return 410, u'短信验证码已经被使用，请重新获取'
+    if item.vcount >= 5:
+        return 410, u'验证码错误频繁，请稍后再获取'
+
+    if item.validate_code != code:
+        item.vcount += 1
+        item.last_validate_time = now
+        item.save()
+        return 410, u'短信验证码输入错误，请重新输入'
 
     item.is_validated = True
     item.code_send_count = 0
     item.vcount = 0
+    item.last_validate_time = now
     item.save()
 
     return 200, ""

@@ -238,7 +238,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com',
+            var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = $('input[name=url]').val(),
                 shareMainTit = $('input[name=title]').val(),
@@ -293,64 +293,218 @@ org.ui = (function(){
                 })
             }
             document.body.onselectstart = function(){return false;};
+        },
+        _showSign:function(signTxt, callback){
+            var $sign = $('.error-sign');
+            if($sign.length == 0){
+                $('body').append("<section class='error-sign'>" + signTxt + "</section>");
+                $sign = $('.error-sign');
+            }else{
+                $sign.text(signTxt)
+            }
+            ~function animate(){
+                $sign.css('display','block');
+                setTimeout(function(){
+                    $sign.css('opacity', 1);
+                    setTimeout(function(){
+                        $sign.css('opacity', 0);
+                        setTimeout(function(){
+                            $sign.hide();
+                            return callback && callback();
+                        },300)
+                    },1000)
+                },0)
+            }()
         }
     }
 
     return {
         alert : lib._alert,
+        showSign : lib._showSign
     }
 })();
 org.weChatStart = (function(org){
     var lib = {
+        $captcha_img : $('#captcha'),
+        $captcha_0 :  $('input[name=captcha_0]'),
+        $captcha_1 :  $('input[name=captcha_1]'),
         init:function(){
-            lib._fetchPack()
+            lib._fetchPack();
+            lib._captcha_refresh();
+            //刷新验证码
+            lib.$captcha_img.on('click', function() {
+                lib._captcha_refresh();
+            });
+            lib._iphoneInputKeyUp();
+        },
+        _iphoneInputKeyUp: function(){
+            var $phone = $('input[name=phone]');
+            $phone.on('keyup',function(){
+                if(!lib._checkPhone($phone.val())) return ;
+                lib._userExists($phone.val());
+            })
+        },
+        _userExists: function(phoneNumber){
+            org.ajax({
+                url : '/api/user_exists/' + phoneNumber + '/',
+                data: {
+                },
+                type : 'GET',
+                success :function(data){
+                    var ele = $('.code-content'),
+                        curHeight = ele.height(),
+                        autoHeight = ele.css('height', 'auto').height();
+                    if(data.existing){
+                        $('#exists').val('true');
+                        ele.height(curHeight).animate({height: 0},500);
+                    }else{
+                        ele.height(curHeight).animate({height: autoHeight},500);
+                        $('#exists').val('false');
+                        lib._getCodeFun();
+                    }
+                },
+                error :function(xhr){
+                }
+            });
+        },
+        _getCodeFun: function(){
+            $('.webchat-button').on('click',function(){
+                var phoneNumber = $('input[name=phone]').val(),
+                    $that = $(this), //保存指针
+                    count = 60; //60秒倒计时
+
+                if(!lib._checkPhone(phoneNumber)) return;  //号码不符合退出
+                $that.attr('disabled', 'disabled').removeClass('webchat-button-right');
+                org.ajax({
+                    url : '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    data: {
+                        captcha_0 : lib.$captcha_0.val(),
+                        captcha_1 : lib.$captcha_1.val()
+                    },
+                    type : 'POST',
+                    error :function(xhr){
+                        clearInterval(intervalId);
+                        var result = JSON.parse(xhr.responseText);
+                        org.ui.showSign(result.message);
+                        $that.text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
+                        lib._captcha_refresh();
+                        return
+                    }
+                });
+                //倒计时
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').addClass('webchat-button-right');
+                        return lib._captcha_refresh();
+                    }
+                };
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            });
         },
         _fetchPack: function(){
             var
                 $submit  = $('.webpack-btn-red'),
                 phoneVal = $('input[name=phone]'),
+                code = $('input[name=validate_code]'),
                 postDo = false;
 
             $submit.on('click', function(){
                 if(postDo) return
-
-                $submit.html('领取中...');
                 var ops = {
                     phone : phoneVal.val() * 1,
                     activity : $(this).attr('data-activity'),
                     orderid : $(this).attr('data-orderid'),
                     openid : $(this).attr('data-openid'),
+                    validate_code : code.val()
+                }
+                if(ops.phone =='' || !lib._checkPhone(phoneVal.val())) {
+                    $('.phone-sign').show();
+                    return;
+                }else{
+                    $('.phone-sign').hide();
                 }
 
-                if(!lib._checkPhone(ops.phone)) return ;
-                org.ajax({
-                    url: '/api/weixin/share/has_gift/',
-                    type: 'POST',
-
-                    data: {
-                        'openid': ops.openid,
-                        'phone_num': ops.phone,
-                        'order_id': ops.orderid
-                    },
-                    dataType : 'json',
-                    success: function(data){
-                        if(data.has_gift == 'true'){
-                            org.ui.alert(data.message, function(){
-                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
-                            });
-                        }else if(data.has_gift == 'false'){
-                            window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
-                        }
-                    },
-                    error: function(data){
-                        org.ui.alert(data)
-                    },
-                    complete: function(){
-                        postDo = false;
-                        $submit.html('立即开奖');
+                if($('#exists').val() == 'false'){
+                    if(lib.$captcha_1.val() == ''){
+                        $('.code-sign').show();
+                        return;
+                    }else{
+                        $('.code-sign').hide();
                     }
-                })
-
+                    if(code.val() == ''){
+                        $('.phone-code-sign').show();
+                        return;
+                    }else{
+                        $('.phone-code-sign').hide();
+                    }
+                    org.ajax({
+                        url: '/api/register/?promo_token=wrp',
+                        type: 'POST',
+                        beforeSend: function(){$submit.html('领取中...')},
+                        data: {
+                            'identifier': ops.phone,
+                            'validate_code': ops.validate_code,
+                            'IGNORE_PWD': 'true',
+                            'captcha_0' :  lib.$captcha_0.val(),
+                            'captcha_1' :  lib.$captcha_1.val(),
+                            'order_id': ops.orderid
+                        },
+                        dataType : 'json',
+                        success: function(data){
+                            if(data.ret_code > 0){
+                                org.ui.showSign(data.message);
+                                clearInterval(intervalId);
+                                $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
+                                lib._captcha_refresh();
+                            }else {
+                                window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
+                            }
+                        },
+                        error: function(data){
+                            org.ui.alert(data)
+                            clearInterval(intervalId);
+                            $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
+                            lib._captcha_refresh();
+                        },
+                        complete: function(){
+                            postDo = false;
+                            $submit.html('立即领取');
+                        }
+                    })
+                }else{
+                    org.ajax({
+                        url: '/api/weixin/share/has_gift/',
+                        type: 'POST',
+                        beforeSend: function(){$submit.html('领取中...')},
+                        data: {
+                            'openid': ops.openid,
+                            'phone_num': ops.phone,
+                            'order_id': ops.orderid
+                        },
+                        dataType : 'json',
+                        success: function(data){
+                            if(data.has_gift == 'true'){
+                                org.ui.alert('用户已经领取过奖品', function(){
+                                    window.location.href = '/weixin_activity/share/'+ops            .phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                                });
+                            }else if(data.has_gift == 'false'){
+                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                            }
+                        },
+                        error: function(data){
+                            org.ui.alert(data)
+                        },
+                        complete: function(){
+                            postDo = false;
+                            $submit.html('立即领取');
+                        }
+                    })
+                }
             });
 
         },
@@ -358,8 +512,25 @@ org.weChatStart = (function(org){
             var isRight = false,
                 $sign = $('.phone-sign'),
                 re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
-            re.test($.trim(val)) ? ($sign.hide(), isRight = true) : ($sign.show(),isRight = false);
+            if(re.test($.trim(val))) {
+                $sign.hide(); $('.webchat-button').addClass('webchat-button-right'); isRight = true;
+            }else{
+                $sign.show(); $('.webchat-button').removeClass('webchat-button-right'); isRight = false;
+                var ele = $('.code-content'),
+                    curHeight = ele.height();
+                ele.height(curHeight).animate({height: 0},500);
+                $('input[name=validate_code]').val('');
+                $('input[name=captcha_1]').val('');
+
+            }
             return isRight;
+        },
+        _captcha_refresh :function(){
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function(res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_0.val(res['key']);
+            });
         }
     }
     return {
@@ -375,7 +546,7 @@ org.weChatDetail = (function(org){
                  org.ui.alert('您已经领取过礼物了！');
               }
             }*/
-        },
+        }
     }
     return {
         init : lib.init
@@ -386,7 +557,7 @@ org.weChatEnd = (function(org){
     var lib = {
         init:function(){
 
-        },
+        }
     }
     return {
         init : lib.init

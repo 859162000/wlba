@@ -1,0 +1,41 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝官网' as title
+        include global/g_head
+        - endwith
+    body
+        include global/g_nav
+        - csrf_token
+        .register
+            .register_nav_min.register_nav_min4
+            .register_box.clearfix
+                .login-form
+                    p.txt_s 恭喜您已完成注册
+                    p.txt_s 扫码关注网利宝微信服务号
+                    p.erweima_max
+                        span
+                    p.go_p2p
+                        a(href='/p2p/list/') 去投资
+                .register_info.last_page
+                    .info_middle.clearfix
+                        .welfare_ed 已获得的奖励：
+                        .welfare_ed_list
+                            i
+                            | 新手注册即送28888元体验金
+                        .welfare_ed_list
+                            i
+                            | 实名认证20元红包
+                        if first_pay_succeed
+                            .welfare_ed_list
+                                i
+                                | 首次充值100元红包
+                        .my_reward
+                            a(href='/accounts/coupon/unused/') 查看我的奖励
+                                i
+    include global/g_footer
+    script.
+      require(["/static/src/pc/register_next.js?v=20151202"])
+

@@ -38,7 +38,7 @@ block main
                     option(value='{{card.id}}') {{card | card_info}}
                 label.error
                 .space-vertical-s
-                a#add-card-button.blue.margin-top-m(href='#add-card-form')
+                a.add-card-button.blue.margin-top-m(href='#add-card-form')
                  .add-icon
                  添加提现银行卡
           tr
@@ -70,14 +70,29 @@ block main
                 .span5
                   input.withdraw-input(type='text', name='validate_code', placeholder='请输入验证码')
                 .span4
-                  button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                  button.ispan4-omega.button-orange.button-large#button-get-code-btn(type='button', data-phone="{{user.wanglibaouserprofile.phone}}",tag="1") 获取验证码
               .row.voice.hidden
                 .span12-omega
                   没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>
           tr
+            th 交易密码 {{user_profile.cards_number}}
+            td
+              .row
+                .aa.trade_pwd_is_set(style='display:none')
+                    .span5
+                      input.withdraw-input(type='text', name='pwd', placeholder='请输入交易密码')
+                    a(href='javascript:void(0)',tag='1').forget-pwd 忘记交易密码？
+                .bb.trade_pwd_is_set_no(style='display:none')
+                    .bank-counts(style='display:none')
+                        a(href='javascript:void(0)',tag='2').forget-pwd 设置交易密码
+                        span.pop-msg 成功设置交易密码后，才能进行提现操作!
+                    .bank-count(style='display:none')
+                        a.add-card-button.blue.margin-top-m(href='#add-card-form') 添加银行卡
+
+          tr
             td.opt(colspan=2)
               .withdraw-td
-                input#withdraw.withdraw-button(type='submit', value='提 现')
+                input.withdraw-button.trade_pwd_is_set(type='button', value='申请提现')
                 p.d4-text 申请通过后 3 个工作日内（此为预估时间，具体实际到账为准）
 
       .space-vertical-xl
@@ -88,7 +103,7 @@ block main
         p 3. 提现银行账号的开户名必须与银行卡名一致， 否则提现失败。
         p 4. 提现最高限额：单笔限额50万（民生银行单笔限额5万），单日不限次数
   #img-code-div2(style="display:none")
-        form#img-code-form.img-code-form(method='post', action='')
+        form#img-code-form.img-code-form(method='post', action='',tag='')
             .form-row
                 label.img-code-label 请输入验证码：
                 input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
@@ -98,6 +113,73 @@ block main
             .code-img-error
             .clearfix.tc
                 span.submit-code-img#submit-code-img4 确定
+  #setTradingPwd(style='display:none')
+    .setTradingPwd.setTradingPwd1
+        .setTitle.tag1
+            span 找回交易密码
+        .setTitle.tag2
+            span 设置交易密码
+            label 为了您的资金安全，请设置交易密码
+        ul
+            li
+                label.label1 第1/2步:
+                span 身份认证
+            li.mt10
+                label 真实姓名
+                span {{user_profile.name}}
+            li
+                label 身份证号码
+                input(type='text',placeholder="请输入身份证号码",name='id').sfz#citizen_id
+                em(style='display:none')#sfzError
+                    i
+                    |
+            li
+                label 绑定银行卡
+                select#card-select1.withdraw-select(name='card_id1')
+                  option(value='') 请选择银行卡
+                  for card in cards
+                    option(value='{{card.id}}') {{card | card_info}}
+                em(style='display:none')#yhkError
+                        i
+            li
+                .aa.clearfix
+                    label 银行卡号
+                    input(type='text',placeholder="请输入银行卡号").yhkh
+                    em(style='display:none')#yhkhError
+                        i
+            li.mt28
+                label
+                a(href='javascript:void(0)',data-phone="{{user.wanglibaouserprofile.phone}}").nextBtn#nextBtn 下一步
+  #backTradingPwd(style='display:none')
+    .setTradingPwd.setTradingPwd2
+        .setTitle.tag1
+            span 找回交易密码
+        .setTitle.tag2
+            span 设置交易密码
+            label 为了您的资金安全，请设置交易密码
+        ul
+            li
+                p
+                    label.label1 第2/2步:
+                    span.tag1 重置交易密码
+                    span.tag2 设置交易密码
+                p.textIn 请设置6位数字作为交易密码，如：246802
+
+            li
+                label 新交易密码
+                input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd1
+                em(style='display:none')#sfzError
+                    i
+                    |
+            li
+                label 确认交易密码
+                input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd2
+                em(style='display:none')#yzmError
+                    i
+            li.mt28
+                label
+                a(href='javascript:void(0)').nextBtn#confirmBtn 确认
+
   #poundageExplain(style="display:none")
     p.explainTitle 温馨提示
     .poundageExplain.clearfix

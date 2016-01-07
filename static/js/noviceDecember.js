@@ -1,45 +1,71 @@
 (function() {
     require.config({
         paths: {
-            jquery: 'lib/jquery.min',
-            'jquery.modal': 'lib/jquery.modal.min',
-            'activityRegister': 'activityRegister'
+            jquery: 'lib/jquery.min'
         },
         shim: {
             'jquery.modal': ['jquery']
         }
     });
-    require(['jquery', 'activityRegister'],
+    require(['jquery'],
     function($, re) {
-        re.activityRegister.activityRegisterInit({
-            registerTitle: '限时限量，满额直送',
-            isNOShow: '1',
-            hasCallBack: true,
-            callBack: function() {
-                $.ajax({
-                    url: '/api/gift/owner/?promo_token=jcw',
-                    type: "POST",
-                    data: {
-                        phone: '',
-                        address: '',
-                        name: '',
-                        action: 'ENTER_WEB_PAGE'
-                    }
-                }).done(function(json) {
-                })
-            }
-        })
+
+		var csrfSafeMethod, getCookie, sameOrigin,
+          getCookie = function (name) {
+              var cookie, cookieValue, cookies, i;
+              cookieValue = null;
+              if (document.cookie && document.cookie !== "") {
+                  cookies = document.cookie.split(";");
+                  i = 0;
+                  while (i < cookies.length) {
+                      cookie = $.trim(cookies[i]);
+                      if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                      }
+                      i++;
+                  }
+              }
+              return cookieValue;
+          };
+      csrfSafeMethod = function (method) {
+          return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+      };
+      sameOrigin = function (url) {
+          var host, origin, protocol, sr_origin;
+          host = document.location.host;
+          protocol = document.location.protocol;
+          sr_origin = "//" + host;
+          origin = protocol + sr_origin;
+          return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+      };
+      $.ajaxSetup({
+          beforeSend: function (xhr, settings) {
+              if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                  xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+              }
+          }
+      });
+
+        var h5_user_static;
+		$.ajax({
+			url: '/api/user_login/',
+			type: 'post',
+			success: function (data1) {
+				h5_user_static = data1.login;
+			}
+		})
 
 		$('.take_red,#zhuce').click(function(){
-			if($('#denglu').index()){
-				$('.title_wrap').show();
+			if(h5_user_static){
+				window.location.href = '/activity/experience/gold/'
 			}else{
 				window.location.href = '/activity/experience/gold/'
 			}
 		});
 
 		$('.take_first_red').click(function(){
-			if($('#denglu').index()){
+			if(h5_user_static){
 				window.location.href = '/p2p/list/'
 			}else{
 				window.location.href = '/accounts/login/?next=/p2p/list/'

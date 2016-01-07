@@ -1,6 +1,6 @@
 # encoding: utf-8
 import datetime
-from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
@@ -37,6 +37,7 @@ from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
 from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages as sms_messages
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
@@ -59,7 +60,6 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
-from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
@@ -82,7 +82,7 @@ logger_anti = logging.getLogger('wanglibao_anti')
 
 
 class RegisterView(RegistrationView):
-    template_name = "register_test.jade"
+    template_name = "register_new.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
@@ -725,8 +725,8 @@ class AccountInviteHikeAPIView(APIView):
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
 
-        hikes = backends.get_hike_nums(request.user)
-        amount = backends.get_hike_amount(request.user)
+        hikes = redpack_backends.get_hike_nums(request.user)
+        amount = redpack_backends.get_hike_amount(request.user)
         thity = ActivityRecord.objects.filter(user=request.user, gift_type='phonefare', msg_type='message').aggregate(Sum('income'))
         if thity['income__sum']:
             callfee = thity['income__sum']
@@ -1023,7 +1023,7 @@ class AccountRedPacket(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'], 0)
+        result = redpack_backends.list_redpack(user, 'all', device['device_type'], 0)
         red_packets = result['packages'].get(status, [])
 
         return {
@@ -1043,7 +1043,7 @@ class AccountCoupon(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
+        result = redpack_backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
         coupons = result['packages'].get(status, [])
 
         return {
@@ -1378,6 +1378,7 @@ def ajax_register(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
+                user_type = form.cleaned_data.get('user_type', '0')
 
                 if request.POST.get('IGNORE_PWD', '') and not password:
                     password = generate_random_password(6)
@@ -1385,7 +1386,7 @@ def ajax_register(request):
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
-                user = create_user(identifier, password, nickname)
+                user = create_user(identifier, password, nickname, user_type)
                 if not user:
                     return HttpResponse(messenger('error'))
 
@@ -1487,6 +1488,7 @@ class P2PAmortizationAPI(APIView):
             'amortization_amount_interest': float(amortization.interest),  # 利息
             'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
             'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+            'amortization_status': self._check_status(amortization.settled, amortization.settlement_time, amortization.term_date)
         } for amortization in amortizations]
 
         res = {
@@ -1496,6 +1498,15 @@ class P2PAmortizationAPI(APIView):
 
         }
         return Response(res)
+
+    def _check_status(self, settled, settlement_time, term_date):
+        if settled:
+            if settlement_time.strftime('%Y-%m-%d') < term_date.strftime('%Y-%m-%d'):
+                return u'提前回款'
+            else:
+                return u'已回款'
+        else:
+            return u'待回款'
 
 
 @login_required
@@ -1677,7 +1688,8 @@ class AdminSendMessageView(TemplateView):
             if not user:
                 result = {
                     'phone': phone,
-                    'status': "not exist"
+                    'status': 'not exist',
+                    'message': u"用户不存在"
                 }
                 send_result.append(result)
                 continue
@@ -1685,28 +1697,72 @@ class AdminSendMessageView(TemplateView):
             if flag == 'different_batch':
                 from django.template import Template, Context
                 code = codes_list[index]
-                context = Context({
-                    'code': code
-                })
                 tmp_template = Template(content)
-                content = tmp_template.render(context)
+                content_result = tmp_template.render(Context({
+                    'code': code
+                }))
+            else:
+                content_result = content
 
+            msg = msg_sms = ''
+            # 发送理财券
+            coupon_ids = request.POST.get("coupon_ids", "")
+            if coupon_ids:
+                now = timezone.now()
+                coupon_ids_list = coupon_ids.split(",")
+                coupon_ids_list = [cid for cid in coupon_ids_list if cid.strip() != ""]
+                if coupon_ids_list:
+                    for coupon_id in coupon_ids_list:
+                        red_pack_event = RedPackEvent.objects.filter(invalid=False, id=coupon_id)\
+                            .filter(give_start_at__lt=now, give_end_at__gt=now).first()
+                        if red_pack_event:
+                            redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
+                            if redpack:
+                                give_pf = red_pack_event.give_platform
+                                if give_pf == "all" or give_pf == 'pc':
+                                    if redpack.token != "":
+                                        redpack.status = "used"
+                                        redpack.save()
+                                    record = RedPackRecord()
+                                    record.user = user
+                                    record.redpack = redpack
+                                    record.change_platform = 'pc'
+                                    record.save()
+                                    msg += u'id:{},成功;'.format(coupon_id)
+                                else:
+                                    msg += u'id:{},失败;'.format(coupon_id)
+                        else:
+                            msg += u'id:{},失败;'.format(coupon_id)
+
+            # 发送短信
+            content_sms = request.POST.get("content_sms", "")
+            if content_sms:
+                send_messages.apply_async(kwargs={
+                    'phones': [phone],
+                    'messages': [content_sms + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD],
+                    'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+                })
+                msg_sms += u'短信发送成功'
+
+            # 发送站内信
             try:
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
                     "title": title,
-                    "content": content,
+                    "content": content_result,
                     "mtype": mtype
                 })
 
                 result = {
                     'phone': "{}, {}".format(phone, code),
-                    'status': 'success'
+                    'status': 'success',
+                    'message': u'站内信发送成功;' + msg + msg_sms
                 }
             except False:
                 result = {
                     'phone': phone,
-                    'status': 'fail'
+                    'status': 'fail',
+                    'message': u'站内信发送失败;' + msg + msg_sms
                 }
 
             send_result.append(result)
@@ -1834,7 +1890,7 @@ class AddressAPIView(APIView):
 
         if address_id:
             try:
-                address = UserAddress.objects.get(id=address_id)
+                address = UserAddress.objects.get(id=address_id, user=self.request.user)
                 address.user = request.user
                 address.name = address_name
                 address.address = address_address
@@ -1873,7 +1929,7 @@ class AddressDeleteAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id)
+            address = UserAddress.objects.get(id=address_id, user=self.request.user)
             address.delete()
             return Response({
                 'ret_code': 0,
@@ -1891,7 +1947,7 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id, user=request.user)
+            address = UserAddress.objects.get(id=address_id, user=self.request.user)
             if address:
                 address = {
                     'address_id': address.id,
@@ -2054,7 +2110,7 @@ class ThirdOrderApiView(APIView):
                 'message': u'request_no长度超出'
             }
 
-        if result_code is None:
+        elif result_code is None:
             json_response = {
                 'ret_code': 20004,
                 'message': u'result_code参数缺失'
@@ -2065,7 +2121,7 @@ class ThirdOrderApiView(APIView):
                 'message': u'result_code长度超出'
             }
 
-        if not self.check_params_length(msg, 'msg'):
+        elif not self.check_params_length(msg, 'msg'):
             json_response = {
                 'ret_code': 20007,
                 'message': u'result_code长度超出'
@@ -2080,7 +2136,7 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = request.POST
+                params = json.loads(request.POST)
                 request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
@@ -2133,3 +2189,9 @@ class ThirdOrderQueryApiView(APIView):
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
 
+class FirstPayResultView(TemplateView):
+    template_name = 'register_three.jade'
+
+    def get_context_data(self, **kwargs):
+        first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
+        return {'first_pay_succeed': first_pay_succeed}

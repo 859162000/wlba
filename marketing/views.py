@@ -1,4 +1,5 @@
 # encoding:utf-8
+from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
 import base64
 import hashlib
 import os
@@ -25,13 +26,17 @@ from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
+from weixin.base import OpenIdBaseAPIView, BaseWeixinTemplate
 from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
-    Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo
+    Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
 from marketing.tops import Top
 from utils import local_to_utc
 from wanglibao_reward.models import WanglibaoWeixinRelative
 # used for reward
+from weixin.models import WeixinAccounts
+import cStringIO
+from wanglibao_account.utils import FileObject
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
@@ -58,6 +63,8 @@ from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
 import logging
+import qrcode
+from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
@@ -71,6 +78,9 @@ from rest_framework import renderers
 from django.core.urlresolvers import reverse
 from misc.views import MiscRecommendProduction
 from marketing.utils import pc_data_generator
+from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.utils import xunleivip_generate_sign
+from weixin.base import ChannelBaseTemplate
 reload(sys)
 
 class YaoView(TemplateView):
@@ -178,6 +188,14 @@ class GennaeratorCode(TemplateView):
 
 class TvView(TemplateView):
     template_name = 'tv.jade'
+
+    def get_context_data(self, **kwargs):
+        return {}
+
+
+class TvViewInside(TemplateView):
+    template_name = 'tv_inside.jade'
+
     def get_context_data(self, **kwargs):
         return {}
 
@@ -1984,33 +2002,32 @@ class CommonAward(object):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
-class ThunderTenAcvitityTemplate(TemplateView):
-    template_name = 'xunlei_ten.jade'
+class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
+    template_name = 'xunlei_one.jade'
 
-    def generate_sign(self, data, key):
-        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        encode_data = urllib.urlencode(sorted_data)
-        sign = hashlib.md5(encode_data+str(key)).hexdigest()
-        return sign
-
-    def check_params(self, sign, _time, nickname, user_id):
+    def check_params(self, channel_code, sign, _time, nickname, user_id):
         response_data = {}
-        if sign is None:
+        if not channel_code or channel_code != 'xunlei9':
+            response_data = {
+                'ret_code': '20001',
+                'message': u'非法请求',
+            }
+        elif not sign:
             response_data = {
                 'ret_code': '10001',
                 'message': u'签名不存在',
             }
-        elif nickname is None:
+        elif not nickname:
             response_data = {
                 'ret_code': '10003',
                 'message': u'用户昵称不存在',
             }
-        elif _time is None:
+        elif not _time:
             response_data = {
                 'ret_code': '10005',
                 'message': u'时间戳不存在',
             }
-        elif user_id is None:
+        elif not user_id:
             response_data = {
                 'ret_code': '10007',
                 'message': u'用户ID不存在',
@@ -2019,12 +2036,15 @@ class ThunderTenAcvitityTemplate(TemplateView):
         return response_data
 
     def get_context_data(self, **kwargs):
+        context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
+
         params = self.request.GET
-        sign = params.get('sign')
-        _time = params.get('time')
-        nickname = params.get('nickname')
-        user_id = params.get('xluserid')
-        response_data = self.check_params(sign, _time, nickname, user_id)
+        channel_code = params.get('promo_token', '').strip()
+        sign = params.get('sign', '').strip()
+        _time = params.get('time', '').strip()
+        nickname = params.get('nickname', '').strip()
+        user_id = params.get('xluserid', '').strip()
+        response_data = self.check_params(channel_code, sign, _time, nickname, user_id)
 
         if not response_data:
             check_data = {
@@ -2035,7 +2055,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
             if len(nickname) > 3:
                 nickname = nickname[:3]+'...'
 
-            if self.generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
+            if xunleivip_generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
@@ -2047,7 +2067,8 @@ class ThunderTenAcvitityTemplate(TemplateView):
                     'message': u'签名错误',
                 }
 
-        return response_data
+        context.update(response_data)
+        return context
 
 class QuickApplyerAPIView(APIView):
     permission_classes = ()
@@ -2158,8 +2179,13 @@ class GiftOwnerInfoAPIView(APIView):
     permission_classes = ()
 
     def get_left_awards(self):
-        items = GiftOwnerGlobalInfo.objects.filter(description__in=('jcw_ticket_80', 'jcw_ticket_188')).values("amount")
-        return items[0]["amount"], items[1]["amount"]
+        items = GiftOwnerGlobalInfo.objects.filter(description__in=('jcw_ticket_80', 'jcw_ticket_188')).values("amount", "description")
+        for item in items:
+            if item["description"] == "jcw_ticket_80":
+                jcw_ticket_80 = item["amount"]
+            elif item["description"] == "jcw_ticket_188":
+                jcw_ticket_188 = item["amount"]
+        return jcw_ticket_80, jcw_ticket_188
 
     def post(self, request):
         action = request.DATA.get('action', 'OTHERS')
@@ -2537,24 +2563,24 @@ class RewardDistributeAPIView(APIView):
         self.get_redpacks()
 
     def post(self, request):
-        openid = request.DATA.get("openid", "")
-        if None == openid:
-            to_json_response = {
-                'ret_code': 3010,
-                'message': u'openid 没有传入',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        w_user = WeixinUser.objects.filter(openid=openid)
-        if not w_user.exists() or not w_user.first().user:
-            to_json_response = {
-                'ret_code': 3011,
-                'message': u'weixin info No saved',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-        else:
-            user = w_user.first().user
-
+        # openid = request.DATA.get("openid", "")
+        # if None == openid:
+        #     to_json_response = {
+        #         'ret_code': 3010,
+        #         'message': u'openid 没有传入',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        #
+        # w_user = WeixinUser.objects.filter(openid=openid)
+        # if not w_user.exists() or not w_user.first().user:
+        #     to_json_response = {
+        #         'ret_code': 3011,
+        #         'message': u'weixin info No saved',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        # else:
+        #     user = w_user.first().user
+        user = request.user
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today, action_name=self.action_name).first()
 
@@ -2625,3 +2651,359 @@ class RewardDistributeAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+
+class RockFinanceQRCodeView(TemplateView):
+    template_name = 'qrcode.jade'
+
+    def get_context_data(self, **kwargs):
+
+        logger.debug("rock finance qrcode view，开始准备渲染数据")
+        user_id = self.request.GET.get("user_id", -1)
+        logger.debug("二维码用户user_id:%s" % user_id)
+        reward = WanglibaoActivityReward.objects.filter(user_id=user_id, activity='rock_finance').first()
+        if not reward:
+            logger.debug(u"您没有领取到对应的入场二维码, user:%s" % self.request.user)
+            return {"code": 1003, "message": u"您没有领到对应的入场二维码"}
+
+        if reward.has_sent:  # 二维码可能被重复使用
+            logger.debug(u"您的二维码已经被使用过, img:%s, user:%s" % (reward.qrcode, self.request.user))
+            return {"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"}
+        else:
+            logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.request.user))
+            return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
+
+
+class RockFinanceForOldUserAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    rock_finance = activity['rock_finance']
+                    is_open = rock_finance["is_open"]
+                    amount = rock_finance["amount"]
+                    start_time = rock_finance["start_time"]
+                    end_time = rock_finance["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        logger.debug(u"user:%s, 运行开关:%s, 开放时间:%s, 结束时间:%s, 总票数:%s" % (request.user, is_open, start_time, end_time, amount))
+
+        # 是否是登录用户
+        if not request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        p2p_record = P2PRecord.objects.filter(amount__gte=1000, user_id=request.user.id, catalog=u'申购', create_time__gte=start_time, create_time__lte=end_time).first()
+
+        if not p2p_record:
+            to_json_response = {
+                'ret_code': 1001,
+                'message': u'没有投资满5000',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        # 1: 如果活动没有打开
+        if is_open == "false":
+            logger.debug(u'开关没打开')
+            to_json_response = {
+                'ret_code': 1002,
+                'message': u'活动开关没打开',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        # 2: 如果票数到800了，直接跳出
+        counts = ActivityReward.objects.filter(activity='rock_finance').count()
+        if counts >= amount:
+            logger.debug(u'票已经发完了, %s' % (counts))
+            to_json_response = {
+                'ret_code': 1003,
+                'message': u'票已经发完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
+        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            logger.debug("start_time:%s, end_time:%s, now:%s" % (start_time, end_time, now))
+            to_json_response = {
+                'ret_code': 1004,
+                'message': u'没有在预定的时间内购标',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        reward = Reward.objects.filter(type='金融摇滚夜', is_used=False).first()
+        if not reward:
+            logger.debug(u"奖品没有了")
+            to_json_response = {
+                'ret_code': 1005,
+                'message': u'小子你来晚了，奖品发光了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        activity_record = ActivityReward.objects.filter(user=request.user, activity='rock_finance').first()
+        if activity_record:
+            logger.debug(u'已经领过奖品了')
+            to_json_response = {
+                'ret_code': 1006,
+                'message': u'已经领过奖品了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        with transaction.atomic():
+            reward = Reward.objects.select_for_update().filter(content=reward.content).first()
+            try:
+                activity_reward = ActivityReward.objects.create(
+                    activity='rock_finance',
+                    order_id=p2p_record.order_id,
+                    user=request.user,
+                    p2p_amount=p2p_record.amount,
+                    reward=reward,
+                    has_sent=False, #当被扫码后， has_sent变成true
+                    left_times=1,
+                    join_times=1,
+                )
+            except Exception, reason:
+                logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
+                raise Exception(u"生成获奖记录异常")
+            else:
+                #不知道为什么create的时候，会报错
+                m = Misc.objects.filter(key='weixin_qrcode_info').first()
+                original_id = None
+                if m and m.value:
+                    info = json.loads(m.value)
+                    original_id = info.get('fwh')
+                    account = WeixinAccounts.getByOriginalId(original_id)
+                encoding_str = urllib.quote("%s/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (settings.WEIXIN_CALLBACK_URL, request.user.id, reward.content))
+                qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s" % (account.app_id, encoding_str, original_id)
+                logger.debug("encoding_st:%s, qrcode_url:%s" % (encoding_str, qrcode_url))
+                img = qrcode.make(qrcode_url)
+                _img = img.tobytes()
+                img_handle = cStringIO.StringIO()
+                img.save(img_handle)
+                img_handle.seek(0)
+                _img = FileObject(img_handle, len(_img))
+                activity_reward.qrcode.save("rock_finance.png", _img, save=True)
+                activity_reward.save()
+                logger.debug("before save: activity_reward.qrcode:%s" % activity_reward.qrcode)
+                #将奖品通过站内信发出
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": request.user.id,
+                    "title": u"网利宝摇滚之夜门票",
+                    "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='%s/rock/finance/qrcode/?user_id=%s'>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝" % (settings.WEIXIN_CALLBACK_URL, request.user.id),
+                    "mtype": "activity"
+                })
+                reward.is_used = True
+                reward.save()
+                logger.debug("after save:activity_reward.qrcode:%s" % activity_reward.qrcode)
+
+                logger.debug(u"user:%s, 站内信已经发出, 奖品内容:%s" % (request.user, reward.content))
+                to_json_response = {
+                    'ret_code': 0,
+                    'message': u'用户的站内信已经发出',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+class RockFinanceAPIView(APIView):
+    permission_classes = ()
+
+    def get_qrcode(self, request):
+        if not request.user.is_authenticated():
+            return Response({"code": 1002, "message": u"请您先登录"})
+
+        reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='rock_finance').first()
+        if not reward:
+            return Response({"code": 1003, "message": u"您没有领到对应的入场二维码"})
+
+        if reward.is_used:  # 二维码可能被重复使用
+            return Response({"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"})
+        else:
+            return Response({"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"})
+
+    def get_vote_static(self):
+        """
+            得到整体的全部数据
+        """
+        records = WanglibaoVoteCounter.objects.filter(activity="rock_finance")
+        records = {"".join(['《', str(record.item), '》']): record.count for record in records}  #前端要求带书名号
+        return Response({"records": records, "message": u'整体的汇总数据', "code":0})
+
+    def get(self, request):
+        _type = request.GET.get("type", None)
+        if not _type or _type not in ('qrcode', 'static'):
+            return Response({"code": 1001, "message": u"请传入合理参数"})
+
+        if _type == 'qrcode':
+            return self.get_qrcode(request)
+        if _type == 'static':
+            return self.get_vote_static()
+
+    def post(self, request):
+        """
+        items 的数据格式为： "乐队-歌曲,乐队-歌曲,..."
+        """
+        items = request.DATA.get("items", None)
+
+        try:
+            assert None is not items
+        except AssertionError:
+            return Response({"code": 1000, "message": u'传入的参数不合法'})
+        else:
+            items = items.split(",")
+
+        musics = list()
+        teams = list()
+        for item in items:
+            item = item.split("-")
+            teams.append(item[0])
+            musics.append(item[1])
+
+        vote_counter = WanglibaoVoteCounter.objects.filter(activity="rock_finance", item__in=musics)
+
+        for music in musics:
+            vote = vote_counter.filter(item=music).first()
+            if not vote:
+                vote = WanglibaoVoteCounter.objects.create(
+                    activity="rock_finance",
+                    catalog=teams[musics.index(music)],
+                    item=music,
+                    count=0
+                )
+
+            vote.count += 1
+            vote.save()
+        return Response({"code": 0, "message": u'投票成功'})
+
+
+class RockFinanceCheckAPIView(BaseWeixinTemplate):
+    template_name = 'rockfinance_checkresult.jade'
+
+    def get_context_data(self, **kwargs):
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    rock_finance = activity['rock_finance']
+                    is_open = rock_finance["is_open"]
+                    start_scan = rock_finance["start_scan"]
+                    end_scan = rock_finance["end_scan"]
+                    openids = rock_finance["openids"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u'misc中activities配置错误，请检查。reason:%s'% reason)
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        logger.debug("user:%s, is_open:%s, start_scan:%s, end_scan:%s openids:%s, scaner_openid:%s" % (self.request.user, is_open, start_scan, end_scan, openids, self.openid))
+
+        #判断是否在扫描列表里
+        if self.openid and self.openid not in openids:
+            return {"code": 1000, "message": u"您没有扫描权限"}
+
+        #判断活动是否开启
+        if is_open == "false":
+            return {"code": 1001, "message": u"活动还没有开启"}
+
+        #判断是否在扫描的时间段内
+        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_scan or now > end_scan:
+            return {"code": 1002, "message": u'扫描时间段不合理'}
+
+
+        owner_id = self.request.GET.get("owner_id", None)
+        activity = self.request.GET.get("activity", None)
+        content = self.request.GET.get("content", None)
+
+        try:
+            assert None not in (owner_id, activity, content)
+        except AssertionError:
+            return {"code": 1005, "message": u"二维码链接的参数不对"}
+
+        with transaction.atomic():
+            reward_record = WanglibaoActivityReward.objects.select_for_update().filter(has_sent=False, user_id=owner_id, activity=activity, reward__content=content).first()
+            if not reward_record:
+                return {"code": 1003, "message": u'您的二维码不合法, 可能已经被使用了'}
+
+            if reward_record.has_sent:
+                reward_record.save()
+                return {"code": 1004, "message": u'每一个二维码只能被使用一次'}
+
+            reward_record.has_sent = True
+            reward_record.left_times = 0
+            reward_record.save()
+            return {"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}
+
+
+class ThunderBindingApi(APIView):
+    """
+    迅雷用户绑定接口
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        # Add by hb on 2015-12-30
+        # Modify by cwb@20151230
+        user = self.request.user
+        user_channel = get_user_channel_record(user)
+        if not user_channel or user_channel.code != 'xunlei9':
+            response_data = {
+                'ret_code': '10004',
+                'message': u'非迅雷渠道用户',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+        channel_code = request.POST.get('promo_token', '').strip()
+        channel_user = request.POST.get('xluserid', '').strip()
+        channel_time = request.POST.get('time', '').strip()
+        channel_sign = request.POST.get('sign', '').strip()
+        nick_name = request.POST.get('nickname', '').strip()
+        if channel_code and (channel_code == 'xunlei9' and channel_user
+                             and channel_time and channel_sign and nick_name):
+            user = self.request.user
+            binding = Binding.objects.filter(user_id=user.id).first()
+            if not binding:
+                CoopRegister(request).process_after_binding(user)
+                binding = Binding.objects.filter(user_id=user.id).first()
+                if binding:
+                    response_data = {
+                        'ret_code': '10000',
+                        'message': u'绑定成功',
+                        'nickname': nick_name,
+                    }
+                else:
+                    response_data = {
+                        'ret_code': '10003',
+                        'message': u'绑定失败',
+                    }
+            else:
+                response_data = {
+                    'ret_code': '10002',
+                    'message': u'该用户已绑定过',
+                    'nickname': nick_name,
+                }
+        else:
+            response_data = {
+                'ret_code': '10001',
+                'message': u'非法请求',
+            }
+
+        logger.info("Thunder binding user_id[%s], promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
+                    % (user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')

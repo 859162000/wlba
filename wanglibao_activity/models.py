@@ -4,7 +4,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from wanglibao_redpack.models import RedPackEvent
-from ckeditor.fields import RichTextField
+from wanglibao_p2p.models import ProductType
 from datetime import timedelta
 
 PLATFORM = (
@@ -40,7 +40,8 @@ TRIGGER_NODE = (
     ('first_buy', u'首次投资'),
     ('p2p_audit', u'满标审核'),
     ('repaid', u'还款'),
-    ('activity', u'活动奖励')
+    ('activity', u'活动奖励'),
+    ('first_bind_weixin', u'首次绑定微信')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),
@@ -64,6 +65,9 @@ MSG_TYPE = (
 SHARE_TYPE = (
     ('both', u'邀请人和被邀请人双方共享'),
     ('inviter', u'邀请人独自获得'),
+)
+WX_TEMPLATE_CHOICE = (
+    ('first_bind', u'首次绑定微信'),
 )
 
 
@@ -130,6 +134,14 @@ class ActivityRule(models.Model):
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
+    p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
+    period = models.IntegerField(default=0, verbose_name=u'限定产品期限', blank=True, help_text=u"填写整数数字")
+    period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=(
+        ('month', u'月'),
+        ('month_gte', u'月及以上'),
+        ('day', u'日'),
+        ('day_gte', u'日及以上'),
+    ), blank=True, help_text=u"产品限定只对[投资/首次投资]有效")
     is_in_date = models.BooleanField(u'判断首次充值（或首次投资）的时间是否在活动时间内', default=False,
                                      help_text=u'勾选此项，则会以活动的起止时间来判断首次投资或充值的动作，否则不做时间判断')
     is_introduced = models.BooleanField(u'邀请好友时才启用', default=False,
@@ -165,6 +177,10 @@ class ActivityRule(models.Model):
                                               优惠券金额/百分比：{{redpack_amount}}，优惠券投资门槛：{{invest_amount}}”')
     sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
                                     help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，变量：同上')
+
+    wx_template = models.CharField(u'微信消息模板', blank=True,
+                                    choices=WX_TEMPLATE_CHOICE, default="", max_length=32)
+
     msg_template_introduce = models.TextField(u'邀请人站内信模板', blank=True,
                                               help_text=u'邀请人站内信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
     sms_template_introduce = models.TextField(u'邀请人短信模板', blank=True,

@@ -10,7 +10,7 @@ html(style="background:#f8f1d1")
     meta(name="viewport", content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
     link(href="/static/styles/mobile_activity/app_invite_result.css", rel="stylesheet")
   body
-    input(type='hidden', name='url', value='/aws/?p={{url}}&promo_token=fwh')
+    input(type='hidden', name='url', value='{{callback_host}}/aws/?p={{url}}&promo_token=fwh')
     //input(type='hidden', name='url', value='/aws/?p=MTg4MTAyNDA4NTY')
 
     .invite-banner-server
@@ -18,7 +18,7 @@ html(style="background:#f8f1d1")
       img(src='/static/imgs/mobile_activity/app_invite/banner_server.png').server-banner
     .invite-server-message
       .messahe-head 获得佣金（元）
-      .messahe-cont 200.00
+      .messahe-cont {{earning}}
     .tly-mod.invite-server-mb
       .invite-result-touch
         .invite-server-btn.invite-result-btn 立即邀请

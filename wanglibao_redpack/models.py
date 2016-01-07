@@ -17,6 +17,7 @@ PLATFORM = (
     ("android", "android"),
     ("pc", "pc"),
     ("app", "移动端"),
+    ("weixin", "微信"),
 )
 
 
@@ -55,7 +56,8 @@ class RedPackEvent(models.Model):
                                 ('buy', u'投资'),
                                 ('pay', u'充值'),
                                 ('p2p_audit', u'满标审核'),
-                                ('repaid', u'还款')), default=u"注册")
+                                ('repaid', u'还款'),
+                                ('first_bind_weixin', u'首次绑定微信')), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="",

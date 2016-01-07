@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from collections import OrderedDict
 import datetime
+import collections
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -12,6 +13,8 @@ from wechatpy.client.api.qrcode import WeChatQRCode
 import logging
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from wanglibao.fields import JSONFieldUtf8
+
 
 logger = logging.getLogger("weixin")
 
@@ -159,9 +162,11 @@ class WeiXinChannel(models.Model):
     def clean(self):
         if len(self.code) == 6:
             raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
-        #
-        # if self.classification == '----':
-        #     raise ValidationError(u'请选择渠道分类')
+        if len(self.digital_code) != 3:
+            raise ValidationError(u'渠道数字代码长度必须等于3位')
+        if not self.digital_code.isdigit():
+            raise ValidationError(u'渠道数字代码必须为3个数字')
+
 
     def __unicode__(self):
         return self.name
@@ -220,13 +225,22 @@ class WeixinAccounts(object):
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_77c09ff2f3a3_258.jpg'
     }
     account_test = {
+        'id': 'gh_d3d05c71a967',
+        'name': 'staging测试号',
+        'app_id': 'wx406c0da365002254',
+        'app_secret': 'd4624c36b6795d1d99dcf0547af5443d',
+        'classify': '微信公众平台测试号',
+        'token': 'tgE3AdMS',
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d3d05c71a967_258.jpg'
+    }
+    account_test_wxq = {
         'id': 'gh_32e9dc3fab8e',
         'name': 'wxq测试号',
         'app_id': 'wx83535d60d4476686',
         'app_secret': 'cc9f1b27fc4aea966cbada7f7dfec655',
         'classify': '微信公众平台测试号',
         'token': 'tgK2dBUn',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_32e9dc3fab8e_258.jpg'
     }
     account_test_hmm = {
         'id': 'gh_3b82a2651647',
@@ -235,7 +249,7 @@ class WeixinAccounts(object):
         'app_secret': '7b30aec7477fb8eaed0673fca8f41044',
         'classify': '微信公众平台测试号',
         'token': 'CPIhRv8V',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_3b82a2651647_258.jpeg'
     }
     account_test_yj = {
         'id': 'gh_9e8ff84237cd',
@@ -244,7 +258,7 @@ class WeixinAccounts(object):
         'app_secret': 'd4624c36b6795d1d99dcf0547af5443d',
         'classify': '微信公众平台测试号',
         'token': '7RvywP6u',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_9e8ff84237cd_258.jpg'
     }
 
     id = None
@@ -281,6 +295,7 @@ class WeixinAccounts(object):
             cls.data['test'] = cls.account_test
             cls.data['account_test_hmm']=cls.account_test_hmm
             cls.data['account_test_yj']=cls.account_test_yj
+            cls.data['account_test_wxq']=cls.account_test_wxq
 
     @classmethod
     def account_classify(cls):
@@ -410,6 +425,7 @@ class SubscribeService(models.Model):
     )
     SERVICE_TYPES = (
         (0, u'月标上线通知'),
+        (1, u'天标上线通知'),
     )
     key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
     describe = models.CharField(u'服务描述', max_length=256)
@@ -429,6 +445,7 @@ class SubscribeRecord(models.Model):
     subscribe_time = models.IntegerField('用户订阅时间', default=0)
     unsubscribe_time = models.IntegerField('用户取消订阅时间', default=0)
     # update_at = models.DateTimeField('更新时间', auto_now_add=True)
+
 
 
 class Material(models.Model):
@@ -526,6 +543,25 @@ class ReplyRule(models.Model):
     pattern = models.IntegerField('回复规则', choices=PATTERN_CHOICES, default=PATTERN_CHOICES[0][0])
     account = models.ForeignKey(Account)
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
+
+
+class WeiXinUserActionRecord(models.Model):
+    ACTION_TYPES = (
+        ('bind', u'绑定网利宝'),
+        ('unbind', u'解除绑定'),
+        ('sign_in', u'用户签到'),
+    )
+    w_user = models.ForeignKey(WeixinUser, null=True)
+    user = models.ForeignKey(User, null=True)
+    action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
+    action_describe = models.CharField(u'动作描述', max_length=64)
+    extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    create_time = models.IntegerField('创建时间', default=0)
+
+class SceneRecord(models.Model):
+    openid = models.CharField('用户标识', max_length=128, db_index=True)
+    scene_str = models.CharField('渠道', max_length=64, blank=True, null=True)
+    create_time = models.IntegerField('创建时间', default=0)
 
 
 class ReplyKeyword(models.Model):

@@ -1,0 +1,46 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝官网' as title
+        include global/g_head
+        - endwith
+    body
+        include global/g_nav
+        - csrf_token
+        .register
+            .register_nav_min.register_nav_min2
+            .register_box.clearfix
+                #registerForm.login-form
+                    .h5.register_welfare 实名认证即送20元红包
+                    .registerFormDiv
+                        ul.registerForm
+                            li.clearfix
+                                label 姓名：
+                                input#userName.placeholderInput(type="text", name="name", placeholder="请输入您的姓名", autocomplete='off', title="请输入您的姓名")
+                                span.error_span
+                            li.clearfix
+                                label 身份证号：
+                                input#nameId.placeholderInput(type="text", name="idcard", placeholder="请输您的身份证号", autocomplete='off', title="请输您的身份证号")
+                                span.error_span
+                        .loginError
+                        .form_bottom
+                            .submitFormStyle#realName 实名认证
+                .register_info
+                    .go_next_welfare 下一步奖励：
+                    .red_packets.clearfix
+                        i
+                        label 新手首次充值送100元红包
+                    .info_middle.clearfix
+                        .welfare_ed 已获得的奖励：
+                        .welfare_ed_list
+                            i
+                            | 新手注册即送28888元体验金
+                    .info_ewm.clearfix
+                        i
+                        label 关注网利宝官方微信
+    include global/g_footer
+    script.
+      require(["/static/src/pc/register_next.js?v=20151202"])
+

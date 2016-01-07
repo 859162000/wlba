@@ -2,19 +2,31 @@
 extends ./app_weChatBase
 
 block content
-	.default-user
-		img(src='/static/imgs/mobile_activity/app_wechat/default_user.png').default-img
-		.default-message
-			.message-icon
-			.message-body 我在网利宝成功投标啦。和我一起拼手气，必中高额度加息券。
-	.webchat-redpack
-		.redpack-bg
-	.webchat-submit
-		input(type='tel', name='phone' ,placeholder='输入手机号拼手气', value="{{phone}}").webchat-input
-		.phone-sign-warp
-			p.phone-sign 请输入正确的手机号
-		a(href="javascript:void(0)",data-openid="{{openid}}",data-activity="share", data-orderid="{{order_id}}").webpack-btn-red 立即开奖
+    - csrf_token
+    .default-user
+        img(src='/static/imgs/mobile_activity/app_wechat/lio.png').default-img
+        .default-message
+            .message-icon
+            .message-body 我在网利宝成功投标啦。和我一起拼手气，必中高额度奖励。
+    .webchat-submit
+        input(type='tel', name='phone' ,placeholder='请输入手机号', value="{{phone}}").webchat-input
+        .phone-sign-warp
+            p.phone-sign 请输入正确的手机号
+        .code-content.clearfix
+            input(type='hidden')#exists
+            .code.clearfix
+                input(type="tel", tabindex="-1" ,name="captcha_1", placeholder="请输入计算结果", data-target2='captcha_1-icon', data-icon='user-validation', data-target="regist-validation", data-empty='regist-validation-disable', data-val='').webchat-input-code
+                input(name="captcha_0", type="hidden", value="", tabindex="-1" )
+                img(src="", alt="", width="100%", height="100%")#captcha.captcha
+            .phone-sign-warp.code-status
+                p.code-sign 请输入正确的验证码
+            .code.clearfix
+                input(type='text', name='validate_code' ,placeholder='请输入短信验证码', value="{{validate_code}}" ,tabindex="-1" ).webchat-input-code
+                button(type="button").webchat-button.webchat-button-disable 获取
+            .phone-sign-warp.code-status
+                p.phone-code-sign 请输入正确的验证码
+        a(href="javascript:void(0)",data-openid="{{openid}}",data-activity="share", data-orderid="{{order_id}}").webpack-btn-red 立即领取
 
 
-	script(src="/static/src/mobile/lib/weixin/wx.js")
-	script(data-init='weChatStart', src='/static/scripts/mobile_activity/dist/weChart_share.js?v=20151113')
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(data-init='weChatStart', src='/static/scripts/mobile_activity/weChart_share.js?v=20151113')

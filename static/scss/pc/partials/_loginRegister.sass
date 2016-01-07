@@ -20,39 +20,39 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
       height: 343px
       @include loginRegister-sprite(ad)
     .safeRelevant
-      padding: 0 8px
       +clearfix()
       li
-        width: 85px
         @extend .fl
-        margin-right: 70px
-        a,span
+        a
           width: 74px
           height: 73px
           margin-bottom: 8px
           +inline-block
+        span
+          width: 73px
+          height: 73px
+          margin-bottom: 8px
+          +inline-block
         .safeSpan1
+          width: 80px
           @include loginRegister-sprite(safe)
-          height: 58px
-          margin: 10px 0 11px
         .safeSpan2
           @include loginRegister-sprite(bank)
-          height: 71px
         .safeSpan3
           @include loginRegister-sprite(cup)
         .safeSpan4
           @include loginRegister-sprite(safe2)
+        .safeSpan5
+          @include loginRegister-sprite(zhongxin)
+
         p
           font-size: 10px
-          +line-height(13)
+          line-height: 15px
           b
             color: #e7350d
             font-weight: normal
-      .mr0
-        margin-right: 0
-      .w140
-        width: 149px
-        margin: 0 55px
+      .mr-38
+        margin-right: 38px
     +clearfix()
   .loginRegisterRight
     border: 1px solid #d5d5d5
@@ -120,9 +120,9 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
             width: auto
             border: 1px solid #d5d5d5
             float: left
-            margin-top: -1px
+            margin: 10px 5px 0 0
             height: auto
-            margin-top: $space-s
+            padding: 0
           a
             color: #4e7cda
       .w145
