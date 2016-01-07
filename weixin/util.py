@@ -133,7 +133,7 @@ def bindUser(w_user, user):
         return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
     other_w_user = WeixinUser.objects.filter(user=user, account_original_id=w_user.account_original_id).first()
     if other_w_user:
-        msg = u"你的手机号<span class='blue'>%s</span>已经绑定微信<span class='blue'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
+        msg = u"你的手机号[%s]已经绑定微信[%s]"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
         return 3, msg
     w_user.user = user
     w_user.bind_time = int(time.time())
