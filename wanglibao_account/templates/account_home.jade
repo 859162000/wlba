@@ -193,8 +193,34 @@ block main
                       p.align-center
                           span.big_number {{experience_account.unpaid_interest | money_format}}
                       p.align-center.desc 待收收益（元）
-              p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动转至理财专区余额。
-              table.table.tableNew
+              p.tyjMark 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除，
+                a(href="javascript:void(0)") 体验金领取及使用说明。
+              .project_div.clearfix
+                h5 专属福利体验标
+                ul.project_detail.clearfix
+                    li.li_one
+                      if experience_amount == 0
+                        label.rzje 28,888元
+                      else
+                        label {{experience_amount}}元
+                      span 融资金额
+                    li.li_two
+                        label {{product.expected_earning_rate}}%
+                        span 年化收益
+                    li.li_three
+                        label {{product.period}}天
+                        span 投资期限
+                    li.li_four
+                        if experience_amount > 0
+                            a(href='javascript:void(0)').investBtn 立即投资
+                        else
+                            a.invest_ed 立即投资
+              if user.is_authenticated and experience_amortization
+                  .look_more_detail
+                    .more_btn
+                        label 查看历史投资项目
+                        span
+              table.table.tableNew(style="display:none")
                   thead
                       tr
                           th 投标时间
