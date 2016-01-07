@@ -1378,6 +1378,26 @@ class WeixinAnnualBonusView(TemplateView):
                     rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
                 wx_bonus.is_max = False
+
+                wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
+                    defaults={
+                        'from_openid' : self.from_openid,
+                        'from_nickname' : self.nick_name,
+                        'from_headimgurl' : self.head_img,
+                        'from_ipaddr' : self.ipaddr,
+                        'to_openid' : self.to_openid,
+                        'is_good_vote' : vote_type,
+                        'current_good_vote' : wx_bonus.good_vote,
+                        'current_bad_vote' : wx_bonus.bad_vote,
+                        'current_annual_bonus' : wx_bonus.annual_bonus,
+                        'create_time' : timezone.now(),
+                    }
+                )
+
+                if not flag:
+                    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
+                    return HttpResponse(json.dumps(rep), content_type='application/json')
+
                 if vote_type!="0":
                     wx_bonus.good_vote += 1
                     wx_bonus.annual_bonus += 500
@@ -1385,31 +1405,18 @@ class WeixinAnnualBonusView(TemplateView):
                         wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
                         wx_bonus.is_max = True
                 else:
-                    wx_bonus.bad_vode += 1
+                    wx_bonus.bad_vote += 1
                     if not wx_bonus.is_max:
                         wx_bonus.annual_bonus -= 500
                         if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
+
                 wx_bonus.update_time = timezone.now()
-
-                wx_vote = WeixinAnnulBonusVote.objects.create(
-                    from_openid = self.from_openid,
-                    from_nickname = self.nick_name,
-                    from_headimgurl = self.head_img,
-                    from_ipaddr = self.ipaddr,
-                    to_openid = self.to_openid,
-                    is_good_vote = vote_type,
-                    current_good_vote = wx_bonus.good_vote,
-                    current_bad_vote = wx_bonus.bad_vote,
-                    current_annual_bonus = wx_bonus.annual_bonus,
-                    create_time = timezone.now(),
-                )
-
                 wx_bonus.save()
 
             except IntegrityError, ex:
                 logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
-                rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
+                rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价(305)', }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
             except Exception, ex:
                 logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
