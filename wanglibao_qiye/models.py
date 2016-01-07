@@ -34,7 +34,7 @@ class EnterpriseUserProfile(models.Model):
     bank_branch_address = models.CharField(u'开户行支行所在地', max_length=100)
     modify_time = models.DateTimeField(u'最近修改时间', auto_now_add=True)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
-    description = models.TextField(u'创建时间', max_length=255, null=True, blank=True)
+    description = models.TextField(u'备注', max_length=255, null=True, blank=True)
     status = models.CharField(u'审核状态', max_length=10, default=u'待审核', choices=STATUS)
     bank = models.ForeignKey(Bank, verbose_name=u'所属银行')
 
@@ -43,17 +43,24 @@ class EnterpriseUserProfile(models.Model):
         if self.status == u'审核通过':
             user_profile.id_is_valid = True
             user_profile.id_valid_time = timezone.now()
-            card = Card()
-            card.bank = self.bank
-            card.no = self.bank_card_no
-            card.user = self.user
-            card.is_default = True
-            card.is_bind_huifu = True
-            # FixMe, 同卡进出
-            # card.is_the_one_card = True
-            card.save()
+            if not Card.objects.filter(no=self.bank_card_no).first():
+                card = Card()
+                card.bank = self.bank
+                card.no = self.bank_card_no
+                card.user = self.user
+                card.is_default = True
+                card.is_bind_huifu = True
+                # FixMe, 同卡进出
+                # card.is_the_one_card = True
+                card.save()
         else:
             user_profile.id_is_valid = False
 
         user_profile.save()
         super(EnterpriseUserProfile, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = u'企业资料'
+
+    def __unicode__(self):
+        return u'%s' % self.company_name

@@ -1,12 +1,9 @@
 # encoding:utf-8
 from django.conf.urls import patterns, url
-from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 from .views import (EnterpriseProfileCreateApi, QiYeIndex, QiYeInfo, EnterpriseProfileUploadApi,
                     EnterpriseProfileUpdateApi, GetEnterpriseUserProfileApi, EnterpriseProfileEditView,
                     EnterpriseProfileIsExistsApi)
-
-
 
 urlpatterns = patterns(
     '',
