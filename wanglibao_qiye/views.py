@@ -167,13 +167,21 @@ class EnterpriseProfileCreateApi(APIView):
                     user.wanglibaouserprofile.save()
 
                     response_data = {
-                        'message': u'success',
+                        'message': u'提交成功',
                         'ret_code': 10000,
                     }
                     return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
+                form_errors = form.errors
+                form_error_keys = form_errors.keys()
+                form_errors_list = []
+                for key in form_error_keys:
+                    value = form_errors[key]
+                    form_error = u'、'.join(value)
+                    form_errors_list.append(form_error)
+
                 response_data = {
-                    'message': form.errors,
+                    'message': u'表单错误：' + u'、'.join(form_errors_list),
                     'ret_code': 10001,
                 }
         else:
@@ -328,8 +336,16 @@ class EnterpriseProfileUpdateApi(APIView):
                         }
                         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
+                form_errors = form.errors
+                form_error_keys = form_errors.keys()
+                form_errors_list = []
+                for key in form_error_keys:
+                    value = form_errors[key]
+                    form_error = u'、'.join(value)
+                    form_errors_list.append(form_error)
+
                 response_data = {
-                    'message': form.errors,
+                    'message': u'表单错误：' + u'、'.join(form_errors_list),
                     'ret_code': 10001,
                 }
         else:
