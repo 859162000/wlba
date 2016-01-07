@@ -24,9 +24,14 @@ block main
                 test = 'yes'
             else
                 if data.status == '审核失败'
-                    test = 'yes'
-                    readonly = false
-                    .notThrough 对不起，您的资料未通过审核，请仔细核查后重新填写，若有疑问请及时与我们的工作人员联系。
+                    if user.wanglibaouserprofile.id_valid_time
+                        test = 'no'
+                        readonly = 'readonly'
+                        .notThrough 对不起，您的资料未通过审核，请仔细核查后重新填写，若有疑问请及时与我们的工作人员联系。
+                    else
+                        test = 'yes'
+                        readonly = false
+                        .notThrough 对不起，您的资料未通过审核，请仔细核查后重新填写，若有疑问请及时与我们的工作人员联系。
                 else
                     test = 'no'
                     readonly = 'readonly'
@@ -43,22 +48,20 @@ block main
                             img(src="/media/{{data.business_license}}",style="width:148px;height:98px;float:left;margin-right:10px")
                             if data.status == '审核通过'
                                 .div#yezz
+                                .errorImg.yezzImg(style='display:none') 请添加营业执照
                             else
                                 .div
-                            //span 营业执照
-                            //a(href='javascript:void(0)').upload 上传
-                            //a(href='javascript:void(0)').del 删除
+                                .errorImg.yezzImg(style='display:none') 请添加营业执照
                     tr
                         td.td-left 税务登记证
                         td
                             img(src="/media/{{data.registration_cert}}",style="width:148px;height:98px;float:left;margin-right:10px")
                             if data.status == '审核通过'
                                 .div#swdjz
+                                .errorImg.yezzImg(style='display:none') 请添加营业执照
                             else
                                 .div
-                            //span 登记证
-                            //a(href='javascript:void(0)').upload 上传
-                            //a(href='javascript:void(0)').del 删除
+                                .errorImg.yezzImg(style='display:none') 请添加营业执照
                     tr
                         td.td-left 授权负责人
                         td
@@ -92,7 +95,7 @@ block main
                     tr
                         td.td-left 公司账户账号
                         td
-                            input(type='text', name="company_account", readonly="readonly", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}", value="{{data.bank_card_no}}")
+                            input(type='text', name="company_account", readonly="readonly", placeholder="请输入帐号", autocomplete='off', class="required isNumber {byteRangeLength:[10,20],messages:{required:'请输入帐号',byteRangeLength:'支持{0}-{1}位字符'}}", value="{{data.bank_card_no}}")
                     tr
                         td.td-left 公司开户行
                         td  {{data.deposit_bank_province}} - {{data.deposit_bank_city}}
@@ -109,7 +112,7 @@ block main
                     tr
                         td.td-left 交易密码
                         td
-                            input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', readonly=readonly, class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}", value="{{data.trade_pwd}}")
+                            input(type='password', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', readonly=readonly, class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}", value="{{data.trade_pwd}}")
             .qiye-btns
                 if test == 'yes'
                     a(href='javascript:void(0)').save-btn 保存

@@ -26,16 +26,14 @@ block main
                             input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}")
                     tr
                         td.td-left 营业执照
-                        td#yezz
-                            //span 营业执照
-                            //a(href='javascript:void(0)').upload 上传
-                            //a(href='javascript:void(0)').del 删除
+                        td
+                           .div#yezz
+                           .errorImg.yezzImg(style='display:none') 请添加营业执照
                     tr
                         td.td-left 税务登记证
-                        td#swdjz
-                            //span 登记证
-                            //a(href='javascript:void(0)').upload 上传
-                            //a(href='javascript:void(0)').del 删除
+                        td
+                          .div#swdjz
+                          .errorImg.swdjzImg(style='display:none') 请添加税务登记证
                     tr
                         td.td-left 授权负责人
                         td
@@ -86,7 +84,7 @@ block main
                     tr
                         td.td-left 交易密码
                         td
-                            input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {messages:{required:'请输入交易密码'}}" )
+                            input(type='password', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}")
             .qiye-btns
                 a(href='javascript:void(0)').save-btn 保存
                 a(href='/').cancel-btn 取消

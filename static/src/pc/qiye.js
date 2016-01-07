@@ -23,6 +23,18 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
     var qiyeFormValidate = $('#qiyeForm').validate({});
     $('.save-btn').on('click',function(){
         if(qiyeFormValidate.form()){
+            if($('input[name="business_license"]').val() == ''){
+                $('.yezzImg').show()
+                return
+            }else{
+                $('.yezzImg').hide()
+            }
+            if($('input[name="registration_cert"]').val() == ''){
+                $('.swdjzImg').show()
+                return
+            }else{
+                $('.swdjzImg').hide()
+            }
             $('#qiyeForm').ajaxSubmit(function(data){
                 window.location.href = '/accounts/home/';
             })
