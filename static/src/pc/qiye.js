@@ -40,16 +40,18 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
                     if (data.ret_code == 10000) {
                         window.location.href = '/accounts/home/';
                     } else {
+                        result = JSON.parse(data.responseText);
                         return tool.modalAlert({
                             title: '温馨提示',
-                            msg: data.message
+                            msg: result.message
                         });
                     }
                 },
                 error :function(data){
+                    result = JSON.parse(data.responseText);
                     return tool.modalAlert({
                         title: '温馨提示',
-                        msg: data.message
+                        msg: result.message
                     });
                 }
             })
