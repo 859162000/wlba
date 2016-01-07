@@ -1398,13 +1398,15 @@ class WeixinAnnualBonusView(TemplateView):
                     rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
 
-                if vote_type!="0":
+                if vote_type=="1":
+                    wx_bonus.is_good_vote = 1
                     wx_bonus.good_vote += 1
                     wx_bonus.annual_bonus += 500
                     if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
                         wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
                         wx_bonus.is_max = True
                 else:
+                    wx_bonus.is_good_vote = 0
                     wx_bonus.bad_vote += 1
                     if not wx_bonus.is_max:
                         wx_bonus.annual_bonus -= 500
