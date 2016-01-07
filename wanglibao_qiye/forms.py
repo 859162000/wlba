@@ -9,8 +9,9 @@ from wanglibao_pay.models import Bank, Card
 class EnterpriseUserProfileForm(forms.Form):
     """企业用户认证资料验证表单"""
 
-    def __init__(self, operation, *args, **kwargs):
+    def __init__(self, operation, user, *args, **kwargs):
         self.operation = operation
+        self._user = user
         super(EnterpriseUserProfileForm, self).__init__(*args, **kwargs)
 
     company_name = forms.CharField(label="Company name", max_length=30, error_messages={'required': u'请输入公司名称'})
@@ -72,46 +73,42 @@ class EnterpriseUserProfileForm(forms.Form):
         return company_address
 
     def clean_company_account(self):
-        if self.operation == 'update':
-            return
-
         company_account = self.cleaned_data.get('company_account', '').strip()
-        if Card.objects.filter(no=company_account).first():
-            raise forms.ValidationError(
-                message=u'该卡已被绑定',
-                code="10004",
-            )
-
-        return company_account
+        try:
+            card = Card.objects.get(no=company_account)
+        except Card.DoesNotExist:
+            return company_account
+        else:
+            if self.operation == 'update':
+                if card.user == self._user:
+                    return company_account
+                else:
+                    raise forms.ValidationError(
+                        message=u'该卡已被绑定',
+                        code="10004",
+                    )
+            elif self.operation == 'create':
+                raise forms.ValidationError(
+                    message=u'该卡已被绑定',
+                    code="10004",
+                )
 
     def clean_company_account_name(self):
-        if self.operation == 'update':
-            return
-
         company_account_name = self.cleaned_data.get('company_account_name', '').strip()
 
         return company_account_name
 
     def clean_deposit_bank_province(self):
-        if self.operation == 'update':
-            return
-
         deposit_bank_province = self.cleaned_data.get('deposit_bank_province', '').strip()
 
         return deposit_bank_province
 
     def clean_deposit_bank_city(self):
-        if self.operation == 'update':
-            return
-
         deposit_bank_city = self.cleaned_data.get('deposit_bank_city', '').strip()
 
         return deposit_bank_city
 
     def clean_bank_branch_address(self):
-        if self.operation == 'update':
-            return
-
         bank_branch_address = self.cleaned_data.get('bank_branch_address', '').strip()
 
         return bank_branch_address
@@ -144,9 +141,6 @@ class EnterpriseUserProfileForm(forms.Form):
         return self.cleaned_data
 
     def clean_bank(self):
-        if self.operation == 'update':
-            return
-
         bank_id = self.cleaned_data.get('bank', '').strip()
         try:
             bank = Bank.objects.get(pk=bank_id)
