@@ -68,6 +68,7 @@ from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
+import re
 import sys
 import time
 from smtplib import SMTP
@@ -2037,6 +2038,13 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
 
     def get_context_data(self, **kwargs):
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
+
+        device_list = ['android', 'iphone']
+        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                self.template_name = 'app_xunlei.jade'
 
         params = self.request.GET
         channel_code = params.get('promo_token', '').strip()

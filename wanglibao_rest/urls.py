@@ -45,7 +45,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
-                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside)
+                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
+                                  BidHasBindingForChannel)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -293,4 +294,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^datacube/$', DataCubeApiView.as_view()),
+)
+
+# 判断bid是否已经绑定渠道
+urlpatterns += patterns(
+    '',
+    url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
 )
