@@ -35,6 +35,8 @@ urlpatterns = patterns(
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
     url(r'^bind/$', login_required(views.WeixinBind.as_view(), login_url='/weixin/login/'), name='weixin_bind'),
 
+    url(r'^trade-pwd/edit/$', TemplateView.as_view(template_name="weixin_tradepwd_edit.jade")),
+    url(r'^trade-pwd/back/$', TemplateView.as_view(template_name="weixin_tradepwd_back.jade")),
 
     url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
