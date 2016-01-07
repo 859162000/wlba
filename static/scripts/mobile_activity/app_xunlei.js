@@ -218,7 +218,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;var boy = $(document.body).height();
-console.log(boy);
 $('.xunmeng,.xunmeng2').css({'height': boy});
 $('.xinlei-rule').click(function () {
     $('.xunmeng').show();
@@ -238,19 +237,14 @@ function getQueryString(name) {
 var token = getQueryString('promo_token'),
     xid = getQueryString('xluserid')
 org.ajax({
-    url: '/api/has_binding/',
+    url: '/api/has_binding/'+token+'/'+xid+'/',
     type: 'GET',
-    data: {
-        'promo_token': token,
-        'xluserid': xid
-    },
     success: function (data) {
         console.log(data);
-        //if (data.ret_code == 10002) {
-        //    $('.xunmeng3').show();
-        //    $('.maimai-form').hide();
-        //} else {
-        //}
+        if (data.ret_code == 10001) {
+            $('.xunmeng3').show();
+            $('.maimai-form').hide();
+        }
     }
 })
 ;
@@ -373,14 +367,14 @@ org.xunlei = (function (org) {
                 }
 
                 if (!lib.checkState) return
-                function getQueryString(name) {
-                    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-                    var r = window.location.search.substr(1).match(reg);
-                    if (r != null) {
-                        return unescape(r[2]);
-                    }
-                    return null;
-                }
+                //function getQueryString(name) {
+                //    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+                //    var r = window.location.search.substr(1).match(reg);
+                //    if (r != null) {
+                //        return unescape(r[2]);
+                //    }
+                //    return null;
+                //}
 
                 var token = getQueryString('promo_token'),
                     xid = getQueryString('xluserid'),
