@@ -1363,6 +1363,10 @@ class WeixinAnnualBonusView(TemplateView):
         if not self.to_openid or not vote_type:
             rep = { 'err_code':301, 'err_messege':u'缺少参数' }
             return HttpResponse(json.dumps(rep), content_type='application/json')
+        if vote_type==u'1':
+            vote_type = 1
+        else:
+            vote_type = 0
 
         if self.to_openid==self.from_openid:
             rep = { 'err_code':302, 'err_messege':u'不能评价自己' }
@@ -1374,10 +1378,9 @@ class WeixinAnnualBonusView(TemplateView):
                 if not wx_bonus:
                     rep = { 'err_code':303, 'err_messege':u'查询受评用户出错' }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
-                if wx_bonus.is_pay:
-                    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
-                    return HttpResponse(json.dumps(rep), content_type='application/json')
-                wx_bonus.is_max = False
+                #if wx_bonus.is_pay:
+                #    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
+                #    return HttpResponse(json.dumps(rep), content_type='application/json')
 
                 wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
                     defaults={
@@ -1399,16 +1402,15 @@ class WeixinAnnualBonusView(TemplateView):
                     return HttpResponse(json.dumps(rep), content_type='application/json')
 
                 if vote_type=="1":
-                    wx_bonus.is_good_vote = 1
                     wx_bonus.good_vote += 1
-                    wx_bonus.annual_bonus += 500
-                    if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
-                        wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
-                        wx_bonus.is_max = True
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
+                        wx_bonus.annual_bonus += 500
+                        if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
+                            wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
+                            wx_bonus.is_max = True
                 else:
-                    wx_bonus.is_good_vote = 0
                     wx_bonus.bad_vote += 1
-                    if not wx_bonus.is_max:
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus -= 500
                         if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
