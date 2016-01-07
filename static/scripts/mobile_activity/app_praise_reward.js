@@ -278,6 +278,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
 				renovate_friends(xhr.follow.length,xhr.follow);
+				if(xhr.wx_user.is_max){
+					$('.num_top').show();
+				}
+				$('#zan_num').text(xhr.wx_user.good_vote);
+				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
 				$('.renovate').removeClass('renovate_rotate');
 				$('.friend_top span').text(xhr.err_messege);
@@ -337,9 +342,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
-					$('.float').text('+100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
 					renovate_friends(xhr.follow.length,xhr.follow);
+					$('#zan_num').text(xhr.wx_user.good_vote);
+					if(xhr.wx_user.is_max){
+						$('.num_top').show();
+					}
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -355,9 +363,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
-					$('.float').text('-100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
 					renovate_friends(xhr.follow.length,xhr.follow);
+					$('#cha_num').text(xhr.wx_user.bad_vote);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
