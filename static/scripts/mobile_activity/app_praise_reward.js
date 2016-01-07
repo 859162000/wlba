@@ -381,6 +381,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
 					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
+				}else if(xhr.err_code==202){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+					$('.apply_button').show();
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -402,8 +406,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*领取我的年终奖*/
 	$('.now_use').click(function(){
-
-
 
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
@@ -430,6 +432,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	$('.regist_button').hide();
 	$('.regist_button').click(function(){
 		window.location.href = '/weixin/regist/?promo_token=h5dianzan&next='+shareLink;
+	});
+
+	$('.apply_button').hide();
+	$('.apply_button').click(function(){
+		window.location.href = '/weixin_activity/weixin/bonus/';
 	});
 	/*领取我的年终奖结束*/
 
