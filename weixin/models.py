@@ -447,6 +447,7 @@ class SubscribeRecord(models.Model):
     # update_at = models.DateTimeField('更新时间', auto_now_add=True)
 
 
+
 class Material(models.Model):
     voice_count = models.IntegerField('音频总数', default=0)
     video_count = models.IntegerField('视频总数', default=0)
@@ -550,11 +551,16 @@ class WeiXinUserActionRecord(models.Model):
         ('unbind', u'解除绑定'),
         ('sign_in', u'用户签到'),
     )
-    w_user = models.ForeignKey(WeixinUser, null=True)
-    user = models.ForeignKey(User, null=True)
+    w_user_id = models.IntegerField(default=0)#models.ForeignKey(WeixinUser, null=True)
+    user_id = models.IntegerField(default=0)#models.ForeignKey(User, null=True)
     action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
     action_describe = models.CharField(u'动作描述', max_length=64)
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    create_time = models.IntegerField('创建时间', default=0)
+
+class SceneRecord(models.Model):
+    openid = models.CharField('用户标识', max_length=128, db_index=True)
+    scene_str = models.CharField('渠道', max_length=64, blank=True, null=True)
     create_time = models.IntegerField('创建时间', default=0)
 
 

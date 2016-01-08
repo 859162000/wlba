@@ -46,20 +46,24 @@
       width: 1.1rem
       height: 1.1rem
 .recharge-body
-  padding: 0 .75rem
   .bank-select
     padding-right: .75rem
+  .recharge-all-show
+    margin-bottom: 2rem
+    .recharge-max
+      color: #ff4c2e
+      font-size: $font-size10
+      padding: 0 0.75rem
+      margin-top: 0.25rem
   .recharge-count
     display: -webkit-box
     -webkit-box-align: center
-    border-radius: $boder-radius
     height: 2.2rem
     font-size: $font-size12
     color: $color-grey-989898
     background: #fff
-    border: 1px solid $border-color
     text-align: center
-    margin-bottom: $margin-bottom
+
     .count-txt-left
       width: 4rem
     .count-input
@@ -87,6 +91,7 @@
     text-align: center
     background: $color-db493f
     border-radius: $boder-radius
+    margin: 0 0.5rem
     &:active
       box-shadow: $active-shadow
   .binding-bank-href
@@ -96,9 +101,9 @@
     text-align: right
 
 .recharge-bank-edit
-  padding-left: .75rem
+  padding: 0 .75rem
   background: #fff
-  margin-bottom: .75rem
+  margin-bottom: .25rem
   overflow: hidden
   .bank-list-btn
     position: relative
@@ -147,13 +152,16 @@
     display: block
     height: 100%
     line-height: normal
-    text-align: left
     border: 0
     background: #fff
     color: $color-grey-989898
+    text-align: right
+    &.bank-account-num
+      line-height: 2.2rem
+      .num
+        color: #f04124
   .bank-txt-name
     line-height: 2.2rem
-
   .recharge-select
     color: $color-grey-989898   
     -webkit-appearance: none
@@ -161,16 +169,15 @@
     background: url("/static/imgs/mobile/select_icon.png") no-repeat right .75rem center #fff
     background-size: .9rem
   .bank-txt-right
-    width: 2.2rem
     height: 100%
     @extend .center
     img
-      width: 1.1rem
-      height: rem(35)
-      margin-right: .5rem
+      height: rem(30)
+      margin-left: 0.5rem
     span
       display: block
       @extend .sanjiao
+
 .recharge-none-card
   padding-top: .75rem
 .card-hide
@@ -196,21 +203,31 @@
   -webkit-box-align: center
   padding: 0 2rem
   .select-bank-body
-    border-radius: .6rem
+    border-radius: .2rem
     background: #fff
     border: 1px solid $color-grey-e8e8e8
-    padding: 0 .25rem
     width: 100%
-    font-size: $font-size12
+    font-size: $font-size16
     color: $color-grey-989898
   .select-bank-tit
     text-align: center
     height: 2.5rem
     line-height: 2.5rem
+    border-bottom: 1px solid #666
+    color: #666
+  .select-bank-cont
+    max-height: 14rem
+    overflow-y: auto
   .select-bank-list
-    display: -webkit-box
     -webkit-box-pack: center
-    padding: .5rem 0
+    padding: .8rem 0.2rem
+    margin: 0 0.8rem
+    border-bottom: 1px solid #ccc
+  .select-cencle
+    text-align: center
+    color: #5db5f2
+    padding: .8rem 0
+    font-size: $font-size14
     border-top: 1px solid $color-grey-e8e8e8
   .bank-type
     width: 2.5rem
@@ -219,11 +236,127 @@
     text-align: center
   .bank-img
     @extend .bank-type
-  .bank-cont
-    -webkit-box-flex: 1
-    text-align: left
-    p:first-child
+//弹出层
+.page-alt
+  display: -webkit-box
+  -webkit-box-pack: center
+  -webkit-box-align: center
+  height: 100%
+  width: 100%
+  position: fixed
+  top: 0
+  left: 0
+  background: rgba(0, 0, 0, 0.5)
+  .account-pwd
+    position: relative
+    background: #fff
+    padding-bottom: 1rem
+    width: 14rem
+    +border-radius(0.25rem)
+    .pwd-tit
+      font-size: $font-size16
+      color: #666
+      padding: 0.675rem 0.75rem
+      border-bottom: 0.05rem solid #5db5f2
+    .pwd-close
+      position: absolute
+      right: 0.75rem
+      top: 0.4rem
+      height: 1.5rem
+      font-size: $font-size26
+      color: $color-grey-dadada
+    .pwd-promote
+      color: $color-grey-989898
+      text-align: center
       font-size: $font-size14
+      margin-top: 1.5rem
+    .pwd-inps
+      padding: 1rem 0.375rem 0
+      position: relative
+      display: -webkit-box
+      .inp-item
+        -webkit-box-flex: 1
+        display: block
+        border: 0.05rem solid $color-grey-e8e8e8
+        margin-right: -0.05rem
+        height: 2.2rem
+        text-align: center
+      .pwd-input
+        position: absolute
+        top: 1rem
+        left: 1.35rem
+        letter-spacing: 1.85rem
+        border: 0
+        height: 2.2rem
+        width: 100%
+        background: none
+    .pwd-img
+      margin-top: 1rem
+      text-align: center
+      height: 3.5rem
+      img
+        height: 100%
+    .page-btn
+      margin-top: 1rem
+      border-top: 0.05rem solid $color-grey-e8e8e8
+      color: #5db5f2
+      font-size: $font-size15
+      text-align: center
+      padding-top: 0.7rem
+  &#page-error
+    .account-pwd
+      padding-bottom: 0
+      .pwd-promote
+        margin-top: 0.5rem
+      .page-btn
+        padding-bottom: 0.7rem
+
+  &#page-ok, &#page-onMoney, &.page-errorAlt
+    .account-pwd
+      padding-bottom: 0
+      padding-top: 1rem
+    .recharge-ok-img
+      height: 2rem
+      text-align: center
+      img
+        height: 100%
+    .recharge-ok-tit
+      font-size: $font-size16
+      text-align: center
+      margin-top: 0.7rem
+      line-height: 1rem
+    .total-money
+      text-align: center
+      line-height: 1rem
+      font-size: $font-size12
+      color: $color-grey-6b6b6b
+      .red
+        color: #f04124
+    .page-btn
+      display: -webkit-box
+      padding: 0
+      &.page-close, &.back-fwh
+        display: block
+        padding: 0.7rem 0
+        text-align: center
+      a
+        -webkit-box-flex: 1
+        display: block
+        padding: 0.75rem 0
+        &:first-child
+          border-right: 0.05rem solid $color-grey-e8e8e8
+
+.confirm-warp
+  .confirm-cont
+    font-size: $font-size14
+    color: $color-grey-6b6b6b
+  .confirm-touch
+    font-size: $font-size15
+.lock-pwd
+  font-size: $font-size14
+  color: $color-grey-6b6b6b
+  text-align: center
+
 
 
 

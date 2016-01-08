@@ -85,7 +85,7 @@ def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_d
     w_user = WeixinUser.objects.filter(openid=openid).first()
     product = P2PProduct.objects.get(pk=product_id)
     if w_user and w_user.subscribe==1 and w_user.user and product.status == u'正在招标':
-        url = settings.CALLBACK_HOST + '/weixin/view/detail/%s/'%product_id
+        url = settings.CALLBACK_HOST + '/weixin/sub_detail/detail/%s/'%product_id
         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)

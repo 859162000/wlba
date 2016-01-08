@@ -36,14 +36,20 @@
       font-size: $font-size14
 
   .unused
-    background: url("/static/imgs/mobile/reward/unused_card.png") no-repeat center
+    background: url("/static/imgs/sub_weixin/reward/ticket-unused.png") no-repeat center
     background-size: 100%
+    &.red-packet
+      background-image: url("/static/imgs/sub_weixin/reward/packet-unused.png")
   .used
-    background: url("/static/imgs/mobile/reward/used_card.png") no-repeat center
-    background-size: cover
-  .expires
-    background: url("/static/imgs/mobile/reward/expires_card.png") no-repeat center
+    background: url("/static/imgs/sub_weixin/reward/ticket-used.png") no-repeat center
     background-size: 100%
+    &.red-packet
+      background-image: url("/static/imgs/sub_weixin/reward/packet-used.png")
+  .expires
+    background: url("/static/imgs/sub_weixin/reward/ticket-overdue.png") no-repeat center
+    background-size: 100%
+    &.red-packet
+      background-image: url("/static/imgs/sub_weixin/reward/packet-overdue.png")
 
 .reward-default
   margin-top: 4rem
