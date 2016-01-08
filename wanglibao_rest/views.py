@@ -368,10 +368,11 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack.valid = 1
                         redpack.save()
         try:
-            openid = request.session.get('openid')
-            if openid:
-                w_user = WeixinUser.objects.get(openid=openid)
-                bindUser(w_user, request.user)
+            if invite_code == 'fwh':
+                openid = request.session.get('openid')
+                if openid:
+                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                    bindUser(w_user, request.user)
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):
