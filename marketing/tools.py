@@ -274,44 +274,65 @@ def send_income_message_sms():
 
 
 @app.task
-def check_redpack_status(delta=timezone.timedelta(days=3)):
+def check_unavailable_3_days():
     """
     每天一次检查3天后到期的红包优惠券.发短息提醒投资.
-    # DOTO: 现在这个方法有问题。
+    直接用sql语句查询。
+    分两种情况查询,1为查询理财券活动的截止日期,2为查询动态截止日期的
     """
-    pass
-    # check_date = timezone.now() + delta
-    # start = timezone.datetime(year=check_date.year, month=check_date.month, day=check_date.day).replace(tzinfo=pytz.UTC)
-    # end = start + timezone.timedelta(days=1)
-    #
-    # # 有效期为3天的优惠券
-    # redpacks = RedPackEvent.objects.filter(unavailable_at__gte=start, unavailable_at__lt=end)
-    # # 未使用过的
-    # available = RedPack.objects.filter(event__in=redpacks, status='used')
-    # # 三天未使用优惠券对应的红包记录
-    # records = RedPackRecord.objects.filter(redpack__in=available)
-    #
-    # ids = [record.user.id for record in records]
-    #
-    # # 获取需要发送提醒的用户
-    # users = User.objects.filter(id__in=ids)
-    #
-    # phones_list = []
-    # messages_list = []
-    # for user in users:
-    #     try:
-    #         count = RedPackRecord.objects.filter(user=user, redpack__event__unavailable_at__gte=start,
-    #                                              redpack__event__unavailable_at__lt=end).exclude(order_id__gt=0).count()
-    #         phones_list.append(user.wanglibaouserprofile.phone)
-    #         messages_list.append(messages.red_packet_invalid_alert(count))
-    #     except Exception, e:
-    #         print e
-    #
-    # send_messages.apply_async(kwargs={
-    #     'phones': phones_list,
-    #     'messages': messages_list,
-    #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-    # })
+    from django.db import connection
+    # 查询三天后的日期
+    days = 3
+    check_date = timezone.now() + timezone.timedelta(days=days)
+    date_fmt = check_date.strftime('%Y-%m-%d')
+    start_date = utils.local_to_utc(check_date, 'min').strftime('%Y-%m-%d %H:%M:%S')
+    end_date = utils.local_to_utc(check_date, 'max').strftime('%Y-%m-%d %H:%M:%S')
+
+    cursor = connection.cursor()
+    # sql = "select COUNT(c.user_id), c.user_id, p.phone " \
+    #       "from wanglibao_redpack_redpackrecord c, " \
+    #       "wanglibao_redpack_redpack r, " \
+    #       "wanglibao_redpack_redpackevent e, " \
+    #       "wanglibao_profile_wanglibaouserprofile p " \
+    #       "where c.redpack_id = r.id and r.event_id = e.id and c.user_id = p.user_id " \
+    #       "and e.unavailable_at > '{}' and e.unavailable_at <= '{}' " \
+    #       "and e.auto_extension = 0 and c.order_id is NULL " \
+    #       "group by c.user_id;".format(start_date, end_date)
+
+    sql = "SELECT COUNT(a.user_id), a.user_id, b.phone FROM " \
+          "(SELECT r.user_id, e.auto_extension AS is_auto, e.unavailable_at, " \
+          "DATE_ADD(r.created_at, INTERVAL e.auto_extension_days day) end_date " \
+          "FROM wanglibao_redpack_redpackrecord AS r, " \
+          "wanglibao_redpack_redpack AS p, " \
+          "wanglibao_redpack_redpackevent AS e " \
+          "WHERE r.redpack_id = p.id AND p.event_id = e.id and r.order_id is NULL) AS a, " \
+          "wanglibao_profile_wanglibaouserprofile AS b " \
+          "WHERE a.user_id = b.user_id " \
+          "AND ((a.is_auto = 0 AND a.unavailable_at > '{}' AND a.unavailable_at <= '{}') " \
+          "OR (a.is_auto = 1 AND a.end_date > '{}' AND a.end_date <= '{}')) " \
+          "GROUP BY a.user_id;".format(start_date, end_date, start_date, end_date)
+
+    print(sql)
+    cursor.execute(sql)
+    fetchall = cursor.fetchall()
+
+    phones_list = []
+    messages_list = []
+    for res in fetchall:
+        try:
+            phones_list.append(res[2])
+            messages_list.append(messages.red_packet_invalid_alert(res[0], days))
+        except Exception, e:
+            print str(e)
+
+    # for msg in messages_list:
+    #     print msg
+
+    send_messages.apply_async(kwargs={
+        'phones': phones_list,
+        'messages': messages_list,
+        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+    })
 
 
 @app.task
