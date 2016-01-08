@@ -15,6 +15,29 @@
     $('.more_btn').click(function() {
       return $('.tableNew').slideToggle();
     });
+    $('#showMark').click(function() {
+      $('.explain_box').modal();
+      $('.modal').removeClass('modal');
+      return $('.explain_box').css({
+        'margin-left': '-435px'
+      });
+    });
+    $('.investBtn').click(function() {
+      return $.ajax({
+        url: '/api/experience/buy/',
+        type: "POST",
+        data: {}
+      }).done(function(data) {
+        $('#success').modal();
+        $('#success').find('.close-modal').hide();
+        return setInterval(function() {
+          $.modal.close();
+          return location.reload();
+        }, 2000);
+      }).fail(function(data) {
+        return console.log(1111);
+      });
+    });
     DataViewModel = (function() {
       function DataViewModel() {
         var self;

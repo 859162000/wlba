@@ -15,6 +15,27 @@ require ['jquery', 'underscore', 'knockout',
   $('.more_btn').click () ->
     $('.tableNew').slideToggle()
 
+  $('#showMark').click () ->
+    $('.explain_box').modal()
+    $('.modal').removeClass('modal')
+    $('.explain_box').css('margin-left':'-435px')
+
+  $('.investBtn').click () ->
+    $.ajax {
+      url: '/api/experience/buy/'
+      type: "POST",
+      data: {}
+    }
+    .done (data) ->
+      $('#success').modal()
+      $('#success').find('.close-modal').hide()
+      setInterval( ->
+          $.modal.close()
+          location.reload()
+      ,2000)
+    .fail (data)->
+      console.log(1111)
+
   class DataViewModel
     constructor: ->
       self = this
