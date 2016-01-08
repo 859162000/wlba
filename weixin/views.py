@@ -349,7 +349,7 @@ class WeixinJoinView(View):
         if m and m.value:
             info = json.loads(m.value)
             big_data_url = info['big_data_url']
-        big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
+        big_data_img_url = "https://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=401567106&idx=3&sn=04e0a33078fed2aaa430ca7c20d4a986&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=afXDbJQe2V9L4zegq2HDoIInqfZPdaDGd52Ml9I9dyXREnBCuI1lWuXmt%2B41znOQ"
 
 
         A_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gIdMuibjodyEeWdavoBO0uvAdfpMzaCNjfreoT4APezdbu6hasMTibTWxw/0?wx_fmt=jpeg"
