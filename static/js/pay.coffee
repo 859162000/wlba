@@ -23,6 +23,10 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
       e.preventDefault()
       $('#id-validate').modal()
       return
+    else if $('#id-is-valid').val() == 'true'
+      $('#id-validate').find('a').attr('href','/qiye/info/')
+      $('#id-validate').modal()
+      return
 
   $.validator.addMethod 'morethan100', (value, element)->
     return Number(value) >= 100
@@ -53,3 +57,7 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
 
   if $('#id-is-valid').val() == 'False'
     $('#id-validate').modal()
+  else if $('#id-is-valid').val() == 'true'
+    $('#id-validate').find('a').attr('href','/qiye/info/')
+    $('#id-validate').modal()
+    return

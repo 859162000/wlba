@@ -32,6 +32,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     if $('#id-is-valid').val() == 'False'
       $('#id-validate').modal()
       return
+    else if $('#id-is-valid').val() == 'true'
+      $('#id-validate').find('a').attr('href','/qiye/info/')
+      $('#id-validate').modal()
+      return
+
     e.preventDefault()
     $(this).modal()
 

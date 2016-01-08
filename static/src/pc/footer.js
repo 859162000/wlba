@@ -15,7 +15,18 @@ require(['jquery'], function( $ ) {
               }
             }).done(function(data) {
                 if(data.ret_code == 10000){
-                    window.location.href = '/accounts/home/';
+                    $.ajax({
+                      url: '/qiye/profile/get/',
+                      type: "GET",
+                      data: {
+                      }
+                    }).done(function(data) {
+                        if(data.data.status == '审核通过'){
+                             window.location.href = '/accounts/home/';
+                        }else{
+                            window.location.href = '/qiye/profile/edit/';
+                        }
+                    })
                 }
             }).fail(function(data){
                 var result = JSON.parse(data.responseText);
@@ -37,15 +48,27 @@ require(['jquery'], function( $ ) {
       }
     }).done(function(data) {
         if(data.ret_code == 10000){
-            $('.finishEd').show();
+            $.ajax({
+              url: '/qiye/profile/get/',
+              type: "GET",
+              data: {
+              }
+            }).done(function(data) {
+                if(data.data.status == '审核通过'){
+                     $('#checkUserType').attr('href','/accounts/home/')
+                }else{
+                    $('#checkUserType').attr('href','/qiye/profile/edit/')
+                    $('#minNavs').hide()
+                }
+            })
         }
     }).fail(function(data){
         var result = JSON.parse(data.responseText);
         if(result.ret_code == 20001){
-            $('.g-user-warp').show()
+            $('#checkUserType').attr('href','/accounts/home')
         }else{
-            $('.finishing').show()
-            $('.g-user-warp').hide()
+           $('#checkUserType').attr('href','/qiye/info/')
+           $('#minNavs').hide()
         }
     })
 })

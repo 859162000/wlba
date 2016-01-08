@@ -179,7 +179,18 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                       }
                     }).done(function(data) {
                         if(data.ret_code == 10000){
-                            window.location.href = '/accounts/home/';
+                            $.ajax({
+                              url: '/qiye/profile/get/',
+                              type: "GET",
+                              data: {
+                              }
+                            }).done(function(data) {
+                                if(data.data.status == '审核通过'){
+                                     window.location.href = '/accounts/home/';
+                                }else{
+                                    window.location.href = '/qiye/profile/edit/';
+                                }
+                            })
                         }
                     }).fail(function(data){
                         var result = JSON.parse(data.responseText);

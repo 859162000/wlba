@@ -66,6 +66,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
 
   if $('#id-is-valid').val() == 'False'
     $('#id-validate').modal()
+  else if $('#id-is-valid').val() == 'true'
+    $('#id-validate').find('a').attr('href','/qiye/info/')
+    $('#id-validate').modal()
+    return
 
   $('#button-get-code-btn').click () ->
     $('#img-code-div2').modal()

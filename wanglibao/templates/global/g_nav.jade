@@ -42,11 +42,11 @@
       .g-user
         if activeItem == "我的账户"
           myacount = 'highlight'
-        a(href="/accounts/home", class='{{myacount}}').user-nav
+        a(href="/accounts/home", class='{{myacount}}')#checkUserType.user-nav
           i.icon.iconfont.icon-user
           span.user-text 我的账户
           i.icon.iconfont.icon-down
-        ul.g-nav-user-nav
+        ul.g-nav-user-nav#minNavs
           mixin liItem(url, text)
             li
               a(href=url)=text

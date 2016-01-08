@@ -26,6 +26,9 @@
       if ($('#id-is-valid').val() === 'False') {
         e.preventDefault();
         $('#id-validate').modal();
+      } else if ($('#id-is-valid').val() === 'true') {
+        $('#id-validate').find('a').attr('href', '/qiye/info/');
+        $('#id-validate').modal();
       }
     });
     $.validator.addMethod('morethan100', function(value, element) {
@@ -64,6 +67,9 @@
     });
     if ($('#id-is-valid').val() === 'False') {
       return $('#id-validate').modal();
+    } else if ($('#id-is-valid').val() === 'true') {
+      $('#id-validate').find('a').attr('href', '/qiye/info/');
+      $('#id-validate').modal();
     }
   });
 
