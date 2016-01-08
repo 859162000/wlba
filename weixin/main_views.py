@@ -73,10 +73,7 @@ class WXLogin(TemplateView):
                 error_msg = u"code or state is None"
             if error_msg:
                 return redirectToJumpPage(error_msg)
-        form = OpenidAuthenticationForm(openid=self.openid, data=request.GET)
-        logger.debug('auto login--------------------opendi::%s'%self.openid)
-        logger.debug('auto login--------------------form.is_valid::%s'%form.is_valid())
-        logger.debug('auto login--------------------form.errors::%s'%form.errors)
+        form = OpenidAuthenticationForm(self.openid, data=request.GET)
         if form.is_valid():
             auth_login(request, form.get_user())
             next = self.request.GET.get('next', '')
