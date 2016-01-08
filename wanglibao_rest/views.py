@@ -1064,7 +1064,7 @@ class StatisticsInside(APIView):
         interest_sum = yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else Decimal('0')
 
         # 昨日资金净流入
-        yesterday_inflow = amount_sum_yesterday - principal_sum - interest_sum
+        yesterday_inflow = amount_sum_yesterday - principal_sum
 
         # 今日还款额
         today_repayment_total = (today_repayment['principal__sum'] if today_repayment['principal__sum'] else 0) + \
