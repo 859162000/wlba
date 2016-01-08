@@ -4,7 +4,6 @@ from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 import views, activity_views, manage_views, sub_views, base
 
-
 urlpatterns = patterns(
     '',
     url(r'^join/(?P<account_key>\w+)/$', views.WeixinJoinView.as_view(), name='weixin_join'),
@@ -35,6 +34,9 @@ urlpatterns = patterns(
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
     url(r'^bind/$', login_required(views.WeixinBind.as_view(), login_url='/weixin/login/'), name='weixin_bind'),
 
+    url(r'^received/all/$', login_required(views.WeiXinReceivedAll.as_view(), login_url='/weixin/login/'), name='weixin_received_all'),
+    url(r'^received/month/$', login_required(views.WeiXinReceivedMonth.as_view(), login_url='/weixin/login/'), name='weixin_received_month'),
+    url(r'^received/detail/$', login_required(views.WeiXinReceivedDetail.as_view(), login_url='/weixin/login/'), name='weixin_received_detail'),
 
     url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
