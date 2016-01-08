@@ -28,7 +28,7 @@ form#add-card-form.add-card-form(style="display:none")
             select.select_bank(autocomplete='off')
                 option(value='') 请选择银行
                 for bank in banks
-                  option(value='{{bank.gate_id}}') {{bank.name}}
+                  option(value='{{bank.gate_id}}',data-id='{{bank.id}}') {{bank.name}}
             span
         .binding-info.w70.clearfix
             label 储蓄卡卡号

@@ -37,10 +37,14 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       if $('#goPersonalInfo').attr('data-type') == 'special'
         $.ajax
           url: "/api/card/"
-          type: "GET"
-          data: {}
+          type: "POST"
+          data: {
+            no : card.val().replace(/\s/g,''),
+            is_default : false,
+            bank : par.find('.select_bank option:selected').attr('data-id')
+          }
         .success (data) ->
-          console.log(1)
+          data.reload()
       else
         $('.bankName').text(par.find('.select_bank option:selected').text()+'（储蓄卡）')
         $('.bankId').text(card.val().replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 "))

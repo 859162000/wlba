@@ -45,10 +45,14 @@
         if ($('#goPersonalInfo').attr('data-type') === 'special') {
           return $.ajax({
             url: "/api/card/",
-            type: "GET",
-            data: {}
+            type: "POST",
+            data: {
+              no: card.val().replace(/\s/g, ''),
+              is_default: false,
+              bank: par.find('.select_bank option:selected').attr('data-id')
+            }
           }).success(function(data) {
-            return console.log(1);
+            return data.reload();
           });
         } else {
           $('.bankName').text(par.find('.select_bank option:selected').text() + '（储蓄卡）');
