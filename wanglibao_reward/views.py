@@ -1483,9 +1483,9 @@ class WeixinAnnualBonusView(TemplateView):
             wx_bonus.pay_time = timezone.now()
             wx_bonus.save()
 
-            wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
+            wx_bonus_json = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-            rep = { 'err_code':0, 'err_messege':u'年终奖已存入网利宝账户：%s 中，登录后才可以使用哦'%wx_bonus.phone, 'wx_user':wx_bonus, }
+            rep = { 'err_code':0, 'err_messege':u'年终奖已存入网利宝账户：%s 中，登录后才可以使用哦'%wx_bonus.phone, 'wx_user':wx_bonus_json, }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def query_bonus(self):
