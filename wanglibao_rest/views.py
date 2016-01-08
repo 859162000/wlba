@@ -1501,3 +1501,26 @@ class DataCubeApiView(APIView):
             }
 
         return HttpResponse(json.dumps(_response), content_type='application/json')
+
+
+class BidHasBindingForChannel(APIView):
+    """
+    根据bid（第三方用户ID）判断该用户是否已经绑定指定渠道
+    """
+
+    permission_classes = ()
+
+    def get(self, request, channel_code, bid):
+        binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
+        if binding:
+            response_data = {
+                'ret_code': 10001,
+                'message': u'该bid已经绑定'
+            }
+        else:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该bid未绑定'
+            }
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
