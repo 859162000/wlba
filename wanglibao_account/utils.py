@@ -82,7 +82,7 @@ def detect_identifier_type(identifier):
 
 
 @method_decorator(transaction.atomic)
-def create_user(identifier, password, nickname, user_type='0'):
+def create_user(identifier, password, nickname):
     username = generate_username(identifier)
     identifier_type = detect_identifier_type(identifier)
     if identifier_type =="unknown":
@@ -93,7 +93,6 @@ def create_user(identifier, password, nickname, user_type='0'):
     user.save()
 
     user.wanglibaouserprofile.nick_name = nickname
-    user.wanglibaouserprofile.utype = user_type
     user.wanglibaouserprofile.save()
     if identifier_type == 'email':
         user.email = identifier

@@ -306,9 +306,15 @@ class WeixinShareDetailView(TemplateView):
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
                 gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2)
+                logger.debug("=======即将被处理的gifts======")
+                for gift in gifts:
+                    logger.debug(gift)
                 exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
                 counts = exp_glods.count() if exp_glods else 0
-                return gifts.filter(amount__lt=10).all(), counts
+                gifts = gifts.filter(amount__lt=10).all()
+                logger.debug("========处理后的gifts=========")
+                return gifts, counts
+                #return gifts.filter(amount__lt=10).all(), counts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
                 return None
@@ -335,7 +341,7 @@ class WeixinShareDetailView(TemplateView):
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
             QSet = WeixinUser.objects.filter(openid=openid).values("nickname", "headimgurl", "openid").first()
             if QSet:
-                ret_val = {"amount": gifts.amount if gifts.amount < 10 else int(gifts.amount), "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
+                ret_val = {"amount": int(gifts.amount) if gifts.type == 3 else gifts.amount, "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
             else:
                 ret_val = {"amount": 0, "name": "", "img": "", "phone": ""}
             self.debug_msg('个人获奖信息返回前端:%s' % (ret_val,))
@@ -419,7 +425,7 @@ class WeixinShareDetailView(TemplateView):
                 has_gift = 'false'
             else:
                 has_gift = 'true'
-            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
+            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s, 领取状态has_gift:%s, phone_num:%s, user_gift.identity:%s' %(openid, user_gift.identity, user_gift, has_gift,phone_num, user_gift.identity ))
         gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
