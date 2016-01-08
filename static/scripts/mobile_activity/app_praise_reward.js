@@ -269,6 +269,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*刷新数据*/
 	$('.renovate').click(function(){
+		$('.regist_button,.apply_button').hide();
 		$(this).addClass('renovate_rotate');
 		$.ajax({
 			url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
@@ -333,7 +334,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	var praise_num = $('#praise_num').val();
 	/*投票*/
 	$('.praise_left').click(function(){
-
+		$('.regist_button,.apply_button').hide();
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -352,6 +353,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 
 	$('.praise_right').click(function(){
+		$('.regist_button,.apply_button').hide();
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=0&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -373,6 +375,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*申请我的年终奖*/
 	var phone_number;
 	$('.take_mine_button').click(function(){
+		$('.regist_button,.apply_button').hide();
 		phone_number = $('#phone_number').val();
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
@@ -382,7 +385,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				if(xhr.err_code==0){
 					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
 				}else if(xhr.err_code==205){
-					
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('.apply_button').show();
@@ -407,7 +409,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*领取我的年终奖*/
 	$('.now_use').click(function(){
-
+		$('.regist_button,.apply_button').hide();
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=pay&wxid='+wxid,
@@ -417,7 +419,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else if(xhr.err_code==404){
-					$('.regist_button').css('display','block');
+					$('.regist_button').show().css('display','block');
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else{
