@@ -2,11 +2,14 @@
 from models import WeixinUser
 
 from django.contrib.auth import get_user_model
+import logging
 User = get_user_model()
+logger = logging.getLogger("weixin")
 
 class OpenidAuthBackend(object):
     def authenticate(self, **kwargs):
         openid = kwargs.get('openid')
+        logger.debug('-----------------------OpenidAuthBackend openid:%s'%openid)
         active_user = None
         if openid:
             w_user = WeixinUser.objects.filter(openid=openid).first()
