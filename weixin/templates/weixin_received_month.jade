@@ -1,0 +1,22 @@
+-load formatters
+doctype html
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 回款计划
+      a(href="javascript:history.back()")
+        span 返回
+      a(href="/weixin/received/all/").right 月份
+    .received-loding
+      include  include/weixin_loading
+    .received-item.month-space
+      .received-default
+        img(src='/static/imgs/mobile/reveived/default.png')
+        .defualt-sign 您还没有回款记录，快去投资吧！
+
+
+    button(type='submit', name='load_more').received-more(style='display:none') 加载更多
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script(data-init='received_month', src="/static/scripts/mobile/dist/mobile.js?v=201251231")

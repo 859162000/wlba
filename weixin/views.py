@@ -1537,9 +1537,13 @@ post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-sa
 class WeiXinReceivedAll(TemplateView):
     """ 回款计划所有 """
     template_name = 'weixin_received_all.jade'
+
+
 class WeiXinReceivedMonth(TemplateView):
     """ 回款计划月 """
     template_name = 'weixin_received_month.jade'
+
+
 class WeiXinReceivedDetail(TemplateView):
     """ 回款计划详细 """
     template_name = 'weixin_received_detail.jade'

@@ -1487,6 +1487,7 @@ class P2PAmortizationAPI(APIView):
             'amortization_amount_interest': float(amortization.interest),  # 利息
             'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
             'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+            'amortization_status': self._check_status(amortization.settled, amortization.settlement_time, amortization.term_date)
         } for amortization in amortizations]
 
         res = {
@@ -1496,6 +1497,15 @@ class P2PAmortizationAPI(APIView):
 
         }
         return Response(res)
+
+    def _check_status(self, settled, settlement_time, term_date):
+        if settled:
+            if settlement_time.strftime('%Y-%m-%d') < term_date.strftime('%Y-%m-%d'):
+                return u'提前回款'
+            else:
+                return u'已回款'
+        else:
+            return u'待回款'
 
 
 @login_required

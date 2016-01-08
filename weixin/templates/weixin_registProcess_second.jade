@@ -19,7 +19,7 @@ html(style='background:#f5f5f5;')
           select(name="bank", type='select', data-target2='binding-bank', data-icon='bank-icon', data-sign= '请选择银行')
             option(value = '')  请选择银行
 
-
+      include include/limit_alert
       .form-list
         .form-icon.binding-bankcard.bankcard-icon
         .form-input
@@ -51,6 +51,8 @@ html(style='background:#f5f5f5;')
         button(type="submit", disabled=true) 绑卡并充值
 
     include include/confirm
+
+
     section.sign-main
       .sign-body
         img(src="/static/imgs/mobile/sign/sign_icon.png")
@@ -60,4 +62,4 @@ html(style='background:#f5f5f5;')
         a(href="/weixin/regist/three/") 下一步
     section.back-index-warp
       a(href='/weixin/list/').back-index 暂不认证，返回首页
-    script(data-init='processSecond', src="/static/scripts/mobile/dist/mobile.js?v=201512072")
+    script(data-init='processSecond', src="/static/scripts/mobile/dist/mobile.js?v=20152072")
