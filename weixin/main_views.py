@@ -62,8 +62,11 @@ class WXLogin(TemplateView):
                     account = WeixinAccounts.getByOriginalId(state)
                     request.session['account_key'] = account.key
                     oauth = WeChatOAuth(account.app_id, account.app_secret, )
-                    res = oauth.fetch_access_token(code)
-                    self.openid = res.get('openid')
+                    user_info = oauth.fetch_access_token(code)
+                    self.openid = user_info.get('openid')
+                    w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
+                    if is_first:
+                        w_user.save()
                 except WeChatException, e:
                     error_msg = e.message
             else:

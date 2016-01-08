@@ -15,6 +15,7 @@ import logging
 import time
 import json
 import urllib
+import re
 
 
 logger = logging.getLogger("weixin")
@@ -89,16 +90,29 @@ def getOrCreateWeixinUser(openid, weixin_account):
             w_user.subscribe = user_info.get('subscribe', 0)
             # if not w_user.subscribe_time:
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
+            w_user.nickname = filter_emoji( w_user.nickname, "*")
             w_user.save()
         except WeChatException, e:
             logger.debug(e.message)
             pass
+
     return w_user, old_subscribe
+
+def filter_emoji(desstr,restr=''):
+    '''
+    过滤表情
+    '''
+    try:
+        co = re.compile(u'[\U00010000-\U0010ffff]')
+    except re.error:
+        co = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
+    return co.sub(restr, desstr)
+
 
 def _process_record(w_user, user, type, describe):
     war = WeiXinUserActionRecord()
-    war.w_user = w_user
-    war.user = user
+    war.w_user_id = w_user.id
+    war.user_id = user.id
     war.action_type = type
     war.action_describe = describe
     war.create_time = int(time.time())
@@ -119,7 +133,7 @@ def bindUser(w_user, user):
         return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
     other_w_user = WeixinUser.objects.filter(user=user, account_original_id=w_user.account_original_id).first()
     if other_w_user:
-        msg = u"你的手机号<span class='blue'>%s</span>已经绑定微信<span class='blue'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
+        msg = u"你的手机号[%s]已经绑定微信[%s]"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
         return 3, msg
     w_user.user = user
     w_user.bind_time = int(time.time())

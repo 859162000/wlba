@@ -62,7 +62,7 @@ from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate
 from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
-from weixin.util import FWH_UNBIND_URL
+from weixin.util import FWH_UNBIND_URL, filter_emoji
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -349,7 +349,7 @@ class WeixinJoinView(View):
         if m and m.value:
             info = json.loads(m.value)
             big_data_url = info['big_data_url']
-        big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
+        big_data_img_url = "https://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=401567106&idx=3&sn=04e0a33078fed2aaa430ca7c20d4a986&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=afXDbJQe2V9L4zegq2HDoIInqfZPdaDGd52Ml9I9dyXREnBCuI1lWuXmt%2B41znOQ"
 
 
         A_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gIdMuibjodyEeWdavoBO0uvAdfpMzaCNjfreoT4APezdbu6hasMTibTWxw/0?wx_fmt=jpeg"
@@ -400,7 +400,7 @@ class WeixinJoinView(View):
         start = datetime.datetime(now.year,now.month, now.day)
         end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
 
-        war = WeiXinUserActionRecord.objects.filter(user=user, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+        war = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
 
         # experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
         #                                                   created_at__lt=end, created_at__gt=start).all()
@@ -1303,6 +1303,7 @@ class GetAuthUserInfo(APIView):
             w_user.province = user_info.get('province', "")
             w_user.subscribe = user_info.get('subscribe', 0)
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
+            w_user.nickname = filter_emoji(w_user.nickname, "*")
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
@@ -1334,6 +1335,7 @@ class GetUserInfo(APIView):
                 w_user.province = user_info.get('province', "")
                 w_user.subscribe = user_info.get('subscribe', 0)
                 w_user.subscribe_time = user_info.get('subscribe_time', 0)
+                w_user.nickname = filter_emoji( w_user.nickname, "*")
                 w_user.save()
         except Exception, e:
             logger.debug(e.message)

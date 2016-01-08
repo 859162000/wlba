@@ -21,18 +21,18 @@ html(style="background: #f6f6f6")
               p 28888体验金
           .xushu
             .xushu-left
-              p 注册网利宝
-              p 账号
+              p 首次充值
+              p 不低于100元
             .xushu-right
-              p 送50元红包
-              p 28888体验金
+              p 送7天迅雷
+              p 白金会员
           .xushu
             .xushu-left
-              p 注册网利宝
-              p 账号
+              p 首次投资
+              p 不低于1000元
             .xushu-right
-              p 送50元红包
-              p 28888体验金
+              p 送1年迅雷
+              p 白金会员
     .xunmeng2
       .xunmeng2-top
         p 迅雷会员&网利宝
@@ -40,15 +40,27 @@ html(style="background: #f6f6f6")
         p 您已成功注册网利宝
         p 并且与迅雷账号绑定成功
       .xunmeng2-moidle2
-        p 迅雷账号：xxx
-        p 网利宝账号：xxx
+        if ret_code == '10000'
+          p 迅雷账号：{{nickname}}
+        p 网利宝账号：
+          span.va
       .xunmeng2-bottom
-        a(href='javascript:void(0);').xunleiwangli 前往网利宝
+        a(href='/weixin/list/').xunleiwangli 前往网利宝
         p 迅雷会员奖励将直接发送到此迅雷账号上
+
     .banner
       img(src='/static/imgs/mobile_activity/app_xunlei/xunleibanner.jpg')
       a(href='javascript:void(0);').xinlei-rule 如何领取1年会员
     .main
+      .xunmeng3
+        .xunmeng3-moidle
+          p 该迅雷账号（{{nickname}}）已绑定网利
+          p 宝账号，请直接登录网利宝账号，
+          p 继续领取会员
+        .xunmeng3-bottom
+          a(href='/weixin/login/').xunleiwangli1 登录网利宝账号
+          a(href='http://act.vip.xunlei.com/waplogin/login.html').xunlei1
+           span 切换迅雷账号
       .maimai-form
         input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
         .maimai-check-body
@@ -63,7 +75,10 @@ html(style="background: #f6f6f6")
             button(type="button").check-submit 短信验证码
         .maimai-form-sign 请输入正确的手机号
         .maimai-form-margin.maimai-sign-margin
-        p.xunleibangding 注册后将与您的迅雷账号：xxx绑定
+        if ret_code == '10000'
+          p.xunleibangding 注册后将与您的迅雷账号：{{nickname}}绑定
+        else
+          p.xunleibangding
         input(type='button',name='submit' ,value="马上注册领取红包",disabled=true).maimai-form-btn2.maimai-form-btn1
         p.xunleipeople
           |已有网利宝账号？
@@ -73,7 +88,7 @@ html(style="background: #f6f6f6")
         p 活动规则
           span &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       ul
-        li 1. 活动时间；
+        li 1. 活动时间2016年1月8日起；
         li 2. 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷渠道新注册用户参与；
         li 3. 活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益；
         li 4. 新用户首次充值不低于100元即可获赠50元直抵红包和7天迅雷会员，直抵红包投资2000元即可抵扣使用，有效期自领取日起7天有效；
