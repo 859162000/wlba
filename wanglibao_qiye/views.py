@@ -241,7 +241,6 @@ class EnterpriseProfileUpdateApi(APIView):
                     # 判断企业信息是否审核中，如果是则不允许修改
                     if e_profile.status in (u'审核中', u'待审核'):
                         response_data = {
-                            'filename': None,
                             'message': u'企业信息审核中，不能更改',
                             'ret_code': 30002,
                         }

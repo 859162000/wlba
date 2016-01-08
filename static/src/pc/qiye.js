@@ -127,7 +127,11 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
           data: {
           }
         }).done(function(data) {
-
+            if($('input[name="bankStatus"]').val() == 'true'){
+                deposit_bank_province = $('input[name="deposit_bank_province"]').val();
+                deposit_bank_city = $('input[name="deposit_bank_city"]').val();
+                new PCAS("deposit_bank_province","deposit_bank_city",deposit_bank_province,deposit_bank_city);
+            }
         }).fail(function(data){
             $('.notThrough').text('请完善信息')
         })
