@@ -1,0 +1,579 @@
+.body_wrap {
+  width: 100%; }
+  .body_wrap .praise_wrap {
+    width: 100%;
+    position: relative; }
+    .body_wrap .praise_wrap .top_light {
+      width: 100%;
+      display: block;
+      position: absolute;
+      top: 0%;
+      left: 0%;
+      z-index: 1; }
+    .body_wrap .praise_wrap .i_want_reward {
+      width: 85.3%;
+      display: block;
+      position: absolute;
+      top: 3.3rem;
+      left: 7.35%;
+      z-index: 3; }
+      .body_wrap .praise_wrap .i_want_reward img {
+        width: 100%;
+        display: block; }
+      .body_wrap .praise_wrap .i_want_reward .text {
+        width: 100%;
+        text-align: center;
+        padding-top: 0.5rem;
+        height: 1.5rem;
+        font-size: 0.9rem;
+        line-height: 1rem;
+        color: #fff; }
+    .body_wrap .praise_wrap .group_bg {
+      position: absolute;
+      top: -2.7rem;
+      left: 0%;
+      z-index: 2;
+      width: 100%; }
+      .body_wrap .praise_wrap .group_bg .main_wrap {
+        width: 100%;
+        position: relative; }
+        .body_wrap .praise_wrap .group_bg .main_wrap .bg {
+          width: 100%;
+          display: block; }
+        .body_wrap .praise_wrap .group_bg .main_wrap .phone {
+          width: 78%;
+          height: 2.5rem;
+          background: #2A1B30;
+          color: #fff;
+          border-radius: 0.7rem;
+          border: none;
+          text-align: center;
+          margin: 0.25rem auto;
+          display: block;
+          font-size: 0.7rem;
+          line-height: 2.5rem; }
+        .body_wrap .praise_wrap .group_bg .main_wrap .button {
+          width: 78%;
+          height: 2.5rem;
+          font-size: 0.7rem;
+          line-height: 2.5rem;
+          text-align: center;
+          color: #ff75fc;
+          background: url("/static/imgs/mobile_activity/app_praise_reward/input_bg.png") no-repeat;
+          margin: 1rem auto;
+          background-size: 100% 100%; }
+        .body_wrap .praise_wrap .group_bg .main_wrap .footer_bg {
+          width: 100%;
+          display: block;
+          position: fixed;
+          left: 0;
+          bottom: 0;
+          z-index: 2; }
+          @media screen and (max-height: 569px) {
+            .body_wrap .praise_wrap .group_bg .main_wrap .footer_bg {
+              position: relative; } }
+        .body_wrap .praise_wrap .group_bg .main_wrap .footer_logo {
+          position: fixed;
+          bottom: 0.8rem;
+          left: 41.2%;
+          width: 17.6%;
+          display: block;
+          z-index: 3; }
+          @media screen and (max-height: 569px) {
+            .body_wrap .praise_wrap .group_bg .main_wrap .footer_logo {
+              position: absolute; } }
+  .body_wrap .invitation_page {
+    width: 100%;
+    display: none; }
+    .body_wrap .invitation_page .top_wrap {
+      width: 100%;
+      display: block;
+      position: relative; }
+      .body_wrap .invitation_page .top_wrap .fly_img {
+        width: 95.7%;
+        display: block; }
+      .body_wrap .invitation_page .top_wrap .man {
+        width: 16%;
+        display: block;
+        margin-left: 38.2%;
+        position: absolute;
+        left: 0;
+        top: 25%;
+        z-index: 2; }
+      .body_wrap .invitation_page .top_wrap .worker {
+        width: 100%;
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 2; }
+        .body_wrap .invitation_page .top_wrap .worker .text {
+          color: #fff;
+          text-align: center;
+          width: 100%;
+          font-size: 0.75rem;
+          height: 0.8rem;
+          margin: 0.5rem 0 1.7rem;
+          line-height: 0.8rem; }
+        .body_wrap .invitation_page .top_wrap .worker .work {
+          width: 81.7%;
+          margin: 0 auto;
+          display: block; }
+    .body_wrap .invitation_page .operation_wrap {
+      width: 100%;
+      background-image: url("/static/imgs/mobile_activity/app_praise_reward/invitation_bg.png");
+      background-position: top center;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      background-color: #4c3456;
+      display: inline-block; }
+      .body_wrap .invitation_page .operation_wrap .reward_wrap {
+        width: 92%;
+        margin: 0 auto;
+        display: block;
+        height: 2.75rem;
+        border: 2px #02F0FA solid;
+        border-radius: 0.75rem;
+        position: relative; }
+        .body_wrap .invitation_page .operation_wrap .reward_wrap .gold {
+          height: 2.35rem;
+          float: left;
+          display: block;
+          padding: 0.4rem 0 0 0.3rem; }
+        .body_wrap .invitation_page .operation_wrap .reward_wrap .text {
+          float: left;
+          height: 2.75rem;
+          line-height: 2.75rem;
+          color: #fcdc3d;
+          font-size: 0.9rem;
+          padding-left: 0.2rem; }
+        .body_wrap .invitation_page .operation_wrap .reward_wrap input {
+          width: 45.3%;
+          float: left;
+          color: #fcdc3d;
+          font-size: 0.9rem;
+          height: 2.25rem;
+          line-height: 2.25rem;
+          border: none;
+          background: #3A2842;
+          position: relative;
+          top: 0.25rem;
+          border-radius: 3px;
+          text-align: center;
+          left: 0.55rem; }
+        .body_wrap .invitation_page .operation_wrap .reward_wrap .renovate {
+          width: 1.6rem;
+          display: block;
+          float: right;
+          margin: 0.7rem 3.3% 0 0; }
+        .body_wrap .invitation_page .operation_wrap .reward_wrap .renovate_rotate {
+          -webkit-animation-name: rotate_ico;
+          animation-name: rotate_ico;
+          -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+          -webkit-animation-fill-mode: both;
+          animation-fill-mode: both; }
+@keyframes rotate_ico {
+  0% {
+    transfrom: rotate(0deg); }
+  50% {
+    transform: rotate(180deg); }
+  100% {
+    transform: rotate(360deg); } }
+@-webkit-keyframes rotate_ico {
+  0% {
+    -webkit-transfrom: rotate(0deg); }
+  50% {
+    -webkit-transform: rotate(180deg); }
+  100% {
+    -webkit-transform: rotate(360deg); } }
+    .body_wrap .invitation_page .praise_wrap {
+      clear: both;
+      width: 92%;
+      margin: 1rem auto 0;
+      display: block;
+      height: 2.75rem; }
+      .body_wrap .invitation_page .praise_wrap .praise {
+        float: left;
+        display: block;
+        position: relative; }
+        .body_wrap .invitation_page .praise_wrap .praise .bg {
+          display: block;
+          height: 2.75rem; }
+        .body_wrap .invitation_page .praise_wrap .praise .zan {
+          width: 15%;
+          display: block;
+          position: absolute;
+          left: 13%;
+          top: 0.65rem; }
+        .body_wrap .invitation_page .praise_wrap .praise .text {
+          position: absolute;
+          left: 61%;
+          top: 0;
+          height: 2.75rem;
+          line-height: 2.55rem;
+          color: #f96ff1;
+          font-size: 0.8rem; }
+      .body_wrap .invitation_page .praise_wrap .praise_right {
+        float: right; }
+        .body_wrap .invitation_page .praise_wrap .praise_right .text {
+          color: #e8b3f5; }
+    .body_wrap .invitation_page .title {
+      width: 100%;
+      clear: both;
+      line-height: 1rem;
+      height: 1rem;
+      font-size: 0.75rem;
+      color: #2A1B30;
+      text-align: center;
+      margin: 0.85rem 0; }
+    .body_wrap .invitation_page .share_button {
+      display: block;
+      width: 78%;
+      height: 2.5rem;
+      font-size: 0.7rem;
+      line-height: 2.5rem;
+      text-align: center;
+      color: #ff75fc;
+      background: url("/static/imgs/mobile_activity/app_praise_reward/input_bg.png") no-repeat;
+      margin: 0rem auto;
+      background-size: 100% 100%; }
+    .body_wrap .invitation_page .now_use {
+      display: block;
+      width: 78%;
+      height: 2.5rem;
+      font-size: 0.7rem;
+      line-height: 2.5rem;
+      text-align: center;
+      color: #ff75fc;
+      background: url("/static/imgs/mobile_activity/app_praise_reward/input_bg.png") no-repeat;
+      margin: 1rem auto;
+      background-size: 100% 100%; }
+    .body_wrap .invitation_page .line {
+      width: 100%;
+      text-align: center;
+      height: 1rem;
+      font-size: 0.65rem;
+      line-height: 1rem;
+      color: #2A1B30;
+      background: url("/static/imgs/mobile_activity/app_praise_reward/line.jpg") no-repeat center center;
+      background-size: 100% auto; }
+    .body_wrap .invitation_page .tab_wrap {
+      width: 100%;
+      margin: 0.375rem 0;
+      display: inline-block;
+      position: relative; }
+      .body_wrap .invitation_page .tab_wrap #mycarousel-prev {
+        width: 0.9rem;
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 0rem;
+        padding-left: 0.45rem;
+        margin-top: -0.3875rem;
+        z-index: 99; }
+        .body_wrap .invitation_page .tab_wrap #mycarousel-prev img {
+          display: block;
+          width: 100%; }
+      .body_wrap .invitation_page .tab_wrap #mycarousel-next {
+        width: 0.9rem;
+        display: block;
+        position: absolute;
+        top: 50%;
+        right: 0rem;
+        padding-right: 0.45rem;
+        margin-top: -0.3875rem;
+        z-index: 99; }
+        .body_wrap .invitation_page .tab_wrap #mycarousel-next img {
+          display: block;
+          width: 100%; }
+    .body_wrap .invitation_page .line_bottom {
+      width: 100%;
+      height: 1px;
+      background: #2A1B30;
+      clear: both; }
+    .body_wrap .invitation_page .title_text1 {
+      width: 100%;
+      color: #EEBBFF;
+      font-size: 0.75rem;
+      margin: 0.85rem 0;
+      line-height: 0.8rem;
+      text-align: center; }
+    .body_wrap .invitation_page .code_img {
+      width: 33.8%;
+      display: block;
+      margin: 0 auto; }
+    .body_wrap .invitation_page .title_text2 {
+      width: 100%;
+      color: #EEBBFF;
+      font-size: 0.75rem;
+      margin: 0.85rem 0 0;
+      line-height: 0.8rem;
+      text-align: center; }
+    .body_wrap .invitation_page .footer_logo {
+      width: 17.6%;
+      display: block;
+      margin: 0.85rem auto;
+      padding-bottom: 0.75rem; }
+  .body_wrap .share_wrap {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 99;
+    background: rgba(0, 0, 0, 0.5);
+    display: none; }
+    .body_wrap .share_wrap .share_text {
+      position: absolute;
+      top: 44%;
+      left: 1.1%;
+      z-index: 2;
+      width: 97.8%;
+      display: block; }
+      .body_wrap .share_wrap .share_text .main {
+        width: 100%;
+        position: relative;
+        display: inline-block; }
+        .body_wrap .share_wrap .share_text .main img {
+          width: 100%;
+          display: block; }
+        .body_wrap .share_wrap .share_text .main .text {
+          text-align: center;
+          color: #2A1B30;
+          line-height: 1rem;
+          font-size: 0.75rem;
+          position: absolute;
+          top: 26%;
+          z-index: 3;
+          left: 0;
+          width: 100%; }
+    .body_wrap .share_wrap .share_img1 {
+      position: absolute;
+      right: 7.6%;
+      top: 2%;
+      width: 18.6%;
+      z-index: 2; }
+    .body_wrap .share_wrap .share_title1 {
+      position: absolute;
+      left: 52%;
+      top: 18%;
+      z-index: 2;
+      font-size: 0.6rem;
+      height: 1.25rem;
+      color: #fff; }
+    .body_wrap .share_wrap ul {
+      position: absolute;
+      left: 52%;
+      top: 18%;
+      z-index: 2;
+      color: #fff;
+      padding-top: 2.5rem; }
+      .body_wrap .share_wrap ul li {
+        height: 1.75rem;
+        line-height: 1.25rem;
+        padding-bottom: 0.5rem; }
+        .body_wrap .share_wrap ul li .img {
+          width: 1.3rem;
+          float: left; }
+          .body_wrap .share_wrap ul li .img img {
+            height: 1.25rem;
+            display: block;
+            padding: 0.125rem 0; }
+        .body_wrap .share_wrap ul li span.text {
+          float: left;
+          font-size: 0.6rem;
+          height: 1.25rem;
+          display: block;
+          margin-left: 0.3rem; }
+  .body_wrap .shine_wrap {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 99;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none; }
+    .body_wrap .shine_wrap .bg {
+      width: 100%;
+      position: absolute;
+      left: 0;
+      top: 7%;
+      display: block; }
+    .body_wrap .shine_wrap .close {
+      width: 9.3%;
+      position: absolute;
+      top: 10%;
+      right: 4%;
+      display: block; }
+    .body_wrap .shine_wrap .title {
+      width: 100%;
+      position: absolute;
+      top: 19%;
+      right: 0;
+      text-align: center;
+      color: #fff;
+      font-size: 1rem;
+      line-height: 1.4rem; }
+    .body_wrap .shine_wrap .text {
+      width: 100%;
+      text-align: center;
+      position: absolute;
+      top: 75%;
+      right: 0;
+      z-index: 99;
+      color: #fff;
+      font-size: 0.75rem;
+      line-height: 0.9rem; }
+  .body_wrap .friend_top {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    z-index: 99;
+    text-align: center;
+    margin: -0.8rem 0 0 0;
+    width: 100%;
+    display: none; }
+    .body_wrap .friend_top .text {
+      padding: 1rem;
+      background: #ccc;
+      color: #483153;
+      line-height: 1rem;
+      font-size: 0.9rem;
+      border-radius: 10px; }
+  .body_wrap .step_me {
+    display: none; }
+  .body_wrap .take_mine_reward {
+    width: 79.3%;
+    margin: 1rem auto;
+    display: none; }
+    .body_wrap .take_mine_reward .phone {
+      width: 100%;
+      height: 2.5rem;
+      text-align: center;
+      background: #2A1B30;
+      color: #fff;
+      font-size: 0.75rem;
+      line-height: 2.5rem;
+      border: none;
+      border-radius: 1.4rem;
+      display: block;
+      margin: 0 auto 0.875rem; }
+    .body_wrap .take_mine_reward .take_mine_button {
+      width: 100%;
+      height: 2.5rem;
+      text-align: center;
+      color: #F976F6;
+      font-size: 0.75rem;
+      line-height: 2.3rem;
+      background: url("/static/imgs/mobile_activity/app_praise_reward/input_bg.png") no-repeat center center;
+      display: block;
+      background-size: 100% 100%; }
+  .body_wrap .checkbox_wrap {
+    width: 100%;
+    height: 2rem;
+    text-align: center;
+    line-height: 1rem;
+    padding-bottom: 1rem; }
+    .body_wrap .checkbox_wrap .checkbox {
+      background: url("/static/imgs/mobile_activity/app_praise_reward/no_checkbox.jpg") no-repeat center left;
+      height: 1rem;
+      background-size: auto 100%;
+      padding-left: 1.2rem; }
+    .body_wrap .checkbox_wrap .checkbox_select {
+      background: url("/static/imgs/mobile_activity/app_praise_reward/checkbox.jpg") no-repeat center left;
+      background-size: auto 100%; }
+    .body_wrap .checkbox_wrap span {
+      height: 1rem;
+      line-height: 1rem;
+      font-size: 0.75rem; }
+    .body_wrap .checkbox_wrap a {
+      height: 1rem;
+      font-size: 0.75rem;
+      line-height: 1rem; }
+
+.jcarousel-skin-tango .jcarousel-clip-horizontal {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  width: 88%;
+  display: inline-block;
+  margin-left: 6%;
+  height: 2rem; }
+  @media screen and (max-width: 1025px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 5.83rem; } }
+  @media screen and (max-width: 769px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 5rem; } }
+  @media screen and (max-width: 415px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 2.45rem; } }
+  @media screen and (max-width: 396px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 2.3rem; } }
+  @media screen and (max-width: 376px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 2.16rem; } }
+  @media screen and (max-width: 361px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 2.05rem; } }
+  @media screen and (max-width: 351px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 1.95rem; } }
+  @media screen and (max-width: 331px) {
+    .jcarousel-skin-tango .jcarousel-clip-horizontal {
+      height: 1.8rem; } }
+
+.user_wrap {
+  width: 100%;
+  display: inline-block;
+  margin-left: 6%; }
+  .user_wrap li {
+    width: 1.8rem;
+    margin: 0 0.3rem 0 0.3rem;
+    height: 1.8rem;
+    float: left;
+    display: block; }
+    @media screen and (max-width: 1025px) {
+      .user_wrap li {
+        width: 5.83rem;
+        height: 5.83rem; } }
+    @media screen and (max-width: 769px) {
+      .user_wrap li {
+        width: 5rem;
+        height: 5rem; } }
+    @media screen and (max-width: 415px) {
+      .user_wrap li {
+        width: 2.45rem;
+        height: 2.45rem; } }
+    @media screen and (max-width: 396px) {
+      .user_wrap li {
+        width: 2.3rem;
+        height: 2.3rem; } }
+    @media screen and (max-width: 376px) {
+      .user_wrap li {
+        width: 2.16rem;
+        height: 2.16rem; } }
+    @media screen and (max-width: 361px) {
+      .user_wrap li {
+        width: 2.05rem;
+        margin: 0 0.3rem 0; } }
+    @media screen and (max-width: 351px) {
+      .user_wrap li {
+        width: 1.95rem;
+        margin: 0 0.3rem 0; } }
+    @media screen and (max-width: 341px) {
+      .user_wrap li {
+        width: 1.95rem;
+        margin: 0 0.27rem 0; } }
+    @media screen and (max-width: 331px) {
+      .user_wrap li {
+        width: 1.8rem;
+        margin: 0 0.27rem 0; } }
+    .user_wrap li .user {
+      width: 100%;
+      display: block; }
+
+/*# sourceMappingURL=app_praise_reward.css.map */
