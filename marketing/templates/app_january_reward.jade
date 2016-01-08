@@ -1,0 +1,69 @@
+- load formatters
+doctype html
+html(style="background: url('/static/imgs/mobile_activity/app_january_reward/body_bg.jpg')")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_january_reward.css?v=122102", rel="stylesheet")
+        - csrf_token
+    body
+        .body_wrap.clear
+            img.banner(src='/static/imgs/mobile_activity/app_january_reward/banner.png')
+            .small_title.small_title_1 50万理财金满额送，更有千万红包加息券猛撒
+            img.big_title_1(src='/static/imgs/mobile_activity/app_january_reward/title_img_1.png')
+            .main_wrap.main_wrap_1
+                .title_top 单笔投资满额就送10倍理财金年终奖，<br>多投多得上不封顶.年终福利靠自己！
+                .red_wrap
+                    img.red_box.red_box_1(src='/static/imgs/mobile_activity/app_january_reward/red_bg_1.png')
+                    img.red_box.red_box_2(src='/static/imgs/mobile_activity/app_january_reward/red_bg_2.png')
+                    .clear
+                    img.red_box.red_box_3(src='/static/imgs/mobile_activity/app_january_reward/red_bg_3.png')
+                    img.button(src='/static/imgs/mobile_activity/app_january_reward/button.png')
+                .title_bottom!='备注：所有体验金10%年化、1天期限计算发放收益到账户余额。<br><span id="see_rule_1">点击查看理财金规则>></span>'
+                .rule_wrap.rule_wrap_1
+                    .title 【理财金领取和使用规则】
+                    p 1、新老用户均可参与，活动期间内首次满额投资即可获得定额10倍理财金，理财金自动发放到相应账户并站内信通知；
+                    p 2、理财金只能在相关活动页投体验标使用（体验标为10%年化收益，1天期限），投标时不能使用其他理财券，理财金自发放日起15日内有效；
+                    p!=' 3、理财金需用户手动投资，投资时系统将自动按理财金总额一次性投标完成。<span id="go_experience">立即前往理财金投资页面>></span>；'
+                    p 4、理财金投资完毕后，当日开始计算利息，到期日16点回款。还款本金系统自动回收，利息收益系统自动发放到用户账户；
+                    p 5、理财金利息收益和正常账户余额一样，可正常投资和提现。
+                    p.last
+            img.big_title_2(src='/static/imgs/mobile_activity/app_january_reward/title_img_2.png')
+            .main_wrap.main_wrap_2
+                .title_top 千万红包雨迎新猛撒，单笔投资双享红包和加息券，<br>一箭双雕开年专享！超级福利盛大来袭
+                .reward_wrap
+                    img.reward_box.reward_box_left(src='/static/imgs/mobile_activity/app_january_reward/reward_box_1.png')
+                    img.reward_box.reward_box_right(src='/static/imgs/mobile_activity/app_january_reward/reward_box_2.png')
+                    img.reward_box.reward_box_left(src='/static/imgs/mobile_activity/app_january_reward/reward_box_3.png')
+                    img.reward_box.reward_box_right(src='/static/imgs/mobile_activity/app_january_reward/reward_box_4.png')
+                    img.button(src='/static/imgs/mobile_activity/app_january_reward/button.png')
+                    .title_bottom!='备注：<span id="see_rule_2">点击查看红包和加息券规则>></span>'
+                .rule_wrap.rule_wrap_2
+                    .title 【红包和加息券规则】
+                    p 1、红包和加息券有效期：2016年1月X日0：00-2016年1月X日23:59；
+                    p 2、单笔投资满额所赠加息券不限标期均可使用，所赠红包为直抵现金红包。投资满额后立即发放，详情使用方法请见我的账户-理财券查看。活动期间多投多送上不封顶；
+                    p 3、红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
+                    p 4、加息券在电脑端和手机端均可使用，一券一标永久加息。投标时选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+                    p 5、投资一个项目时，红包不可叠加使用，也不可与加息券叠加使用；
+                    p 6、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+                    p 7、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+                    p.last
+            .act_rule
+                .title 【活动规则】
+                p 1、活动时间：2016年1月x日-2016年1月x日；
+                p 2、活动期间，新老用户均可参加活动，投资满额送10倍年终奖理财金理财金需用户投体验标后才可获得收益，立即前往理财金投资页面；
+                p 3、大额投资专享加息券和红包福利，单笔投资后立得双重好礼;
+                p 4、红包和加息券只限投正常期限理财标获得和使用，不可用于定存宝和债转等产品;
+                p 5、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑;
+                p 6、网利宝对此活动享有最终解释权。
+                p(style="display:none")#ios-show 7、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js?v=20151215")
+        script(src="/static/scripts/mobile_activity/dist/app_january_reward.js?v=122807")
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
