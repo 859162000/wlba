@@ -17,14 +17,14 @@ require ['jquery', 'underscore', 'knockout',
     url: "/qiye/profile/get/"
     type: "GET"
     data: {}
-  .fail (xhr) ->
-    tool.modalAlert({title: '温馨提示', msg: xhr.message})
+  .fail (data) ->
+    result = JSON.parse(data.responseText);
+    if result.ret_code == 20001
+      $('#tyjzq').show()
   .success (data) ->
     $('#tyjzq').hide()
     if data.ret_code == 10000
       $('#qiyeUser i').text(data.data.company_name)
-    if data.ret_code == 20001
-      $('#tyjzq').show()
 
   class DataViewModel
     constructor: ->

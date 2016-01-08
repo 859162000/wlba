@@ -16,18 +16,16 @@
       url: "/qiye/profile/get/",
       type: "GET",
       data: {}
-    }).fail(function(xhr) {
-      return tool.modalAlert({
-        title: '温馨提示',
-        msg: xhr.message
-      });
+    }).fail(function(data) {
+      var result;
+      result = JSON.parse(data.responseText);
+      if (result.ret_code === 20001) {
+        return $('#tyjzq').show();
+      }
     }).success(function(data) {
       $('#tyjzq').hide();
       if (data.ret_code === 10000) {
-        $('#qiyeUser i').text(data.data.company_name);
-      }
-      if (data.ret_code === 20001) {
-        return $('#tyjzq').show();
+        return $('#qiyeUser i').text(data.data.company_name);
       }
     });
     DataViewModel = (function() {

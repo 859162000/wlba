@@ -29,4 +29,23 @@ require(['jquery'], function( $ ) {
             window.location.href = '/qiye/register/'
         }
     })
+
+    $.ajax({
+      url: '/qiye/profile/exists/',
+      type: "GET",
+      data: {
+      }
+    }).done(function(data) {
+        if(data.ret_code == 10000){
+            $('.finishEd').show();
+        }
+    }).fail(function(data){
+        var result = JSON.parse(data.responseText);
+        if(result.ret_code == 20001){
+            $('.g-user-warp').show()
+        }else{
+            $('.finishing').show()
+            $('.g-user-warp').hide()
+        }
+    })
 })
