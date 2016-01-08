@@ -412,7 +412,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，',
 		user_info = $('.user_info').text();
 
-	if(user_info){
+	if(user_info=="True"){
 		$('.friend_top span').text('您已注册成功，请点击<立即使用>领用您的年终奖了');
 		$('.friend_top').show();
 	}else{
@@ -478,11 +478,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	$('.regist_button,.apply_button,.login_button,.go_experience').hide();
 	$('.regist_button').click(function(){
-<<<<<<< HEAD
 		window.location.href = '/weixin/regist/?next=/weixin_activity/weixin/bonus/from_regist/&promo_token=h5dianzan';
-=======
-		window.location.href = '/weixin/regist/?promo_token=h5dianzan&next='+shareLink;
->>>>>>> 5c0097b602701faac4b09c515c5e315e6cffdf85
 	});
 
 	$('.apply_button').click(function(){
