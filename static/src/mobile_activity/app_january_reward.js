@@ -9,69 +9,83 @@
         }
     });
     var login = false;
+
     wlb.ready({
         app: function(mixins) {
-			mixins.shareData({title: '双旦来了，翻倍狂欢', content: '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。'});
+			mixins.shareData({title: '2016年1月年终奖', content: '终于成功领到了1月年终奖，感谢老板！'});
 
             mixins.sendUserInfo(function(data) {
-				$('.link_licai').click(function(){
-					mixins.jumpToManageMoney();
-				});
-				$('.investment_button').click(function() {
+				$('.button').click(function(){
 					mixins.jumpToManageMoney();
 				});
 
                 if (data.ph == '') {
                     login = false;
-					$('.recharge_button').click(function() {
-                        mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/app_double_eggs'});
+					$('#go_experience').click(function() {
+                        mixins.loginApp({refresh:1, url:'/activity/experience/redirect/'});
                     })
 
                 } else {
                     login = true;
-                    $('.recharge_button').click(function() {
-                        mixins.jumpToManageMoney();
+                    $('#go_experience').click(function() {
+                       window.location.href = '/activity/experience/redirect/'
                     })
                 }
 				$('#tiyanjin').click(function(){
 					window.location.href = '/activity/experience/redirect/'
 				});
             });
-			$('.code_wrap').hide();
         },
         other: function() {
+			$('.button').click(function(){
+				window.location.href = '/weixin/list/';
+			});
             if(h5_user_static){
-                $('.recharge_button').click(function() {
-                    window.location.href = '/weixin/recharge/?rechargeNext=/weixin/account/'
+				$('#go_experience').click(function() {
+					window.location.href = '/weixin/login/?next=/activity/experience/redirect/';
                 })
             }else{
-                $('.recharge_button').click(function() {
-                    window.location.href = '/weixin/login/?next=/weixin/recharge/'
+                $('#go_experience').click(function() {
+					window.location.href = '/activity/experience/redirect/';
                 })
             }
-			$('.investment_button').click(function() {
-				window.location.href = '/weixin/list/'
-			});
-			$('.link_licai').click(function(){
-				window.location.href = '/weixin/list/'
-			});
-			$('#tiyanjin').click(function(){
-				window.location.href = '/activity/experience/mobile/';
-			});
-			$('.code_wrap').show();
-            //console.log('其他场景的业务逻辑');
+
         }
     });
 
-	var see_rule_button_index;
-	$('.see_rule_button').click(function(){
-		see_rule_button_index = $(this).next().hasClass('rule_wrap_show');
-		if(see_rule_button_index){
-			$(this).next().removeClass('rule_wrap_show').hide();
+
+	$('#see_rule_1').on('click',function(){
+		var ele = $('.rule_wrap_1');
+		var curHeight = ele.height();
+		var autoHeight = ele.css('height', 'auto').height();
+		if (!ele.hasClass('down')){
+			$('#see_rule_1').addClass('select');
+			ele.height(curHeight).animate({'height':autoHeight,'margin':'0.75rem auto 0'},500,function(){
+				ele.addClass('down');
+			});
 		}else{
-			$(this).next().addClass('rule_wrap_show').show();
+			$('#see_rule_1').removeClass('select');
+			ele.height(curHeight).animate({'height':'0','margin':'0 auto 0'},500,function(){
+				ele.removeClass('down');
+			});
 		}
-	});
+	})
+	$('#see_rule_2').on('click',function(){
+		var ele = $('.rule_wrap_2');
+		var curHeight = ele.height();
+		var autoHeight = ele.css('height', 'auto').height();
+		if (!ele.hasClass('down')){
+			$('#see_rule_2').addClass('select');
+			ele.height(curHeight).animate({'height':autoHeight,'margin':'0.75rem auto 0'},500,function(){
+				ele.addClass('down');
+			});
+		}else{
+			$('#see_rule_2').removeClass('select');
+			ele.height(curHeight).animate({'height':'0','margin':'0 auto 0'},500,function(){
+				ele.removeClass('down');
+			});
+		}
+	})
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
@@ -92,11 +106,11 @@
 	});
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
-			shareName = '双旦来了，翻倍狂欢',
-			shareImg = host + '/static/imgs/mobile_activity/app_double_dan/300x300.jpg',
-			shareLink = host + '/activity/app_double_dan/',
-			shareMainTit = '双旦来了，翻倍狂欢',
-			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
+			shareName = '2016年1月年终奖',
+			shareImg = host + '/static/imgs/mobile_activity/app_january_reward/300x300.jpg',
+			shareLink = host + '/activity/app_january_reward/',
+			shareMainTit = '2016年1月年终奖',
+			shareBody = '终于成功领到了1月年终奖，感谢老板！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -106,7 +120,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '双旦来了，翻倍狂欢',
+			title: '10倍体验金，还有最高2.8%和3000直抵红包！',
 			link : shareLink,
 			imgUrl: shareImg
 		})

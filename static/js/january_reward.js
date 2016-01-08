@@ -86,9 +86,9 @@
         })
 		$('#go_experience').click(function(){
             if(h5_user_static){
-                window.location.href = '/activity/experience/gold/'
+                window.location.href = '/accounts/home/experience/'
             }else{
-                window.location.href = '/accounts/login/?next=/activity/experience/gold/'
+                window.location.href = '/accounts/login/?next=/accounts/home/experience/'
             }
 
 		});
