@@ -63,7 +63,11 @@
             hasCallBack: true,
             callBack: function () {
                 if ($('#register_submit').hasClass('buttom-mm')) {
-                    window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
+                    if(getQueryString('referfrom')){
+                        var refer=getQueryString('referfrom');
+                         window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao&referfrom="+refer;
+                    }
+
                 } else {
                     history.go(0);
                 }
