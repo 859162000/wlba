@@ -193,7 +193,7 @@
 		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，',
 		user_info = $('.user_info').text();
 
-	if(user_info){
+	if(user_info=='True'){
 		$('.friend_top span').text('您已注册成功，请点击<立即使用>领用您的年终奖了');
 		$('.friend_top').show();
 	}else{

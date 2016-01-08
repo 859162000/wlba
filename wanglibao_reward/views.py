@@ -1218,8 +1218,10 @@ class WeixinAnnualBonusView(TemplateView):
     url_name = ''
     wx_classify = 'fwh'
     url_name = "weixin_annual_bonus"
+    url_path = ""
     url_query = ""
     template_name = 'app_praise_reward.jade'
+    is_from_regist = False
 
     def __init__(self):
         self.from_openid = ''
@@ -1243,6 +1245,7 @@ class WeixinAnnualBonusView(TemplateView):
             #self.nick_name = wxid
             #self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
 
+        self.url_path = self.request.path
         self.url_query = self.request.META.get('QUERY_STRING', None)
 
         if not self.from_openid:
@@ -1263,6 +1266,10 @@ class WeixinAnnualBonusView(TemplateView):
         from wanglibao_rest.utils import get_client_ip
         self.ipaddr = get_client_ip(request)
 
+        if self.url_path == u'/weixin_activity/weixin/bonus/from_regist/':
+            self.is_from_regist = True
+            return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
+
         self.action = self.request.GET.get('act', 'view')
         if self.action=='view':
             return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
@@ -1281,6 +1288,7 @@ class WeixinAnnualBonusView(TemplateView):
         if not self.to_openid:
             self.template_name = 'app_praise_reward.jade'
             return { 'err_code':101, 'err_messege':u'获取受评用户失败' }
+
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         #wx_bonus = None
         if wx_bonus:
@@ -1292,7 +1300,8 @@ class WeixinAnnualBonusView(TemplateView):
                      'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                      'share_link':settings.CALLBACK_HOST + reverse(self.url_name) + "?uid=" + self.to_openid,
                      'share_title':u'我的努力需要你的一个肯定，谢谢你',
-                     'share_body':u'您的好友正在领取他的年终奖，随手一赞，助他多拿500！'
+                     'share_body':u'您的好友正在领取他的年终奖，随手一赞，助他多拿500！',
+                     'is_from_regist' : self.is_from_regist,
                     }
         else:
             if self.is_myself:
@@ -1302,7 +1311,7 @@ class WeixinAnnualBonusView(TemplateView):
                         'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                         'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
                         'share_title':u'您的好友邀请您参加分享领取年终奖活动',
-                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！'
+                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！',
                         }
             else:
                 self.template_name = 'app_praise_reward.jade'
@@ -1474,9 +1483,9 @@ class WeixinAnnualBonusView(TemplateView):
             wx_bonus.pay_time = timezone.now()
             wx_bonus.save()
 
-            wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
+            wx_bonus_json = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-            rep = { 'err_code':0, 'err_messege':u'年终奖领取成功', 'wx_user':wx_bonus, }
+            rep = { 'err_code':0, 'err_messege':u'年终奖已存入网利宝账户：%s 中，登录后才可以使用哦'%wx_bonus.phone, 'wx_user':wx_bonus_json, }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def query_bonus(self):
@@ -1506,6 +1515,15 @@ class WeixinAnnualBonusView(TemplateView):
                 "create_time": str(vote.create_time),
             } for vote in wx_votes
         ]
+
+        leon_vote = {
+            "from_nickname": "leon",
+            "from_headimgurl": settings.CALLBACK_HOST + "/static/imgs/mobile_activity/app_praise_reward/people_6.png",
+            "is_good_vote": "True",
+            "create_time": "2018-01-08 00:00:00",
+        }
+        vote_list.insert(0,leon_vote)
+
         return vote_list
 
     def getAccountid(self):
@@ -1517,7 +1535,7 @@ class WeixinAnnualBonusView(TemplateView):
 
     def getOpenid(self, request, *args, **kwargs):
         account_id = self.getAccountid()
-        redirect_uri = settings.CALLBACK_HOST + reverse(self.url_name) + "?" + self.url_query
+        redirect_uri = settings.CALLBACK_HOST + self.url_path + "?" + self.url_query
         #self.request.session['WECHAT_OPEN_ID'] = None
         self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
         if not self.openid:
