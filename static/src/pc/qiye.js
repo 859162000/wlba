@@ -67,9 +67,10 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
             $('#yezz').parent().find('img').remove();
         },
         error:function( data ) {
+            result = JSON.parse(data.responseText);
             return tool.modalAlert({
               title: '温馨提示',
-              msg: data.message
+              msg: result.message
             });
         },
         buttonText : '营业执照',
