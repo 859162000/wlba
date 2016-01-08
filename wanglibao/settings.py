@@ -1140,9 +1140,15 @@ XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 
 # 脉脉
+WLB_FOR_MAIMAI1_KEY = '2004'
 MAIMAI1_CHANNEL_CODE = 'maimai1'
 MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
 MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
+
+# 亚洲财经
+WLB_FOR_YZCJ_KEY = '2005'
+YZCJ_COOP_KEY = 'yzcj_2005'
+YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表
@@ -1199,7 +1205,7 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST='https://staging.wanglibao.com'
+    CALLBACK_HOST = 'https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'

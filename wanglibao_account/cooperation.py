@@ -54,7 +54,8 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
-     XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, XUNLEIVIP_LOGIN_URL
+     XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, YZCJ_CALL_BACK_URL, YZCJ_COOP_KEY,\
+     XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
                                     xunleivip_callback
@@ -1330,7 +1331,8 @@ class XunleiVipRegister(CoopRegister):
             logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
                         (user.id, channel_user, channel_name))
         else:
-            logger.info("xunlei9 binding faild with user[%s] not xunlei user" % user.id)
+            logger.info("xunlei9 binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
+                        (user.id, self.channel_user, self.channel_time, self.channel_sign))
 
     def binding_for_after_register(self, user):
         """
@@ -1480,14 +1482,59 @@ class MaimaiRegister(CoopRegister):
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
+class YZCJRegister(CoopRegister):
+    def __init__(self, request):
+        super(YZCJRegister, self).__init__(request)
+        self.c_code = 'yzcj'
+        self.coop_key = YZCJ_COOP_KEY
+        self.call_back_url = YZCJ_CALL_BACK_URL
+
+    def purchase_call_back(self, user, order_id):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购'
+                                              ).select_related('product').order_by('create_time').first()
+
+        # 判断是否已绑定并且首次投资
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
+            # 判断投资金额是否大于1000
+            pay_amount = int(p2p_record.amount)
+            if pay_amount >= 1000:
+                invest_time = p2p_record.create_time
+                period = p2p_record.product.period
+                pay_method = p2p_record.product.pay_method
+
+                # 根据支付方式判定标周期的单位（天/月）,如果是单位为月则转换为天
+                if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                    period = (invest_time + relativedelta(months=period) - invest_time).days
+
+                sign = hashlib.md5(str(p2p_record.order_id) + str(binding.bid) +
+                                   str(period) + str(pay_amount) + self.coop_key).hexdigest()
+
+                params = {
+                    'oid': p2p_record.order_id,
+                    'tid': binding.bid,
+                    'time': timezone.localtime(invest_time).strftime('%Y%m%d%H%M%S'),
+                    'procuctId': p2p_record.product_id,
+                    'interval': period,
+                    'investment': pay_amount,
+                    'phone': get_phone_for_coop(user.id),
+                    'IdNum': '',
+                    'sign': sign,
+                }
+
+                # 异步回调
+                common_callback.apply_async(
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister, JuChengRegister, MaimaiRegister, RockFinanceRegister]
-
+                          XunleiVipRegister, JuChengRegister, MaimaiRegister,
+                          YZCJRegister, RockFinanceRegister,]
 
 #######################第三方用户查询#####################
 
