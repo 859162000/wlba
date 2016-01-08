@@ -425,7 +425,7 @@ class WeixinShareDetailView(TemplateView):
                 has_gift = 'false'
             else:
                 has_gift = 'true'
-            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
+            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s, 领取状态has_gift:%s, phone_num:%s, user_gift.identity:%s' %(openid, user_gift.identity, user_gift, has_gift,phone_num, user_gift.identity ))
         gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
