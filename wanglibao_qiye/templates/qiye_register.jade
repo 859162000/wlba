@@ -76,7 +76,7 @@ body
                             li.voice(style='display:none') 没有收到验证码？请尝试<a href="javascript:void(0)" class="voiceValidate">语音验证</a>
                             li#passWordInput.pwdLi
                                 i.icon.iconfont.icon-key.mg-l-sm
-                                input.registerPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                                input.registerPwd.placeholderInput.checkPwd(type="text",onfocus="this.type='password'",name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
                         .loginError
                         .submitFormStyle.tc.font-l#registerSubmit 注册
     include global/g_footer
