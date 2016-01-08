@@ -314,6 +314,7 @@ class RegisterAPIView(DecryptParmsAPIView):
             # save_to_binding(user, request)
 
         if device['device_type'] == "pc" or request.GET.get('promo_token') == 'wrp':
+            logger.debug(u'用户注册完后，开始登录：promo_token:%s, phone:%s' % (request.GET.get('promo_token'), identifier))
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
