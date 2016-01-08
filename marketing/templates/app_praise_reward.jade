@@ -5,7 +5,7 @@ html(style="background: #3a2741")
         title 网利宝
         include include/app_head
         link(href="/static/styles/mobile_activity/swiper.min.css", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010702", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010801", rel="stylesheet")
         - csrf_token
     body
         .fix_wrap(style='width: 100%;height: 100%;background: #3a2741;position: fixed;left: 0;top: 0;z-index: 9999')
@@ -89,6 +89,8 @@ html(style="background: #3a2741")
                         img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
                         .regist_button 注册
                         .apply_button 去看看我的年终奖
+                        .login_button 登录
+                        .go_experience 领取成功
             .rule_wrap
                 .main
                     .text
@@ -118,8 +120,9 @@ html(style="background: #3a2741")
             .share_info.share_link {{share_link}}
             .share_info.share_title {{share_title}}
             .share_info.share_body {{share_body}}
+            .user_info {{is_from_regist}}
             include include/tracking
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/swiper.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010801")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010802")
