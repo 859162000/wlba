@@ -369,7 +369,8 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack.valid = 1
                         redpack.save()
         try:
-            if invite_code == 'fwh':
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh':
                 openid = request.session.get('openid')
                 if openid:
                     w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
