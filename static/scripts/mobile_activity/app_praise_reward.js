@@ -478,7 +478,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	$('.regist_button,.apply_button,.login_button,.go_experience').hide();
 	$('.regist_button').click(function(){
+<<<<<<< HEAD
 		window.location.href = '/weixin/regist/?next=/weixin_activity/weixin/bonus/from_regist/&promo_token=h5dianzan';
+=======
+		window.location.href = '/weixin/regist/?promo_token=h5dianzan&next='+shareLink;
+>>>>>>> 5c0097b602701faac4b09c515c5e315e6cffdf85
 	});
 
 	$('.apply_button').click(function(){

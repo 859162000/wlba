@@ -1240,8 +1240,8 @@ class WeixinAnnualBonusView(TemplateView):
         wxid = self.request.GET.get('wxid')
         if wxid and wxid!='undefined':
             self.from_openid = wxid
-            self.nick_name = wxid
-            self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
+            #self.nick_name = wxid
+            #self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
 
         self.url_query = self.request.META.get('QUERY_STRING', None)
 
@@ -1285,7 +1285,7 @@ class WeixinAnnualBonusView(TemplateView):
         #wx_bonus = None
         if wx_bonus:
             #wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
-            follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid)
+            follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=1).order_by('-create_time')
             self.template_name = 'app_praise_reward.jade'
             return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows,
                      'share_name':u'我的努力需要你的一个肯定，谢谢你',
@@ -1311,7 +1311,12 @@ class WeixinAnnualBonusView(TemplateView):
     def apply_bonus(self):
         phone = self.request.GET.get('phone')
         #TODO: 手机号码有效性检查
-        if not phone or phone=='undefined':
+        isMobilePhone = False
+        if phone:
+            valphone = SinicValidate().phone(phone)
+            if valphone['isPhone']:
+                isMobilePhone = True
+        if not isMobilePhone:
             rep = { 'err_code':201, 'err_messege':u'请填写有效的手机号', }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
@@ -1337,11 +1342,12 @@ class WeixinAnnualBonusView(TemplateView):
 #               'user_id' : user_profile.user.id if user_profile else None,
                 'user' : user_profile.user if user_profile else None,
                 'is_new' : is_new,
-                'min_annual_bonus' : 28888 if is_new else 1000,
-                'max_annual_bonus' : 36888 if is_new else 8000,
+                'annual_bonus' : 500 if is_new else 500,
+                'min_annual_bonus' : 500 if is_new else 500,
+                'max_annual_bonus' : 8000 if is_new else 8000,
             })
         except Exception, ex :
-            logger.Exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
+            logger.exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
             rep = { 'err_code':204, 'err_messege':u'系统繁忙，请稍后重试', }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
@@ -1353,10 +1359,14 @@ class WeixinAnnualBonusView(TemplateView):
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def vote_bonus(self):
-        vote_type = self.request.GET.get('type', None)
-        if not self.to_openid or not vote_type:
+        str_vote_type = self.request.GET.get('type', None)
+        if not self.to_openid or not str_vote_type:
             rep = { 'err_code':301, 'err_messege':u'缺少参数' }
             return HttpResponse(json.dumps(rep), content_type='application/json')
+
+        vote_type = 1
+        if str_vote_type==u'0':
+            vote_type = 0
 
         if self.to_openid==self.from_openid:
             rep = { 'err_code':302, 'err_messege':u'不能评价自己' }
@@ -1368,59 +1378,58 @@ class WeixinAnnualBonusView(TemplateView):
                 if not wx_bonus:
                     rep = { 'err_code':303, 'err_messege':u'查询受评用户出错' }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
-                if wx_bonus.is_pay:
-                    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
-                    return HttpResponse(json.dumps(rep), content_type='application/json')
-                wx_bonus.is_max = False
-                if vote_type:
+                #if wx_bonus.is_pay:
+                #    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
+                #    return HttpResponse(json.dumps(rep), content_type='application/json')
+
+                if vote_type==1:
                     wx_bonus.good_vote += 1
-                    wx_bonus.annual_bonus += 500
-                    if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
-                        wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
-                        wx_bonus.is_max = True
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
+                        wx_bonus.annual_bonus += 500
+                        if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
+                            wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
+                            wx_bonus.is_max = True
                 else:
-                    wx_bonus.bad_vode += 1
-                    if not wx_bonus.is_max:
+                    wx_bonus.bad_vote += 1
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus -= 500
                         if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
-                wx_bonus.update_time = timezone.now()
 
-                wx_vote = WeixinAnnulBonusVote.objects.create(
-                    from_openid = self.from_openid,
-                    from_nickname = self.nick_name,
-                    from_headimgurl = self.head_img,
-                    from_ipaddr = self.ipaddr,
-                    to_openid = self.to_openid,
-                    is_good_vote = vote_type,
-                    current_good_vote = wx_bonus.good_vote,
-                    current_bad_vote = wx_bonus.bad_vote,
-                    current_annual_bonus = wx_bonus.annual_bonus,
-                    create_time = timezone.now(),
+                wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
+                    defaults={
+                        'from_openid' : self.from_openid,
+                        'from_nickname' : self.nick_name,
+                        'from_headimgurl' : self.head_img,
+                        'from_ipaddr' : self.ipaddr,
+                        'to_openid' : self.to_openid,
+                        'is_good_vote' : vote_type,
+                        'current_good_vote' : wx_bonus.good_vote,
+                        'current_bad_vote' : wx_bonus.bad_vote,
+                        'current_annual_bonus' : wx_bonus.annual_bonus,
+                        'create_time' : timezone.now(),
+                    }
                 )
 
+                if not flag:
+                    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
+                    return HttpResponse(json.dumps(rep), content_type='application/json')
+
+                wx_bonus.update_time = timezone.now()
                 wx_bonus.save()
 
-            except IntegrityError, ex:
-                logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
-                rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
-                return HttpResponse(json.dumps(rep), content_type='application/json')
+            #except IntegrityError, ex:
+            #    logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
+            #    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价(305)', }
+            #    return HttpResponse(json.dumps(rep), content_type='application/json')
             except Exception, ex:
                 logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
                 rep = { 'err_code':306, 'err_messege':'系统繁忙，请稍后重试', }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
-        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid).order_by('-create_time')
-        vote_list = [
-            {
-                "from_nickname": vote.from_nickname,
-                "from_headimgurl": vote.from_headimgurl,
-                "is_good_vote": vote.is_good_vote,
-                "create_time": str(vote.create_time),
-            } for vote in wx_votes
-        ]
-        rep = { 'err_code':0, 'err_messege':'评价成功', 'wx_user':wx_bonus, 'follow':vote_list }
+
+        rep = { 'err_code':0, 'err_messege':'评价成功', 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def pay_bonus(self):
@@ -1431,29 +1440,35 @@ class WeixinAnnualBonusView(TemplateView):
         with transaction.atomic():
             wx_bonus = WeixinAnnualBonus.objects.select_for_update().filter(openid=self.to_openid).first()
             if not wx_bonus:
-                return { 'err_code':402, 'err_messege':u'查询受评用户出错' }
+                rep = { 'err_code':402, 'err_messege':u'查询受评用户出错' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             if wx_bonus.is_pay:
-                return { 'err_code':403, 'err_messege':u'您已经领取过了' }
+                rep = { 'err_code':403, 'err_messege':u'您已经领取过了' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册
-            user = WanglibaoUserProfile.objects.filter(phone=wx_bonus.phone).first()
-            if not user:
-                return { 'err_code':404, 'err_messege':u'请注册后再领取' }
+            user_profile = WanglibaoUserProfile.objects.filter(phone=wx_bonus.phone).first()
+            if not user_profile:
+                rep = { 'err_code':404, 'err_messege':u'请使用手机号%s注册后再领取'%wx_bonus.phone }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 以体验金形式发放年终奖
             bonus = wx_bonus.annual_bonus
-            if wx_bonus.is_new:
-                bonus = wx_bonus.annual_bonus - wx_bonus.min_annual_bonus
+            ## by hb : remove 28888 from bonus
+            ##if wx_bonus.is_new:
+            ##    bonus = wx_bonus.annual_bonus - wx_bonus.min_annual_bonus
             event = ExperienceEvent.objects.filter(description=u'2015年终奖体验金').filter(amount=bonus).first()
             if not event:
-                return { 'err_code':405, 'err_messege':u'领取失败，请联系客服(405)' }
+                rep = { 'err_code':405, 'err_messege':u'领取失败，请联系客服(405)' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             try:
-                SendExperienceGold(user).send(pk=event.id)
+                SendExperienceGold(user_profile.user).send(pk=event.id)
             except Exception, ex:
-                logger.exception("SendExperienceGold [%s, %s] Except: [%s]" % (user, event, ex))
-                return { 'err_code':406, 'err_messege':u'领取失败，请联系客服(406)' }
+                logger.exception("SendExperienceGold [%s, %s] Except: [%s]" % (user_profile.user, event, ex))
+                rep = { 'err_code':406, 'err_messege':u'领取失败，请联系客服(406)' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             wx_bonus.is_pay = True
             wx_bonus.pay_time = timezone.now()
@@ -1472,7 +1487,17 @@ class WeixinAnnualBonusView(TemplateView):
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid).order_by('-create_time')
+        rep = { 'err_code':0, 'err_messege':'', 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
+        return HttpResponse(json.dumps(rep), content_type='application/json')
+
+    def share_bonus(self):
+        pass
+
+    def visit_bonus(self):
+        pass
+
+    def getGoodvoteToJson(self):
+        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=1).order_by('-create_time')
         vote_list = [
             {
                 "from_nickname": vote.from_nickname,
@@ -1481,15 +1506,7 @@ class WeixinAnnualBonusView(TemplateView):
                 "create_time": str(vote.create_time),
             } for vote in wx_votes
         ]
-
-        rep = { 'err_code':0, 'err_messege':'', 'wx_user':wx_bonus, 'follow':vote_list }
-        return HttpResponse(json.dumps(rep), content_type='application/json')
-
-    def share_bonus(self):
-        pass
-
-    def visit_bonus(self):
-        pass
+        return vote_list
 
     def getAccountid(self):
         m = Misc.objects.filter(key='weixin_qrcode_info').first()
@@ -1534,3 +1551,51 @@ class WeixinAnnualBonusView(TemplateView):
         self.from_openid = self.openid
 
         return self.dispatch(request, *args, **kwargs)
+
+
+import re
+class SinicValidate(object):
+    def __init__(self):
+        # Refer: http://www.oschina.net/code/snippet_238351_48624
+        self.ChinaMobile = r'^134[0-8]\d{7}$|^(?:13[5-9]|147|15[0-27-9]|178|18[2-478])\d{8}$'  # 移动方面最新答复
+        self.ChinaUnion = r'^(?:13[0-2]|145|15[56]|176|18[56])\d{8}$'  # 向联通微博确认并未回复
+        self.ChinaTelcom = r'^(?:133|153|177|18[019])\d{8}$'  # 1349号段 电信方面没给出答复，视作不存在
+        self.OtherTelphone = r'^170([059])\d{7}$'  # 其他运营商
+
+        self.email_regex = r'^.+@([^.@][^@]+)$'
+
+    def phone(self, message, china_mobile=None, china_union=None, china_telcom=None, other_telphone=None):
+        """
+        Validates a phone number.
+        :param message:
+        :param china_mobile:
+        :param china_union:
+        :param china_telcom:
+        :param other_telphone:
+        :return:
+        """
+        isChinaMobile = isChinaUnion = isChinaTelcom = isOtherTelphone = False
+        if re.match(china_mobile or self.ChinaMobile, message):
+            isChinaMobile = True
+        elif re.match(china_union or self.ChinaUnion, message):
+            isChinaUnion = True
+        elif re.match(china_telcom or self.ChinaTelcom, message):
+            isChinaTelcom = True
+        elif re.match(other_telphone or self.OtherTelphone, message):
+            isOtherTelphone = True
+        return {
+            'isPhone': isChinaMobile or isChinaUnion or isChinaTelcom or isOtherTelphone,
+            'isChinaMobile': isChinaMobile,
+            'isChinaUnion': isChinaUnion,
+            'isChinaTelcom': isChinaTelcom,
+            'isOtherTelphone': isOtherTelphone,
+        }
+
+    def email(self, message, regex=None):
+        """
+        Validates an email address.
+        :param message:
+        :param regex:
+        :return:
+        """
+        return re.match(regex or self.email_regex, message)

@@ -236,7 +236,7 @@
 					}else{
 						$('.login_button').show();
 					}
-
+					
 					//go_experience();
 					//倒数3秒跳转到体验金页面
 
