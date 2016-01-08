@@ -36,10 +36,6 @@
       if ($('#id-is-valid').val() === 'False') {
         $('#id-validate').modal();
         return;
-      } else if ($('#id-is-valid').val() === 'true1') {
-        $('#id-validate').find('a').attr('href', '/qiye/info/');
-        $('#id-validate').modal();
-        return;
       }
       e.preventDefault();
       return $(this).modal();

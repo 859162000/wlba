@@ -79,7 +79,7 @@ block main
                   input#pay.button-pay(type='submit', value='立即充值')
   #id-validate(style='display: none')
     if user.wanglibaouserprofile.utype == '3'
-        input#id-is-valid(type='hidden', value='true1')
+        input#id-is-valid(type='hidden', value='true')
     else
         input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
     .padding-xl.align-center
