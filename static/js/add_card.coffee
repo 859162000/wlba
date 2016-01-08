@@ -34,10 +34,18 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     card = par.find('.cardId')
     if _checkBankCard(bank,card)
       card.next().html('<i class="dui"></i>')
-      $('.bankName').text(par.find('.select_bank option:selected').text()+'（储蓄卡）')
-      $('.bankId').text(card.val().replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 "))
-      $('#confirmInfo').show()
-      $('#chooseBank,.bankTitle span').hide()
+      if $('#goPersonalInfo').attr('data-type') == 'special'
+        $.ajax
+          url: "/api/card/"
+          type: "GET"
+          data: {}
+        .success (data) ->
+          console.log(1)
+      else
+        $('.bankName').text(par.find('.select_bank option:selected').text()+'（储蓄卡）')
+        $('.bankId').text(card.val().replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 "))
+        $('#confirmInfo').show()
+        $('#chooseBank,.bankTitle span').hide()
 
   ###验证银行卡信息###
   _checkBankCard = (bank,card)->
@@ -235,8 +243,14 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     if $('#id-is-valid').val() == 'False'
       $('#id-validate').modal()
       return
+    $.ajax
+      url: "/api/profile/"
+      type: "GET"
+      data: {}
+    .success (data) ->
+      if data.is_mainland_user == false
+        $('#goPersonalInfo').attr('data-type':'special')
     e.preventDefault()
-#    $(this).modal()
     $('.banks-list,.bankManage').hide()
     $('#chooseBank,.bankTitle').show()
 

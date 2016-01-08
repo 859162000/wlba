@@ -42,10 +42,20 @@
       card = par.find('.cardId');
       if (_checkBankCard(bank, card)) {
         card.next().html('<i class="dui"></i>');
-        $('.bankName').text(par.find('.select_bank option:selected').text() + '（储蓄卡）');
-        $('.bankId').text(card.val().replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, "$1 "));
-        $('#confirmInfo').show();
-        return $('#chooseBank,.bankTitle span').hide();
+        if ($('#goPersonalInfo').attr('data-type') === 'special') {
+          return $.ajax({
+            url: "/api/card/",
+            type: "GET",
+            data: {}
+          }).success(function(data) {
+            return console.log(1);
+          });
+        } else {
+          $('.bankName').text(par.find('.select_bank option:selected').text() + '（储蓄卡）');
+          $('.bankId').text(card.val().replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, "$1 "));
+          $('#confirmInfo').show();
+          return $('#chooseBank,.bankTitle span').hide();
+        }
       }
     });
 
@@ -293,6 +303,17 @@
         $('#id-validate').modal();
         return;
       }
+      $.ajax({
+        url: "/api/profile/",
+        type: "GET",
+        data: {}
+      }).success(function(data) {
+        if (data.is_mainland_user === false) {
+          return $('#goPersonalInfo').attr({
+            'data-type': 'special'
+          });
+        }
+      });
       e.preventDefault();
       $('.banks-list,.bankManage').hide();
       return $('#chooseBank,.bankTitle').show();
