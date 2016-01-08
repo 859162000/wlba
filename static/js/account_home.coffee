@@ -15,6 +15,27 @@ require ['jquery', 'underscore', 'knockout',
   $('.more_btn').click () ->
     $('.tableNew').slideToggle()
 
+  $('#showMark').click () ->
+    $('.explain_box').modal()
+    $('.modal').removeClass('modal')
+    $('.explain_box').css('margin-left':'-435px')
+
+  $('.investBtn').click () ->
+    $.ajax {
+      url: '/api/experience/buy/'
+      type: "POST",
+      data: {}
+    }
+    .done (data) ->
+      $('#success').modal()
+      $('#success').find('.close-modal').hide()
+      setInterval( ->
+          $.modal.close()
+          location.reload()
+      ,2000)
+    .fail (data)->
+      console.log(1111)
+
   class DataViewModel
     constructor: ->
       self = this
@@ -79,22 +100,6 @@ require ['jquery', 'underscore', 'knockout',
 
   viewModel = new DataViewModel()
   ko.applyBindings viewModel
-
-###  backend.fundInfo()
-  .done (data)->
-    totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"])
-    $("#total_asset").text($.number(totalAsset, 2))
-    $("#fund_total_asset").text($.number(data["fund_total_asset"], 2))
-    $("#fund_total_asset_title").text($.number(data["fund_total_asset"], 2))
-    $("#total_income").text($.number(data["total_income"], 2))
-    $("#fund_income_week").text($.number(data["fund_income_week"], 2))
-    $("#fund_income_month").text($.number(data["fund_income_month"], 2))
-    return
-  .fail (data)->
-    tool.modalAlert({title: '温馨提示', msg: '基金获取失败，请刷新重试！', callback_ok: ()->
-              location.reload()
-          })
-    return###
 
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()
