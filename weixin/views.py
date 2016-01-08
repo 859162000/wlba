@@ -219,7 +219,7 @@ class WeixinJoinView(View):
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
+            infos = "%s元\n总资产　：%s元 \n可用余额：%s元"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
                     keyword1=now_str,
                     keyword2=infos)
@@ -377,10 +377,10 @@ class WeixinJoinView(View):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
         if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
-            txt = u"客官，想和网利菌天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利菌在线时间为\n" \
+            txt = u"客官，想和网利君天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利君在线时间为\n" \
                   u"【周一至周五10：00~17：00】"
         else:
-            txt = u"客官，网利菌在线时间为\n"\
+            txt = u"客官，网利君在线时间为\n"\
                     + u"【周一至周五10：00~17：00】，请在工作与我们联系哦~"
         return txt
 
