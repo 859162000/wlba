@@ -241,7 +241,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		shareLink = $('.share_link').text(),
 		shareMainTit = $('.share_title').text(),
 		shareBody = $('.share_body').text(),
-		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，';
+		share_friends = '我领到一份年终奖，你也为自己一年的努力另一份吧！';
 
 	var is_myself;
 	var phone_num;
