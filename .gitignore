@@ -1,0 +1,16 @@
+*.pyc
+.idea/
+db.sqlite3
+media
+publish/
+*.log
+static/sass/partials/*.css
+static/sass/*.css
+*.swp
+.DS_Store
+*.pid
+celerybeat-schedule
+gems
+env/
+.sass-cache
+static/node_modules/

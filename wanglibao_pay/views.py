@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+s:!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import logging
@@ -515,6 +515,10 @@ class CardViewSet(ModelViewSet):
                                 "message": u"没有找到该银行",
                                 'error_number': ErrorNumber.not_find
                             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # passport user
+        if not request.user.wanglibaouserprofile.id_number[0].isdigit():
+            card.is_bind_yee = True
 
         card.save()
 
