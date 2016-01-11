@@ -1177,7 +1177,7 @@ org.buy = (function (org) {
             }
 
         },
-        _trade_pws_set: function(operation, new_trade_pwd){
+        _trade_pws_set: function(entry_operation, new_trade_pwd){
             org.ajax({
                 url: '/api/trade_pwd/',
                 type: 'post',
@@ -1186,10 +1186,13 @@ org.buy = (function (org) {
                     new_trade_pwd: new_trade_pwd
                 },
                 success: function(result){
+                    entry_operation.hide_loading()
+                    entry_operation.clear()
+                    entry_operation.hide();
                     if(result.ret_code == 0){
                         Deal_ui.show_alert('success', function(){
                             window.location = window.location.href;
-                        })
+                        }, '交易密码设置成功，请牢记！')
                     }
 
                     if(result.ret_code > 0 ){
@@ -1487,7 +1490,7 @@ org.recharge = (function (org) {
             }
 
         },
-        _trade_pws_set: function(operation, new_trade_pwd){
+        _trade_pws_set: function(entry_operation, new_trade_pwd){
             org.ajax({
                 url: '/api/trade_pwd/',
                 type: 'post',
@@ -1496,10 +1499,13 @@ org.recharge = (function (org) {
                     new_trade_pwd: new_trade_pwd
                 },
                 success: function(result){
+                    entry_operation.hide_loading()
+                    entry_operation.clear()
+                    entry_operation.hide();
                     if(result.ret_code == 0){
                         Deal_ui.show_alert('success', function(){
                             window.location = window.location.href;
-                        })
+                        },'交易密码设置成功，请牢记！')
                     }
 
                     if(result.ret_code > 0 ){
@@ -2191,8 +2197,9 @@ org.trade_back = (function (org) {
     }
 
     Deal_ui = {
-        show_alert: function(state, callback){
+        show_alert: function(state, callback, state_message){
             $('.tran-alert-error').show().find('.'+state).show().siblings().hide()
+            if(state_message)  $('.tran-alert-error').show().find('.'+state).find('p').html(state_message)
             $('.tran-alert-error').find('.alert-bottom').one('click', function(){
                 $('.tran-alert-error').hide()
                 callback && callback();
