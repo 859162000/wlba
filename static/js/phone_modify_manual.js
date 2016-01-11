@@ -9,8 +9,6 @@
 			'fileinput': ['jquery']
         }
     });
-
-
     require(['jquery','fileinput'],
     function($, re) {
 
@@ -67,6 +65,28 @@
 	        overwriteInitial: false,
 	        maxFileSize: 1000,
 	        maxFilesNum: 1,
+	        //allowedFileTypes: ['image', 'video', 'flash'],
+	        slugCallback: function(filename) {
+	            return filename.replace('(', '_').replace(']', '_');
+	        }
+		});
+		$("#file_2").fileinput({
+	        uploadUrl: '/api/manual_modify/phone/', // you must set a valid URL here else you will get an error
+	        allowedFileExtensions : ['jpg', 'png','gif'],
+	        overwriteInitial: false,
+	        maxFileSize: 1000,
+	        maxFilesNum: 10,
+	        //allowedFileTypes: ['image', 'video', 'flash'],
+	        slugCallback: function(filename) {
+	            return filename.replace('(', '_').replace(']', '_');
+	        }
+		});
+		$("#file_3").fileinput({
+	        uploadUrl: '/api/manual_modify/phone/', // you must set a valid URL here else you will get an error
+	        allowedFileExtensions : ['jpg', 'png','gif'],
+	        overwriteInitial: false,
+	        maxFileSize: 1000,
+	        maxFilesNum: 10,
 	        //allowedFileTypes: ['image', 'video', 'flash'],
 	        slugCallback: function(filename) {
 	            return filename.replace('(', '_').replace(']', '_');

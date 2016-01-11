@@ -2199,13 +2199,13 @@ class FirstPayResultView(TemplateView):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
 
-
+from .forms import ManualModifyPhoneForm
 class ManualModifyPhoneTemplate(TemplateView):
     template_name = 'phone_modify_manual.jade'
 
     def get_context_data(self, **kwargs):
-
-        return {}
+        form = ManualModifyPhoneForm()
+        return {'form':form}
 
 
 class ManualModifyPhoneAPI(APIView):
@@ -2213,8 +2213,23 @@ class ManualModifyPhoneAPI(APIView):
     permission_classes = ()
 
     def post(self, request):
-
+            
         return Response({'ret_code': 0})
+
 
 class EditProfileTemplateView(TemplateView):
     template_name = 'account_safe.jade'
+
+
+class IdentityInformationTemplate(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        return {
+            "phone": safe_phone_str(profile.phone),
+            "id_is_valid": profile.id_is_valid,
+            "trade_pwd": profile.trade_pwd==""
+        }
+
