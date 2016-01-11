@@ -231,7 +231,7 @@ class WeixinShareDetailView(TemplateView):
             #1: 此处有数据不一致性的问题, GiftOrder表和ActivityGift表的不一致性
             gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
             if gift_order.valid_amount > 0:
-                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True).exclude(type=3)
 
                 counts = gifts.count()
                 if counts > 0:
@@ -425,7 +425,7 @@ class WeixinShareDetailView(TemplateView):
                 has_gift = 'false'
             else:
                 has_gift = 'true'
-            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
+            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s, 领取状态has_gift:%s, phone_num:%s, user_gift.identity:%s' %(openid, user_gift.identity, user_gift, has_gift,phone_num, user_gift.identity ))
         gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {

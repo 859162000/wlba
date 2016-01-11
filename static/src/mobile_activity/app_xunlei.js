@@ -6,6 +6,13 @@ $('.xinlei-rule').click(function () {
 $('.xunjiang-zong span').click(function () {
     $('.xunmeng').hide();
 });
+$('.xunlei1 span').click(function () {
+    if (getQueryString('referfrom')) {
+        var refer = getQueryString('referfrom');
+        window.location.href = "http://act.vip.xunlei.com/waplogin/login.html?referfrom=" + refer
+    }
+
+});
 
 function getQueryString(name) {
     var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
@@ -19,7 +26,7 @@ function getQueryString(name) {
 var token = getQueryString('promo_token'),
     xid = getQueryString('xluserid')
 org.ajax({
-    url: '/api/has_binding/'+token+'/'+xid+'/',
+    url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
     success: function (data) {
         console.log(data);
@@ -169,9 +176,9 @@ org.xunlei = (function (org) {
                     success: function (data) {
                         console.log(data)
                         if (data.ret_code == 10002 || data.ret_code == 10000) {
-                            var va=$('input[name=phone]').val();
+                            var va = $('input[name=phone]').val();
 
-                            $('.va').html(va.substring(0, 3) + "******"+va.substring(9, 11));
+                            $('.va').html(va.substring(0, 3) + "******" + va.substring(9, 11));
                             $('.xunmeng2').show();
                         } else {
                             //$('.get_ticket_wrap1').show();

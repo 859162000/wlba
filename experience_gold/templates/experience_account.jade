@@ -28,7 +28,7 @@ html(style="background:#efeff4")
                             p.asset_title 待收收益(元)
                             p.asset_count {{unpaid_interest | money_format}}
             .markTitle
-                a(href='')
+                a(href='/activity/experience/explain/',target='_blank')
                     i
                     span 体验金获取及使用说明
             .account_list
@@ -54,7 +54,7 @@ html(style="background:#efeff4")
                         if experience_amount > 0
                             .investment_btn.accountInvestBtn 立即投资
                         else
-                            .investment_btn.accountInvestBtn 立即投资
+                            .investment_btn.investBtnEd.accountInvestBtned 立即投资
             if user.is_authenticated and experience_amortization
               .account_list.investment_list
                 section.project_box

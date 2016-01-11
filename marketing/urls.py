@@ -166,6 +166,7 @@ urlpatterns += patterns(
     url(r'^app_praise_reward/$', TemplateView.as_view(template_name="app_praise_reward.jade")),
     url(r'^app_xunlei/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunlei.jade")),
     url(r'^app_send_reward/$', TemplateView.as_view(template_name="app_send_reward.jade")),
+    url(r'^app_january_reward/$', TemplateView.as_view(template_name="app_january_reward.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
 )
