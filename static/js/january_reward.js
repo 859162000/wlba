@@ -56,23 +56,42 @@
 			}
 		})
 
-		$('.recharge_button').click(function(){
-			window.location.href = '/p2p/list/'
-		});
-
-        $('.investment_button').click(function(){
-		    window.location.href = '/p2p/list/'
-		});
-
-        var see_rule_button_index;
-        $('.see_rule_button').click(function(){
-            see_rule_button_index = $(this).parent().next().hasClass('rule_wrap_show');
-            if(see_rule_button_index){
-                $(this).parent().next().removeClass('rule_wrap_show').hide();
+        $('#see_rule_1').on('click',function(){
+            var ele = $('.rule_wrap_1');
+            var curHeight = ele.height();
+            var autoHeight = ele.css('height', 'auto').height();
+            if (!ele.hasClass('down')){
+                ele.height(curHeight).animate({height: autoHeight},500,function(){
+                    ele.addClass('down');
+                });
             }else{
-                $(this).parent().next().addClass('rule_wrap_show').show();
+                ele.height(curHeight).animate({height: 0},500,function(){
+                    ele.removeClass('down');
+                });
             }
-        });
+        })
+        $('#see_rule_2').on('click',function(){
+            var ele = $('.rule_wrap_2');
+            var curHeight = ele.height();
+            var autoHeight = ele.css('height', 'auto').height();
+            if (!ele.hasClass('down')){
+                ele.height(curHeight).animate({height: autoHeight},500,function(){
+                    ele.addClass('down');
+                });
+            }else{
+                ele.height(curHeight).animate({height: 0},500,function(){
+                    ele.removeClass('down');
+                });
+            }
+        })
+		$('#go_experience').click(function(){
+            if(h5_user_static){
+                window.location.href = '/accounts/home/experience/'
+            }else{
+                window.location.href = '/accounts/login/?next=/accounts/home/experience/'
+            }
+
+		});
     })
 
 }).call(this);

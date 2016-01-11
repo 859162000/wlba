@@ -1,20 +1,43 @@
-<<<<<<< HEAD
-- load widget_tweaks
-doctype html
-html
-    head
-        - with '网利宝' as title
-        include include/common_head
-        - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/fileinput.css?v=201512")
-        - csrf_token
-    body(style="background: #ffe6a6")
-        include global/g_nav
-        .form-group
-            {{form.id_front_image}}
-            {{form.id_back_image}}
-            {{form.id_user_image}}
-        include global/g_footer
-        script.
+extends account_home_base
+- load formatters
+- load mathfilters
+block head
+    include include/head
+block sidebar
+    //- with '账户总览' as activeItem
+    include include/user_center_sidebar
+block main
+    .main_wrap
+        .main_title_top 身份信息-人工审核修改手机号
+        .form_wrap
+            .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
+            form
+                .box
+                    label 真实姓名
+                    .box_right
+                        .text 张****
+                .box
+                    label!='<span>*</span>身份证正面'
+                    //input#file_1.file(type="file" multiple="true")
+                form.form-group
+                    {{form.id_front_image}}
+                    {{form.id_back_image}}
+                    {{form.id_user_image}}
+                    .show_img
+                        #img_1
+                        #img_2
+                        #img_3
+                    .button 提交
 
-        include include/tracking
+
+
+
+    //.form-group
+    //    input#file_1.file(type="file" multiple="true")
+
+    //include global/g_footer
+    script.
+        require(["/static/js/phone_modify_manual.js?v=1"])
+
+    include include/tracking
+

@@ -551,8 +551,8 @@ class WeiXinUserActionRecord(models.Model):
         ('unbind', u'解除绑定'),
         ('sign_in', u'用户签到'),
     )
-    w_user = models.ForeignKey(WeixinUser, null=True)
-    user = models.ForeignKey(User, null=True)
+    w_user_id = models.IntegerField(default=0)#models.ForeignKey(WeixinUser, null=True)
+    user_id = models.IntegerField(default=0)#models.ForeignKey(User, null=True)
     action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
     action_describe = models.CharField(u'动作描述', max_length=64)
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})

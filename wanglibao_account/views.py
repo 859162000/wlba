@@ -498,6 +498,8 @@ class AccountHome(TemplateView):
         experience_amount = 0
         paid_interest = unpaid_interest = 0
 
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
+
         experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
             .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
         if experience_record.get('event__amount__sum'):
@@ -515,7 +517,9 @@ class AccountHome(TemplateView):
             'total_experience_amount': total_experience_amount,
             'experience_amount': float(experience_amount),
             'paid_interest': paid_interest,
-            'unpaid_interest': unpaid_interest
+            'unpaid_interest': unpaid_interest,
+            'experience_amortization': experience_amortization,
+            'product': experience_product,
         }
 
         return {
@@ -1378,7 +1382,6 @@ def ajax_register(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
-                user_type = form.cleaned_data.get('user_type', '0')
 
                 if request.POST.get('IGNORE_PWD', '') and not password:
                     password = generate_random_password(6)
@@ -1386,7 +1389,7 @@ def ajax_register(request):
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
-                user = create_user(identifier, password, nickname, user_type)
+                user = create_user(identifier, password, nickname)
                 if not user:
                     return HttpResponse(messenger('error'))
 
@@ -2226,6 +2229,10 @@ class ManualModifyPhoneAPI(APIView):
         return Response({'ret_code': 0})
 
 
+class EditProfileTemplateView(TemplateView):
+    template_name = 'account_safe.jade'
+
+
 class IdentityInformationTemplate(TemplateView):
     template_name = ''
 
@@ -2258,3 +2265,6 @@ class ValidateAccountInfoAPI(APIView):
             print '----------------------'
             return Response({'ret_code': 0})
         return Response(status=400)
+
+
+
