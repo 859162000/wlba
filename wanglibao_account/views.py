@@ -498,6 +498,8 @@ class AccountHome(TemplateView):
         experience_amount = 0
         paid_interest = unpaid_interest = 0
 
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
+
         experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
             .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
         if experience_record.get('event__amount__sum'):
@@ -515,7 +517,9 @@ class AccountHome(TemplateView):
             'total_experience_amount': total_experience_amount,
             'experience_amount': float(experience_amount),
             'paid_interest': paid_interest,
-            'unpaid_interest': unpaid_interest
+            'unpaid_interest': unpaid_interest,
+            'experience_amortization': experience_amortization,
+            'product': experience_product,
         }
 
         return {
