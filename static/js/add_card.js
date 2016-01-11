@@ -44,7 +44,7 @@
               url: '/qiye/profile/get/',
               data: {},
               type: 'GET'
-            }).done(function() {
+            }).done(function(data) {
               if (data.data.status !== '审核通过') {
                 return $('.verifyHref').attr('href', '/qiye/profile/edit/');
               }

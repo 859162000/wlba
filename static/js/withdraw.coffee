@@ -64,8 +64,33 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         required: '不能为空'
         minlength: $.format("验证码至少输入1位")
 
-  if $('#id-is-valid').val() == 'False'
+  if $('#id-is-valid').attr('data-type') == 'qiye'
+    $.ajax {
+      url: '/qiye/profile/exists/'
+      data: {
+      }
+      type: 'GET'
+    }
+    .done (data)->
+      if data.ret_code == 10000
+        $.ajax {
+          url: '/qiye/profile/get/'
+          data: {
+          }
+          type: 'GET'
+        }
+        .done (data)->
+          if data.data.status != '审核通过'
+            $('.verifyHref').attr('href','/qiye/profile/edit/')
+    .fail (data)->
+      $('.verifyHref').attr('href','/qiye/info/')
+
     $('#id-validate').modal()
+    return
+  else
+    if $('#id-is-valid').val() == 'False'
+      $('#id-validate').modal()
+      return
 
   $('#button-get-code-btn').click () ->
     $('#img-code-div2').modal()

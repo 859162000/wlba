@@ -37,7 +37,7 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
             }
             type: 'GET'
           }
-          .done ()->
+          .done (data)->
             if data.data.status != '审核通过'
               $('.verifyHref').attr('href','/qiye/profile/edit/')
       .fail (data)->
