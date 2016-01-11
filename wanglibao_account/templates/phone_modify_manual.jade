@@ -10,10 +10,10 @@ html
     body(style="background: #ffe6a6")
         include global/g_nav
         .form-group
-            input#file_1.file(type="file" multiple="true")
-            input#file_2.file(type="file" multiple="true")
-            input#file_3.file(type="file" multiple="true")
+            {{form.id_front_image}}
+            {{form.id_back_image}}
+            {{form.id_user_image}}
         include global/g_footer
         script.
-            require(["/static/js/phone_modify_manual.js"])
+
         include include/tracking

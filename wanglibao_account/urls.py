@@ -13,7 +13,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf,
-                   JrjiaAutoRegisterView, ManualModifyPhoneTemplate)
+                   JrjiaAutoRegisterView, ManualModifyPhoneTemplate, IdentityInformationTemplate)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
@@ -127,7 +127,9 @@ urlpatterns = patterns(
 
     url(r'^auto_tender/$', login_required(AutomaticView.as_view(), login_url='/accounts/login/')),
     url(r'^caipiao/$', login_required(LotteryListTemplateView.as_view(), login_url='/accounts/login/')),
+    url(r'^security/$', login_required(IdentityInformationTemplate.as_view(), login_url='/accounts/login/')),
     url(r'^manual_modify/phone/', ManualModifyPhoneTemplate.as_view()),
+
 
 )
 
@@ -136,4 +138,3 @@ if settings.DEBUG:
         '',
         url(r'^contract/test/(?P<equity_id>\w+)/', test_contract)
     )
-
