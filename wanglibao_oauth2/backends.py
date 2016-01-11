@@ -8,17 +8,18 @@ from .utils import now
 
 class BasicClientBackend(object):
     def authenticate(self, request=None):
+        error_data = None
         client_id = request.POST.get('client_id', '').strip()
         if client_id:
             try:
                 form = ClientAuthForm(request.POST)
                 if form.is_valid():
-                    return form.cleaned_data['client']
-                return None
-
+                    return form.cleaned_data['client'], error_data
+                else:
+                    return None, None
             except ValueError:
                 # Auth header was malformed, unpacking went wrong
-                return None
+                return None, None
 
 
 class AccessTokenBackend(ModelBackend):

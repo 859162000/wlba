@@ -92,8 +92,7 @@ class ClientAuthForm(OAuthForm):
                 'message': _("invalid client_id.")
             })
 
-        self.cleaned_data['client'] = client
-        return self.cleaned_data
+        return client
 
 
 class UserAuthForm(OAuthForm):

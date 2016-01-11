@@ -9,8 +9,8 @@ urlpatterns = patterns(
     '',
     url('^(?P<grant_type>(access_token|refresh_token))/?$',
         csrf_exempt(AccessTokenView.as_view()),
-        name='access_token'),
+        name='oauth2_access_token'),
 
     url('^login/?$', TokenLoginOpenApiView.as_view(),
-        name='access_token'),
+        name='oauth2_token_login'),
 )
