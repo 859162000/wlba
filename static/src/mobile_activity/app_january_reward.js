@@ -60,12 +60,12 @@
 		var autoHeight = ele.css('height', 'auto').height();
 		if (!ele.hasClass('down')){
 			$('#see_rule_1').addClass('select');
-			ele.height(curHeight).animate({'height':autoHeight,'margin':'0.75rem auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':autoHeight},500,function(){
 				ele.addClass('down');
 			});
 		}else{
 			$('#see_rule_1').removeClass('select');
-			ele.height(curHeight).animate({'height':'0','margin':'0 auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':'0'},500,function(){
 				ele.removeClass('down');
 			});
 		}
@@ -76,12 +76,12 @@
 		var autoHeight = ele.css('height', 'auto').height();
 		if (!ele.hasClass('down')){
 			$('#see_rule_2').addClass('select');
-			ele.height(curHeight).animate({'height':autoHeight,'margin':'0.75rem auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':autoHeight},500,function(){
 				ele.addClass('down');
 			});
 		}else{
 			$('#see_rule_2').removeClass('select');
-			ele.height(curHeight).animate({'height':'0','margin':'0 auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':'0'},500,function(){
 				ele.removeClass('down');
 			});
 		}
