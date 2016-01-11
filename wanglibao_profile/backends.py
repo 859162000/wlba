@@ -214,7 +214,7 @@ def _is_version_satisfied(request):
         return True
     # no trade_pwd for pc first pay
     if device['device_type'] == 'pc' and PayInfo.models.filter(
-            user=request.user, status=PayInfo.SUCCESS).exists()
+            user=request.user, status=PayInfo.SUCCESS).exists():
         return True
     return False
 
