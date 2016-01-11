@@ -66,7 +66,7 @@
 	        allowedFileExtensions : ['jpg', 'png','gif'],
 	        overwriteInitial: false,
 	        maxFileSize: 1000,
-	        maxFilesNum: 10,
+	        maxFilesNum: 1,
 	        //allowedFileTypes: ['image', 'video', 'flash'],
 	        slugCallback: function(filename) {
 	            return filename.replace('(', '_').replace(']', '_');
