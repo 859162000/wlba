@@ -12,7 +12,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
-                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI)
+                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI,
+                            ValidateAccountInfoAPI)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -224,6 +225,7 @@ urlpatterns = patterns(
     url(r'^inner/send_sms/$', InnerSysSendSMS.as_view()),
     url(r'^inner/validate_id/$', InnerSysValidateID.as_view()),
     url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
+    url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
     url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
 )
 

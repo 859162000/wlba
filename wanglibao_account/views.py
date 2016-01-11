@@ -32,7 +32,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
-    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,ManualModifyPhoneForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
@@ -69,7 +69,7 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
-from wanglibao_account.models import UserThreeOrder
+from wanglibao_account.models import UserThreeOrder, ManualModifyPhoneRecord
 import requests
 from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
@@ -2196,12 +2196,24 @@ class FirstPayResultView(TemplateView):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
 
-from .forms import ManualModifyPhoneForm
+
 class ManualModifyPhoneTemplate(TemplateView):
     template_name = 'phone_modify_manual.jade'
 
     def get_context_data(self, **kwargs):
         form = ManualModifyPhoneForm()
+        if form.is_valid():
+            id_front_image = form.cleaned_data['id_front_image']
+            id_back_image = form.cleaned_data['id_back_image']
+            id_user_image = form.cleaned_data['id_user_image']
+            new_phone = form.cleaned_data['new_phone']
+            manual_record = ManualModifyPhoneRecord()
+            manual_record.id_front_image = id_front_image
+            manual_record.id_back_image = id_back_image
+            manual_record.id_user_image = id_user_image
+            manual_record.new_phone = new_phone
+            manual_record.status = u'初审中'
+            manual_record.save()
         return {'form':form}
 
 
@@ -2210,7 +2222,7 @@ class ManualModifyPhoneAPI(APIView):
     permission_classes = ()
 
     def post(self, request):
-            
+
         return Response({'ret_code': 0})
 
 
@@ -2223,5 +2235,26 @@ class IdentityInformationTemplate(TemplateView):
         return {
             "phone": safe_phone_str(profile.phone),
             "id_is_valid": profile.id_is_valid,
-            "trade_pwd": profile.trade_pwd==""
+            "trade_pwd": profile.trade_pwd == ""
         }
+
+
+class ValidateAccountInfoTemplate(TemplateView):
+    template_name = ""
+
+    def get_context_data(self, **kwargs):
+        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
+        is_bind_card = cards.exists()
+        return {
+            'is_bind_card': is_bind_card
+        }
+
+class ValidateAccountInfoAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        form = LoginAuthenticationNoCaptchaForm(request, data=request.DATA)
+        if form.is_valid():
+            print '----------------------'
+            return Response({'ret_code': 0})
+        return Response(status=400)

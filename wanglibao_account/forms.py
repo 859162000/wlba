@@ -441,25 +441,22 @@ class ManualModifyPhoneForm(forms.Form):
     def clean_validate_code(self):
         if not self._flag:
             return
-        if 'identifier' in self.cleaned_data:
-            identifier = self.cleaned_data["identifier"]
-            identifier_type = detect_identifier_type(identifier)
-            if identifier_type == 'phone':
-                phone = identifier
-                validate_code = self.cleaned_data.get('validate_code', '')
-                if validate_code:
-                    status, message = validate_validation_code(phone, validate_code)
-                    if status != 200:
-                        raise forms.ValidationError(
-                            # Modify by hb on 2015-12-02
-                            #self.error_messages['validate code not match'],
-                            message,
-                            code='validate_code_error',
-                        )
-                else:
+        if 'new_phone' in self.cleaned_data:
+            new_phone = self.cleaned_data["new_phone"]
+            validate_code = self.cleaned_data.get('validate_code', '')
+            if validate_code:
+                status, message = validate_validation_code(new_phone, validate_code)
+                if status != 200:
                     raise forms.ValidationError(
-                            self.error_messages['validate must not be null'],
-                            code='validate_code_error',
-                        )
+                        # Modify by hb on 2015-12-02
+                        #self.error_messages['validate code not match'],
+                        message,
+                        code='validate_code_error',
+                    )
+            else:
+                raise forms.ValidationError(
+                        self.error_messages['validate must not be null'],
+                        code='validate_code_error',
+                    )
         return self.cleaned_data
 
