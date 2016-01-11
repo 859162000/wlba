@@ -52,7 +52,14 @@
               bank: par.find('.select_bank option:selected').attr('data-id')
             }
           }).success(function(data) {
-            return data.reload();
+            return location.reload();
+          }).fail(function(xhr) {
+            var result;
+            result = JSON.parse(xhr.responseText);
+            tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message
+            });
           });
         } else {
           $('.bankName').text(par.find('.select_bank option:selected').text() + '（储蓄卡）');

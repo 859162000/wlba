@@ -44,7 +44,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
             bank : par.find('.select_bank option:selected').attr('data-id')
           }
         .success (data) ->
-          data.reload()
+          location.reload()
+        .fail (xhr)->
+          result = JSON.parse xhr.responseText
+          tool.modalAlert({title: '温馨提示', msg: result.message})
+          return
       else
         $('.bankName').text(par.find('.select_bank option:selected').text()+'（储蓄卡）')
         $('.bankId').text(card.val().replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 "))
