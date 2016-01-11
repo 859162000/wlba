@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.tokens import default_token_generator
 
@@ -16,7 +18,19 @@ class BasicClientBackend(object):
                 if form.is_valid():
                     return form.cleaned_data['client'], error_data
                 else:
-                    return None, None
+                    print ">>>>>>>>>>>>>", form.errors
+                    form_errors = form.errors
+                    form_error_keys = form_errors.keys()
+                    form_errors_list = []
+                    for key in form_error_keys:
+                        value = form_errors[key]
+                        form_error = u'、'.join(value)
+                        form_errors_list.append(form_error)
+
+                        response_data = {
+                            'message': u'表单错误：' + u'、'.join(form_errors_list),
+                            'ret_code': 10001,
+                        }
             except ValueError:
                 # Auth header was malformed, unpacking went wrong
                 return None, None

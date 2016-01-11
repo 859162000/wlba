@@ -1,4 +1,4 @@
-# -×- coding: utf-8 -*-
+# encoding: utf-8
 
 import json
 from django.http import HttpResponse
