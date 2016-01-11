@@ -306,13 +306,9 @@ class WeixinShareDetailView(TemplateView):
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
                 gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2)
-                logger.debug("=======即将被处理的gifts======")
-                for gift in gifts:
-                    logger.debug(gift)
                 exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
                 counts = exp_glods.count() if exp_glods else 0
                 gifts = gifts.filter(amount__lt=10).all()
-                logger.debug("========处理后的gifts=========")
                 return gifts, counts
                 #return gifts.filter(amount__lt=10).all(), counts
             except Exception, reason:
@@ -361,7 +357,7 @@ class WeixinShareDetailView(TemplateView):
                                   "name": weixins[key].nickname,
                                   "img": weixins[key].headimgurl,
                                   "message": self.get_react_text(index),
-                                  "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
+                                  "sort_by": user_info[key].id})
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
