@@ -428,7 +428,7 @@ org.weChatStart = (function(org){
                 }else{
                     $('.phone-sign').hide();
                 }
-
+                lib._userExists(phoneVal.val())
                 if($('#exists').val() == 'false'){
                     if(lib.$captcha_1.val() == ''){
                         $('.code-sign').show();
@@ -464,12 +464,15 @@ org.weChatStart = (function(org){
                             }else {
                                 window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
                             }
+                            $submit.html('立即领取');
+                            $('#exists').val('true');
                         },
                         error: function(data){
                             org.ui.alert(data)
                             clearInterval(intervalId);
                             $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
                             lib._captcha_refresh();
+                            $submit.html('立即领取');
                         },
                         complete: function(){
                             postDo = false;
@@ -489,7 +492,7 @@ org.weChatStart = (function(org){
                         dataType : 'json',
                         success: function(data){
                             if(data.has_gift == 'true'){
-                                org.ui.alert(data.message, function(){
+                                org.ui.alert('用户已经领取过奖品', function(){
                                     window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
                                 });
                             }else if(data.has_gift == 'false'){

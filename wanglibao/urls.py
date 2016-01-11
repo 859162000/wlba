@@ -12,7 +12,7 @@ from wanglibao.views import IndexView, SecurityView, PartnerView
     # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
     ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView, \
-    Rong360P2PListView, Rong360TokenView
+    Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -170,6 +170,10 @@ urlpatterns += patterns(
 
     url(r'^api/loans/success/$', MidaiSuccessView.as_view()),
     url(r'^api/loans/new/$', MidaiNewView.as_view()),
+
+    # 西瓜理财
+    url(r'^api/xglcApi/onSaleProduct/$', XiguaP2PListView.as_view()),
+    url(r'^api/xglcApi/productStateInfo/$', XiguaP2PQueryView.as_view()),
 
     url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
 

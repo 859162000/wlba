@@ -62,7 +62,7 @@ from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate
 from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
-from weixin.util import FWH_UNBIND_URL
+from weixin.util import FWH_UNBIND_URL, filter_emoji
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -219,7 +219,7 @@ class WeixinJoinView(View):
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
+            infos = "%s元\n总资产　：%s元 \n可用余额：%s元"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
                     keyword1=now_str,
                     keyword2=infos)
@@ -349,7 +349,7 @@ class WeixinJoinView(View):
         if m and m.value:
             info = json.loads(m.value)
             big_data_url = info['big_data_url']
-        big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
+        big_data_img_url = "https://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=401567106&idx=3&sn=04e0a33078fed2aaa430ca7c20d4a986&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=afXDbJQe2V9L4zegq2HDoIInqfZPdaDGd52Ml9I9dyXREnBCuI1lWuXmt%2B41znOQ"
 
 
         A_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gIdMuibjodyEeWdavoBO0uvAdfpMzaCNjfreoT4APezdbu6hasMTibTWxw/0?wx_fmt=jpeg"
@@ -377,10 +377,10 @@ class WeixinJoinView(View):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
         if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
-            txt = u"客官，想和网利菌天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利菌在线时间为\n" \
+            txt = u"客官，想和网利君天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利君在线时间为\n" \
                   u"【周一至周五10：00~17：00】"
         else:
-            txt = u"客官，网利菌在线时间为\n"\
+            txt = u"客官，网利君在线时间为\n"\
                     + u"【周一至周五10：00~17：00】，请在工作与我们联系哦~"
         return txt
 
@@ -400,7 +400,7 @@ class WeixinJoinView(View):
         start = datetime.datetime(now.year,now.month, now.day)
         end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
 
-        war = WeiXinUserActionRecord.objects.filter(user=user, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+        war = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
 
         # experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
         #                                                   created_at__lt=end, created_at__gt=start).all()
@@ -855,6 +855,7 @@ class P2PDetailView(TemplateView):
         redpacks = []
         user = self.request.user
         id_is_valid = False
+        card_is_bind = False
         if user.is_authenticated():
             user_margin = user.margin.margin
             equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
@@ -865,14 +866,14 @@ class P2PDetailView(TemplateView):
             result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
             redpacks = result['packages'].get('available', [])
             id_is_valid = user.wanglibaouserprofile.id_is_valid,
-
+            cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
+            card_is_bind = cards.exists()
         orderable_amount = min(p2p['limit_amount_per_user'] - current_equity, p2p['remain'])
         total_buy_user = P2PEquity.objects.filter(product=p2p['id']).count()
 
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
         next = self.request.GET.get('next', '')
-        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
         context.update({
             'p2p': p2p,
             'end_time': end_time,
@@ -888,7 +889,7 @@ class P2PDetailView(TemplateView):
             'next': next,
             'amount_profit': amount_profit,
             'id_is_valid':id_is_valid,
-            'card_is_bind':cards.exists()
+            'card_is_bind':card_is_bind
         })
 
         return context
@@ -1303,6 +1304,7 @@ class GetAuthUserInfo(APIView):
             w_user.province = user_info.get('province', "")
             w_user.subscribe = user_info.get('subscribe', 0)
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
+            w_user.nickname = filter_emoji(w_user.nickname, "*")
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
@@ -1334,6 +1336,7 @@ class GetUserInfo(APIView):
                 w_user.province = user_info.get('province', "")
                 w_user.subscribe = user_info.get('subscribe', 0)
                 w_user.subscribe_time = user_info.get('subscribe_time', 0)
+                w_user.nickname = filter_emoji( w_user.nickname, "*")
                 w_user.save()
         except Exception, e:
             logger.debug(e.message)

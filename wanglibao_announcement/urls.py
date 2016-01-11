@@ -15,4 +15,5 @@ urlpatterns = patterns(
 
     url(r'^risk/$', TemplateView.as_view(template_name="client_announcement_risk.jade")),
     url(r'^safe/$', TemplateView.as_view(template_name="client_announcement_safe.jade")),
+    url(r'^reward/$', TemplateView.as_view(template_name="client_announcement_reward.jade")),
 )
