@@ -246,6 +246,7 @@ org.weChatStart = (function(org){
                                 window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
                             }
                             $submit.html('立即领取');
+                            $('#exists').val('true');
                         },
                         error: function(data){
                             org.ui.alert(data)

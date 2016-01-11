@@ -313,7 +313,8 @@ class RegisterAPIView(DecryptParmsAPIView):
             # set_promo_user(request, user, invitecode=invite_code)
             # save_to_binding(user, request)
 
-        if device['device_type'] == "pc":
+        if device['device_type'] == "pc" or request.GET.get('promo_token') == 'wrp':
+            logger.debug(u'用户注册完后，开始登录：promo_token:%s, phone:%s' % (request.GET.get('promo_token'), identifier))
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
@@ -368,10 +369,12 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack.valid = 1
                         redpack.save()
         try:
-            openid = request.session.get('openid')
-            if openid:
-                w_user = WeixinUser.objects.get(openid=openid)
-                bindUser(w_user, request.user)
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh':
+                openid = request.session.get('openid')
+                if openid:
+                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                    bindUser(w_user, request.user)
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):

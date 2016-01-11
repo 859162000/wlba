@@ -201,14 +201,18 @@ def _above_version(version_str, version_standard):
 def _is_version_satisfied(request):
         # return {"device_type":device_type, "app_version":arr[0],
         #     "channel_id":arr[2], "model":arr[1],
-        #     "os_version":arr[3], "network":arr[4]}
+        #     "os_version":arr[3], "network
+        # ":arr[4]}
     device = split_ua(request)
-    # logging.getLogger('django').error('trade request device %s'%device)
+    print(11111111111111111111)
+    print('trade request device %s'%device)
     if device['device_type'] == 'ios' and _above_version(device['app_version'], '2.6.0'):
         # 2.6.0版本起，支持交易密码
         return True
     if device['device_type'] == 'android' and _above_version(device['app_version'], '2.6.0'):
         #2.6.0版本起，支持交易密码
+        return True
+    if device['device_type'] == 'pc':
         return True
     return False
 
@@ -252,7 +256,7 @@ def require_trade_pwd(view_func):
             else:
                 return HttpResponse(json.dumps(check_result), content_type="application/json")
         except ValueError:
-            logger.error('trade request POST %s header %s'%(request.POST, request.META))
+            logger.exception('trade request POST %s header %s'%(request.POST, request.META))
             return HttpResponse(json.dumps({'ret_code': 40002, 'message': '交易密码错误'}), content_type="application/json")
     
     return _wrapped_view
