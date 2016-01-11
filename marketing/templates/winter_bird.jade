@@ -1,0 +1,19 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/winter_brid.css?v=20151103")
+  body.winter-bird-body
+    include global/g_nav
+    .winter-banner.winter-mod
+      img(src='/static/imgs/pc_activity/winter/banner.png').winter-mod-img-banner
+    .winter-content.winter-mod
+      img(src='/static/imgs/pc_activity/winter/center.png').winter-mod-img
+    .winter-footer.winter-mod
+      img(src='/static/imgs/pc_activity/winter/footer.png?v=2').winter-mod-img
+
+    include global/g_footer

@@ -6,8 +6,8 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    link(rel="stylesheet",href="/static/stylesheets/xunlei-setp.css")
-    link(rel="stylesheet",href="/static/styles/pc_activity/xunlei_ten.css")
+    link(rel="stylesheet",href="/static/stylesheets/xunlei-setp.css?v=20151110")
+    link(rel="stylesheet",href="/static/styles/pc_activity/xunlei_ten.css?v=20151110")
   body(style="background:#ffeec3")
     include include/activityTopNewxunlei
     //baidu
@@ -30,7 +30,7 @@ html
             .center-box
             .right-box
           .ten-prize 还剩
-            b 1000
+            b#jianli
             |份奖品
           if user.is_authenticated
             .open-box-btn.received
@@ -97,28 +97,28 @@ html
              span
           .ten-rule
             ul#rule1
-              li 1. 加息券有效期：11月1日-12月1日；
+              li 1. 加息券有效期：11月1日-12月31日；
               li 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
               li 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
-              li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+              li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不能再次使用加息券；
               li 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
         .prize-box
           h1.tit.ten-com.ten-tit 活动规则
           ul#rule2
-            li 活动时间：2015年11月1日-2015年12月1日；
-            li 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷新注册用户参与；
-            li 加息券规则，50元现金红包为直抵红包（投资满2000元方可抵扣使用）；
+            li 活动时间：2015年11月1日-2015年12月31日；
+            li 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷渠道新注册的网利宝用户参与；
+            li 新用户首次充值不低于100元即可获赠7天迅雷白金会员，首次投资不低于1000元即可获赠1年迅雷白金会员；
             li 新用户注册送0.5%加息券及50元现金红包，其中加息券使用规则见
               span#guizhexunlei(style='cursor: pointer') 加息券规则
               |，50元现金红包为直抵红包（投资满2000元方可抵扣使用）；
+            li 0.5%加息券仅限定3月及3月以上标的使用；
             li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
-            li 0.5%加息券仅限定3月及以上标的使用；
             li 网利宝对此活动享有最终解释权。
           ul.xianshi(style='display: none')
-              li 1. 加息券有效期：11月1日-12月1日；
+              li 1. 加息券有效期：11月1日-12月31日；
               li 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
               li 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
-              li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+              li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不能再次使用加息券；
               li 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
 
 
@@ -196,5 +196,4 @@ html
     p 请您先登录
     .reg-btn.setplogin 快速登录
   script.
-      var v = new Date().getTime()
-      require(['/static/js/xunlei_ten.js?v='+v])
+      require(['/static/js/xunlei_ten.js?v=20151110'])

@@ -1,10 +1,25 @@
-footer
-  a(href="/weixin/list/")
-    span.index 首页
 
-  a(href="/weixin/account/")
-    span.account 我的账户
-  a(href="/weixin/more/")
-    span.more 更多
+
+footer
+  if state == 'list'
+    a(href="/weixin/list/").active.list-a
+      span.index 首页
+  else
+    a(href="/weixin/list/").list-a
+      span.index 首页
+
+  if state == 'account'
+    a(href="/weixin/account/").active.account-a
+      span.account 我的账户
+  else
+    a(href="/weixin/account/").account-a
+      span.account 我的账户
+
+  if state == 'more'
+    a(href="/weixin/more/").active.more-a
+      span.more 更多
+  else
+    a(href="/weixin/more/").more-a
+      span.more 更多
 
   include include/tracking

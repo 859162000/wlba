@@ -8,42 +8,32 @@ html
     - endwith
     link(rel="stylesheet",href="/static/styles/pc/pc.css")
     link(rel="stylesheet",href="/static/stylesheets/november_new.css")
-  body(style="background:#ffd200")
+  body(style="background:#5f92ee")
     include global/g_nav
 
     .banner.pc-banner#banner
+    .big-tit 新手福利专享
     .main-part
       .welfare1.clearfix
         span.welfare-icon
         .welfare-box
           p.welfare-tit 福利一：
           p.welfare-cont
-            | 新手注册并实名即送20元红包 <br />
-            | ①注册 &nbsp;&nbsp; ②实名认证
+            | 新手注册送10元红包<br />单笔投资满<span class="brown">1000</span>元可用
           p.btn-box
             if user.is_authenticated
               a(href="javascript:void(0);").red-btn.receive-red 立即注册
             else
               a(href="/accounts/register/?next=/activity/november_new/").red-btn.for-red 立即注册
-          p.btn-box
-            if user.is_authenticated
-              a(href="/accounts/id_verify/?next=/activity/november_new/").red-btn.name-red 立即实名
-            else
-              a(href="javascript:void(0);").red-btn.for-name 立即实名
-        img(src="/static/imgs/pc_activity/new_user/welfare-img1.png").welfare-img
-
+        img(src="/static/imgs/pc_activity/november_user/welfare-img1.png").welfare-img
       .welfare2.clearfix
-        img(src="/static/imgs/pc_activity/new_user/welfare-img2.png").welfare-img
+        img(src="/static/imgs/pc_activity/november_user/welfare-img2.png").welfare-img
         .welfare-box
           p.welfare-tit 福利二：
           p.welfare-cont
-            | 注册后首次完成充值， <br />
-            | 即送100元红包。
+            | 新手完成实名认证送20元红包<br />单笔投资满<span class="brown">2000</span>元可用
           p.btn-box
-            if user.is_authenticated
-              a(href="javascript:void(0);").red-btn.recharge 注册充值
-            else
-              a(href="/accounts/register/?next=/activity/new_user/").red-btn 注册充值
+            a(href="javascript:void(0);").red-btn.for-name 立即实名认证
         span.welfare-icon
 
       .welfare3.clearfix
@@ -51,35 +41,109 @@ html
         .welfare-box
           p.welfare-tit 福利三：
           p.welfare-cont
-            | 新手投资理财最高送400元红包 <br />
-            | 首次单笔投资≥10000元 送200元 <br />
-            | 首次单笔投资≥20000元 送400元
+            | 新手首次完成充值送50元红包<br />单笔投资满<span class="brown">3000</span>元可用
+          p.btn-box
+            a(href="javascript:void(0);").red-btn.recharge 立即充值
+        img(src="/static/imgs/pc_activity/november_user/welfare-img3.png").welfare-img
+      .welfare4.clearfix
+        img(src="/static/imgs/pc_activity/november_user/welfare-img4.png").welfare-img
+        .welfare-box
+          p.welfare-tit 福利四：
+          p.welfare-cont
+            | 新手完成首次投资<br />
+            | 最高送500元红包
           p.btn-box
             if user.is_authenticated
-              a(href="javascript:void(0);").red-btn.manage-money 我要理财
+              a(href="javascript:void(0);").red-btn.manage-money 立即投资
             else
-              a(href="/accounts/register/?next=/activity/new_user/").red-btn 我要理财
-        img(src="/static/imgs/pc_activity/new_user/welfare-img3.png").welfare-img
+              a(href="/p2p/list/").red-btn 立即投资
+        span.welfare-icon
     .rule-box
-      .rule-tit 【新手任务攻略】
-      .rule-cont
-        p.p1 1、活动期间注册并实名认证成功即获得20元红包（投资500元可直减使用）；
-        p.p1 2、注册后首次充值（充值金额≥100元）成功即获得100元红包（投资2000元可直减使用）；
-        p.p1 3、注册后首次投资满额即可获得红包奖励，规则如下（奖励二选一）：
-        p.p2 a).注册后首次投资单笔达到10,000元以上（包含）即获得200元红包（二次投资20000元既可直减使用）；
-        p.p2 b).注册后首次投资单笔达到20,000元以上（包含）即获得400元红包（二次投资40000元既可直减使用）。
-      .rule-tit.mt50px 【投资流程】
-      .rule-cont
-        p.text-center 注册网利宝账号——充值资金到账户——选择投资标——获得收益和奖励
+      .rule-tit （1）5000元≤首次投资＜20000元，送150元组合红包，包含：
+      .packet-cont.clearfix
+        .packet-item
+          p.packet-img.clearfix
+            i.money-num.money-num1
+            span.money-tit 限投3月标
+          p.packet-tit 单笔投资满15000元可用
+        .plus-icon +
+        .packet-item
+          p.packet-img.clearfix
+            i.money-num.money-num2
+            span.money-tit 限投6月标
+          p.packet-tit 单笔投资满20000元可用
+      .rule-tit （2）20000元≤首次投资，送500元组合红包，包含：
+      .packet-cont.clearfix
+        .packet-item
+          p.packet-img.clearfix
+            i.money-num.money-num3
+            span.money-tit 限投3月标
+          p.packet-tit 单笔投资满40000元可用
+        .plus-icon +
+        .packet-item
+          p.packet-img.clearfix
+            i.money-num.money-num4
+            span.money-tit 限投6月标
+          p.packet-tit 单笔投资满50000元可用
+      p.btn-box.text-center
+        if user.is_authenticated
+          a(href="javascript:void(0);").red-btn.manage-money 立即投资
+        else
+          a(href="/p2p/list/").red-btn 立即投资
+      .leo-item
+    .n-invite-box
+      .big-tit 推荐投资送红包
+      .invite-packet.clearfix
+        .packet-item
+          .tit1 受邀好友完成首次投资（100元起）
+          .tit2 送邀请人30元红包
+          .packet-img
+            i.money-num.money-num6
+            span.money-p 单笔投资满<br />1000元可用
+        .packet-item
+          .tit1 5000元≤受邀好友首次投资＜20000元
+          .tit2 送邀请人50元红包
+          .packet-img
+            i.money-num.money-num8
+            span.money-p 单笔投资满<br />3000元可用
+        .packet-item
+          .tit1 受邀好友首次投资≥20000元
+          .tit2 送邀请人80元红包
+          .packet-img
+            i.money-num.money-num7
+            span.money-p 单笔投资满<br />5000元可用
+      .invite-prompt.clearfix
+        .prompt-tit 【如何邀请】
+        .clearfix
+          .leo-img
+            img(src="/static/imgs/pc_activity/november_user/leo-code.png")
+          ul.invite-prompt-r
+            li 好友使用你的邀请码或邀请链接注册，并完成首投（100元起投），即算成功邀请，你可获30元红包。
+            li 受邀好友首投金额越高，赠送红包金额越高，邀请每个好友最高送80元。
+          div.result
+            | 所以邀请好友多多投资吧！多邀多送，上不封顶！TA好我也好！<br />
+            | 还没有邀请码？注册即可拥有
+            if user.is_authenticated
+              a(href="/accounts/invite/") 立即注册 > <br />
+            else
+              a(href="/accounts/register/?next=/accounts/invite/") 立即注册 > <br />
+            | 登录后，在“我的账户 > 全民淘金”可查看专属邀请码<br />
     .use-rule
+      .use-rule-tit 【投资流程】
+      .use-rult-cont.text-center
+        p 注册网利宝账号——充值资金到账户——选择投资标——获得收益和奖励
       .use-rule-tit 【红包使用规则】
-      .use-rult-cont
-        p 1、活动时间： 2015年9月22日-2015年10月31日；
-        p 2、手机号为网利宝唯一账户，通过网利宝电脑官网、手机客户端、官方微信号主动新注册用户均可享受活动红包福利；
-        p 3、红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，无论是否有余额均失效；
-        p 4、首次单笔投资满额所赠红包为直抵红包，二次投资满额即可直抵使用。红包有效期自发放日起15天内有效。
-        p 5、部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
-
+      ul.use-rult-cont
+        li 活动时间：2015年11月11日-2015年12月3日；
+        li 手机号为网利宝唯一账户，通过网利宝电脑端官网、手机客户端、官方微信号、部分渠道主动新注册用户均可享受活动红包福利；
+        li 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
+        li 新手专享红包为直抵红包，投资时可选择使用红包，直抵现金使用；
+        li 注册、实名认证、首次充值所赠红包有效期自领取日起7天内有效；首次投资满额所赠红包有效期自领取日起15天内有效；
+        li 部分合作渠道无标示新手活动的来源用户无法享受此活动奖励。
+      p.use-rult-cont.litter-tit 网利宝对此活动享有最终解释权。
+    .gold-footer
+      .gold-wrap.relative
+        img(src="/static/imgs/pc_activity/november_user/footer.png")
     include global/g_footer
     include include/tracking
 
@@ -96,21 +160,21 @@ html
       span.alert-close
       .alert-cont.pt 实名认证后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/accounts/id_verify/").alert-btn 去实名认证
+        a(href="/accounts/register/first/",target="_blank").alert-btn.close-per 去实名认证
 
     //充值后
     .alert-box.go-money
       span.alert-close
       .alert-cont.pt 充值后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/pay/banks/").alert-btn 去充值
+        a(href="/pay/banks/",target="_blank").alert-btn.close-per 去充值
 
     //投资后
     .alert-box.to-invest
       span.alert-close
       .alert-cont.pt 投资后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/p2p/list/").alert-btn 去投资
+        a(href="/p2p/list/",target="_blank").alert-btn.close-per 去投资
 
     //奖励已发放
     .alert-box.running

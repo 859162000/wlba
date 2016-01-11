@@ -9,6 +9,7 @@ var org = (function(){
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
+                async: options.async,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -171,23 +172,39 @@ org.ui = (function(){
             }else{
                 var shield = document.createElement("DIV");
                 shield.id = "popubMask";
-                shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+                shield.style.cssText="position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
                 var alertFram = document.createElement("DIV");
                 alertFram.id="alert-cont";
-                alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
+                alertFram.style.cssText="position:fixed; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
                 strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
                 strHtml += " <div class='popub-footer' style='width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;'>确认</div>";
                 alertFram.innerHTML = strHtml;
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
+            }
+            $('.popub-footer').on('click',function(){
+                $('#alert-cont, #popubMask').hide()
+                callback && callback();
+            })
+            document.body.onselectstart = function(){return false;};
+        },
+        _confirm: function(title, certainName, callback, callbackData){
+            if($('.confirm-warp').length> 0 ){
+                $('.confirm-text').text(title);
+                $('.confirm-certain').text(certainName);
+                $('.confirm-warp').show();
 
-                $('.popub-footer').on('click',function(){
-                    alertFram.style.display = "none";
-                    shield.style.display = "none";
-                    callback && callback();
+                $('.confirm-cancel').on('click', function(e){
+                    $('.confirm-warp').hide();
+                })
+                $('.confirm-certain').on('click', function(e){
+                    $('.confirm-warp').hide();
+
+                    if(callback){
+                        callbackData ? callback(callbackData): callback();
+                    }
                 })
             }
-            document.body.onselectstart = function(){return false;};
         },
         _showSign:function(signTxt, callback){
             var $sign = $('.error-sign');
@@ -237,7 +254,12 @@ org.ui = (function(){
                             { target: $self.attr('data-target2'), addName : ($self.attr('data-icon')+"-active"), reMove : $self.attr('data-icon')}
                         ])
                     }
-                    canSubmit() ? $submit.css('background','rgba(219,73,63,1)').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled')
+                    var disabledBg = 'rgba(219,73,63,.5)' , activeBg =  'rgba(219,73,63,1)';
+                    if(options.submitStyle){
+                        disabledBg = options.submitStyle.disabledBg || 'rgba(219,73,63,.5)';
+                        activeBg = options.submitStyle.activeBg || 'rgba(219,73,63,1)';
+                    }
+                    canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled',true)
                 })
             })
 
@@ -294,6 +316,7 @@ org.ui = (function(){
         focusInput: lib._inputStyle,
         showSign : lib._showSign,
         alert : lib._alert,
+        confirm: lib._confirm
     }
 })();
 
@@ -303,7 +326,7 @@ org.login = (function(org){
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
-            lib._captcha_refresh();
+            //lib._captcha_refresh();
             lib._checkFrom();
         },
         _captcha_refresh :function(){
@@ -321,20 +344,17 @@ org.login = (function(org){
                 inputList: [
                     {target : $('input[name=identifier]'),  required:true},
                     {target : $('input[name=password]'), required : true},
-                    {target: $('input[name=captcha_1]'), required : true},
                 ],
             });
 
             //刷新验证码
-            lib.$captcha_img.on('click', function() {
-                lib._captcha_refresh();
-            });
+            //lib.$captcha_img.on('click', function() {
+              //  lib._captcha_refresh();
+            //});
             $submit.on('click', function() {
                 var data = {
                     'identifier': $.trim($form.find('input[name=identifier]').val()),
                     'password': $.trim($form.find('input[name=password]').val()),
-                    'captcha_0': $.trim($form.find('input[name=captcha_0]').val()),
-                    'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
                     'openid': $.trim($form.find('input[name=openid]').val())
                 }
                 org.ajax({
@@ -383,9 +403,16 @@ org.regist = (function(org){
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
+            lib._onlytrue();
             lib._captcha_refresh();
             lib._checkFrom();
             lib._animateXieyi();
+        },
+        _onlytrue: function(){
+            var onlyture = org.getQueryStringByName('onlyphone');
+            if(onlyture && onlyture == 'true'){
+                $('input[name=identifier]').attr('readOnly', true);
+            }
         },
         _animateXieyi:function(){
             var $submitBody = $('.submit-body'),
@@ -548,7 +575,7 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/first/' : org.getQueryStringByName('next');
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
                             window.location.href = next;
@@ -607,11 +634,9 @@ org.list = (function(org){
             });
         },
         _scrollListen:function(){
-            $(document).scroll(function(){
-                if(document.body.scrollTop / (document.body.clientHeight -lib.windowHeight ) >= lib.scale){
-                    lib.canGetPage && lib._getNextPage();
-                }
-            });
+            $('.load-body').on('click', function(){
+                lib.canGetPage && lib._getNextPage();
+            })
         },
         _getNextPage :function(){
             org.ajax({
@@ -620,14 +645,19 @@ org.list = (function(org){
                 data: {page: lib.page, 'pagesize': lib.pageSize},
                 beforeSend:function(){
                     lib.canGetPage =false
+                    $('.load-text').html('加载中...');
                 },
                 success: function(data){
                    $('#list-body').append(data.html_data);
                     lib.page++;
                     lib.canGetPage = true;
+
                 },
                 error: function(){
                     org.ui.alert('Ajax error!')
+                },
+                complete: function(){
+                     $('.load-text').html('点击查看更多项目');
                 }
             })
         }
@@ -917,8 +947,11 @@ org.buy=(function(org){
                 }
 
                 if(lib.isBuy){
-                   if(confirm("购买金额为" + amount)){
-                        org.ajax({
+
+                   org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
+
+                   function gobuy(){
+                       org.ajax({
                             type: 'POST',
                             url: '/api/p2p/purchase/',
                             data: {product: productID, amount: amount, redpack: redpackValue},
@@ -928,7 +961,7 @@ org.buy=(function(org){
                             },
                             success: function(data){
                                if(data.data){
-                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew);
+                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
                                    $(".sign-main").css("display","-webkit-box");
                                }
                             },
@@ -957,7 +990,7 @@ org.buy=(function(org){
                                 }
                             },
                             complete:function(){
-                               $buyButton.text("确定抢购");
+                               $buyButton.text("立即投资");
                                 lib.isBuy = true;
                             }
                         })
@@ -1147,7 +1180,11 @@ org.recharge=(function(org){
                      return org.ui.alert('最高充值'+ maxamount +'元！')
                 }
                 if(lib.canRecharge){
-                    confirm("充值金额为"+amount) && lib._rechargeSingleStep(card_no,amount);
+                    var postdata = {
+                        card_no: card_no,
+                        amount: amount
+                    }
+                    org.ui.confirm("充值金额为"+amount, '确认充值', lib._rechargeSingleStep, postdata)
                 }else{
                     return org.ui.alert('充值中，请稍后');
                 }
@@ -1157,11 +1194,11 @@ org.recharge=(function(org){
         /*
         * 快捷充值接口业务
          */
-        _rechargeSingleStep: function(card_no, amount) {
+        _rechargeSingleStep: function(getdata) {
             org.ajax({
                 type: 'POST',
                 url: '/api/pay/deposit/',
-                data: {card_no: card_no, amount: amount},
+                data: {card_no: getdata.card_no, amount: getdata.amount},
                 beforeSend:function(){
                     lib.canRecharge = false;
                     $('#secondBtn').text("充值中..");
@@ -1278,7 +1315,8 @@ org.recharge_second=(function(org){
                 }
 
                 if(canPost){
-                    if(confirm("充值金额为" + amount)){
+                    org.ui.confirm("充值金额为" + amount, '确认充值', recharge);
+                    function  recharge(){
                         org.ajax({
                             type: 'POST',
                             url: '/api/pay/cnp/dynnum/',
@@ -1355,7 +1393,7 @@ org.authentication = (function(org){
                     },
                     success:function(){
                         org.ui.alert("实名认证成功!",function(){
-                           return window.location.href = '/weixin/security/';
+                           return window.location.href = '/weixin/account/';
                         });
                     },
                     error:function(xhr){
@@ -1437,6 +1475,595 @@ org.bankcardAdd = (function(org){
         init : lib.init
     }
 })(org);
+
+org.processFirst = (function(org){
+    var lib = {
+        $submit : $('button[type=submit]'),
+        $name : $('input[name=name]'),
+        $idcard : $('input[name=idcard]'),
+        init:function(){
+            lib._form_logic()
+            lib._postData()
+        },
+        _form_logic: function(){
+            var _self = this;
+
+            org.ui.focusInput({
+                submit : _self.$submit,
+                inputList: [
+                    {target : _self.$name,  required:true},
+                    {target : _self.$idcard, required : true}
+                ]
+            });
+        },
+
+        _postData :function(){
+            var _self = this, data = {};
+            _self.$submit.on('click',function(){
+                data = {
+                    name: _self.$name.val(),
+                    id_number: _self.$idcard.val()
+                };
+                _self._check($('.check-list')) && _self._forAuthentication(data)
+            });
+
+
+
+        },
+        _check: function(checklist){
+            var check = true,
+                reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+
+            checklist.each(function(i){
+                if($(this).val() == ''){
+                    org.ui.showSign($(this).attr('placeholder'))
+                    return check = false;
+                }else{
+                    if(i === 1 && !reg.test($(this).val())){
+                        org.ui.showSign('请输入正确的身份证号')
+                        return check =false;
+                    }
+                }
+            })
+
+            return check
+        },
+        _forAuthentication:function(postdata){
+            org.ajax({
+                type: 'POST',
+                url : '/api/id_validate/',
+                data : postdata,
+                beforeSend:function(){
+                    lib.$submit.attr('disabled',true).text("认证中，请等待...");
+                },
+                success:function(data){
+                    if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
+                    org.ui.alert("实名认证成功!",function(){
+                       return window.location.href = '/weixin/regist/second/';
+                    });
+                },
+                error:function(xhr){
+                    result = JSON.parse(xhr.responseText);
+
+                    if(result.error_number == 8){
+                        org.ui.alert(result.message,function(){
+                           window.location.href = '/weixin/list/';
+                        });
+                    }else{
+                        return org.ui.alert(result.message);
+                    }
+
+
+                },
+                complete:function(){
+                    lib.$submit.removeAttr('disabled').text("实名认证");
+                }
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.processSecond = (function(org){
+    var lib = {
+        $submit: $('button[type=submit]'),
+        $bank: $('select[name=bank]'),
+        $bankcard: $('input[name=bankcard]'),
+        $bankphone: $('input[name=bankphone]'),
+        $validation: $('input[name=validation]'),
+        $money: $('input[name=money]'),
+        init: function(){
+            lib._init_select();
+            lib.form_logic();
+            lib._validation();
+            lib._submit();
+        },
+        _format_limit: function(amount){
+            var money = amount, reg = /^\d{5,}$/, reg2 = /^\d{4}$/;
+            if(reg.test(amount)){
+                 return money = amount.replace('0000','') + '万'
+            }
+            if(reg2.test(amount)){
+                return money = amount.replace('000','') + '千'
+            }
+        },
+        _limit_style: function(data){
+            var _self = this, $limitItem = $('.limit-bank-item'), list = '';
+
+            for(var i =0; i< data.length;i++){
+                list += "<div class='limit-bank-list'>"
+                list += "<div class='limit-list-dec'> "
+                list += "<div class='bank-name'>"+data[i].name+"</div>";
+                list += "<div class='bank-limit'>首次限额"+_self._format_limit(data[i].first_one)+"/单笔限额"+_self._format_limit(data[i].first_one)+"/日限额"+_self._format_limit(data[i].second_day)+"</div>";
+                list += "</div>"
+                list += "<div class='limit-list-icon "+data[i].bank_id+"'></div>"
+                list += "</div>"
+            }
+            $limitItem.html(list)
+        },
+        _init_select: function(){
+            if(localStorage.getItem('bank')){
+                var content = JSON.parse(localStorage.getItem('bank'));
+                lib.$bank.append(appendBanks(content));
+                lib._limit_style(content)
+            }
+            org.ajax({
+                type: 'POST',
+                url: '/api/bank/list_new/',
+                success: function(results) {
+                    if(results.ret_code === 0){
+                        lib.$bank.append(appendBanks(results.banks));
+                        console.log(results)
+                        var content = JSON.stringify(results.banks);
+                        window.localStorage.setItem('bank', content);
+
+                    }else{
+                        return org.ui.alert(results.message);
+                    }
+                },
+                error:function(data){
+                    console.log(data)
+                }
+            })
+
+            function appendBanks(banks){
+                var str = ''
+                for(var bank in banks){
+                    str += "<option value ="+banks[bank].gate_id+" > " + banks[bank].name + "</option>"
+                }
+                return str
+            }
+        },
+        form_logic: function(){
+            var _self = this;
+            org.ui.focusInput({
+                submit : _self.$submit,
+                inputList: [
+                    {target : _self.$bankcard,required : true},
+                    {target : _self.$bankphone,required : true},
+                    {target : _self.$validation,required : true},
+                    {target : _self.$money,required : true}
+                ],
+                otherTarget : [{target: _self.$bank,required: true}]
+            });
+
+            org.ui.focusInput({
+                submit : $('.regist-validation'),
+                inputList: [
+                    {target : _self.$bankcard,required : true},
+                    {target : _self.$bankphone,required : true},
+                    {target : _self.$money,required : true}
+                ],
+                otherTarget: [{target: _self.$bank,required: true}],
+                submitStyle: {
+                    'disabledBg': '#ccc',
+                    'activeBg': '#50b143',
+                }
+
+            });
+
+            var addClass = _self.$bank.attr('data-icon'),
+                $target = $('.'+_self.$bank.attr('data-target2'));
+
+            _self.$bank.change(function() {
+                if($(this).val() == ''){
+                    $target.addClass(addClass).removeClass(addClass + '-active');
+                }else{
+                    $target.addClass(addClass + '-active').removeClass(addClass);
+                }
+                _self.$bankcard.trigger('input')
+            });
+
+        },
+        _validation: function(){
+            var _self = this,
+                re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/),
+                $validationBtn = $('.regist-validation');
+
+            $validationBtn.on('click', function(){
+                var count = 60, intervalId ; //定时器
+
+                if(_self.$bankcard.val().length < 10){
+                    return org.ui.alert('银行卡号不正确');
+                }
+
+                if(!re.test(_self.$bankphone.val())){
+                    return org.ui.alert('请填写正确手机号');
+                }
+
+                $(this).attr('disabled', 'disabled').css('background','#ccc')
+                //倒计时
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return $validationBtn.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
+                        return
+                    }
+                };
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/deposit_new/',
+                    data: {
+                        card_no: _self.$bankcard.val(),
+                        gate_id: _self.$bank.val(),
+                        phone: _self.$bankphone.val(),
+                        amount: _self.$money.val()
+                    },
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            clearInterval(intervalId);
+                            $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
+                            return org.ui.alert(data.message);
+                        }else {
+                            $("input[name='order_id']").val(data.order_id);
+                            $("input[name='token']").val(data.token);
+                        }
+                    },
+                    error:function(data){
+                        clearInterval(intervalId);
+                        $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
+                        return org.ui.alert(data);
+                    }
+                })
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            })
+        },
+        _submit: function(){
+            var _self = this;
+
+            _self.$submit.on('click',function(){
+                org.ui.confirm("充值金额为" + _self.$money.val(), '确认充值', recharge);
+
+            });
+
+            function recharge(){
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/cnp/dynnum_new/',
+                    data: {
+                         phone: _self.$bankphone.val(),
+                         vcode: _self.$validation.val(),
+                         order_id: $('input[name=order_id]').val(),
+                         token: $('input[name=token]').val()
+                    },
+                    beforeSend:function(){
+                        _self.$submit.attr('disabled', 'disabled').text('充值中...');
+                    },
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            return org.ui.alert(data.message);
+                        } else {
+                           $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                        }
+                    },
+                    complete:function(){
+                        _self.$submit.removeAttr('disabled').text('绑卡并充值');
+                    }
+                })
+            }
+
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.received_ui = (function(){
+    var slide = function(data){
+        var slide = "<div class='swiper-slide received-slide'>"
+            slide += "<div class='received-slide-date'>"+data.term_date.slice(0,4)+"年"+data.term_date.slice(5,7)+"月</div>"
+            slide += "<div class='received-slide-data'>";
+            slide += "<div class='received-data-list'>";
+            slide += "<span class='received-left-center'>"
+            slide += "<div class='data-name'>回款总额(元)</div>"
+            if(data.total_sum == 0){
+                slide += "<div class='data-value'>0.00</div>"
+            }else{
+                slide += "<div class='data-value'>"+data.total_sum +"</div>"
+            }
+            slide += "</span>"
+            slide += "</div>"
+            slide += "<div class='received-data-list'>";
+            slide += "<span class='received-left-center'>"
+            slide += "<div class='data-name'>回款笔数</div>"
+            if(data.term_date_count == 0){
+                slide += "<div class='data-value'>0.00</div>"
+            }else{
+                slide += "<div class='data-value'>"+data.term_date_count +"</div>"
+            }
+            slide += "</span>"
+            slide += "</div>"
+            slide += "</div>"
+            slide += "</div>"
+
+        return slide
+    }
+
+    var list = function(data){
+        var list = "<a href='/weixin/received/detail/?productId="+data.product_id+"' class='received-list'>";
+            list += "<div class='list-head-warp'>";
+            list += "<div class='list-head arrow'>";
+            list += "<div class='head-space'>&nbsp&nbsp</div>"
+            list += "<span class='head-name'>"+data.product_name+"</span>"
+            list += "<span class='head-process'>"+data.term+"/"+data.term_total+"</span>"
+            list += "</div></div>";
+
+            list += "<div class='list-cont'>";
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-grey-2'>"+data.term_date.slice(0,10)+"</div>";
+            list += "<div class='cont-grey-1'>回款日期</div>";
+            list += "</div>";
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-red'>"+data.principal+"</div>";
+            list += "<div class='cont-grey-1'>本(元)</div>";
+            list += "</div>";
+
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-red'>"+data.total_interest+"</div>";
+            list += "<div class='cont-grey-1'>息(元)</div>";
+            list += "</div>";
+
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-grey-2'>"+data.settlement_status+"</div>";
+            if(data.settlement_status == '提前回款'){
+                list += "<div class='cont-grey-1'>"+data.settlement_time.slice(0,10)+"</div>";
+            }
+            list += "</div>";
+            list += "</div>";
+
+            list += "</div></a>"
+
+        return list
+
+    }
+
+    var detail = function(data){
+        var detail = "<div class='list-head-warp'>";
+            detail += "<div class='list-head'>";
+            detail += "<div class='head-space'>&nbsp&nbsp</div>";
+            detail += "<span class='head-name head-allshow'>"+data.equity_product_short_name+"</span>";
+            detail += "</div></div>";
+
+            detail += "<div class='list-nav'>";
+            detail += "<ul><li class='item-date'>时间</li><li>本金(元)</li><li>利息(元)</li><li class='item-count'>总计(元)</li></ul>";
+            detail += "</div>";
+            detail += "<div class='detail-space-grep'></div>";
+
+            for(var i=0; i< data.amortization_record.length;i++){
+
+                detail += "<div class='detail-list'>";
+                detail += "<div class='detail-item item-date'>"+data.amortization_record[i].amortization_term_date.slice(0,10)+"</div>";
+                detail += "<div class='detail-item'>"+data.amortization_record[i].amortization_principal+"</div>";
+                detail += "<div class='detail-item'>" + data.amortization_record[i].amortization_amount_interest;
+                if(data.amortization_record[i].amortization_coupon_interest > 0){
+                    detail += "<span>+</span><span class='blue-text'>"+data.amortization_record[i].amortization_coupon_interest+"</span><span class='blue-sign'>加息</span>";
+                }
+                detail += "</div>";
+                detail += "<div class= 'detail-item item-count'>"+data.amortization_record[i].amortization_amount+"</div>";
+                if(data.amortization_record[i].amortization_status== '提前回款' || data.amortization_record[i].amortization_status== '已回款'){
+                    detail += "<div class= 'repayment-icon'></div>";
+                }
+                detail += "</div>";
+            }
+
+
+        return detail;
+    }
+
+    return {
+        slide: slide,
+        list: list,
+        detail: detail
+    }
+})()
+org.received_all = (function(){
+    var lib = {
+        init: function(){
+            lib.init_operation()
+
+        },
+        init_operation:function(){
+            var _self = this;
+
+            function style(data){
+                var slide = [], INDEX = null;
+                for(var i =0; i< data.month_group.length; i++){
+                    if(data.current_month == data.month_group[i].term_date){
+                        INDEX = i;
+                    }
+                    slide.push(org.received_ui.slide(data.month_group[i]))
+                }
+                swiper_m.appendSlide(slide);
+                swiper_m.slideTo(INDEX, 150, false);
+                 _self.list_style(data)
+                $('.received-loding').hide()
+            }
+
+            var swiper_m = new Swiper('.swiper-container', {
+                direction: 'horizontal',
+                loop: false,
+                slidesPerView: 1.21,
+                centeredSlides: true,
+                paginationClickable: true,
+                spaceBetween: 30,
+                onSlideChangeStart:function(swiper){
+                    var slide_index = swiper.activeIndex;
+                    var target = $('.swiper-slide').eq(slide_index).find('.received-slide-date').text();
+                    var year = target.slice(0,4);
+                    var month = target.slice(5,-1);
+                    $('.received-loading-warp').show()
+                    _self.fetch({ year: year,  month: month}, _self.list_style)
+                }
+            });
+
+            _self.fetch({ year: '',  month: ''}, style);
+
+        },
+        list_style: function(data){
+            var slide = [],
+                $item = $('.receive-body'),
+                $default =$('.received-default');
+            if(data.data.length === 0){
+                $item.html('');
+                $default.show();
+                return
+            }
+            for(var i =0; i< data.data.length; i++){
+                slide.push(org.received_ui.list(data.data[i]))
+            }
+            $default.hide();
+            $item.html(slide.join(''))
+            $('.received-loading-warp').hide()
+
+        },
+        fetch: function(data, callback){
+            org.ajax({
+                url: '/api/m/repayment_plan/month/',
+                type: 'POST',
+                data: data,
+                success:function(data){
+                    callback && callback(data)
+                }
+            })
+        }
+
+    }
+
+    return {
+        init : lib.init
+    }
+})()
+
+org.received_month = (function(){
+    var lib = {
+        page: 1,
+        num: 10,
+        init: function(){
+            var
+                _self = lib;
+
+            var get_data = function(callback){
+                _self.fetch({
+                    page: _self.page,
+                    num: _self.num
+                },callback)
+            }
+
+            get_data(function(){
+                $('.received-loding').hide()
+            });
+
+            $('.received-more').on('click', function(){
+               get_data()
+            })
+        },
+        init_style:function(data){
+            var slide = [],
+                $item = $('.received-item');
+            for(var i =0; i< data.data.length; i++){
+                slide.push(org.received_ui.list(data.data[i]))
+            }
+            $item.append(slide.join(''))
+        },
+        fetch: function(data, callback){
+            var _self = this;
+            org.ajax({
+                url: '/api/m/repayment_plan/all/',
+                type: 'POST',
+                data: data,
+                beforeSend: function(){
+                    $('.received-more').attr('disabled',true).html('加载中，请稍后...')
+                },
+                success:function(data){
+                    if(data.count === 0 ){
+                        $('.received-default').show()
+                    }
+                    if(data.count - data.page > 0 ){
+                        $('.received-more').show()
+                    }else{
+                        $('.received-more').hide()
+                    }
+                    _self.page = _self.page + 1;
+
+                    _self.init_style(data)
+                    callback && callback(data)
+
+                },
+                complete: function(){
+                    $('.received-more').removeAttr('disabled').html('加载更多')
+                }
+
+            })
+        }
+    }
+
+    return {
+        init : lib.init
+    }
+})()
+
+
+
+org.received_detail = (function(){
+    var lib = {
+        init: function(){
+            var
+                _self = lib;
+            var product_id  = org.getQueryStringByName('productId')
+            _self.fetch(product_id);
+        },
+        init_style:function(data){
+            var slide = [],
+                $item = $('.received-list');
+            slide.push(org.received_ui.detail(data));
+            $item.append(slide.join(''))
+            $('.received-loding').hide()
+        },
+        fetch: function(product_id){
+            var _self = this;
+
+            org.ajax({
+                url: '/api/home/p2p/amortization/'+product_id,
+                type: 'get',
+                success:function(data){
+                    _self.init_style(data);
+                }
+            })
+        }
+    }
+
+    return {
+        init : lib.init
+    }
+})()
+
 
 ;(function(org){
     $.each($('script'), function(){

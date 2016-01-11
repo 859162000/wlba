@@ -1,364 +1,554 @@
 .clear:after
-    content: ""
+  content: ""
+  overflow: hidden
+  display: block
+  clear: both
+
+body
+  .wrap
+    height: 485px
     overflow: hidden
-    display: block
-    clear: both
-body .wrap
-    height: 475px
-    background: url("/static/imgs/pc_activity/newgive/banner.jpg") no-repeat center center
-.biaoyu
-    font-size: 24px
-    color: #ff5252
-    text-align: center
-.denelu-form
-    padding-top: 12px
-#aug-center
-    width: 90%
-    height: auto
-    position: absolute
-    background: #ffffff
-    top: 29%
-    margin-left: 5%
-    opacity: 1
-    border-radius: 5px
-    z-index: 10
-    display: none
-.off-form
-    border-radius: 15px
-    font-size: 22px
-    font-weight: bold
-    color: #999
-    position: absolute
-    top: 2px
-    right: 3px
-    cursor: pointer
-.aut-form
-    padding: 18px 13px
-#aug-code
+.g-banner-slide-baidu
+  position: absolute
+  width: 100%
+  height: 100%
+  z-index: 10
+  .g-slide
+    position: relative
+    left: 0 
+    top: 0
     width: 100%
     height: 100%
-    background: #000
-    opacity: 0.4
-    border-radius: 5px
+    .slide-banner
+      position: absolute
+      left: 0
+      top: 0
+      width: 100%
+      height: 100%
+      background-position: center
+      background-repeat: no-repeat
+  .g-slide-anchor
     position: absolute
-    top: 0
-    border: 1px solid #000
-    z-index: 9
-    display: none
-input.captcha
-    width: 120px
-.ng_conban
+    left: 0
+    bottom: 10px
     width: 100%
-    height: 475px
-    background: url("/static/imgs/pc_activity/newgive/banner.jpg") no-repeat center center
-.gv_tls
-    width: 1100px
-    height: 88px
-    line-height: 88px
-    font-size: 26px
-    font-weight: bold
-    color: #666
-    margin: 0 auto
-    span
-        width: 28px
-        height: 28px
-        display: inline-block
-        background: url("/static/imgs/pc_activity/newgive/fuli.png") no-repeat 0 center
-        margin-right: 10px
-    a
-        color: #666
-        line-height: 88px
-        text-align: right
-        font-size: 12px
-        font-weight: normal
-        float: right
-.gv_info
-    width: 1100px
-    height: 110px
-    margin: 0 auto
-    li
-        width: 365px
-        height: 110px
-        border-right: 1px solid #ccc
-        float: left
-        p
-            width: 170px
-            height: 30px
-            line-height: 30px
-            text-indent: 35px
-            margin: 10px auto
-        .gv_touz1
-            background: url("/static/imgs/pc_activity/newgive/xb_touz.png") no-repeat 0 0
-        .gv_touz2
-            background: url("/static/imgs/pc_activity/newgive/xb_touz.png") no-repeat 0 -41px
-        .gv_touz3
-            background: url("/static/imgs/pc_activity/newgive/xb_touz.png") no-repeat 0 -84px
-        h5
-            font-size: 14px
-            color: #717171
-            line-height: 50px
-            text-align: center
-        .num-animate
-            font-size: 21px
-            color: #6a94ef
-            font-weight: bold
-    li.bornone
-        border: none
-.gv_tstls
-    width: 1100px
-    height:  39px
-    border-bottom: 1px solid #ccc
-    margin: 30px auto 0 auto
-    span
-        color: #666
-        font-weight: bold
-        border-bottom: 5px solid #f5462e
-        line-height: 48px
-.gv_financing
-    width: 1100px
-    height: auto
-    margin: 40px auto 0 auto
-.gv_minbox
-    width: 352px
-    height: auto
-    border: 1px solid #ebebeb
-    margin: 0 20px 38px 0
-    float: left
-.min11
-    margin-right: 0
-.gv_Item
-    width: 352px
-    height: 93px
-    position: relative
-    padding-top: 22px
-    .Item_tle
-        font-size: 22px
-        color: #474e5e
-        font-weight: bold
-
-        text-indent: 40px
-    .Ite_tst
-        color: #929293
-        text-indent: 40px
-    .gv_taoj
-        width: 28px
-        height: 86px
-        background: url("/static/imgs/pc_activity/newgive/qmtj.png") no-repeat
-        position: absolute
-        left: -4px
-        top: 3px
-.item1
-    background: url("/static/imgs/pc_activity/newgive/xb_lici.jpg") no-repeat 0 0
-.item2
-    background: url("/static/imgs/pc_activity/newgive/xb_lici.jpg") no-repeat 0 -94px
-.item3
-    background: url("/static/imgs/pc_activity/newgive/xb_lici.jpg") no-repeat 0 -188px
-.gv_entle
-    line-height: 68px
-    font-size: 17px
-    margin-left: 18px
-    span
-        width: 78px
-        height: 25px
-        background: url("/static/imgs/pc_activity/newgive/xin_li.png") no-repeat
-        display: inline-block
-        margin-right: 10px
-.gv_entext
-    color: #a6a6a6
-    text-indent: 10px
-.gv_schedule
-    height: 10px
-    .sch_jd
-        width: 260px
-        height: 4px
-        background: #e3e3e3
-        -webkit-border-radius: 2px
-        -moz-border-radius: 2px
-        border-radius: 2px
-        margin-left: 10px
-        float: left
-        margin-top: 3px
-        span
-            width: 80%
-            height: 4px
-            -webkit-border-radius: 2px
-            -moz-border-radius: 2px
-            border-radius: 2px
-            background: #DB493F
-            display: block
-    .sch_zhi
-        color: #a6a6a6
-        float: left
-        line-height: 10px
-.gv_tzbanf
-    float: left
-    margin-left: 10px
-    line-height: 80px
-    span
-        color: #666
-    .gv_yers
-        color: #dc362b
-        font-size: 16px
-.gv_tztime
-    float: left
-    margin-left: 30px
-    color: #666
-    line-height: 80px
-    .gv_yers
-        font-size: 16px
-.gv_tzbtn
-    float: right
-    margin-right: 30px
-    line-height: 80px
-    a
-        width: 98px
-        height: 30px
-        background: #DB493F
-        display: inline-block
-        border-radius: 2px
-        font-size: 14px
-        color: #ffffff
-        line-height: 30px
-        text-align: center
-        box-shadow: 0 10px 10px #dadada
-.gv_felfare
-    width: 100%
-    height: auto
-    background: #f5f5f5
-.gv_felbox
-    width: 1100px
-    height: 540px
-    margin: 0 auto
-    position: relative
-.gv_feldls
-    width: 365px
-    height: auto
-    float: left
-    dt
-        text-align: center
-    dd
-        margin-top: 15px
-        text-align: center
-        color: #666666
-        font-size: 15px
-        font-weight: bold
-        line-height: 24px
-        span b
-            color: #DB493F
-.feldls1
-    margin-top: 65px
-.feldls2
-    margin-top: 70px
-.feldls3
-    margin-top: 40px
-.gv_touzbtn
-    width: 220px
-    height: 48px
-    background: #f5462e
-    -webkit-border-radius: 25px
-    -moz-border-radius: 25px
-    border-radius: 25px
     text-align: center
-    line-height: 48px
-    display: inline-block
-    font-size: 22px
-    color: #ffffff
-    position: absolute
-    left: 50%
-    bottom: 60px
-    margin-left: -110px
-.gv_touzbtn:link
-    color: #ffffff
-.gv_about
-    width: 1100px
-    height: auto
-    margin: 0 auto
+    .slide-anchor
+      width: 15px
+      height: 15px
+      display: inline-block
+      border-radius: 9px
+      background: #bbb
+      margin: 0 5px
+      text-indent: 9000em
+    .active
+      background: #fff
+.biaoyu
+  font-size: 24px
+  color: #ff5252
+  text-align: center
 
-.gv_abdls
-    width: 275px
-    height: 260px
+.denelu-form
+  padding-top: 12px
+
+#aug-center
+  width: 90%
+  height: auto
+  position: absolute
+  background: #ffffff
+  top: 29%
+  margin-left: 5%
+  opacity: 1
+  border-radius: 5px
+  z-index: 10
+  display: none
+
+.off-form
+  border-radius: 15px
+  font-size: 22px
+  font-weight: bold
+  color: #999
+  position: absolute
+  top: 2px
+  right: 3px
+  cursor: pointer
+
+.aut-form
+  padding: 18px 13px
+
+#aug-code
+  width: 100%
+  height: 100%
+  background: #000
+  opacity: 0.4
+  border-radius: 5px
+  position: absolute
+  top: 0
+  border: 1px solid #000
+  z-index: 9
+  display: none
+
+input.captcha
+  width: 120px
+
+.ng_conban
+  width: 100%
+  height: 475px
+  background: url("/static/imgs/pc_activity/newgive/banner.jpg") no-repeat center center
+
+.gv_tls
+  width: 1100px
+  height: 88px
+  line-height: 88px
+  font-size: 26px
+  font-weight: bold
+  color: #666
+  margin: 0 auto
+  span
+    width: 28px
+    height: 28px
+    display: inline-block
+    background: url("/static/imgs/pc_activity/newgive/fuli.png") no-repeat 0 center
+    margin-right: 10px
+  a
+    color: #666
+    line-height: 88px
+    text-align: right
+    font-size: 12px
+    font-weight: normal
+    float: right
+
+.gv_info
+  width: 1100px
+  height: 110px
+  margin: 0 auto
+  li
+    width: 365px
+    height: 110px
+    border-right: 1px solid #ccc
     float: left
-    margin-top: 40px
-    dt.about_dts
-        width: 130px
-        height: 130px
-        margin: 0 auto
-    .about_dts1
-        background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 0
-    .about_dts2
-        background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 -130px
-    .about_dts3
-        background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 -260px
-    .about_dts4
-        background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 -390px
-    dd
-        text-align: center
-        color: #707070
-        h5
-            font-size: 18px
-            font-weight: bold
-            line-height: 46px
+    p
+      width: 170px
+      height: 30px
+      line-height: 30px
+      text-indent: 35px
+      margin: 10px auto
+    .gv_touz1
+      background: url("/static/imgs/pc_activity/newgive/xb_touz.png") no-repeat 0 0
+    .gv_touz2
+      background: url("/static/imgs/pc_activity/newgive/xb_touz.png") no-repeat 0 -41px
+    .gv_touz3
+      background: url("/static/imgs/pc_activity/newgive/xb_touz.png") no-repeat 0 -84px
+    h5
+      font-size: 14px
+      color: #717171
+      line-height: 50px
+      text-align: center
+    .num-animate
+      font-size: 21px
+      color: #6a94ef
+      font-weight: bold
+  li.bornone
+    border: none
+
+.gv_tstls
+  width: 1100px
+  height: 39px
+  border-bottom: 1px solid #ccc
+  margin: 30px auto 20px auto
+  span
+    color: #666
+    font-weight: bold
+    border-bottom: 5px solid #f5462e
+    line-height: 48px
+
+.gv_financing
+  width: 1100px
+  height: auto
+  margin: 40px auto
+
+.gv_minbox
+  width: 352px
+  height: auto
+  border: 1px solid #ebebeb
+  margin-right: 20px
+  float: left
+
+.min11
+  margin-right: 0
+
+.gv_Item
+  width: 352px
+  height: 93px
+  position: relative
+  padding-top: 22px
+  .Item_tle
+    font-size: 22px
+    color: #474e5e
+    font-weight: bold
+
+    text-indent: 40px
+  .Ite_tst
+    color: #929293
+    text-indent: 40px
+  .gv_taoj
+    width: 28px
+    height: 86px
+    background: url("/static/imgs/pc_activity/newgive/qmtj.png") no-repeat
+    position: absolute
+    left: -4px
+    top: 3px
+
+.item1
+  background: url("/static/imgs/pc_activity/newgive/xb_lici.jpg") no-repeat 0 0
+
+.item2
+  background: url("/static/imgs/pc_activity/newgive/xb_lici.jpg") no-repeat 0 -94px
+
+.item3
+  background: url("/static/imgs/pc_activity/newgive/xb_lici.jpg") no-repeat 0 -188px
+
+.gv_entle
+  line-height: 68px
+  font-size: 17px
+  margin-left: 18px
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+  span
+    width: 78px
+    height: 25px
+    background: url("/static/imgs/pc_activity/newgive/xin_li.png") no-repeat
+    display: inline-block
+    margin-right: 10px
+
+.gv_entext
+  color: #a6a6a6
+  text-indent: 10px
+
+.gv_schedule
+  height: 10px
+  .sch_jd
+    width: 260px
+    height: 4px
+    background: #e3e3e3
+    -webkit-border-radius: 2px
+    -moz-border-radius: 2px
+    border-radius: 2px
+    margin-left: 10px
+    float: left
+    margin-top: 3px
+    span
+      width: 80%
+      height: 4px
+      -webkit-border-radius: 2px
+      -moz-border-radius: 2px
+      border-radius: 2px
+      background: #DB493F
+      display: block
+  .sch_zhi
+    color: #a6a6a6
+    float: left
+    line-height: 10px
+
+.gv_tzbanf
+  float: left
+  margin-left: 10px
+  line-height: 80px
+  span
+    color: #666
+  .gv_yers
+    color: #dc362b
+    font-size: 16px
+
+.gv_tztime
+  float: left
+  margin-left: 30px
+  color: #666
+  line-height: 80px
+  .gv_yers
+    font-size: 16px
+
+.gv_tzbtn
+  float: right
+  margin-right: 30px
+  line-height: 80px
+  a
+    display: inline-block
+    position: relative
+    top: 0
+    width: 98px
+    height: 30px
+    font-size: 14px
+    line-height: 30px
+    text-align: center
+    border-radius: 2px
+  .active-stylebtn
+    background: #DB493F
+    color: #ffffff
+    box-shadow: 0 3px 0 #bd332a, 0 6px 1px rgba(0,0,0,0.2)
+    transition: all .01s ease-in
+    &:hover
+      top: 2px
+      color: #fff
+      box-shadow: 0 1px 0 #bd332a, 0 2px 1px rgba(0,0,0,0.2)
+    &:active
+      color: #fff
+      box-shadow: 0 0 0 #bd332a,0 0 0 #fe7369
+  .un-stylebtn
+    background: #c7c7c7
+    color: #fff
+    vertical-align: middle
+    zoom: 1
+.gv_felfare
+  width: 100%
+  height: auto
+  background: #f5f5f5
+
+.gv_felbox
+  width: 1100px
+  margin: 0 auto
+  position: relative
+  overflow: hidden
+.gv_feldls
+  width: 275px
+  height: auto
+  float: left
+  dt
+    text-align: center
+  dd
+    margin-top: 15px
+    text-align: center
+    color: #666666
+    font-size: 15px
+    font-weight: bold
+    line-height: 24px
+    span b
+      color: #DB493F
+
+.feldls1
+  margin-top: 100px
+  img
+    width: 100%
+
+.feldls2
+  margin-top: 46px
+
+.feldls3
+  margin-top: 52px
+
+.feldls4
+  margin-top: 20px
+
+.gv_touzbtn
+  display: block
+  width: 220px
+  height: 48px
+  background: #f5462e
+  border-radius: 25px
+  text-align: center
+  line-height: 48px
+  font-size: 22px
+  color: #fff
+  margin: 40px auto
+
+.gv_touzbtn:link
+  color: #ffffff
+
+.gv_about
+  width: 1100px
+  height: auto
+  margin: 40px auto 0 auto
+.gv_abdls
+  width: 130px
+  float: left
+  margin-right: 190px
+
+  dt.about_dts
+    width: 100%
+    height: 130px
+    margin: 0 auto
+  .about_dts1
+    background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 0
+  .about_dts2
+    background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 -130px
+  .about_dts3
+    background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 -260px
+  .about_dts4
+    background: url("/static/imgs/pc_activity/newgive/xb_guay.jpg") no-repeat 0 -390px
+  dd
+    text-align: center
+    color: #707070
+    h5
+      font-size: 18px
+      font-weight: bold
+      line-height: 46px
+
+.unmargin
+  margin-right: 0
 .gv_focal
-    width: 875px
+  width: 875px
+  height: 320px
+  margin: 0 auto
+  position: relative
+  ul
+    width: 745px
     height: 320px
     margin: 0 auto
     position: relative
-    ul
-        width: 745px
-        height: 320px
-        margin: 0 auto
-        position: relative
-        li
-            position: absolute
-        .idx
-            z-index: 2
-    span
-        width: 40px
-        height: 40px
-        display: block
-        position: absolute
-        margin-top: -20px
-        cursor: pointer
-    .btn_left
-        background: url("/static/imgs/pc_activity/newgive/sanjiao.jpg") no-repeat 0 0
-        left: 0px
-        top: 50%
-    .btn_right
-        background: url("/static/imgs/pc_activity/newgive/sanjiao.jpg") no-repeat 0 -51px
-        right: 0
-        top: 50%
+    li
+      position: absolute
+    .idx
+      z-index: 2
+  span
+    width: 40px
+    height: 40px
+    display: block
+    position: absolute
+    margin-top: -20px
+    cursor: pointer
+  .btn_left
+    background: url("/static/imgs/pc_activity/newgive/sanjiao.jpg") no-repeat 0 0
+    left: 0px
+    top: 50%
+  .btn_right
+    background: url("/static/imgs/pc_activity/newgive/sanjiao.jpg") no-repeat 0 -51px
+    right: 0
+    top: 50%
+
 .gv_explain
-    width: 100%
-    height: 360px
-    margin-top: 55px
-    background: #f5f5f5
-    padding-top: 15px
+  width: 100%
+  background: #f5f5f5
+  overflow: hidden
 .explain
-    width: 1100px
-    height: auto
-    margin: 0 auto
-    p
-        margin-top: 20px
-        color: #999999
-        span
-            line-height: 24px
+  width: 1100px
+  height: auto
+  margin: 0 auto
+  color: #999999
+
+  p
+    line-height: 24px
+  .gv-explain-decend
+    padding-bottom: 20px
 
 
 #ganjiwang-model
-    width: 320px
-    height: 256px
-    background: #000000
-    opacity: 0.4
-    position: absolute
-    top: 100px
-    right: 0px
+  width: 320px
+  height: 256px
+  background: #000000
+  opacity: 0.4
+  position: absolute
+  top: 100px
+  right: 0px
+
 .banner-form
-    margin-top: 100px
+  margin-top: 100px
 
+.bd-finance-data-warp
+  width: 100%
+  border-bottom: 1px solid #ccc
+.bd-finance-data
+  width: 1100px
+  margin: 10px auto 10px auto
+  .bd-data-title-warp
+    float: left
+    margin-top: 6px
+  .bd-data-body
+    margin-left: 120px
+    font-size: 14px
+  .bd-time-marg
+    margin-right: 40px
+  .bd-data-time
+    color: #a6a6a6
+    text-align: right
+  .bd-data-main
+    text-align: right
+    color: #808080
+    line-height: 1
+    .num-text
+      color: #4d4d4d
+      font-size: 16px
+    .num-animate
+      color: #5384ed
+      font-size: 28px
 
+  .bd-data-title
+    width: 110px
+    height: 38px
+    line-height: 38px
+    border-radius: 4px
+    color: #fff
+    background: #f5462e
+    text-align: center
+    font-size: 22px
 
+.bd-finance-bodyimg
+  width: 1100px
+  margin: 40px auto
+  img
+    width: 100%
+    height: auto
 
+.rules-detail
+  color: #5ab1ed
+  cursor: pointer
+.explain-detail
+  height: 0
 
+.gv-tstls-new
+  width: 1100px
+  height: 39px
+  border-bottom: 1px solid #ccc
+  margin-bottom: 22px
+  span
+    color: #666
+    font-weight: bold
+    border-bottom: 5px solid #f5462e
+    line-height: 48px
 
-
+.regist-su-finance
+  position: absolute
+  top: 70px
+  right: 0
+  width: 315px
+  height: 346px
+  color: #fff
+  text-align: center
+  border-radius: 4px
+  overflow: hidden
+  z-index: 22
+  .regist-su-mask
+    height: 100%
+    background: #8f1100
+    opacity: 0.7
+    filter: alpha(opacity=70)
+  .regist-su-body
+    position: absolute
+    top: 0
+    width: 100%
+    padding: 0 25px 15px 25px
+    h4
+      font-size: 22px
+      line-height: 50px
+    .erweima-img
+      height: 183px
+      width: 183px
+      margin: 15px auto
+      background: url("/static/imgs/pc_activity/newgive/loading.gif?v=2") no-repeat center
+      img
+        display: block
+        width: 100%
+        height: 100%
+    p
+      font-size: 14px
+    .regist-for-account
+      display: block
+      width: 100%
+      height: 40px
+      line-height: 40px
+      font-size: 18px
+      color: #fff
+      text-align: center
+      background: #f5462e
+      border-radius: 4px
 

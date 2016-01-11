@@ -5,6 +5,7 @@
 import time
 import random
 import logging
+from celery.utils.log import get_task_logger
 from wanglibao.celery import app
 from django.db import transaction
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
@@ -13,7 +14,8 @@ from django.conf import settings
 from decimal import Decimal
 import json
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 @app.task
 def create_update_redpack(event_id):

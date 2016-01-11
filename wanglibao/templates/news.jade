@@ -1,7 +1,9 @@
 doctype html
-- with '媒体报道' as title
+- with '网利宝是中国领先的互联网金融_p2p理财_p2p网贷平台_网利宝' as title
 include include/head
 - endwith
+meta(name="keywords", content="互联网金融,互联网金融平台,网利宝")
+meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
 body
   include include/header
   include include/navigation
@@ -15,7 +17,7 @@ body
         for news in news_list
           .media-list-content
             p
-              img(src="/media/{{news.image}}", width="270", height="170")
+              img(src="/media/{{news.image}}", width="270", height="170", alt='p2p贷款')
             dl
               dt
                 a(href="{{news.link}}",target="_blank") {{news.name}}

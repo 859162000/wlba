@@ -9,6 +9,7 @@
 
 import logging
 import time
+from celery.utils.log import get_task_logger
 from marketing import tools
 from wanglibao_anti.models import AntiDelayCallback
 from wanglibao_anti.anti.anti import GlobalParamsSpace
@@ -16,7 +17,6 @@ from wanglibao.celery import app
 from json import JSONDecoder
 
 logger = logging.getLogger('wanglibao_anti')
-
 
 def kill_register_user_by_admin(*ips):
     '''针对某些特殊的ip，手工封杀；不管其IP注册数有多少
@@ -36,7 +36,7 @@ def recover_anti_user_data():
         record.status = 1
         record.updatetime = int(time.time())
         record.save(update_fields=['status', 'updatetime'])
-        logging.debug(" RECOVER:%s, %s, %s" % (record.ip, record.uid, record.status))
+        logger.debug("=20151216= AntiRecovery manualy: [%s] [%s] [%s]" % (record.ip, record.uid, record.status))
 
 
 @app.task
@@ -48,7 +48,7 @@ def handle_delay_time_data():
     recover_anti_user_data()
 
     channels = GlobalParamsSpace.DELAY_CHANNELS
-    max_record_for_one_ip = 5
+    max_record_for_one_ip = 10
 
     records = AntiDelayCallback.objects.filter(channel__in=channels, status=0)
     valid_records = dict()
@@ -68,7 +68,7 @@ def handle_delay_time_data():
         record.status = 1
         record.updatetime = int(time.time())
         record.save(update_fields=['status', 'updatetime'])
-        logging.debug(" SUCCESS:%s, %s, %s" % (record.ip, record.uid, record.status))
+        logger.debug("=20151216= AntiRecovery timely: [%s] [%s] [%s]" % (record.ip, record.uid, record.status))
 
 
     # 处理疑似作弊的用户,直接标记为2，并且不会有活动行为发生
@@ -77,4 +77,4 @@ def handle_delay_time_data():
         record.status = 2
         record.updatetime = int(time.time())
         record.save(update_fields=['status', 'updatetime'])
-        logging.debug(" FAILED:%s, %s, %s" % (record.ip, record.uid, record.status))
+        logger.debug("=20151216= AntiLock timely: [%s] [%s] [%s]" % (record.ip, record.uid, record.status))

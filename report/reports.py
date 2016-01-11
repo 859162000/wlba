@@ -11,7 +11,7 @@ from marketing.models import IntroducedBy
 from report.crypto import ReportCrypto
 from report.models import Report
 from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning, EquityRecord
-from wanglibao_pay.models import PayInfo
+from wanglibao_pay.models import PayInfo, Card
 from wanglibao_margin.models import MarginRecord
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -147,9 +147,13 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
-                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号'])
+                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号', u'资金管理费', u'管理费计算金额'])
 
         for payinfo in payinfos:
+            # 增加银行卡号验证,卡号不存在的/卡号大于1张的,不导出
+            card = Card.objects.filter(no=payinfo.card_no).count()
+            if card == 0 or card > 1:
+                continue
             confirm_time = ""
             if payinfo.confirm_time:
                 confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
@@ -173,7 +177,60 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
                 confirm_time,
-                unicode(payinfo.uuid)
+                unicode(payinfo.uuid),
+                str(payinfo.management_fee),
+                str(payinfo.management_amount),
+            ])
+        return output.getvalue()
+
+
+class WithDrawReportGeneratorAbnormal(ReportGeneratorBase):
+    prefix = 'txjl'
+    reportname_format = u'提现记录(卡被删或多张卡) %s--%s'
+
+    @classmethod
+    def generate_report_content(cls, start_time, end_time):
+        payinfos = PayInfo.objects.filter(create_time__gte=start_time, create_time__lt=end_time, type='W',
+                                          status__in=[PayInfo.SUCCESS, PayInfo.ACCEPTED]) \
+            .prefetch_related('user').prefetch_related('user__wanglibaouserprofile').prefetch_related('order')
+
+        output = cStringIO.StringIO()
+
+        writer = UnicodeWriter(output, delimiter='\t')
+        writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
+                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号', u'资金管理费', u'管理费计算金额'])
+
+        for payinfo in payinfos:
+            # 增加银行卡号验证,卡号不存在的/卡号大于1张的,不导出
+            card = Card.objects.filter(no=payinfo.card_no).count()
+            if card == 1:
+                continue
+            confirm_time = ""
+            if payinfo.confirm_time:
+                confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")
+
+            bank_name = payinfo.bank.name if payinfo.bank else ''
+
+            writer.writerow([
+                str(payinfo.id),
+                payinfo.user.wanglibaouserprofile.phone,
+                payinfo.account_name,
+                payinfo.user.wanglibaouserprofile.id_number,
+                payinfo.user.wanglibaouserprofile.phone,
+                bank_name,
+                '-',
+                '-',
+                payinfo.card_no,
+                str(payinfo.total_amount),
+                str(payinfo.amount),
+                str(payinfo.fee),
+                timezone.localtime(payinfo.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                str(payinfo.request_ip),
+                unicode(payinfo.status),
+                confirm_time,
+                unicode(payinfo.uuid),
+                str(payinfo.management_fee),
+                str(payinfo.management_amount),
             ])
         return output.getvalue()
 
@@ -266,7 +323,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
-                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'完成时间'])
+                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'完成时间', u'加息利息'])
 
         amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time) \
             .prefetch_related('product_amortization').prefetch_related('product_amortization__product') \
@@ -292,7 +349,8 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 # u'待还',
                 amortization.product_amortization.product.status,
                 unicode("wanglibao_yhhkjl_" + str(amortization.id)),
-                settled_at
+                settled_at,
+                str(amortization.coupon_interest)
             ])
         return output.getvalue()
 

@@ -6,7 +6,7 @@ html
     - with '网利宝' as title
     include global/g_head
     - endwith
-    link(rel="stylesheet",href="/static/styles/pc_activity/seckill.css?v=20151026")
+    link(rel="stylesheet",href="/static/styles/pc_activity/seckill.css?v=201512041")
   body(style="background:#fde59f")
     include global/g_nav
     .seckill
@@ -20,25 +20,37 @@ html
             .pageTitle.clearfix#page1Pos
                 span.pageIcon1
                 .titleC
-                    p 10月26日加息
+                    p
+                      | 加息
                       em 秒杀日
-                    p.p2 单笔投资满额5万，立送2%加息券一张！限时限量尖叫来袭！
+                      |（12月8日-9日）
+                    p.p2 活动期间首次投资满100送2张加息券，1张1%，1张1.8%！限时限量尖叫来袭！
             .page1.clearfix
                 .tc.clearfix
                     a(href='/p2p/list/').btn 立即抢投赢取
                 .pageContent
                     span
-                p.pageRemark.f14 备注：新老用户均可参与，加息券有效期1天，不限起投门槛，一券一标永久加息。满额投资多投多送哦！
+                p.pageRemark.f14 备注：新老用户均可参与，加息券有效期仅2天，所赠2张加息券不限标期均可使用，一券一标永久加息。满额投资多投多送哦！
                 p.pageRemark.f16
                     span#remark 加息券规则 >>
             .remarkDiv.clearfix(style='display:none')#remarkContent
                 .borderDiv
-                .remarkContent
-                    p 1. 用户单笔投资满额5万元，即可获得一张2%加息券，加息券使用不限平台均可使用，有效期限活动当日有效，过期不补；
-                    p 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
-                    p 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
-                    p 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
-                    p 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+                .remarkContent.clearfix
+                    p.clearfix
+                        span 1.
+                        label 活动期间用户首次投资100元即可获得一张1%加息券,一张1.8%加息券，加息券在电脑端、手机端均可使用，有效期截止到12月9日，1%加息券限1万起用，1.8%加息券限5万起用，过期不补；
+                    p.clearfix
+                        span 2.
+                        label 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+                    p.clearfix
+                        span 3.
+                        label 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+                    p.clearfix
+                        span 4.
+                        label 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+                    p.clearfix
+                        span 5.
+                        label 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
             .pageTitle.clearfix.mt40
                 span.pageIcon2
                 .titleC.lineH84
@@ -75,19 +87,37 @@ html
                 .flow_border2
             .page3.tc
                 span.page3Title 活动规则
-            .page3Remark
-                p 1. 活动日期：仅限10月26日0:00-23:59全天参与抢投赢取；
-                p 2. 用户单笔投资满额5万元，即可获得一张2%加息券，加息券使用不限平台均可使用，有效期限领取日当日有效，过期不补；
-                p 3. 加息券统一会以站内信通知，收到后可立即使用。详情请看
-                  a(href='javascript:void(0)')#rule 加息券使用规则
-                  | ；
-                p 4. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
-                .remarkD#ruleContent(style='display:none')
-                    p 1. 用户单笔投资满额5万元，即可获得一张2%加息券，加息券使用不限平台均可使用，有效期限活动当日有效，过期不补；
-                    p 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
-                    p 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
-                    p 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
-                    p 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+            .page3Remark.clearfix
+                p.clearfix
+                    span 1.
+                    label 活动日期：仅限12月8日-9日0:00-23:59全天参与抢投赢取；
+                p.clearfix
+                    span 2.
+                    label 活动期间用户首次投资100元即可获得一张1%加息券,一张1.8%加息券，加息券在电脑端、手机端均可使用，所赠2张加息券不限标期均可使用。有效期截止到12月9日，1%加息券限1万起用，1.8%加息券限5万起用，过期不补；
+                p.clearfix
+                    span 3.
+                    label 加息券统一会以站内信通知，收到后可立即使用。详情请看
+                            a(href='javascript:void(0)')#rule 加息券使用规则
+                            |；
+                p.clearfix
+                    span 4.
+                    label 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+                .remarkD.clearfix#ruleContent(style='display:none')
+                    p.clearfix
+                        span 1.
+                        label 活动期间用户首次投资100元即可获得一张1%加息券,一张1.8%加息券，加息券在电脑端、手机端均可使用，有效期截止到12月9日，1%加息券限1万起用，1.8%加息券限5万起用，过期不补；
+                    p.clearfix
+                        span 2.
+                        label 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+                    p.clearfix
+                        span 3.
+                        label 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+                    p.clearfix
+                        span 4.
+                        label 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+                    p.clearfix
+                        span 5.
+                        label 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
                 p.mark * 网利宝对此活动享有最终解释权
         .footDiv
             .footMargin

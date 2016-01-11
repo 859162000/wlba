@@ -1,0 +1,101 @@
+@import "./tab_nav"
+
+.area-warp
+  width: 100%
+.area-container
+  width: 100%
+.area-nav
+  overflow: hidden
+.area-scroll
+  padding: rem(30) rem(20) rem(42) rem(20)
+  //overflow-y: auto
+  //-webkit-overflow-scrolling: touch
+
+.area-list
+  display: block
+  padding: 0 rem(20)
+  background: #fff
+  border: 1px solid #E7E7E7
+  margin-bottom: rem(12)
+  .area-ac-head
+    color: #666666
+    font-size: rem(30)
+    line-height: 2
+  .area-ac-banner
+    position: relative
+
+    .area-ac-time
+      position: absolute
+      top: rem(14)
+      left: 0
+      height: 1.1rem
+      line-height: 1.1rem
+      background: url("/static/imgs/app/area/icon_time.png") no-repeat left center
+      background-size: rem(26)
+      background-color: rgba(0,0,0,.2)
+      background-position-x: rem(8)
+      font-size: rem(18)
+      color: #fff
+      padding: 0 .8rem 0 1.05rem
+      border-bottom-right-radius: 2rem
+      border-top-right-radius: 2rem
+    img
+      display: block
+      width: 100%
+      height: rem(382)
+
+  .area-ac-dec
+    color: #9B9B9B
+    font-size: rem(20)
+    line-height: 1.5
+    margin: rem(10) 0
+
+  .area-ac-line
+    width: 100%
+    height: 1px
+    background: #E5E5E5
+
+  .area-ac-footer
+    display: block
+    height: rem(70)
+    line-height: rem(70)
+    font-size: rem(24)
+    color: #9B9B9B
+    background: url("/static/imgs/app/area/arrow.png") no-repeat right center
+    background-size: rem(12)
+
+  .area-ac-milepost-footer
+    display: -webkit-box
+    height: rem(70)
+    line-height: rem(70)
+    font-size: rem(24)
+    color: #9B9B9B
+    .area-milepost-time
+      -webkit-box-flex: 1
+
+    .area-milepost-link
+      background: url("/static/imgs/app/area/arrow.png") no-repeat right center
+      background-size: rem(12)
+      padding-right: .6rem
+.area-latest-more,.area-milepost-more
+  text-align: center
+  padding: .5rem
+  font-size: .7rem
+  color: #706E6E
+.unactivty
+  text-align: center
+  color: #A4A1A1
+  font-size: .7rem
+  padding: .5rem
+
+.img-responsive
+  display: block
+  max-width: 100%
+  width: 670px
+  height: 250px
+  background: url('data:image/png;base64,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') no-repeat center
+.lazy
+  width: 100%
+  height: 0
+  padding-top: 37.5%
+  background-size: 100%

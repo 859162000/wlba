@@ -81,18 +81,19 @@ class ClientAuthForm(OAuthForm):
         if not client_id:
             raise OAuthValidationError({
                 'code': '10105',
-                'message': _("invalid client_id.")
+                'message': _("invalid client_id")
             })
-
-        try:
-            client = Client.objects.get(client_id=client_id)
-        except Client.DoesNotExist:
-            raise OAuthValidationError({
-                'code': '10105',
-                'message': _("invalid client_id.")
-            })
-
-        return client
+        else:
+            try:
+                client = Client.objects.get(client_id=client_id)
+            except Client.DoesNotExist:
+                raise OAuthValidationError({
+                    'code': '10105',
+                    'message': _("invalid client_id")
+                })
+            else:
+                self.cleaned_data['client'] = client
+                return self.cleaned_data
 
 
 class UserAuthForm(OAuthForm):
@@ -110,14 +111,14 @@ class UserAuthForm(OAuthForm):
         if not user_id:
             raise OAuthValidationError({
                 'code': '10104',
-                'message': _("invalid user_id.")
+                'message': _("invalid user_id")
             })
 
         usn = self.cleaned_data.get('usn', '').strip()
         if not usn:
             raise OAuthValidationError({
                 'code': '10107',
-                'message': 'invalid_usn'
+                'message': _('invalid_usn')
             })
 
         try:
@@ -125,12 +126,12 @@ class UserAuthForm(OAuthForm):
         except User.DoesNotExist:
             raise OAuthValidationError({
                 'code': '10104',
-                'message': _("invalid user_id or usn.")
+                'message': _("invalid user_id or usn")
             })
-
-        self.cleaned_data['usn'] = usn
-        self.cleaned_data['user'] = user
-        return self.cleaned_data
+        else:
+            self.cleaned_data['usn'] = usn
+            self.cleaned_data['user'] = user
+            return self.cleaned_data
 
 
 class RefreshTokenGrantForm(OAuthForm):
@@ -146,16 +147,16 @@ class RefreshTokenGrantForm(OAuthForm):
         if not token:
             raise OAuthValidationError({
                 'code': '10110',
-                'message': 'invalid refresh_token.'
+                'message': _('invalid refresh_token')
             })
-
-        try:
-            token = RefreshToken.objects.get(token=token, expired=False, client=self.client)
-        except RefreshToken.DoesNotExist:
-            raise OAuthValidationError({
-                'code': '10110',
-                'message': 'invalid refresh_token.'
-            })
-
-        self.cleaned_data['refresh_token'] = token
-        return self.cleaned_data
+        else:
+            try:
+                token = RefreshToken.objects.get(token=token, expired=False, client=self.client)
+            except RefreshToken.DoesNotExist:
+                raise OAuthValidationError({
+                    'code': '10110',
+                    'message': _('invalid refresh_token')
+                })
+            else:
+                self.cleaned_data['refresh_token'] = token
+                return self.cleaned_data

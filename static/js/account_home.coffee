@@ -11,6 +11,10 @@ require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
          'model/portfolio', 'tools', 'lib/jquery.number.min',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
+
+  $('.more_btn').click () ->
+    $('.tableNew').slideToggle()
+
   class DataViewModel
     constructor: ->
       self = this
@@ -76,7 +80,7 @@ require ['jquery', 'underscore', 'knockout',
   viewModel = new DataViewModel()
   ko.applyBindings viewModel
 
-  backend.fundInfo()
+###  backend.fundInfo()
   .done (data)->
     totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"])
     $("#total_asset").text($.number(totalAsset, 2))
@@ -90,7 +94,7 @@ require ['jquery', 'underscore', 'knockout',
     tool.modalAlert({title: '温馨提示', msg: '基金获取失败，请刷新重试！', callback_ok: ()->
               location.reload()
           })
-    return
+    return###
 
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()

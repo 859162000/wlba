@@ -32,7 +32,7 @@
         return $form.find('img.captcha').attr('src', json.image_url);
       });
     });
-    $('#add-card-button').click(function(e) {
+    $('.add-card-button').click(function(e) {
       if ($('#id-is-valid').val() === 'False') {
         $('#id-validate').modal();
         return;

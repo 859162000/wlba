@@ -1,20 +1,24 @@
 html
   head
     meta(name='format-detection', content='telephone=no,email=no')
-    title
-      | 万圣节恐怖夜...
+    title 万圣节恐怖夜...
     meta(charset='utf-8')
     meta(content='telephone=no,email=no', name='format-detection')
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     meta(content='yes', name='apple-mobile-web-app-capable')
-    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102701', rel='stylesheet')
-    script(src='/static/src/pc/lib/jquery.min.js')
-    script(src='/static/src/pc/lib/jquery.animateNumber.min.js')
-    script(src='/static/src/mobile_activity/app_halloween.js?v=2015102701')
+    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102908', rel='stylesheet')
   body
-    .no_signal_wrap
+    img.weixin(src='/static/imgs/mobile_activity/app_halloween/weixin.jpg')
+    .loading(style='width:100%; height:100%; background: #293966; position: fixed; z-index: 9999; left:0; top:0;')
+      .main(style='position:absolute; top:30%; left:0; width:100%; display:block;')
+          img(src='/static/imgs/mobile_activity/app_halloween/loading.gif' sytle='width:50%; margin:0 auto; display: block;')
+
+    .no_signal_wrap(style='display:none')
       .no_signal
-    #wrap
+    #play.play_music
+        audio#music(loop='loop',style='width:0;height:0;')
+            source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_halloween/music.mp3")
+    #wrap(style='opacity:0')
       .bg_after
       .bg_front_wrap
         .main
@@ -49,6 +53,8 @@ html
       img.money_50.money_50_animate(src='/static/imgs/mobile_activity/app_halloween/50.png')
       .boy
         .main
+          .boy_go.boy_animate1
+          //img.boy_go_one(src='/static/imgs/mobile_activity/app_halloween/go_one.gif')
           img.boy_stay(src='/static/imgs/mobile_activity/app_halloween/stay.gif')
           img.boy_run(src='/static/imgs/mobile_activity/app_halloween/run.gif')
       .girl_wrap
@@ -67,3 +73,23 @@ html
         .choice_step.choice_step3
           img.button.choice1(src='/static/imgs/mobile_activity/app_halloween/button3_1.png')
           img.button.choice2(src='/static/imgs/mobile_activity/app_halloween/button3_2.png')
+    .poor_wrap(style='display:none')
+      .bg
+      img.poor_boy(src='/static/imgs/mobile_activity/app_halloween/poor_boy.gif')
+      img.poor_text(src='/static/imgs/mobile_activity/app_halloween/poor_text.png')
+      .light.poor_light_animate
+      a.button(href='https://www.wanglibao.com/weixin/regist/?next=/weixin/authentication/?promo_token=h5chuanbo')
+        img(src='/static/imgs/mobile_activity/app_halloween/poor_button.png')
+    .rich_wrap(style='display:none')
+      .bg_front
+      .rich_bg_after
+      img.boy_img(src='/static/imgs/mobile_activity/app_halloween/fage.gif')
+      img.rich_text(src='/static/imgs/mobile_activity/app_halloween/rich_text.png')
+      .light.rich_light_animate
+        img(src='/static/imgs/mobile_activity/app_halloween/rich_light_one.png')
+      a.button(href='https://www.wanglibao.com/weixin/regist/?next=/weixin/authentication/?promo_token=h5chuanbo')
+        img(src='/static/imgs/mobile_activity/app_halloween/rich_button.png')
+    script(src='/static/src/pc/lib/jquery.min.js')
+    script(src='/static/src/pc/lib/jquery.animateNumber.min.js')
+    script(src='/static/src/mobile/lib/weixin/wx.js')
+    script(src='/static/scripts/mobile_activity/dist/app_halloween.js?v=2015103001')

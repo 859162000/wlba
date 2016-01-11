@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 from decimal import Decimal
+import datetime
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
@@ -16,6 +17,7 @@ PLATFORM = (
     ("android", "android"),
     ("pc", "pc"),
     ("app", "移动端"),
+    ("weixin", "微信"),
 )
 
 
@@ -33,7 +35,14 @@ class RedPackEvent(models.Model):
     amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
-    period = models.CharField(default='',max_length=200, verbose_name=u'限定产品期限(月/天)', blank=True, help_text=u"如果期限有多个,则用英文逗号 , 隔开")
+    period = models.IntegerField(default=0, max_length=200, verbose_name=u'限定产品期限', blank=True,
+                                 help_text=u"填写整数数字")
+    period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=(
+        ('month', u'月'),
+        ('month_gte', u'月及以上'),
+        ('day', u'日'),
+        ('day_gte', u'日及以上'),
+    ), blank=True)
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
@@ -47,7 +56,8 @@ class RedPackEvent(models.Model):
                                 ('buy', u'投资'),
                                 ('pay', u'充值'),
                                 ('p2p_audit', u'满标审核'),
-                                ('repaid', u'还款')), default=u"注册")
+                                ('repaid', u'还款'),
+                                ('first_bind_weixin', u'首次绑定微信')), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="",
@@ -56,10 +66,10 @@ class RedPackEvent(models.Model):
     give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换结束时间")
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
-    auto_extension = models.BooleanField(default=False, verbose_name=u"自动延长生效时间",
-                                         help_text=u"选择此项后系统会将失效时间设置为具体发放日期加上延长天数")
-    auto_extension_days = models.IntegerField(verbose_name=u"生效延长天数", default=0, null=False,
-                                              help_text=u"请填写活动持续的天数")
+    auto_extension = models.BooleanField(default=False, verbose_name=u"自动设定失效时间",
+                                         help_text=u"选择此项后系统会将失效时间设置为具体发放日期加上失效延长天数")
+    auto_extension_days = models.IntegerField(verbose_name=u"失效延长天数", default=0, null=False,
+                                              help_text=u"如果填写了失效延长天数,系统会动态计算失效截止时间")
     invalid = models.BooleanField(default=False, verbose_name=u"是否作废")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
@@ -122,8 +132,9 @@ class InterestHike(models.Model):
         verbose_name = u"加息券"
         verbose_name_plural = u"加息券"
 
-#佣金,加息等
-#todo: move p2p earning to here
+
+# 佣金,加息等
+# todo: move p2p earning to here
 class Income(models.Model):
     user = models.ForeignKey(User, verbose_name=u"用户", related_name="user")
     invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="invite")
@@ -136,7 +147,7 @@ class Income(models.Model):
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
 
 
-#创建红包列表
+# 创建红包列表
 def create_redpack(sender, instance, **kwargs):
     from wanglibao_redpack import tasks
     tasks.create_update_redpack.apply_async(kwargs={

@@ -21,6 +21,7 @@ from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing import tools
 from wanglibao_rest.utils import split_ua
+from wanglibao_account.cooperation import CoopRegister
 import re
 
 logger = logging.getLogger(__name__)
@@ -459,7 +460,8 @@ class KuaiPay:
                     pay_info.save()
                     return {"ret_code":201181, "message":result['message']}
                 device = split_ua(request)
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
+                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'],
+                                        util.get_client_ip(request), res.content, device, request)
 
                 return ms
             else:
@@ -514,16 +516,17 @@ class KuaiPay:
             return {"ret_code":20123, "message":"信息不匹配"}
         elif result['ret_code'] == 51:
             #余额不足也进行绑定卡信息
-            self.bind_card(pay_info)
+            self.bind_card(pay_info, request)
             return {"ret_code":201241, "message":result['message']}
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
         device = split_ua(request)
-        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
+        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'],
+                                util.get_client_ip(request), res.content, device, request)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device, request):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code":20131, "message":"order not exist"}
@@ -551,12 +554,14 @@ class KuaiPay:
             pay_info.margin_record = margin_record
             pay_info.status = PayInfo.SUCCESS
             logger.critical("orderId:%s success" % order_id)
-            rs = {"ret_code":0, "message":"success", "amount":amount, "margin":margin_record.margin_current}
+            rs = {"ret_code": 0, "message":"success", "amount":amount, "margin":margin_record.margin_current,
+                  'order_id': order_id}
+
 
         pay_info.save()
         if rs['ret_code'] == 0:
             #保存卡信息到个人名下
-            self.bind_card(pay_info)
+            self.bind_card(pay_info, request)
            # card_no = pay_info.card_no
            # if len(card_no) > 10:
            #     exist_cards = Card.objects.filter(no=card_no, user=pay_info.user).first()
@@ -568,7 +573,9 @@ class KuaiPay:
            #         card.is_default = False
            #         card.save()
             try:
-                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                # fix@chenweibi, add order_id
+                tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                     "device": device, "order_id": order_id})
             except:
                 pass
 
@@ -581,7 +588,7 @@ class KuaiPay:
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
-    def bind_card(self, pay_info):
+    def bind_card(self, pay_info, request):
         #保存卡信息到个人名下
         card_no = pay_info.card_no
         if len(card_no) > 10:
@@ -594,6 +601,13 @@ class KuaiPay:
             card.user = pay_info.user
             card.is_default = False
             card.save()
+
+            # try:
+            #     # 处理第三方用户绑卡回调
+            #     CoopRegister(request).process_for_binding_card(request.user)
+            # except Exception, e:
+            #     logger.error(e)
+
             return True
 
     def pay_callback(self, request):
@@ -623,7 +637,7 @@ def xml2dict(node, res, xmlns):
                 res.append(rep[tag][0])
     else:
         value = {}
-        value = {"value":node.text.strip(), "attr":node.attrib}
+        value = {"value":node.text.strip() if node.text else '', "attr":node.attrib}
         res.append({tag:value})
     return
 
@@ -1051,7 +1065,7 @@ class KuaiShortPay:
             else:
                 error_code = 20119
                 is_inner_error = True
-            error_message = str(error)
+            error_message = error.message
             pay_info.save_error(error_code=error_code, error_message=error_message, is_inner_error=is_inner_error)
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
             return {"ret_code": error_code, "message": error_message, 'order_id':order_id, 'pay_info_id':payinfo_id}
@@ -1060,7 +1074,7 @@ class KuaiShortPay:
             return {"ret_code": pay_info.error_code, "message": pay_info.error_message,
                     'order_id':order_id, 'pay_info_id':payinfo_id}
 
-    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device, ip, exit_for_test=False):
+    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device_type, ip, request, exit_for_test=False):
         # if not user.wanglibaouserprofile.id_is_valid:
         #     return {"ret_code":20111, "message":"请先进行实名认证"}
 
@@ -1104,7 +1118,7 @@ class KuaiShortPay:
                 return {"ret_code":201153, "message":"银行卡与银行不匹配"}
 
         if not card:
-            card = self.add_card_unbind(user, card_no, bank)
+            card = self.add_card_unbind(user, card_no, bank, request)
 
         if not card and not bank:
             return {"ret_code":201152, "message":"卡号不存在或银行不存在"}
@@ -1119,7 +1133,7 @@ class KuaiShortPay:
 
         # pay_info.request_ip = util.get_client_ip(request)
         pay_info.request_ip = ip
-        pay_info.device = device
+        pay_info.device = device_type
         order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
                                         pay_info = model_to_dict(pay_info))
         pay_info.order = order
@@ -1176,7 +1190,8 @@ class KuaiShortPay:
                     else:
                         raise ThirdPayError(201181, result['message'])
                 # device = split_ua(request)
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], ip, res.content, device)
+                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], ip, res.content,
+                                        device_type, request)
 
                 return ms
             else:
@@ -1184,16 +1199,16 @@ class KuaiShortPay:
                 if not token:
                     raise ThirdPayError(201172, '信息不匹配')
                 elif token['ret_code'] != 0:
-                    if token['ret_code'] == 2:
-                        raise ThirdPayError(self.ERR_CODE_WAITING, token['message'])
-                    else:
-                        raise ThirdPayError(201182, token['message'])
+                    # if token['ret_code'] == 2:
+                    #     raise ThirdPayError(self.ERR_CODE_WAITING, token['message'])
+                    # else:
+                    raise ThirdPayError(201182, token['message'])
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
             return self._handle_third_pay_error(e, user.id, pay_info.id, order.id)
 
-    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, device, ip):
+    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, device_type, ip, request):
         # vcode = request.DATA.get("vcode", "").strip()
         # order_id = request.DATA.get("order_id", "").strip()
         # token = request.DATA.get("token", "").strip()
@@ -1243,13 +1258,14 @@ class KuaiShortPay:
                                     result['user_id'],
                                     ip,
                                     res.content,
-                                    device)
+                                    device_type,
+                                    request)
             return ms
         except Exception, e:
             return self._handle_third_pay_error(e, user.id, pay_info.id, order_id)
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device_type, request):
         # todo add test
         pay_info = PayInfo.objects.select_for_update().filter(order_id=order_id).first()
         if not pay_info:
@@ -1286,9 +1302,12 @@ class KuaiShortPay:
             # self.bind_card(pay_info)
 
             try:
-                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                # fix@chenweibi, add order_id
+                tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                     "device": device_type, "order_id": order_id})
+                CoopRegister(request).process_for_recharge(pay_info.user, pay_info.order_id)
             except:
-                pass
+                logger.exception('kuai_pay_deposit_call_back_failed')
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
@@ -1352,7 +1371,7 @@ class KuaiShortPay:
 
 
     def pay_callback(self, user_id, amount, res_code, res_message, order_id, ref_number, res_content,
-                     signature):
+                     signature, request):
         """
         快钱快捷支付TR3应答API。
         TR1中会将该api的地址传给快钱，快钱在TR3阶段回调该API。
@@ -1372,7 +1391,7 @@ class KuaiShortPay:
                     if res_code == 0:
                         # 第三方不管我方处理的结果，只在乎是否发送TR4，所以不用处理返回
                         self.handle_margin(amount, pay_info.order.id, user_id,
-                                           pay_info.request_ip, res_content, pay_info.device)
+                                           pay_info.request_ip, res_content, pay_info.device, request)
                     else:
                         raise ThirdPayError(res_code, res_message)
             except Exception, e:
@@ -1380,22 +1399,33 @@ class KuaiShortPay:
 
         # TR4应答
         self._request_dict = dict(user_id=user_id, order_id=order_id, amount=amount)
-        # return self._sp_pay_tr4_xml(ref_number)
-        return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
+        return self._sp_pay_tr4_xml(ref_number)
+        # return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
 
-    def add_card_unbind(self, user, card_no, bank):
+    def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
 
+        add_card = False
         if not card:
             card = Card()
             card.user = user
             card.no = card_no
             card.is_default = False
 
+            add_card = True
+
         card.bank = bank
         card.save()
+
+        # if add_card:
+        #     try:
+        #         # 处理第三方用户绑卡回调
+        #         CoopRegister(request).process_for_binding_card(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
         return card

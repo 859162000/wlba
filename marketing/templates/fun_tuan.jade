@@ -1,0 +1,85 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/stylesheets/fun_tuan.css?v=201511121")
+    body(style="background:#fff")
+        include global/g_nav
+        #bg
+        #wrap_box
+          .banner
+              .left_bg
+              .right_bg
+              .img
+          .introduction
+            .down_ico
+                  .ico
+            img.logo_img(src="/static/imgs/pc_activity/fun_tuan/logo_img.png")
+            p.text 懂得理财的人，一定热爱生活。<br>我们负责创造有意思的活动，<br>让每一个爱理财、爱生活、爱网利宝的你，<br>“团”在一起！<br>在这里，认识新自己；<br>在这里，结交新朋友；<br>在这里，让好收益，<br>开启我们的多彩生活！
+            .man_info
+                .man_left
+                .man_right
+                .down_ico_2
+                .title
+                .text_wrap
+                    .text.text_left 青年钢琴家<br>李云迪、郎朗的同门师弟<br>毕业于柯蒂斯音乐学院<br>师从加里格拉夫曼大师<br>是音乐界一颗冉冉升起<br>的钢琴新星
+                    .text.text_right 网利宝CEO<br>曾在美国摩根斯坦利<br>美银美林等世界投行工作<br>随之创办互联网金融公司网利宝<br>2015上榜福布斯<br>“中国30位30岁以下创业领袖”
+                    .line
+            .man_text
+            .man_join
+          .join_wrap
+            .main
+                img.code_img(src="/static/imgs/pc_activity/fun_tuan/code_1.jpg")
+                .text_wrap
+                    dl
+                        dt 活动时间：
+                        dd 12月5日 下午15：30
+                    dl
+                        dt 活动地点：
+                        dd 北京万般艺博馆<br>东土城路乙14号(原沐蕾拉帝思公馆)
+                    dl
+                        dt 报名方式：
+                        dd 扫描二维码关注网利宝微信，<br>回复“报名”+你想对嘉宾提问的内容，即可报名。<br>仅限30人，错过一定会后悔。
+          .space_wrap
+            .down_ico_2
+          .place_wrap.place_1
+            .main
+                .title
+                    .img.img_1
+                    p.text_1 万般艺博馆
+                .img_wrap
+                    img(src="/static/imgs/pc_activity/fun_tuan/placeImg_1.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/placeImg_3.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/placeImg_2.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/placeImg_4.jpg")
+          .map_wrap
+            .down_ico_2
+            .benefit
+            p.text_1 新用户投资还送张昊辰12月6日北京音乐厅演奏会门票，<br>限量130张，先到先得！
+            img.code(src="/static/imgs/pc_activity/fun_tuan/footer_code.png")
+            p.text_2 扫描二维码，投资领门票
+            img.footer_img(src="/static/imgs/pc_activity/fun_tuan/footer_text.png")
+        include global/g_footer
+    script(src="/static/js/lib/jquery.min.js")
+    script.
+        $(function(){
+            window.onscroll = function(e) {
+                var scrolltop=document.documentElement.scrollTop||document.body.scrollTop;
+                if(scrolltop>=400){
+                    $('#bg').css({'position':'fixed','top':'0px'})
+                }else{
+                    $('#bg').css({'position':'absolute','top':'400px'})
+                }
+            }
+            var body_scroll = $(window).scrollTop();
+            if(body_scroll>=400){
+                $('#bg').css({'position':'fixed','top':'0px'})
+            }else{
+                $('#bg').css({'position':'absolute','top':'400px'})
+            }
+        })
+

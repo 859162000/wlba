@@ -1,0 +1,262 @@
+.banner {
+    width: 100%;
+    display: block;
+}
+
+.explain_main {
+    width: 100%;
+    display: inline-block;
+    padding-bottom: 0.45rem;
+}
+
+.explain_button {
+    display: block;
+    margin-left: 1.5rem;
+    background: #ee7700;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    display: inline-block;
+    text-align: center;
+}
+
+.title_big {
+    text-align: center;
+    font-size: 0.9rem;
+    width: 100%;
+    height: 2.4rem;
+    color: #ee7700;
+    letter-spacing: 4px;
+    line-height: 2.4rem;
+}
+
+.maimai-form {
+    padding: 0rem 2rem 2rem;
+}
+
+.maimai-phone, .maimai-load {
+    color: #b3b3b7;
+}
+
+.maimai-form-btn:disabled {
+    background: #ff9c39;
+}
+
+.maimai-form-btn {
+    background: #ee7700;
+}
+
+.maimai-form-sign {
+    color: #ee7700;
+}
+
+.maimai-form .phone-check .check-submit, .maimai-form .phone-check .check-img {
+    background: #bcc500;
+    color: #fff;
+}
+
+.explain_wrap {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    background: #f6f6f6;
+    overflow: auto;
+    display: none;
+}
+
+.explain_wrap .explain_button {
+    margin-left: 1rem;
+}
+
+.explain_wrap .main {
+    padding: 0.75rem 1.75rem 2rem;
+    width: 100%;
+    display: inline-block;
+}
+
+.explain_wrap dl {
+    width: 100%;
+    display: inline-block;
+    clear: both;
+    font-size: 0.7rem;
+    color: #ee7700;
+}
+
+.explain_wrap dl dt {
+    float: left;
+    display: block;
+    width: 1rem;
+    line-height: 1.125rem;
+}
+
+.explain_wrap dl dd {
+    float: left;
+    display: inline-block;
+    width: 90%;
+    line-height: 1.125rem;
+}
+
+.get_ticket_wrap {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    background: #f6f6f6;
+    overflow: auto;
+    padding-top: 1.4rem;
+    display: none;
+}
+
+.get_ticket_wrap .title {
+    color: #ee7700;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.5rem;
+    padding-top: 2rem;
+}
+
+.get_ticket_wrap ul {
+    padding: 1.5rem 0 4rem;
+    width: 100%;
+    display: inline-block;
+}
+
+.get_ticket_wrap li {
+    text-align: center;
+    color: #728087;
+    font-size: 0.8rem;
+    height: 2.25rem;
+    line-height: 2.25rem;
+}
+
+.get_ticket_wrap span {
+    border-bottom: 1px #7e8b91 solid;
+    display: inline-block;
+    width: 52px;
+    height: 32px;
+    line-height: 32px;
+}
+
+.get_ticket_wrap .button {
+    display: block;
+    width: 75%;
+    height: 2.1rem;
+    line-height: 2.1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    border-radius: 0.3rem;
+    background: #ee7700;
+    color: #fff;
+    margin: 0 auto;
+    border: 0;
+    -webkit-appearance: none;
+}
+
+.write_info {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    background: #f6f6f6;
+    overflow: auto;
+    display: none;
+}
+
+.write_info .text {
+    height: 42px;
+    width: 100%;
+    text-align: center;
+    color: #ee7700;
+    line-height: 22px;
+    font-size: 0.7rem;
+    display: inline-block;
+    margin-bottom: 0.43rem;
+}
+
+.write_info .title {
+    font-size: 0.8rem;
+    padding: 2.5rem 1.2rem 2rem;
+    text-align: center;
+    color: #ee7700;
+    font-weight: bold;
+    width: 100%;
+    line-height: 1.5rem;
+}
+
+.write_info ul {
+    padding: 0px 2rem 1rem;
+    width: 100%;
+}
+
+.write_info li {
+    width: 100%;
+    margin: 0.43rem 0;
+    display: inline-block;
+}
+
+.write_info input {
+    border: none;
+    -webkit-appearance: none;
+    background-color: #fff;
+    font-size: 0.8rem;
+    width: 100%;
+    text-align: left;
+    border-radius: 0.3rem;
+    padding: 0.575rem 0.25rem 0.575rem 1.8rem;
+    color: #b3b3b7;
+}
+
+.write_info .name {
+    background-image: url("/static/imgs/mobile_activity/app_jucheng/write_info_ico1.png");
+    background-position: 0.45rem center;
+    background-size: 0.9rem;
+    background-repeat: no-repeat;
+}
+
+.write_info .phone {
+    background-image: url("/static/imgs/mobile_activity/app_jucheng/write_info_ico2.png");
+    background-position: 0.45rem center;
+    background-size: 0.9rem;
+    margin-left: 0;
+    background-repeat: no-repeat;
+}
+
+.write_info .address {
+    background-image: url("/static/imgs/mobile_activity/app_jucheng/write_info_ico3.png");
+    background-position: 0.45rem center;
+    background-size: 0.9rem;
+    background-repeat: no-repeat;
+}
+
+.write_info .button {
+    display: block;
+    width: 75%;
+    height: 2.1rem;
+    line-height: 2.1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    border-radius: 0.3rem;
+    background: #ee7700;
+    color: #fff;
+    margin: 0 auto;
+    border: 0;
+    -webkit-appearance: none;
+}
+
+.xun-p {
+    font-size: 0.6rem;
+    text-align: right;
+    margin-right: 0px;
+    padding-top: 0.5rem;
+    color: #ff5252;
+}

@@ -13,9 +13,9 @@
         }
     });
     require(['jquery', 'jqueryRotate', "tools"], function ($, jqueryRotate, tool) {
-        var activityId = 38; //activity id l:37 s:65&69 w:72
-        var payId = 38;
-        function ajaxFun(url,data,fn){
+        var activityId = 86; //activity id l:38 s:98 w:86
+        var payId = 86;
+        function ajaxFun(url,data,fn,err){
             $.ajax({
                 type: "get",
                 url: url,
@@ -24,6 +24,12 @@
                 async: false,
                 success: function(data){
                     fn(data);
+                },
+                error: function(){
+                    if(err != undefined){
+                       err();
+                    }
+
                 }
             });
         }
@@ -97,6 +103,12 @@
                 }else{
                     showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
                 }
+            },
+            "validationErr": function(){
+                window.open("/accounts/register/?next=/accounts/register/first/");
+            },
+            "rechargeErr": function(){
+                window.open("/accounts/register/?next=/pay/banks/");
             }
         };
         //注册领红包
@@ -104,9 +116,13 @@
             //ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"validation"},funs.validation);
             ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"register"},funs.register);
         });
+        //实名
+        $(".for-name").on("click",function(){
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"validation"},funs.validation,funs.validationErr);
+        });
         //充值
         $(".recharge").on("click",function(){
-            ajaxFun("/api/activity/joinInfo/",{"activity_id":payId,"trigger_node":"first_pay"},funs.firstPay);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":payId,"trigger_node":"first_pay"},funs.firstPay,funs.rechargeErr);
         });
         //理财
         $(".manage-money").on("click",function(){

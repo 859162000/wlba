@@ -40,29 +40,32 @@ block main
               .row
                 .banks
                   col_num = 4
+                  col_num_1 = col_num - 1
                   count = len(banks)
-                  rows = range(0, count/col_num)
+                  rows = range(0, (count+col_num-1)/col_num)
                   cols = range(0, col_num)
 
                   for row_index in rows
                     .row
                       for col_index in cols
-                        bank = banks[row_index * col_num + col_index]
-                        active = default_bank and bank.id == default_bank.id
-                        if col_index != 3
-                          .grid
-                            .inner
-                              if active
-                                a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
-                              else
-                                a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
-                        else
-                          .grid-omega
-                            .inner
-                              if active
-                                a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
-                              else
-                                a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                        c = row_index * col_num + col_index
+                        if c < count
+                          bank = banks[row_index * col_num + col_index]
+                          active = default_bank and bank.id == default_bank.id
+                          if col_index != col_num_1
+                            .grid
+                              .inner
+                                if active
+                                  a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                                else
+                                  a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                          else
+                            .grid-omega
+                              .inner
+                                if active
+                                  a.active(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
+                                else
+                                  a(href="javascript:void(0)", data-gate-id="{{bank.gate_id}}", data-desc-id="bank-limit-{{bank.id}}", title="{{bank.name}}", style='background: url({{bank.logo.url}})')
                 .row.bank-description
                   for bank in banks
                     if default_bank and default_bank.id == bank.id
@@ -79,7 +82,7 @@ block main
     .padding-xl.align-center
       p 为保证您的资金安全，请先进行实名认证
       .space-vertical-l
-      a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
+      a.button.button-middle.button-l.button-red(href='/accounts/register/first/') 去实名认证
 
 
 block script

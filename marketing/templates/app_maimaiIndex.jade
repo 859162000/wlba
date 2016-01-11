@@ -18,9 +18,25 @@ html(style="background: #f6f6f6")
           img(src='').check-img
         .maimai-form-margin
         .phone-check
-          input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入验证码').check-input
-          button(type="button").check-submit 数字验证码
+          input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+          button(type="button").check-submit 短信验证码
       .maimai-form-sign 请输入正确的手机号
       .maimai-form-margin.maimai-sign-margin
-      input(type='button',name='submit' ,value="领 取").maimai-form-btn
-    script(data-init='mmIndex', src="/static/scripts/mobile_activity/maimai.js?v=20150707")
+      input(type='button',name='submit' ,value="领 取",disabled=true).maimai-form-btn
+    //宣传文案
+    section.regist-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4=title
+            p=bodyTxt1
+            p=bodyTxt2
+
+
+        +li('trust', '信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资')
+        +li('safe', '安全', '第三方资金托管', '阳光保险承保资金安全')
+        +li('authority', '权威', '华尔街精英金融团队', 'IT数据风控系统')
+        +li('profit', '高收益', '30余倍银行活期收益', '100元起投')
+
+    script(data-init='mmIndex', src="/static/scripts/mobile_activity/dist/maimai.js?v=201511061")

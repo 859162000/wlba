@@ -80,9 +80,10 @@
   -webkit-box-flex: 1
   display: -webkit-box
   -webkit-box-align: center
-  input
+  input, select
     display: block
     -webkit-box-flex: 1
+    -webkit-appearance: none
     width: 100%
     outline: 0
     border: 0
@@ -92,7 +93,8 @@
     &::-webkit-input-placeholder
       color: #ccc
       font-size: $font-size14
-
+  select 
+    background: url("/static/imgs/mobile/detail/buyjiantou.png") no-repeat right center #fff
   .input-clear
     position: relative
     width: 1rem
@@ -197,6 +199,7 @@ $checkbox-width: .8rem
   font-size: $font-size14
   line-height: 1.1rem
   padding-left: .4rem
+  margin-top: 1rem
   .xieyi-btn
     padding-left: 1.2rem
   .checkbox
@@ -229,7 +232,6 @@ $checkbox-width: .8rem
       -webkit-transform: rotateZ(45deg)
   .regist-for-login
     float: right
-    text-decoration: underline
     padding-right: .25rem
 
 $progress-h4-color: #666

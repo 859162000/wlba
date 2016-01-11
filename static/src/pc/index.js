@@ -101,33 +101,6 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     $balanceShowCont.hide()
   })
 
-
-  //合作伙伴
-  ~function _initPart($partner, $next, $last, idx, count){
-    $partner.css({'width': $partner.find('li').length * 100 + '%'})
-    $next.on('click',function(){
-      idx++
-      if(idx > count) idx = 0;
-      _amt(idx);
-    })
-
-    $last.on('click',function(){
-      idx--
-      if(idx < 0) idx = count;
-      _amt(idx);
-    })
-
-    function _amt(page){
-      $partner.animate({'left': - page * 1050}, 200)
-    }
-  }(
-    $('.cn-ul-warp ul'),
-    $('.cn-next'),
-    $('.cn-last'),
-    0,
-    $('.cn-ul-warp li').length - 1
-  );
-
   //扫描送红包
   var scrollTimer = null;
   $(window).on('scroll', function () {

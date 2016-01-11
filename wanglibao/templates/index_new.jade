@@ -4,10 +4,11 @@
 doctype html
 html
   head
-    - with '网利宝官网--p2p理财--p2p网贷--值得信赖的互联网金融服务平台' as title
+    - with '网利宝官网_p2p理财_p2p网贷_值得信赖的互联网金融服务平台_网利宝' as title
     include global/g_head
     - endwith
-
+    meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+    meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
   body
     - with '首页' as activeItem
     include global/g_nav
@@ -19,16 +20,18 @@ html
       .i-mod-exhibition
         .ex-lf-cont
           .ex-intro
-            mixin intro(icon, head, cont1, cont2)
+            mixin intro(icon, head, cont1, cont2, cont3)
               .intro-item
                 i.iconfont.icon.t-d16(class=icon)
                 .item-text
                   h4=head
                   p.t-d4=cont1
                   p.t-d4=cont2
+                  if cont3
+                    p.t-d4=cont3
             +intro('icon-rocket', '高收益 低门槛', '30余倍银行活期收益', '100元起投')
-            +intro('icon-safe', '安全保障', '第三方资金托管', '阳光保险承保资金安全')
-            +intro('icon-authority', '专业权威', '华尔街精英金融团队', 'IT数据风控系统')
+            +intro('icon-safe', '安全保障', '第三方资金托管', '阳光保险承保资金安全', '平台风险准备金')
+            +intro('icon-authority', '专业权威', '华尔街精英金融团队', 'IT数据风控系统', '引入第三方征信')
           for product in recommend_product
             if product.category ==  "新手标"
               invest = 'ac-targer-uninvest'
@@ -58,7 +61,7 @@ html
                   .pdt-progress-percent.t-d7.fl {{percent | percentage}}
                 .ac-tg-row.clearfix
                   .tg-list.profit-amount
-                    total_amount = product.total_amount / 10000
+                    total_amount = product.total_amount / 10000.0
                     span.t-d5.font-xll {{total_amount}}
                       span.font-m 万
                     .t-d7.tg-bt-text 融资金额
@@ -94,7 +97,7 @@ html
             .dc-head
               .dc-title.font-l
                 i.icon.iconfont.icon-data
-                span 数据统计
+                a(href='/data_cube/',target="_blank") 数据统计
               .dc-time.t-d7.fr 截至 {{site_data.updated_at | milldate_format}}
             .ex-data
               ul
@@ -112,7 +115,7 @@ html
                   | 小伙伴们昨日共投资
                   span.num-space(data-number='{{site_data.p2p_amount_yesterday}}',data-type='amount')
           .ex-download-app.mg-t-sm.padding-sm
-            img(src='/static/imgs/pc/home/www_erweima.jpg').dol-app.mg-r-sm.fl
+            img(src='/static/imgs/pc/home/www_erweima.jpg', alt='p2p金融').dol-app.mg-r-sm.fl
             .dol-btn.fl
               .t-d4 网利宝APP-随时随地 让钱生钱
               a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
@@ -161,7 +164,7 @@ html
                         percent = float(p2p.ordered_amount) / p2p.total_amount * 100
                         .pro-container(style="width:{{percent | percentage}}")
                       .pdt-progress-percent.t-d7.fl {{percent | percentage}}
-                    total_amount = p2p.total_amount / 10000
+                    total_amount = p2p.total_amount / 10000.0
                     amount = p2p.total_amount - p2p.ordered_amount
                     .t-d7.mg-b-s {{total_amount}}万元/￥{{amount | money_format_int}}元 可投
                   .product-footer.clearfix
@@ -191,7 +194,7 @@ html
                   .product-line.mg-l-r-sm
     //product end
 
-    .i-mod-wrap.mg-t-sm
+    .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-news
         ul.clearfix
           li.mg-r-xxl
@@ -199,7 +202,7 @@ html
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
             a(href="/pc_guide/").ns-cont
-              img(src='/static/imgs/pc/home/about.gif').ns-about
+              img(src='/static/imgs/pc/home/video.jpg', alt='互联网金融').ns-about
           li.mg-r-xxl
             a(href="/announcement/").ns-head
               i.icon.iconfont.icon-notice
@@ -218,36 +221,15 @@ html
             .ns-cont.ns-media.t-d4
               for news in news_and_reports
                 a(href="/news/detail/{{news.id}}", title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
-                  img(src="/media/{{news.image}}", alt="{{news.name}}")
+                  img(src="/media/{{news.image}}", alt="p2p理财")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
-    .i-mod-wrap.mg-t-sm.mg-b-xl
-      .i-mod-cooperation
-        .cn-head.br-b-d2.font-l.clearfix
-          a(href="/partner/").cn-head-title.fl
-            i.icon.iconfont.icon-cooperation.mg-r-s.t-d7.font-xxl
-            |合作伙伴
-          .cn-head-change.fr.t-d7
-            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl.cn-last
-            i.icon.iconfont.icon-flip-right.font-xl.cn-next
-        .cn-cont
-          .cn-ul-warp
-            itemLeng = 14
-            lenarr = range(int((len(partners)+ itemLeng - 1)/ itemLeng))
-            ul
-              for i in lenarr
-                li
-                  startItem = i * itemLeng
-                  endItem = (i + 1) * itemLeng
-                  parts = enumerate(partners)
-                  for index, partner in parts
-                    if startItem <= index and index < endItem
-                        a(href="{{partner.link}}",  style="background: url('/media/{{partner.image}}') no-repeat", target="_blank", title="{{partner.name}}",)
     a.bonus-icon
     .bonus-img(style='display:none')
-        .close
+      a.weixin_btn(href="/activity/pc_caipiao/")
+      .close
     .page(style='display:none')
     include global/g_footer
     script.
-      require(["/static/src/pc/index.js?v=20151016"])
+      require(["/static/src/pc/index.js?v=201511301"])
     include include/tracking

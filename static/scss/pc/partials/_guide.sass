@@ -5,10 +5,11 @@
 .i-guide-advantage, .i-guide-select
   background: #f0f4f7
 .section
+  position: relative
   overflow: hidden
 .i-guide-item
   width: $content-width
-  margin: 0 auto
+  margin: 100px auto
   padding: 10px 0
   height: 100%
   overflow: hidden
@@ -16,12 +17,28 @@
 .i-item-cont-warp
   vertical-align: middle
   display: table-cell
+
 .i-guide-banner
   width: 100%
-  height: auto
+  height: 780px
+  display: block
+  background: url("/static/imgs/pc/guide/guide_banner.jpg") no-repeat center
 
+.i-guide-banner-body
+  width: $content-width
+  height: 100%
+  overflow: hidden
+  display: table
+  background: url("/static/imgs/pc/guide/video.png") no-repeat center
+  margin: 10px auto 0 auto
+.i-guide-video-warp
+  position: absolute
+  top: 50%
+  left: 50%
+  margin: -148px 0 0 -280px
 .guide-title
   text-align: center
+  padding-bottom: 20px
   span
     display: inline-block
     height: 40px

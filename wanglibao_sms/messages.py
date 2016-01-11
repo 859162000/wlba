@@ -5,6 +5,11 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_redis.backend import redis_backend
 
+SMS_SIGN = u'【网利科技】'
+SMS_SIGN_TD = u'退订回TD【网利科技】'
+SMS_STR_WX = u' 关注网利宝服务号，每日签到抽大奖。'
+SMS_STR_400 = u'如有疑问请致电网利宝客服电话：4008-588-066'
+
 
 # zhoudong 重写该模块 2015/10/
 
@@ -20,13 +25,13 @@ def format_datetime(time, fmt):
 
 def suffix(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs)) + u'【网利科技】'
+        return unicode(f(*args, **kwargs)) + SMS_SIGN
     return wrapper
 
 
 def suffix_td(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs)) + u'退订回TD【网利科技】'
+        return unicode(f(*args, **kwargs)) + SMS_SIGN_TD
     return wrapper
 
 
@@ -35,11 +40,10 @@ def deposit_succeed(name, amount):
     """
     充值成功
     """
-
     if get_stitch():
         try:
             redis = redis_backend()
-            obj = redis._get('sms_income')
+            obj = redis._get('deposit_succeed')
             content = cPickle.loads(obj)['content']
             return content.format(name, amount)
         except Exception, e:
@@ -67,12 +71,12 @@ def withdraw_failed(name, error_message=None):
         except Exception, e:
             print e
             if len(error_message) < 1:
-                return u'亲爱的{}，您的提现失败，请重新尝试。如有疑问请致电网利宝客服电话：4008-588-066'.format(name)
-            return u'亲爱的{}，您的提现失败，原因如下：{}。如有疑问请致电网利宝客服电话：4008-588-066'.format(name, error_message)
+                return u'亲爱的{}，您的提现失败，请重新尝试。{}'.format(name, SMS_STR_400)
+            return u'亲爱的{}，您的提现失败，原因如下：{}。{}'.format(name, error_message, SMS_STR_400)
     else:
         if len(error_message) < 1:
-            return u'亲爱的{}，您的提现失败，请重新尝试。如有疑问请致电网利宝客服电话：4008-588-066'.format(name)
-        return u'亲爱的{}，您的提现失败，原因如下：{}。如有疑问请致电网利宝客服电话：4008-588-066'.format(name, error_message)
+            return u'亲爱的{}，您的提现失败，请重新尝试。{}'.format(name, SMS_STR_400)
+        return u'亲爱的{}，您的提现失败，原因如下：{}。{}'.format(name, error_message, SMS_STR_400)
 
 
 @suffix
@@ -126,17 +130,17 @@ def product_settled(name, equity, product, settled_time):
             obj = redis._get('product_settled')
             content = cPickle.loads(obj)['content']
             return content.format(
-                name, product.serial_number, equity.equity,
+                name, product.name, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand)
         except Exception, e:
             print e
             return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
-                name, product.serial_number, equity.equity,
+                name, product.name, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
             )
     else:
         return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
-            name, product.serial_number, equity.equity,
+            name, product.name, equity.equity,
             format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
         )
 
@@ -152,17 +156,17 @@ def product_failed(name, product):
             obj = redis._get('product_failed')
             content = cPickle.loads(obj)['content']
             return content.format(name,
-                                  product.serial_number,
+                                  product.name,
                                   format_datetime(product.end_time, u'%Y年%m月%d日'))
         except Exception, e:
             print e
             return u'亲爱的{}，您投标的{}项目在{}之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。'.format(
-                name, product.serial_number, format_datetime(product.end_time, u'%Y年%m月%d日')
+                name, product.name, format_datetime(product.end_time, u'%Y年%m月%d日')
             )
 
     else:
         return u'亲爱的{}，您投标的{}项目在{}之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。'.format(
-            name, product.serial_number, format_datetime(product.end_time, u'%Y年%m月%d日')
+            name, product.name, format_datetime(product.end_time, u'%Y年%m月%d日')
         )
 
     # return u'%s[%s]在%s之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。' \
@@ -202,7 +206,7 @@ def product_prepayment(name, product, amount):
             redis = redis_backend()
             obj = redis._get('product_prepayment')
             content = cPickle.loads(obj)['content']
-            return content.format(name, product.short_name, product.serial_number)
+            return content.format(name, product.name, amount)
         except Exception, e:
             print e
             return u'亲爱的{}，您投资的{}项目收到还款{}元，已到账，请登录您的网利宝账户进行查看。'.format(
@@ -288,13 +292,13 @@ def red_packet_get_alert(amount, rtype):
             return content.format(amount, rtype)
         except Exception, e:
             print e
-            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
+            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。{}'.format(amount, rtype, SMS_STR_WX)
     else:
-        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
+        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。{}'.format(amount, rtype, SMS_STR_WX)
 
 
 @suffix_td
-def red_packet_invalid_alert(count):
+def red_packet_invalid_alert(count, days):
     """
     红包、加息券快过期前3天提醒
     """
@@ -306,9 +310,9 @@ def red_packet_invalid_alert(count):
             return content.format(count)
         except Exception, e:
             print e
-            return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
+            return u'温馨提示，您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！{}'.format(count, days, SMS_STR_WX)
     else:
-        return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
+        return u'温馨提示，您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！{}'.format(count, days, SMS_STR_WX)
 
 
 @suffix_td
@@ -360,7 +364,8 @@ def msg_bid_purchase(order_id, product_name, amount):
 
 def msg_bid_earning(product_name, activity_name, term, time, earning_percent, earning_aoumnt, unit):
     title = u"活动收益"
-    content = u"借款项目“%s(%s），期限%s%s”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 查看账户余额 感谢您对我们的支持与关注。" \
+    content = u"借款项目“%s(%s），期限%s%s”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 " \
+              u"<a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。" \
               % (product_name, activity_name, term, unit, time, earning_percent, u"%", earning_aoumnt)
     return title, content
 
@@ -458,10 +463,10 @@ def msg_redpack_give_percent(amount, highest_amount, name, dt):
 
 
 # 全民淘金短信站内信模板
-@suffix
+@suffix_td
 def sms_income(name, count, amount):
     return u"亲爱的{}，今日您共有{}个好友参与投资，为您产生的理财佣金为{}元已发放，" \
-           u"请进入我的账户－全民淘金中查询！感谢您对我们的支持与关注。".format(name, count, amount)
+           u"请进入我的账户－全民淘金中查询！感谢您的支持。".format(name, count, amount)
     # redis = redis_backend()
     # obj = redis._get('sms_income')
     # content = cPickle.loads(obj)['content']
@@ -478,7 +483,7 @@ def msg_give_income(count, amount):
 
 @suffix_td
 def sms_alert_invest(name):
-    return u"提醒投资：我（{}）在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！".format(name)
+    return u"{}在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！{}".format(name, SMS_STR_WX)
 
 
 @suffix_td
@@ -495,6 +500,13 @@ def msg_give_coupon(name, amount, end_time):
               u"感谢您对我们的支持与关注！<br/>网利宝".format(name, amount, end_time)
     return title, content
 
+
+def sms_alert_unbanding_xunlei(reward_dsct, url):
+    content = u"由于您之前没有完成迅雷帐号登录，无法关联，导致会员奖励无法到帐。<br/>" \
+              u"请先到以下页面完成迅雷帐号登录，即可获得{}奖励。" \
+              u"<br/>" \
+              u"<a href='{}'>领取奖励>></a><br/>"
+    return content.format(reward_dsct, url)
 
 if __name__ == "__main__":
     print sms_alert_invest('test')

@@ -1,0 +1,41 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+<script>
+var _is_pc;
+var _is_app;
+
+function hide_pc_div(){
+    if (_is_pc.checked == false){
+        $("#_pc_div").hide();
+    }else{
+        $("#_pc_div").show();
+    }
+}
+
+function hide_app_div(){
+    if (_is_app.checked == false){
+        $("#_app_div").hide();
+    }else{
+        $("#_app_div").show();
+    }
+}
+
+$(document).ready(function (){
+    _is_pc=document.getElementById("id_is_pc");
+    hide_pc_div();
+    _is_pc.onchange=hide_pc_div;
+    _is_app=document.getElementById("id_is_app");
+    hide_app_div();
+    _is_app.onchange=hide_app_div;
+});
+
+</script>
+{% endblock %}
+
+{% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "./admin/wanglibao_activity/activityshow/fieldset.html" %}
+{% endfor %}
+{% endblock %}

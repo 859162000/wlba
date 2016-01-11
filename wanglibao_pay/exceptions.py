@@ -21,3 +21,15 @@ class VerifyError(Exception):
         return "Signature verify error: using certificate %s for content %s with signature %s" % (
             self.pem_path, self.content, self.signature
         )
+
+
+class CardException(Exception):
+    pass
+
+
+class ManyCardException(CardException):
+    message = u"银行卡数量重复"
+
+
+class AbnormalCardException(CardException):
+    message = u"银行卡异常"

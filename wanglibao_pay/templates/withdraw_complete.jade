@@ -4,12 +4,11 @@
 
 doctype html
 - with '提现结果' as title
-include include/head
+include include/common_head
 - endwith
 body
-  include include/header
   - with '首页' as activeItem
-  include include/navigation
+  include global/g_nav
   - endwith
 
   .callback-container
@@ -29,10 +28,10 @@ body
         .error-icon
         .callback-description
           h1 提现申请异常
-          p {{result}}
+          h4 {{result}}
           p 请先查看<a class='blue' href='/accounts/transaction/withdraw/'>提现记录</a>,如果没有申请成功，请拨打客服电话咨询：400-588-066
 
   - with 1 as no_margin
-  include include/footer
+  include global/g_footer
   - endwith
   include include/tracking

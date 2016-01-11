@@ -1,7 +1,11 @@
 doctype html
-- with '媒体报道' as title
+- with news.name as title
 include include/head
 - endwith
+if news.keywords
+  meta(name="keywords", content="{{news.keywords}}")
+if news.description
+  meta(name="description", content="{{news.description}}")
 body
   include global/g_nav
   .space-vertical-ssm

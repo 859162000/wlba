@@ -5,13 +5,36 @@ block content
     img(src='/static/imgs/mobile_activity/app_wechat/default_user.png').default-img
     .default-message
       .message-icon
-      .message-body 我的加息券福袋已经被抢光了。你可以下载网利宝APP，只要投标成功，你也可以拥有自己的福袋啦。
+      .message-body 我的奖励福袋已经被抢光了。你可以下载网利宝APP,成功投标1000元以上,你也可以拥有自己的福袋啦。
   .webchat-redpack-end
     .redpack-bg
+    .void 福袋已被抢空
   .webchat-submit
     a(href="/weixin/regist/").webpack-btn-red 注册领取新手红包
-    a(href="/activity/app_pc_download/").webpack-btn-blue 登录APP享新福利
+    a(href="/activity/app_pc_download/").webpack-btn-blue 下载网利宝
+  .receive-peoples 已有 {{count}} 人领取 28888 元体验金
 
+  .webchar-friend-list
+    .webchar-list-head
+      span 看朋友们手气如何
+    .webchar-list-item
+      if all_gift
+        for gift in all_gift
+          dl
+            dt.item-start
+              img(src='{{gift.img}}')
+            dd.item-cont
+              .friend-warp
+                span.fried-name {{gift.name}}&nbsp
+                span.take-time {{gift.time}}
+              .friend-taking {{gift.message}}
+
+            dd.item-right
+              em#amount.friend-list {{gift.amount}}%
+              if gift.amount > 10
+                span.jiaxi-text 体验金
+              else
+                span.jiaxi-text 加息券
   script(src="/static/src/mobile/lib/weixin/wx.js")
-  script(data-init='weChatEnd', src='/static/scripts/mobile_activity/weChart_share.js')
+  script(data-init='weChatEnd', src='/static/scripts/mobile_activity/dist/weChart_share.js?v=20151113')
 

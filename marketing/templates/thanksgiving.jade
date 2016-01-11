@@ -1,0 +1,233 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/thanksgiving.css?v=20446477")
+  body
+    include global/g_nav
+    .thanksgiving-kuang
+    .kuang-tidhi
+      img(src='/static/imgs/pc_activity/thanksgiving/guanbibutton.png').imgx
+      .huodejiang
+        p(style='font-size: 16px')
+          | 恭喜您！获得
+          span#app-jiangli
+    .thanksgiving
+      .banner#banner
+        .bannerdong
+      .thanksgiving-prize
+        .prize
+          p.prize-title 单笔投资满5000元可参与抽奖一次，100%中奖，投资额越高中大奖几率越高。百万豪礼抽疯了，多投多抽不要停！
+          .prize-rotary#lottery
+            table(border="0", cellpadding="0", cellspacing="0")
+              - csrf_token
+              tbody
+                tr
+                  td.lottery-unit.lottery-unit-0
+                    .active1
+                  td.lottery-unit.lottery-unit-1
+                    .active1
+                  td.lottery-unit.lottery-unit-2
+                    .active1
+                  td.lottery-unit.lottery-unit-3
+                    .active1
+                  td.lottery-unit.lottery-unit-4
+                    .active1
+                tr
+                  td.lottery-unit.lottery-unit-13
+                    .active1
+                  td(colspan="3", rowspan="2").prize-mingdan
+                    .prize-le
+                      h2 中奖名单
+                      .setp-list
+                        .long-p
+                          p 恭喜130******77获得
+                            span 感恩节10元现金红包
+                          p 恭喜130******61获得
+                            span 感恩节10元现金红包
+                          p 恭喜130******51获得
+                            span 霍尼韦尔空气净化器
+                          p 恭喜158******71获得
+                            span 感恩节10元现金红包
+                          p 恭喜132******81获得
+                            span 感恩节10元现金红包
+                          p 恭喜130******31获得
+                            span 感恩节1%加息券
+                          p 恭喜132******71获得
+                            span 感恩节1%加息券
+                          p 恭喜130******71获得
+                            span 感恩节1.5%加息券
+                          p 恭喜130******71获得
+                            span 感恩节1%加息券
+                          p 恭喜132******71获得
+                            span 感恩节1%加息券
+                          p 恭喜130******66获得
+                            span 感恩节1%加息券
+                          p 恭喜158******71获得
+                            span 霍尼韦尔空气净化器
+                          p 恭喜133******45获得
+                            span 感恩节1.5%加息券
+                          p 恭喜130******44获得
+                            span 感恩节1.5%加息券
+                    .prize-ri
+                      if user.is_authenticated
+                        p
+                          | 你还有
+                          span.app-jihui
+                          | 次抽奖机会
+                      else
+                        p
+                      if user.is_authenticated
+                        a(href='javascript:void(0);').jiang-button.jiang-button2 立即抽奖
+                      else
+                        a(href='/accounts/login/?next=/activity/thanksgiving/').jiang-button.jiang-button1 立即抽奖
+                      a(href='/p2p/list/', target="_blank").jiang-a 投资赢抽奖机会>>
+                  td.lottery-unit.lottery-unit-5
+                    .active1
+                tr
+                  td.lottery-unit.lottery-unit-12
+                    .active1
+                  td.lottery-unit.lottery-unit-6
+                    .active1
+                tr
+                  td.lottery-unit.lottery-unit-11
+                    .active1
+                  td.lottery-unit.lottery-unit-10
+                    .active1
+                  td.lottery-unit.lottery-unit-9
+                    .active1
+                  td.lottery-unit.lottery-unit-8
+                    .active1
+                  td.lottery-unit.lottery-unit-7
+                    .active1
+
+          p.prize-title1
+            | 说明：新老用户均可参与，虚拟奖品抽完立即发放。立即
+            a(href='javascript:void(0);').title1-a 查看加息券和红包规则>>
+          .title1-guizhe
+            h6 【加息券和红包规则】
+            ul
+              li 1、红包和加息券有效期：自领取日起10天内有效；
+              li 2、购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+              li 3、投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+              li 4、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+              li 5、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+      .thanksgiving-investment
+        .imgtu
+        .investment
+          p.investment-title 活动期间，累计投资额最高的前30名，可获得相对应的排名奖励。
+          .investment-rotary
+            .rotary1
+              h1 第1名
+              p IPad Pro32G&nbsp;&nbsp;一台
+            .rotary1.rotary2
+              h1 第2~3名
+              p IPhone6s16G&nbsp;&nbsp;一台
+            .rotary1.rotary3
+              h1 第4~6名
+              p 霍尼韦尔空气净化器&nbsp;&nbsp;一台
+          .investment-rotary
+            .rotary1.rotary4
+              h1 第5~7名
+              p beats头戴式耳机&nbsp;&nbsp;一个
+            .rotary1.rotary5
+              h1 第8~10名
+              p 苏泊尔厨具7件套&nbsp;&nbsp;一个
+            .rotary1.rotary6
+              h1 第11~20名
+              p 车行者车载记录仪
+            .rotary1.rotary7
+              h1 第21~30名
+              p 365谷五常大米
+          a(href='/p2p/list/', target="_blank").thanks.thanks1 立即投资
+          p.investment-title1
+            | 说明：在活动结束后7个工作日内会有客服人员与您联系，奖品展示图片仅作参考，实际款式以通知为准。所有实物奖品均会在12月15日前发放完毕。立即
+            a(href='javascript:void(0);').title1-a 查看加息券和红包规则>>
+          .title1-guizhe1
+            h6 【加息券和红包规则】
+            ul
+              li 1、红包和加息券有效期：自领取日起10天内有效；
+              li 2、购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+              li 3、投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+              li 4、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+              li 5、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+      .thanksgiving-main
+        .main-thank
+          p.thank-title 单笔投资100元~4999元用户不用愁，100%获得阳光普照大奖，所有奖品随机发送。全民大福利，根本停不下来！
+          .thank
+            .thank1
+              h2 ￥30
+              p 代金券
+            .thank1.thank2
+              h2 ￥30
+              p 代金券
+            .thank1.thank3
+              h2 ￥29
+              p 代金券
+            .thank1.thank4
+              h2 ￥30
+              p 代金券
+          .thank
+            .thank1.thank5
+              h2 ￥40
+              p 代金券
+            .thank1.thank6
+              h2 7天会员
+              p 兑换码
+            .thank1.thank7
+              h2 1月会员
+              p 兑换码
+            .thank1.thank8
+              h2 7天会员
+              p 兑换码
+          .prize-ri1
+            if user.is_authenticated
+              p
+                | 你还有
+                span
+                | 次抽奖机会
+            else
+              p
+          if user.is_authenticated
+            a(href='javascript:void(0);').thanks.thanks2 领取奖品
+              .hongxi
+                h5
+                  | 恭喜您！获得
+                  span#thankgi-thanks2
+          else
+            a(href='/accounts/login/?next=/activity/thanksgiving/').thanks.thanks1 领取奖品
+          a(href='/p2p/list/', target="_blank").jiang-a 投资赢抽奖机会>>
+          p.thank-title1 说明：当前奖品统一以站内信形式发放，敬请留意。
+          h6 【加息券和红包规则】
+          ul
+            li 1、红包和加息券有效期：自领取日起10天内有效；
+            li 2、购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+            li 3、投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+            li 4、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+            li 5、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+          h6 【活动规则】
+          ul
+            li 1、活动时间：2015年11月23日-11月29日；
+            li 2、感恩节活动期间，新老用户不限渠道均可参与活动，单笔投资5000元即可获得大富翁转盘抽奖一次，多抽多送上不封顶；
+            li 3、用户需在用户中心里完善收货信息，中得实物奖品的用户，在活动结束后7个工作日内会有客服MM与您联系，
+              br
+              | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15个工作日内完成奖品发放，请保持手机畅通；
+            li 4、所有奖品不兑换现金，不可替换。中得优惠券得用户，使用方法请登录品牌官网联系查询；
+            li 5、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+            li 6、网利宝对此活动享有最终解释权。
+      .thanksgiving-footer
+      include global/g_footer
+      include include/tracking
+      .xl-backtop(style="z-index:99")
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+        .erweima
+  script.
+    require(['/static/js/thanksgiving.js?v=20158877'])

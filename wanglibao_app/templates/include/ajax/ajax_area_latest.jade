@@ -1,0 +1,15 @@
+
+if results
+  for activity in results
+    a(href='{{activity.app_detail_link}}').area-list
+      .area-ac-head {{activity.activity.name}}
+      .area-ac-banner
+        .area-ac-time {{activity.activity_status}}
+        //img(src='/media/{{activity.app_banner}}', onerror="this.src='/static/imgs/app/area/default.jpg'", )
+        div( class="lazy img-responsive", data-original="/media/{{activity.app_banner}}")
+      .area-ac-dec {{activity.app_description}}
+      .area-ac-line
+      .area-ac-footer 立即查看
+else
+
+  .unactivty 暂无活动

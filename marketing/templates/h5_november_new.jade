@@ -1,0 +1,99 @@
+- load formatters
+doctype html
+html
+  head
+    title 11月福利大升级，新手最高580元红包
+    include include/app_head
+  body(style="background-color:#5f92ee;").nove-body
+    .nove-banner#banner
+      img(src="/static/imgs/mobile_activity/november_new/banner.png")
+    .tit-big 新手福利专享
+    .nove-main#sep-main
+      .welfare1.relative
+        img(src="/static/imgs/mobile_activity/november_new/welfare1.png")
+        .welfare-txt
+          p.welfare-tit1 福利一：
+          p.welfare-cont 新手注册送10元红包<br />单笔投资满<span class="brown">1000</span>元可用
+      .welfare2.relative
+        img(src="/static/imgs/mobile_activity/november_new/welfare2.png")
+        .welfare-txt
+          p.welfare-tit1 福利二：
+          p.welfare-cont 新手完成实名认证送20元红包<br />单笔投资满<span class="brown">2000</span>元可用
+      .welfare3.relative
+        img(src="/static/imgs/mobile_activity/november_new/welfare3.png")
+        .welfare-txt
+          p.welfare-tit1 福利三：
+          p.welfare-cont 新手首次完成充值送50元红包<br />单笔投资满<span class="brown">3000</span>元可用
+      .welfare4.relative
+        img(src="/static/imgs/mobile_activity/november_new/welfare4.png")
+        .welfare-txt
+          p.welfare-tit1 福利四：
+          p.welfare-cont 新手完成首次投资<br />最高送500元红包
+    .promote-nove
+      h3.use-tit （1）5000元≤首次投资＜20000元<br />送150元组合红包，包含：
+      ul.use-cont.clear
+        li.red-packet
+          p
+            img(src="/static/imgs/mobile_activity/november_new/money50.png")
+          p 单笔投资<br />满15000元可用
+        li.plus-icon +
+        li.red-packet
+          p
+            img(src="/static/imgs/mobile_activity/november_new/money100.png")
+          p 单笔投资<br />满20000元可用
+      h3.use-tit （2）20000元≤首次投资<br />送500元组合红包，包含：
+      ul.use-cont.clear
+        li.red-packet
+          p
+            img(src="/static/imgs/mobile_activity/november_new/money150.png")
+          p 单笔投资<br />满40000元可用
+        li.plus-icon +
+        li.red-packet
+          p
+            img(src="/static/imgs/mobile_activity/november_new/money350.png")
+          p 单笔投资<br />满50000元可用
+    .recommend-nove
+      .tit-big 推荐投资送红包
+      .red-packet
+        .tit1 受邀好友完成首次投资（100元起）
+        .tit2 送邀请人30元红包
+        .packet-img
+          img(src="/static/imgs/mobile_activity/november_new/red10.png?v=20151111")
+      .red-packet
+        .tit1 5000元≤受邀好友首次投资＜20000元
+        .tit2 送邀请人50元红包
+        .packet-img
+          img(src="/static/imgs/mobile_activity/november_new/red30.png?v=20151111")
+      .red-packet
+        .tit1 受邀好友首次投资≥20000元
+        .tit2 送邀请人80元红包
+        .packet-img
+          img(src="/static/imgs/mobile_activity/november_new/red80.png?v=20151111")
+      .invite-nove
+        .invite-tit 【如何邀请】
+        ul.invite-cont.invite-ul
+          li 好友使用你的邀请码或邀请链接注册，并完成首投（100元起投），即算成功邀请，你可获30元红包。
+          li 受邀好友首投金额越高，赠送红包金额越高，邀请每个好友最高送80元。
+        .invite-cont.text-center
+          p 所以邀请好友多多投资吧！
+          p 多邀多送，上不封顶！TA好我也好！
+          p 还没有邀请码？注册即可拥有
+          p 登录后，在“我的账户 > 全民淘金”可
+          p 查看专属邀请码
+
+    .nove-rule
+      h3.use-tit 【投资流程】
+      .use-cont.font26.text-center 注册网利宝账号 → 充值资金到账户→<br />选择投资标 → 获得收益和奖励
+
+      h3.use-tit.mt1 【红包使用规则】
+      ul.use-cont.font24.ul-cont
+        li <span class="rule-num">1.</span>活动时间：2015年11月11日-2015年12月3日；
+        li <span class="rule-num">2.</span>手机号为网利宝唯一账户，通过网利宝电脑端官网、手机客户端、官方微信号、部分渠道主动新注册用户均可享受活动红包福利；
+        li <span class="rule-num">3.</span>红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
+        li <span class="rule-num">4.</span>新手专享红包为直抵红包，投资时可选择使用红包，直抵现金使用;
+        li <span class="rule-num">5.</span>注册、实名认证、首次充值所赠红包有效期自领取日起7天内有效；首次投资满额所赠红包有效期自领取日起15天内有效;
+        li <span class="rule-num">6.</span>部分合作渠道无标示新手活动的来源用户无法享受此活动奖励。
+        li#ios-show(style="display:none") <span class="rule-num">7.</span>所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+      p.rule-p 网利宝对此活动享有最终解释权。
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="/static/js/app_isIphone.js")

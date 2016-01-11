@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
+import random
+from celery.utils.log import get_task_logger
 
 from django.forms import model_to_dict
 from django.utils import timezone
@@ -20,6 +22,7 @@ from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
 
+logger = get_task_logger(__name__)
 
 @app.task
 def p2p_watchdog():
@@ -33,9 +36,13 @@ def delete_old_product_amortization(pa_list):
 
 @app.task
 def process_paid_product(product_id):
-    time.sleep(2)
-    p2p = P2PProduct.objects.select_related('user').get(pk=product_id)
-    P2POperator.preprocess_for_settle(p2p)
+    try:
+        time.sleep(2)
+        p2p = P2PProduct.objects.select_related('user').get(pk=product_id)
+        P2POperator.preprocess_for_settle(p2p)
+    except:
+        print('p2p process_for_settle error: ' + str(p2p))
+        logger.error('p2p process_for_settle error: ' + str(p2p))
 
 @app.task
 def full_send_message(product_name):
@@ -179,12 +186,29 @@ def p2p_auto_ready_for_settle():
     today_0 = time_zone.localize(datetime.datetime.combine(today.date(), today.min.time()))
     today_24 = time_zone.localize(datetime.datetime.combine(today.date(), today.max.time()))
 
-    ProductAmortization.objects.filter(product__status=u'还款中',
-                                       term_date__gte=today_0,
-                                       term_date__lte=today_24,
-                                       ready_for_settle=False,
-                                       settled=False
-    ).update(ready_for_settle=True, settlement_time=timezone.now(), is_auto_ready_for_settle=True)
+    # ProductAmortization.objects.filter(product__status=u'还款中',
+    #                                    term_date__gte=today_0,
+    #                                    term_date__lte=today_24,
+    #                                    ready_for_settle=False,
+    #                                    settled=False
+    # ).update(ready_for_settle=True, settlement_time=timezone.now(), is_auto_ready_for_settle=True)
+
+    product_amorts = ProductAmortization.objects.filter(product__status=u'还款中',
+                                                        term_date__gte=today_0,
+                                                        term_date__lte=today_24,
+                                                        ready_for_settle=False,
+                                                        settled=False).all()
+    now = timezone.now()
+    for amort in product_amorts:
+        time_offset = datetime.timedelta(minutes=random.randint(1, 30))
+        settle_time = now + time_offset
+        # amort.update(ready_for_settle=True, settlement_time=settle_time, is_auto_ready_for_settle=True)
+        amort.ready_for_settle = True
+        amort.settlement_time = settle_time
+        amort.is_auto_ready_for_settle = True
+        amort.save()
+
+
 
 
 

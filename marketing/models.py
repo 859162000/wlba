@@ -57,7 +57,7 @@ class SiteData(models.Model):
 
 class InviteCode(models.Model):
     code = models.CharField(u'邀请码', max_length=6, db_index=True, unique=True)
-    is_used = models.BooleanField(u'是否使用', default=False)
+    is_used = models.BooleanField(u'是否使用', default=False, db_index=True)
 
     def __unicode__(self):
         return self.code
@@ -78,16 +78,80 @@ class PromotionToken(models.Model):
         verbose_name_plural = u'用户邀请码'
 
 
+# class Channels(models.Model):
+#     """
+#         渠道信息
+#     """
+#     code = models.CharField(u'渠道代码', max_length=50, db_index=True, unique=True)
+#     name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
+#     description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
+#     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+#     image = models.ImageField(upload_to='channel', blank=True, default='',
+#                               verbose_name=u'渠道图片', help_text=u'主要用于渠道落地页的banner图片')
+#
+#     class Meta:
+#         verbose_name_plural = u"渠道"
+#
+#     def clean(self):
+#         if len(self.code) == 6:
+#             raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
+#
+#     def __unicode__(self):
+#         return self.name
+
 class Channels(models.Model):
     """
         渠道信息
     """
+    _FROM = (
+        ('full', u'全平台'),
+        ('pc', u'电脑端'),
+        ('mobile', u'移动端'),
+        ('ios', u'苹果'),
+        ('android', u'安卓'),
+        ('ios+pc', u'苹果和电脑端'),
+        ('android+pc', u'安卓和电脑端')
+    )
+
+    _CLASS = (
+        ('----', '----'),
+        ('CPC', u'CPC-按点击计费'),
+        ('CPD', u'CPD-按天计费'),
+        ('CPT', u'CPT-按时间计费'),
+        ('CPA', u'CPA-按行为计费'),
+        ('CPS', u'CPS-按销售计费')
+    )
+
+    _STATUS = (
+        (0, u'0-正常'),
+        (1, u'1-暂停拉新'),
+        (2, u'2-暂停合作'),
+        (3, u'3-渠道归并')
+    )
+
+    _CALLBACK = (
+        ('register', u'注册'),
+        ('validation', u'实名'),
+        ('binding', u'绑卡'),
+        ('first_investment', u'首投'),
+        ('investment', u'投资'),
+        ('first_pay', u'首充'),
+        ('pay', u'充值')
+    )
+
     code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
-    name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
+    name = models.CharField(u'渠道名字', max_length=20, default="")
     description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
     image = models.ImageField(upload_to='channel', blank=True, default='',
                               verbose_name=u'渠道图片', help_text=u'主要用于渠道落地页的banner图片')
+    coop_status = models.IntegerField(u'合作状态', max_length=2, default=0, choices=_STATUS)
+    merge_code = models.CharField(u'并入渠道代码', blank=True, null=True, max_length=12)
+    classification = models.CharField(u'渠道分类', max_length=20, default="----", choices=_CLASS)
+    platform = models.CharField(u'渠道平台', max_length=20, default="full", choices=_FROM)
+    start_at = models.DateTimeField(u'合作开始时间', blank=True, null=True, help_text=u'*可为空')
+    end_at = models.DateTimeField(u'合作结束时间', blank=True, null=True, help_text=u'*可为空')
+    is_abandoned = models.BooleanField(u'是否废弃', default=False)
 
     class Meta:
         verbose_name_plural = u"渠道"
@@ -96,9 +160,21 @@ class Channels(models.Model):
         if len(self.code) == 6:
             raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
 
+#        if self.classification == '----':
+#            raise ValidationError(u'请选择渠道分类')
+
+        if self.coop_status == 3:
+            if self.merge_code:
+                ch = Channels.objects.filter(code=self.merge_code).first()
+                if (not ch or ch.coop_status!=0 or ch.is_abandoned):
+                    raise ValidationError(u'请输入正常状态的并入渠道代码')
+                if (ch.code==self.code):
+                    raise ValidationError(u'不能指定并入渠道为自己')
+            else:
+                raise ValidationError(u'设置状态为“渠道归并”时，请输入并入渠道代码')
+
     def __unicode__(self):
         return self.name
-
 
 class ChannelsNew(models.Model):
     """
@@ -339,6 +415,8 @@ class ClientData(models.Model):
     user_id = models.IntegerField(u"用户ID", blank=False, null=False, default=0)
     amount = models.DecimalField(u'金额', max_digits=20, decimal_places=2, default=0)
     action = models.CharField(max_length=10, blank=False, null=False, choices=ACTION)
+    # fix@chenweibi, add order_id
+    order_id = models.IntegerField(u'关联订单编号', null=True, db_index=True)
     create_time = models.DateTimeField(u'创建时间', blank=False, null=False, default=timezone.now)
 
 
@@ -455,3 +533,77 @@ class LoginAccessToken(models.Model):
     expire_at = models.BigIntegerField(default=None, verbose_name=u"时间戳", blank=True)
     class Meta:
         verbose_name_plural = u'h5用户令牌登录表'
+
+
+class QuickApplyInfo(models.Model):
+    """
+        Author:Yihen@20151102
+        Description: 快速申请人填写自己的基本信息，包括姓名、电话、住址、房车、贷款金额
+    """
+    APPLY_WAY = (
+        (0, u'我有房'),
+        (1, u'我有车'),
+        (2, u'其他'),
+    )
+    STATUS = (
+        (0, u'提交申请'),
+        (1, u'申请中'),
+        (2, u'申请成功'),
+        (3, u'申请失败')
+    )
+    name = models.CharField(max_length=128, default='', null=False, verbose_name=u'姓名')
+    phone = models.CharField(max_length=32, default='', null=False, verbose_name=u'电话', db_index=True)
+    address = models.CharField(max_length=256, default='', null=False, verbose_name=u'住址')
+    apply_way = models.IntegerField(max_length=2, choices=APPLY_WAY, default=2, verbose_name=u'贷款抵押')
+    apply_amount = models.CharField(max_length=32, null=False, verbose_name=u'贷款金额')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+    update_time = models.DateTimeField(null=True, verbose_name=u'更新时间')
+    status = models.IntegerField(max_length=32, null=False, default=0, choices=STATUS, verbose_name=u'流程状态')
+    class Meta:
+        verbose_name = u'贷款申请人信息'
+        verbose_name_plural = u'贷款申请人信息'
+
+
+class GiftOwnerGlobalInfo(models.Model):
+    description = models.CharField(max_length=64, verbose_name=u'奖品描述')
+    amount = models.IntegerField(default=0, verbose_name=u'奖品个数', unique=True)
+    valid = models.BooleanField(default=True, verbose_name=u'是否生效')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+    update_time = models.DateTimeField(default=None, null=True, verbose_name=u'修改时间')
+    class Meta:
+        verbose_name = u'发奖全局表'
+        verbose_name_plural = u'发奖全局表'
+
+
+class GiftOwnerInfo(models.Model):
+    """
+        Author:Yihen@20151102
+        Description: 抽奖人的基本信息表
+    """
+    sender =models.ForeignKey(User,verbose_name=u'奖品派送人', help_text=u'领奖人和奖品派送人可以不是同一个人')
+    config = models.ForeignKey(GiftOwnerGlobalInfo, verbose_name=u'外键关联')
+    name = models.CharField(max_length=128, default='', null=False, verbose_name=u'姓名')
+    phone = models.CharField(max_length=32, default='', null=False, verbose_name=u'电话', db_index=True)
+    address = models.CharField(max_length=256, default='', null=False, verbose_name=u'住址')
+    award = models.CharField(max_length=64, default='', null=False, verbose_name=u'奖品名称', db_index=True)
+    type = models.IntegerField(default=0, null=False, verbose_name=u'奖品类别')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'领奖时间')
+    update_time = models.DateTimeField(null=True, verbose_name=u'更新时间')
+    class Meta:
+        verbose_name = u'抽奖人信息表'
+        verbose_name_plural = u'抽奖人信息表'
+
+class WanglibaoVoteCounter(models.Model):
+    """
+        网里宝投票记录表
+    """
+    catalog = models.CharField(verbose_name=u'大类别', max_length=256, default="", blank=True, null=True)
+    item = models.CharField(verbose_name=u'小条目', max_length=256, default="", blank=True, null=True)
+    activity = models.CharField(verbose_name=u'活动名称', max_length=246, default="", blank=True, null=True)
+    count = models.IntegerField(verbose_name=u'投票计数器', default=0, blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = u'投票记录表'
+        verbose_name_plural = u'投票记录表'

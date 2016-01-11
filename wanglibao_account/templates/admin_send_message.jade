@@ -35,37 +35,49 @@ head
                 .span6
                   .span3(style="line-height:40px")
                     label 用户手机号
-                  .span4
+                  .span9-omega
                     textarea#phones(name='phones', placeholder='手机号码,一行一个', style="width:200px;height:120px")
-                    span 一行一个(可一个或多个)
+                    p(style="color:red") 一行一个(可一个或多个)
                 if flag == 'different_batch'
                   .span6
                     .span3(style="line-height:40px")
                       label 兑换码/奖品码
-                    .span4
+                    .span9-omega
                       textarea#exchange_codes(name='exchange_codes', placeholder='兑换码/兑换码,一行一个', style="width:200px;height:120px")
                       span(style="color:red") 兑换码/奖品码的数量必须和手机号的数量一致(一行一个)
-                .span6(style="margin-top:10px")
-                  .span3(style="line-height:40px")
-                    label 站内信标题
-                  .span4
-                    input#title(type='text', name='title', placeholder='标题', style="width:200px;")
-                .span6(style="margin-top:10px")
-                  .span3(style="line-height:40px")
-                    label 站内信内容
-                  .span8
-                    textarea#content(name='content', placeholder='站内信内容', style="width:500px;height:100px")
-                    if flag == 'different_batch'
-                      reward = '{{code}}'
-                      span(style="color:red") 站内信内容中用"{{reward}}"代替要替换的兑换码
                 .span6(style="margin-top:20px")
-                  .span3(style="line-height:40px")
+                  .span3(style="line-height:23px")
                     label 站内信类型
-                  .span4
+                  .span5
                     select#mtype(name="mtype")
                       option(value ="activityintro") 活动介绍
                       option(value ="activity") 活动奖励
                       option(value ="invite") 邀请奖励
+                .span6(style="margin-top:10px")
+                  .span3(style="line-height:40px")
+                    label 站内信标题
+                  .span9-omega
+                    input#title(type='text', name='title', placeholder='标题', style="width:500px;")
+                .span6(style="margin-top:10px")
+                  .span3(style="line-height:40px")
+                    label 站内信内容
+                  .span9-omega
+                    textarea#content(name='content', placeholder='站内信内容', style="width:500px;height:100px")
+                    if flag == 'different_batch'
+                      reward = '{{code}}'
+                      span(style="color:red") 站内信内容中用"{{reward}}"代替要替换的兑换码
+                if flag != 'different_batch'
+                  .span6(style="margin-top:10px")
+                    .span3(style="line-height:40px")
+                      label 短信内容
+                    .span9-omega
+                      textarea#content(name='content_sms', placeholder='短信内容,不填写则不发短信', style="width:500px;height:40px")
+                  .span6(style="margin-top:10px")
+                    .span3(style="line-height:40px")
+                      label 红包或加息券ID
+                    .span9-omega
+                      input#title(type='text', name='coupon_ids', placeholder='红包或加息券ID(不填则不发)', style="width:500px;")
+                      p 填写符合条件的理财券id,多个id用英文逗号间隔
                 .span(style="clear:both")
                 input#btn_sub.button-primary(style="margin-top:20px", type="submit") 确认发送
           else
@@ -77,10 +89,10 @@ head
                     li
                       | {{result.phone}}
                       if result.status == 'success'
-                        span(style="color:green") 成功
+                        span(style="color:green") {{result.message}}
                       elif result.status == 'fail'
-                        span(style="color:red") 失败
+                        span(style="color:red") {{result.message}}
                       else
-                        span(style="color:#DA8309") 用户不存在
+                        span(style="color:#DA8309") {{result.message}}
               a(href='/{{ "" | admin_address}}/accounts/message/')
                 button.button-home-action(type='submit') 再次发送

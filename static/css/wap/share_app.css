@@ -190,7 +190,7 @@ h1 {
 }
 header {
   background: #ffffff url("/static/images/wap/share_header_bg.jpg") no-repeat left top;
-  background-size: 100% 100%;
+  background-size: contain;
 }
 .activity-app-header {
   background: url("/static/images/wap/activity_header.jpg") no-repeat left top;
@@ -211,7 +211,7 @@ header {
 }
 @media screen and (max-width: 320px) {
   header {
-    height: 13em;
+    height: 11em;
   }
   .crazy-feast-header {
     height: 10.7em;
@@ -228,7 +228,7 @@ header {
 }
 @media screen and (min-width: 360px) {
   header {
-    height: 15.3em;
+    height: 13.3em;
   }
   .crazy-feast-header {
     height: 12.4em;
@@ -245,7 +245,7 @@ header {
 }
 @media screen and (min-width: 414px) {
   header {
-    height: 17.3em;
+    height: 15.3em;
   }
   .crazy-feast-header {
     height: 13.9em;

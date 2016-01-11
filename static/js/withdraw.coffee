@@ -6,6 +6,8 @@ require.config(
     'jquery.validate': 'lib/jquery.validate.min'
     tools: 'lib/modal.tools'
 
+  urlArgs: 'v=20151118'
+
   shim:
     'jquery.modal': ['jquery']
     'jquery.placeholder': ['jquery']
@@ -13,20 +15,21 @@ require.config(
 )
 
 require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], ($, modal, backend, tool, placeholder, validate)->
-
+  max_amount = parseInt($('input[name=fee]').attr('data-max_amount'))
+  min_amount = parseInt($('input[name=fee]').attr('data-min_amount'))
   $.validator.addMethod "balance", (value, element)->
     return backend.checkBalance(value, element)
   $.validator.addMethod "money", (value, element)->
     return backend.checkMoney(value, element)
   $.validator.addMethod "huge", (value, element)->
-    return value <= 100000
+    return value <= max_amount
   $.validator.addMethod "small", (value, element)->
     balance = $(element).attr('data-balance')
     if value <= 0
       return false
     if balance - value == 0
       return true
-    else if value >= 50
+    else if value >= min_amount
       return true
     return false
 
@@ -35,9 +38,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       amount:
         required: true
         money: true
-        balance: true
-        huge: true
-        small: true
+        balance: false
+        huge: false
+        small: false
       card_id:
         required: true
       validate_code:
@@ -51,8 +54,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         required: '不能为空'
         money: '请输入正确的金额格式'
         balance: '余额不足'
-        huge: '单笔提现金额不能超过10万元'
-        small: '最低提现金额 50 元起。如果余额低于 50 元，请一次性取完。'
+        huge: '单笔提现金额不能超过' + max_amount + '万元'
+        small: '最低提现金额 ' + min_amount + ' 元起。如果余额低于 ' + min_amount + ' 元，请一次性取完。'
       card_id:
         required: '请选择银行卡'
       validate_code:
@@ -129,6 +132,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     timerFunction()
     intervalId = setInterval timerFunction, 1000
 
+  $('.withdraw-button').click ()->
+    if(!$(this).hasClass('no-click'))
+      $('#withdraw-form').submit()
+
   $(".voice").on 'click', '.voice-validate', (e)->
     e.preventDefault()
 
@@ -178,3 +185,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     .fail (xhr)->
       if xhr.status > 400
         tool.modalAlert({title: '温馨提示', msg: result.message})
+
+  $('.poundageF').click ()->
+    $('#poundageExplain').modal()

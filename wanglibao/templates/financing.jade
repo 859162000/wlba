@@ -1,0 +1,145 @@
+doctype html
+html
+  head
+    - with '贷款专区' as title
+    include global/g_head
+    - endwith
+  body.financing
+    - with '贷款专区' as activeItem
+    include global/g_nav
+    - endwith
+    .financing-banner
+      .mod.g-banner-login-warp
+        .form-box.g-banner-login#financeForm
+          - csrf_token
+          h3.form-tit 快速申请
+          p.form-item
+            input.txt-input.placeholderInput.name-inp(placeholder="请输入您的姓名",title="请输入您的姓名",maxlength="128")
+          p.form-item
+            input.txt-input.placeholderInput.checkMobile(placeholder="请输入您的手机号",title="请输入您的手机号",maxlength="20")
+          .relative1.select-box
+            p.form-item.relative.js-select
+              input.txt-input.city-inp(placeholder="选择您的所在城市",title="选择您的所在城市",readonly="true")
+              span.arr-box
+                i.arr-top
+            .select-cont.js-select-skin(style="display:none;")
+              p.form-item.relative.js-select-top
+                input.txt-input.city-inp(placeholder="选择您的所在城市",title="选择您的所在城市",readonly="true")
+                span.arr-box
+                  i.arr-bottom
+              .form-cont
+                .form-list.clearfix
+                  a(href="javascript:;") 北京
+                  a(href="javascript:;") 上海
+                  a(href="javascript:;") 中山
+                  a(href="javascript:;") 深圳
+                  a(href="javascript:;") 天津
+                  a(href="javascript:;") 长沙
+                  a(href="javascript:;") 武汉
+                  a(href="javascript:;") 贵阳
+                  a(href="javascript:;") 西安
+                  a(href="javascript:;") 青岛
+                  a(href="javascript:;") 石家庄
+                  a(href="javascript:;") 海口
+                  a(href="javascript:;") 郑州
+                  a(href="javascript:;") 重庆
+                  a(href="javascript:;") 其它
+                .form-promot *如上若无您所在城市，请选择就近城市或其它城市
+          .relative2.select-box
+            p.form-item.relative.js-select
+              input.txt-input.home-inp(placeholder="我有车/我有房",title="我有车/我有房",readonly="true")
+              span.arr-box
+                i.arr-top
+            .select-cont.js-select-skin(style="display:none;")
+              p.form-item.relative.js-select-top
+                input.txt-input.home-inp(placeholder="我有车/我有房",title="我有车/我有房",readonly="true")
+                span.arr-box
+                  i.arr-bottom
+              .form-cont
+                .form-list.clearfix.three-item
+                  a(href="javascript:;",data-val="1") 我有车
+                  a(href="javascript:;",data-val="0") 我有房
+                  a(href="javascript:;",data-val="2") 其它
+          .relative3.select-box
+            p.form-item.relative.js-select
+              input.txt-input.money-inp(placeholder="选择您要贷款的金额",title="选择您要贷款的金额",readonly="true")
+              span.arr-box
+                i.arr-top
+            .select-cont.js-select-skin(style="display:none;")
+              p.form-item.relative.js-select-top
+                input.txt-input.money-inp(placeholder="选择您要申请的金额",title="选择您要申请的金额",readonly="true")
+                span.arr-box
+                  i.arr-bottom
+              .form-cont
+                .form-list.clearfix.three-item
+                  a(href="javascript:;") 3-10万
+                  a(href="javascript:;") 10-30万
+                  a(href="javascript:;") 30万以上
+          p.error-box(style="display:none;")#errorBox
+          p.submitFormStyle.font-l#financeSub 提交
+
+    .ex-intro.finance-detail
+      .i-mod-product.clearfix
+        .pdt-item
+          i.finance-icon
+          .item-text
+            .big-tit 门槛低
+            .t-d4.font-m 有车有房即可申请
+        .pdt-item
+          i.finance-icon.finance-icon1
+          .item-text
+            .big-tit 额度高
+            .t-d4.font-m 单笔最高600万
+        .pdt-item
+          i.finance-icon.finance-icon2
+          .item-text
+            .big-tit 放款快
+            .t-d4.font-m 手续齐全，当天放款
+    .i-mod-product.clearfix.finance-step
+      .font-xxl.step-tit.tc 申请流程
+      .clearfix.relative.tc.wrap918
+        .pdt-item
+          i.finance-icon.step1
+          .item-text.font-ll 线上申请
+        .arr-left.lft-arr
+        .pdt-item
+          i.finance-icon.step2
+          .item-text.font-ll 专员回访，办理手续
+        .arr-left.rht-arr
+        .pdt-item
+          i.finance-icon.step3
+          .item-text.font-ll 审核通过，融资放款
+      .br-d2.wrap918.clearfix.finance-info
+        .info-item
+          .info-tit.font-l 申请条件：
+          p.font-s 18-60周岁；
+          p.font-s 在所在城市有稳定住所；
+          p.font-s 在所在城市有收入来源。
+        .info-item
+          .info-tit.font-l 所需资料：
+          p.font-s 二代身份证；近期征信报告；
+          p.font-s 工作收入证明（银行流水、纳税单或相关证明）；
+          p.font-s 抵押物相关证件（车辆、房屋产权等相关证件）
+    .ex-intro.now-items-box
+      .i-mod-product.wrap918.clearfix
+        .font-xxl.step-tit.tc 当前融资项目
+        .clearfix
+          .now-item
+            i.finance-icon.news1
+            .item-text
+              p.font-xl 车贷
+              p.t-d4.font-m 个人或企业名下有车；信用记录良好<br />贷款额度：3—180万
+          .now-item
+            i.finance-icon.news2
+            .item-text
+              p.font-xl 房贷
+              p.t-d4.font-m 个人或企业名下有房产；信用记录良好<br />贷款额度：3—600万
+    .alt-pages#alt-pages
+    .alt-box#alt-box
+      p#alt-promote 您已提交成功,请您耐心等待
+      p.promote <span id="times-box">3秒</span>后将关闭
+    include global/g_footer
+    include include/tracking
+
+    script.
+      require(["/static/src/pc/financing.js"])

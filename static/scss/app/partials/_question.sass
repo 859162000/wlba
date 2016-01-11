@@ -1,0 +1,31 @@
+$list-height: 2.9rem
+.question-warp
+
+  .question-list
+    display: -webkit-box
+    -webkit-box-align: center
+    height: $list-height
+    border-bottom: 1px solid #E5E5E5
+    padding: 0 .8rem 0 1rem
+  .question-name
+    -webkit-box-flex: 1
+    color: #666
+    font-size: $font-size14
+  .question-arrow
+    width: .95rem
+    height: .95rem
+    background: url("/static/imgs/app/question/arrow.png") no-repeat center
+    background-size: 50%
+    transition: -webkit-transform 300ms
+    -webkit-transform: rotate(90deg)
+  .question-arrow-rotate
+    -webkit-transform: rotate(-90deg)
+
+  .question-answer
+    padding: .6rem 1.05rem
+    font-size: $font-size14
+    color: #999
+    text-align: justify
+    border-bottom: 1px solid #E5E5E5
+    max-height: 99999rem
+    display: none

@@ -1,34 +1,30 @@
 
 style.
-  .footer-down{display: -webkit-box; -webkit-box-align: center; position: fixed; bottom: 0; left: 0; width: 100%;
-    color: #fff; background: rgba(0,0,0,.6); padding: .375rem 1.25rem .375rem .75rem;}
-  .down-logo {width: 2.25rem; height: 2.25rem; margin-right: .375rem;}
+  .footer-down{display: -webkit-box; -webkit-box-align: center; position: relative; bottom: 0; left: 0; width: 100%;
+    color: #ccc; background: #4A4A4A; padding:0 .35rem 0 .75rem; height: 2.25rem; overflow: hidden;}
+  .down-logo {width: 1.3rem; height: 1.45rem; margin-right: .375rem;}
   .down-logo img { display: block; width: 100%; height: 100%;}
-  .down-desc{ -webkit-box-flex: 1;}
-  .down-desc .company-name { font-size: .7rem}
-  .down-desc .down-message{width: 6.5rem; height: .8rem; background: url("/static/imgs/mobile/footer_download/download-message.png") no-repeat center; background-size: 100%; }
-  .down-btn { width: 3.75rem;}
-  .down-btn p {font-size: .6rem; width: 100%; background: #DB493F; border-radius: .15rem; text-align: center; padding: .2rem 0;}
-  .down-btn p:active{background: #C73026;}
-  .down-close { position: absolute; right: 0; top: 0; width: .8rem; height: .8rem; background: url("/static/imgs/mobile/footer_download/close.png") no-repeat center; background-size: 100%; }
+  .down-desc{ -webkit-box-flex: 1; color: #ccc;}
+  .down-desc .company-name{ display: -webkit-box; -webkit-box-align: center;}
+  .down-desc .company-name span { display: block;font-size: .7rem; background: url("/static/imgs/mobile/footer_download/shape.png") no-repeat right center ; background-size: .75rem; padding-right: 1.2rem }
+  .down-btn {  width: 1.5rem; height: 100%; line-height: 2.25rem; text-align: center; transform: rotate(45deg); font-size: 1.4rem}
 
 .footer-down#footer-down
   .down-logo
-    img(src='/static/imgs/mobile/footer_download/logo.png')
-  .down-desc
-    p.company-name 网利宝
-    p.down-message
-  .down-btn#down-btn
-    p 立即下载
-  .down-close#close
+    img(src='/static/imgs/mobile/footer_download/lion.png')
+  .down-desc#down
+    p.company-name
+      span 下载网利宝APP  查看更多信息
+  .down-btn#close +
 
 script.
+
   (function(){
       var
           u = navigator.userAgent,
           ua = navigator.userAgent.toLowerCase(),
           close  =  document.getElementById('close'),
-          down  =  document.getElementById('down-btn'),
+          down  =  document.getElementById('down'),
           footer  =  document.getElementById('footer-down'),
           isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
           isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
@@ -40,16 +36,39 @@ script.
       down.onclick = function(){
           if (ua.match(/MicroMessenger/i) == "micromessenger") {
             window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
-        }else{
-          if(isiOS){
-            window.location.href = 'https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8';
-          }else if(isAndroid) {
-            window.location.href = 'https://www.wanglibao.com/static/wanglibao1.apk';
           }else{
-            window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
+            if(isiOS){
+              window.location.href = 'https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8';
+            }else if(isAndroid) {
+              window.location.href = 'https://www.wanglibao.com/static/wanglibao1.apk';
+            }else{
+              window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
+            }
           }
-        }
       }
 
+      if (ua.match(/MicroMessenger/i) != "micromessenger"){
+        setTimeout(function(){
+          openAppByFrame('wanglibao://')
+        },0)
+      }
+
+      function openAppByFrame(url) {
+        var frm = getOpenAppProxyFrame();
+        var src = '\<script\>window.location="' + url + '";\</script\>';
+        frm.contentDocument.write(src);
+      }
+
+      var _openAppProxyFrame;
+      function getOpenAppProxyFrame() {
+        if (_openAppProxyFrame) {
+          return _openAppProxyFrame;
+        }
+        _openAppProxyFrame = document.createElement('iframe');
+        document.body.appendChild(_openAppProxyFrame);
+        _openAppProxyFrame.style.display = 'none';
+        return _openAppProxyFrame;
+      }
   })();
+
 

@@ -1,0 +1,122 @@
+- load formatters
+doctype html
+html(style="background: #ffeec3")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_365_gu.css?v=201511171", rel="stylesheet")
+        - csrf_token
+    body
+        img.banner(src="/static/imgs/mobile_activity/app_365_gu/banner.jpg")
+        img.module_title(src="/static/imgs/mobile_activity/app_365_gu/module_1.png")
+        .act_wrap
+            .box.box_1
+                .main
+                    img.title_img(src="/static/imgs/mobile_activity/app_365_gu/goods_title_1.png")
+                    .title_text 用户注册网利宝送
+                    .goods_wrap
+                        .goods.goods_left
+                            img(src="/static/imgs/mobile_activity/app_365_gu/goods_1.jpg")
+                            p 0.5千克<br>五常大米
+                        img.add_ico(src="/static/imgs/mobile_activity/app_365_gu/add_ico.png")
+                        .goods.goods_right
+                            img(src="/static/imgs/mobile_activity/app_365_gu/goods_2.jpg")
+                            p 110元365谷<br>代金券礼包
+            a.button(href="/weixin/regist/?promo_token=365gu")
+                img(src="/static/imgs/mobile_activity/app_365_gu/button_1.png")
+            .box
+                .main
+                    img.title_img(src="/static/imgs/mobile_activity/app_365_gu/goods_title_2.png")
+                    .title_text 用户投资 ≥500元送
+                    .goods_wrap
+                        .goods.goods_left
+                            img(src="/static/imgs/mobile_activity/app_365_gu/goods_3.jpg")
+                            p 4.5千克<br>五常长粒香米
+                        img.add_ico(src="/static/imgs/mobile_activity/app_365_gu/add_ico.png")
+                        .goods.goods_right
+                            img(src="/static/imgs/mobile_activity/app_365_gu/goods_4.jpg")
+                            p 210元365谷<br>代金券礼包
+            a.button(href="/weixin/regist/?promo_token=365gu")
+                img(src="/static/imgs/mobile_activity/app_365_gu/button_2.png")
+            .box.box_3
+                .main
+                    img.title_img(src="/static/imgs/mobile_activity/app_365_gu/goods_title_3.png")
+                    .title_text 新用户最高可享有
+                    .goods_wrap
+                        img.goods_img(src="/static/imgs/mobile_activity/app_365_gu/goods_5.jpg")
+                        p 580元网利宝现金红包
+            a.button(href="/weixin/regist/?promo_token=365gu")
+                img(src="/static/imgs/mobile_activity/app_365_gu/button_3.png")
+        .act_rule_button 活动规则
+            img(src="/static/imgs/mobile_activity/app_365_gu/ico.png")
+        .act_rule_wrap
+            dl
+                dt 1.
+                dd 用户注册网利宝可获赠0.5千克五常大米 + 110元365谷代金券礼包，礼包包含80元代金券1张（满359元可用）、20元代金券1张（满119元可用）、5元代金券2张（全场通用）；
+            dl
+                dt 2.
+                dd 单笔首次投资大于等于500元送4.5千克五常长粒香米 + 210元365谷代金券礼包，礼包包含80元代金券1张（满359可用）、20元代金券1张（满119元可用）、100元代金券1张（满529元可用）、5元代金券2张（全场通用）；
+            dl
+                dt 3.
+                dd 网利宝新用户享580元现金红包：<br>
+                    .text
+                        span.space_1 (1)
+                        span.text_2 新手注册送10元红包（单笔投资1000元可抵扣使用）;
+                    <br>
+                    .text
+                        span.space_1 (2)
+                        span.text_2 新手完成实名认证送20元红包（单笔投资2000元可抵扣使用）;
+                    <br>
+                    .text
+                        span.space_1 (3)
+                        span.text_2 新手首次充值送50元红包（单笔投资3000元可抵扣使用）；
+                    <br>
+                    .text
+                        span.space_1 (4)
+                        span.text_2 新手完成首次投资最高送500元红包<br>5000元≤首次投资＜20000元，送150元组合红包，包含：<br>a. 50元，限投3月标，单笔投资满15000元可用；<br>b. 100元，限投6月标，单笔投资满20000元可用；<br>20000元≤首次投资，送500元组合红包，包含：<br>a. 150元，限投3月标，单笔投资满40000元可用；<br>a. 150元，限投3月标，单笔投资满40000元可用；
+            dl
+                dt 4.
+                dd 获得五常大米用户请留意网利宝站内信，凭站内信兑换码兑换领取。365谷代金券请查看365谷账户并抵扣使用；
+            dl
+                dt 5.
+                dd 网利宝对此活动享有最终解释权；
+            dl(style="display:none")#ios-show
+                dt 6.
+                dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+        img.module_title(src="/static/imgs/mobile_activity/app_365_gu/module_2.png")
+        .introduction_wrap
+            .box
+                img(src="/static/imgs/mobile_activity/app_365_gu/advantage_1.png")
+                dl
+                    dt 信赖
+                    dd IDG资本投资A轮融资<br>鸿利光电投资B轮融资
+            .box
+                img(src="/static/imgs/mobile_activity/app_365_gu/advantage_2.png")
+                dl
+                    dt 安全
+                    dd 第三方资金托管<br>阳光保险承保资金安全
+            .box
+                img(src="/static/imgs/mobile_activity/app_365_gu/advantage_3.png")
+                dl
+                    dt 权威
+                    dd 华尔街精英金融团队<br>IT数据风控系统
+            .box
+                img(src="/static/imgs/mobile_activity/app_365_gu/advantage_4.png")
+                dl
+                    dt 高收益
+                    dd 30余倍银行活期收益<br>100元起投
+        img.code(src="/static/imgs/mobile_activity/app_365_gu/code.png")
+        p.code_text 扫码关注微信
+
+    script(src='/static/src/mobile/lib/weixin/wx.js')
+    script(src="/static/scripts/mobile_activity/dist/app_365_gu.js?v=201511176")
+    script.
+        var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+            iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+            ios = ipad || iphone;
+        if (ios) {
+            document.getElementById('ios-show').style.display = 'block';
+        }
+
+
+

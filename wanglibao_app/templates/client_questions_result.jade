@@ -1,0 +1,17 @@
+-load formatters
+-load mathfilters
+-load widget_tweaks
+doctype html
+html
+  head
+    title=title
+    include include/app_header.jade
+  body
+    .question-warp
+      for val in list
+        .question-box
+          .question-list#list
+            .question-name {{val.question}}
+            .question-arrow
+          .question-answer {{val.answer|linebreaksbr}}
+    script(src='/static/scripts/app/dist/question.js', data-init='result')

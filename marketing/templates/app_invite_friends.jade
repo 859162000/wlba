@@ -1,0 +1,87 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+  head
+    title 全民淘金
+    include include/app_head
+  body
+    input(type='hidden', name='url', value='{{url}}')
+    .invite-banner-tly
+      img(src='/static/imgs/mobile_activity/app_invite/logo.png').logo
+      .data-item
+        .data-text 累计投资(元)
+        .data-num.num-space#p2p-num(data-number='{{site_data.p2p_amount}}',data-type='amount')
+        .data
+          |已有
+          span#regist-num.num-space(data-number='{{site_data.p2p_register_number}}', data-type='man')
+          |小伙伴选择网利宝
+    .tly-mod
+      .invite-message
+        .ivt-use
+          img(src='/static/imgs/mobile_activity/app_invite/userimg.png')
+        if friend_phone
+          .ivt-message-body 你的朋友{{ friend_phone|safe_phone_new }}<br>邀请您来网利宝赚钱，立即领300元
+        else
+          .ivt-message-body 网利宝送您<br>300元新人特权红包
+
+      .invite-from
+        .mod-form
+          input#friend_identifier(type="hidden", name="friend_identifier", value="{{ friend_phone }}")
+          input#invite_code(type="hidden", name="invite_code", value="{{ invite_code }}")
+          input(type='tel', name='phone',data-existing='true', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').mod-phone
+          .mod-check-body
+            .mod-form-margin
+            .phone-check
+              input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码', autocomplete = 'off').check-input
+              input(type='hidden', name='codeimg_key',value='')
+              img(src='').check-img
+            .mod-form-margin
+            .phone-check
+              input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码', autocomplete = 'off').check-input
+              button(type="button").check-submit 短信验证码
+          .mod-form-sign 请输入正确的手机号
+          .mod-form-margin.mod-sign-margin
+          input(type='button',name='submit' ,value="领 取").mod-form-submit
+    .invite-protocol-n.tly-mod
+      span.checkbox.agreement#agreement(data-type='Agree', data-message='请同意注册协议')
+        input(type='checkbox',name='agreement', checked=true)
+      span.xieyi-btn 同意网利宝注册协议
+    .tly-title
+      span 选择网利宝的优势
+    //宣传文案
+    section.regist-propagate.invite-friend-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4=title
+            p=bodyTxt1
+            p=bodyTxt2
+        +li('trust', '信赖', 'IDG资本A轮投资', '100%本息保障')
+        +li('authority', '权威', 'A股百亿上市公司', '鸿利光电投资入股')
+        +li('safe', '安全', '账户资金安全', '由阳光保险承保')
+        +li('profit', '高收益', '37倍银行活期收益', '100元起投0手续')
+    .tly-title
+      span 谁投资了我们
+    //宣传文案
+    section.invite-us
+      img(src='/static/imgs/mobile_activity/app_invite/idg.png').invite-us-logo-idg
+      .invite-us-dec 2014年2月，网利宝获得国际知名风投IDG资本的千万美元A轮投资。自1992年开始，作为最早进入中国市场的国际投资机构之一，IDG资本已投资包括百度、腾讯、携程等200家优秀企业，并已有超过60家企业在美国、中国香港、中国A股证券市场上市，或通过M&A成功退出。
+      img(src='/static/imgs/mobile_activity/app_invite/hlgd.png').invite-us-logo-hgdl
+      .invite-us-dec 2015年5月，网利宝获市值百亿上市公司鸿利光电战略投资。鸿利光电是中国白光LED器件领军者，国家高新技术企业，致力于打造中国领先的LED+互联网金融+车联网的生态平台。
+    .tly-mod
+      .invite-result-touch
+        a(href='http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653').invite-download 下载网利宝客户端
+    img(src='/static/imgs/mobile_activity/app_invite/grep_logo.png').invite-bottom-logo
+
+    //协议内容
+    section.regist-protocol-div
+      header.xieyi-head
+        hgroup 注册协议
+        a(href="javascript:void(0)").cancel-xiyie
+          span 返回
+      article.xieyi-cont
+        include include/weixin_xieyiFixed
+    script(src='/static/scripts/mobile_activity/lib/js-base64.min.js')
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(data-init='invite_index', src="/static/scripts/mobile_activity/dist/app_invite.js?v=20151124")

@@ -174,12 +174,12 @@ class AccessTokenBaseView(OAuthView, Mixin):
         """
         raise NotImplementedError
 
-    def error_response(self, error, mimetype='application/json', status=400, **kwargs):
+    def error_response(self, error, content_type='application/json', status=400, **kwargs):
         """
         Return an error response to the client with default status code of
         *400* stating the error as outlined in :rfc:`5.2`.
         """
-        return HttpResponse(json.dumps(error), mimetype=mimetype, status=status, **kwargs)
+        return HttpResponse(json.dumps(error), content_type=content_type, status=status, **kwargs)
 
     def access_token_response(self, access_token, user_id):
         """
@@ -205,7 +205,7 @@ class AccessTokenBaseView(OAuthView, Mixin):
             response_data['msg'] = u'refresh_token不存在'
 
         return HttpResponse(
-            json.dumps(response_data), mimetype='application/json'
+            json.dumps(response_data), content_type='application/json'
         )
 
     def access_token(self, request, data, client, user):

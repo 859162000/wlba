@@ -22,6 +22,7 @@ html
         span.xingmei-com.four
       .xingmei-prize
         .prize.xingmei-com.one
+          .zhang
           p 注册网利宝送
             span 10元
             |电影优惠券
@@ -36,7 +37,7 @@ html
       .xingmei-prize
         .prize.xingmei-com.two
           p(style="top:177px") 首次投资网利宝送电影票
-            span 一张
+            span 两张
         if user.is_authenticated
           .btn
             a(href="/p2p/list/",target="_blank") 立即投资
@@ -46,7 +47,7 @@ html
       .xingmei-prize(style="margin-right:0")
         .prize.xingmei-com.three
           p(style="top:177px") 首次投资≥500元送电影票
-            span 两张
+            span 四张
         if user.is_authenticated
           .btn
             a(href="/p2p/list/",target="_blank") 立即投资

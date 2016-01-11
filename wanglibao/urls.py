@@ -5,12 +5,14 @@ from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
 # from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
     # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
-    ZhongniuP2PDataQuery, CoopInvestmentQuery
+    ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView, \
+    Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -22,10 +24,12 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
-from marketing.views import NewsListView, NewsDetailView
+from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
+    AppShareViewSuccess, AppShareViewError, RockFinanceQRCodeView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
+from wanglibao_sms.views import ArriveRate
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -88,7 +92,7 @@ urlpatterns = patterns(
     url(r'^ckeditor/', include('ckeditor.urls')),
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
-    url(r'^activity/', decorator_include(include('marketing.urls'), wap_activity_manage)),
+    url(r'^activity/', include('marketing.urls')),
     # url(r'^activity/', include('marketing.urls')),
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
@@ -98,6 +102,9 @@ urlpatterns = patterns(
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
     url(r'^lottery/', include('wanglibao_lottery.urls')),
     url(r'^landpage/', landpage_view),
+
+    url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
+    url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),
 )
 
 urlpatterns += patterns(
@@ -147,13 +154,44 @@ urlpatterns += patterns(
     # url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
     url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopQuery.as_view()),
     url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/(?P<page>[0-9]*)/$', CoopQuery.as_view()),
-    url(r'^api/coopinvestinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopInvestmentQuery.as_view()),
+    url(r'^api/coopinvestinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<p_id>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopInvestmentQuery.as_view()),
 
     url(r'^api/csai/users/', CsaiUserQuery.as_view()),
     url(r'^api/csai/investment/', CsaiInvestmentQuery.as_view()),
 
     url(r'^api/zhongniu/products/', ZhongniuP2PQuery.as_view()),
     url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
+
+    url(r'^api/01/p2plist/$', ZOP2PListView.as_view()),
+    url(r'^api/01/record/$', ZORecordView.as_view()),
+    url(r'^api/01/count/$', ZOCountView.as_view()),
+
+    url(r'^api/rong360/token/$', Rong360TokenView.as_view()),
+    url(r'^api/rong360/list/$', Rong360P2PListView.as_view()),
+
+    url(r'^api/loans/success/$', MidaiSuccessView.as_view()),
+    url(r'^api/loans/new/$', MidaiNewView.as_view()),
+
+    # 西瓜理财
+    url(r'^api/xglcApi/onSaleProduct/$', XiguaP2PListView.as_view()),
+    url(r'^api/xglcApi/productStateInfo/$', XiguaP2PQueryView.as_view()),
+
+    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
+
+    # url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
+    url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
+    url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
+    url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
+
+    url(r'^rock/finance/qrcode/$', RockFinanceQRCodeView.as_view(), name="qrcode"),
+
+)
+
+# 短信
+urlpatterns += patterns(
+    '',
+    url(r'wanglibao_sms/', include('wanglibao_sms.urls'))
 )
 
 # 微信

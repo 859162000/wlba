@@ -199,7 +199,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         }
         .done (data)->
 
-          tool.modalAlert({title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
+          tool.modalAlert({height:'364px', title: '温馨提示', msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功', callback_ok: ()->
             if data.category == '酒仙众筹标'
               window.location.href="/accounts/home/jiuxian/"
             else
@@ -272,6 +272,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   #$('#id_amount').keyup hideEmptyLabel
 
   #build the table for invest history
+  toThousands = (num) ->
+    return  (num || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
   buildTable = (list) ->
     html = []
     i = 0
@@ -287,7 +289,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         list[i].user
         "</em></td>"
         "<td><span class='money-highlight'>"
-        list[i].amount
+        toThousands(parseInt(list[i].amount))
         "</span><span>元</span></td>"
         "</tr>"
       ].join("")

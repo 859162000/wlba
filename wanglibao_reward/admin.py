@@ -1,6 +1,6 @@
 from django.contrib import admin
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, \
-    WanglibaoWeixinRelative
+    WanglibaoWeixinRelative, WanglibaoActivityReward
 
 class WanglibaoActivityGiftGlobalCfgAdmin(admin.ModelAdmin):
 
@@ -30,7 +30,11 @@ class WanglibaoWeixinRelativeAdmin(admin.ModelAdmin):
     list_display = ("user", "phone", "nick_name", "openid", "img",)
 
 
+class WanglibaoActivityRewardAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("activity", "when_dist", "left_times", "join_times", "redpack_event", "user", "channel", "p2p_amount", "create_at", "update_at",)
 
+admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin)
 admin.site.register(WanglibaoWeixinRelative, WanglibaoWeixinRelativeAdmin)
 admin.site.register(WanglibaoActivityGiftGlobalCfg, WanglibaoActivityGiftGlobalCfgAdmin)
 admin.site.register(WanglibaoUserGift, WanglibaoUserGiftAdmin)

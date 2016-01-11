@@ -48,3 +48,31 @@ class Announcement(models.Model):
 
     def get_absolute_url(self):
         return '/announcement/detail/%s' % self.id
+
+
+class AppMemorabilia(models.Model):
+    STATUS = (
+        (0, u'未进行'),
+        (1, u'进行中')
+    )
+
+    title = models.CharField(max_length=100, blank=False, null=False, verbose_name=u'名称')
+    banner = models.ImageField(upload_to='announcement', blank=False, null=False, verbose_name=u'Banner')
+    detail_link = models.CharField(max_length=255, blank=False, null=False, verbose_name=u'详情页链接')
+    done_date = models.DateField(auto_now=False, default=timezone.now, verbose_name=u'完成日期')
+    start_time = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示开始时间')
+    end_time = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示结束时间')
+    priority = models.IntegerField(blank=True, default=0, verbose_name=u'优先级', help_text=u'越大越优先')
+    status = models.SmallIntegerField(verbose_name=u'当前状态', max_length=2, choices=STATUS, default=0)
+    hide_link = models.BooleanField(verbose_name=u'是否隐藏（大事记页面）', default=False)
+
+    class Meta:
+        verbose_name = u"APP-大事记"
+        verbose_name_plural = u'APP-大事记'
+        ordering = ['-priority']
+
+    def __unicode__(self):
+        return "%s" % self.title
+
+    def get_absolute_url(self):
+        return '/memorabilia/detail/%s' % self.id

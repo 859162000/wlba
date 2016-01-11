@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import hashlib
+import logging
 from datetime import timedelta
 
 from django.http import HttpResponse
@@ -18,6 +19,8 @@ from .forms import RefreshTokenGrantForm, UserAuthForm
 from .utils import now
 from .backends import AccessTokenBackend
 import constants
+
+logger = logging.getLogger(__name__)
 
 
 class AccessTokenView(AccessTokenBaseView):
@@ -85,14 +88,14 @@ class AccessTokenView(AccessTokenBaseView):
         if constants.ENFORCE_SECURE and not request.is_secure():
             return self.error_response({
                 'code': '10100',
-                'message': _("A secure connection is required.")
+                'message': _("A secure connection is required")
             })
 
         client = self.authenticate(request)
         if client is None:
             return self.error_response({
                 'code': '10101',
-                'message': 'invalid_client'})
+                'message': _('invalid client')})
 
         form = UserAuthForm(request.POST)
         if not form.is_valid():
@@ -104,18 +107,18 @@ class AccessTokenView(AccessTokenBaseView):
         if not self._cleaned_sign(client, usn, sign):
             return self.error_response({
                 'code': '10108',
-                'message': 'invalid signature'})
+                'message': _('invalid signature')})
 
         handler = self.get_handler(grant_type)
 
         try:
             return handler(request, request.POST, client, user)
-        except OAuthError, e:
-            return self.error_response(e.args[0])
         except Exception, e:
+            logger.info("oauth2 access token failed with request_data[%s] client[%s] user[%s]" %
+                        (request.POST, client.id, user.id))
             return self.error_response({
-                'code': '10400',
-                'message': 'api error.'
+                'code': '50001',
+                'message': _('api error')
             })
 
 
@@ -132,11 +135,11 @@ class TokenLoginOpenApiView(APIView):
 
         if user and user.is_authenticated():
             response_data = {'code': '10000',
-                             'message': 'ok'}
+                             'message': _('ok')}
 
         else:
             response_data = {'code': '10210',
-                             'message': 'Token error.'}
+                             'message': _('Token error')}
 
         return HttpResponse(renderers.JSONRenderer().render(response_data,
                                                             'application/json'))

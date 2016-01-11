@@ -1,0 +1,173 @@
+@mixin btn
+  display: inline-block
+  padding: 0.3rem 1rem
+  border-radius: 1rem
+  background: #f5462e
+  color: #fff
+  font-size: 0.8rem
+  width: 6rem
+  text-align: center
+
+.txt-center,.text-center
+  text-align: center
+.relative
+  position: relative
+
+.nove-body
+  position: relative
+  $brown: #ffa82d
+  //banner
+  .nove-banner
+    width: 100%
+    overflow: hidden
+    background-color: #5f92ee
+    img
+      width: 100%
+  .tit-big
+    background: url("/static/imgs/mobile_activity/november_new/tit-bg.png") center top no-repeat
+    background-size: contain
+    width: 100%
+    text-align: center
+    font-size: 0.8rem
+    color: #fff
+    height: 2.675rem
+    line-height: 2.675rem
+    margin: 1rem 0
+  //mian
+  .nove-main
+    background: #5f92ee 1rem 2.1rem url("/static/imgs/mobile_activity/november_new/route.png") no-repeat
+    background-size: 100% auto
+    padding: 0 0.5rem 2rem
+    width: 100%
+    box-sizing: border-box
+    margin: 0 auto
+    overflow: hidden
+    .brown
+      color: $brown
+    .welfare-txt
+      position: absolute
+      top: 3.3rem
+      left: 1.5rem
+      line-height: 1.05rem
+      .welfare-tit1
+        font-size: 0.8rem
+        color: $brown
+      .welfare-cont 
+        font-size: 0.65rem
+        color: #fff
+    img
+      width: 95%
+    .welfare1
+      padding-left: 0.55rem
+    .welfare2
+      text-align: right
+      margin-top: 2rem
+      .welfare-txt
+        top: 5.3rem
+        left: auto
+        right: 1.5rem
+    .welfare3
+      padding: 20px
+      margin-top: -0.5rem
+      .welfare-txt
+        top: 5.3rem
+    .welfare4
+      margin-top: 3.5rem
+      padding: 20px
+      .welfare-txt
+        top: 4.3rem
+        left: auto
+        right: 1.5rem
+  .promote-nove
+    margin-top: -1rem
+    background: url("/static/imgs/mobile_activity/november_new/packet-bg1.png") no-repeat
+    background-size: 100% 100%
+    padding: 8% 0
+    .use-tit
+      font-size: 0.8rem
+      text-align: center
+      color: #3f72ce
+    .use-cont
+      color: #d97819
+      width: 82%
+      margin: 0.5rem auto 1rem
+      font-size: 0.65rem
+      .red-packet
+        float: left
+        width: 42%
+        text-align: center
+        img
+          width: 80%
+  .recommend-nove
+    width: 100%
+    background: #3f72ce
+    margin-top: 1rem
+    overflow: hidden
+    .red-packet
+      text-align: center
+      font-size: 0.65rem
+      line-height: 1.05rem
+      margin-bottom: 1rem
+      .tit1
+        color: $brown
+      .tit2
+        color: #fff
+      .packet-img
+        margin-top: 0.5rem
+        img
+          width: 6.1rem
+    .invite-nove
+      background: url("/static/imgs/mobile_activity/november_new/box-bg2.png") no-repeat
+      background-size: 100% 100%
+      padding: 8% 0
+      margin-bottom: 1.2rem
+      line-height: 1.05rem
+      .invite-tit
+        color: #304556
+        font-size: 0.8rem
+        text-align: center
+      .invite-cont
+        font-size: 0.6rem
+        color: #d97819
+        width: 82%
+        margin: 0 auto
+        &.invite-ul
+          list-style: decimal outside
+          padding-left: 1.25rem
+  .nove-rule
+    padding: 1rem 0
+    background: #3e5888
+    color: #fff
+    line-height: 1.25rem
+    .use-tit
+      color: $brown
+      font-size: 0.8rem
+      text-align: center
+    .font26
+      font-size: 0.65rem
+    .font24
+      font-size: 0.6rem
+    .mt1
+      margin-top: 0.5rem
+    .use-cont
+      padding: 0 1rem
+      &.ul-cont
+        li
+          padding-left: 1rem
+          position: relative
+        .rule-num
+          position: absolute
+          left: 0
+    .rule-p
+      font-size: 0.5rem
+      text-align: right
+      margin-top: 0.5rem
+  .plus-icon
+    float: left
+    width: 16%
+    text-align: center
+    font-size: 0.9rem
+    color: #3f72ce
+    height: 1.8rem
+    line-height: 1.8rem
+    font-weight: bold

@@ -1,0 +1,16 @@
+doctype html
+html(style='background:#f5f5f5;')
+  head
+    title 实名认证
+    include include/service_head.jade
+  body
+    - with '3' as processnum
+    include include/service_registProcess
+    - endwith
+    .regist-process-leo
+      p.red 恭喜您，成功完成新手任务
+      p.grey 奖励已经放入您的帐户，<br>请查收,首次投资还有红包送哦
+
+    .regist-process-btns
+      a(href="/weixin/sub_account/") 我的账户
+      a(href="/weixin/sub_list/") 投资抢红包

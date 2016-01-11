@@ -1,0 +1,185 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/jucheng.css?v=201511065")
+  body(style="background:#d9e6de")
+    //include global/g_nav
+    .g-nav-warp
+      .g-nav
+        a(href="/").g-logo-box
+          img(src="/static/imgs/pc/logo/logo_80.jpg", alt='logo', class='logo_l')
+          img(src="/static/imgs/pc/logo/logo_60.jpg", alt='logo', class='logo_s')
+        .g-user-warp
+          .g-user
+            if activeItem == "我的账户"
+              myacount = 'highlight'
+            a(href="/accounts/home", class='{{myacount}}').user-nav
+              i.icon.iconfont.icon-user
+              span.user-text 我的账户
+              i.icon.iconfont.icon-down
+            ul.g-nav-user-nav
+              mixin liItem(url, text)
+                li
+                  a(href=url)=text
+              +liItem('/pay/banks/', '我要充值')
+              +liItem('/pay/withdraw/', '我要提现')
+              +liItem('/accounts/auto_tender/', '自动投标')
+              +liItem('/accounts/transaction/p2p/', '交易记录')
+              if user.is_authenticated
+                li
+                  a(href='/accounts/logout?next=/activity/jucheng/?promo_token=jcw') 退出
+        .g-nav-box
+          mixin nav-item(name, link)
+            if activeItem == name
+                a.highlight(href=link)= name
+            else
+                a(href=link)= name
+          +nav-item('首页', '/')
+          +nav-item('理财专区', '/p2p/list/')
+          +nav-item('贷款专区', '/finance/')
+          +nav-item('安全保障', '/security')
+          +nav-item('帮助中心', '/help')
+
+    .banner
+      .main
+        .button#button 我要抢票
+    .wrap_main
+      .cooperation
+        dl
+          dt 网利宝携手聚橙网
+          dd 奉上网利宝用户年终福利<br>投资满额即送钢琴王子张昊辰独奏会北京站门票<br>先到先得，机不可失！<br>网利宝，好收益，开启多彩生活！
+      .discount
+        .box.one
+          .title 惊喜
+          p.text 注册为网利宝用户并且完成实名认证，<br>即有20元现金红包
+        .box.two
+          .title 超值
+          p.text 成功投资500元即可获得<br>价值80元的张昊辰独奏会门票（限量30张）<br>送完为止
+        .box.three
+          .title 畅爽
+          p.text 成功投资1000元即可获得<br>价值180元的张昊辰独奏会门票（限量100张）<br>送完为止
+      .rule
+        p.title 活动规则
+        ul
+          li!='<span class="space">1.</span> 活动时间：11月12日－12月5日；'
+          li!='<span class="space">2.</span> 注册为网利宝用户并且完成实名认证即得20元现金红包（投资2000元可抵扣使用）；'
+          li!='<span class="space">3.</span>用户通过网利宝单笔首次投资满500元即可获得80元独奏会门票（限量30张），送完为止；'
+          li!='<span class="space">4.</span>用户通过网利宝单笔首次投资满1000元即可获得180元独奏会门票（限量100张），送完为止；'
+          li!='<span class="space">5.</span>本次活动仅限于张昊辰北京独奏会抢票活动；'
+          li!='<span class="space">6.</span>获得独奏会门票用户请留意网利宝站内信及短信，并凭领票短信及手机号码取票；'
+          li!='<span class="space">7.</span>现场取票地址：演出当天到北京音乐厅一楼大厅票务兑换处，咨询电话：13581710219 ，<br><span class="space"></span>上门取票地址：北京市东城区东四北大街107号科林大厦A座710，咨询电话：13581710219；'
+          li!='<span class="space">8.</span>本活动最终解释权在法律允许范围内归网利宝所有；'
+      .advantage
+        .box.one
+          .img
+            img(src='/static/imgs/pc_activity/jucheng/advantage_img1.png')
+          .main
+            .title 安全保障
+            .text 阳光保险承保<br>IT风控数据系统把关<br>合作机构全额担保<br>四重身份认证
+        .box.two
+          .img
+            img(src='/static/imgs/pc_activity/jucheng/advantage_img2.png')
+          .main
+            .title 高收益
+            .text 年化高达10-16%<br>30余倍银行活期理财<br>打通传统金融行业中间环节<br>让利给投资者
+        .box.three
+          .img
+            img(src='/static/imgs/pc_activity/jucheng/advantage_img3.png')
+          .main
+            .title 专业
+            .text 独创IT风控数据系统<br>汇聚华尔街精英金融团队<br>专注于垂直细分领域<br>打造金融服务新蓝海
+        .box.four
+          .img
+            img(src='/static/imgs/pc_activity/jucheng/advantage_img4.png')
+          .main
+            .title 服务
+            .text 360度贴心服务<br>理财需求快速反应<br>客户问题即时解决<br>客服服务全年无休
+
+    .popup_bg
+    .register_wrap.popup
+        .close_ico
+        if user.is_authenticated
+          #ganjiwang-model
+          .banner-form#ganjiwang-welcome
+            .space-vertical-m
+              h1.banner-form--title 欢迎来网利宝投资理财
+              .space-vertical-s
+              p.banner-form--row.font-s 您的登录账户:
+                span {{user|display_name}}
+              .space-vertical-m
+              .banner-form--row.align-center
+                a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
+        else
+            .denelu-form#denglu
+                #aug-center
+                    .off-form#off-form ×
+                    form#img-code-form.img-code-form.aut-form(method='post', action='')
+                        .form-row
+                            input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                            input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                            img.captcha.captcha-img(alt="captcha", src="")
+                            button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                        .code-img-error.aut-error
+                        .clearfix.tc
+                            span.submit-code-img#submit-code-img1 确定
+                #aug-code
+                h1.biaoyu
+                form#register-modal-form.login-form.dale(method='post', action='')
+                  - csrf_token
+                  .form-row
+                    .form-control-group
+                      .span12
+                        input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                    .form-row-error
+                  .form-row.voice
+                    .span12-omega.hidden.show
+                      没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                    .form-control-group
+                      .span6(style="width:49%")
+                        input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                      .span6-omega
+                        button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
+                        button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:5px") 获取验证码
+                    .form-row-error
+                  .form-row
+                    input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                    .form-row-error
+                  .form-row
+                    input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                    .form-row-error#aug-form-row-eroor
+                  .form-row.form-bottom-bar
+                    .agreement(style="padding:0 0 10px 10px;text-align:left")
+                      label(for="agreement")
+                        input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 2px;margin-right: 0px;width: 16px;")
+                      | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                      .form-row-error
+                    button#register_submit.button-account.span10.xun-zhuce(type='button')
+                  .space-vertical-s
+                p.xun-p 已有账号,
+                  a(href="/accounts/login/?next=/accounts/home/") 立即登录
+    .write_info.popup
+      .title 请您认真填写相关信息，以便奖励顺利发放，谢谢！
+      ul
+        li
+          input.name(type="text", name="user_name", placeholder="姓名")
+        li
+          input.phone(type="text", name="user_phone", placeholder="联系电话")
+        li
+          input.address(type="text", name="user_address", placeholder="邮寄地址")
+      .text
+      .button 保存
+    .get_ticket.popup
+      .title 恭喜！您已成功注册网利宝，<br>实名认证领取20元现金红包；<br>立即投资，疯抢限量门票。
+      ul
+        li!='80元门票剩余 <span class="shi"></span> 张'
+        li!='180元门票剩余 <span class="bai"></span> 张'
+      a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 立即抢门票
+    include global/g_footer
+    script.
+      require(['/static/js/jucheng.js?v=201511065'])
+

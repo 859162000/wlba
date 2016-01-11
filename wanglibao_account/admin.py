@@ -9,13 +9,18 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import DecimalWidget
 from marketing.models import PromotionToken, IntroducedBy
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText, UserPushId, UserAddress
+from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText, UserPushId, \
+                                     UserAddress, UserThreeOrder
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.views import AdminIdVerificationView, AdminSendMessageView
 from wanglibao.templatetags.formatters import safe_phone_str, safe_name
 from django.forms.models import BaseInlineFormSet
+from wanglibao_account.models import UserSource
+from wanglibao.settings import ENV, ENV_PRODUCTION
+from .backends import get_verify_result
+from .utils import Xunlei9AdminCallback
 
 
 class ProfileInline(admin.StackedInline):
@@ -121,13 +126,13 @@ User.__unicode__ = user_unicode
 
 class IdVerificationAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at')
+    list_display = ('id', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
     search_fields = ('name', 'id_number')
     list_filter = ('is_valid', )
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_idverification'):
-            return ( 'name', 'id_number', 'is_valid', 'created_at')
+            return ('name', 'id_number', 'is_valid', 'created_at',)
         return ()
 
     def has_delete_permission(self, request, obj=None):
@@ -135,6 +140,22 @@ class IdVerificationAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def save_model(self, request, obj, form, change):
+        if obj.update_verify is True:
+            form.update_verify = False
+            obj.update_verify = False
+
+            # 只有生产环境可以实现更新操作
+            if ENV == ENV_PRODUCTION:
+                verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
+                obj.description = message
+                if verify_result:
+                    obj.is_valid = True
+                    if _id_photo:
+                        obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
+
+        obj.save()
 
 
 class VerifyCounterAdmin(admin.ModelAdmin):
@@ -172,6 +193,15 @@ class BindingAdmin(admin.ModelAdmin):
     list_display = ("user", "bid", "btype", "isvip")
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('user', )
+    model = Binding
+
+    def save_model(self, request, obj, form, change):
+        if obj.detect_callback is True and obj.btype in ['xunlei9', 'zgdx']:
+            obj.detect_callback = False
+            order_list = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
+            if obj.btype == 'xunlei9':
+                Xunlei9AdminCallback().process_callback(obj, order_list)
+        obj.save()
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -226,6 +256,30 @@ class UserAddressAdmin(admin.ModelAdmin):
         return False
 
 
+class UserThreeOrderAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("user", "order_on", "request_no", "result_code", "created_at")
+    search_fields = ('user__wanglibaouserprofile__phone', "request_no")
+    raw_id_fields = ('user', )
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+class UserSourceAdmin(admin.ModelAdmin):
+    list_display = ['keyword', 'website', 'created_at']
+    readonly_fields = ['keyword', 'website', 'created_at']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return  False
+
+admin.site.register(UserSource, UserSourceAdmin)
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
@@ -237,5 +291,6 @@ admin.site.register(Message, MessageAdmin)
 admin.site.register(MessageText, MessageTextAdmin)
 admin.site.register(UserPushId, UserPushIdAdmin)
 admin.site.register(UserAddress, UserAddressAdmin)
+admin.site.register(UserThreeOrder, UserThreeOrderAdmin, name=u'渠道订单记录')
 
 admin.site.register_view('accounts/message/', view=AdminSendMessageView.as_view(), name=u'网利宝-发送站内信')

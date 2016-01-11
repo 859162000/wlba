@@ -9,12 +9,14 @@ from django.db.models import Sum
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
     PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, \
     EearningReportGenerator, P2PstatusReportGenerator, ClientInfoGenerator, \
-    RedpackReportGenerator, ProductionAmortizationsReportAllGenerator
+    RedpackReportGenerator, ProductionAmortizationsReportAllGenerator, WithDrawReportGeneratorAbnormal
 from wanglibao_margin.models import Margin
+import wanglibao.settings as settings
 
 type = (
     (u'充值', 0),
     (u'提现', 1),
+    (u'提现(卡被删/多张卡)', 13),
     (u'产品流水', 2),
     (u'产品还款', 3),
     (u'用户还款', 4),
@@ -58,6 +60,8 @@ class AdminReportExport(TemplateView):
             self._generate_desposite(request, start_time, end_time)
         if type == '1':
             self._generate_withdraw(request, start_time, end_time)
+        if type == '13':
+            self._generate_withdraw_abnormal(request, start_time, end_time)
         if type == '2':
             self._generate_production_record(request, start_time, end_time)
         if type == '3':
@@ -89,6 +93,9 @@ class AdminReportExport(TemplateView):
     def _generate_withdraw(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, WithDrawReportGenerator, u'提现表格')
 
+    def _generate_withdraw_abnormal(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, WithDrawReportGeneratorAbnormal, u'提现表格(卡被删/多张卡)')
+
     def _generate_production_record(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, ProductionRecordReportGenerator, u'产品流水')
 
@@ -105,8 +112,8 @@ class AdminReportExport(TemplateView):
         print type, 'type........'
         self._apply_generate(request, start_time, end_time, EearningReportGenerator, u'赠送记录', type=type)
 
-    def _generate_withdrawdetail(self, request, start_time, end_time):
-        self._apply_generate(request, start_time, end_time, WithDrawDetailReportGenerator, u'提现详细记录')
+    # def _generate_withdrawdetail(self, request, start_time, end_time):
+    #     self._apply_generate(request, start_time, end_time, WithDrawDetailReportGenerator, u'提现详细记录')
 
     def _generate_p2pstatus(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, P2PstatusReportGenerator, u'满标状态变化')
@@ -120,8 +127,8 @@ class AdminReportExport(TemplateView):
     def _generate_production_amortizations_all(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, ProductionAmortizationsReportAllGenerator, u'产品还款计划all')
 
-    def _generate_introduced_reward(self, request, start_time, end_time):
-        self._apply_generate(request, start_time, end_time, IntroducedRewardGenerator, u'邀请收益统计')
+    # def _generate_introduced_reward(self, request, start_time, end_time):
+    #     self._apply_generate(request, start_time, end_time, IntroducedRewardGenerator, u'邀请收益统计')
 
     def _apply_generate(self, request, start_time, end_time, cls, message='', type=None):
         print type, 'type........'
@@ -132,7 +139,7 @@ class AdminReportExport(TemplateView):
                 cls.generate_report(start_time, end_time)
             messages.info(
                 request, u'生成{}成功，请到'
-                         u'<a href="/AK7WtEQ4Q9KPs8Io_zOncw/report/report" />导出表格处 </a> 查看'.format(message))
+                         u'<a href="/{}/report/report" />导出表格处 </a> 查看'.format(message, settings.ADMIN_ADDRESS))
         except Exception, e:
             messages.info(request, u'导出失败，请重新生成.错误信息{}'.format(e))
 

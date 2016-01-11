@@ -9,24 +9,28 @@ html
         p 多重保障
         p 安全升级
       .secure-head-img
-    mixin secureItem(bgStyle, explainTit, explain2, explain3, fangxiang)
+    mixin secureItem(bgStyle, explainTit, explain2, explain3, fangxiang, explain4)
       article.secure-item(class=bgStyle)
-        if fangxiang
+        if fangxiang == 'imgleft'
           .secure-item-img
           .secure-item-explain
             h4=explainTit
             p=explain2
             p=explain3
-
+            if explain4
+              p=explain4
         else
           .secure-item-explain
             h4=explainTit
             p=explain2
             p=explain3
+            if explain4
+              p=explain4
           .secure-item-img
     +secureItem('buleLeft', '多业务模式', '业务综合完整', '强力保障个人资产稳健增值', 'imgleft')
     +secureItem('greenRight', '资金安全', '多重身份认证', '阳光保险保障账户资金安全')
     +secureItem('orginLeft', '合作伙伴', '与权威机构合作', '从源头杜绝安全风险', 'imgleft')
     +secureItem('brownRight', '信息安全', '业界最安全标准全站加密', '全面保障账户信息安全')
     +secureItem('greenLeft', '本息保障', '资金链360°保障', '银行全程监管，不动用户1分钱', 'imgleft')
+    +secureItem('blueRight', '风险准备金', '千万级别风险准备金', '借款逾期时', 'right', '风险准备金先行垫付')
     +secureItem('writeNone')

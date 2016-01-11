@@ -1,0 +1,20 @@
+- load formatters
+doctype html
+html(style="background: #FFF29A")
+  head
+    title 网利宝
+    include include/app_head
+  body
+    .wechat-banner
+      img(src='/static/imgs/mobile_activity/app_reward/banner_1.png')
+    .wechat-card
+      .card-text 1.0
+        em %
+    .wechat-form
+      .wechat-form-text
+
+      .wechat-form-margin.wechat-sign-margin
+      a(href='/weixin/list/').wechat-form-btn 立即使用
+    a(href='/activity/wechat_rule/').wechat-rules 加息券使用规则>>
+    .wechat-logo
+    script(data-init='result', src="/static/scripts/mobile_activity/dist/app_wechatReward.js?v=20151119")

@@ -1,0 +1,29 @@
+- load formatters
+doctype html
+html(style="background: #FFF29A")
+  head
+    title 网利宝
+    include include/app_head
+  body
+    .wechat-banner
+      img(src='/static/imgs/mobile_activity/app_reward/banner_1.png')
+
+    .wechat-card
+      .card-text 1.0
+        em %
+    .wechat-form
+      input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').wechat-phone
+      .wechat-check-body
+        .wechat-form-margin
+        .phone-check
+          input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+          input(type='hidden', name='codeimg_key',value='')
+          img(src='').check-img
+        .wechat-form-margin
+        .phone-check
+          input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+          button(type="button").check-submit 短信验证码
+      .wechat-form-sign 请输入正确的手机号
+      .wechat-form-margin.wechat-sign-margin
+      input(type='button',name='submit' ,value="立即领取",disabled=).wechat-form-btn
+    script(data-init='reward', src="/static/scripts/mobile_activity/dist/app_wechatReward.js?v=20151119")

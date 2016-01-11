@@ -1,0 +1,42 @@
+-load formatters
+doctype html
+html
+  head
+    title 提现费用说明
+    include include/app_header.jade
+  body
+    .cost-warp
+      .cost-title 客户在网利宝充值、提现，将由第三方支付平台按金额收取一定比例的手续费。目前网利宝将为客户垫付充值手续费；同时，客户在满足条件时每月可享受一定次数的免费提现，超过当月享受的免费提现次数后，具体收取规则如下（其他超出部分将由网利宝平台垫付）：
+      .cost-equality 提现费用＝基本手续费＋额外手续费
+
+      .cost-rule-list
+        .cost-rule-title 基本手续费
+        .cost-rule-body
+          p.cost-mg-boot 每月前2次提现免基本手续费
+          p.cost-mg-boot 超出2次提现费用如下：
+          p.cost-color-unsame 0 < 提现金额 ≤ 1万；2元/笔
+            br
+            |1万 < 提现金额 ≤ 5万；3元/笔
+            br
+            |提现金额 > 5万；5元/笔
+
+      .cost-rule-list
+        .cost-rule-title 额外手续费
+        .cost-rule-body
+          p 充值未投资的资金如需提现
+          p 将收取提现金额的 0.3%
+
+
+      .cost-rule-list
+        .cost-rule-title 提现限额
+        .cost-rule-body
+          p 最低限额：
+          p 当账户余额 < 50；需一次性全部提现。
+          p 当账户余额 ≥ 50，每笔提现最低限额为50元；
+          p 最高限额：单笔限额50万（民生银行单笔限额5万），单日不限次数。
+
+      .cost-rule-list
+        .cost-rule-title 举例说明
+        .cost-rule-body
+          p 用户账户中有到期回款资金3万元，用户充值5万后（未投资），一次性提现8万元（用户该月已经用完2次免收提现基本手续费机会）：
+          p 提现费用= 5元（基本手续费）+ 5万*0.3%（额外手续费）=155元：

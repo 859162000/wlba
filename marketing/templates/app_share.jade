@@ -12,9 +12,9 @@ html
       header
       div.content
         p 您的朋友
-          span.red {{ identifier|safe_phone_new }}
+          span.red {{ phone|safe_phone_new }}
           | 邀请您来网利宝赚钱，立即去领
-          span.red 520元
+          span.red 580元
           | 红包。
         #validate-modal-form
           - csrf_token
@@ -68,11 +68,10 @@ html
           | 红包。
         //p.padding-l-r-s.gray 红包将在3个工作日内发放至您的注册手机号。
         p(style='text-align: left;padding:0 1em') 送您
-            span.red 520元
+            span.red 580元
             现金红包，请至APP个人资产-红包中查看
         p.padding-l-r-s.gray 感谢您对网利宝的信任和支持！
 
     script.
-      var v = new Date().getTime()
-      require(["/static/js/app_share.js?v="+v])
+      require(["/static/js/app_share.js?v=201510281"])
     include include/tracking

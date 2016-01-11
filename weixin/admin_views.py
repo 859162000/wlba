@@ -1,5 +1,6 @@
 # encoding:utf-8
 from __future__ import unicode_literals
+
 from django.views.generic import View, TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
@@ -9,25 +10,33 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authentication import SessionAuthentication
+
 from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
-from weixin.wechatpy.exceptions import WeChatException
+from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import weixin_api_error
-
+from weixin.models import WeixinAccounts
 
 class AdminWeixinAccountMixin(object):
     account_cache = None
     client_cache = None
 
-    def get_account(self, account_id=None):
-        account_id = account_id or self.request.session.get('account_id')
-        if not account_id:
-            raise Http404()
+    # def get_account(self, account_id=None):
+    #     account_id = account_id or self.request.session.get('account_id')
+    #     if not account_id:
+    #         raise Http404()
+    #     try:
+    #         account = Account.objects.get(pk=int(account_id))
+    #     except Account.DoesNotExist:
+    #         raise Http404('page not found')
+    #     return account
+    def get_account(self, account_key=None):
         try:
-            account = Account.objects.get(pk=int(account_id))
-        except Account.DoesNotExist:
-            raise Http404('page not found')
-        return account
+            account_key = account_key or self.request.session.get('account_key')
+            account = WeixinAccounts.get(account_key)
+            return account
+        except:
+            raise Http404()
 
     @property
     def account(self):
@@ -79,7 +88,7 @@ class WeixinView(AdminWeixinTemplateView):
     def get_context_data(self, id, **kwargs):
         context = super(WeixinView, self).get_context_data(**kwargs)
         self.request.session['account_id'] = id
-        context['account'] = self.account
+        context['account'] = self.account.db_account
         return context
 
 
@@ -88,7 +97,8 @@ class WeixinMassView(AdminWeixinTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinMassView, self).get_context_data(**kwargs)
-        context['account'] = self.account
+        print self.account.__dict__
+        context['account'] = self.account.db_account
         return context
 
 
@@ -97,7 +107,7 @@ class WeixinReplyView(AdminWeixinTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinReplyView, self).get_context_data(**kwargs)
-        context['account'] = self.account
+        context['account'] = self.account.db_account
         return context
 
 
@@ -106,7 +116,7 @@ class WeixinMenuView(AdminWeixinTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinMenuView, self).get_context_data(**kwargs)
-        context['account'] = self.account
+        context['account'] = self.account.db_account
         return context
 
 
@@ -115,9 +125,9 @@ class WeixinMaterialView(AdminWeixinTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinMaterialView, self).get_context_data(**kwargs)
-        context['account'] = self.account
+        context['account'] = self.account.db_account
         # 获取素材总数 缓存24小时
-        context['material'], _ = Material.objects.get_or_create(account=self.account)
+        context['material'], _ = Material.objects.get_or_create(account=self.account.db_account)
         try:
             context.get('material').init()
         except WeChatException, e:
@@ -131,7 +141,8 @@ class WeixinCustomerServiceView(AdminWeixinTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinCustomerServiceView, self).get_context_data(**kwargs)
-        context['account'] = self.account
+        context['account'] = self.account.db_account
+
         return context
 
 
@@ -140,14 +151,14 @@ class WeixinCustomerServiceCreateView(AdminWeixinTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinCustomerServiceCreateView, self).get_context_data(**kwargs)
-        context['account'] = self.account
+        context['account'] = self.account.db_account
         return context
 
 
 class WeixinMaterialImageView(AdminWeixinView):
 
     def get(self, request, media_id):
-        media = MaterialImage.objects.get(account=self.account, media_id=media_id)
+        media = MaterialImage.objects.get(account=self.account.db_account, media_id=media_id)
         if not media.file:
             try:
                 res = self.client.material.get(media_id)
@@ -185,7 +196,7 @@ class WeixinMaterialListJsonApi(AdminAPIView):
         offset = count * (page - 1)
 
         res = self.client.material.batchget(media_type, offset, count)
-        media_count = getattr(self.account.material, '{media_type}_count'.format(media_type=media_type))
+        media_count = getattr(self.account.db_account.material, '{media_type}_count'.format(media_type=media_type))
 
         media_class_dict = {
             'image': MaterialImage,
@@ -198,7 +209,7 @@ class WeixinMaterialListJsonApi(AdminAPIView):
         # 如果第一次获取，并且本地数据于微信官方数据不一致 则清空数据库
         if offset == 0 and media_count != res.get('total_count'):
             # 清空数据库
-            media_class.objects.filter(account=self.account).delete()
+            media_class.objects.filter(account=self.account.db_account).delete()
 
         for item in res.get('item'):
             try:
@@ -209,7 +220,7 @@ class WeixinMaterialListJsonApi(AdminAPIView):
                         media_id=item.get('media_id'),
                         name=item.get('name'),
                         update_time=item.get('update_time'),
-                        account=self.account
+                        account=self.account.db_account
                     )
                 elif media_type == 'news':
                     pass
@@ -225,15 +236,27 @@ class WeixinMaterialListJsonApi(AdminAPIView):
 
 class WeixinCustomerServiceApi(AdminAPIView):
 
-    http_method_names = ['post']
+    http_method_names = ['get', 'post', 'delete']
+
+    @weixin_api_error
+    def get(self, request):
+        res = self.client.customservice.get_accounts()
+        self.client.customservice.upload_headimg()
+        return Response(res.json())
 
     @weixin_api_error
     def post(self, request):
-        kf_account = '{}@gh_d852bc2cead2'.format(request.POST.get('kf_account'))
+        kf_account = '{account_no}@{original_id}'.format(account_no=request.POST.get('kf_account'), original_id=self.account.id)
         nickname = request.POST.get('nickname')
         password = request.POST.get('password')
         res = self.client.customservice.add_account(kf_account, nickname, password)
         return Response(res.json())
+
+    @weixin_api_error
+    def delete(self, request):
+        kf_account = request.DATA.get('kf_account')
+        res = self.client.customservice.delete_account(kf_account)
+        return Response(res, status=204)
 
 
 class WeixinMenuApi(AdminAPIView):
@@ -241,7 +264,7 @@ class WeixinMenuApi(AdminAPIView):
 
     @weixin_api_error
     def get(self, request):
-        key = 'account_menu_{account_id}'.format(account_id=self.account.id)
+        key = 'account_menu_{account_id}'.format(account_id=self.account.db_account.id)
         if not cache.get(key):
             res = self.client.menu.get()
             try:

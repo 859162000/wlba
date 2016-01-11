@@ -31,8 +31,9 @@
       .g-banner-cont
         if user.is_authenticated
           .g-landed
+            .font-s.t-d4.mg-b-sm
             .landed-head.clearfix
-              img(src='/static/imgs/pc/home/user.jpg').fl
+              img(src='/static/imgs/pc/home/user.jpg', alt='网利宝官网').fl
               .head-username.fr.tl
                 .font-m {{user | display_name}}
                   span.font-s , 您好!
@@ -59,12 +60,13 @@
               a(href="/p2p/list/").landed-for-tou 投资
         else
           .g-unlanded
-            .font-xxxll.t-d2.lh 13.0%
+            .font-s.t-d4 第三方本息保障，100%投资人按时获取收益
+            .font-xxxll.t-d2.lh.mg-t-sm 13.0%
             .font-m.t-d4 平均年化收益率
-            .font-m.t-d5.mg-t-s.mg-b-sm 第三方本息担保
-            .unlanded-btn.font-m
-              a(href="/accounts/register/").unlanded-for-regist.mg-r-sm 快速注册
-              a(href="/accounts/login/").unlanded-for-login 登录
-
+            .unlanded-btn.font-l.mg-t-sm.mg-b-s
+              a(href="/accounts/register/").unlanded-for-regist 注册领28888元体验金
+              //a(href="/accounts/login/").unlanded-for-login 登录
+            .font-xs.unlanded-login-link 已有账号？
+              a(href="/accounts/login/") 立即登录
 
 

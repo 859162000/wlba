@@ -16,10 +16,10 @@ html(style="background:#090c0b")
                 .logo
                     img(src='/static/imgs/mobile_activity/share/logo.png')
                 p.profit 已注册用户
-                p.profit 不能领取520元新人现金红包
+                p.profit 不能领取580元新人现金红包
                 .operation
                     a(href='javascript:void(0)')#more 分享赚红包
-                p.invitation 每位好友成功领取你分享的520元新人现金红包，你可获得一个30元红包，奖励自动放入你的网利账户，24小时内到账。
+                p.invitation 每位好友成功领取你分享的580元新人现金红包，你最高可获得80元红包，奖励自动放入你的网利账户，24小时内到账。
                 .rule
                     label
                         span
@@ -30,9 +30,9 @@ html(style="background:#090c0b")
                     p.title 红包规则
                     p ① 本次所领红包注册后方可生效，15天后失效；
                     p ② 红包领取条件：
-                    p.textL -被邀请人注册并实名后即送20元红包 ，单笔投资满500元可直抵使用；
-                    p.textL -被邀请人首次完成充值100元即送100元红包，单笔投资满2000元可直抵使用；
-                    p.textL -被邀请人首次单笔投资满20000元则送400元，单笔投资满40000元可直抵使用；
+                    p.textL -被邀请人注册并实名后即送30元组合红包，10元单笔投资满1000元可直抵使用；20元单笔投资满2000元可直抵使用;
+                    p.textL -被邀请人首次完成充值100元即送50元红包，单笔投资满3000元可直抵使用;
+                    p.textL -被邀请人首次投资≥5000元，最高可获得500元组合红包;
                     p ③ 一次使用后不管红包是否有余额皆失效，回款时可将红包金额提现。
                     p.title 活动规则
                     p ① 同一手机号，同一账户号，同一设备号，同一链接内仅限领取一个红包；
@@ -45,16 +45,16 @@ html(style="background:#090c0b")
             .share-icon
             .share-content
                 p 给好友发
-                  span 520
+                  span 580
                   | 元新人现金红包
                 p 每一位好友成功领取
-                p 你都将同时获得一个
-                  span 30元
+                p 你最高可获得
+                  span 80元
                   | 的红包奖励
         .page(style='display:none')
         script(src="/static/src/mobile/lib/weixin/wx.js")
         script(src="/static/src/mobile/lib/weixin/wx.js")
-        script(data-init='shareFun',src="/static/scripts/mobile_activity/dist/weixin_share.js?v=201509245")
+        script(data-init='shareFun',src="/static/scripts/mobile_activity/dist/weixin_share.js?v=201510301")
         script.
           var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
               iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,

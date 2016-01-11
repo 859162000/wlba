@@ -1,7 +1,7 @@
 from vender.nginxparser import dumps
 
 
-def generate_conf(apps, upstream_port='80', listen_on_80=True):
+def generate_conf(apps, upstream_port='80', listen_on_80=True, listen_on_http=False):
     conf = [
         ['proxy_cache_path', '/var/cache/nginx levels=1:2 keys_zone=static-cache:8m max_size=1000m inactive=600m'],
         ['proxy_temp_path', '/var/cache/tmp'],
@@ -32,6 +32,22 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True):
                 ['return', '301 https://www.wanglibao.com$request_uri'],
             ]]
         ]
+
+    if listen_on_http:
+        conf += [
+            [['server'], [
+                ['listen', '8081'],
+                ['server_name', 'staging.wanglibao.com'],
+
+            [['location', '^~/weixin/join/'], [
+                ['proxy_pass', 'http://apps'],
+                ['proxy_set_header', 'Host $host'],
+                ['proxy_set_header', 'X-Real-IP $remote_addr'],
+                ['proxy_set_header', 'X-Forwarded-For $proxy_add_x_forwarded_for']
+            ]],
+
+        ]],
+    ]
 
     conf += [
         [['server'], [

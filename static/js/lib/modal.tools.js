@@ -40,6 +40,11 @@
     };
     modalAlert = function(option) {
       alertOption = option;
+      //  alert(option.height);设定高
+      if(option.height){
+        $('#' + alert_container_id).css("height", option.height);
+      }
+
       $('.modal-content-inner', $('#' + alert_container_id)).html(option.msg);
       if (option.title) {
         $('.modal-header', $('#' + alert_container_id)).html(option.title);

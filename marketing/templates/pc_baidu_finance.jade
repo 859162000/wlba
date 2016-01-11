@@ -6,22 +6,117 @@ html
     - with '网利宝' as title
     include include/pc_screen
     - endwith
-    link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css")
+    link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css?v=20151215")
   body(style="background:#fff")
     include global/g_nav
-    include include/activityTopNew2
-    //.ng_conban
-    h3.gv_tls <span></span>数据统计 <a>截止2015-10-21</a>
-    ul.gv_info
-      li
-        p.gv_touz1 <span></span> 选择加入网利宝的已有
-        h5.gv_tzh(data-number='{{site_data.p2p_register_number}}',data-type='man')
-      li
-        p.gv_touz2 <span></span> 小伙伴们总共投资额
-        h5.gv_tzh(data-number='{{site_data.p2p_amount}}',data-type='amount')
-      li.bornone
-        p.gv_touz3 <span></span> 小伙伴们总共赚取了
-        h5.gv_tzh(data-number='{{site_data.user_income}}',data-type='amount')
+
+
+    if user.is_authenticated
+      input(type='hidden', name='is_authenticated', value='true')
+      input( type="hidden", value="{{original_id}}", name="original_id")
+      input( type="hidden", value="{{code}}", name="weixin_code")
+    else
+      input(type='hidden', name='is_authenticated', value='false')
+
+    .wrap#ganjiwang-banner
+      .g-banner-slide-baidu
+        .g-slide
+          if token == 'google1'
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_signnew.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_signnew.jpg')")
+          else
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_unsign.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_unsign.jpg')")
+        .g-slide-anchor
+            a.slide-anchor.active 0
+            a.slide-anchor 1
+      .gold2
+        if user.is_authenticated
+          //#ganjiwang-model
+          .regist-su-finance
+            .regist-su-mask
+            .regist-su-body
+              h4 欢迎来到网利宝投资理财
+              p 你的登录账户：{{user|display_name}}
+              div.erweima-img
+              a(href='/accounts/home/').regist-for-account 进入我的帐户
+
+        else
+          .denelu-form#denglu
+            #aug-center
+              .off-form#off-form ×
+              form#img-code-form.img-code-form.aut-form(method='post', action='')
+                .form-row
+                  input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                  input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                  img.captcha.captcha-img(alt="captcha", src="")
+                  button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                .code-img-error.aut-error
+                .clearfix.tc
+                  span.submit-code-img#submit-code-img1 确定
+            #aug-code
+            h1.biaoyu
+            form#register-modal-form.login-form.dale(method='post', action='')
+              - csrf_token
+              .form-row
+                .form-control-group
+                  .span12
+                    input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                .form-row-error
+              .form-row.voice
+                .span12-omega.hidden.show
+                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                .form-control-group
+                  .span6(style="width:49%")
+                    input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                  .span6-omega
+                    button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
+                    button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:5px") 获取验证码
+                .form-row-error
+              .form-row
+                input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                .form-row-error
+              .form-row
+                input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                .form-row-error#aug-form-row-eroor
+              .form-row.form-bottom-bar
+                .agreement(style="padding:0 0 10px 10px;text-align:left")
+                  label(for="agreement")
+                    input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                  | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                  .form-row-error
+                button#register_submit.button-account.span10.xun-zhuce(type='button')
+              .space-vertical-s
+            p.xun-p 已有账号,
+              a#xun_login(href="/accounts/login/") 立即登录
+
+    .bd-finance-data-warp
+      .bd-finance-data.clear
+        .bd-data-title-warp
+          .bd-data-title 数据统计
+        .bd-data-body
+          .bd-data-time 截至 {{today}}
+          .bd-data-main
+            span 选择加入网利宝的已有
+            span.bd-time-marg.gv_tzh(data-number='{{site_data.p2p_register_number}}',data-type='man')
+            span 小伙伴们总共投资额
+            span.bd-time-marg.gv_tzh(data-number='{{site_data.p2p_amount}}',data-type='amount')
+            span 小伙伴们总共赚取了
+            span.gv_tzh(data-number='{{site_data.user_income}}',data-type='amount')
+
+    .gv_about.clear
+      mixin fn_about(title, test, text, icon, warpclass)
+        dl.gv_abdls(class=warpclass)
+          dt.about_dts(class=icon)
+          dd
+            h5= title
+            span= test
+            br
+            span=text
+      +fn_about('信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资', 'about_dts1')
+      +fn_about("安全", "第三方资金托管", "阳光保险承担资金安全", "about_dts2")
+      +fn_about("权威", "华尔街精英金融团队", "IT数据风控系统", "about_dts3")
+      +fn_about("高收益", "30余倍活期银行收益", "100元起投", "about_dts4", 'unmargin')
     mixin gv_title(content)
       h2.gv_tstls
         span=content
@@ -71,76 +166,65 @@ html
               span {{p2p.pay_method|period_unit}}
             .gv_tzbtn
               if p2p.display_status == '抢购中'
-                a.tz_btn(href="/p2p/detail/{{p2p.id}}/") 立即投资
+                a.tz_btn(href="javascript:void(0);", class='active-stylebtn') 立即投资
               elif p2p.display_status == '满标审核'
-                a.tz_btn(href="javascript:void(0);", style="background-color:#aaaaaa") 满标审核
+                a.tz_btn(href="javascript:void(0);",class='un-stylebtn') 满标审核
               else
-                a.tz_btn(href="javascript:void(0);", style="background-color:#aaaaaa") 还款中
+                a.tz_btn(href="javascript:void(0);",class='un-stylebtn') 还款中
     .gv_felfare
       .gv_felbox.clear
         +gv_title("新手福利")
-        dl.gv_feldls.feldls1.clear
-          dt
-            img(src="/static/imgs/pc_activity/newgive/xinx1.png")
-          dd
-            span 新手注册并实名即送<b>20</b>元红包<br>
-            span ①注册  ②实名认证
-        dl.gv_feldls.feldls2.clear
-          dt
-            img(src="/static/imgs/pc_activity/newgive/xinx2.png")
-          dd
-            span 注册后首次完成充值<br>
-            span 即送<b>100</b>元红包
-        dl.gv_feldls.feldls3.clear
-          dt
-            img(src="/static/imgs/pc_activity/newgive/xinx3.png")
-          dd
-            span 新手投资最高送<b>400</b>元红包<br>
-            span 首次单笔投资≥10000元 送<b>200</b>元<br>
-            span 首次单笔投资≥20000元 送<b>400</b>元<br>
-        a.gv_touzbtn.clear(href="/p2p/list/", style="color:white") 立即投资
+        .gv_feldls-warp.clear
+          dl.gv_feldls.feldls1
+            dt
+              img(src="/static/imgs/pc_activity/newgive/list1.png")
+            dd
+              span 新手注册送<b>28888</b>元红包
+          dl.gv_feldls.feldls2
+            dt
+              img(src="/static/imgs/pc_activity/newgive/list2.png")
+            dd
+              span 完成实名认证送<b>20</b>元红包
+          dl.gv_feldls.feldls3
+            dt
+              img(src="/static/imgs/pc_activity/newgive/list3.png")
+            dd
+              span 新手首次完成充值送<b>100</b>元红包
+          dl.gv_feldls.feldls4
+            dt
+              img(src="/static/imgs/pc_activity/newgive/list4.png")
+            dd
+              span 新手投资理财最高送<b>180</b>元红包
+        .gv_touzbtn-warp(style='text-align:center;margin:40px 0')
+          a.gv_touzbtn.clear(href="javascript:void(0);", style="color:white;display:inline-block;margin: 0;") 立即投资
+          div(style='font-size:20px;display:block;') 投资有风险，理财需谨慎
 
-    +gv_title("关于网利宝")
-    .gv_about.clear
-      mixin fn_about(title, test, text, icon)
-        dl.gv_abdls
-          dt.about_dts(class=icon)
-          dd
-            h5= title
-            span= test
-            br
-            span=text
-      +fn_about('信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资', 'about_dts1')
-      +fn_about("安全", "第三方资金托管", "阳光保险承担资金安全", "about_dts2")
-      +fn_about("权威", "华尔街精英金融团队", "IT数据风控系统", "about_dts3")
-      +fn_about("高收益", "30余倍活期银行收益", "100元起投", "about_dts4")
-    .gv_focal
-      span.btn_left#btn_left
-      ul#fal_box
-        li.idx
-          img(src="/static/imgs/pc_activity/newgive/lub1.jpg")
-        li
-          img(src="/static/imgs/pc_activity/newgive/lub2.jpg")
-        li
-          img(src="/static/imgs/pc_activity/newgive/lub3.jpg")
-        li
-          img(src="/static/imgs/pc_activity/newgive/lub4.jpg")
-      span.btn_right#btn_right
+    .bd-finance-bodyimg
+      img(src='/static/imgs/pc_activity/newgive/about.jpg')
+
+
     .gv_explain
       .explain
-        +gv_title("活动说明")
-        p
-          span 1.手机号为网利宝唯一账户，本活动仅限于新注册用户在此页面参与，用户首次充值、首次投资最低为100元方可获取相关福利；<br>
-          span 2.活动期间注册并实名认证成功即获得20元红包（投资500元可直接使用）;<br>
-          span 3.注册后首次充值（充值金额≥100元）成功即可获得100元红包（投资2000元可直减使用）;<br>
-          span 4.注册后首次投资满额即可获取红包奖励，规则入下（奖励二选一）;<br>
-          span &nbsp;&nbsp;&nbsp;a).注册后首次投资单笔达到10,000元以上（包含）即获取200元红包（二次投资20000元即可直减使用）;<br>
-          span &nbsp;&nbsp;&nbsp;b).注册后首次投资单笔达到20,000元以上（包含）即获取400元红包（二次投资40000元即可直减使用）;<br>
-          span 5.红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，无论是否有余额均失效;<br>
-          span 6.首次单笔投资满额所赠送红包为直抵红包，二次投资满额即可直抵使用。红包有效自发放日起15天内有效;<br>
-          span 7.本活动不收取任何费用，谨慎上当受骗; 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承诺;<br>
-          span 8.网利宝对此活动享有最终解释权。
+        h2.gv_tstls
+          span 活动说明
+        .gv-explain-decend
+          p 1. 活动期间新用户注册即送28888元体验金，专享1天10%年化收益，我出本金，收益全归你;
+          p 2. 活动期间注册后实名认证，即可获得20元红包；
+          p 3. 活动期间注册后首次充值（充值金额≥100元）成功即获得100元红包；
+          p 4. 注册后首次投资满额即可获得红包奖励，规则如下（三选一）：
+          p 5.注册后首次投资满额即可获取红包奖励，规则入下;<br>
+          p &nbsp;&nbsp;&nbsp;a. 1000元≤首次投资＜5000元，送50元直抵红包;
+          p &nbsp;&nbsp;&nbsp;b. 5000元≤首次投资＜10000元，送100元直抵红包;
+          p &nbsp;&nbsp;&nbsp;c. 10000元≤首次投资，送180元直抵红包;
+          p 备注：首次投资所赠红包适用范围限投3月标(含）以上。<span class='rules-detail'>点击立即查看新手红包规则>></span>
+        .explain-detail
+          h2.gv-tstls-new
+            span 新手红包使用规则
+          .gv-explain-decend
+            p 1. 实名认证所赠20元红包单笔投资满1000元可直抵使用，有效期自领取日起3天内有效;
+            p 2. 充值所赠100元红包单笔投资满5000元可直抵使用，有效期自领取日起7天内有效；
+            p 3. 首投所赠50元红包单笔投资满5000元可直抵使用、100元红包单笔投资满8000元可直抵使用、180元红包单笔投资满12000元可直抵使用。有效期自领取日起15天内有效；
     include global/g_footer
   script.
-    var v = new Date().getTime()
     require(["/static/js/newgive.js?v=20151020"])
+  include include/tracking

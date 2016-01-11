@@ -5,13 +5,22 @@ include include/activityTop2
     if user.is_authenticated
       //#ganjiwang-model
       .denelu-form.dengruhou
-        p.xunshang(style="margin-top: 12px") 恭喜已完成网利宝注册
-        p.xunshang 并与您的迅雷账号绑定成功
+        if ret_code == '10000'
+          p.xunshang(style="margin-top: 12px") 恭喜已完成网利宝注册
+          p.xunshang 并与您的迅雷账号绑定成功
+        else
+          p.xunshang(style="margin-top: 12px") 您所在的用户组
+          p.xunshang 无法参与此次活动
         .xunleierwei
-          p.xunleiten &nbsp;&nbsp;&nbsp;迅雷账号：{{nickname}}
-          p.xunleiten 网利宝账号：
-            span {{user|display_name}}
-          .erweima
+          if ret_code == '10000'
+            p.xunleiten &nbsp;&nbsp;&nbsp;迅雷账号：{{nickname}}
+            p.xunleiten 网利宝账号：
+              span {{user|display_name}}
+          else
+            p.xunleiten 网利宝账号：
+              span {{user|display_name}}
+
+          .erweimaxunlei11#erweimaxunlei11
           p.xunleitenma 扫码关注微信
         .banner-form--row.align-center
           a.banner-form--button(href="/accounts/home",style="color:#fff;border-radius: 5px") 进入我的账户
@@ -63,7 +72,7 @@ include include/activityTop2
                     input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
                   | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
                   .form-row-error
-                    //p {{ret_code}}
+                    p {{ret_code}}
                 if ret_code == '10000'
                   button#register_submit.button-account.span10.xun-zhuce(type='button')
                 else
@@ -73,7 +82,7 @@ include include/activityTop2
               p.xun-p 注册后直接与您的迅雷账号{{nickname}}绑定
             else
               p.xun-p
-                a(href="http://vip.xunlei.com/vip_service/alliance/") 未获取到您的迅雷账号,请返回登录迅雷账号
+                a(href="http://act.vip.xunlei.com/vip/2014/wanglibao/") 未获取到您的迅雷账号,请返回登录迅雷账号
             p.xun-p 已有账号,
               a(href="/accounts/login/") 立即登录
         .denelu-form.dengruhou.denruxunlei(style="display:none")
@@ -82,4 +91,4 @@ include include/activityTop2
           p.xunshang(style="margin-top: 36px;color: #000000") 请先返回迅雷会员-理财特权页面
           p.xunshang(style="color: #000000") 登录您的迅雷账号
           .banner-form--row.align-center(style="margin-bottom: 62px")
-            a.banner-form--button(href="http://vip.xunlei.com/vip_service/alliance/",style="color:#fff;border-radius: 5px;margin-top: 62px") 返回登录迅雷
+            a.banner-form--button(href="http://act.vip.xunlei.com/vip/2014/wanglibao/",style="color:#fff;border-radius: 5px;margin-top: 62px") 返回登录迅雷

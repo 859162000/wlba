@@ -1,4 +1,5 @@
 @import ./swipe
+@import "./propagate"
 
 @mixin rule-item($bg, $color, $type)
   position: absolute
@@ -26,11 +27,9 @@
   border-radius: .3rem
   background: $bg
   color: $color
-  -webkit-transition: all 1s
   margin: 0 auto
   border: 0
-  //&:hover
-    box-shadow: 0 0 100rem rgba(0,0,0,.2) inset
+  -webkit-appearance: none
 
 .maimai-banner
   position: relative
@@ -45,12 +44,11 @@
     height: auto
 
 .maimai-form
-  padding: 4rem 2rem
-
+  padding: 2rem 2rem 1rem 2rem
 .maimai-check-body
   height: 0
   overflow: hidden
-  -webkit-transition: height 1s
+  -webkit-transition: height 500ms
 .maimai-phone
   border: none
   -webkit-appearance: none
@@ -60,29 +58,17 @@
   background-color: #fff
   font-size: .8rem
   width: 100%
-  height: 2.1rem
-  line-height: 2.1rem
   text-align: center
   border-radius: .3rem
-  padding: 0 .25rem 0 1.8rem
+  padding: .575rem .25rem .575rem 1.8rem
 
 
 .maimai-form-btn
   +btn(#2380c4, #fff)
-
-input[name='submit']
   &:disabled
     +btn(#b4d2e7, #fff)
 
 
-.btn-activity
-  width: 2.1rem
-  color: #2380c4
-  margin: 0 auto
-  -webkit-animation: rotateplane 1.5s infinite
-  animation: rotateplane 1.5s infinite
-  -webkit-animation-delay: 1.0s
-  animation-delay: 1.0s
 
 .maimai-load
   @extend .maimai-phone
@@ -109,35 +95,34 @@ input[name='submit']
   overflow: hidden
 
 
-.phone-check
-  display: -webkit-box
-  .check-input
-    -webkit-box-flex: 1
-    border: none
-    -webkit-appearance: none
-    font-size: .8rem
-    height: 2.1rem
-    line-height: 2.1rem
-    text-align: center
-    border-radius: .3rem
-    display: block
-    padding: 0 .25rem
-  .check-submit
-    width: 5.4rem
-    height: 2.1rem
-    font-size: .8rem
-    color: #2380c4
-    background: #f2d434
-    border-radius: .3rem
-    border: 0
-    margin-left: .25rem
-  .postValidation
-    background: #ECE8D2
-  .check-img
-    display: block
-    @extend .check-submit
-    background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat center
-    background-size: .9rem
+.maimai-form
+  .phone-check
+    display: -webkit-box
+    .check-input
+      -webkit-box-flex: 1
+      border: none
+      -webkit-appearance: none
+      font-size: .8rem
+      text-align: center
+      border-radius: .3rem
+      padding: .575rem .25rem
+      display: block
+    .check-submit
+      width: 5.4rem
+      height: 2.1rem
+      font-size: .8rem
+      color: #2380c4
+      background: #f2d434
+      border-radius: .3rem
+      border: 0
+      margin-left: .25rem
+    .postValidation
+      background: #ECE8D2
+    .check-img
+      display: block
+      @extend .check-submit
+      background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat center
+      background-size: .9rem
 .maimai-itme
   background: #f2d434
   margin-bottom: 1.5rem
@@ -222,25 +207,7 @@ input[name='submit']
 
 .maimai-use-btn
   +btn(#f2d434, #2679b7)
+  &:visited, &:link
+    color: #2679b7
 
-
-@-webkit-keyframes rotateplane
-  0%
-    -webkit-transform: perspective(120px)
-  50%
-    -webkit-transform: perspective(120px) rotateY(180deg)
-  100%
-    -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg)
-
-
-@keyframes rotateplane
-  0%
-    transform: perspective(120px) rotateX(0deg) rotateY(0deg)
-    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg)
-  50%
-    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg)
-    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg)
-  100%
-    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg)
-    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg)
 

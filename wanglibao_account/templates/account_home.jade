@@ -19,7 +19,7 @@ block main
         span.verified 已实名认证
       else
         span
-          a#name-hight(href="/accounts/id_verify/") 立即进行实名认证
+          a#name-hight(href="/accounts/register/first/") 立即进行实名认证
 
     .card-panel
       .total-asset-money-card
@@ -35,7 +35,7 @@ block main
               span.big_number {{p2p_total_asset|money_format}}
             p.align-center 理财专区(元)
         .sign-money-card
-          +
+          //+
       else
         .brief--p2p-total-asset
           a(href="/accounts/home/")
@@ -43,19 +43,19 @@ block main
               span.big_number {{p2p_total_asset|money_format}}
             p.align-center 理财专区(元)
         .sign-money-card
-          +
-      if mode == 'p2p'
-        .brief--fund-total-asset
-          a(href="/accounts/home/fund/")
-            p.align-center
-              span#fund_total_asset_title.big_number
-            p.align-center 货币基金(元)
-      else
-        .brief--fund-total-asset.active
-          a(href="/accounts/home/fund/")
-            p.align-center
-              span#fund_total_asset_title.big_number
-            p.align-center 货币基金(元)
+      //    +
+      //if mode == 'p2p'
+      //  .brief--fund-total-asset
+      //    a(href="/accounts/home/experience/")
+      //      p.align-center
+      //        span.big_number {{experience_account.unpaid_interest}}
+      //      p.align-center 体验金(元)
+      //else
+      //  .brief--fund-total-asset.active
+      //    a(href="/accounts/home/experience/")
+      //      p.align-center
+      //        span.big_number {{experience_account.unpaid_interest}}
+            p.align-center 体验金(元)
   if mode == 'p2p'
     .account-home-panel__no-padding
       .account-home-panel--title-bar__product
@@ -63,7 +63,8 @@ block main
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 理财专区
           li.title-bar--tab
-            a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
+            a.title-bar--tab--anchor(href="/accounts/home/experience/") 体验金专区
+            i
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
       .clamp-xl
         .account-home-panel--action-bar
@@ -168,53 +169,82 @@ block main
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/") 理财专区
           li.title-bar--tab.active
-            a.title-bar--tab--anchor(href="javascript:void(0)") 货币基金
-        a.pull-right.align-right.detail-view(href='/accounts/transaction/fund/') 查看交易记录
-      .clamp-xl
-        .space-vertical-s
-        .row.total-money
-          .gray-card4
-            p
-              span#fund_total_asset.big_number
-            p 总资产(元)
-          .gray-card4
-            p
-              span#total_income.big_number
-            p 累积收益(元)
-          .gray-card4
-            p
-              span#fund_income_week.big_number
-            p 近一周收益(元)
-          .gray-card4
-            p
-              span#fund_income_month.big_number
-            p 近一月收益(元)
-        .space-vertical-s
-
-        table.table
-          thead
-            tr
-              th 产品名称
-              th 金额(元)
-              th 收益(元)
-              th 操作
-          tbody#fund_detail_body
-            if fund_hold_info
-              each fund in fund_hold_info
-                tr
-                  td
-                    a(href="/fund/detail/{{fund.id}}/") {{fund.fund_name}}
-                  td {{fund.current_remain_share}}
-                  td {{fund.unpaid_income}}
-                  td
-                    a.button.button-small.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=purchase" target="_blank") 继续购买
-                    &nbsp;
-                    a.button.button-small.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=redeem" target="_blank") 赎回
-            else
-              tr
-                td(colspan='4') 无持仓记录
-
-        .space-vertical-m
+            a.title-bar--tab--anchor(href="javascript:void(0)") 体验金专区
+            i
+        a.pull-right.align-right.detail-view(href='/activity/experience/gold/', target="_blank")
+            i
+            | 查看体验金活动
+      .account-home-panel__no-padding
+          .clamp-xl
+              .row.tyjRow
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number {{experience_account.total_experience_amount | money_format}}
+                      p.align-center.desc 体验金总资产（元）
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number {{experience_account.experience_amount | money_format}}
+                      p.align-center.desc 体验金余额（元）
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number {{experience_account.paid_interest | money_format}}
+                      p.align-center.desc 到账收益（元）
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number {{experience_account.unpaid_interest | money_format}}
+                      p.align-center.desc 待收收益（元）
+              p.tyjMark 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除，
+                a(href="javascript:void(0)") 体验金领取及使用说明。
+              .project_div.clearfix
+                h5 专属福利体验标
+                ul.project_detail.clearfix
+                    li.li_one
+                      if experience_amount == 0
+                        label.rzje 28,888元
+                      else
+                        label {{experience_amount}}元
+                      span 融资金额
+                    li.li_two
+                        label {{product.expected_earning_rate}}%
+                        span 年化收益
+                    li.li_three
+                        label {{product.period}}天
+                        span 投资期限
+                    li.li_four
+                        if experience_amount > 0
+                            a(href='javascript:void(0)').investBtn 立即投资
+                        else
+                            a.invest_ed 立即投资
+              if user.is_authenticated and experience_amortization
+                  .look_more_detail
+                    .more_btn
+                        label 查看历史投资项目
+                        span
+              table.table.tableNew(style="display:none")
+                  thead
+                      tr
+                          th 投标时间
+                          th 产品名称
+                          th 投资金额
+                          th 年化收益
+                          th 项目期限
+                          th 已收益／预期收益
+                  tbody
+                    if experience_amortization
+                      for amo in experience_amortization
+                        tr
+                          td {{amo.created_time}}
+                          td {{amo.product.name}}
+                          td {{amo.principal}}
+                          td {{amo.product.expected_earning_rate}}%
+                          td {{amo.product.period}}
+                          if amo.settled
+                            td {{amo.interest | money_format}}/{{amo.interest | money_format}}（（元）
+                          else
+                            td 0.00/{{amo.interest | money_format}}（元）
+                    else
+                        tr
+                            td 暂无记录
 
 block script
   script.

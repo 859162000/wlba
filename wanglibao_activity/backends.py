@@ -1,6 +1,6 @@
 # encoding:utf-8
 
-import time
+import re
 import datetime
 import json
 import logging
@@ -16,29 +16,23 @@ from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
-from wanglibao_p2p.models import P2PRecord, P2PEquity
+from wanglibao_p2p.models import P2PRecord, P2PEquity, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages as sms_messages
+from wanglibao_rest.utils import decide_device
+from experience_gold.models import ExperienceEvent, ExperienceEventRecord
+from weixin.models import WeixinUser
+from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
+from weixin.tasks import sentTemplate
 
 logger = logging.getLogger(__name__)
 
 
-def _decide_device(device_type):
-    device_type = device_type.lower()
-    if device_type == 'pc':
-        return 'pc'
-    elif device_type == 'ios':
-        return 'ios'
-    elif device_type == 'android':
-        return 'android'
-    else:
-        return 'all'
-
-
-def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_full=False):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False, is_first_bind=False):
     now = timezone.now()
-    device_type = _decide_device(device_type)
+    device_type = decide_device(device_type)
     if not trigger_node:
         return
     channel = helper.which_channel(user)
@@ -70,18 +64,21 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
-                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full, user_ib)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type,
+                                                 amount, product_id, is_full, order_id, user_ib, is_first_bind_wx=is_first_bind)
                     else:
-                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
+                        _check_rules_trigger(user, rule, rule.trigger_node, device_type,
+                                             amount, product_id, is_full, order_id, is_first_bind_wx=is_first_bind)
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None, is_first_bind_wx=False):
     """ check the trigger node """
     product_id = int(product_id)
+    order_id = int(order_id)
     # 注册 或 实名认证
     if trigger_node in ('register', 'validation'):
         _send_gift(user, rule, device_type, is_full)
@@ -89,15 +86,32 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     elif trigger_node == 'first_pay':
         # check first pay
         penny = Decimal(0.01).quantize(Decimal('.01'))
+        with transaction.atomic():
+            # 等待pay_info交易完成
+            pay_info_lock = PayInfo.objects.select_for_update().get(order_id=order_id)
         if rule.is_in_date:
-            first_pay_num = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                                   update_time__gt=rule.activity.start_at,
-                                                   status=PayInfo.SUCCESS).count()
+            first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                               update_time__gt=rule.activity.start_at,
+                                               status=PayInfo.SUCCESS
+                                               ).order_by('create_time').first()
         else:
-            first_pay_num = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                                   status=PayInfo.SUCCESS).count()
-        if first_pay_num == 1:
+            first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                               status=PayInfo.SUCCESS
+                                               ).order_by('create_time').first()
+
+        if first_pay and int(first_pay.order_id) == int(order_id):
+            # Add by hb only for debug
+            if first_pay.order_id != order_id:
+                logger.exception("=_check_rules_trigger= first_pay: type(%s)=[%s], type(%s)=[%s]" % (first_pay.order_id, type(first_pay.order_id), order_id, type(order_id)))
             _check_trade_amount(user, rule, device_type, amount, is_full)
+        else:
+            # Add by hb only for debug
+            order_pay = PayInfo.objects.filter(order_id=int(order_id)).first()
+            if order_pay:
+                logger.error("=_check_rules_trigger= first_pay: order_id=[%s], status=[%s], amount=[%s]" % (order_id, order_pay.status, order_pay.amount))
+            else:
+                logger.error("=_check_rules_trigger= first_pay: order_id=[%s] not found" % (order_id))
+
     # 充值
     elif trigger_node == 'pay':
         _check_trade_amount(user, rule, device_type, amount, is_full)
@@ -105,28 +119,37 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     elif trigger_node == 'first_buy':
         # check first pay
         if rule.is_in_date:
-            first_buy_num = P2PRecord.objects.filter(user=user,
-                                                     create_time__gt=rule.activity.start_at).count()
+            first_buy = P2PRecord.objects.filter(user=user,
+                                                 create_time__gt=rule.activity.start_at
+                                                 ).order_by('create_time').first()
         else:
-            first_buy_num = P2PRecord.objects.filter(user=user).count()
+            first_buy = P2PRecord.objects.filter(user=user
+                                                 ).order_by('create_time').first()
 
-        if first_buy_num == 1:
+        if first_buy and int(first_buy.order_id) == int(order_id):
+            # Add by hb only for debug
+            if first_buy.order_id != order_id:
+                logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % (first_buy.order_id, type(first_buy.order_id), order_id, type(order_id)))
             # 判断当前购买产品id是否在活动设置的id中
+            is_product_type_period = _check_product_type_period(product_id, rule)
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
-                if is_product:
+                if is_product and is_product_type_period:
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
-                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+                if is_product_type_period:
+                    _check_buy_product(user, rule, device_type, amount, product_id, is_full)
 
     # 购买
     elif trigger_node == 'buy':
+        is_product_type_period = _check_product_type_period(product_id, rule)
         if product_id > 0 and rule.activity.product_ids:
             is_product = _check_product_id(product_id, rule.activity.product_ids)
-            if is_product:
+            if is_product and is_product_type_period:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
         else:
-            _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+            if is_product_type_period:
+                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
     # 满标审核
 
     # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
@@ -168,7 +191,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                 is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
                 if is_amount:
                     _send_gift(user, rule, device_type, is_full, amount)
-
+    elif trigger_node == 'first_bind_weixin':
+        if is_first_bind_wx:
+            _send_gift(user, rule, device_type, is_full)
     else:
         return
 
@@ -176,26 +201,31 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 def _send_gift(user, rule, device_type, is_full, amount=0):
     # rule_id = rule.id
     rtype = rule.trigger_node
-    #送奖品
+    # 送奖品
     if rule.gift_type == 'reward':
         reward_name = rule.reward
         _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_full)
 
-    #送优惠券，红包
+    # 送优惠券，红包
     if rule.gift_type == 'redpack':
         redpack_id = rule.redpack
-        #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
+        # 此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
         _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full)
 
-    #送现金或收益
-    if rule.gift_type == 'income':
-        #send to
-        _send_gift_income(user, rule, amount, is_full)
+    # 送体验金
+    if rule.gift_type == 'experience_gold':
+        experience_id = rule.redpack
+        _send_gift_experience(user, rule, rtype, experience_id, device_type, amount, is_full)
 
-    #送话费
-    if rule.gift_type == 'phonefare':
-        #send to
-        _send_gift_phonefare(user, rule, amount, is_full)
+    # 送现金或收益
+    # if rule.gift_type == 'income':
+    #     send to
+    #     _send_gift_income(user, rule, amount, is_full)
+
+    # 送话费
+    # if rule.gift_type == 'phonefare':
+    #     send to
+    #     _send_gift_phonefare(user, rule, amount, is_full)
 
 
 def _check_introduced_by(user, start_dt, is_invite_in_date):
@@ -220,48 +250,135 @@ def _check_introduced_by_product(user):
 
 
 def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
-    #检查单标投资顺序是否设置数字
-    ranking_num = int(rule.ranking)
-    if ranking_num > 0:
-        #查询单标投资顺序
-        records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购') \
-                                   .order_by('create_time')
-        if records:
-            this_record = records[ranking_num-1]
-            if this_record.user.id == user.id:
-                _send_gift(user, rule, device_type, is_full)
-    elif ranking_num == -1 and is_full is True:
-        #查询是否满标，满标时不再考虑最小/最大金额，直接发送
-        _send_gift(user, rule, device_type, is_full)
-    elif ranking_num == 0:
-        _check_trade_amount(user, rule, device_type, amount, is_full)
+    if product_id:
+        # 检查单标投资顺序是否设置数字
+        ranking_num = int(rule.ranking)
+        if not rule.is_total_invest:
+            if ranking_num > 0 and not is_full:
+                # 查询单标投资顺序
+                records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
+                                           .order_by('create_time')
+                print records.query
+                if records and records.count() <= ranking_num:
+                    try:
+                        this_record = records[ranking_num-1]
+                        if this_record.user.id == user.id:
+                            _check_trade_amount(user, rule, device_type, amount, is_full)
+                            # _send_gift(user, rule, device_type, is_full)
+                    except Exception:
+                        pass
+            if ranking_num > 0 and is_full is True:
+                # 符合抢标顺序且满标
+                records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
+                                           .order_by('create_time')
+                # print records.query
+                if records and records.count() <= ranking_num:
+                    try:
+                        this_record = records[ranking_num-1]
+                        if this_record.user.id == user.id:
+                            _check_trade_amount(user, rule, device_type, amount, is_full)
+                    except Exception:
+                        pass
+            elif ranking_num == -1 and is_full is True:
+                # 查询是否满标，满标时不再考虑最小/最大金额，直接发送
+                _check_trade_amount(user, rule, device_type, amount, is_full)
+                # _send_gift(user, rule, device_type, is_full)
+            elif ranking_num == 0 and not is_full:
+                _check_trade_amount(user, rule, device_type, amount, is_full)
 
-    #判断单标累计投资名次
-    if rule.is_total_invest and is_full is True:
-        total_invest_order = int(rule.total_invest_order)
-        if total_invest_order > 0:
-            #按用户查询单标投资的总金额
-            records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购').values('user') \
-                                       .annotate(amount_sum=Sum('amount')) \
-                                       .extra({'amount_sum': Sum('amount')}).order_by('-amount_sum')
-            if records:
-                record = records[total_invest_order-1]
-                #给符合名次的用户发放奖励
-                total_user = User.objects.filter(id=record['user']).first()
-                #如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
-                amount_sum = record['amount_sum']
-                is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
-                if is_amount and total_user:
-                    _send_gift(total_user, rule, device_type, is_full)
-        # else:
-        #     #直接取当前用户的投资总额
-        #     record = P2PRecord.objects.filter(product__id=product_id, user=user, catalog=u'申购')\
-        #                               .extra({'amount_sum': Sum('amount')}).first()
-        #     if record:
-        #         amount_sum = record.amount_sum
-        #         is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
-        #         if is_amount:
-        #             _send_gift(user, rule, device_type)
+        # 判断单标累计投资名次
+        if rule.is_total_invest and is_full is True:
+            total_invest_order = int(rule.total_invest_order)
+            if total_invest_order > 0:
+                # 按用户查询单标投资的总金额
+                records = P2PEquity.objects.filter(product=product_id, product__status=u'满标待打款').order_by('-equity')
+                if records:
+                    try:
+                        record = records[total_invest_order-1]
+                        # 如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
+                        is_amount = _check_amount(rule.min_amount, rule.max_amount, record.equity)
+                        if is_amount:
+                            _send_gift(record.user, rule, device_type, is_full)
+                    except Exception:
+                        pass
+
+
+def _check_product_type_period(product_id, rule):
+    # 根据标ID判断相关的类型,期限等信息
+    try:
+        product = P2PProduct.objects.filter(pk=product_id, hide=False)\
+            .values('period', 'pay_method', 'types_id').first()
+    except P2PProduct.DoesNotExist:
+        logger.error("==== 标不存在,ID:%s ====".format(product_id))
+        return False
+
+    if not rule.period and not rule.p2p_types:
+        return True
+    elif rule.period and rule.p2p_types:
+        rule_period = int(rule.period)
+        rule_period_type = rule.period_type
+        product_period = product['period']
+        pay_method = product['pay_method']
+        p2p_types_id = int(rule.p2p_types.id)
+        if product['types_id']:
+            if product['types_id'] == p2p_types_id:
+                is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
+                if is_send_gift:
+                    return True
+    elif rule.p2p_types:
+        p2p_types_id = int(rule.p2p_types.id)
+        if product['types_id']:
+            if product['types_id'] == p2p_types_id:
+                return True
+    elif rule.period:
+        if product['types_id']:
+            rule_period = int(rule.period)
+            rule_period_type = rule.period_type
+            product_period = product['period']
+            pay_method = product['pay_method']
+            is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
+            if is_send_gift:
+                return True
+
+    return False
+
+
+def _check_period(pay_method, product_period, rule_period, rule_period_type):
+    if not rule_period_type:
+        rule_period_type = 'month'
+
+    matches = re.search(u'日计息', pay_method)
+    if matches and matches.group():
+        if rule_period_type == 'month_gte':
+            # 当"规则的月数*30 < 产品的天数"时符合规则
+            if rule_period * 30 <= product_period:
+                return True
+        elif rule_period_type == 'day_gte':
+            # 当"规则的天数 < 产品的天数"时符合规则
+            if rule_period <= product_period:
+                return True
+        elif rule_period_type == 'day':
+            if rule_period == product_period:
+                return True
+        elif rule_period_type == 'month':
+            if rule_period * 30 == product_period:
+                return True
+    else:
+        if rule_period_type == 'month_gte':
+            # 当"规则的月数 < 产品的月数"时符合规则
+            if rule_period <= product_period:
+                return True
+        elif rule_period_type == 'day_gte':
+            # 当"规则的天数 < 产品的月数*30"时符合规则
+            if rule_period <= product_period * 30:
+                return True
+        elif rule_period_type == 'day':
+            if rule_period == product_period * 30:
+                return True
+        elif rule_period_type == 'month':
+            if rule_period == product_period:
+                return True
+    return False
 
 
 def _check_trade_amount(user, rule, device_type, amount, is_full):
@@ -309,7 +426,7 @@ def _check_product_id(product_id, product_ids):
 def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_full):
     now = timezone.now()
     if rule.send_type == 'sys_auto':
-        #do send
+        # do send
         if rule.share_type != 'inviter':
             _send_reward(user, rule, rtype, reward_name, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
@@ -317,7 +434,7 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_fu
             if user_introduced_by:
                 _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
     else:
-        #只记录不发信息
+        # 只记录不发信息
         if rule.share_type != 'inviter':
             _save_activity_record(rule, user, 'only_record', reward_name, False, is_full)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
@@ -335,10 +452,10 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None, amount
         reward.is_used = True
         reward.save()
         description = '=>'.join([rtype, reward.type])
-        #记录奖品发放流水
+        # 记录奖品发放流水
         has_reward_record = _keep_reward_record(user, reward, description)
         if has_reward_record:
-            #发放站内信或短信
+            # 发放站内信或短信
             if user_introduced_by:
                 _send_message_sms(user, rule, user_introduced_by, reward, amount)
             else:
@@ -398,6 +515,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
             _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            #logger.info("user_introduced_by %s" % user_introduced_by)
             if user_introduced_by:
                 _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_introduced_by, amount)
     else:
@@ -410,6 +528,13 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
 
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
+    # add by hb for debug
+    try:
+        phone = user.wanglibaouserprofile.phone
+    except:
+        phone = None
+    logger.debug("=_give_activity_redpack_new= [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (phone, rtype, redpack_id, device_type, rule, user_ib, amount))
+    print("=_give_activity_redpack_new= [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (phone, rtype, redpack_id, device_type, rule, user_ib, amount))
     """ rule: get message template """
     now = timezone.now()
     if user_ib:
@@ -417,7 +542,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
     else:
         this_user = user
     user_channel = helper.which_channel(this_user)
-    device_type = _decide_device(device_type)
+    device_type = decide_device(device_type)
 
     # 新增允许一次填写多个优惠券ID号
     if redpack_id:
@@ -426,9 +551,9 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
     else:
         return
 
-    print redpack_id_list
+    #print redpack_id_list
     if len(redpack_id_list) == 1:
-        print(redpack_id_list[0])
+        #print(redpack_id_list[0])
         red_pack_event = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id_list[0],
                                                      give_start_at__lt=now, give_end_at__gt=now).first()
         if red_pack_event:
@@ -441,7 +566,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
             if redpack:
                 # event = redpack.event
                 give_pf = red_pack_event.give_platform
-                if give_pf == "all" or give_pf == device_type:
+                if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                     if redpack.token != "":
                         redpack.status = "used"
                         redpack.save()
@@ -463,11 +588,11 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                     chs = red_pack_event.target_channel.split(",")
                     chs = [m for m in chs if m.strip() != ""]
                     if user_channel not in chs:
-                        return
+                        continue
                 redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
                 if redpack:
                     give_pf = red_pack_event.give_platform
-                    if give_pf == "all" or give_pf == device_type:
+                    if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                         if redpack.token != "":
                             redpack.status = "used"
                             redpack.save()
@@ -480,6 +605,98 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
             _send_message_sms(user, rule, user_ib, None, amount, None, None)
         else:
             _send_message_sms(user, rule, None, None, amount, None, None)
+
+
+def _send_gift_experience(user, rule, rtype, experience_id, device_type, amount, is_full):
+    """ 活动中发送的理财金使用规则里边配置的模板，其他的使用系统原有的模板。 """
+    if rule.send_type == 'sys_auto':
+        if rule.share_type != 'inviter':
+            _give_activity_experience_new(user, rtype, experience_id, device_type, rule, None, amount)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_introduced_by, amount)
+    else:
+        if rule.share_type != 'inviter':
+            _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
+
+
+def _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_ib=None, amount=0):
+    """ rule: get message template """
+    now = timezone.now()
+    if user_ib:
+        this_user = user_ib
+    else:
+        this_user = user
+    user_channel = helper.which_channel(this_user)
+    device_type = decide_device(device_type)
+
+    # 新增允许一次填写多个体验金ID号
+    if experience_id:
+        experience_id_list = experience_id.split(',')
+        experience_id_list = [int(rid) for rid in experience_id_list if rid.strip() != '']
+    else:
+        return
+
+    # 限制id为1的体验金重复发放
+    experience_count = ExperienceEventRecord.objects.filter(user=user).filter(event__id=1).count()
+
+    if len(experience_id_list) == 1:
+        experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=experience_id_list[0],
+                                                          available_at__lt=now, unavailable_at__gt=now).first()
+        if experience_event:
+
+            if experience_count and experience_event.id == 1:
+                logger.debug(">>>>用户id: {}, ID为1 的体验金已经发放过,不允许重复领取".format(user.id))
+                return
+
+            if experience_event.target_channel != "":
+                chs = experience_event.target_channel.split(",")
+                chs = [m for m in chs if m.strip() != ""]
+                if user_channel not in chs:
+                    return
+
+            give_pf = experience_event.give_platform
+            if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
+                record = ExperienceEventRecord()
+                record.event = experience_event
+                record.user = this_user
+                record.save()
+                if user_ib:
+                    _send_message_sms(user, rule, user_ib, None, amount)
+                else:
+                    _send_message_sms(user, rule, None, None, amount)
+    else:
+        for e_id in experience_id_list:
+            experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=e_id,
+                                                              available_at__lt=now, unavailable_at__gt=now).first()
+            if experience_event:
+
+                # 限制ID:1体验金重复发放
+                if experience_count and experience_event.id == 1:
+                    logger.debug(">>>>用户id: {}, ID为1 的体验金已经发放过,不允许重复领取".format(user.id))
+                    continue
+
+                if experience_event.target_channel != "":
+                    chs = experience_event.target_channel.split(",")
+                    chs = [m for m in chs if m.strip() != ""]
+                    if user_channel not in chs:
+                        continue
+
+                give_pf = experience_event.give_platform
+                if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
+                    record = ExperienceEventRecord()
+                    record.event = experience_event
+                    record.user = this_user
+                    record.save()
+        if user_ib:
+            _send_message_sms(user, rule, user_ib, None, amount)
+        else:
+            _send_message_sms(user, rule, None, None, amount)
 
 
 def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False, is_full=False):
@@ -523,14 +740,23 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
         end_date = timezone.localtime(reward.end_time).strftime(fmt_str)
         name = reward.type
     if redpack_event:
-        redpack_amount = redpack_event.amount
-        invest_amount = redpack_event.invest_amount
-        highest_amount = redpack_event.highest_amount
+        try:
+            redpack_amount = redpack_event.amount
+        except AttributeError:
+            redpack_amount = 0
+        try:
+            invest_amount = redpack_event.invest_amount
+        except AttributeError:
+            invest_amount = 0
+        try:
+            highest_amount = redpack_event.highest_amount
+        except AttributeError:
+            highest_amount = 0
         name = redpack_event.name
         if redpack_event.auto_extension and redpack_event.auto_extension_days > 0 and created_at:
             unavailable_at = created_at + datetime.timedelta(days=int(redpack_event.auto_extension_days))
-            if unavailable_at < redpack_event.unavailable_at:
-                unavailable_at = redpack_event.unavailable_at
+            # if unavailable_at < redpack_event.unavailable_at:
+            #     unavailable_at = redpack_event.unavailable_at
         else:
             unavailable_at = redpack_event.unavailable_at
         end_date = timezone.localtime(unavailable_at).strftime(fmt_str)
@@ -568,6 +794,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
     else:
         msg_template = rule.msg_template
         sms_template = rule.sms_template
+        wx_template = rule.wx_template
         invited_phone = safe_phone_str(mobile)
         introduced_by = IntroducedBy.objects.filter(user=user).first()
         if introduced_by and introduced_by.introduced_by:
@@ -582,10 +809,13 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template)
+            sms = Template(sms_template + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD)
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
+        if wx_template:
+            if wx_template == "first_bind":
+                _send_wx_frist_bind_template(user, end_date, redpack_amount, invest_amount)
 
 
 def _keep_reward_record(user, reward, description=''):
@@ -610,6 +840,25 @@ def _send_message_template(user, title, content):
 def _send_sms_template(phones, content):
     send_messages.apply_async(kwargs={
         "phones": [phones, ],
-        "messages": [content, ]
+        "messages": [content, ],
+        "ext": 666
     })
+
+
+def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):
+    weixin_user = WeixinUser.objects.filter(user=user).first()
+    if weixin_user:
+        now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+        remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。"%(amount,
+                                                                     invest_amount, end_date)
+        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                                    "openid":weixin_user.openid,
+                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                    "name1":"",
+                                    "name2":user.wanglibaouserprofile.phone,
+                                    "time":now_str+'\n',
+                                    "remark":remark
+                                        })},
+                                    queue='celery02'
+                                    )
 

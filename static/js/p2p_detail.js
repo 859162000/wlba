@@ -16,7 +16,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var $target_more, acount_product, buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
+    var $target_more, acount_product, buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, toThousands, validator;
     isFirst = true;
     getFormatedNumber = function(num) {
       return Math.round(num * 100) / 100;
@@ -230,8 +230,9 @@
               redpack: redpack_id
             }).done(function(data) {
               return tool.modalAlert({
+                height: '364px',
                 title: '温馨提示',
-                msg: '份额认购成功',
+                msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功',
                 callback_ok: function() {
                   if (data.category === '酒仙众筹标') {
                     return window.location.href = "/accounts/home/jiuxian/";
@@ -317,13 +318,16 @@
     $('#purchase-form').on('redpack', function() {
       return showPayTip();
     });
+    toThousands = function(num) {
+      return (num || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+    };
     buildTable = function(list) {
       var html, i, len;
       html = [];
       i = 0;
       len = list.length;
       while (i < len) {
-        html.push(["<tr>", "<td><p>", list[i].create_time, "</p></td>", "<td><em>", list[i].user, "</em></td>", "<td><span class='money-highlight'>", list[i].amount, "</span><span>元</span></td>", "</tr>"].join(""));
+        html.push(["<tr>", "<td><p>", list[i].create_time, "</p></td>", "<td><em>", list[i].user, "</em></td>", "<td><span class='money-highlight'>", toThousands(parseInt(list[i].amount)), "</span><span>元</span></td>", "</tr>"].join(""));
         i++;
       }
       return html.join("");

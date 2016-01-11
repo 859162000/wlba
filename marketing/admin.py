@@ -4,11 +4,11 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 
-from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
+from views import AggregateView, MarketingView, TvView, TvViewInside, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, Channels, ChannelsNew, IntroducedByReward, PlayList, \
-    ActivityJoinLog, WanglibaoActivityReward
+    ActivityJoinLog, WanglibaoActivityReward, GiftOwnerGlobalInfo, GiftOwnerInfo, QuickApplyInfo
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -199,9 +199,11 @@ class RewardRecordAdmin(admin.ModelAdmin):
 
 class ChannelsAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ("id", "code", "name", "description")
+##    list_display = ("id", "code", "name", "description")
+    list_display = ("id", "code", "name", "description", "platform", "coop_status", "is_abandoned")
     search_fields = ("name",)
-    list_filter = ("name",)
+##    list_filter = ("name",)
+    list_filter = ("coop_status", "is_abandoned", "classification")
 
     # def __init__(self, *args, **kwargs):
     #     super(ChannelsAdmin, self).__init__(*args, **kwargs)
@@ -267,7 +269,31 @@ class ChannelsNewAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+class GiftOwnerGlobalInfoAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("description", "amount", "valid")
 
+
+class GiftOwnerInfoAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("sender", "name", "phone", "address", "award", "type", "create_time", "update_time")
+    readonly_fields = list_display
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class QuickApplyInfoAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("name", "phone", "address", "apply_way", "apply_amount", "status", "create_time", "update_time")
+    readonly_fields = list_display
+
+    def has_delete_permission(self, request, obj=None):
+        return None
+
+admin.site.register(QuickApplyInfo, QuickApplyInfoAdmin) #add by Yihen@20151103
+admin.site.register(GiftOwnerGlobalInfo, GiftOwnerGlobalInfoAdmin) #add by Yihen@20151103
+admin.site.register(GiftOwnerInfo, GiftOwnerInfoAdmin) #add by Yihen@20151103
 admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin)  # add by Yihen@20150901
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
@@ -280,7 +306,7 @@ admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
 #admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
-admin.site.register(ChannelsNew, ChannelsNewAdmin)
+##admin.site.register(ChannelsNew, ChannelsNewAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
 admin.site.register(ActivityJoinLog, ActivityJoinLogAdmin)
 admin.site.register(PlayList, PlayListAdmin)
@@ -288,6 +314,7 @@ admin.site.register(PlayList, PlayListAdmin)
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
 # admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')
 admin.site.register_view('statistics/tv', view=TvView.as_view(), name=u'统计数据汇总')
+admin.site.register_view('statistics/tv_1', view=TvViewInside.as_view(), name=u'统计数据汇总(内部)')
 admin.site.register(InviteCode, InviteCodeAdmin)
 
 admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')

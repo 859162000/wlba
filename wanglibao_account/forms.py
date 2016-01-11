@@ -19,6 +19,7 @@ from hashlib import md5
 from rest_framework.authtoken.models import Token
 from marketing.models import LoginAccessToken
 from django.conf import settings
+from wanglibao_profile.models import USER_TYPE
 
 User = get_user_model()
 
@@ -43,6 +44,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     invitecode = forms.CharField(label="Invitecode", required=False)
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    user_type = forms.IntegerField(label="User type", required=False)
 
     MlGb = forms.CharField(label='MlGb', required=False)
     _flag = False
@@ -171,7 +173,9 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                     status, message = validate_validation_code(phone, validate_code)
                     if status != 200:
                         raise forms.ValidationError(
-                            self.error_messages['validate code not match'],
+                            # Modify by hb on 2015-12-02
+                            #self.error_messages['validate code not match'],
+                            message,
                             code='validate_code_error',
                         )
                 else:
@@ -180,6 +184,13 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             code='validate_code_error',
                         )
         return self.cleaned_data
+
+    def clean_user_type(self):
+        user_type = self.cleaned_data.get('user_type') or '0'
+        if user_type.isdigit():
+            if user_type in [i for i, j in USER_TYPE]:
+                self.cleaned_data['user_type'] = user_type
+                return self.cleaned_data
 
 
 def verify_captcha(dic, keep=False):
@@ -202,6 +213,7 @@ def verify_captcha(dic, keep=False):
         return True, ""
     else:
         return False, u"图片验证码错误"
+
 
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
@@ -258,6 +270,59 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
         return self.user_cache
 
 
+class LoginAuthenticationNoCaptchaForm(forms.Form):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    username/password logins.
+    """
+    identifier = forms.CharField(max_length=254, error_messages={'required': u'请输入手机号'})
+    password = forms.CharField(label="Password", widget=forms.PasswordInput, error_messages={'required': u'请输入密码'})
+
+    error_messages = {
+        'invalid_login': u"用户名或者密码不正确",
+        'frozen': u"用户账户已被冻结",
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        """
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
+        """
+        self.request = request
+        self.user_cache = None
+        super(LoginAuthenticationNoCaptchaForm, self).__init__(*args, **kwargs)
+
+        self._errors = None
+
+    def clean(self):
+        identifier = self.cleaned_data.get('identifier')
+        password = self.cleaned_data.get('password')
+
+        if identifier and password:
+            self.user_cache = authenticate(identifier=identifier, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'identifier': identifier},
+                )
+            else:
+                if self.user_cache.wanglibaouserprofile.frozen:
+                    raise forms.ValidationError(
+                        self.error_messages['frozen'],
+                        code='frozen',
+                        params={'identifier': identifier},
+                    )
+        return self.cleaned_data
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache
+
 
 class ResetPasswordGetIdentifierForm(forms.Form):
     identifier = forms.CharField(max_length=254)
@@ -272,8 +337,11 @@ class IdVerificationForm(forms.Form):
         super(IdVerificationForm, self).__init__(*args, **kwargs)
         self._user = user
 
+
 def timestamp():
     return long(time.time())
+
+
 class TokenSecretSignAuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts

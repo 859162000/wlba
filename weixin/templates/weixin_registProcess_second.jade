@@ -1,0 +1,65 @@
+doctype html
+html(style='background:#f5f5f5;')
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 银行卡绑定
+    - with '2' as processnum
+    include include/weixin_registProcess
+    - endwith
+    //表单
+    section.form-box.regist-process-form
+      input(type='hidden', name='order_id', value='')
+      input(type='hidden', name='token', value='')
+      //表单单个模版
+      .form-list
+        .form-icon.binding-bank.bank-icon
+        .form-input
+          select(name="bank", type='select', data-target2='binding-bank', data-icon='bank-icon', data-sign= '请选择银行')
+            option(value = '')  请选择银行
+
+      include include/limit_alert
+      .form-list
+        .form-icon.binding-bankcard.bankcard-icon
+        .form-input
+          input(type="tel",name='bankcard',value='', data-sign= '银行卡号错误', placeholder="请输入银行卡号", data-target2='binding-bankcard', data-icon='bankcard-icon')
+
+      .form-list
+        .form-icon.binding-bankphone.bankphone-icon
+        .form-input
+          input(type="tel",name='bankphone',value='', data-sign= '手机号错误', placeholder="请输入银行预留手机号", data-target2='binding-bankphone', data-icon='bankphone-icon', data-target = 'regist-validation', data-empty='regist-validation-disable', data-val='')
+
+      .form-list
+        .form-icon.binding-amount.amount-icon
+        .form-input
+          input(type="tel",name='money',value='', data-sign= '请输入正确的金额', placeholder="请输入充值金额", data-target2='binding-amount', data-icon='amount-icon')
+
+      .form-code
+        .form-list.form-validation
+          .form-icon.binding-validation.validation-icon
+          .form-input
+            input(type="tel",name="validation", data-sign= '验证码错误', placeholder="请输入短信验证码",data-target2='binding-validation', data-icon='validation-icon')
+        .login-validation
+          button(type="button", disabled=true).request-check.regist-validation.regist-validation-disable 获取验证码
+
+      //账户安全
+      section.regist-safe
+        span 账户资金安全由阳光保险承保
+
+      section#shiming.login-submit
+        button(type="submit", disabled=true) 绑卡并充值
+
+    include include/confirm
+
+
+    section.sign-main
+      .sign-body
+        img(src="/static/imgs/mobile/sign/sign_icon.png")
+        p.sign-tit 恭喜您，充值成功！
+        p.balance-tit 本次充值金额：
+          em.balance-sign
+        a(href="/weixin/regist/three/") 下一步
+    section.back-index-warp
+      a(href='/weixin/list/').back-index 暂不认证，返回首页
+    script(data-init='processSecond', src="/static/scripts/mobile/dist/mobile.js?v=20152072")

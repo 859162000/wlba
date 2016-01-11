@@ -1,0 +1,409 @@
+@charset "utf-8"
+@keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    transform: rotate(1080deg)
+  100%
+    transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
+@-webkit-keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    -webkit-transform: rotate(1080deg)
+  100%
+    -webkit-transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
+@-moz-keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    -webkit-transform: rotate(1080deg)
+  100%
+    -webkit-transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
+@-o-keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    -webkit-transform: rotate(1080deg)
+  100%
+    -webkit-transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
+html
+  font-size: 20px
+  background: #efeff4
+html *
+  outline: none
+  -webkit-text-size-adjust: none
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+  -webkit-box-sizing: border-box
+html,body
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,input,textarea,p,th,td,hr,button,article,aside,footer,header,menu,nav,section
+  margin: 0
+  padding: 0
+input,select,textarea
+  font-size: 100%
+table
+  border-collapse: collapse
+  border-spacing: 0
+img
+  border: 0
+ol,ul
+  list-style: none
+h1,h2,h3,h4,h5,h6
+  font-size: 100%
+  font-weight: 500
+a
+  text-decoration: none
+  cursor: auto
+  color: inherit
+  &:visited
+    color: inherit
+
+body
+  background: #fc9300
+.banner
+  position: relative
+  img
+    width: 100%
+  .receive_box
+    position: absolute
+    width: 100%
+    text-align: center
+    bottom: .45rem
+    padding: 0 1.825rem
+    .invested,.investedH
+      width: 100%
+      height: 2.5rem
+      line-height: 2.5rem
+      background: url(/static/imgs/mobile_activity/app_experience/ed.png) no-repeat
+      background-size: 100% 100%
+      font-size: .9rem
+      color: #f7cccc
+      font-weight: bold
+  .banner_fonts_div
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    .banner_fonts
+      background: url(/static/imgs/mobile_activity/app_experience/banner_fonts.png) no-repeat
+      background-size: 100% 100%
+      width: 80.8%
+      height: 6.1rem
+      position: relative
+      margin: 18% auto 0
+      @media screen and (max-width: 640px)
+        margin: 12% auto 0
+      .fonts_style
+        position: absolute
+        color: #ffffff
+        left: 2.5rem
+        top: 3rem
+        font-size: 1.7rem
+        @media screen and (max-width: 640px)
+          top: 3.3rem
+          font-size: 1.5rem
+
+.my_experience_gold
+  margin-top: 1rem
+  border-top: 2px dashed #d56900
+.title
+  padding: 1.325rem 3.25rem 1.475rem
+  text-align: center
+  .title_img
+    background: url(/static/imgs/mobile_activity/app_experience/title.png)
+    background-size: 100% 100%
+    color: #ffffff
+    font-size: .9rem
+    height: 2.35rem
+    line-height: 2.075rem
+.assets_list
+  display: -webkit-box
+  padding: .8rem
+  .assets_box
+    -webkit-box-flex: 1
+    margin: .5rem 1rem 0
+    width: 50%
+    .box
+      margin-top: .5rem
+      background: #ffeed3
+      border-radius: .25rem
+      padding: .925rem 0
+      p
+        text-align: center
+      .pt
+        color: #d0314b
+        font-size: .6rem
+      .pb
+        font-size: .825rem
+        color: #f45e37
+        font-family: '[FZLTTHK]'
+        margin-top: .6rem
+.project
+  padding: 1rem .8rem
+  .project_detail
+    background: #ffeed3
+    border-radius: .25rem
+    h5
+      padding: .75rem 0 .75rem .65rem
+      color: #d0314b
+      font-size: .75rem
+    .detail_font_box
+      display: -webkit-box
+      padding-bottom: 1.3rem
+      .detail_font
+        -webkit-box-flex: 1
+        text-align: center
+        line-height: .875rem
+      .p2
+        -webkit-box-flex: 1.5
+      .pt
+        color: #f45e37
+        font-size: .75rem
+      .pb
+        color: #fc8f02
+        font-size: .5rem
+    .project_btn
+      text-align: center
+      padding-bottom: 1.3rem
+      a.investBtn,.investBtnEd
+        background: #f45e37
+        color: #ffffff
+        font-size: .75rem
+        display: inline-block
+        width: 5.85rem
+        height: 1.95rem
+        line-height: 1.95rem
+        text-decoration: none
+        border-radius: .25rem
+      a.investBtnEd
+        background: #fa8162
+      .time_style
+        font-size: .5rem
+        color: #fc8f02
+        margin-top: .2rem
+.look_more
+  text-align: center
+  color: #c66032
+  font-size: .5rem
+  span
+    display: inline-block
+    i
+      background: url(/static/imgs/mobile_activity/app_experience/more.png) center no-repeat
+      background-size: cover
+      width: .65rem
+      height: .5rem
+      display: inline-block
+.history-list
+  padding: 0 .8rem
+  height: 0
+  overflow: hidden
+  .border-top
+    height: .2rem
+    background: #7c3109
+    border-radius: .2rem
+  .table_box
+    -moz-box-shadow: 0px 5px 5px #d8be97 inset
+    -webkit-box-shadow: 0px 5px 5px #d8be97 inset
+    box-shadow: 0px 5px 5px #d8be97 inset
+    margin: -0.1rem .2rem 0
+    padding: 0.5rem .45rem 0
+    background: #ffeed3
+    border-bottom-left-radius: .25rem
+    border-bottom-right-radius: .25rem
+    table
+      font-size: .246rem
+      width: 100%
+      table-layout: fixed
+      border-collapse: collapse
+      width: 100%
+      thead
+        background: #f7deb6
+        padding: .35rem 0
+        th.last
+          width: 2.725rem
+
+      tr:nth-child(even)
+        background: #fffaf1
+      td
+        text-align: center
+        color: #3e3e3e
+        padding: .35rem 0
+.re_box
+  padding: 1.825rem 0 2.55rem
+  font-size: 0
+  .rule_list
+    background: url(/static/imgs/mobile_activity/app_experience/bg.jpg) center center no-repeat
+    background-size: 100% 100%
+    display: inline-block
+    margin: 0 auto
+    ul
+      width: 100%
+      font-size: .4rem
+      padding: 2rem 1.5rem
+      li
+        list-style-type: inherit
+        display: -webkit-box
+        margin-bottom: 1rem
+        max-height: 99999rem
+        span
+          display: block
+          width: .675rem
+          height: .725rem
+          background: url(/static/imgs/mobile_activity/app_experience/jinbi.png) center no-repeat
+          background-size:  cover
+          margin-right: .7rem
+        .rule_content
+          -webkit-box-flex: 1
+          line-height: .75rem
+          .rule_content_top
+            color: #624838
+          .rule_content_bt
+            color: #705848
+          .p_last
+            margin-top: 1.175rem
+            color: #705848
+      .title
+        text-align: center
+        color: #d03144
+        font-size: .5rem
+        display: block
+        padding: 0
+.successWin
+  position: relative
+  background: url('/static/imgs/mobile_activity/app_experience/hongbao.png') no-repeat
+  background-size: 100% 100%
+  width: 100%
+  height: 15rem
+  img
+    width: 100%
+  .winContent
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    text-align: center
+    padding-top: 2.5rem
+    color: #ffffff
+    .qianshu
+      font-size: 1.825rem
+      font-weight: bold
+      span
+        font-size: 1.1rem
+    .con1
+      margin-top: 2rem
+      font-size: 1rem
+    .con2
+      margin-bottom: 1.2rem
+      font-size: 1rem
+  .btns
+    text-align: center
+    width: 100%
+    z-index: 10000
+    a
+      width: 45%
+      height: 1.5rem
+      line-height: 1.5rem
+      font-size: .6rem
+      background: #fb7c00
+      color: #ffffff
+      display: inline-block
+      border-radius: .5rem
+      z-index: 100000
+.investWin
+  position: fixed
+  top: 35%
+  left: 50%
+  width: 14rem
+  margin: -2.75rem 0 0 -7rem
+  background: #fafafa
+  border-radius: .5rem
+  z-index: 1000001
+  padding: 1.9rem 0 1.45rem
+  img
+    width: 5.7rem
+    height: 5.7rem
+    
+  p
+    text-align: center
+    font-size: .775rem
+    color: #3f3f41
+  .successFonts
+    color: #fb7c00
+    font-size: 1.055rem
+    padding: .75rem 0
+.oldUserWin
+  position: fixed
+  top: 35%
+  left: 50%
+  width: 14rem
+  margin: -2.75rem 0 0 -7rem
+  background: #fafafa
+  border-radius: .5rem
+  z-index: 1000001
+  padding: 1.9rem 0 1.45rem
+  text-align: center
+  .p_left
+    text-align: left
+    padding-left: 2.175rem
+    color: #3f3f41
+    font-size: .77rem
+  .p_center
+    text-align: center
+    color: #3f3f41
+  font-size: .77rem
+  img
+    width: 4.35rem
+    height: 4.35rem
+    margin: .5rem 0 1rem
+  .close_btn
+    width: 80%
+    height: 1.5rem
+    line-height: 1.5rem
+    font-size: .6rem
+    background: #d1d1d1
+    color: #ffffff
+    display: inline-block
+    border-radius: .5rem
+
+#showMoney
+  width: 100%
+  top: 0px
+  position: fixed
+  z-index: 999999999999
+.roll
+  position: absolute
+  opacity: 0
+  animation: mysnow 5s
+  -webkit-animation: mysnow 5s
+  -moz-animation: mysnow 5s
+  ms-animation: mysnow 5s
+  -o-animation: mysnow 5s
+  width: .825rem
+  height: .8rem
+.div
+  position: fixed
+  z-index: 999
+
+
+
+
+
+
+

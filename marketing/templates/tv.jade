@@ -38,6 +38,12 @@ html
                 .col-xs-6.col-sm-4
                     .number.all_amount 0
                     .desc 累计交易金额
+            //.row.tv-row
+            //    .col-xs-6.col-sm-4
+            //        .number
+            //          span.disp -
+            //          span.today_inflow 0
+            //        .desc 昨日资金净流入
 
 
     script
@@ -77,13 +83,18 @@ html
               $.post('/api/marketing/tv/', function(json) {
                   var data = {};
                   for(var key in json) {
-                      $().html(json[key]);
+                      amount = json[key]
+                      if(amount < 0)
+                      {
+                         $('.disp').show();
+                         amount = Math.abs(amount)
+                      }
+                      $().html(amount);
                       data[key] = $.trim($('.' + key).html());
-
-                      $('.' + key).prop('number', parseFloat(data[key]))
+                      $('.' + key).prop(key, parseFloat(data[key]))
                           .animateNumber(
                           {
-                          number: json[key],
+                          number: amount,
                           numberStep: comma_separator_number_step
                           },
                           2000
@@ -101,5 +112,5 @@ html
             });
 
             getNum();
-            setInterval(getNum, 15000);
+            setInterval(getNum, 600000);
         });

@@ -69,7 +69,7 @@ require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/messageTable'
   $('.msg-id').click (e)->
     e.preventDefault()
     #console.log(e.currentTarget)
-    msg_id = e.currentTarget.id
+    msg_id = e.currentTarget.id || $(this).attr('data-id')
     msg_icon = $("#icon_" + msg_id).attr('class')
     read_status = $('#'+msg_id).attr('data-read-status')
     msg_id_id = $('#'+msg_id).attr('data-msg-id')
