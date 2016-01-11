@@ -49,6 +49,9 @@
           }
       });
 
+
+
+
         var h5_user_static;
 		$.ajax({
 			url: '/api/user_login/',
@@ -92,6 +95,88 @@
 	            return filename.replace('(', '_').replace(']', '_');
 	        }
 		});
+
+
+        $('.main_title_top').click(function(){
+            alert($('#id_id_back_image').val());
+            var img_url = $('#id_id_back_image').val();
+            $('#img').attr('src',img_url);
+        });
+
+        window.onload=function(){
+            var result = document.getElementById("img_1");
+            var input = document.getElementById("id_id_front_image");
+
+            if(typeof FileReader==='undefined'){
+                result.innerHTML = "抱歉，你的浏览器不支持 FileReader";
+                input.setAttribute('disabled','disabled');
+            }else{
+                input.addEventListener('change',readFile,false);
+            }
+
+
+            function readFile(){
+                var file = this.files[0];
+                if(!/image\/\w+/.test(file.type)){
+                    alert("文件必须为图片！");
+                    return false;
+                }
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(e){
+                    result.innerHTML = '<img src="'+this.result+'" alt=""/>'
+                }
+            }
+
+            var result_2 = document.getElementById("img_2");
+            var input_2 = document.getElementById("id_id_back_image");
+
+            if(typeof FileReader==='undefined'){
+                result_2.innerHTML = "抱歉，你的浏览器不支持 FileReader";
+                input_2.setAttribute('disabled','disabled');
+            }else{
+                input_2.addEventListener('change',readFile_2,false);
+            }
+
+
+            function readFile_2(){
+                var file = this.files[0];
+                if(!/image\/\w+/.test(file.type)){
+                    alert("文件必须为图片！");
+                    return false;
+                }
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(e){
+                    result_2.innerHTML = '<img src="'+this.result+'" alt=""/>'
+                }
+            }
+
+            var result_3 = document.getElementById("img_3");
+            var input_3 = document.getElementById("id_id_user_image");
+
+            if(typeof FileReader==='undefined'){
+                result_3.innerHTML = "抱歉，你的浏览器不支持 FileReader";
+                input_3.setAttribute('disabled','disabled');
+            }else{
+                input_3.addEventListener('change',readFile_3,false);
+            }
+
+
+            function readFile_3(){
+                var file = this.files[0];
+                if(!/image\/\w+/.test(file.type)){
+                    alert("文件必须为图片！");
+                    return false;
+                }
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(e){
+                    result_3.innerHTML = '<img src="'+this.result+'" alt=""/>'
+                }
+            }
+        }
+
     })
 
 }).call(this);

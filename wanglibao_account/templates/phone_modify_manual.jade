@@ -19,15 +19,25 @@ block main
                 .box
                     label!='<span>*</span>身份证正面'
                     //input#file_1.file(type="file" multiple="true")
-                .form-group
+                form.form-group
                     {{form.id_front_image}}
                     {{form.id_back_image}}
                     {{form.id_user_image}}
+                    .show_img
+                        #img_1
+                        #img_2
+                        #img_3
+                    .button 提交
+
+
+
+
     //.form-group
     //    input#file_1.file(type="file" multiple="true")
 
     //include global/g_footer
     script.
-        require(["/static/js/phone_modify_manual.js"])
+        require(["/static/js/phone_modify_manual.js?v=1"])
+
     include include/tracking
 
