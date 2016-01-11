@@ -29,9 +29,34 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       $form.find('img.captcha').attr('src', json.image_url)
 
   $('#add-card-button').click (e)->
-    if $('#id-is-valid').val() == 'False'
+    if $('#id-is-valid').attr('data-type') == 'qiye'
+      $.ajax {
+        url: '/qiye/profile/exists/'
+        data: {
+        }
+        type: 'GET'
+      }
+      .done (data)->
+        if data.ret_code == 10000
+          $.ajax {
+            url: '/qiye/profile/get/'
+            data: {
+            }
+            type: 'GET'
+          }
+          .done ()->
+            if data.data.status != '审核通过'
+              $('.verifyHref').attr('href','/qiye/profile/edit/')
+      .fail (data)->
+        $('.verifyHref').attr('href','/qiye/info/')
+
       $('#id-validate').modal()
       return
+
+    else
+      if $('#id-is-valid').val() == 'False'
+        $('#id-validate').modal()
+        return
 
     e.preventDefault()
     $(this).modal()

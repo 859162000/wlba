@@ -14,6 +14,7 @@
   });
 
   require(['jquery', 'jquery.validate', 'lib/modal'], function($, validate, modal) {
+    var userStatus;
     $('.banks a').click(function(e) {
       e.preventDefault();
       $('.banks a').removeClass('active');
@@ -23,11 +24,37 @@
       return $('#' + $(e.target).attr('data-desc-id')).show();
     });
     $('#pay').click(function(e) {
-      if ($('#id-is-valid').val() === 'False') {
-        e.preventDefault();
-        $('#id-validate').modal();
-      }
+      e.preventDefault();
+      return userStatus();
     });
+    userStatus = function() {
+      if ($('#id-is-valid').attr('data-type') === 'qiye') {
+        $.ajax({
+          url: '/qiye/profile/exists/',
+          data: {},
+          type: 'GET'
+        }).done(function(data) {
+          if (data.ret_code === 10000) {
+            return $.ajax({
+              url: '/qiye/profile/get/',
+              data: {},
+              type: 'GET'
+            }).done(function() {
+              if (data.data.status !== '审核通过') {
+                return $('.verifyHref').attr('href', '/qiye/profile/edit/');
+              }
+            });
+          }
+        }).fail(function(data) {
+          return $('.verifyHref').attr('href', '/qiye/info/');
+        });
+        $('#id-validate').modal();
+      } else {
+        if ($('#id-is-valid').val() === 'False') {
+          $('#id-validate').modal();
+        }
+      }
+    };
     $.validator.addMethod('morethan100', function(value, element) {
       return Number(value) >= 100;
     }, '充值金额100元起');
@@ -62,9 +89,7 @@
         }
       }
     });
-    if ($('#id-is-valid').val() === 'False') {
-      return $('#id-validate').modal();
-    }
+    return userStatus();
   });
 
 }).call(this);

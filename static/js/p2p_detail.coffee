@@ -212,8 +212,33 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             $('.login-modal').trigger('click')
             return
           else if result.error_number == 2
-            $('#id-validate').modal()
-            return
+            if $('#id-is-valid').attr('data-type') == 'qiye'
+              $.ajax {
+                url: '/qiye/profile/exists/'
+                data: {
+                }
+                type: 'GET'
+              }
+              .done (data)->
+                if data.ret_code == 10000
+                  $.ajax {
+                    url: '/qiye/profile/get/'
+                    data: {
+                    }
+                    type: 'GET'
+                  }
+                  .done ()->
+                    if data.data.status != '审核通过'
+                      $('.verifyHref').attr('href','/qiye/profile/edit/')
+              .fail (data)->
+                $('.verifyHref').attr('href','/qiye/info/')
+
+              $('#id-validate').modal()
+              return
+
+            else
+              $('#id-validate').modal()
+              return
           else if result.error_number == 4 && result.message == "余额不足"
             tool.modalAlert({btnText:"去充值", title: '温馨提示', msg: result.message, callback_ok: ()->
               window.location.href = '/pay/banks/'

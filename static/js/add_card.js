@@ -33,9 +33,33 @@
       });
     });
     $('#add-card-button').click(function(e) {
-      if ($('#id-is-valid').val() === 'False') {
+      if ($('#id-is-valid').attr('data-type') === 'qiye') {
+        $.ajax({
+          url: '/qiye/profile/exists/',
+          data: {},
+          type: 'GET'
+        }).done(function(data) {
+          if (data.ret_code === 10000) {
+            return $.ajax({
+              url: '/qiye/profile/get/',
+              data: {},
+              type: 'GET'
+            }).done(function() {
+              if (data.data.status !== '审核通过') {
+                return $('.verifyHref').attr('href', '/qiye/profile/edit/');
+              }
+            });
+          }
+        }).fail(function(data) {
+          return $('.verifyHref').attr('href', '/qiye/info/');
+        });
         $('#id-validate').modal();
         return;
+      } else {
+        if ($('#id-is-valid').val() === 'False') {
+          $('#id-validate').modal();
+          return;
+        }
       }
       e.preventDefault();
       return $(this).modal();
