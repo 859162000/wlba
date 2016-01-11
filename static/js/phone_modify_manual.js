@@ -2,16 +2,16 @@
     require.config({
         paths: {
             jquery: 'lib/jquery.min',
-			'fileinput': 'lib/fileinput',
-			'fileinput_locale_zh': 'lib/fileinput_locale_zh',
+			'fileinput': 'lib/fileinput'
         },
         shim: {
             'jquery.modal': ['jquery'],
-			'fileinput': ['jquery'],
-			'fileinput_locale_zh': ['jquery']
+			'fileinput': ['jquery']
         }
     });
-    require(['jquery','fileinput','fileinput_locale_zh'],
+
+
+    require(['jquery','fileinput'],
     function($, re) {
 
 		var csrfSafeMethod, getCookie, sameOrigin,
@@ -60,12 +60,13 @@
 			}
 		})
 
+
 		$("#file_1").fileinput({
 	        uploadUrl: '/api/manual_modify/phone/', // you must set a valid URL here else you will get an error
 	        allowedFileExtensions : ['jpg', 'png','gif'],
 	        overwriteInitial: false,
 	        maxFileSize: 1000,
-	        maxFilesNum: 10,
+	        maxFilesNum: 1,
 	        //allowedFileTypes: ['image', 'video', 'flash'],
 	        slugCallback: function(filename) {
 	            return filename.replace('(', '_').replace(']', '_');
