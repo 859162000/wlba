@@ -2,7 +2,9 @@
 from models import WeixinUser
 
 from django.contrib.auth import get_user_model
+import logging
 User = get_user_model()
+logger = logging.getLogger("weixin")
 
 class OpenidAuthBackend(object):
     def authenticate(self, **kwargs):

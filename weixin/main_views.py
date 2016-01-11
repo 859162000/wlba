@@ -62,8 +62,11 @@ class WXLogin(TemplateView):
                     account = WeixinAccounts.getByOriginalId(state)
                     request.session['account_key'] = account.key
                     oauth = WeChatOAuth(account.app_id, account.app_secret, )
-                    res = oauth.fetch_access_token(code)
-                    self.openid = res.get('openid')
+                    user_info = oauth.fetch_access_token(code)
+                    self.openid = user_info.get('openid')
+                    w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
+                    if is_first:
+                        w_user.save()
                 except WeChatException, e:
                     error_msg = e.message
             else:
@@ -90,7 +93,7 @@ class WXLoginAPI(APIView):
 
     def post(self, request):
         form = self._form(request)
-
+        data = {}
         if form.is_valid():
             user = form.get_user()
             try:
@@ -104,8 +107,9 @@ class WXLoginAPI(APIView):
                         data = {'re_code':0,'nickname': user.wanglibaouserprofile.nick_name}
                     else:
                         data = {'re_code':rs, 'errmessage':txt}
-            except WeixinUser.DoesNotExist:
-                pass
+            except WeixinUser.DoesNotExist, e:
+                data = {'re_code':-1, 'errmessage':'wx_user does not exist'}
+                logger.debug(e.message)
 
             return Response(data)
 
