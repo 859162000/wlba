@@ -168,7 +168,7 @@ var org = (function(){
 org.ui = (function(){
     var lib = {
         _alert: function(txt, callback, btn){
-            if(typeof callback !="function"){
+            if(typeof callback !="function" && typeof callback !="object"){
                 btn = callback;
             }
             if(!btn){
@@ -190,12 +190,17 @@ org.ui = (function(){
                 alertFram.innerHTML = strHtml;
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
+                if(typeof callback == "object") {
+                    //alert(callback.url);
+                    $('.popub-footer').html('<a href="'+callback.url+'" style="display:block;">'+btn+'</a>');
+                }else{
+                   $('.popub-footer').on('click',function(){
+                        alertFram.style.display = "none";
+                        shield.style.display = "none";
+                        (typeof callback == "function") && callback();
+                    });
+                }
 
-                $('.popub-footer').on('click',function(){
-                    alertFram.style.display = "none";
-                    shield.style.display = "none";
-                    (typeof callback == "function") && callback();
-                })
             }
             document.body.onselectstart = function(){return false;};
         },
@@ -205,12 +210,11 @@ org.ui = (function(){
                 $('.confirm-certain').text(certainName);
                 $('.confirm-warp').show();
 
-                $('.confirm-cancel').on('click', function(e){
+                $('.confirm-cancel').unbind('click').on('click', function(e){
                     $('.confirm-warp').hide();
                 });
-                $('.confirm-certain').on('click', function(e){
+                $('.confirm-certain').unbind('click').on('click', function(e){
                     $('.confirm-warp').hide();
-
                     if(callback){
                         callbackData ? callback(callbackData): callback();
                     }
@@ -479,7 +483,11 @@ org.login = (function(org){
                         $submit.attr('disabled', true).text('登录中..');
                     },
                     success: function(res) {
-                        window.location.href = "/weixin/jump_page/?message=您已登录并绑定成功";
+                        if(res.re_code != 0){
+                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                        }else{
+                            window.location.href = "/weixin/jump_page/?message=您已登录并绑定成功";
+                        }
                         //org.ajax({
                         //   'type': 'post',
                         //    'url': '/weixin/api/bind/',
@@ -681,17 +689,18 @@ org.regist = (function(org){
                         'validate_code':    $validation.val(),
                         'invite_code':      token,
                         'tid' : tid,
-                        'invite_phone' : invite_phone
+                        'invite_phone' : invite_phone,
+                        'register_channel': "fwh"
                     },
                     beforeSend: function() {
                         $submit.text('注册中,请稍等...');
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            //var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            var next = '/weixin/sub_regist_first/?phone='+$identifier.val();
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
-                            //var next = '/weixin/sub_code/?phone='+$identifier.val();
                             //console.log(next);
                             window.location.href = next;
                         }else if(data.ret_code > 0){
@@ -894,7 +903,7 @@ org.buy=(function(org){
                 balance = cfg.balance;
             org.ajax({
                 type: 'POST',
-                url: '/api/p2p/purchase/',
+                url: '/api/p2p/purchase/?v='+Math.random(),
                 data: {product: productID, amount: amount, redpack: redpackValue},
                 beforeSend:function(){
                     $buyButton.text("抢购中...");
@@ -913,7 +922,7 @@ org.buy=(function(org){
                     if(xhr.status === 400){
                         if (result.error_number === 1) {
                             org.ui.alert("登录超时，请重新登录！",function(){
-                                return window.location.href= '/weixin/sub_login/?next=/weixin/view/buy/'+productID+'/';
+                                //return window.location.href= '/weixin/sub_login/?next=/weixin/sub_detail/detail/'+productID+'/';
                             });
                         } else if (result.error_number === 2) {
                             return org.ui.alert('必须实名认证！');
@@ -926,7 +935,7 @@ org.buy=(function(org){
                     }else if(xhr.status === 403){
                         if (result.detail) {
                             org.ui.alert("登录超时，请重新登录！",function(){
-                                return window.location.href = '/weixin/sub_login/?next=/weixin/view/buy/' + productID + '/';
+                                return window.location.href = '/weixin/sub_login/?next=/weixin/sub_detail/detail/' + productID + '/';
                             });
                         }
                     }
@@ -965,7 +974,12 @@ org.buy=(function(org){
                 }else{
                      return org.ui.alert('请输入正确的金额');
                 }
-                var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
+                var redpackDom = $redpack[0].options[$redpack[0].options.selectedIndex],
+                    minAmount = $(redpackDom).attr("data-investamount"),
+                    redpackValue = redpackDom.value;
+                if(minAmount && amount<minAmount){
+                    return org.ui.alert('未达到红包使用门槛');
+                }
                 if(!redpackValue || redpackValue == ''){
                     redpackValue = null;
                 }
@@ -991,53 +1005,8 @@ org.buy=(function(org){
                     callBackOpt: postdata
                 };
                 if(lib.isBuy){
-                    function gobuy(){//使用交易密码时删除
-                        org.ajax({
-                            type: 'POST',
-                            url: '/api/p2p/purchase/',
-                            data: {product: productID, amount: amount, redpack: redpackValue},
-                            beforeSend:function(){
-                                $buyButton.text("抢购中...");
-                                lib.isBuy = false;
-                            },
-                            success: function(data){
-                               if(data.data){
-                                   //$('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
-                                   //$(".sign-main").css("display","-webkit-box");
-                                   $("#page-ok").css('display','-webkit-box');
-                               }
-                            },
-                            error: function(xhr){
-                                var  result;
-                                result = JSON.parse(xhr.responseText);
-                                if(xhr.status === 400){
-                                    if (result.error_number === 1) {
-                                        org.ui.alert("登录超时，请重新登录！",function(){
-                                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                                        });
-                                    } else if (result.error_number === 2) {
-                                        return org.ui.alert('必须实名认证！');
-                                    } else if (result.error_number === 4 && result.message === "余额不足") {
-                                        $(".buy-sufficient").show();
-                                        return;
-                                    }else{
-                                        return org.ui.alert(result.message);
-                                    }
-                                }else if(xhr.status === 403){
-                                    if (result.detail) {
-                                        org.ui.alert("登录超时，请重新登录！",function(){
-                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
-                                        });
-                                    }
-                                }
-                            },
-                            complete:function(){
-                               $buyButton.text("立即投资");
-                                lib.isBuy = true;
-                            }
-                        })
-                    }
-                    org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);//使用交易密码时删除
+
+                    org.ui.confirm("购买金额为" + amount, '确认投资', lib._goBuy, postdata);//使用交易密码时删除
 
                     //org.ajax({ //交易密码，使用时去掉注释
                     //    url: '/api/profile/',
@@ -1685,9 +1654,10 @@ org.authentication = (function(org){
                         lib.$fromComplete.text("认证中，请等待...");
                     },
                     success:function(){
-                        org.ui.alert("实名认证成功!",function(){
-                           return window.location.href = '/weixin/account/';
-                        });
+                        //org.ui.alert("实名认证成功!",function(){
+                        //   return window.location.href = '/weixin/account/';
+                        //});
+                        org.ui.alert("实名认证成功!",{url:'/weixin/sub_account/'});
                     },
                     error:function(xhr){
                         result = JSON.parse(xhr.responseText);
@@ -1831,16 +1801,19 @@ org.processFirst = (function(org){
                 },
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
-                    org.ui.alert("实名认证成功!",function(){
-                        window.location.href = '/weixin/sub_regist_second/';
-                    });
+                    //org.ui.alert("实名认证成功!",function(){
+                    //    window.location.href = '/weixin/sub_regist_second/';
+                    //});
+                    //org.ui.alert("实名认证成功!",{url:'/weixin/sub_regist_second/'});
+                    $('.sign-main').css('display','-webkit-box');
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
                     if(result.error_number == 8){
-                        org.ui.alert(result.message,function(){
-                           window.location.href = '/weixin/sub_list/';
-                        });
+                        //org.ui.alert(result.message,function(){
+                        //   window.location.href = '/weixin/sub_list/';
+                        //});
+                        $('.sign-main-error').css('display','-webkit-box').find(".sign-tit").html(result.message);
                     }else{
                         return org.ui.alert(result.message);
                     }

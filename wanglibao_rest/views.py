@@ -313,7 +313,8 @@ class RegisterAPIView(DecryptParmsAPIView):
             # set_promo_user(request, user, invitecode=invite_code)
             # save_to_binding(user, request)
 
-        if device['device_type'] == "pc":
+        if device['device_type'] == "pc" or request.GET.get('promo_token') == 'wrp':
+            logger.debug(u'用户注册完后，开始登录：promo_token:%s, phone:%s' % (request.GET.get('promo_token'), identifier))
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
@@ -368,10 +369,12 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack.valid = 1
                         redpack.save()
         try:
-            openid = request.session.get('openid')
-            if openid:
-                w_user = WeixinUser.objects.get(openid=openid)
-                bindUser(w_user, request.user)
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh':
+                openid = request.session.get('openid')
+                if openid:
+                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                    bindUser(w_user, request.user)
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):
@@ -1064,7 +1067,7 @@ class StatisticsInside(APIView):
         interest_sum = yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else Decimal('0')
 
         # 昨日资金净流入
-        yesterday_inflow = amount_sum_yesterday - principal_sum - interest_sum
+        yesterday_inflow = amount_sum_yesterday - principal_sum
 
         # 今日还款额
         today_repayment_total = (today_repayment['principal__sum'] if today_repayment['principal__sum'] else 0) + \
@@ -1509,3 +1512,26 @@ class DataCubeApiView(APIView):
             }
 
         return HttpResponse(json.dumps(_response), content_type='application/json')
+
+
+class BidHasBindingForChannel(APIView):
+    """
+    根据bid（第三方用户ID）判断该用户是否已经绑定指定渠道
+    """
+
+    permission_classes = ()
+
+    def get(self, request, channel_code, bid):
+        binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
+        if binding:
+            response_data = {
+                'ret_code': 10001,
+                'message': u'该bid已经绑定'
+            }
+        else:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该bid未绑定'
+            }
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')

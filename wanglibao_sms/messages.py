@@ -310,9 +310,9 @@ def red_packet_invalid_alert(count, days):
             return content.format(count)
         except Exception, e:
             print e
-            return u'您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count, days)
+            return u'温馨提示，您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！{}'.format(count, days, SMS_STR_WX)
     else:
-        return u'您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count, days)
+        return u'温馨提示，您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！{}'.format(count, days, SMS_STR_WX)
 
 
 @suffix_td
