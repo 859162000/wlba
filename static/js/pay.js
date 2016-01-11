@@ -24,7 +24,6 @@
       return $('#' + $(e.target).attr('data-desc-id')).show();
     });
     $('#pay').click(function(e) {
-      e.preventDefault();
       return userStatus();
     });
     userStatus = function() {

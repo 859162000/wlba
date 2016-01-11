@@ -19,7 +19,6 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
     $('#' + $(e.target).attr('data-desc-id')).show()
 
   $('#pay').click (e)->
-      e.preventDefault()
       userStatus()
 
   userStatus = () ->
