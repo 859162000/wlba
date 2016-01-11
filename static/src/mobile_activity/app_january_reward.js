@@ -19,36 +19,19 @@
 					mixins.jumpToManageMoney();
 				});
 
-                if (data.ph == '') {
-                    login = false;
-					$('#go_experience').click(function() {
-                        mixins.loginApp({refresh:1, url:'/activity/experience/redirect/'});
-                    })
-
-                } else {
-                    login = true;
-                    $('#go_experience').click(function() {
-                       window.location.href = '/activity/experience/redirect/'
-                    })
-                }
-				$('#tiyanjin').click(function(){
-					window.location.href = '/activity/experience/redirect/'
-				});
+				$('#go_experience').click(function() {
+				   window.location.href = '/activity/experience/account/'
+				})
             });
         },
         other: function() {
 			$('.button').click(function(){
 				window.location.href = '/weixin/list/';
 			});
-            if(h5_user_static){
-				$('#go_experience').click(function() {
-					window.location.href = '/weixin/login/?next=/activity/experience/redirect/';
-                })
-            }else{
-                $('#go_experience').click(function() {
-					window.location.href = '/activity/experience/redirect/';
-                })
-            }
+
+			$('#go_experience').click(function() {
+				window.location.href = '/activity/experience/account/';
+			})
 
         }
     });
