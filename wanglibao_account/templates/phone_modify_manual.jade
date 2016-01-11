@@ -7,14 +7,22 @@ block sidebar
     //- with '账户总览' as activeItem
     include include/user_center_sidebar
 block main
-
-    .title_top 身份信息-人工审核修改手机号
-        .main_wrap
-            .title 客服会对您所提交的资料进行审核，审核结果将以短信通知您
+    .main_wrap
+        .main_title_top 身份信息-人工审核修改手机号
+        .form_wrap
+            .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
+            form
+                .box
+                    label 真实姓名
+                    .box_right
+                        .text 张****
+                .box
+                    label!='<span>*</span>身份证正面'
+                    input#file_1.file(type="file" multiple="true")
     //.form-group
     //    input#file_1.file(type="file" multiple="true")
 
     //include global/g_footer
     script.
-        //require(["/static/js/phone_modify_manual.js"])
+        require(["/static/js/phone_modify_manual.js"])
     include include/tracking

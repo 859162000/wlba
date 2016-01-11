@@ -2212,3 +2212,6 @@ class ManualModifyPhoneAPI(APIView):
     def post(self, request):
 
         return Response({'ret_code': 0})
+
+class EditProfileTemplateView(TemplateView):
+    template_name = 'account_safe.jade'
