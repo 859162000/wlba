@@ -122,6 +122,9 @@ class WeixinShareDetailView(TemplateView):
         "direct": 0,
         "interest_coupon": 1,
         "percent": 2}
+        record = WanglibaoActivityGiftOrder.objects.filter(order_id=product_id).first()
+        if record:
+            return
 
         ids = self.get_redpack_id(activity)
         if ids:
