@@ -1150,7 +1150,10 @@ MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
 # 亚洲财经
 WLB_FOR_YZCJ_KEY = '2005'
 YZCJ_COOP_KEY = 'yzcj_2005'
-YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
+if ENV == ENV_PRODUCTION:
+    YZCJ_CALL_BACK_URL = 'http://www.asiafinance.cn/wanglibaoBg.jspx'
+else:
+    YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'

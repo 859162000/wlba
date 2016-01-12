@@ -231,7 +231,7 @@ class WeixinShareDetailView(TemplateView):
             #1: 此处有数据不一致性的问题, GiftOrder表和ActivityGift表的不一致性
             gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
             if gift_order.valid_amount > 0:
-                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True).exclude(type=3)
 
                 counts = gifts.count()
                 if counts > 0:
@@ -306,13 +306,9 @@ class WeixinShareDetailView(TemplateView):
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
                 gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2)
-                logger.debug("=======即将被处理的gifts======")
-                for gift in gifts:
-                    logger.debug(gift)
                 exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
                 counts = exp_glods.count() if exp_glods else 0
                 gifts = gifts.filter(amount__lt=10).all()
-                logger.debug("========处理后的gifts=========")
                 return gifts, counts
                 #return gifts.filter(amount__lt=10).all(), counts
             except Exception, reason:
@@ -361,7 +357,7 @@ class WeixinShareDetailView(TemplateView):
                                   "name": weixins[key].nickname,
                                   "img": weixins[key].headimgurl,
                                   "message": self.get_react_text(index),
-                                  "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
+                                  "sort_by": user_info[key].id})
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
@@ -425,7 +421,7 @@ class WeixinShareDetailView(TemplateView):
                 has_gift = 'false'
             else:
                 has_gift = 'true'
-            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
+            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s, 领取状态has_gift:%s, phone_num:%s, user_gift.identity:%s' %(openid, user_gift.identity, user_gift, has_gift,phone_num, user_gift.identity ))
         gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
