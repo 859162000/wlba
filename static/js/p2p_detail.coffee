@@ -213,28 +213,29 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             return
           else if result.error_number == 2
             if $('#id-is-valid').attr('data-type') == 'qiye'
-              $.ajax {
-                url: '/qiye/profile/exists/'
-                data: {
-                }
-                type: 'GET'
-              }
-              .done (data)->
-                if data.ret_code == 10000
-                  $.ajax {
-                    url: '/qiye/profile/get/'
-                    data: {
-                    }
-                    type: 'GET'
+              if $('#id-is-valid').val() == 'False'
+                $.ajax {
+                  url: '/qiye/profile/exists/'
+                  data: {
                   }
-                  .done (data)->
-                    if data.data.status != '审核通过'
-                      $('.verifyHref').attr('href','/qiye/profile/edit/')
-              .fail (data)->
-                $('.verifyHref').attr('href','/qiye/info/')
+                  type: 'GET'
+                }
+                .done (data)->
+                  if data.ret_code == 10000
+                    $.ajax {
+                      url: '/qiye/profile/get/'
+                      data: {
+                      }
+                      type: 'GET'
+                    }
+                    .done (data)->
+                      if data.data.status != '审核通过'
+                        $('.verifyHref').attr('href','/qiye/profile/edit/')
+                .fail (data)->
+                  $('.verifyHref').attr('href','/qiye/info/')
 
-              $('#id-validate').modal()
-              return
+                $('#id-validate').modal()
+                return
 
             else
               $('#id-validate').modal()
