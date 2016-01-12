@@ -16,7 +16,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var $target_more, acount_product, buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, toThousands, validator;
+    var $target_more, acount_product, buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, purchaseFun, showPayInfo, showPayTip, toThousands, validator;
     isFirst = true;
     getFormatedNumber = function(num) {
       return Math.round(num * 100) / 100;
@@ -216,95 +216,97 @@
           return;
         }
         tip = '您的投资金额为:' + $('input[name=amount]').val() + '元';
-        return tool.modalConfirm({
+        return tool.modalAlert({
           title: '温馨提示',
           msg: tip,
           callback_ok: function() {
-            var amount, product, redpack_id;
-            product = $('input[name=product]').val();
-            amount = $('input[name=amount]').val();
-            redpack_id = $('.dd-selected-value').val();
-            return backend.purchaseP2P({
-              product: product,
-              amount: amount,
-              redpack: redpack_id
+            return $.ajax({
+              url: '/qiye/profile/exists/',
+              data: {},
+              type: 'GET'
             }).done(function(data) {
-              return tool.modalAlert({
-                height: '364px',
-                title: '温馨提示',
-                msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功',
-                callback_ok: function() {
-                  if (data.category === '酒仙众筹标') {
-                    return window.location.href = "/accounts/home/jiuxian/";
+              if (data.ret_code === 10000) {
+                return $.ajax({
+                  url: '/qiye/profile/get/',
+                  data: {},
+                  type: 'GET'
+                }).done(function(data) {
+                  if (data.data.status !== '审核通过') {
+                    return window.location.href = '/qiye/profile/edit/';
                   } else {
-                    return window.location.href = "/accounts/home";
-                  }
-                }
-              });
-            }).fail(function(xhr) {
-              var error_message, message, result;
-              result = JSON.parse(xhr.responseText);
-              if (result.error_number === 1) {
-                $('.login-modal').trigger('click');
-                return;
-              } else if (result.error_number === 2) {
-                if ($('#id-is-valid').attr('data-type') === 'qiye') {
-                  if ($('#id-is-valid').val() === 'False') {
-                    $.ajax({
-                      url: '/qiye/profile/exists/',
-                      data: {},
-                      type: 'GET'
-                    }).done(function(data) {
-                      if (data.ret_code === 10000) {
-                        return $.ajax({
-                          url: '/qiye/profile/get/',
-                          data: {},
-                          type: 'GET'
-                        }).done(function(data) {
-                          if (data.data.status !== '审核通过') {
-                            return $('.verifyHref').attr('href', '/qiye/profile/edit/');
-                          }
-                        });
-                      }
-                    }).fail(function(data) {
-                      return $('.verifyHref').attr('href', '/qiye/info/');
-                    });
-                    $('#id-validate').modal();
-                    return;
-                  }
-                } else {
-                  $('#id-validate').modal();
-                  return;
-                }
-              } else if (result.error_number === 4 && result.message === "余额不足") {
-                tool.modalAlert({
-                  btnText: "去充值",
-                  title: '温馨提示',
-                  msg: result.message,
-                  callback_ok: function() {
-                    return window.location.href = '/pay/banks/';
+                    return purchaseFun();
                   }
                 });
-                return;
               }
-              message = result.message;
-              error_message = '';
-              if ($.type(message) === 'object') {
-                error_message = _.chain(message).pairs().map(function(e) {
-                  return e[1];
-                }).flatten().value();
+            }).fail(function(data) {
+              var result;
+              result = JSON.parse(data.responseText);
+              if (result.ret_code !== 20001) {
+                return window.location.href = '/qiye/info/';
               } else {
-                error_message = message;
+                return purchaseFun();
               }
-              return tool.modalAlert({
-                title: '温馨提示',
-                msg: error_message
-              });
             });
           }
         });
       }
     });
+    purchaseFun = function() {
+      var amount, product, redpack_id;
+      product = $('input[name=product]').val();
+      amount = $('input[name=amount]').val();
+      redpack_id = $('.dd-selected-value').val();
+      return backend.purchaseP2P({
+        product: product,
+        amount: amount,
+        redpack: redpack_id
+      }).done(function(data) {
+        return tool.modalAlert({
+          height: '364px',
+          title: '温馨提示',
+          msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功',
+          callback_ok: function() {
+            if (data.category === '酒仙众筹标') {
+              return window.location.href = "/accounts/home/jiuxian/";
+            } else {
+              return window.location.href = "/accounts/home";
+            }
+          }
+        });
+      }).fail(function(xhr) {
+        var error_message, message, result;
+        result = JSON.parse(xhr.responseText);
+        if (result.error_number === 1) {
+          $('.login-modal').trigger('click');
+          return;
+        } else if (result.error_number === 2) {
+
+        } else if (result.error_number === 4 && result.message === "余额不足") {
+          tool.modalAlert({
+            btnText: "去充值",
+            title: '温馨提示',
+            msg: result.message,
+            callback_ok: function() {
+              return window.location.href = '/pay/banks/';
+            }
+          });
+          return;
+        }
+        message = result.message;
+        error_message = '';
+        if ($.type(message) === 'object') {
+          error_message = _.chain(message).pairs().map(function(e) {
+            return e[1];
+          }).flatten().value();
+        } else {
+          error_message = message;
+        }
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: error_message
+        });
+      });
+    };
     $("#get-validate-code-buy").click(function() {
       var count, element, intervalId, phoneNumber, timerFunction;
       element = this;
