@@ -1354,6 +1354,7 @@ class WeixinAnnualBonusView(TemplateView):
                 'annual_bonus' : 500 if is_new else 500,
                 'min_annual_bonus' : 500 if is_new else 500,
                 'max_annual_bonus' : 8000 if is_new else 8000,
+                'create_time' : timezone.now(),
             })
         except Exception, ex :
             logger.exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
