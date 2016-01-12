@@ -46,7 +46,7 @@
       phone = $(this).attr('data-phone');
       id = $.trim(parent.find('.sfz').val());
       yhkh = $('#bindingEdInfo').attr('data-no');
-      reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$|[a-zA-Z][0-9]{1,}$/);
+      reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$|[a-zA-Z][a-zA-Z0-9]{1,}$/);
       $('.errorS').html('').hide();
       sfzError = parent.find('#sfzError');
       if (id === '') {
@@ -54,7 +54,7 @@
         return;
       } else {
         if (!reg.test(id)) {
-          sfzError.show().addClass('errorS').html('<i></');
+          sfzError.show().addClass('errorS').html('<i></i>身份证信息有误');
           return;
         } else {
           sfzError.show().removeClass('errorS').html('<i></i>');
