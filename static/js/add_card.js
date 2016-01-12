@@ -320,9 +320,10 @@
         data: {}
       }).success(function(data) {
         if (data.is_mainland_user === false) {
-          return $('#goPersonalInfo').attr({
+          $('#goPersonalInfo').attr({
             'data-type': 'special'
           });
+          return $('#goPersonalInfo').text('绑定银行卡');
         }
       });
       e.preventDefault();

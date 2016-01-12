@@ -258,6 +258,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     .success (data) ->
       if data.is_mainland_user == false
         $('#goPersonalInfo').attr('data-type':'special')
+        $('#goPersonalInfo').text('绑定银行卡')
     e.preventDefault()
     $('.banks-list,.bankManage').hide()
     $('#chooseBank,.bankTitle').show()

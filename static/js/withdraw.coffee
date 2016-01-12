@@ -297,6 +297,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       data: dataStr
     .success (xhr)->
       tool.modalAlert({title: '温馨提示', msg: xhr.message})
+      location.reload()
   ###获取绑卡状态###
   $.ajax
       url: "/api/pay/the_one_card/"
