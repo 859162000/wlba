@@ -38,7 +38,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
             $('#qiyeForm').ajaxSubmit({
                 success: function (data) {
                     if (data.ret_code == 10000) {
-                        window.location.href = '/accounts/home/';
+                        window.location.href = '/qiye/profile/edit/';
                     } else {
                         result = JSON.parse(data.responseText);
                         return tool.modalAlert({
