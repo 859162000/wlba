@@ -1345,28 +1345,38 @@ class CoopRequestParamsMap(object):
         data = None
         client_id = self.coop_params.get('appid', '')
         if client_id:
-            get_coop_params = getattr(self, 'get_%s_params', None)
-            if get_coop_params:
-                data = get_coop_params()
+            try:
+                client = Client.objects.selete_related().get(client_id=client_id)
+            except Client.DoesNotExist:
+                return data
             else:
-                data = self.get_params_default()
+                get_coop_params = getattr(self, 'get_%s_params' % client.channel.code, None)
+                if get_coop_params:
+                    data = get_coop_params()
+                else:
+                    data = self.get_params_default()
 
-        return data
+                return data
 
     def get_params_default(self):
-        client_id = self.coop_params.get('client_id', '').strip()
+        client_id = self.coop_params.get('appid', '').strip()
+        # promo_token = self.coop_params.get('Cust_key', '').strip()
         sign = self.coop_params.get('sign', '').strip()
         identifier = self.coop_params.get('identifier', '').strip()
         v_code = self.coop_params.get('validate_code', '').strip()
 
     def get_bajinshe_params(self):
-        client_id = self.coop_params.get('client_id', '').strip()
-        sign = self.coop_params.get('sign', '').strip()
-        identifier = self.coop_params.get('identifier', '').strip()
+        client_id = self.coop_params.get('appid', '').strip()
+        sign = self.coop_params.get('signature', '').strip()
+        identifier = self.coop_params.get('usn', '').strip()
         v_code = self.coop_params.get('validate_code', '').strip()
 
     def get_renrenli_params(self):
-        pass
+        client_id = self.coop_params.get('appid', '').strip()
+        # promo_token = self.coop_params.get('Cust_key', '').strip()
+        sign = self.coop_params.get('Sign', '').strip()
+        identifier = self.coop_params.get('Phone', '').strip()
+        v_code = self.coop_params.get('validate_code', '').strip()
 
 
 class RegisterOpenApiView(APIView):
