@@ -11,8 +11,9 @@ block main
         .main_title_top 身份信息-人工审核修改手机号
         .form_wrap
             .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
-            form( method="post" enctype="multipart/form-data")
+            form(enctype="multipart/form-data", content_type="multipart/form-data", action="/api/manual_modify/phone/", method="post")
                 -csrf_token
+
                 .box
                     label 真实姓名
                     .box_right
@@ -21,20 +22,18 @@ block main
                     label!='<span>*</span>身份证正面'
                     //input#file_1.file(type="file" multiple="true")
                 form.form-group
-                    {{form.id_front_image}}
-                    {{form.id_back_image}}
-                    {{form.id_user_image}}
+                    <input id="id_id_user_image" type="file" name="id_user_image" multiple="true">
+                    <input id="id_id_front_image" type="file" name="id_front_image" multiple="true">
+                    <input id="id_id_back_image" type="file" name="id_back_image" multiple="true">
+
                     .show_img
                         #img_1
                         #img_2
                         #img_3
+
                     input(type="submit" value="提交")
 
 
-
-
-    //.form-group
-    //    input#file_1.file(type="file" multiple="true")
 
     //include global/g_footer
     script.

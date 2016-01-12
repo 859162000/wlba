@@ -61,15 +61,15 @@
 			}
 		})
 
-		$('.button').click(function(){
-            $.ajax({
-                url: '/api/manual_modify/phone/',
-                type: 'post',
-                success: function (data1) {
-
-                }
-            })
-		})
+//		$('.button').click(function(){
+//            $.ajax({
+//                url: '/api/manual_modify/phone/',
+//                type: 'post',
+//                success: function (data1) {
+//
+//                }
+//            })
+//		})
 
 
 
