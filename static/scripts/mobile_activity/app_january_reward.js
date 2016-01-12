@@ -238,36 +238,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					mixins.jumpToManageMoney();
 				});
 
-                if (data.ph == '') {
-                    login = false;
-					$('#go_experience').click(function() {
-                        mixins.loginApp({refresh:1, url:'/activity/experience/redirect/'});
-                    })
-
-                } else {
-                    login = true;
-                    $('#go_experience').click(function() {
-                       window.location.href = '/activity/experience/redirect/'
-                    })
-                }
-				$('#tiyanjin').click(function(){
-					window.location.href = '/activity/experience/redirect/'
-				});
+				$('#go_experience').click(function() {
+				   window.location.href = '/activity/experience/account/'
+				})
             });
         },
         other: function() {
 			$('.button').click(function(){
 				window.location.href = '/weixin/list/';
 			});
-            if(h5_user_static){
-				$('#go_experience').click(function() {
-					window.location.href = '/weixin/login/?next=/activity/experience/redirect/';
-                })
-            }else{
-                $('#go_experience').click(function() {
-					window.location.href = '/activity/experience/redirect/';
-                })
-            }
+
+			$('#go_experience').click(function() {
+				window.location.href = '/activity/experience/account/';
+			})
 
         }
     });
@@ -279,12 +262,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var autoHeight = ele.css('height', 'auto').height();
 		if (!ele.hasClass('down')){
 			$('#see_rule_1').addClass('select');
-			ele.height(curHeight).animate({'height':autoHeight,'margin':'0.75rem auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':autoHeight},500,function(){
 				ele.addClass('down');
 			});
 		}else{
 			$('#see_rule_1').removeClass('select');
-			ele.height(curHeight).animate({'height':'0','margin':'0 auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':'0'},500,function(){
 				ele.removeClass('down');
 			});
 		}
@@ -295,12 +278,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var autoHeight = ele.css('height', 'auto').height();
 		if (!ele.hasClass('down')){
 			$('#see_rule_2').addClass('select');
-			ele.height(curHeight).animate({'height':autoHeight,'margin':'0.75rem auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':autoHeight},500,function(){
 				ele.addClass('down');
 			});
 		}else{
 			$('#see_rule_2').removeClass('select');
-			ele.height(curHeight).animate({'height':'0','margin':'0 auto 0'},500,function(){
+			ele.height(curHeight).animate({'height':'0'},500,function(){
 				ele.removeClass('down');
 			});
 		}
