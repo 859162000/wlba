@@ -8,10 +8,44 @@ block sidebar
     include include/user_center_sidebar
 block main
     .main_wrap
+        .main_title_top 身份信息-短信修改手机号
         .form_wrap
-            .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
-
-
+            .title_top 为保证您的账户安全，请输入以下信息：
+            form.form-group(enctype="multipart/form-data", content_type="multipart/form-data", action="/api/manual_modify/phone/", method="post")
+                -csrf_token
+                .box
+                    label 原手机号
+                    .box_right
+                        .text 180****908
+                .box
+                    label 验证码
+                    .box_right
+                        <input class="input_code" type='text' placeholder="请输入验证码" autocomplete="off"/>
+                        <button type="button" class="get_code">获取验证码</button>
+                        .static
+                            .true
+                            .false
+                            .false_text
+                                验证码错误
+                .box
+                    label 账户登录密码
+                    .box_right
+                        .input_box
+                            <input class="input_phone" type="text" placeholder="请输入账户登录密码" autocomplete="off">
+                .box
+                    label 实名身份证号
+                    .box_right
+                        .input_box
+                            <input class="input_phone" type="text" placeholder="请输入身份证号" autocomplete="off">
+                .box
+                    label 新手机号
+                    .box_right
+                        .input_box
+                            <input class="input_phone" type="text" placeholder="请输入新手机号" autocomplete="off">
+                .box
+                    label
+                    .box_right
+                        <input class="submit" type="submit" value="下一步"/>
 
     //include global/g_footer
     //script.
