@@ -9,7 +9,7 @@ block sidebar
 block main
     .main_wrap.main_wrap_1
         .main_title_top 身份信息
-        .info_box
+        .info_box.is_open
             .img.img_1
             dl
                 dt
@@ -18,6 +18,8 @@ block main
                     span.is_set_text 已绑定
                 dd 180*****274
             .button 修改
+        .phone_change_wrap
+
         .info_box
             .img.img_2
             dl
@@ -26,7 +28,29 @@ block main
                     .ico.no_set_ico
                     span.no_set_text 待认证
                 dd 您尚未进行实名认证！
+                dd( style='display:none') *永明 370125**********
+            .button 实名认证
+    .main_wrap.main_wrap_2
+        .main_title_top 密码管理
+        .info_box
+            .img.img_3
+            dl
+                dt
+                    .text 登录密码
+                    .ico.is_set_ico
+                    span.is_set_text 已设置
+                dd 账户登录使用，定期修改可提升账户安全性
             .button 修改
+        .info_box
+            .img.img_4
+            dl
+                dt
+                    .text 交易密码
+                    .ico.no_set_ico
+                    span.no_set_text 未设置
+                dd 6位数字，投资、提现时使用，保证账户资金安全
+            .button 设置
+            .button.button_change 找回
 
 
 
