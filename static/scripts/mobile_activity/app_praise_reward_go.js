@@ -253,15 +253,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$.ajax({
 			url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_num+'&wxid='+wxid,
 			type: "GET",
-		}).done(function (xhr) {
-			if(xhr.err_code==0){
-				window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid
-			}else{
-				$('.friend_top span').text(xhr.err_messege);
-				$('.friend_top').show();
+			success: function (xhr) {
+				if (xhr.err_code == 0) {
+					window.location.href = '/weixin_activity/weixin/bonus/?wxid=' + wxid
+				} else {
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').show();
+				}
 			}
 		});
-	});
+	})
 	/*申请领取*/
 
 	$('.friend_top .close').click(function(){
