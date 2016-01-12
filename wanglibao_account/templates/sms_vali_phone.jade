@@ -24,24 +24,39 @@ block main
                         <button type="button" class="get_code">获取验证码</button>
                         .static
                             .true
-                            .false
-                            .false_text
-                                验证码错误
+                            .false 验证码错误
                 .box
                     label 账户登录密码
                     .box_right
                         .input_box
                             <input class="input_phone" type="text" placeholder="请输入账户登录密码" autocomplete="off">
+                            .static
+                                .true
+                                .false 账户登录密码有误
                 .box
                     label 实名身份证号
                     .box_right
                         .input_box
                             <input class="input_phone" type="text" placeholder="请输入身份证号" autocomplete="off">
+                            .static
+                                .true
+                                .false 身份证信息有误
+                .box
+                    label 银行卡号
+                    .box_right
+                        .input_box
+                            <input class="input_phone" type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
+                            .static
+                                .true
+                                .false 银行卡号码有误
                 .box
                     label 新手机号
                     .box_right
                         .input_box
                             <input class="input_phone" type="text" placeholder="请输入新手机号" autocomplete="off">
+                            .static
+                                .true
+                                .false 新手机号码有误
                 .box
                     label
                     .box_right
