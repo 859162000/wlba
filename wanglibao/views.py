@@ -19,6 +19,7 @@ from wanglibao import settings
 from wanglibao_rest import utils as rest_utils
 import logging
 from weixin.base import ChannelBaseTemplate
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -318,3 +319,6 @@ class BaiduFinanceView(ChannelBaseTemplate):
             'today': today
         })
         return context
+
+
+class LandPageOpenApi(APIView):
