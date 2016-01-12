@@ -2204,20 +2204,12 @@ class ManualModifyPhoneTemplate(TemplateView):
     template_name = 'phone_modify_manual.jade'
 
     def get_context_data(self, **kwargs):
+        user = self.request.user
+
         form = ManualModifyPhoneForm()
-        if form.is_valid():
-            id_front_image = form.cleaned_data['id_front_image']
-            id_back_image = form.cleaned_data['id_back_image']
-            id_user_image = form.cleaned_data['id_user_image']
-            new_phone = form.cleaned_data['new_phone']
-            manual_record = ManualModifyPhoneRecord()
-            manual_record.id_front_image = id_front_image
-            manual_record.id_back_image = id_back_image
-            manual_record.id_user_image = id_user_image
-            manual_record.new_phone = new_phone
-            manual_record.status = u'初审中'
-            manual_record.save()
-        return {'form':form}
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        return {'form':form, 'modify_phone_record':modify_phone_record}
+
 
 
 class ManualModifyPhoneAPI(APIView):
@@ -2225,8 +2217,23 @@ class ManualModifyPhoneAPI(APIView):
     permission_classes = ()
 
     def post(self, request):
-
+        user = request.user
+        form = ManualModifyPhoneForm(self.request.POST, self.request.FILES)
+        if form.is_valid():
+            id_front_image = form.cleaned_data['id_front_image']
+            id_back_image = form.cleaned_data['id_back_image']
+            id_user_image = form.cleaned_data['id_user_image']
+            new_phone = form.cleaned_data['new_phone']
+            manual_record = ManualModifyPhoneRecord()
+            manual_record.user = user
+            manual_record.id_front_image = id_front_image
+            manual_record.id_back_image = id_back_image
+            manual_record.id_user_image = id_user_image
+            manual_record.new_phone = new_phone
+            manual_record.status = u'初审中'
+            manual_record.save()
         return Response({'ret_code': 0})
+
 
 
 class EditProfileTemplateView(TemplateView):

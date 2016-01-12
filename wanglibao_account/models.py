@@ -238,6 +238,8 @@ class ManualModifyPhoneRecord(models.Model):
     status = models.CharField(max_length=16, default=u'初审中', db_index=True,
                               choices=STATUS_CHOICES,
                               verbose_name=u'申请状态')
+    created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
+    update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
 
 #发给所有人
 def send_public_message(sender, instance, **kwargs):
