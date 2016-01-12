@@ -821,6 +821,20 @@ class KuaiShortPay:
         """ % (self.MER_ID, self.TERM_ID, ref_number))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
+    def _sp_query_xml(self, order_id):
+        xml = etree.XML("""
+            <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
+                <version>1.0</version>
+                <QryTxnMsgContent>
+                    <txnType>PUR</txnType>
+                    <merchantId>%s</merchantId>
+                    <terminalId>%s</terminalId>
+                    <externalRefNumber>%s</externalRefNumber>
+                </QryTxnMsgContent>
+            </MasMessage>
+        """ % (self.MER_ID, self.TERM_ID, order_id))
+        return self.xmlheader + etree.tostring(xml, encoding="utf-8")
+
 
     def _request(self, data, url):
         headers = self.headers
