@@ -12,6 +12,7 @@ block main
         .form_wrap
             .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
             form( method="post" enctype="multipart/form-data")
+                -csrf_token
                 .box
                     label 真实姓名
                     .box_right
