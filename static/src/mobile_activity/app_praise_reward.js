@@ -19,7 +19,7 @@
 		type: "GET",
 	}).done(function (xhr) {
 		if(xhr.err_code==0){
-			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max);
+			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
 			//$('.renovate').click();
 		}else{
 			//$('.friend_top span').text(xhr.err_messege);
@@ -76,7 +76,8 @@
 	/*刷新数据结束*/
 
 	/*刷新朋友圈*/
-	function renovate_friends(friends_length,friends_img,is_max){
+	function renovate_friends(friends_length,friends_img,is_max,annual_bonus){
+
 		var str='';
 		var follow_one='';
 		for(var i=0; i<friends_length; i++){
@@ -98,6 +99,7 @@
 		if(is_max){
 			$('.num_top').show();
 		}
+		$('#praise_num').val(annual_bonus);
 	}
 	/*刷新朋友圈结束*/
 	/*同意活动规则按钮*/
