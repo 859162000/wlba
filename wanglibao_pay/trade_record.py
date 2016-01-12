@@ -54,10 +54,9 @@ def _deposit_record(user, pagesize, pagenum):
             "amount": x.amount,
             "created_at": util.fmt_dt_normal(util.local_datetime(x.create_time)),
             "status": x.status,
-            "channel": "APP"
+            "channel": "APP",
+            "balance": x.margin_record.margin_current
         }
-        if x.status == u"成功":
-            obj['balance'] = x.margin_record.margin_current
         if x.channel and x.channel == "huifu":
             obj['channel'] = "PC"
         res.append(obj)
