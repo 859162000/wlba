@@ -12,6 +12,8 @@ block main
         .form_wrap
             .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
             form(enctype="multipart/form-data", content_type="multipart/form-data", action="/api/manual_modify/phone/", method="post")
+                -csrf_token
+
                 .box
                     label 真实姓名
                     .box_right
@@ -32,11 +34,6 @@ block main
                     input(type="submit" value="提交")
 
 
-
-
-
-    //.form-group
-    //    input#file_1.file(type="file" multiple="true")
 
     //include global/g_footer
     script.
