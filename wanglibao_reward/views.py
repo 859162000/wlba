@@ -1396,14 +1396,14 @@ class WeixinAnnualBonusView(TemplateView):
                     wx_bonus.good_vote += 1
                     if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus += 500
-                        if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
+                        if wx_bonus.annual_bonus >= wx_bonus.max_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
                             wx_bonus.is_max = True
                 else:
                     wx_bonus.bad_vote += 1
                     if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus -= 500
-                        if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
+                        if wx_bonus.annual_bonus <= wx_bonus.min_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
 
                 wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
