@@ -41,6 +41,9 @@
           origin = protocol + sr_origin;
           return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
       };
+
+
+
       $.ajaxSetup({
           beforeSend: function (xhr, settings) {
               if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
@@ -73,8 +76,6 @@
 
 
 
-
-
         $('.main_title_top').click(function(){
             alert($('#id_id_back_image').val());
             var img_url = $('#id_id_back_image').val();
@@ -82,18 +83,32 @@
         });
 
         window.onload=function(){
-            var result = document.getElementById("img_1");
-            var input = document.getElementById("id_id_front_image");
+
+            var result_1 = document.getElementById("user_img_1");
+			var result_2 = document.getElementById("user_img_2");
+			var result_3 = document.getElementById("user_img_3");
+			var result_4 = document.getElementById("user_img_4");
+            var input_1 = document.getElementById("id_front_image");
+			var input_2 = document.getElementById("id_back_image");
+			var input_3 = document.getElementById("id_user_image");
+			var input_4 = document.getElementById("id_bank_image");
 
             if(typeof FileReader==='undefined'){
-                result.innerHTML = "抱歉，你的浏览器不支持 FileReader";
-                input.setAttribute('disabled','disabled');
+                $('.upload_img').html('抱歉，你的浏览器不支持 FileReader');
+                input_1.setAttribute('disabled','disabled');
+				input_2.setAttribute('disabled','disabled');
+				input_3.setAttribute('disabled','disabled');
+				input_4.setAttribute('disabled','disabled');
             }else{
-                input.addEventListener('change',readFile,false);
+                input_1.addEventListener('change',readFile,false);
+				input_2.addEventListener('change',readFile,false);
+				input_3.addEventListener('change',readFile,false);
+				input_4.addEventListener('change',readFile,false);
             }
-
 
             function readFile(){
+				var this_name=this.name;
+				//alert(this_name);
                 var file = this.files[0];
                 if(!/image\/\w+/.test(file.type)){
                     alert("文件必须为图片！");
@@ -102,57 +117,22 @@
                 var reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = function(e){
-                    result.innerHTML = '<img src="'+this.result+'" alt=""/>'
+					if(this_name=='id_front_image'){
+						$('#user_img_1').show();
+                    	result_1.innerHTML = '<img src="'+this.result+'" alt=""/>';
+					}else if(this_name=='id_back_image'){
+						$('#user_img_2').show();
+                    	result_2.innerHTML = '<img src="'+this.result+'" alt=""/>';
+					}else if(this_name=='id_user_image'){
+						$('#user_img_3').show();
+                    	result_3.innerHTML = '<img src="'+this.result+'" alt=""/>';
+					}else if(this_name=='id_bank_image'){
+						$('#user_img_4').show();
+                    	result_4.innerHTML = '<img src="'+this.result+'" alt=""/>';
+					}
                 }
             }
 
-            var result_2 = document.getElementById("img_2");
-            var input_2 = document.getElementById("id_id_back_image");
-
-            if(typeof FileReader==='undefined'){
-                result_2.innerHTML = "抱歉，你的浏览器不支持 FileReader";
-                input_2.setAttribute('disabled','disabled');
-            }else{
-                input_2.addEventListener('change',readFile_2,false);
-            }
-
-
-            function readFile_2(){
-                var file = this.files[0];
-                if(!/image\/\w+/.test(file.type)){
-                    alert("文件必须为图片！");
-                    return false;
-                }
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function(e){
-                    result_2.innerHTML = '<img src="'+this.result+'" alt=""/>'
-                }
-            }
-
-            var result_3 = document.getElementById("img_3");
-            var input_3 = document.getElementById("id_id_user_image");
-
-            if(typeof FileReader==='undefined'){
-                result_3.innerHTML = "抱歉，你的浏览器不支持 FileReader";
-                input_3.setAttribute('disabled','disabled');
-            }else{
-                input_3.addEventListener('change',readFile_3,false);
-            }
-
-
-            function readFile_3(){
-                var file = this.files[0];
-                if(!/image\/\w+/.test(file.type)){
-                    alert("文件必须为图片！");
-                    return false;
-                }
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function(e){
-                    result_3.innerHTML = '<img src="'+this.result+'" alt=""/>'
-                }
-            }
         }
 
     })
