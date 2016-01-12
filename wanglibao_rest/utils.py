@@ -3,14 +3,14 @@
 
 import re
 import logging
-import requests
 import hashlib
 import datetime
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
-from django.core.urlresolvers import reverse
 from wanglibao_oauth2.views import oauth_token_login
+from wanglibao_account.models import Binding
+from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -127,3 +127,11 @@ def process_for_bajinshe_landpage(request, channel_code):
             oauth_token_login(phone, client_id, access_token)
         except Exception, e:
             logger.info('internal request oauth failed with error %s' % e)
+
+
+def has_binding_for_bid(channel_code, bid):
+    return Binding.objects.filter(btype=channel_code, bid=bid).exists()
+
+
+def has_register_for_phone(phone):
+    return WanglibaoUserProfile.objects.filter(phone=phone).exists()

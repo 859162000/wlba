@@ -19,8 +19,8 @@ from wanglibao import settings
 from wanglibao_rest import utils as rest_utils
 import logging
 from weixin.base import ChannelBaseTemplate
-from rest_framework.views import APIView
-from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_account.cooperation import CoopRegister
+from wanglibao_rest.utils import has_register_for_phone
 
 logger = logging.getLogger(__name__)
 
@@ -304,7 +304,7 @@ def landpage_view(request):
                 # 判断手机号是否已经注册
                 phone = request.session.get('channel_user', None)
                 if phone:
-                    phone_has_register = WanglibaoUserProfile.objects.filter(phone=phone).exists()
+                    phone_has_register = has_register_for_phone(phone)
                 else:
                     phone_has_register = False
 
@@ -313,6 +313,8 @@ def landpage_view(request):
                     url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
                 else:
                     url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
+            else:
+                CoopRegister(request).process_for_clear_session(request.user)
         else:
             url = reverse(activity_page) + "?promo_token=" + channel_code
 

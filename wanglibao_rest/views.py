@@ -46,7 +46,7 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua, get_client_ip
+from wanglibao_rest.utils import split_ua, get_client_ip, has_binding_for_bid, has_register_for_phone
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
@@ -54,7 +54,6 @@ from marketing import tools
 from marketing.models import PromotionToken
 from marketing.utils import local_to_utc
 from django.conf import settings
-from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
@@ -1340,48 +1339,6 @@ def generate_random_password(length=6):
     return ''.join([str(randint(0, 9)) for i in range(length)])
 
 
-class CoopRequestParamsMap(object):
-    def __init__(self, request):
-        self.coop_params = request.POST
-
-    def get_params(self):
-        data = None
-        client_id = self.coop_params.get('appid', '')
-        if client_id:
-            try:
-                client = Client.objects.selete_related().get(client_id=client_id)
-            except Client.DoesNotExist:
-                return data
-            else:
-                get_coop_params = getattr(self, 'get_%s_params' % client.channel.code, None)
-                if get_coop_params:
-                    data = get_coop_params()
-                else:
-                    data = self.get_params_default()
-
-                return data
-
-    def get_params_default(self):
-        client_id = self.coop_params.get('appid', '').strip()
-        # promo_token = self.coop_params.get('Cust_key', '').strip()
-        sign = self.coop_params.get('sign', '').strip()
-        identifier = self.coop_params.get('identifier', '').strip()
-        v_code = self.coop_params.get('validate_code', '').strip()
-
-    def get_bajinshe_params(self):
-        client_id = self.coop_params.get('appid', '').strip()
-        sign = self.coop_params.get('signature', '').strip()
-        identifier = self.coop_params.get('usn', '').strip()
-        v_code = self.coop_params.get('validate_code', '').strip()
-
-    def get_renrenli_params(self):
-        client_id = self.coop_params.get('appid', '').strip()
-        # promo_token = self.coop_params.get('Cust_key', '').strip()
-        sign = self.coop_params.get('Sign', '').strip()
-        identifier = self.coop_params.get('Phone', '').strip()
-        v_code = self.coop_params.get('validate_code', '').strip()
-
-
 class RegisterOpenApiView(APIView):
     permission_classes = ()
 
@@ -1725,8 +1682,8 @@ class BidHasBindingForChannel(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code, bid):
-        binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
-        if binding:
+        has_binding = has_binding_for_bid(channel_code, bid)
+        if has_binding:
             response_data = {
                 'ret_code': 10001,
                 'message': u'该bid已经绑定'
@@ -1735,6 +1692,24 @@ class BidHasBindingForChannel(APIView):
             response_data = {
                 'ret_code': 10000,
                 'message': u'该bid未绑定'
+            }
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class PhoneRegisterOrBindingDetectApi(APIView):
+    permission_classes = ()
+
+    def get(self, request, channel_code, phone):
+        if not has_binding_for_bid(channel_code, phone) or has_register_for_phone(phone):
+            response_data = {
+                'ret_code': 10001,
+                'message': u'该手机号已经被抢注'
+            }
+        else:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该手机号可以使用'
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')

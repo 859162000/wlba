@@ -46,7 +46,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                                  BidHasBindingForChannel)
+                            BidHasBindingForChannel, PhoneRegisterOrBindingDetectApi)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -309,4 +309,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
+)
+
+# 判断手机号是否已经绑定渠道或被注册
+urlpatterns += patterns(
+    '',
+    url(r'^phone_has_reg/(?P<channel_code>[a-z0-9A-Z_]*)/$', PhoneRegisterOrBindingDetectApi.as_view()),
 )
