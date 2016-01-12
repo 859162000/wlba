@@ -454,6 +454,16 @@ class CoopRegister(object):
         except:
             logger.exception('process after binding error for user %s' % user.id)
 
+    def process_for_clear_session(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.clear_session()
+        except Exception, e:
+            logger.exception('channel clear session error for user %s' % user.id)
+            logger.info(e)
+
 
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
@@ -1531,21 +1541,59 @@ class BaJinSheRegister(CoopRegister):
     def __init__(self, request):
         super(BaJinSheRegister, self).__init__(request)
         self.c_code = 'bajinshe'
-        self.coop_p_id_key = 'product_id'
-        self.p_id_key = 'product_id'
+        self.internal_channel_p_id_key = 'product_id'
+        self.external_channel_p_id_key = 'product_id'
+        self.external_channel_client_id_key = 'appid_id'
+        self.internal_channel_client_id_key = 'client_id'
+        self.external_channel_access_token_key = 'access_token'
+        self.internal_channel_access_token_key = 'access_token'
         self.external_channel_user_key = 'usn'
 
     def save_to_session(self):
-        super(BaJinSheRegister, self).save_to_session()
-        p_id = self.request.GET.get(self.coop_p_id_key, None)
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.POST.get(self.external_channel_user_key, None)
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+
+        p_id = self.request.POST.get(self.external_channel_p_id_key, None)
         if p_id:
-            self.request.session[self.p_id_key] = p_id
-            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+            self.request.session[self.internal_channel_p_id_key] = p_id
+
+        client_id = self.request.POST.get(self.external_channel_client_id_key, None)
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+        access_token = self.request.POST.get(self.external_channel_access_token_key, None)
+        if access_token:
+            self.request.session[self.internal_channel_access_token_key] = client_id
 
     def clear_session(self):
         super(BaJinSheRegister, self).clear_session()
-        self.request.session.pop(self.p_id_key, None)
+        self.request.session.pop(self.internal_channel_p_id_key, None)
+        self.request.session.pop(self.internal_channel_client_id_key, None)
+        self.request.session.pop(self.internal_channel_access_token_key, None)
 
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len:
+            has_binding = Binding.objects.filter(btype=channel_name, bid=channel_user).exists()
+            if not has_binding:
+                binding = Binding()
+                binding.user = user
+                binding.btype = channel_name
+                binding.bid = channel_user
+                binding.save()
+                # logger.debug('save user %s to binding'%user)
 
 
 # 注册第三方通道

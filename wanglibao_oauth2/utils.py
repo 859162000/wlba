@@ -3,11 +3,17 @@ import shortuuid
 from datetime import datetime, tzinfo
 from django.conf import settings
 from django.utils import dateparse
+from django.utils.translation import ugettext as _
 from django.db.models.fields import (DateTimeField, DateField,
                                      EmailField, TimeField,
                                      FieldDoesNotExist)
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth import get_user_model
 from .constants import EXPIRE_DELTA
+from .backends import AccessTokenBackend
+
+User = get_user_model()
+
 
 try:
     import json
@@ -85,3 +91,18 @@ def deserialize_instance(model, data={}):
                 pass
         setattr(ret, k, v)
     return ret
+
+
+def oauth_token_login(phone, client_id, token):
+    response_data = {}
+    user = User.object.filter(user__wanglibaouserprofile__phone=phone).first()
+    if user:
+        user = AccessTokenBackend().authenticate(token, client_id, user.id)
+        if user and user.is_authenticated():
+            response_data = {'code': '10000',
+                             'message': _('ok')}
+    else:
+        response_data = {'code': '10210',
+                         'message': _('Token error')}
+
+    return response_data

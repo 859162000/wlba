@@ -288,6 +288,7 @@ def landpage_view(request):
                     logger.exception('process for %s landpage error' % channel_code)
                     logger.info(e)
 
+        # 判断是否属于交易操作
         if action and action in ['purchase', 'deposit', 'withdraw']:
             if action == 'purchase':
                 product_id = request.session.get('product_id', '')
@@ -298,19 +299,23 @@ def landpage_view(request):
             elif action == 'withdraw':
                 url = reverse('withdraw')
 
-            phone = request.session.get('channel_user', None)
-            if phone:
-                phone_has_register = WanglibaoUserProfile.objects.filter(phone=phone).exists()
-            else:
-                phone_has_register = False
+            # 判断用户是否为登录状态
+            if not request.user.is_authenticated():
+                # 判断手机号是否已经注册
+                phone = request.session.get('channel_user', None)
+                if phone:
+                    phone_has_register = WanglibaoUserProfile.objects.filter(phone=phone).exists()
+                else:
+                    phone_has_register = False
 
-            if phone_has_register:
-                if not request.user.is_authenticated():
+                # 如果手机号还未被注册，则引导用户注册，否则，引导用户登录
+                if phone_has_register:
                     url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
-            else:
-                url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
+                else:
+                    url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
         else:
             url = reverse(activity_page) + "?promo_token=" + channel_code
+
     return HttpResponseRedirect(url)
 
 

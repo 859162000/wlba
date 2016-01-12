@@ -2,11 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import re
+import logging
+import requests
 import hashlib
 import datetime
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
+from django.core.urlresolvers import reverse
+from wanglibao_oauth2.views import oauth_token_login
+
+logger = logging.getLogger(__name__)
 
 
 def search(client, string):
@@ -109,3 +115,15 @@ def process_for_fuba_landpage(request, channel_code):
                 return
         else:
             redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
+
+
+def process_for_bajinshe_landpage(request, channel_code):
+    phone = request.session.get('phone', None)
+    client_id = request.session.get('client_id', None)
+    access_token = request.session.get('access_token', None)
+
+    if phone and client_id and access_token:
+        try:
+            oauth_token_login(phone, client_id, access_token)
+        except Exception, e:
+            logger.info('internal request oauth failed with error %s' % e)

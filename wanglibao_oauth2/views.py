@@ -16,8 +16,7 @@ from . import AccessTokenBaseView
 from .models import AccessToken
 from .models import RefreshToken
 from .forms import RefreshTokenGrantForm, UserAuthForm
-from .utils import now
-from .backends import AccessTokenBackend
+from .utils import now, oauth_token_login
 import constants
 
 logger = logging.getLogger(__name__)
@@ -127,19 +126,11 @@ class TokenLoginOpenApiView(APIView):
 
     def post(self, request):
         data = request.POST
-        token = data.get('token', '').strip()
+        token = data.get('access_token', '').strip()
         client_id = data.get('client_id', '').strip()
-        user_id = data.get('user_id', '').strip()
+        phone = data.get('phone', '').strip()
 
-        user = AccessTokenBackend().authenticate(token, client_id, user_id)
-
-        if user and user.is_authenticated():
-            response_data = {'code': '10000',
-                             'message': _('ok')}
-
-        else:
-            response_data = {'code': '10210',
-                             'message': _('Token error')}
+        response_data = oauth_token_login(phone, client_id, token)
 
         return HttpResponse(renderers.JSONRenderer().render(response_data,
                                                             'application/json'))
