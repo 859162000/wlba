@@ -133,7 +133,7 @@ urlpatterns = patterns(
     url(r'^manual_modify/vali_acc_info/$', login_required(ValidateAccountInfoTemplate.as_view(template_name=""), login_url='/accounts/login/')),
     url(r'^manual_modify/phone/$', ManualModifyPhoneTemplate.as_view()),
     url(r'^sms_modify/vali_acc_info/$', login_required(SMSModifyPhoneValidateTemplate.as_view(template_name=""), login_url='/accounts/login/')),
-    url(r'^sms_modify/phone/$', login_required(SMSModifyPhoneTemplate.as_view(template_name=""), login_url='/accounts/login/'))
+    url(r'^sms_modify/phone/$', login_required(SMSModifyPhoneTemplate.as_view(template_name="sms_modify_phone.jade"), login_url='/accounts/login/'))
 )
 
 if settings.DEBUG:
