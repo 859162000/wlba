@@ -2269,6 +2269,28 @@ class ValidateAccountInfoAPI(APIView):
         return Response(status=400)
 
 class SMSModifyPhoneValidateTemplate(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        return {
+            "phone": profile.phone,
+            }
+
+class SMSModifyPhoneValidateAPI(APIView):
+
+    pass
+
+class SMSModifyPhoneTemplate(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        return {
+            "new_phone": profile.phone,
+            }
+
+class SMSModifyPhoneAPI(APIView):
     pass
 
 

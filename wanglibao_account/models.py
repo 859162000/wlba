@@ -221,6 +221,8 @@ class UserPhoneBook(models.Model):
 
 class ManualModifyPhoneRecord(models.Model):
     STATUS_CHOICES = (
+        (u"短信修改提交", u"短信修改提交"),
+        (u"短信修改成功", u"短信修改成功"),
         (u"初审中",   u"初审中"),
         (u"初审待定", u"初审待定"),
         (u"初审驳回", u"初审驳回"),
