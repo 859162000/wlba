@@ -1152,6 +1152,8 @@ WLB_FOR_YZCJ_KEY = '2005'
 YZCJ_COOP_KEY = 'yzcj_2005'
 YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
+# 八金社
+BAJINSHE_CHANNEL_CODE = 'bajinshe'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:

@@ -20,6 +20,7 @@ from wanglibao_rest import utils as rest_utils
 import logging
 from weixin.base import ChannelBaseTemplate
 from rest_framework.views import APIView
+from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -274,6 +275,7 @@ def landpage_view(request):
     """
     request_data = request.GET
     channel_code = request_data.get('promo_token', None)
+    action = request_data.get('action', None)
     url = reverse('index')
     if channel_code:
         activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
@@ -286,7 +288,29 @@ def landpage_view(request):
                     logger.exception('process for %s landpage error' % channel_code)
                     logger.info(e)
 
-        url = reverse(activity_page) + "?promo_token=" + channel_code
+        if action and action in ['purchase', 'deposit', 'withdraw']:
+            if action == 'purchase':
+                product_id = request.session.get('product_id', '')
+                if product_id:
+                    url = reverse('p2p detail', kwargs={'id': product_id})
+            elif action == 'deposit':
+                url = reverse('pay-banks')
+            elif action == 'withdraw':
+                url = reverse('withdraw')
+
+            phone = request.session.get('channel_user', None)
+            if phone:
+                phone_has_register = WanglibaoUserProfile.objects.filter(phone=phone).exists()
+            else:
+                phone_has_register = False
+
+            if phone_has_register:
+                if not request.user.is_authenticated():
+                    url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
+            else:
+                url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
+        else:
+            url = reverse(activity_page) + "?promo_token=" + channel_code
     return HttpResponseRedirect(url)
 
 
@@ -320,5 +344,3 @@ class BaiduFinanceView(ChannelBaseTemplate):
         })
         return context
 
-
-class LandPageOpenApi(APIView):

@@ -1527,6 +1527,27 @@ class YZCJRegister(CoopRegister):
                     kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
+class BaJinSheRegister(CoopRegister):
+    def __init__(self, request):
+        super(BaJinSheRegister, self).__init__(request)
+        self.c_code = 'bajinshe'
+        self.coop_p_id_key = 'product_id'
+        self.p_id_key = 'product_id'
+        self.external_channel_user_key = 'usn'
+
+    def save_to_session(self):
+        super(BaJinSheRegister, self).save_to_session()
+        p_id = self.request.GET.get(self.coop_p_id_key, None)
+        if p_id:
+            self.request.session[self.p_id_key] = p_id
+            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def clear_session(self):
+        super(BaJinSheRegister, self).clear_session()
+        self.request.session.pop(self.p_id_key, None)
+
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
@@ -1534,7 +1555,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister,]
+                          YZCJRegister, RockFinanceRegister, BaJinSheRegister,]
 
 #######################第三方用户查询#####################
 
