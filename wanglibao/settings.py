@@ -1152,8 +1152,7 @@ YZCJ_COOP_KEY = 'yzcj_2005'
 if ENV == ENV_PRODUCTION:
     YZCJ_CALL_BACK_URL = 'http://www.asiafinance.cn/wanglibaoBg.jspx'
 else:
-    YZCJ_CALL_BACK_URL = 'http://www.asiafinance.cn/wanglibaoBg.jspx'
-    # YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
+    YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表
