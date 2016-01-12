@@ -2235,11 +2235,6 @@ class ManualModifyPhoneAPI(APIView):
         return Response({'ret_code': 0})
 
 
-
-class EditProfileTemplateView(TemplateView):
-    template_name = 'account_safe.jade'
-
-
 class IdentityInformationTemplate(TemplateView):
     template_name = ''
 
@@ -2272,6 +2267,12 @@ class ValidateAccountInfoAPI(APIView):
             print '----------------------'
             return Response({'ret_code': 0})
         return Response(status=400)
+
+class SMSModifyPhoneValidateTemplate(TemplateView):
+    pass
+
+
+
 
 
 
