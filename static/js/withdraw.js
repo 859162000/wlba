@@ -359,11 +359,11 @@
         type: "POST",
         data: dataStr
       }).success(function(xhr) {
-        tool.modalAlert({
+        return tool.modalAlert({
           title: '温馨提示',
-          msg: xhr.message
+          msg: xhr.message,
+          callback_ok: _showModal
         });
-        return location.reload();
       });
     });
 
