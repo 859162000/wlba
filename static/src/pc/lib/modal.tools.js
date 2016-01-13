@@ -4,7 +4,7 @@
     var alertOption, alert_container_id, confirmOption, confirm_container_id, init, initAlert, initConfirm, modalAlert, modalConfirm, modal_container;
     alert_container_id = 'alert-container-id';
     confirm_container_id = 'confirm-container-id';
-    modal_container = 'modal-container';
+    modal_container = 'modal-containerNew';
     confirmOption = null;
     alertOption = null;
     initAlert = function() {

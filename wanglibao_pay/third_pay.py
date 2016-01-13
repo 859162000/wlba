@@ -304,31 +304,31 @@ def card_bind_list(request):
         return {"ret_code": 20071, "message": "请先进行实名认证"}
 
     try:
-        # # 查询易宝已经绑定卡
-        # res = YeeShortPay().bind_card_query(user=user)
-        # if res['ret_code'] not in (0, 20011): return res
-        # if 'data' in res and 'cardlist' in res['data']:
-        #     yee_card_no_list = []
-        #     for car in res['data']['cardlist']:
-        #         card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
-        #         if card:
-        #             yee_card_no_list.append(card.no)
-        #     # if yee_card_no_list:
-        #     #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
-        #     #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
-        #
-        # # 查询块钱已经绑定卡
-        # res = KuaiShortPay().query_bind_new(user.id)
-        # if res['ret_code'] != 0: return res
-        # if 'cards' in res:
-        #     kuai_card_no_list = []
-        #     for car in res['cards']:
-        #         card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
-        #         if card:
-        #             kuai_card_no_list.append(card.no)
-        #     if kuai_card_no_list:
-        #         Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
-        #         Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
+        # 查询易宝已经绑定卡
+        res = YeeShortPay().bind_card_query(user=user)
+        if res['ret_code'] not in (0, 20011): return res
+        if 'data' in res and 'cardlist' in res['data']:
+            yee_card_no_list = []
+            for car in res['data']['cardlist']:
+                card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
+                if card:
+                    yee_card_no_list.append(card.no)
+            # if yee_card_no_list:
+            #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+            #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+
+        # 查询块钱已经绑定卡
+        res = KuaiShortPay().query_bind_new(user.id)
+        if res['ret_code'] != 0: return res
+        if 'cards' in res:
+            kuai_card_no_list = []
+            for car in res['cards']:
+                card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
+                if card:
+                    kuai_card_no_list.append(card.no)
+            if kuai_card_no_list:
+                Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
+                Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
 
         card_list = []
         cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行']).filter(Q(user=user),
@@ -591,12 +591,42 @@ def bind_pay_dynnum(request):
     if res.get('ret_code') == 0:
         if set_the_one_card:
             TheOneCard(request.user).set(card.id)
-        try:
-            CoopRegister(request).process_for_binding_card(user)
-        except:
-            logger.exception('bind_card_callback_failed for %s' % str(user))
+    # # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
+    # try:
+    #     bind_flag = 0
+    #     if (card.bank.channel == 'kuaipay' and res.get('ret_code') == 0) or (
+    #                     card.bank.channel == 'yeepay' and res.get('ret_code') == 22000):
+    #         bind_flag = 1;
+    #     else:
+    #         card = Card.objects.filter(user=user, id=card.id).first()
+    #         if card and (card.is_bind_huifu or card.is_bind_kuai or card.is_bind_yee):
+    #             logger.error('=20151224= deposit failed but binding success: [%s] [%s]' % (card.user, card.no))
+    #             bind_flag = 1;
+    #     if bind_flag == 1:
+    #         CoopRegister(request).process_for_binding_card(user)
+    # except Exception, ex:
+    #     logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card_no, ex))
+    process_for_bind_card(user, card, res, request)
 
     return res
+
+
+def process_for_bind_card(user, card, req_res, request):
+        # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
+    try:
+        bind_flag = 0
+        if (card.bank.channel == 'kuaipay' and req_res.get('ret_code') == 0) or (
+                        card.bank.channel == 'yeepay' and req_res.get('ret_code') == 22000):
+            bind_flag = 1;
+        else:
+            card = Card.objects.filter(user=user, id=card.id).first()
+            if card and (card.is_bind_huifu or card.is_bind_kuai or card.is_bind_yee):
+                logger.error('=20151224= deposit failed but binding success: [%s] [%s]' % (card.user, card.no))
+                bind_flag = 1;
+        if bind_flag == 1:
+            CoopRegister(request).process_for_binding_card(user)
+    except Exception, ex:
+        logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card.no, ex))
 
 
 def yee_callback(request):

@@ -9,12 +9,20 @@ from wanglibao_account import message as inside_message
 from wanglibao_sms.tasks import send_messages
 from order.utils import OrderHelper
 from dateutil.relativedelta import relativedelta
+from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
+from weixin.models import WeixinUser
+from weixin.tasks import sentTemplate
+
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import Sum
 from decimal import *
 from exceptions import PrepaymentException
 import pytz
+import json
+from datetime import datetime
+
+
 
 REPAYMENT_MONTHLY = 'monthly'
 REPAYMENT_DAILY = 'daily'
@@ -103,6 +111,24 @@ class PrepaymentHistory(object):
                     "content": content,
                     "mtype": "amortize"
                 })
+                try:
+                    weixin_user = WeixinUser.objects.filter(user=user_amortization.user).first()
+        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
+
+                    if weixin_user and weixin_user.subscribe:
+                        now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+                        sentTemplate.apply_async(kwargs={
+                                        "kwargs":json.dumps({
+                                                        "openid": weixin_user.openid,
+                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                                        "keyword1": product.name,
+                                                        "keyword2": "%s 元"%str(amo_amount),
+                                                        "keyword3": now,
+                                                            })},
+                                                        queue='celery02')
+
+                except Exception,e:
+                    pass
 
             amortization_records.append(product_record)
 
@@ -119,7 +145,6 @@ class PrepaymentHistory(object):
                 "phones": phone_list,
                 "messages": message_list
             })
-
         return product_record
 
     def get_product_amortization(self, payment_date):

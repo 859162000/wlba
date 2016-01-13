@@ -276,6 +276,9 @@ class P2PProductForm(forms.ModelForm):
             if self.cleaned_data.get('expected_earning_rate') == float(0):
                 raise forms.ValidationError(u'支付方式为等额本息时, 预期收益(%)必须大于零')
 
+        if self.cleaned_data.get('end_time') <= self.cleaned_data.get('publish_time'):
+            raise forms.ValidationError(u'截止时间不能小于等于发布时间')
+
 #        if self.cleaned_data['status'] == u'正在招标':
 #
 #            pa = ProductAmortization.objects.filter(product__version=self.cleaned_data['version'])

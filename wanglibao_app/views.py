@@ -194,9 +194,11 @@ class AppRepaymentPlanAllAPIView(APIView):
                 user_amortizations = paginator.page(paginator.num_pages)
 
             amo_list = _user_amortization_list(user_amortizations)
+            count = paginator.num_pages
         else:
             amo_list = []
-        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
+            count = 0
+        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize, 'count': count})
 
 
 class AppRepaymentPlanMonthAPIView(APIView):
@@ -211,7 +213,9 @@ class AppRepaymentPlanMonthAPIView(APIView):
         request_month = request.DATA.get('month', '')
         year = request_year if request_year else now.year
         month = request_month if request_month else now.month
-        current_month = '{}-{}'.format(now.year, now.month)
+        # current_month = '{}-{}'.format(now.year, now.month)
+        current_month = now.strftime('%Y-%m')
+
 
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
         if int(month) == 12:
@@ -331,15 +335,37 @@ class AppSecureView(TemplateView):
 class AppExploreView(TemplateView):
     """ app发现页面 """
 
-    template_name = 'client_discover.jade'
+    # template_name = 'client_discover.jade'
+    #
+    # def get_context_data(self, **kwargs):
+    #     #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
+    #     banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
+    #     return {
+    #         'banner': banner,
+    #     }
+
+
+    template_name = 'client_area.jade'
 
     def get_context_data(self, **kwargs):
-        #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
-        banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
-        return {
-            'banner': banner,
-        }
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
+                                                    is_app=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now()
+                                                    ).select_related('activity')
 
+        limit = 6
+        page = 1
+
+        activity_list = get_sorts_for_activity_show(activity_list)
+
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
+
+        return {
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page
+        }
 
 class AppManagementView(TemplateView):
     """ app管理团队 """
@@ -355,7 +381,7 @@ class AppP2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         qs = super(AppP2PProductViewSet, self).get_queryset()
@@ -814,6 +840,7 @@ class AppCostView(TemplateView):
 
 
 class AppAreaView(TemplateView):
+    """ 最新活动 """
     template_name = 'client_area.jade'
 
     def get_context_data(self, **kwargs):
@@ -835,7 +862,6 @@ class AppAreaView(TemplateView):
             'all_page': all_page,
             'page': page
         }
-
 
 class AppAreaApiView(APIView):
     permission_classes = ()
@@ -904,6 +930,10 @@ class AppMemorabiliaView(APIView):
             'list_count': data_count
         })
 
+class AppDataModuleView(TemplateView):
+
+    """ 数据魔方 """
+    template_name = 'client_data_cube.jade'
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'
