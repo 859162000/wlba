@@ -605,7 +605,7 @@ class WeixinShareEndView(TemplateView):
                               "name": weixins[key].nickname,
                               "img": weixins[key].headimgurl,
                               "message": self.get_react_text(index),
-                              "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
+                              "sort_by": user_info[key].id})
             index += 1
 
         tmp_dict = {item["sort_by"]: item for item in ret_value}
