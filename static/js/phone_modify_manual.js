@@ -136,6 +136,18 @@
                 return true;
             }
 
+        $('.get_code').click(function(){
+            var phone = $('.input_phone');
+            alert(phone.val());
+            $.ajax({
+                url: '/api/phone_validation_code/' + phone.val() + '/',
+                type: 'POST',
+                success: function (xhr) {
+
+            }});
+        })
+
+
         $('.button').click(function(){
             alert(id_front_image);
             alert(id_back_image);
