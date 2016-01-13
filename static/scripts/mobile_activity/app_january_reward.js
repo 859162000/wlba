@@ -236,7 +236,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             mixins.sendUserInfo(function(data) {
 				if (data.ph == '') {
                     $('#go_experience').click(function() {
-					   mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
+					   mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/account/'});
 					})
                 } else {
                     $('#go_experience').click(function() {
@@ -277,7 +277,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				ele.removeClass('down');
 			});
 		}
-	})
+	});
 	$('#see_rule_2').on('click',function(){
 		var ele = $('.rule_wrap_2');
 		var curHeight = ele.height();

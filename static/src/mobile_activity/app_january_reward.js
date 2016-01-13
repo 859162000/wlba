@@ -17,7 +17,7 @@
             mixins.sendUserInfo(function(data) {
 				if (data.ph == '') {
                     $('#go_experience').click(function() {
-					   mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
+					   mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/account/'});
 					})
                 } else {
                     $('#go_experience').click(function() {
@@ -58,7 +58,7 @@
 				ele.removeClass('down');
 			});
 		}
-	})
+	});
 	$('#see_rule_2').on('click',function(){
 		var ele = $('.rule_wrap_2');
 		var curHeight = ele.height();
