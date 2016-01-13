@@ -10,11 +10,13 @@ from wanglibao_p2p.models import P2PRecord
 USER_TYPE = (
     ('0', u'正常用户'),
     ('1', u'渠道用户'),
-    ('2', u'经纪人')
+    ('2', u'经纪人'),
+    ('3', u'企业用户'),
 )
 
+
 class WanglibaoUserProfile(models.Model):
-    #user = models.OneToOneField(get_user_model(), primary_key=True)
+    # user = models.OneToOneField(get_user_model(), primary_key=True)
     user = models.OneToOneField(User, primary_key=True)
 
     frozen = models.BooleanField(u'冻结状态', default=False)
@@ -60,6 +62,7 @@ class WanglibaoUserProfile(models.Model):
             is_invested = True
         return is_invested
 
+
 def create_profile(sender, **kw):
     """
     Create the user profile when a user object is created
@@ -69,5 +72,5 @@ def create_profile(sender, **kw):
         profile = WanglibaoUserProfile(user=user)
         profile.save()
 
-#post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
+# post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
 post_save.connect(create_profile, sender=User, dispatch_uid="users-profile-creation-signal")

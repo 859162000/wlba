@@ -70,6 +70,34 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       trade_pwd:
         required: '请输入交易密码'
 
+  if $('#id-is-valid').attr('data-type') == 'qiye'
+    if $('#id-is-valid').val() == 'False'
+      $.ajax {
+        url: '/qiye/profile/exists/'
+        data: {
+        }
+        type: 'GET'
+      }
+      .done (data)->
+        if data.ret_code == 10000
+          $.ajax {
+            url: '/qiye/profile/get/'
+            data: {
+            }
+            type: 'GET'
+          }
+          .done (data)->
+            if data.data.status != '审核通过'
+              $('.verifyHref').attr('href','/qiye/profile/edit/')
+      .fail (data)->
+        $('.verifyHref').attr('href','/qiye/info/')
+
+      $('#id-validate').modal()
+      return
+  else
+    if $('#id-is-valid').val() == 'False'
+      $('#id-validate').modal()
+      return
 
   $('.ispan4-omega').click () ->
     $('.code-img-error').html('')

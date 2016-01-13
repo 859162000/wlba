@@ -1378,6 +1378,7 @@ def ajax_register(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
+                user_type = form.cleaned_data.get('user_type', '0')
 
                 if request.POST.get('IGNORE_PWD', '') and not password:
                     password = generate_random_password(6)
@@ -1385,9 +1386,12 @@ def ajax_register(request):
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
-                user = create_user(identifier, password, nickname)
+                user = create_user(identifier, password, nickname, user_type)
                 if not user:
                     return HttpResponse(messenger('error'))
+
+                if user_type == '3':
+                    invitecode = 'qyzh'
 
                 # 处理第三方渠道的用户信息
                 CoopRegister(request).all_processors_for_user_register(user, invitecode)
@@ -1611,6 +1615,9 @@ class IdVerificationView(TemplateView):
 
     def form_valid(self, form):
         user = self.request.user
+        # add by ChenWeiBin@2010105
+        if user.wanglibaouserprofile.utype == '3':
+            return {"ret_code": 30056, "message": u"企业用户无法通过此方式认证"}
 
         user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
         user.wanglibaouserprofile.name = form.cleaned_data.get('name')
