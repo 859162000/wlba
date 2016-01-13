@@ -90,10 +90,6 @@
         }
       }
     });
-<<<<<<< HEAD
-    $('.ispan4-omega').click(function() {
-      $('.code-img-error').html('');
-=======
     if ($('#id-is-valid').attr('data-type') === 'qiye') {
       if ($('#id-is-valid').val() === 'False') {
         $.ajax({
@@ -124,9 +120,8 @@
         return;
       }
     }
-    $('#button-get-code-btn').click(function() {
-      var url;
->>>>>>> qiye_investment
+    $('.ispan4-omega').click(function() {
+      $('.code-img-error').html('');
       $('#img-code-div2').modal();
       $('#img-code-div2').find('#id_captcha_1').val('');
       return _refreshCode();

@@ -337,21 +337,21 @@
       } else {
         if ($('#id-is-valid').val() === 'False') {
           $('#id-validate').modal();
+          $.ajax({
+            url: "/api/profile/",
+            type: "GET",
+            data: {}
+          }).success(function(data) {
+            if (data.is_mainland_user === false) {
+              $('#goPersonalInfo').attr({
+                'data-type': 'special'
+              });
+              return $('#goPersonalInfo').text('绑定银行卡');
+            }
+          });
           return;
         }
       }
-      $.ajax({
-        url: "/api/profile/",
-        type: "GET",
-        data: {}
-      }).success(function(data) {
-        if (data.is_mainland_user === false) {
-          $('#goPersonalInfo').attr({
-            'data-type': 'special'
-          });
-          return $('#goPersonalInfo').text('绑定银行卡');
-        }
-      });
       e.preventDefault();
       $('.banks-list,.bankManage').hide();
       return $('#chooseBank,.bankTitle').show();
