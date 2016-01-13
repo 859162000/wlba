@@ -19,6 +19,7 @@ from hashlib import md5
 from rest_framework.authtoken.models import Token
 from marketing.models import LoginAccessToken
 from django.conf import settings
+from wanglibao_profile.models import USER_TYPE
 
 User = get_user_model()
 
@@ -43,6 +44,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     invitecode = forms.CharField(label="Invitecode", required=False)
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    user_type = forms.CharField(label="User type", required=False)
 
     MlGb = forms.CharField(label='MlGb', required=False)
     _flag = False
@@ -182,6 +184,12 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             code='validate_code_error',
                         )
         return self.cleaned_data
+
+    def clean_user_type(self):
+        user_type = self.cleaned_data.get('user_type') or '0'
+        if user_type.isdigit():
+            if user_type in [i for i, j in USER_TYPE]:
+                return user_type
 
 
 def verify_captcha(dic, keep=False):

@@ -59,7 +59,7 @@
         url: "/api/fee/",
         type: "POST",
         data: {
-          card_id: $('select[name=card_id]').val(),
+          card_id: $('.bindingCard').attr('id'),
           amount: amount
         }
       }).success(function(xhr) {

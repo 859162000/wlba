@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import logging
@@ -13,6 +12,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponseBadRequest
 from django.template.loader import get_template
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -28,6 +28,7 @@ from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.models import IdVerification
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.exceptions import ThirdPayError, ManyCardException, AbnormalCardException
@@ -39,6 +40,7 @@ from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
+from wanglibao_pay.third_pay import TheOneCard
 from wanglibao_pay.third_pay import process_for_bind_card
 from wanglibao_pay.util import get_client_ip, fmt_two_amount
 from wanglibao_pay import util
@@ -513,6 +515,11 @@ class CardViewSet(ModelViewSet):
                                 "message": u"没有找到该银行",
                                 'error_number': ErrorNumber.not_find
                             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # passport user
+        if not request.user.wanglibaouserprofile.id_number[0].isdigit():
+            card.is_bind_yee = True
+	    card.is_bind_kuai = True
 
         card.save()
 
@@ -1223,3 +1230,41 @@ class YeeShortPayCallbackView(APIView):
         request.GET = request.DATA
         result = third_pay.yee_callback(request)
         return Response(result)
+
+class UnbindCardTemplateView(TemplateView):
+    """
+    同卡进出，提供给客服的解绑页面
+    """
+    template_name = 'unbind_card.jade'
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone')
+        if not phone:
+            return {'phone': None}
+
+        #解绑
+        profile = WanglibaoUserProfile.objects.get(phone=phone)
+        the_one_card = TheOneCard(profile.user)
+        if self.request.GET.get('unbind'):
+            the_one_card.unbind()
+
+        #返回用户名，电话，身份证，发卡行，卡号，有图像返回图像
+        try:
+            card = the_one_card.get()
+            card_number = card.no
+            bank_name = card.bank.name
+        except:
+            card_number = None
+            bank_name = None
+        try:
+            avatar_url = IdVerification.objects.filter(id_number=profile.id_number).first().id_photo.url
+        except:
+            avatar_url = None
+
+        print avatar_url
+        return {'name': profile.name, 'phone': profile.phone, 'social_id': profile.id_number,
+                'bank_name': bank_name, 'card_number': card_number, 'avatar_url': avatar_url}
+
+
+
+

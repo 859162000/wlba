@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
+    'wanglibao_qiye', #add by wangxiaoqing
     'report',
     'misc',
 
@@ -806,8 +807,8 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
-    CALLBACK_HOST = 'https://staging.wanglibao.com'
-    STATIC_FILE_HOST = 'https://staging.wanglibao.com'
+    CALLBACK_HOST = 'https://feature1.wanglibao.com'
+    STATIC_FILE_HOST = 'https://feature1.wanglibao.com'
     # MER_ID = '510743'
     # CUSTOM_ID = '000010124821'
     # huifu id 改为和生产相同

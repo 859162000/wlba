@@ -2,7 +2,14 @@
 # encoding:utf-8
 
 import sys
+from django.http.response import Http404
+from rest_framework.exceptions import APIException
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
+from rest_framework.views import APIView
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_pay.serializers import CardSerializer
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -343,7 +350,8 @@ def card_bind_list(request):
                     'bank_id': card.bank.code,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
-                    'storable_no': card.no[:6] + card.no[-4:]
+                    'storable_no': card.no[:6] + card.no[-4:],
+                    'is_the_one_card': card.is_the_one_card,
                 }
 
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
@@ -459,6 +467,9 @@ def bind_pay_deposit(request):
     ip = util.get_client_ip(request)
 
     user = request.user
+    if user.wanglibaouserprofile.utype == '3':
+        return {"ret_code": 30059, "message": u"企业用户无法请求该接口"}
+
     if not user.wanglibaouserprofile.id_is_valid:
         return {"ret_code":20111, "message":"请先进行实名认证"}
 
@@ -543,6 +554,7 @@ def bind_pay_dynnum(request):
     token = request.DATA.get("token", "").strip()
     vcode = request.DATA.get("vcode", "").strip()
     input_phone = request.DATA.get("phone", "").strip()
+    set_the_one_card = request.DATA.get('set_the_one_card', '').strip()
     device = split_ua(request)
     ip = util.get_client_ip(request)
 
@@ -576,6 +588,9 @@ def bind_pay_dynnum(request):
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
+    if res.get('ret_code') == 0:
+        if set_the_one_card:
+            TheOneCard(request.user).set(card.id)
     # # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
     # try:
     #     bind_flag = 0
@@ -616,3 +631,96 @@ def process_for_bind_card(user, card, req_res, request):
 
 def yee_callback(request):
     return YeeShortPay().pay_callback(request)
+
+
+
+#######################################同卡进出 start###############################
+class ParaException(APIException):
+    status_code = 401
+    default_detail = '参数错误'
+
+class CardNotFoundException(APIException):
+    status_code = 403
+    default_detail = '未发现唯一绑定卡片'
+
+class CardExistException(APIException):
+    status_code = 405
+    default_detail = '不能重复绑卡'
+
+
+class TheOneCard(object):
+    def __init__(self, user):
+        self.user = user
+
+    def get(self):
+        """
+        获取用户绑定的唯一进出卡
+        :return:
+        """
+        try:
+            return Card.objects.get(user=self.user, is_the_one_card=True)
+        except:
+            raise CardNotFoundException
+
+    def set(self, card_id):
+        """
+        将一张已经绑定的卡设置为唯一进出卡
+        :param card_id: 卡在数据库中的ID，不是卡号
+        :return:
+        """
+        if Card.objects.filter(user=self.user, is_the_one_card=True).count() > 0:
+            raise CardExistException
+
+        try:
+            card = Card.objects.filter(Q(is_bind_kuai=True)|Q(is_bind_yee=True)).get(user=self.user, pk=card_id)
+        except:
+            raise CardNotFoundException
+
+        card.is_the_one_card = True
+        card.save()
+
+    def unbind(self):
+        """
+        这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
+        :return:
+        """
+        card = self.get()
+        card.is_the_one_card = False
+        card.save()
+
+
+
+class TheOneCardAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        card = TheOneCard(request.user).get()
+        serializer = CardSerializer(card)
+        return Response(serializer.data)
+
+    def put(self, request):
+        """
+        将一张现有的卡设置为唯一进出卡
+        :param request:
+        :param card_id:
+        :return:
+        """
+        try:
+            card_id = int(request.DATA.get('card_id'))
+        except:
+            raise ParaException('卡号错误')
+
+        TheOneCard(request.user).set(card_id)
+        return Response({'status_code': 0})
+
+    def delete(self, request):
+        """
+        这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
+        :param request:
+        :param card_id:
+        :return:
+        """
+        TheOneCard(request.user).unbind()
+        return Response({'status_code': 0})
+
+#######################################同卡进出 end###############################

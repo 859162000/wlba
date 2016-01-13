@@ -12,7 +12,7 @@ from decimal import Decimal
 
 class Bank(models.Model):
     name = models.CharField(verbose_name=u'银行', max_length=32)
-    gate_id = models.CharField(max_length=8, verbose_name=u'gate id')
+    gate_id = models.CharField(max_length=8, unique=True, verbose_name=u'gate id')
     code = models.CharField(max_length=16, verbose_name=u'银行代码')
     limit = models.TextField(blank=True, verbose_name=u'汇付网银银行限额信息')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
@@ -27,6 +27,7 @@ class Bank(models.Model):
     yee_bind_code = models.CharField(max_length=20, verbose_name=u'易宝侧银行代码', blank=True, default="")
     # 提现限额:min_amount=50,max_amount=50000
     withdraw_limit = models.CharField(max_length=500, blank=True, verbose_name=u"银行提现限额", default="")
+    have_company_channel = models.BooleanField(u"是否对公", default=False)
 
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
@@ -77,6 +78,8 @@ class Card(models.Model):
     is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
     last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
     yee_bind_id = models.CharField(max_length=50, verbose_name=u'易宝帮卡id', blank=True, default="")
+    # 同卡进出
+    is_the_one_card = models.BooleanField(verbose_name='是否为唯一进出卡片', default=False)
 
     class Meta:
         verbose_name_plural = "银行卡"

@@ -9,8 +9,23 @@ require.config(
 
 require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
-         'model/portfolio', 'tools', 'lib/jquery.number.min',
+         'model/portfolio', 'tools',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
+
+  #  判断是否是企业用户
+  $.ajax
+    url: "/qiye/profile/get/"
+    type: "GET"
+    data: {}
+  .fail (data) ->
+    result = JSON.parse(data.responseText);
+    if result.ret_code == 20001
+      $('#tyjzq').show()
+  .success (data) ->
+    $('#tyjzq').hide()
+    if data.ret_code == 10000
+      $('#qiyeUser i').text(data.data.company_name)
+
   class DataViewModel
     constructor: ->
       self = this
@@ -76,7 +91,7 @@ require ['jquery', 'underscore', 'knockout',
   viewModel = new DataViewModel()
   ko.applyBindings viewModel
 
-###  backend.fundInfo()
+  ###  backend.fundInfo()
   .done (data)->
     totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"])
     $("#total_asset").text($.number(totalAsset, 2))
