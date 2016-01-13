@@ -47,7 +47,8 @@ def detect(request):
 
 def _deposit_record(user, pagesize, pagenum):
     res = []
-    records = PayInfo.objects.filter(user=user, type="D").exclude(status=PayInfo.PROCESSING)[(pagenum-1)*pagesize:pagenum*pagesize]
+    records = PayInfo.objects.filter(user=user, type="D").select_related('user__margin')\
+                     .exclude(status=PayInfo.PROCESSING)[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
         obj = {
             "id": x.id,
@@ -55,7 +56,7 @@ def _deposit_record(user, pagesize, pagenum):
             "created_at": util.fmt_dt_normal(util.local_datetime(x.create_time)),
             "status": x.status,
             "channel": "APP",
-            "balance": x.margin_record.margin_current
+            "balance": x.user.margin.margin
         }
         if x.channel and x.channel == "huifu":
             obj['channel'] = "PC"
