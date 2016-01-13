@@ -19,10 +19,28 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'wanglibao_account', ['SMSModifyPhoneRecord'])
 
+        # Adding model 'ManualModifyPhoneRecord'
+        db.create_table(u'wanglibao_account_manualmodifyphonerecord', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('id_front_image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
+            ('id_back_image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
+            ('id_user_image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
+            ('new_phone', self.gf('django.db.models.fields.CharField')(max_length=64, blank=True)),
+            ('status', self.gf('django.db.models.fields.CharField')(default=u'\u521d\u5ba1\u4e2d', max_length=16, db_index=True)),
+            ('remarks', self.gf('django.db.models.fields.CharField')(max_length=64, blank=True)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('update_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+        ))
+        db.send_create_signal(u'wanglibao_account', ['ManualModifyPhoneRecord'])
+
 
     def backwards(self, orm):
         # Deleting model 'SMSModifyPhoneRecord'
         db.delete_table(u'wanglibao_account_smsmodifyphonerecord')
+
+        # Deleting model 'ManualModifyPhoneRecord'
+        db.delete_table(u'wanglibao_account_manualmodifyphonerecord')
 
 
     models = {
@@ -112,6 +130,7 @@ class Migration(SchemaMigration):
             'id_front_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'id_user_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'new_phone': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
+            'remarks': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "u'\\u521d\\u5ba1\\u4e2d'", 'max_length': '16', 'db_index': 'True'}),
             'update_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
@@ -135,7 +154,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.messagetext': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'MessageText'},
             'content': ('django.db.models.fields.TextField', [], {}),
-            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1452666309L', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1452677383L', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mtype': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})

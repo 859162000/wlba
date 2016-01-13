@@ -237,6 +237,7 @@ class ManualModifyPhoneRecord(models.Model):
     status = models.CharField(max_length=16, default=u'初审中', db_index=True,
                               choices=STATUS_CHOICES,
                               verbose_name=u'申请状态')
+    remarks = models.CharField(max_length=64, blank=True, help_text=u'客服在审核过程中的备注')
     created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
     update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
 
