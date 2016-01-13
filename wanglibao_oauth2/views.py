@@ -16,7 +16,8 @@ from . import AccessTokenBaseView
 from .models import AccessToken
 from .models import RefreshToken
 from .forms import RefreshTokenGrantForm, UserAuthForm
-from .utils import now, oauth_token_login
+from .utils import now
+from .tools import oauth_token_login
 import constants
 
 logger = logging.getLogger(__name__)

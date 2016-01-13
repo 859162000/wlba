@@ -8,7 +8,7 @@ import datetime
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
-from wanglibao_oauth2.views import oauth_token_login
+from wanglibao_oauth2.tools import oauth_token_login
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 

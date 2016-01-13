@@ -11,36 +11,20 @@ class Migration(SchemaMigration):
         # Adding model 'Client'
         db.create_table(u'wanglibao_oauth2_client', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='oauth2_client', null=True, to=orm['auth.User'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
-            ('redirect_uri', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
-            ('client_id', self.gf('django.db.models.fields.CharField')(default='8a62b06d6eb6e17c3b8d', max_length=255)),
-            ('client_secret', self.gf('django.db.models.fields.CharField')(default='27ae7459c57adf926a68a77a644b023479e304b7', max_length=255)),
-            ('client_type', self.gf('django.db.models.fields.IntegerField')()),
+            ('client_id', self.gf('django.db.models.fields.CharField')(default='4d5b7f13e1cbb1d94052', unique=True, max_length=255, db_index=True)),
+            ('client_secret', self.gf('django.db.models.fields.CharField')(default='c6bd4dff3669c62b7bebbcb82c02f62052636bfe', max_length=255)),
+            ('channel', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Channels'], null=True, blank=True)),
+            ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_oauth2', ['Client'])
-
-        # Adding model 'Grant'
-        db.create_table(u'wanglibao_oauth2_grant', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('client', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_oauth2.Client'])),
-            ('code', self.gf('django.db.models.fields.CharField')(default='0e2531381f41ebd9dfad305b8661df2a9ff41fa2', max_length=255)),
-            ('expires', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2015, 10, 20, 0, 0))),
-            ('redirect_uri', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('scope', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal(u'wanglibao_oauth2', ['Grant'])
 
         # Adding model 'AccessToken'
         db.create_table(u'wanglibao_oauth2_accesstoken', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('token', self.gf('django.db.models.fields.CharField')(default='5547a514e753eedb94a03000bccd88de8a8948bf', max_length=255, db_index=True)),
+            ('token', self.gf('django.db.models.fields.CharField')(default='e1e60b8e95c1ad4affe6071d21b9a6c60844a1e9', max_length=255, db_index=True)),
             ('client', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_oauth2.Client'])),
             ('expires', self.gf('django.db.models.fields.DateTimeField')()),
-            ('scope', self.gf('django.db.models.fields.IntegerField')(default=2)),
         ))
         db.send_create_signal(u'wanglibao_oauth2', ['AccessToken'])
 
@@ -48,7 +32,7 @@ class Migration(SchemaMigration):
         db.create_table(u'wanglibao_oauth2_refreshtoken', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('token', self.gf('django.db.models.fields.CharField')(default='0369bcd78ab90ac8ca416f7343b72300cf2d3d76', max_length=255)),
+            ('token', self.gf('django.db.models.fields.CharField')(default='5d51f26ef790a8f59fac7a5f6b93cb82c08b59fb', max_length=255)),
             ('access_token', self.gf('django.db.models.fields.related.OneToOneField')(related_name='refresh_token', unique=True, to=orm['wanglibao_oauth2.AccessToken'])),
             ('client', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_oauth2.Client'])),
             ('expired', self.gf('django.db.models.fields.BooleanField')(default=False)),
@@ -59,9 +43,6 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Deleting model 'Client'
         db.delete_table(u'wanglibao_oauth2_client')
-
-        # Deleting model 'Grant'
-        db.delete_table(u'wanglibao_oauth2_grant')
 
         # Deleting model 'AccessToken'
         db.delete_table(u'wanglibao_oauth2_accesstoken')
@@ -107,35 +88,37 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        u'marketing.channels': {
+            'Meta': {'object_name': 'Channels'},
+            'classification': ('django.db.models.fields.CharField', [], {'default': "'----'", 'max_length': '20'}),
+            'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '12', 'db_index': 'True'}),
+            'coop_status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '2'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50', 'blank': 'True'}),
+            'end_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
+            'is_abandoned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'merge_code': ('django.db.models.fields.CharField', [], {'max_length': '12', 'null': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20'}),
+            'platform': ('django.db.models.fields.CharField', [], {'default': "'full'", 'max_length': '20'}),
+            'start_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
+        },
         u'wanglibao_oauth2.accesstoken': {
             'Meta': {'object_name': 'AccessToken'},
             'client': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_oauth2.Client']"}),
             'expires': ('django.db.models.fields.DateTimeField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'scope': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
-            'token': ('django.db.models.fields.CharField', [], {'default': "'a5ab6324759f92b46e6909e900596a4a4010dc3d'", 'max_length': '255', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'7671b8c7c2be4744270fe7779afb8d9facddabc2'", 'max_length': '255', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'wanglibao_oauth2.client': {
             'Meta': {'object_name': 'Client'},
-            'client_id': ('django.db.models.fields.CharField', [], {'default': "'2436ca666dec38f0d018'", 'max_length': '255'}),
-            'client_secret': ('django.db.models.fields.CharField', [], {'default': "'27354a50291362d2c8ed45312befe0986b207e85'", 'max_length': '255'}),
-            'client_type': ('django.db.models.fields.IntegerField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'redirect_uri': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'oauth2_client'", 'null': 'True', 'to': u"orm['auth.User']"})
-        },
-        u'wanglibao_oauth2.grant': {
-            'Meta': {'object_name': 'Grant'},
-            'client': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_oauth2.Client']"}),
-            'code': ('django.db.models.fields.CharField', [], {'default': "'806afe87274f6f36b09393d290540f1d7240da02'", 'max_length': '255'}),
-            'expires': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 10, 20, 0, 0)'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'redirect_uri': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'scope': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+            'channel': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['marketing.Channels']", 'null': 'True', 'blank': 'True'}),
+            'client_id': ('django.db.models.fields.CharField', [], {'default': "'eb725bdd5c0a2fa52a17'", 'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'client_secret': ('django.db.models.fields.CharField', [], {'default': "'808cd0f0470e39b51503dfe0f3ad7822949c0683'", 'max_length': '255'}),
+            'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         u'wanglibao_oauth2.refreshtoken': {
             'Meta': {'object_name': 'RefreshToken'},
@@ -143,7 +126,7 @@ class Migration(SchemaMigration):
             'client': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_oauth2.Client']"}),
             'expired': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'token': ('django.db.models.fields.CharField', [], {'default': "'3870d013cc50543f523cff9e4164eef16b829764'", 'max_length': '255'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'7f2c43c4406b61e89427006d920448dcda49318d'", 'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         }
     }

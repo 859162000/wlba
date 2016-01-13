@@ -46,7 +46,7 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua, get_client_ip, has_binding_for_bid, has_register_for_phone
+from wanglibao_rest.utils import split_ua, get_client_ip, has_binding_for_bid
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
@@ -1701,13 +1701,16 @@ class PhoneRegisterOrBindingDetectApi(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code, phone):
-        if not has_binding_for_bid(channel_code, phone) or has_register_for_phone(phone):
+        user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+        if not has_binding_for_bid(channel_code, phone) and user:
             response_data = {
+                'user_id': user.id,
                 'ret_code': 10001,
                 'message': u'该手机号已经被抢注'
             }
         else:
             response_data = {
+                'user_id': None,
                 'ret_code': 10000,
                 'message': u'该手机号可以使用'
             }

@@ -38,7 +38,7 @@ class Client(models.Model):
     client_id = models.CharField(u'客户端ID', unique=True, db_index=True, max_length=255, default=short_token)
     client_secret = models.CharField(u'客户端密钥', max_length=255, default=long_token)
     channel = models.ForeignKey(Channels, verbose_name=u'渠道', help_text=u'渠道', blank=True, null=True)
-    reg_return_token = models.BooleanField(u'注册返回Token', default=False)
+    # reg_return_token = models.BooleanField(u'注册返回Token', default=False)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
 
     def __unicode__(self):

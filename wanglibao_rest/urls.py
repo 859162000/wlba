@@ -314,5 +314,5 @@ urlpatterns += patterns(
 # 判断手机号是否已经绑定渠道或被注册
 urlpatterns += patterns(
     '',
-    url(r'^phone_has_reg/(?P<channel_code>[a-z0-9A-Z_]*)/$', PhoneRegisterOrBindingDetectApi.as_view()),
+    url(r'^access_user/(?P<channel_code>[a-z0-9A-Z_]*)/$', PhoneRegisterOrBindingDetectApi.as_view()),
 )
