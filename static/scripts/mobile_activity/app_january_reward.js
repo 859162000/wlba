@@ -234,20 +234,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			mixins.shareData({title: '2016年1月年终奖', content: '终于成功领到了1月年终奖，感谢老板！'});
 
             mixins.sendUserInfo(function(data) {
+				if (data.ph == '') {
+                    $('#go_experience').click(function() {
+					   mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
+					})
+                } else {
+                    $('#go_experience').click(function() {
+						window.location.href = '/activity/experience/account/';
+					})
+                }
+
 				$('.button').click(function(){
 					mixins.jumpToManageMoney();
 				});
-
-				if(h5_user_static){
-					$('#go_experience').click(function() {
-					   window.location.href = '/activity/experience/account/'
-					})
-				}else{
-					$('#go_experience').click(function() {
-					   mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
-					})
-				}
-
             });
         },
         other: function() {
