@@ -62,6 +62,7 @@ from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
 from weixin.util import sendTemplate, redirectToJumpPage
+from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -679,6 +680,14 @@ class WeixinLoginAPI(APIView):
         return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
+        # add by ChenWeiBin@20160113
+        phone = request.POST.get('identifier', '')
+        profile = WanglibaoUserProfile.objects.filter(phone=phone, utype='3').first()
+        if profile:
+            return Response({
+                "code": u"企业用户请在PC端登录",
+            }, status=400)
+
         form = self._form(request)
 
         if form.is_valid():

@@ -51,7 +51,7 @@ class EnterpriseUserProfile(models.Model):
                 card.is_default = True
                 card.is_bind_huifu = True
                 # FixMe, 同卡进出
-                # card.is_the_one_card = True
+                card.is_the_one_card = True
                 card.save()
         else:
             user_profile.id_is_valid = False

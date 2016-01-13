@@ -924,6 +924,7 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
+
 class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
@@ -933,6 +934,11 @@ class LoginAPIView(DecryptParmsAPIView):
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+
+        # add by ChenWeiBin@20160113
+        profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
+        if profile:
+            return Response({"token": "false", "message": u"企业用户请在PC端登录"}, status=400)
 
         user = authenticate(identifier=identifier, password=password)
 
