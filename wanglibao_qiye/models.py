@@ -49,9 +49,10 @@ class EnterpriseUserProfile(models.Model):
                 card.no = self.bank_card_no
                 card.user = self.user
                 card.is_default = True
-                card.is_bind_huifu = True
+                card.is_bind_kuai = True
+                card.is_bind_yee = True
                 # FixMe, 同卡进出
-                # card.is_the_one_card = True
+                card.is_the_one_card = True
                 card.save()
         else:
             user_profile.id_is_valid = False
