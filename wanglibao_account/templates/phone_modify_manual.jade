@@ -22,10 +22,10 @@ block main
                     .box_right
                         .input_box
                             span 浏览
-                            <input id="id_front_image" class='input' type="file" name="id_front_image" multiple="true" val='选择'/>
+                            <input id="id_front_image" class='input' type="file" name="id_front_image" multiple="true" val='选择' onchange="javascript:setImagePreview();“/>
                         .title 请上传彩色、完整证件图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
                         .upload_img#user_img_1
-                            img.send_img(src="/static/images/account_safe/img.jpg")
+                            img.send_img#file_img_1(src="/static/images/account_safe/img.jpg")
                 .box
                     label!='<span>*</span>身份证背面'
                     .box_right
@@ -34,7 +34,7 @@ block main
                             <input id="id_back_image" class='input' type="file" name="id_back_image" multiple="true" val='选择'/>
                         .title 请上传彩色、完整证件图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
                         .upload_img#user_img_2
-                            img.send_img(src="/static/images/account_safe/img.jpg")
+                            img.send_img#file_img_2(src="/static/images/account_safe/img.jpg")
                 .box
                     label!='<span>*</span>手持身份证正面'
                     .box_right
@@ -43,7 +43,7 @@ block main
                             <input id="id_user_image" class='input' type="file" name="id_user_image" multiple="true" val='选择'/>
                         .title 请上传本人手持身份证图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
                         .upload_img#user_img_3
-                            img.send_img(src="/static/images/account_safe/img.jpg")
+                            img.send_img#file_img_3(src="/static/images/account_safe/img.jpg")
                 .box
                     label!='<span>*</span>手持银行卡正面'
                     .box_right
@@ -52,7 +52,7 @@ block main
                             <input id="id_bank_image" class='input' type="file" name="id_bank_image" multiple="true" val='选择'/>
                         .title 请上传本人手持已绑定银卡的照片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
                         .upload_img#user_img_4
-                            img.send_img(src="/static/images/account_safe/img.jpg")
+                            img.send_img#file_img_4(src="/static/images/account_safe/img.jpg")
                 .box
                     label!='<span>*</span>新手机号'
                     .box_right
