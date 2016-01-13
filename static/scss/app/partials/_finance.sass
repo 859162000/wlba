@@ -1,0 +1,366 @@
+
+
+.client-finance
+  height: 100%
+  font-size: .6rem
+  text-align: center
+  .yellow
+    font-style: normal
+    color: #FDF11C
+  .swiper-container
+    width: 100%
+    height: 100%
+  .swiper-first
+    background: url("/static/imgs/app/finance/start_bg.png") no-repeat center
+    background-size: 100%
+  .swiper-other
+    background: url("/static/imgs/app/finance/public_bg.png") no-repeat center
+    background-size: 100%
+  .finance-model-dotted
+    padding: 0 1rem
+    .dotted-item
+      display: -webkit-box
+      -webkit-box-align: center
+      -webkit-box-pack: center
+    .dotted-line
+      height: 2px
+      width: 0
+      border-bottom: 2px dotted #725CBF
+    .dotted-circle
+      width: .4rem
+      height: .4rem
+      background: #725CBF
+      border-radius: 50%
+  .finance-page-chicken
+    position: absolute
+    left: 0
+    bottom: 2.6rem
+    width: 100%
+    z-index: 3
+    color: #B599E8
+    @media screen and (max-device-width: 320px)
+      bottom: 2rem
+  .touch-next
+    position: absolute
+    left: 50%
+    bottom: 0
+    width: rem(55)
+    height: rem(93)
+    z-index: 3
+    @media screen and (max-device-width: 320px)
+      width: 1rem
+      height: rem(68)
+    background: url("/static/imgs/app/finance/next_icon.png") no-repeat center
+    background-size: 100%
+    margin-left: -(rem(27.5))
+    -webkit-animation: bounce 1.5s infinite ease-in-out
+    animation: bounce 1.5s infinite ease-in-out
+
+  .swiper-white
+    color: #fff
+  //第一页
+  .finance-logo
+    display: block
+    width: rem(258)
+    height: rem(219)
+    margin: 1.5rem auto 0 auto
+    @media screen and (max-device-width: 320px)
+      width: rem(218)
+      height: rem(185)
+      margin: 1rem auto 0 auto
+    background: url("/static/imgs/app/finance/logo.png") no-repeat center
+    background-size: 100%
+  .finance-stars
+    position: absolute
+    top: 10rem
+    right: 2rem
+    width: rem(149)
+    height: rem(166)
+    background: url("/static/imgs/app/finance/smile_star.png") no-repeat center
+    background-size: 100%
+    @media screen and (max-device-width: 320px)
+      top: 5rem
+
+  .finance-rocket
+    width: rem(129)
+    height: rem(197)
+    margin: 2rem 0 0 rem(50)
+    background: url("/static/imgs/app/finance/airplane.png") no-repeat center
+    background-size: 100%
+    @media screen and (max-device-width: 320px)
+      margin: rem(10) 0 0 rem(30)
+  .finance-lion
+    position: absolute
+    bottom: 9rem
+    left: 50%
+    width: rem(404)
+    height: rem(515)
+    background: url("/static/imgs/app/finance/leo.png") no-repeat center
+    background-size: 100%
+    margin-left: -6.5rem
+    z-index: 2
+    @media only screen and (max-device-width: 385px) and (min-device-width: 320px)
+      width: 7.1rem
+      height: rem(362)
+      bottom: 8.2rem
+      margin-left: -5rem
+
+  .finance-floor
+    position: absolute
+    bottom: 0
+    left: 50%
+    width: rem(657)
+    height: rem(512)
+    background: url("/static/imgs/app/finance/floor.png") no-repeat
+    background-size: 100%
+    margin-left: -(rem(657/2))
+    z-index: 1
+    @media only screen and (max-device-width: 385px)  and (min-device-width: 320px)
+      width: rem(577)
+      height: rem(450)
+      margin-left: -(rem(577/2))
+
+
+
+  //第二页
+  .finance-model2
+    position: relative
+    z-index: 4
+  .finance-head
+    font-size: .9rem
+    line-height: 2
+    margin: 1.5rem 0
+
+    @media screen and (max-device-width: 320px)
+      margin: .5rem 0
+    .star-head
+      width: rem(52)
+      height: rem(50)
+      background: url("/static/imgs/app/finance/star_head.png") no-repeat center
+      background-size: 100%
+      margin: 0 auto
+  .finance-model2-title
+    font-size: .75rem
+    span
+      padding: 0 .5rem
+
+    &:before, &:after
+      display: inline-block
+      content: ''
+      width: .5rem
+      height: rem(17)
+      background: url("/static/imgs/app/finance/hreat.png") no-repeat center
+      background-size: 100%
+  .finance-model2-list
+    font-size: .9rem
+    line-height: 1.5
+    padding: .5rem 0
+    @media screen and (max-device-width: 320px) and (max-device-height: 480px)
+      font-size: .75rem
+      padding: 0 .3rem
+    i
+      font-size: 1rem
+
+
+  .finance-earth
+    position: absolute
+    left: 0
+    bottom: 0
+    width: 100%
+    height: auto
+  //第三页
+  .finance-model3-list
+    font-size: .75rem
+
+  .finance-model3-rotate
+    display: -webkit-box
+
+    .rotate-item
+      -webkit-box-flex: 1
+      display: -webkit-box
+      -webkit-box-align: center
+      -webkit-box-orient: vertical
+    .item-warp
+      position: relative
+      display: -webkit-box
+      -webkit-box-align: center
+      -webkit-box-pack: center
+      width: rem(214)
+      height: rem(226)
+    .model3-circle-icon
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      background: url("/static/imgs/app/finance/model3_circle.png") no-repeat center
+      background-size: 100%
+    .item-dec
+      font-size: .7rem
+  .finance-model3-canvas
+    display: -webkit-box
+    font-size: .75rem
+    .finance-canvas-list
+      -webkit-box-flex: 1
+      width: 50%
+      .max-finance
+        width: rem(287)
+        height: rem(145)
+        line-height: rem(145)
+        background: url("/static/imgs/app/finance/reward_bg.png") no-repeat center
+        background-size: 100%
+        @extend .yellow
+
+
+
+@-webkit-keyframes bounce
+  0%, 100%
+    opacity: 1
+  50%
+    opacity: .5
+
+@keyframes bounce
+  0%, 100%
+    opacity: 1
+  50%
+    opacity: .5
+
+.swiper-slide-active
+  .ele-ballon
+    animation-name: m2ball
+    -webkit-animation-name: m2ball
+    animation-duration: 2s
+    -webkit-animation-duration: 2s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+    animation-iteration-count: infinite
+    -webkit-animation-iteration-count: infinite
+  .ele-txt, .ele-txt2
+    opacity: 0
+    animation-name: fall
+    -webkit-animation-name: fall
+    animation-delay: .5s
+    -webkit-animation-delay: .5s
+    animation-duration: .3s
+    -webkit-animation-duration: .3s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+  .ele-txt2
+    animation-delay: 1s
+    -webkit-animation-delay: 1s
+  .ele-line
+    animation-name: lines
+    -webkit-animation-name: lines
+    animation-delay: .3s
+    -webkit-animation-delay: .3s
+    animation-duration: .3s
+    -webkit-animation-duration: .3s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+  .ele-rotate
+    animation-name: ele-rotate
+    -webkit-animation-name: ele-rotate
+    animation-delay: .8s
+    -webkit-animation-delay: .8s
+    animation-duration: 1.5s
+    -webkit-animation-duration: 1.5s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+
+@-webkit-keyframes ele-rotate
+  0%
+    -webkit-transform: rotate(0deg)
+    transform: rotate(0deg)
+  100%
+    -webkit-transform: rotate(90deg)
+    transform: rotate(90deg)
+
+@keyframes ele-rotate
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(90deg)
+
+@-webkit-keyframes lines
+  0%
+    width: 0%
+  100%
+    width: 94%
+
+@keyframes lines
+  0%
+    width: 0%
+  100%
+    width: 94%
+@-webkit-keyframes m2ball 
+  0%
+    opacity: 1
+    -webkit-transform: translateY(-15px)
+    transform: translateY(-15px)
+  50%
+    opacity: 1
+    -webkit-transform: translateY(0px)
+    transform: translateY(0px)
+  100%
+    opacity: 1
+    -webkit-transform: translateY(-15px)
+    transform: translateY(-15px)
+    
+@keyframes m2ball
+  0%
+    opacity: 1
+    -webkit-transform: translateY(-15px)
+    transform: translateY(-15px)
+  50%
+    opacity: 1
+    -webkit-transform: translateY(0px)
+    transform: translateY(0px)
+  100%
+    opacity: 1
+    -webkit-transform: translateY(-15px)
+    transform: translateY(-15px)
+
+@-webkit-keyframes fall 
+  0%
+    opacity: 0
+    -webkit-transform: translate3d(0,-30px,0)
+    transform: translate3d(0,-30px,0)
+  80%
+    opacity: 1
+    -webkit-transform: translate3d(0,5px,0)
+    transform: translate3d(0,5px,0)
+  100%
+    opacity: 1
+    -webkit-transform: translate3d(0,0,0)
+    transform: translate3d(0,0,0)
+
+@keyframes fall 
+  0%
+    opacity: 0
+    -webkit-transform: translate3d(0,-30px,0)
+    transform: translate3d(0,-30px,0)
+
+  80%
+    opacity: 1
+    -webkit-transform: translate3d(0,5px,0)
+    transform: translate3d(0,5px,0)
+
+  100%
+    opacity: 1
+    -webkit-transform: translate3d(0,0,0)
+    transform: translate3d(0,0,0)
+    

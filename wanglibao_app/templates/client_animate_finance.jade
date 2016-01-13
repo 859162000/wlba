@@ -1,0 +1,81 @@
+doctype html
+html(style='background:#f5f5f5;height:100%;overflow:hidden;')
+  head
+    title 2015投资记
+    include include/app_header.jade
+  body(style='position: relative;height: 100%;')
+    .client-finance
+      .swiper-container.swiper-container-vertical
+        .swiper-wrapper
+          //第一页
+          .swiper-slide.swiper-first
+            .finance-logo.ele-txt
+            .finance-rocket
+            .finance-stars
+            .finance-lion.ele-ballon
+            .finance-floor
+            .finance-page-chicken.ele-txt2 去看看，2015年我在网利宝的那些事儿
+            .touch-next
+          //第二页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model2
+              .finance-head
+                .star-head
+                .head-title 这一年，我在网利宝
+              .finance-model2-title
+                span 亲爱的张张张
+              .finance-model2-list 您是网利宝第 <i class= 'yellow'>66668888</i> 位注册用户
+              .finance-model-dotted
+                .dotted-item
+                  .dotted-circle
+                  .dotted-line.ele-line
+                  .dotted-circle
+              .finance-model2-list 投资总额： <i class= 'yellow'>￥88888888.00</i> <br>击败99%的投资人
+              .finance-model2-dotted
+                .dotted-item
+                  .dotted-circle
+                  .dotted-line.ele-line
+                  .dotted-circle
+              .finance-model2-list 投资总收益： <i class= 'yellow'>￥88888888.00</i> <br>这个数字会惨遭嫉妒
+
+            img(src='/static/imgs/app/finance/earth_lion.png').finance-earth
+            .finance-page-chicken.ele-txt2 回顾我的致富之路
+            .touch-next
+
+          //第三页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model3
+              .finance-head
+                .star-head
+                .head-title 土豪致富秘笈
+              .finance-model3-list 秘笈1:做土豪，必先勤劳（全年投资次数／周期）
+              .finance-model3-rotate
+                .rotate-item
+                  .item-warp
+                    .model3-circle-icon.ele-rotate
+                    .model3-rotate-text 37次
+                  .item-dec 全年投资次数
+                .rotate-item
+                  .item-warp
+                    .model3-circle-icon
+                    .model3-rotate-text 37次
+                  .item-dec 全年投资次数
+              .finance-model-dotted
+                .dotted-item
+                  .dotted-circle
+                  .dotted-line.ele-line
+                  .dotted-circle
+              .finance-model3-list 秘笈2:不光勤劳，出手要豪（单笔投资最大额度）
+              .finance-model3-canvas
+                .finance-canvas-list
+                  .max-finance ¥1,000,000.00
+                .finance-canvas-list
+                  canvas(id="canvas-model3", width="150", height="150")
+              .item-dec 出手豪气超过80%投资人
+            .finance-page-chicken.ele-txt2 分析我的性格色彩，紧抱自己大腿
+            .touch-next
+
+    // banner javascript
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script(src="/static/src/app/echarts/Chart.min.js")
+    script(src='/static/scripts/app/finance.js?v=201512181', data-init='finance')
