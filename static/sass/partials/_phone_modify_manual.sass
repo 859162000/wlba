@@ -46,7 +46,6 @@
           position: relative
           left: 0
           top: 0
-          width: 88px
           height: 34px
           span
             text-align: center
@@ -91,14 +90,15 @@
         .get_code
           float: left
           display: block
-          background: #c7c7c7
-          border: 1px #c7c7c7 solid
+          background: #fd9827
+          border: 1px #fd9827 solid
           color: #fff
           font-size: 14px
           text-align:  center
           line-height: 36px
-          width: 102px
+          width: 106px
           margin-left: 10px
+          cursor: pointer
         .title
           color: #bfbfbf
           font-size: 12px
@@ -116,6 +116,27 @@
           margin-bottom: 90px
           background: #e4371f
           cursor: pointer
+        .static
+          height: 16px
+          position: relative
+          left: 0px
+          top: 13px
+          float: left
+          display: block
+          margin-left: 15px
+          display: none
+          .true
+            width: 12px
+            height: 16px
+            background: url("/static/images/account_safe/ico.png") no-repeat -58px -34px
+            display: block
+            float: left
+          .false
+            height: 16px
+            background: url("/static/images/account_safe/ico.png") no-repeat -71px -34px
+            display: block
+            float: left
+            padding-left: 13px
     .upload_img
       width: 158px
       display: none
@@ -124,14 +145,3 @@
       img
         width: 100%
         display: block
-.show_img
-  clear: both
-  width: 100%
-  display: inline-block
-#img_1,#img_2,#img_3
-  width: 150px
-  display: block
-  float: left
-  img
-    width: 100%
-    display: block

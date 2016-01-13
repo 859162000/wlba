@@ -13,7 +13,6 @@ block main
             .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
             form.form-group(enctype="multipart/form-data", content_type="multipart/form-data", action="/api/manual_modify/phone/", method="post")
                 -csrf_token
-
                 .box
                     label 真实姓名
                     .box_right
@@ -70,17 +69,7 @@ block main
                         <input class="submit" type="submit" value="提交"/>
 
 
-                //form.form-group
-                    <input id="id_id_user_image" type="file" name="id_user_image" multiple="true">
-                    <input id="id_id_front_image" type="file" name="id_front_image" multiple="true">
-                    <input id="id_id_back_image" type="file" name="id_back_image" multiple="true">
-
-                    .show_img
-                        #img_1
-                        #img_2
-                        #img_3
-
-                    input(type="submit" value="提交")
+                    //input(type="submit" value="提交")
     //include global/g_footer
     script.
         require(["/static/js/phone_modify_manual.js?v=3"])

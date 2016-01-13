@@ -52,9 +52,6 @@
           }
       });
 
-
-
-
         var h5_user_static;
 		$.ajax({
 			url: '/api/user_login/',
