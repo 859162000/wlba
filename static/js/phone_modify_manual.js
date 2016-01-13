@@ -149,19 +149,37 @@
 
         $('.button').click(function(){
             var form =$("#form");
+
+             var formData = new FormData($( "#form" )[0]);
+             alert(formData)
+             $.ajax({
+                  url: '/api/manual_modify/phone/' ,
+                  type: 'POST',
+                  data: formData,
+                  async: false,
+                  cache: false,
+                  contentType: false,
+                  processData: false,
+                  success: function (returndata) {
+                      alert(returndata);
+                  },
+                  error: function (returndata) {
+                      alert(returndata);
+                  }
+             });
             //alert(form.action);
-            $.ajax({
-                url:'/api/manual_modify/phone/',
-                type:'post',
-                data: form.serialize(),
-                dataType: 'json',
-                success:function(data){
-                    alert('1');
-                },
-                error:function(data){
-                    alert('2');
-                }
-            })
+//            $.ajax({
+//                url:'/api/manual_modify/phone/',
+//                type:'post',
+//                data: form.serialize(),
+//                dataType: 'json',
+//                success:function(data){
+//                    alert('1');
+//                },
+//                error:function(data){
+//                    alert('2');
+//                }
+//            })
         });
 
         //$('#form').submit(function(){
