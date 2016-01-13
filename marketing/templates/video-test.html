@@ -1,0 +1,39 @@
+<html>
+<head>
+    <title>video</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="http://xianchang.damai.cn/pub/js/zepto.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="http://xianchang.damai.cn/pub/js/flowplayer-3.2.13.min.js" charset="utf-8"></script>
+</head>
+<body>
+<div class="player" id="player">
+
+</div>
+<script type="text/javascript">
+ if (navigator.userAgent.indexOf("Safari") > -1 &&  navigator.userAgent.indexOf("Chrome") == -1) {
+ 	var str= '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
+ 	$('#player').append(str);
+ }else{
+ 	var w = $('#player').width();
+ 	var h = w * 9/16;
+ 	$('#player').height(h);
+ 	flowplayer("player", "http://xianchang.damai.cn/pub/js/flowplayer-3.2.18.swf",{
+		clip:{
+			url:'hd_1',
+	        provider: 'rtmp',
+	        live:true
+	    },
+
+	    plugins:{
+			rtmp:{
+			   // use latest RTMP plugin release
+			    url: "http://xianchang.damai.cn/pub/js/flowplayer.rtmp-3.2.13.swf",
+			    netConnectionUrl: 'rtmp://damai.rtmplive.ks-cdn.com/live/'
+			}
+	    }
+	}).play();
+ }
+</script>
+</body>
+
+</html>
