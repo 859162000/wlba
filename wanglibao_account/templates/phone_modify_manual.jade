@@ -11,7 +11,7 @@ block main
         .main_title_top 身份信息-人工审核修改手机号
         .form_wrap
             .title_top 客服会对您所提交的资料进行审核，审核结果将以短信通知您
-            form.form-group(enctype="multipart/form-data", content_type="multipart/form-data", action="/api/manual_modify/phone/", method="post")
+            form.form-group#form(enctype="multipart/form-data", content_type="multipart/form-data",action="/api/manual_modify/phone/", method="post")
                 -csrf_token
                 .box
                     label 真实姓名
@@ -66,7 +66,7 @@ block main
                 .box
                     label
                     .box_right
-                        <input class="submit button" type="button" value="提交"/>
+                        <input class="submit button" type="submit" value="提交"/>
 
     //include global/g_footer
     script.
