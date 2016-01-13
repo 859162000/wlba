@@ -60,7 +60,7 @@
 			}
 		})
 
-
+        var id_front_image,id_back_image,id_user_image,id_bank_image,new_phone;
         var docObj,imgObjPreview;
         $('#id_front_image').on('change',function(){
             docObj=document.getElementById("id_front_image");
@@ -87,7 +87,6 @@
             $('#user_img_4').show();
         });
         function setImagePreview(docObj,imgObjPreview) {
-
                 if(docObj.files &&docObj.files[0])
                 {
                 //火狐下，直接设img属性
@@ -109,6 +108,9 @@
                 localImagId.style.width = "158px";
                 //localImagId.style.height = "100px";
                 //图片异常的捕捉，防止用户修改后缀来伪造图片
+
+
+
                 try{
                 localImagId.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
                 localImagId.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgSrc;
@@ -121,78 +123,46 @@
                 imgObjPreview.style.display = 'none';
                 document.selection.empty();
                 }
+                var img_url = imgObjPreview.src;
+                if(docObj.id=='id_front_image'){
+                    id_front_image = img_url;
+                }else if(docObj.id=='id_back_image'){
+                    id_back_image = img_url;
+                }else if(docObj.id=='id_user_image'){
+                    id_user_image = img_url;
+                }else if(docObj.id=='id_bank_image'){
+                    id_bank_image = img_url;
+                }
                 return true;
             }
 
+        $('.button').click(function(){
+            alert(id_front_image);
+            alert(id_back_image);
+            alert(id_user_image);
+            alert(id_bank_image);
+            var new_phone = $('.input_phone').val();
+            var new_code = $('.new_code').val();
+            $.ajax({
+                url: '/api/manual_modify/phone/',
+                type: 'post',
+                data: {
+                    'id_front_image': id_front_image,
+                    'id_back_image': id_back_image,
+                    'id_user_image': id_user_image,
+                    'id_bank_image': id_bank_image,
+                    'new_phone': new_phone,
+                    'validate_code': new_code
+                },
+                success: function (data1) {
 
+                }
+            })
+        })
 
 
         window.onload=function(){
 
-
-
-            //$('.button').click(function(){
-//            $.ajax({
-//                url: '/api/manual_modify/phone/',
-//                type: 'post',
-//                success: function (data1) {
-//
-//                }
-//            })
-//		})
-
-            /*
-            html5方法
-            var result_1 = document.getElementById("user_img_1");
-			var result_2 = document.getElementById("user_img_2");
-			var result_3 = document.getElementById("user_img_3");
-			var result_4 = document.getElementById("user_img_4");
-            var input_1 = document.getElementById("id_front_image");
-			var input_2 = document.getElementById("id_back_image");
-			var input_3 = document.getElementById("id_user_image");
-			var input_4 = document.getElementById("id_bank_image");
-
-            if(typeof FileReader==='undefined'){
-                $('.upload_img').html('抱歉，你的浏览器不支持 FileReader');
-                input_1.setAttribute('disabled','disabled');
-				input_2.setAttribute('disabled','disabled');
-				input_3.setAttribute('disabled','disabled');
-				input_4.setAttribute('disabled','disabled');
-            }else{
-                input_1.addEventListener('change',readFile,false);
-				input_2.addEventListener('change',readFile,false);
-				input_3.addEventListener('change',readFile,false);
-				input_4.addEventListener('change',readFile,false);
-            }
-
-            function readFile(){
-				var this_name=this.name;
-				//alert(this_name);
-                var file = this.files[0];
-                if(!/image\/\w+/.test(file.type)){
-                    alert("文件必须为图片！");
-                    return false;
-                }
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function(e){
-					if(this_name=='id_front_image'){
-						$('#user_img_1').show();
-                    	result_1.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}else if(this_name=='id_back_image'){
-						$('#user_img_2').show();
-                    	result_2.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}else if(this_name=='id_user_image'){
-						$('#user_img_3').show();
-                    	result_3.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}else if(this_name=='id_bank_image'){
-						$('#user_img_4').show();
-                    	result_4.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}
-                }
-            }
-            html5方法结束
-            */
 
         }
 
