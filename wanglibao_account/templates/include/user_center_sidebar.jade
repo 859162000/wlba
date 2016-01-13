@@ -60,11 +60,13 @@ if user.wanglibaouserprofile.utype == '3'
                 +sidebar-item('站内信', '/accounts/message/', '_self', '0', 'icon11', 'msg')
                 +sidebar-item('资料修改', '/qiye/profile/edit/', '_self', '0', 'icon13', 'last')
     .finishing(style="display:none")
-        ul
-            +sidebar-item('资料完善', '/qiye/info/', '_self', '0', 'icon13', 'last')
+        .box
+            ul.sidebar
+                +sidebar-item('资料完善', '/qiye/info/', '_self', '0', 'icon13', 'last')
     .finishingV(style="display:none")
-        ul
-            +sidebar-item('资料修改', '/qiye/profile/edit/', '_self', '1', 'icon13')
+        .box
+            ul.sidebar
+                +sidebar-item('资料修改', '/qiye/profile/edit/', '_self', '0', 'icon13', 'last')
 else
     ul
         +sidebar-item('账户总览', '/accounts/home/', '_self', '1', '0')
