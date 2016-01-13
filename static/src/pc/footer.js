@@ -15,7 +15,9 @@ require(['jquery'], function( $ ) {
                 }).done(function(data) {
                     if(data.data.status == '审核通过'){
                          $('#checkUserType').attr('href','/accounts/home/')
-                         window.location.href = '/accounts/home/'
+                         if(type == '1'){
+                            window.location.href = '/accounts/home/'
+                         }
                     }else{
                         $('#checkUserType').attr('href','/qiye/profile/edit/');
                         if(type != '1'){
