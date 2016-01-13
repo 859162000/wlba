@@ -2,16 +2,41 @@
 <head>
     <title>video</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1,user-scalable=no">
     <script type="text/javascript" src="/static/test/zepto.js" charset="utf-8"></script>
     <script type="text/javascript" src="/static/test/flowplayer-3.2.13.min.js" charset="utf-8"></script>
+    <style>
+        video{
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
 <div class="player" id="player">
 
 </div>
 <script type="text/javascript">
- if (navigator.userAgent.indexOf("Safari") > -1 &&  navigator.userAgent.indexOf("Chrome") == -1) {
+    function IsPC() {
+    var userAgentInfo = navigator.userAgent;
+    var Agents = ["Android", "iPhone",
+                "SymbianOS", "Windows Phone",
+                "iPad", "iPod"];
+    var flag = true;
+    for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+            flag = false;
+            break;
+        }
+    }
+    return flag;
+}
+
+ if (navigator.userAgent.indexOf("Safari") > -1 &&  navigator.userAgent.indexOf("Chrome") == -1 ) {
+     console.log(11)
  	var str= '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
+ 	$('#player').append(str);
+ }else if(!IsPC()){
+    var str= '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
  	$('#player').append(str);
  }else{
  	var w = $('#player').width();
