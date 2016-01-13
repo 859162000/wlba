@@ -1236,16 +1236,16 @@ class JuChengRegister(CoopRegister):
 class WeixinRedpackRegister(CoopRegister):
     def __init__(self, request):
         super(WeixinRedpackRegister, self).__init__(request)
-        self.c_code = 'weixin_redpack'
-        self.invite_code = 'weixin_redpack'
-        self.order_id = request.GET.get("order_id", None)
+        self.c_code = 'wrp'
+        self.invite_code = 'wrp'
+        self.order_id = request.POST.get("order_id", None)
 
     def register_call_back(self, user):
         phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         try:
             ex_event = ExperienceEvent.objects.filter(name=u'新手体验金', invalid=False).first()
-            WanglibaoActivityReward.objects.create(
+            ActivityReward.objects.create(
                 order_id=self.order_id,
                 activity='weixin_experience_glod',
                 experience=ex_event,

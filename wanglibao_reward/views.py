@@ -122,6 +122,9 @@ class WeixinShareDetailView(TemplateView):
         "direct": 0,
         "interest_coupon": 1,
         "percent": 2}
+        record = WanglibaoActivityGiftOrder.objects.filter(order_id=product_id).first()
+        if record:
+            return
 
         ids = self.get_redpack_id(activity)
         if ids:
@@ -130,27 +133,31 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg(u"获得配置红包id失败")
             return None
         self.debug_msg("红包编号为：%s" % (ids, ))
-        for redpack in redpacks:
-            try:
-                activity_gift = WanglibaoActivityGift.objects.create(
-                gift_id=product_id,
-                activity=self.activity,
-                redpack=redpack,
-                name=redpack.rtype,
-                total_count=redpack.value,  #这个地方很关键,优惠券个数
-                valid=True,
-                cfg_id=1
-                )
-                activity_gift.type = redpack_type[redpack.rtype]
-                activity_gift.save()
-                self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
-            except Exception, reason:
-                self.exception_msg(reason, '组合红包入库报错')
+        try:
+            with transaction.atomic():
+                for redpack in redpacks:
+                    try:
+                        activity_gift = WanglibaoActivityGift.objects.create(
+                        gift_id=product_id,
+                        activity=self.activity,
+                        redpack=redpack,
+                        name=redpack.rtype,
+                        total_count=redpack.value,  #这个地方很关键,优惠券个数
+                        valid=True,
+                        cfg_id=1
+                        )
+                        activity_gift.type = redpack_type[redpack.rtype]
+                        activity_gift.save()
+                        self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
+                    except Exception, reason:
+                        self.exception_msg(reason, '组合红包入库报错')
 
-        WanglibaoActivityGiftOrder.objects.create(
-            valid_amount=len(redpacks),
-            order_id=product_id
-        )
+                WanglibaoActivityGiftOrder.objects.create(
+                    valid_amount=len(redpacks),
+                    order_id=product_id
+                )
+        except Exception, reason:
+            logger.debug('红包组合已经生成了，不要重复生成, reason:%s' % reason)
 
     def has_got_redpack(self, phone_num, activity, order_id, openid):
         """
@@ -174,6 +181,45 @@ class WeixinShareDetailView(TemplateView):
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
             return None
 
+    def distribute_experience_glod(self, user, phone_num, openid, product_id, ex_event):
+        gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
+        if gift_order.valid_amount <= 0:
+            return "No Reward"
+        else:
+            gift = WanglibaoActivityGift.objects.create(
+                gift_id=product_id,
+                activity=self.activity,
+                redpack_id=2,
+                valid=True,
+                type=3,
+                cfg_id=1
+            )
+            logger.debug("在activity_gift表中增加了一条记录：体验金；product_id:%s, user_id:%s" % (product_id, user.id))
+
+            send_gift = WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user if user else None,
+                identity=phone_num,
+                activity=self.activity,
+                amount=ex_event.amount,
+                type=gift.type,
+                valid=0,
+            )
+            logger.debug("基于用户手机号的获奖记录已经生成; phone:%s, activity:%s, user_id:%s" % (phone_num, self.activity, user.id))
+
+            WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user if user else None,
+                identity=openid,
+                activity=self.activity,
+                amount=ex_event.amount,
+                type=gift.type,
+                valid=2,
+            )
+            logger.debug("基于用户微信openid的获奖记录已经生成了; phone:%s, activity:%s, user_id:%s" % (phone_num, self.activity, user.id))
+
+            return send_gift
+
     @method_decorator(transaction.atomic)
     def distribute_redpack(self, phone_num, openid, activity, product_id):
         """
@@ -182,12 +228,17 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.get_activity_by_id(activity)
 
+        profile = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
+        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=profile.user.id, activity='weixin_experience_glod').first()
+        if activity_record:
+            return self.distribute_experience_glod(profile.user, phone_num, openid, product_id, activity_record.experience)
+
         try:
             #TODO: 增加分享记录表，用于计数和加锁
             #1: 此处有数据不一致性的问题, GiftOrder表和ActivityGift表的不一致性
             gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
             if gift_order.valid_amount > 0:
-                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True).exclude(type=3)
 
                 counts = gifts.count()
                 if counts > 0:
@@ -261,8 +312,12 @@ class WeixinShareDetailView(TemplateView):
 
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2).all()
-                return gifts
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2)
+                exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
+                counts = exp_glods.count() if exp_glods else 0
+                gifts = gifts.filter(amount__lt=10).all()
+                return gifts, counts
+                #return gifts.filter(amount__lt=10).all(), counts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
                 return None
@@ -289,7 +344,7 @@ class WeixinShareDetailView(TemplateView):
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
             QSet = WeixinUser.objects.filter(openid=openid).values("nickname", "headimgurl", "openid").first()
             if QSet:
-                ret_val = {"amount": gifts.amount, "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
+                ret_val = {"amount": int(gifts.amount) if gifts.type == 3 else gifts.amount, "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
             else:
                 ret_val = {"amount": 0, "name": "", "img": "", "phone": ""}
             self.debug_msg('个人获奖信息返回前端:%s' % (ret_val,))
@@ -309,7 +364,7 @@ class WeixinShareDetailView(TemplateView):
                                   "name": weixins[key].nickname,
                                   "img": weixins[key].headimgurl,
                                   "message": self.get_react_text(index),
-                                  "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
+                                  "sort_by": user_info[key].id})
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
@@ -361,9 +416,10 @@ class WeixinShareDetailView(TemplateView):
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 self.template_name = 'app_weChatEnd.jade'
-                gifts = self.get_distribute_status(order_id, activity)
+                gifts, counts = self.get_distribute_status(order_id, activity)
                 share_title, share_content, url = get_share_infos(order_id)
                 return {
+                    "count": counts,
                     "share": {'content': share_content, 'title': share_title, 'url': url},
                     "all_gift": self.format_response_data(gifts, openid, 'gifts'),
                 }
@@ -372,11 +428,12 @@ class WeixinShareDetailView(TemplateView):
                 has_gift = 'false'
             else:
                 has_gift = 'true'
-            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
-        gifts = self.get_distribute_status(order_id, activity)
+            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s, 领取状态has_gift:%s, phone_num:%s, user_gift.identity:%s' %(openid, user_gift.identity, user_gift, has_gift,phone_num, user_gift.identity ))
+        gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
+            "count": counts,
             "has_gift": has_gift,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
@@ -454,7 +511,7 @@ class WeixinShareTools(APIView):
                     logger.debug("开奖页面，已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
-            self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
+            logger.debug(u'判断用户领奖，数据库查询出错, reason:%s' % reason)
             return None
 
     def post(self, request):
@@ -524,8 +581,10 @@ class WeixinShareEndView(TemplateView):
             获得用户领奖信息
         """
         try:
-            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
-            return gifts
+            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2)
+            exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
+            counts = exp_glods.count() if exp_glods else 0
+            return gifts.filter(amount__lt=10).all(), counts
         except Exception, reason:
             logger.debug(reason, u'获取已领奖用户信息失败')
             return None
@@ -557,9 +616,10 @@ class WeixinShareEndView(TemplateView):
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         share_title, share_content, url = get_share_infos(order_id)
-        gifts = self.get_distribute_status(order_id)
+        gifts, counts = self.get_distribute_status(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
+         "count": counts,
          "all_gift": self.format_response_data(gifts),
          "share": {'content': share_content, 'title': share_title, 'url': url}
         }
