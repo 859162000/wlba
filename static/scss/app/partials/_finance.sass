@@ -55,7 +55,22 @@
     margin-left: -(rem(27.5))
     -webkit-animation: bounce 1.5s infinite ease-in-out
     animation: bounce 1.5s infinite ease-in-out
+  .finance-mode-btnl-aue
+    width: 95%
+    margin: 0 auto
+    background: #F3741F
+    border-radius: .2rem
+    font-size: .9rem
+    color: #fff
+    padding: .8rem
 
+  .finance-public-aue
+    font-size: .9rem
+    line-height: 1.5
+    padding: .5rem 0
+    @media screen and (max-device-width: 320px) and (max-device-height: 480px)
+      font-size: .75rem
+      padding: 0 .3rem
   .swiper-white
     color: #fff
   //第一页
@@ -128,9 +143,10 @@
     z-index: 4
   .finance-head
     font-size: .9rem
-    line-height: 2
-    margin: 1.5rem 0
-
+    margin: 1.5rem 0 1rem 0
+    .head-title
+      margin: .5rem 0
+      line-height: 1.5
     @media screen and (max-device-width: 320px)
       margin: .5rem 0
     .star-head
@@ -171,10 +187,19 @@
   //第三页
   .finance-model3-list
     font-size: .75rem
+    @media screen and (max-device-width: 320px)
+      font-size: .6rem
 
+
+  .finance-model3-space
+    margin: 1.5rem 0
+    @media screen and (max-device-width: 320px) and (max-device-height: 480px)
+      margin: .5rem 0
   .finance-model3-rotate
     display: -webkit-box
-
+    margin: 1rem 0
+    @media screen and (max-device-width: 320px) and (max-device-height: 480px)
+      margin: .5rem 0
     .rotate-item
       -webkit-box-flex: 1
       display: -webkit-box
@@ -197,12 +222,17 @@
       background-size: 100%
     .item-dec
       font-size: .7rem
+      margin-top: .5rem
   .finance-model3-canvas
     display: -webkit-box
     font-size: .75rem
     .finance-canvas-list
-      -webkit-box-flex: 1
-      width: 50%
+      display: -webkit-box
+      -webkit-box-align: center
+      -webkit-box-pack: center
+      width: 60%
+      &:last-child
+        width: 40%
       .max-finance
         width: rem(287)
         height: rem(145)
@@ -210,8 +240,157 @@
         background: url("/static/imgs/app/finance/reward_bg.png") no-repeat center
         background-size: 100%
         @extend .yellow
+  //第四页
+  .finance-model4
+    font-size: .75rem
+    @media screen and (max-device-width: 320px)
+      font-size: .6rem
+  .finance-model4-data-item
+    padding-left: 2rem
+    text-align: left
+    margin: 3rem 0 1rem 0
+    @media screen and (max-device-width: 320px)
+      margin: 1rem 0
+    .model4-data-list
+      display: -webkit-box
+      -webkit-box-align: center
+      margin-bottom: .5rem
+    .model4-circle
+      display: block
+      width: .55rem
+      height: .55rem
+      border-radius: 50%
+      margin-right: 1rem
+
+    .model4-circle-sort
+      background: #F35B47
+    .model4-circle-mid
+      background: #FFBA26
+    .model4-circle-long
+      background: #4877C8
+
+  //第五页
+  .finance-model5-lead
+    display: block
+    width: rem(567)
+    height: rem(377)
+    background: url("/static/imgs/app/finance/model5_lead.png") no-repeat center
+    background-size: 100%
+    margin: 0 auto
+    @media screen and (max-device-width: 320px)
+      width: rem(487)
+      height: rem(324)
+  .finance-model-cravat-space
+    margin: 3.5rem auto .5rem auto
+    @media screen and (max-device-width: 320px)
+      margin: 3.5rem auto 0 auto
+  .finance-model-cravat
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    position: relative
+    width: rem(607)
+    height: rem(95)
+    background: url("/static/imgs/app/finance/cravat.png") no-repeat center
+    background-size: 100%
+
+    @media screen and (max-device-width: 320px)
+      width: rem(567)
+      height: rem(95)
+
+    .cravat-cue
+      font-size: .9rem
+    .cravat-icon
+      width: 1rem
+      height: 1rem
+      background: url("/static/imgs/app/finance/model5_answer.png") no-repeat center
+      background-size: 100%
+      margin-left: 1rem
+    .cravat-alert
+      position: absolute
+      top: -3.3rem
+      left: 50%
+      width: 91%
+      margin-left: -45%
+      background: rgba(235,235,235,1)
+      color: #4A4A4A
+      font-size: .6rem
+      text-align: left
+      padding: .5rem
+      line-height: 1.5
+      border-radius: .2rem
+      opacity: 0
+      &:before
+        position: absolute
+        bottom: -.4rem
+        right: 4.2rem
+        content: ''
+        width: 0
+        height: 0
+        border-top: .5rem solid rgba(235,235,235,1)
+        border-left: .5rem solid transparent
+        border-right: .5rem solid transparent
+  //第六页
+  .finance-model-bold-text
+    font-weight: bold
+    font-size: .9rem
+    line-height: 1.4
+  .model6-yang-icon
+    margin: 1.5rem 0 1rem 0
+    .sheep-icon
+      display: inline-block
+      width: rem(82)
+      height: rem(96)
+      background: url("/static/imgs/app/finance/sheep.png") no-repeat center
+      background-size: 100%
+      margin-right: .6rem
+      &:last-child
+        margin-right: 0
+  .model6-aue-space
+    margin: 2rem auto 1rem auto
 
 
+  //第七页
+  .model7-lead
+    width: rem(531)
+    height: rem(456)
+    @media screen and (max-device-width: 320px)
+      width: rem(411)
+      height: rem(353)
+  .finance-model7-cravat-space
+    margin: 3.5rem auto 2rem auto
+    @media screen and (max-device-width: 320px)
+      margin: 2rem auto 1rem auto
+  //第八
+  .finance-model8
+    position: relative
+    z-index: 4
+  .finance-last-head
+    padding: 0 1.25rem
+    text-align: justify
+    font-size: .7rem
+    line-height: 1.4
+    margin-bottom: 1.5rem
+    @media screen and (min-device-width: 321px) and (max-device-width: 385px)
+      margin-bottom: .5rem
+  .finance-last-message
+    font-size: .75rem
+    line-height: 2
+  .finance-last-bold
+    font-size: rem(64)
+    margin-bottom: .6rem
+  .last-layout
+    position: absolute
+    bottom:  1.5rem
+    width: 100%
+    z-index: 4
+  .finance-earth2
+    @media screen and (max-device-width: 320px)
+      display: none
+  .finance-earth-efault
+    display: none
+    @media screen and (max-device-width: 320px)
+      display: block
 
 @-webkit-keyframes bounce
   0%, 100%
@@ -323,16 +502,16 @@
 @keyframes m2ball
   0%
     opacity: 1
-    -webkit-transform: translateY(-15px)
-    transform: translateY(-15px)
+    -webkit-transform: translateY(-20px)
+    transform: translateY(-20px)
   50%
     opacity: 1
     -webkit-transform: translateY(0px)
     transform: translateY(0px)
   100%
     opacity: 1
-    -webkit-transform: translateY(-15px)
-    transform: translateY(-15px)
+    -webkit-transform: translateY(-20px)
+    transform: translateY(-20px)
 
 @-webkit-keyframes fall 
   0%
