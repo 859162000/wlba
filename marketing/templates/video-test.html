@@ -2,8 +2,8 @@
 <head>
     <title>video</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script type="text/javascript" src="http://xianchang.damai.cn/pub/js/zepto.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="http://xianchang.damai.cn/pub/js/flowplayer-3.2.13.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/test/zepto.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/test/flowplayer-3.2.13.min.js" charset="utf-8"></script>
 </head>
 <body>
 <div class="player" id="player">
@@ -17,7 +17,7 @@
  	var w = $('#player').width();
  	var h = w * 9/16;
  	$('#player').height(h);
- 	flowplayer("player", "http://xianchang.damai.cn/pub/js/flowplayer-3.2.18.swf",{
+ 	flowplayer("player", "http://staging.wanglibao.com/static/test/flowplayer-3.2.18.swf",{
 		clip:{
 			url:'hd_1',
 	        provider: 'rtmp',
@@ -27,7 +27,7 @@
 	    plugins:{
 			rtmp:{
 			   // use latest RTMP plugin release
-			    url: "http://xianchang.damai.cn/pub/js/flowplayer.rtmp-3.2.13.swf",
+			    url: "http://staging.wanglibao.com/static/test/flowplayer.rtmp-3.2.13.swf",
 			    netConnectionUrl: 'rtmp://damai.rtmplive.ks-cdn.com/live/'
 			}
 	    }
