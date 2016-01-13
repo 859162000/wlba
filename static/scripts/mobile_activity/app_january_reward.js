@@ -238,9 +238,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					mixins.jumpToManageMoney();
 				});
 
-				$('#go_experience').click(function() {
-				   window.location.href = '/activity/experience/account/'
-				})
+				if(h5_user_static){
+					$('#go_experience').click(function() {
+					   window.location.href = '/activity/experience/account/'
+					})
+				}else{
+					$('#go_experience').click(function() {
+					   mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
+					})
+				}
+
             });
         },
         other: function() {

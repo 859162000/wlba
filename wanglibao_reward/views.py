@@ -122,6 +122,9 @@ class WeixinShareDetailView(TemplateView):
         "direct": 0,
         "interest_coupon": 1,
         "percent": 2}
+        record = WanglibaoActivityGiftOrder.objects.filter(order_id=product_id).first()
+        if record:
+            return
 
         ids = self.get_redpack_id(activity)
         if ids:
@@ -130,27 +133,31 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg(u"获得配置红包id失败")
             return None
         self.debug_msg("红包编号为：%s" % (ids, ))
-        for redpack in redpacks:
-            try:
-                activity_gift = WanglibaoActivityGift.objects.create(
-                gift_id=product_id,
-                activity=self.activity,
-                redpack=redpack,
-                name=redpack.rtype,
-                total_count=redpack.value,  #这个地方很关键,优惠券个数
-                valid=True,
-                cfg_id=1
-                )
-                activity_gift.type = redpack_type[redpack.rtype]
-                activity_gift.save()
-                self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
-            except Exception, reason:
-                self.exception_msg(reason, '组合红包入库报错')
+        try:
+            with transaction.atomic():
+                for redpack in redpacks:
+                    try:
+                        activity_gift = WanglibaoActivityGift.objects.create(
+                        gift_id=product_id,
+                        activity=self.activity,
+                        redpack=redpack,
+                        name=redpack.rtype,
+                        total_count=redpack.value,  #这个地方很关键,优惠券个数
+                        valid=True,
+                        cfg_id=1
+                        )
+                        activity_gift.type = redpack_type[redpack.rtype]
+                        activity_gift.save()
+                        self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
+                    except Exception, reason:
+                        self.exception_msg(reason, '组合红包入库报错')
 
-        WanglibaoActivityGiftOrder.objects.create(
-            valid_amount=len(redpacks),
-            order_id=product_id
-        )
+                WanglibaoActivityGiftOrder.objects.create(
+                    valid_amount=len(redpacks),
+                    order_id=product_id
+                )
+        except Exception, reason:
+            logger.debug('红包组合已经生成了，不要重复生成, reason:%s' % reason)
 
     def has_got_redpack(self, phone_num, activity, order_id, openid):
         """
