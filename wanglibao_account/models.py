@@ -221,8 +221,6 @@ class UserPhoneBook(models.Model):
 
 class ManualModifyPhoneRecord(models.Model):
     STATUS_CHOICES = (
-        (u"短信修改提交", u"短信修改提交"),
-        (u"短信修改成功", u"短信修改成功"),
         (u"初审中",   u"初审中"),
         (u"初审待定", u"初审待定"),
         (u"初审驳回", u"初审驳回"),
@@ -242,6 +240,22 @@ class ManualModifyPhoneRecord(models.Model):
                               verbose_name=u'申请状态')
     created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
     update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
+
+class SMSModifyPhoneRecord(models.Model):
+    STATUS_CHOICES = (
+        (u"短信修改提交", u"短信修改提交"),
+        (u"短信修改成功", u"短信修改成功"),
+    )
+    user = models.ForeignKey(User)
+    new_phone = models.CharField(max_length=64, blank=True, help_text=u'新的手机号码')
+    status = models.CharField(max_length=16, default=u'短信修改提交', db_index=True,
+                              choices=STATUS_CHOICES,
+                              verbose_name=u'短信修改状态')
+
+    created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
+    update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
+
+
 
 #发给所有人
 def send_public_message(sender, instance, **kwargs):
