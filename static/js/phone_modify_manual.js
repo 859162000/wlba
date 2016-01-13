@@ -147,30 +147,52 @@
             }});
         })
 
-
         $('.button').click(function(){
-            alert(id_front_image);
-            alert(id_back_image);
-            alert(id_user_image);
-            alert(id_bank_image);
-            var new_phone = $('.input_phone').val();
-            var new_code = $('.new_code').val();
+            var form =$("#form");
+            //alert(form.action);
             $.ajax({
-                url: '/api/manual_modify/phone/',
-                type: 'post',
-                data: {
-                    'id_front_image': id_front_image,
-                    'id_back_image': id_back_image,
-                    'id_user_image': id_user_image,
-                    'id_bank_image': id_bank_image,
-                    'new_phone': new_phone,
-                    'validate_code': new_code
+                url:'/api/manual_modify/phone/',
+                type:'post',
+                data: form.serialize(),
+                dataType: 'json',
+                success:function(data){
+                    alert('1');
                 },
-                success: function (data1) {
-
+                error:function(data){
+                    alert('2');
                 }
             })
-        })
+        });
+
+        //$('#form').submit(function(){
+        //    alert($(this).serialize());
+        //    return false;
+        //});
+
+
+        //$('.button').click(function(){
+        //    //alert(id_front_image);
+        //    //alert(id_back_image);
+        //    //alert(id_user_image);
+        //    //alert(id_bank_image);
+        //    var new_phone = $('.input_phone').val();
+        //    var new_code = $('.new_code').val();
+        //    $.ajax({
+        //        url: '/api/manual_modify/phone/',
+        //        type: 'post',
+        //        data: {
+        //            'id_front_image': id_front_image,
+        //            'id_back_image': id_back_image,
+        //            'id_user_image': id_user_image,
+        //            //'id_bank_image': id_bank_image,
+        //            'new_phone': new_phone,
+        //            'validate_code': new_code
+        //        },
+        //        success: function (data1) {
+		//
+        //        }
+        //    });
+        //})
 
 
         window.onload=function(){
