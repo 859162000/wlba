@@ -147,24 +147,27 @@
             }});
         })
 
-        var form =$("#form");
-        //alert(form.action);
-        var options ={
-            url:'/api/manual_modify/phone/',
-            type:'post',
-            data: form.serialize(),
-            dataType: 'json',
-            success:function(data){
-                alert('1');
-            },
-            error:function(data){
-                return false;
-            }
-        };
-        $('#form').submit(function(){
-            alert($(this).serialize());
-
+        $('.button').click(function(){
+            var form =$("#form");
+            //alert(form.action);
+            $.ajax({
+                url:'/api/manual_modify/phone/',
+                type:'post',
+                data: form.serialize(),
+                dataType: 'json',
+                success:function(data){
+                    alert('1');
+                },
+                error:function(data){
+                    alert('2');
+                }
+            })
         });
+
+        //$('#form').submit(function(){
+        //    alert($(this).serialize());
+        //    return false;
+        //});
 
 
         //$('.button').click(function(){
