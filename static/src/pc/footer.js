@@ -35,6 +35,8 @@ require(['jquery'], function( $ ) {
                $('#checkUserType').attr('href','/qiye/info/');
                if(type != '1') {
                    $('#minNavs').hide()
+               }else{
+                   window.location.href = '/qiye/info/'
                }
             }
         })
