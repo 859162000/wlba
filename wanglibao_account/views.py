@@ -2284,7 +2284,9 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.new_phone = new_phone
             manual_record.status = u'初审中'
             manual_record.save()
-        return Response({'ret_code': 0})
+            return Response({'ret_code': 0})
+        else:
+            return Response(form.error_messages, status=400)
 
 
 class SMSModifyPhoneValidateTemplate(TemplateView):

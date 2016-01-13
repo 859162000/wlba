@@ -426,6 +426,7 @@ class TokenSecretSignAuthenticationForm(forms.Form):
 class ManualModifyPhoneForm(forms.Form):
     error_messages ={
         'validate must not be null': '1',
+        'new phone has been registered': '2',
     }
 
     id_front_image = forms.ImageField(label='身份证正面照片', required=True)
@@ -433,6 +434,17 @@ class ManualModifyPhoneForm(forms.Form):
     id_user_image = forms.ImageField(label='手持身份证照片', required=True)
     new_phone = forms.CharField(max_length=64, label='新的手机号码', required=True)
     validate_code = forms.CharField(label="Validate code for phone", required=True)
+
+    def clean_new_phone(self):
+        if 'new_phone' in self.cleaned_data:
+            new_phone = self.cleaned_data["new_phone"]
+            new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
+            if new_phone_user:
+                raise forms.ValidationError(
+                    self.error_messages['new phone has been registered'],
+                    code='new phone has been registered'
+                )
+
     def clean_validate_code(self):
         if 'new_phone' in self.cleaned_data:
             new_phone = self.cleaned_data["new_phone"]
