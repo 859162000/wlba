@@ -2213,7 +2213,7 @@ class IdentityInformationTemplate(TemplateView):
         return {
             "phone": safe_phone_str(profile.phone),
             "id_is_valid": profile.id_is_valid,
-            "trade_pwd": profile.trade_pwd == ""
+            "trade_pwd": profile.trade_pwd != ""
         }
 
 
@@ -2252,10 +2252,14 @@ class ManualModifyPhoneTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         user = self.request.user
-
+        profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
         modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
-        return {'form':form, 'modify_phone_record':modify_phone_record}
+        return {
+                'form':form,
+                'user_name':profile.name,
+                'modify_phone_record':modify_phone_record
+                }
 
 
 
