@@ -22,7 +22,7 @@ block main
                     .box_right
                         .input_box
                             span 浏览
-                            <input id="id_front_image" class='input' type="file" name="id_front_image" multiple="true" val='选择' onchange="javascript:setImagePreview();“/>
+                            <input id="id_front_image" class='input' type="file" name="id_front_image" multiple="true" val='选择'/>
                         .title 请上传彩色、完整证件图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
                         .upload_img#user_img_1
                             img.send_img#file_img_1(src="/static/images/account_safe/img.jpg")
@@ -72,7 +72,7 @@ block main
                     //input(type="submit" value="提交")
     //include global/g_footer
     script.
-        require(["/static/js/phone_modify_manual.js?v=3"])
+        require(["/static/js/phone_modify_manual.js?v=5"])
 
     include include/tracking
 

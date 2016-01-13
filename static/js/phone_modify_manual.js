@@ -2,14 +2,13 @@
     require.config({
         paths: {
             jquery: 'lib/jquery.min',
-			'fileinput': 'lib/fileinput'
+
         },
         shim: {
             'jquery.modal': ['jquery'],
-			'fileinput': ['jquery']
         }
     });
-    require(['jquery','fileinput'],
+    require(['jquery'],
     function($, re) {
 
 		var csrfSafeMethod, getCookie, sameOrigin,
@@ -61,37 +60,40 @@
 			}
 		})
 
-//		$('.button').click(function(){
-//            $.ajax({
-//                url: '/api/manual_modify/phone/',
-//                type: 'post',
-//                success: function (data1) {
-//
-//                }
-//            })
-//		})
 
-
-
-        $('.main_title_top').click(function(){
-            alert($('#id_id_back_image').val());
-            var img_url = $('#id_id_back_image').val();
-            $('#img').attr('src',img_url);
+        var docObj,imgObjPreview;
+        $('#id_front_image').on('change',function(){
+            docObj=document.getElementById("id_front_image");
+            imgObjPreview=document.getElementById("file_img_1");
+            setImagePreview(docObj,imgObjPreview);
+            $('#user_img_1').show();
         });
+        $('#id_back_image').on('change',function(){
+            docObj=document.getElementById("id_back_image");
+            imgObjPreview=document.getElementById("file_img_2");
+            setImagePreview(docObj,imgObjPreview);
+            $('#user_img_2').show();
+        });
+        $('#id_user_image').on('change',function(){
+            docObj=document.getElementById("id_user_image");
+            imgObjPreview=document.getElementById("file_img_3");
+            setImagePreview(docObj,imgObjPreview);
+            $('#user_img_3').show();
+        });
+        $('#id_bank_image').on('change',function(){
+            docObj=document.getElementById("id_bank_image");
+            imgObjPreview=document.getElementById("file_img_4");
+            setImagePreview(docObj,imgObjPreview);
+            $('#user_img_4').show();
+        });
+        function setImagePreview(docObj,imgObjPreview) {
 
-        window.onload=function(){
-
-            function setImagePreview(avalue) {
-
-                var docObj=document.getElementById("id_front_image");
-
-                var imgObjPreview=document.getElementById("file_img_1");
                 if(docObj.files &&docObj.files[0])
                 {
                 //火狐下，直接设img属性
                 imgObjPreview.style.display = 'block';
                 imgObjPreview.style.width = '158px';
-                imgObjPreview.style.height = '100px';
+                //imgObjPreview.style.height = '100px';
                 //imgObjPreview.src = docObj.files[0].getAsDataURL();
 
                 //火狐7以上版本不能用上面的getAsDataURL()方式获取，需要一下方式
@@ -105,7 +107,7 @@
                 var localImagId = document.getElementById("localImag");
                 //必须设置初始大小
                 localImagId.style.width = "158px";
-                localImagId.style.height = "100px";
+                //localImagId.style.height = "100px";
                 //图片异常的捕捉，防止用户修改后缀来伪造图片
                 try{
                 localImagId.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
@@ -122,6 +124,22 @@
                 return true;
             }
 
+
+
+
+        window.onload=function(){
+
+
+
+            //$('.button').click(function(){
+//            $.ajax({
+//                url: '/api/manual_modify/phone/',
+//                type: 'post',
+//                success: function (data1) {
+//
+//                }
+//            })
+//		})
 
             /*
             html5方法
