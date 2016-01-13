@@ -28,11 +28,13 @@ html(style="background:#efeff4")
                             p.asset_title 待收收益(元)
                             p.asset_count {{unpaid_interest | money_format}}
             if user.is_authenticated
-                if experience_amount != 0
+                lengths = len(experience_amortization)
+                if experience_amount != 0 or lengths > 0
                     .markTitle
                         a(href='/activity/experience/explain/',target='_blank')
                             i
                             span 体验金获取及使用说明
+                if experience_amount != 0
                     .account_list
                         section.project_box
                             .transaction_list.mb1
@@ -87,7 +89,6 @@ html(style="background:#efeff4")
                                       p 0.00
                                     p 待收金额（元）
                 if experience_amount == 0
-                    lengths = len(experience_amortization)
                     if lengths == 0
                         .account_no_list
                             .no_info_div
