@@ -425,6 +425,7 @@ class SubscribeService(models.Model):
     )
     SERVICE_TYPES = (
         (0, u'月标上线通知'),
+        (1, u'天标上线通知'),
     )
     key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
     describe = models.CharField(u'服务描述', max_length=256)
@@ -444,6 +445,7 @@ class SubscribeRecord(models.Model):
     subscribe_time = models.IntegerField('用户订阅时间', default=0)
     unsubscribe_time = models.IntegerField('用户取消订阅时间', default=0)
     # update_at = models.DateTimeField('更新时间', auto_now_add=True)
+
 
 
 class Material(models.Model):
@@ -549,11 +551,16 @@ class WeiXinUserActionRecord(models.Model):
         ('unbind', u'解除绑定'),
         ('sign_in', u'用户签到'),
     )
-    w_user = models.ForeignKey(WeixinUser, null=True)
-    user = models.ForeignKey(User, null=True)
+    w_user_id = models.IntegerField(default=0)#models.ForeignKey(WeixinUser, null=True)
+    user_id = models.IntegerField(default=0)#models.ForeignKey(User, null=True)
     action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
     action_describe = models.CharField(u'动作描述', max_length=64)
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    create_time = models.IntegerField('创建时间', default=0)
+
+class SceneRecord(models.Model):
+    openid = models.CharField('用户标识', max_length=128, db_index=True)
+    scene_str = models.CharField('渠道', max_length=64, blank=True, null=True)
     create_time = models.IntegerField('创建时间', default=0)
 
 

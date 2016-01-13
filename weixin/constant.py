@@ -46,6 +46,17 @@ else:
 #     DEPOSIT_SUCCESS_TEMPLATE_ID = "LuwpMH6CdEP2IeEsB7h6uewLhZdrnQPb0vmjDlqWh70"     #充值到账通知
 #     PRODUCT_AMORTIZATION_TEMPLATE_ID = "wDHmjettSpgHys4HMXdcndUfkloiQNu2j9LXTa_qkO4"#项目还款通知
 #     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "JgSYj3TqABs9UbmA33QfkZ2ZGjHL436oBBvOMpyWGh8"#投标成功通知
+# else:#玉姣's
+#     BIND_SUCCESS_TEMPLATE_ID = "XFyiciGriKwniC2SFGwh476H5kjQcnVzRCinWQpuDU8"#绑定通知
+#     UNBIND_SUCCESS_TEMPLATE_ID = "TjTDJSN5G02O0A6lBl16hDDMWa_QQ_W_msFiJJMB1hk"#解绑通知
+#     ACCOUNT_INFO_TEMPLATE_ID = "uF7aZpQWUbvEXP8vVQRiXYRhLNOP73BdKAtb8IHyJTg"#账户信息通知
+#     PRODUCT_ONLINE_TEMPLATE_ID = "ahEXfjXGTBuUfi5mhldgiCy5PyqAtCHqZLvfW6Mrx6U"#项目上线通知
+#     AWARD_COUPON_TEMPLATE_ID  = ""#暂时不用
+#     WITH_DRAW_SUBMITTED_TEMPLATE_ID = "CVVTdimar58smTZwzKc3tNbhljIGMB9AafDIFB2bBOQ"#取现已受理通知
+#     WITH_DRAW_SUCCESS_TEMPLATE_ID = ""#暂时不用
+#     DEPOSIT_SUCCESS_TEMPLATE_ID = "R3UNq2ZvB3JrwlKSlMeEBNlDPTDi_o5wuXXRQ2TCljI"     #充值到账通知
+#     PRODUCT_AMORTIZATION_TEMPLATE_ID = "dQZJtqzbGnw06fLrTBkvTyMRynEgZ0J93UD1Rs6maJY"#项目还款通知
+#     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "5cPoYu4IHv68uiPkBOGljhTw2ctHRYcDRFTfRxYFhzA"#投标成功通知
 
 
 from copy import deepcopy
@@ -256,7 +267,7 @@ Message_template = {
                    "color":"#173177"
                }
         },
-        "url": settings.CALLBACK_HOST + '/weixin/account/?promo_token=fwh',
+        "url": settings.CALLBACK_HOST + '/weixin/sub_account/?promo_token=fwh',
     },
     UNBIND_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',

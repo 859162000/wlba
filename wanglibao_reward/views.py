@@ -6,6 +6,7 @@
 # Description: 策划活动中的红包、奖品、加息券等用户奖励行为，独立在这个文件中
 #########################################################################
 from django.utils import timezone
+from experience_gold.backends import SendExperienceGold
 from django.db import transaction
 from django.db import IntegrityError
 from django.db.models import Sum
@@ -26,6 +27,7 @@ from marketing.models import IntroducedBy, Reward
 from wanglibao import settings
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder
 from wanglibao_redpack.models import RedPackEvent
+from experience_gold.models import ExperienceEvent
 from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_p2p.models import P2PRecord
@@ -120,6 +122,9 @@ class WeixinShareDetailView(TemplateView):
         "direct": 0,
         "interest_coupon": 1,
         "percent": 2}
+        record = WanglibaoActivityGiftOrder.objects.filter(order_id=product_id).first()
+        if record:
+            return
 
         ids = self.get_redpack_id(activity)
         if ids:
@@ -128,27 +133,31 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg(u"获得配置红包id失败")
             return None
         self.debug_msg("红包编号为：%s" % (ids, ))
-        for redpack in redpacks:
-            try:
-                activity_gift = WanglibaoActivityGift.objects.create(
-                gift_id=product_id,
-                activity=self.activity,
-                redpack=redpack,
-                name=redpack.rtype,
-                total_count=redpack.value,  #这个地方很关键,优惠券个数
-                valid=True,
-                cfg_id=1
-                )
-                activity_gift.type = redpack_type[redpack.rtype]
-                activity_gift.save()
-                self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
-            except Exception, reason:
-                self.exception_msg(reason, '组合红包入库报错')
+        try:
+            with transaction.atomic():
+                for redpack in redpacks:
+                    try:
+                        activity_gift = WanglibaoActivityGift.objects.create(
+                        gift_id=product_id,
+                        activity=self.activity,
+                        redpack=redpack,
+                        name=redpack.rtype,
+                        total_count=redpack.value,  #这个地方很关键,优惠券个数
+                        valid=True,
+                        cfg_id=1
+                        )
+                        activity_gift.type = redpack_type[redpack.rtype]
+                        activity_gift.save()
+                        self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
+                    except Exception, reason:
+                        self.exception_msg(reason, '组合红包入库报错')
 
-        WanglibaoActivityGiftOrder.objects.create(
-            valid_amount=len(redpacks),
-            order_id=product_id
-        )
+                WanglibaoActivityGiftOrder.objects.create(
+                    valid_amount=len(redpacks),
+                    order_id=product_id
+                )
+        except Exception, reason:
+            logger.debug('红包组合已经生成了，不要重复生成, reason:%s' % reason)
 
     def has_got_redpack(self, phone_num, activity, order_id, openid):
         """
@@ -172,6 +181,45 @@ class WeixinShareDetailView(TemplateView):
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
             return None
 
+    def distribute_experience_glod(self, user, phone_num, openid, product_id, ex_event):
+        gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
+        if gift_order.valid_amount <= 0:
+            return "No Reward"
+        else:
+            gift = WanglibaoActivityGift.objects.create(
+                gift_id=product_id,
+                activity=self.activity,
+                redpack_id=2,
+                valid=True,
+                type=3,
+                cfg_id=1
+            )
+            logger.debug("在activity_gift表中增加了一条记录：体验金；product_id:%s, user_id:%s" % (product_id, user.id))
+
+            send_gift = WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user if user else None,
+                identity=phone_num,
+                activity=self.activity,
+                amount=ex_event.amount,
+                type=gift.type,
+                valid=0,
+            )
+            logger.debug("基于用户手机号的获奖记录已经生成; phone:%s, activity:%s, user_id:%s" % (phone_num, self.activity, user.id))
+
+            WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user if user else None,
+                identity=openid,
+                activity=self.activity,
+                amount=ex_event.amount,
+                type=gift.type,
+                valid=2,
+            )
+            logger.debug("基于用户微信openid的获奖记录已经生成了; phone:%s, activity:%s, user_id:%s" % (phone_num, self.activity, user.id))
+
+            return send_gift
+
     @method_decorator(transaction.atomic)
     def distribute_redpack(self, phone_num, openid, activity, product_id):
         """
@@ -180,12 +228,17 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.get_activity_by_id(activity)
 
+        profile = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
+        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=profile.user.id, activity='weixin_experience_glod').first()
+        if activity_record:
+            return self.distribute_experience_glod(profile.user, phone_num, openid, product_id, activity_record.experience)
+
         try:
             #TODO: 增加分享记录表，用于计数和加锁
             #1: 此处有数据不一致性的问题, GiftOrder表和ActivityGift表的不一致性
             gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
             if gift_order.valid_amount > 0:
-                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True).exclude(type=3)
 
                 counts = gifts.count()
                 if counts > 0:
@@ -259,8 +312,12 @@ class WeixinShareDetailView(TemplateView):
 
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2).all()
-                return gifts
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2)
+                exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
+                counts = exp_glods.count() if exp_glods else 0
+                gifts = gifts.filter(amount__lt=10).all()
+                return gifts, counts
+                #return gifts.filter(amount__lt=10).all(), counts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
                 return None
@@ -287,7 +344,7 @@ class WeixinShareDetailView(TemplateView):
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
             QSet = WeixinUser.objects.filter(openid=openid).values("nickname", "headimgurl", "openid").first()
             if QSet:
-                ret_val = {"amount": gifts.amount, "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
+                ret_val = {"amount": int(gifts.amount) if gifts.type == 3 else gifts.amount, "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
             else:
                 ret_val = {"amount": 0, "name": "", "img": "", "phone": ""}
             self.debug_msg('个人获奖信息返回前端:%s' % (ret_val,))
@@ -307,7 +364,7 @@ class WeixinShareDetailView(TemplateView):
                                   "name": weixins[key].nickname,
                                   "img": weixins[key].headimgurl,
                                   "message": self.get_react_text(index),
-                                  "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
+                                  "sort_by": user_info[key].id})
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
@@ -359,9 +416,10 @@ class WeixinShareDetailView(TemplateView):
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 self.template_name = 'app_weChatEnd.jade'
-                gifts = self.get_distribute_status(order_id, activity)
+                gifts, counts = self.get_distribute_status(order_id, activity)
                 share_title, share_content, url = get_share_infos(order_id)
                 return {
+                    "count": counts,
                     "share": {'content': share_content, 'title': share_title, 'url': url},
                     "all_gift": self.format_response_data(gifts, openid, 'gifts'),
                 }
@@ -370,11 +428,12 @@ class WeixinShareDetailView(TemplateView):
                 has_gift = 'false'
             else:
                 has_gift = 'true'
-            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
-        gifts = self.get_distribute_status(order_id, activity)
+            self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s, 领取状态has_gift:%s, phone_num:%s, user_gift.identity:%s' %(openid, user_gift.identity, user_gift, has_gift,phone_num, user_gift.identity ))
+        gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
+            "count": counts,
             "has_gift": has_gift,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
@@ -452,7 +511,7 @@ class WeixinShareTools(APIView):
                     logger.debug("开奖页面，已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
-            self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
+            logger.debug(u'判断用户领奖，数据库查询出错, reason:%s' % reason)
             return None
 
     def post(self, request):
@@ -522,8 +581,10 @@ class WeixinShareEndView(TemplateView):
             获得用户领奖信息
         """
         try:
-            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
-            return gifts
+            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2)
+            exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
+            counts = exp_glods.count() if exp_glods else 0
+            return gifts.filter(amount__lt=10).all(), counts
         except Exception, reason:
             logger.debug(reason, u'获取已领奖用户信息失败')
             return None
@@ -555,9 +616,10 @@ class WeixinShareEndView(TemplateView):
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         share_title, share_content, url = get_share_infos(order_id)
-        gifts = self.get_distribute_status(order_id)
+        gifts, counts = self.get_distribute_status(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
+         "count": counts,
          "all_gift": self.format_response_data(gifts),
          "share": {'content': share_content, 'title': share_title, 'url': url}
         }
@@ -1011,3 +1073,157 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+
+class XunleiActivityAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(XunleiActivityAPIView, self).__init__()
+        self.activity_name = 'xunlei_laba'
+
+    def introduced_by_with(self, user_id, promo_token, register_time=None):
+        """
+            register_time:为None表示不需要关注用户的注册时间
+        """
+        if not register_time:
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token).first()
+        else:
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token, created_at__gte=register_time).first()
+        return True if introduced_by else False
+
+    def has_generate_reward_activity(self, user_id, activity):
+        activitys = WanglibaoActivityReward.objects.filter(user_id=user_id, activity=activity)
+        return activitys if activitys else None
+
+    def generate_reward_activity(self, user):
+        """这个函数必须被不断重写
+            三次摇奖必中两次，中将金额 分别为88(60%), 188(30%), 888(10%)
+        """
+        points = {
+            "0-1-3-5-7-9": ("xunlei_laba_88", 88),
+            "4-6-8": ("xunlei_laba_188", 188),
+            "2": ("xunlei_laba_888", 888)
+        }
+
+        for index in xrange(2):
+            records = WanglibaoActivityReward.objects.filter(activity=self.activity_name)
+            counter = (records.count()+1) % 10
+            for key, value in points.items():
+                if str(counter) in key:
+                    WanglibaoActivityReward.objects.create(
+                    user=user,
+                    experience=ExperienceEvent.objects.filter(name=value[0]).first(),
+                    activity=self.activity_name,
+                    when_dist=1,
+                    left_times=1,
+                    join_times=1,
+                    channel='xunlei9',
+                    has_sent=False,
+                    p2p_amount=value[1]
+                    )
+                    break
+
+        WanglibaoActivityReward.objects.create(
+            user=user,
+            experience=None,
+            activity=self.activity_name,
+            when_dist=1,
+            left_times=1,
+            join_times=1,
+            channel='xunlei9',
+            has_sent=False,
+            p2p_amount=0
+        )
+
+        return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
+
+    def get(self, request):
+        _type = request.GET.get("type", None)
+        if _type == "orders":
+            records = WanglibaoActivityReward.objects.filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
+            data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': str(record.p2p_amount)} for record in records]
+            to_json_response = {
+                'ret_code': 1005,
+                'data': data,
+                'message': u'获得抽奖成功用户',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if _type == "chances":
+            if not request.user.is_authenticated():
+                json_to_response = {
+                    'code': 1000,
+                    'message': u'用户没有登录'
+                }
+
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+            if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                json_to_response = {
+                    'code': 1005,
+                    'lefts': 0,
+                    'message': u'用户不是在活动期内从迅雷渠道过来的用户'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
+
+            if not self.has_generate_reward_activity(request.user.id, self.activity_name):
+                self.generate_reward_activity(request.user)
+
+            sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user).aggregate(amount_sum=Sum('left_times'))
+            to_json_response = {
+                'ret_code': 1005,
+                'lefts': str(sum_left["amount_sum"]) if sum_left else 0,
+                'message': u'获得剩余抽奖次数',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'code': 1000,
+                'message': u'用户没有登录'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+            json_to_response = {
+                'code': 1001,
+                'message': u'用户不是在活动期内从迅雷渠道过来的用户'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
+
+        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name)
+        activitys = _activitys if _activitys else self.generate_reward_activity(request.user)
+        activity_record = activitys.filter(left_times__gt=0)
+
+        if activity_record.filter(left_times__gt=0).count() == 0:
+            json_to_response = {
+                'code': 1002,
+                'messge': u'用户的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        else:
+            with transaction.atomic():
+                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
+                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+                if record.experience:
+                    json_to_response = {
+                        'code': 0,
+                        'lefts': sum_left["amount_sum"]-1,
+                        'amount': "%04d" % (record.experience.amount,),
+                        'message': u'用户抽到奖品'
+                    }
+                    SendExperienceGold(request.user).send(record.experience.id)
+
+                else:
+                    json_to_response = {
+                        'code': 1,
+                        'lefts': sum_left["amount_sum"]-1,
+                        'message': u'此次没有得到奖品'
+                    }
+
+                record.left_times = 0
+                record.has_sent = True
+                record.save()
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
