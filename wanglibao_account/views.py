@@ -2260,8 +2260,7 @@ class ManualModifyPhoneTemplate(TemplateView):
 
 
 class ManualModifyPhoneAPI(APIView):
-    # permission_classes = (IsAuthenticated, )
-    permission_classes = ()
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         user = request.user
@@ -2274,7 +2273,9 @@ class ManualModifyPhoneAPI(APIView):
             id_back_image = form.cleaned_data['id_back_image']
             id_user_image = form.cleaned_data['id_user_image']
             new_phone = form.cleaned_data['new_phone']
-            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"待初审", u"初审待定", u"待复审"]).first()
+            if modify_phone_record:
+                return Response({'message': u"您之前申请的人工修改手机号的请求还未处理完毕"}, status=400)
             #todo
             manual_record = ManualModifyPhoneRecord()
             manual_record.user = user
@@ -2282,7 +2283,7 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.id_back_image = id_back_image
             manual_record.id_user_image = id_user_image
             manual_record.new_phone = new_phone
-            manual_record.status = u'初审中'
+            manual_record.status = u'待初审'
             manual_record.save()
             return Response({'ret_code': 0})
         else:
@@ -2321,12 +2322,16 @@ class SMSModifyPhoneValidateAPI(APIView):
                 return Response({'message':message}, status=400)
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
-            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user).first()
+            new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
+            if new_phone_user:
+                return Response({'message':"new phone has been registered"}, status=400)
+            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status = u'短信修改手机号提交').first()
             if not sms_modify_record:
                 sms_modify_record = SMSModifyPhoneRecord()
                 sms_modify_record.user = user
-            sms_modify_record.new_phone = new_phone
-            sms_modify_record.status = u'短信修改提交'
+                sms_modify_record.status = u'短信修改手机号提交'
+                sms_modify_record.new_phone = new_phone
+                sms_modify_record.save()
             return Response({"message":'ok'})
 
         return Response(form.errors, status=400)
@@ -2344,25 +2349,28 @@ class SMSModifyPhoneTemplate(TemplateView):
 class SMSModifyPhoneAPI(APIView):
     def post(self, request):
         user = request.user
-        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user).first()
+        new_phone = request.DATA.get('new_phone', "").strip()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status = u'短信修改手机号提交').first()
         if not sms_modify_record:
             return Response({'message':u"还没有短信申请修改手机号"}, status=400)
 
         profile = user.wanglibaouserprofile
-        new_phone = request.DATA.get('new_phone', "").strip()
-        if new_phone != sms_modify_record.new_phone:
-            return Response({'message':u"手机号错误"}, status=400)
         validate_code = request.DATA.get('validate_code', "").strip()
         if not validate_code:
             return Response({'message':"validate_code is null"}, status=400)
-        status, message = validate_validation_code(profile.phone, validate_code)
+        status, message = validate_validation_code(new_phone, validate_code)
         if status != 200:
             return Response({'message':message}, status=400)
+        new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
+        if new_phone_user:
+            return Response({'message':"new phone has been registered"}, status=400)
         with transaction.atomic(savepoint=True):
             old_phone = profile.phone
             profile.phone = new_phone
             profile.save()
             PhoneValidateCode.objects.filter(phone=old_phone).delete()
+            sms_modify_record.status=u'短信修改手机号成功'
+            sms_modify_record.save()
             return {'message':'ok'}
 
 
