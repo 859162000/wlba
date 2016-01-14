@@ -217,129 +217,132 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function(org) {
+;CanvasRenderingContext2D.prototype.clear = function() {
+    this.save();
+    this.globalCompositeOperation = 'destination-out';
+    this.fillStyle = 'black';
+    this.fill();
+    this.restore();
+};
+CanvasRenderingContext2D.prototype.clearArc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
+    this.beginPath();
+    this.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+    this.clear();
+};
 
-    var h5_user_static;
-    org.ajax({
-        url: '/api/user_login/',
-        type: 'post',
-        success: function(data1) {
-            h5_user_static = data1.login;
-        }
-    });
-    var login = false;
+org.finance = (function (org) {
+    var lib = {
+        process_num: 0,
+        model_canvac_opeartion: true,
+        init: function () {
 
-    wlb.ready({
-        app: function(mixins) {
-			mixins.shareData({title: '2016年1月年终奖', content: '终于成功领到了1月年终奖，感谢老板！'});
+            var swiper = new Swiper('.swiper-container', {
+                paginationClickable: true,
+                direction: 'vertical',
+                initialSlide: 0,
+                onSlideChangeEnd: function(swiper){
+                    if(swiper.activeIndex == 2){
+                        lib.canvas_model3_doging()
+                    }
+                    if(swiper.activeIndex == 3){
+                        lib.cavas_model4()
+                    }
 
-            mixins.sendUserInfo(function(data) {
-				if (data.ph == '') {
-                    $('#go_experience').click(function() {
-					   mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/account/'});
-					})
-                } else {
-                    $('#go_experience').click(function() {
-						window.location.href = '/activity/experience/account/';
-					})
                 }
-
-				$('.button').click(function(){
-					mixins.jumpToManageMoney();
-				});
             });
+
+
         },
-        other: function() {
-			$('.button').click(function(){
-				window.location.href = '/weixin/list/';
-			});
+        canvas_model3_doging: function () {
+            var _self = this;
 
-			$('#go_experience').click(function() {
-				window.location.href = '/activity/experience/account/';
-			})
+            function Start() {
+                _self.canvas_model3(90, 90, 70, _self.process_num);
+                t = setTimeout(Start, 30);
+                if (_self.process_num >= 60) {
+                    clearTimeout(t);
+                    _self.process_num = 0;
+                    return;
+                }
+                _self.process_num += 1;
+            }
 
+            Start()
+        },
+        canvas_model3: function (x, y, radius, process) {
+            var _self = this;
+            var canvas = document.getElementById('canvas-model3');
+
+            if (canvas.getContext) {
+                var cts = canvas.getContext('2d');
+
+                if (_self.model_canvac_opeartion) {
+                    canvas.getContext('2d').translate(0.5, 0.5)
+                    _self.model_canvac_opeartion = false
+                }
+            } else {
+                return;
+            }
+
+            cts.beginPath();
+            cts.moveTo(x, y);
+            cts.arc(x, y, radius, 0, Math.PI * 2, false);
+            cts.closePath();
+            cts.fillStyle = '#D8D8D8';
+            cts.fill();
+
+            cts.beginPath();
+            cts.moveTo(x, y);
+            endAgl = Math.PI * 2 * process / 100
+            cts.arc(x, y, radius, 0, endAgl, false);
+            cts.closePath();
+            cts.fillStyle = '#FDF11C';
+            cts.fill();
+            cts.clearArc(x, y, radius - (radius * 0.26), 0, Math.PI * 2, true);
+            //在中间写字
+            cts.font = '34px Arial'
+            cts.fillStyle = '#FDF11C';
+            cts.textAlign = 'center';
+            cts.textBaseline = 'middle';
+            cts.moveTo(x, y);
+            cts.fillText(process + "%", x, y);
+        },
+        cavas_model4: function(){
+            var doughnutData = [
+				{
+					value: 5,
+					color:"#4877C8"
+				},
+				{
+					value : 15,
+					color : "#FFBA26"
+				},
+				{
+					value : 80,
+					color : "#F35B47"
+				},
+
+			];
+
+            var myDoughnut = new Chart(document.getElementById("model4-canvas").getContext("2d"))
+                .Doughnut(doughnutData, {segmentShowStroke: false, onAnimationComplete: function(e){
+                }});
         }
-    });
+    }
 
-
-	$('#see_rule_1').on('click',function(){
-		var ele = $('.rule_wrap_1');
-		var curHeight = ele.height();
-		var autoHeight = ele.css('height', 'auto').height();
-		if (!ele.hasClass('down')){
-			$('#see_rule_1').addClass('select');
-			ele.height(curHeight).animate({'height':autoHeight},500,function(){
-				ele.addClass('down');
-			});
-		}else{
-			$('#see_rule_1').removeClass('select');
-			ele.height(curHeight).animate({'height':'0'},500,function(){
-				ele.removeClass('down');
-			});
-		}
-	});
-	$('#see_rule_2').on('click',function(){
-		var ele = $('.rule_wrap_2');
-		var curHeight = ele.height();
-		var autoHeight = ele.css('height', 'auto').height();
-		if (!ele.hasClass('down')){
-			$('#see_rule_2').addClass('select');
-			ele.height(curHeight).animate({'height':autoHeight},500,function(){
-				ele.addClass('down');
-			});
-		}else{
-			$('#see_rule_2').removeClass('select');
-			ele.height(curHeight).animate({'height':'0'},500,function(){
-				ele.removeClass('down');
-			});
-		}
-	})
-
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-	org.ajax({
-		type : 'GET',
-		url : '/weixin/api/jsapi_config/',
-		dataType : 'json',
-		success : function(data) {
-			//请求成功，通过config注入配置信息,
-			wx.config({
-				debug: false,
-				appId: data.appId,
-				timestamp: data.timestamp,
-				nonceStr: data.nonceStr,
-				signature: data.signature,
-				jsApiList: jsApiList
-			});
-		}
-	});
-	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
-			shareName = '2016年1月年终奖',
-			shareImg = host + '/static/imgs/mobile_activity/app_january_reward/300x300.jpg',
-			shareLink = host + '/activity/app_january_reward/',
-			shareMainTit = '2016年1月年终奖',
-			shareBody = '终于成功领到了1月年终奖，感谢老板！';
-		//分享给微信好友
-		org.onMenuShareAppMessage({
-			title: shareMainTit,
-			desc: shareBody,
-			link: shareLink,
-			imgUrl: shareImg
-		});
-		//分享给微信朋友圈
-		org.onMenuShareTimeline({
-			title: '10倍体验金，还有最高2.8%和3000直抵红包！',
-			link : shareLink,
-			imgUrl: shareImg
-		})
-		//分享给QQ
-		org.onMenuShareQQ({
-			title: shareMainTit,
-			desc: shareBody,
-			link : shareLink,
-			imgUrl: shareImg
-		})
-	})
+    return {
+        init: lib.init
+    }
 })(org);
 
-
+;
+(function (org) {
+    $.each($('script'), function () {
+        var src = $(this).attr('src');
+        if (src) {
+            if ($(this).attr('data-init') && org[$(this).attr('data-init')]) {
+                org[$(this).attr('data-init')].init();
+            }
+        }
+    })
+})(org);
