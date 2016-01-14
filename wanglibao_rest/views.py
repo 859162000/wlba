@@ -1709,8 +1709,9 @@ class AccessUserExistsApi(APIView):
             channel = get_channel_record(channel_code)
             if channel:
                 phone = request.session.get('phone')
+                binding = has_binding_for_bid(channel_code, phone)
                 user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-                if has_binding_for_bid(channel_code, phone) and user:
+                if binding and user:
                     crypto = Crypto()
                     data_buf = crypto.encrypt_mode_cbc(str(user.id), settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
                     user_id = crypto.encode_bytes(data_buf)
@@ -1719,11 +1720,17 @@ class AccessUserExistsApi(APIView):
                         'ret_code': 10000,
                         'message': u'该号已注册'
                     }
-                else:
+                elif not user:
                     response_data = {
                         'user_id': None,
                         'ret_code': 10001,
                         'message': u'该号未注册'
+                    }
+                else:
+                    response_data = {
+                        'user_id': None,
+                        'ret_code': 10002,
+                        'message': u'该号已注册，非本渠道用户'
                     }
 
                 return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
