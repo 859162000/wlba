@@ -17,32 +17,32 @@ block main
                     label 账户登录密码
                     .box_right
                         .input_box
-                            <input class="input_phone" type="text" placeholder="请输入账户登录密码" autocomplete="off">
-                            .static
+                            <input id='id_number' class="input_phone" type="text" placeholder="请输入账户登录密码" autocomplete="off">
+                            .status
                                 .true
                                 .false 账户登录密码有误
                 .box
                     label 实名身份证号
                     .box_right
                         .input_box
-                            <input class="input_phone" type="text" placeholder="请输入实名认证身份证号" autocomplete="off">
-                            .static
+                            <input id='validate_code' class="input_phone" type="text" placeholder="请输入实名认证身份证号" autocomplete="off">
+                            .status
                                 .true
                                 .false 身份证信息有误
                 .box
                     label 银行卡号
                     .box_right
                         .input_box
-                            <input class="input_phone" type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
-                            .static
+                            <input id='password' class="input_phone" type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
+                            .status
                                 .true
                                 .false 银行卡号码有误
                 .box
                     label
                     .box_right
-                        <input class="submit" type="submit" value="下一步"/>
+                        <input class="submit button" type="button" value="下一步"/>
 
     //include global/g_footer
-    //script.
-        require(["/static/js/account_safe.js"])
+    script.
+        require(["/static/js/manual_audit.js"])
     include include/tracking
