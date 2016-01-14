@@ -17,7 +17,9 @@ org.finance = (function (org) {
         model_canvac_opeartion: true,
         canvas_model4: null,
         init: function () {
-            alert($(window).height())
+            $('.refresh').on('click', function(){
+                window.location = window.location.href
+            })
             window.onload = function(){
                 $('.client-loding-warp').animate({
                     opacity: 0
@@ -44,8 +46,14 @@ org.finance = (function (org) {
                 }
             });
         },
+        fetch_data: function(){
+            org.ajaj({
+                url: '/api/account2015/',
+
+            })
+        },
         canvas_model3_doging: function () {
-            var _self = this,canvas_w = 180,canvas_r = 140,canvas_font = '34px';
+            var _self = this,canvas_w = 140,canvas_r = 140,canvas_font = '34px';
             var isAndroid = navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1; //android终端
             if(isAndroid){
                 canvas_w = canvas_w/2
@@ -121,7 +129,7 @@ org.finance = (function (org) {
 
 			];
             var canvas_target  = document.getElementById("model4-canvas");
-            var _self = this,canvas_w = 400,canvas_h = 400
+            var _self = this,canvas_w = 300,canvas_h = 300
             var isAndroid = navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1; //android终端
             if(isAndroid){
                 canvas_w = canvas_w/2;
