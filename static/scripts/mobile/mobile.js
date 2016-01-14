@@ -1780,10 +1780,6 @@ org.processSecond = (function (org) {
             lib._validation();
             lib._submit();
         },
-<<<<<<< HEAD
-        _init_select: function () {
-            if (localStorage.getItem('bank')) {
-=======
         _format_limit: function(amount){
             var money = amount, reg = /^\d{5,}$/, reg2 = /^\d{4}$/;
             if(reg.test(amount)){
@@ -1809,7 +1805,6 @@ org.processSecond = (function (org) {
         },
         _init_select: function(){
             if(localStorage.getItem('bank')){
->>>>>>> production5.0
                 var content = JSON.parse(localStorage.getItem('bank'));
                 lib.$bank.append(appendBanks(content));
                 lib._limit_style(content)
@@ -1823,12 +1818,8 @@ org.processSecond = (function (org) {
                         console.log(results)
                         var content = JSON.stringify(results.banks);
                         window.localStorage.setItem('bank', content);
-<<<<<<< HEAD
-                    } else {
-=======
 
                     }else{
->>>>>>> production5.0
                         return org.ui.alert(results.message);
                     }
                 },
@@ -1986,7 +1977,6 @@ org.processSecond = (function (org) {
     }
 })(org);
 
-<<<<<<< HEAD
 org.trade_back = (function (org) {
     var lib = {
         $submit : $('button[type=submit]'),
@@ -2268,9 +2258,6 @@ org.trade_back = (function (org) {
     window.Deal_ui = Deal_ui;
 })();
 
-(function (org) {
-    $.each($('script'), function () {
-=======
 org.received_ui = (function(){
     var slide = function(data){
         var slide = "<div class='swiper-slide received-slide'>"
@@ -2563,7 +2550,6 @@ org.received_detail = (function(){
 
 ;(function(org){
     $.each($('script'), function(){
->>>>>>> production5.0
         var src = $(this).attr('src');
         if (src && src.indexOf(org.scriptName) > 0) {
             if ($(this).attr('data-init') && org[$(this).attr('data-init')]) {
