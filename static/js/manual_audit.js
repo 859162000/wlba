@@ -55,13 +55,15 @@
             var id_number_val = $('#id_number').val();
             var validate_code_val = $('#validate_code').val();
             var password_val = $('#password').val();
+            alert(id_number_val);
+            alert(validate_code_val);
             $.ajax({
-                url: 'manual_modify/vali_acc_info/' ,
+                url: '/api/manual_modify/vali_acc_info/' ,
                 type: 'POST',
                 data: {
                     id_number:id_number_val,
-                    validate_code:validate_code_val,
-                    password:password_val
+                    validate_code:validate_code_val
+                    //password:password_val
                 },
                 success: function (returndata) {
                     alert(returndata);
