@@ -883,6 +883,11 @@ YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
+# 汇讯群呼语音验证码(快易通)
+VOICE_HX_URL = 'http://i.huixun35.com/sdk/SMS'
+VOICE_HX_UID = '52361'
+VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
+
 # Modify by hb on 2015-11-25 for new id-verify-channel
 #ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
