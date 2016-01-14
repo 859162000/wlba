@@ -110,11 +110,11 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":"",
+                   "value":"点击详情进入刮刮卡",
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": settings.CALLBACK_HOST + '/weixin/activity_ggl/',
     },
     PRODUCT_AMORTIZATION_TEMPLATE_ID:{
         "top_color":'#88ffdd',
@@ -214,11 +214,11 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":u'您可以使用下方微信菜单进行更多体验。',
+                   "value":u'点击详情进入刮刮卡。',
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": settings.CALLBACK_HOST + '/weixin/activity_ggl/',
     },
 
     BIND_SUCCESS_TEMPLATE_ID:{

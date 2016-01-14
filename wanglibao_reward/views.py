@@ -1315,14 +1315,14 @@ class WeixinActivityAPIView(APIView):
             with transaction.atomic():
                 record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
                 sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
-                if record.experience:
+                if record.redpack_event:
                     json_to_response = {
                         'code': 0,
                         'lefts': sum_left["amount_sum"]-1,
-                        'amount': "%04d" % (record.experience.amount,),
+                        'amount': "%s" % (record.redpack_event.amount,),
                         'message': u'用户抽到奖品'
                     }
-                    SendExperienceGold(request.user).send(record.experience.id)
+                    redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
 
                 else:
                     json_to_response = {

@@ -34,6 +34,7 @@ from marketing.tops import Top
 from utils import local_to_utc
 from wanglibao_reward.models import WanglibaoWeixinRelative
 # used for reward
+from wanglibao_profile.models import Account2015
 from weixin.models import WeixinAccounts
 import cStringIO
 from wanglibao_account.utils import FileObject
@@ -3015,3 +3016,51 @@ class ThunderBindingApi(APIView):
                     % (user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+import math
+class CustomerAccount2015ApiView(APIView):
+    """
+    迅雷用户绑定接口
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        error_code = 0
+        error_message = u''
+        account_dict = u''
+
+        user = self.request.user
+        if user and user.id:
+            user_id = user.id
+            user_id = 297109
+            account = Account2015.objects.filter(user_id=user_id).first()
+            if account:
+                account_dict = account.toJSON_filter()
+                if account.tz_times>0:
+                    account_dict['tz_avg_time'] = round(365.0/float(account.tz_times), 2)
+                if account.tz_amount>0:
+                    a = math.ceil(account.tz_sterm_amount / account.tz_amount * 100)
+                    b = math.ceil(account.tz_mterm_amount / account.tz_amount * 100)
+                    c = math.ceil(account.tz_lterm_amount / account.tz_amount * 100)
+                    if a+b+c > 100:
+                        max_value = max(a, b, c)
+                        if a==max_value:
+                            a = a - 1
+                        elif b==max_value:
+                            b = b - 1
+                        elif c==max_value:
+                            c = c - 1
+                    account_dict['tz_sterm_percent'] = a
+                    account_dict['tz_mterm_percent'] = b
+                    account_dict['tz_lterm_percent'] = c
+                error_code=0
+                error_message=u'Success'
+            else:
+                error_code=405
+                error_message=u'Account not found'
+        else:
+            error_code=404
+            error_message=u'User not found'
+
+        resp = {"error_code":error_code, "error_message":error_message, "account":account_dict}
+        return HttpResponse(json.dumps(resp, sort_keys=True), content_type='application/json')
