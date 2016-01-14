@@ -135,6 +135,17 @@
                 }
                 return true;
             }
+        var myreg = /^(((12[0-9]{1}|)|(13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1})|(14[57]{1})|(17[0678]{1}))+\d{8})$/;
+        $('.input_phone').blur(function(){
+            if(!myreg.test($(".input_phone").val()))
+            {
+                $('.error_phone').show();
+            }else{
+                $('.error_phone').hide();
+            }
+        });
+
+
 
         $('.get_code').click(function(){
             var phone = $('.input_phone');
