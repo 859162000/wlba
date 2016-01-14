@@ -27,16 +27,16 @@
 	var is_myself;
 	var phone_num;
 	/*申请领取*/
-	$('#go_receive').click(function() {
+	$('#go_receive').click(function(){
 
 		phone_num = $('#get_phone').val();
 
 		$.ajax({
-			url: '/weixin_activity/weixin/bonus/?act=apply&phone=' + phone_num + '&wxid=' + wxid,
+			url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_num+'&wxid='+wxid,
 			type: "GET",
 			success: function (xhr) {
 				if (xhr.err_code == 0) {
-					window.location.href = '/weixin_activity/weixin/bonus/?wxid=' + wxid
+					window.location.href ='/weixin_activity/weixin/bonus/?wxid='+wxid
 				} else {
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').show();
