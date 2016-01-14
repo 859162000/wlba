@@ -8,6 +8,7 @@ from django.utils import timezone
 from marketing import tools
 #from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
+from django.conf import settings
 #from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_reward.views import RewardDistributer
 from wanglibao_account.cooperation import CoopRegister
@@ -186,6 +187,7 @@ class P2PTrader(object):
                                                 "keyword1": self.product.name,
                                                 "keyword2": "%s 元"%str(amount),
                                                 "keyword3": now,
+                                                "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
                                                     })},
                                                 queue='celery02')
         except Exception, e:
