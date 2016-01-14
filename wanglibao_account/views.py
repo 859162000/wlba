@@ -2235,8 +2235,12 @@ class ValidateAccountInfoAPI(APIView):
         profile = user.wanglibaouserprofile
         id_number = request.DATA.get('id_number', "").strip()
         params = request.DATA
-        params['identifier']=profile.phone
-        form = LoginAuthenticationNoCaptchaForm(request, data=params)
+
+        data = {}
+        for k,v in params:
+            data[k]=v
+        data['identifier']=profile.phone
+        form = LoginAuthenticationNoCaptchaForm(request, data=data)
         if form.is_valid():
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
