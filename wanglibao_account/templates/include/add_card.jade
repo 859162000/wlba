@@ -59,7 +59,7 @@ form#add-card-form.add-card-form(style="display:none")
         .binding-info.clearfix.codeBox
             label 短信验证码
             input(type="text", placeholder="填写短信验证码", autocomplete='off').sem-input.code
-            button(type='button', data-phone="{{user.wanglibaouserprofile.phone}}",tag="1").get-code.get-code 获取验证码
+            button(type='button', data-phone="{{user.wanglibaouserprofile.phone}}",tag="1",autocomplete='off').get-code.get-code 获取验证码
             span
         .binding-info.clearfix
             a(href='javascript:void(0)').btns#bindingBtn 绑定银行卡
