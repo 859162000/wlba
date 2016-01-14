@@ -103,13 +103,12 @@
         window.jwplayer = $.extend(jwplayer, {'key': "F4UVreRdsAfmJwi9PjMJ8FXZOeG7ox0PN4l/Ig=="});
         if (navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") == -1) {
             console.log(11)
-            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
+            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8" >';
             $('#player').append(str);
         } else if (!IsPC()) {
             var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
             $('#player').append(str);
         } else {
-            console.log(12);
             var w = $('#player').width();
             var h = w * 9 / 16;
             $('#player').height(h);
