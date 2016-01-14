@@ -248,7 +248,6 @@
             file_1 = document.getElementById("id_front_image").value;
             file_2 = document.getElementById("id_back_image").value;
             file_3 = document.getElementById("id_user_image").value;
-            phone_true = false;
             code_num = $('.input_code').val();
             if(file_1&&file_2&&file_3&&phone_true&&code_num) {
                 $('.error_form').hide();
