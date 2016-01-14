@@ -1497,7 +1497,7 @@ class WeixinAnnualBonusView(TemplateView):
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-        rep = { 'err_code':0, 'err_messege':'', 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
+        rep = { 'err_code':0, 'err_messege':'', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def share_bonus(self):
