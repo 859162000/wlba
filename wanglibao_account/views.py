@@ -2245,6 +2245,7 @@ class ValidateAccountInfoAPI(APIView):
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
             #todo
+            # 同卡之后要对银行卡号进行验证
             return Response({'ret_code': 0})
         return Response(form.errors, status=400)
 
@@ -2330,11 +2331,16 @@ class SMSModifyPhoneValidateAPI(APIView):
             new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
             if new_phone_user:
                 return Response({'message':"new phone has been registered"}, status=400)
-            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status = u'短信修改手机号提交').first()
+            #todo
+            # 同卡之后要对银行卡号进行验证
+            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, status = u'短信修改手机号提交').first()
             if not sms_modify_record:
                 sms_modify_record = SMSModifyPhoneRecord()
                 sms_modify_record.user = user
                 sms_modify_record.status = u'短信修改手机号提交'
+                sms_modify_record.new_phone = new_phone
+                sms_modify_record.save()
+            if sms_modify_record.new_phone != new_phone:
                 sms_modify_record.new_phone = new_phone
                 sms_modify_record.save()
             return Response({"message":'ok'})
@@ -2345,10 +2351,13 @@ class SMSModifyPhoneTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         user = self.request.user
-        profile = user.wanglibaouserprofile
+        new_phone = ""
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, status = u'短信修改手机号提交').first()
+        if sms_modify_record:
+            new_phone = sms_modify_record.new_phone
 
         return {
-            "new_phone": profile.phone,
+            "new_phone": new_phone,
             }
 
 class SMSModifyPhoneAPI(APIView):
