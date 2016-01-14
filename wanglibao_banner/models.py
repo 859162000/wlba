@@ -99,12 +99,21 @@ class AppActivate(models.Model):
     class Meta:
         verbose_name_plural = u'启动页活动(app/pc)'
 
-    DEVICE_TYPE = ('app_iso', 'app_android', 'act_iso', 'act_android', 'pc_home')
+    DEVICE_TYPE = ('app_iso', 'app_android', 'act_iso', 'act_android', 'act_score_iso', 'pc_home', 'act_i')
     DEVICES = ((x, x) for x in DEVICE_TYPE)
     LINK_CHOICES = (
         (u'1', u'理财专区'),
         (u'2', u'发现页'),
         (u'3', u'全民淘金'),
+        (u'4', u'发现页h5页面'),
+        (u'5', u'其他h5页面'),
+        (u'6', u'体验金'),
+    )
+
+    USER_LOGIN_STATUS = (
+        (u'-1', u'不限制用户登录状态'),
+        (u'0', u'用户未登录状态弹出'),
+        (u'1', u'用户登录状态弹出'),
     )
 
     name = models.CharField(u'名称', max_length=30, help_text=u'名称')
@@ -124,8 +133,12 @@ class AppActivate(models.Model):
     start_at = models.DateTimeField(u"banner生效时间", null=True, blank=True)
     end_at = models.DateTimeField(u"banner失效时间", null=True, blank=True)
     is_used = models.BooleanField(u'是否启用', default=False, help_text=u'默认不启用')
+    user_login_status_limit = models.CharField(u'用户登录状态限制', default=u'-1', max_length=8, choices=USER_LOGIN_STATUS, help_text="用户登录状态限制")
     jump_state = models.BooleanField(u'是否开启跳转', default=False, help_text=u'默认不开启跳转,PC端也适用')
     link_dest = models.CharField(u'跳转链接', default=u'3', max_length=32, choices=LINK_CHOICES)
+    link_dest_h5_url = models.CharField(u'活动浮层跳转h5页url', default=u'https://', max_length=300,
+                                       help_text=u'如果浮层跳转的是h5页面,一定要配置这个url')
     pc_redirect_url = models.CharField(u'PC端跳转链接', default=u'http://', max_length=300,
                                        help_text=u'PC端跳转链接,请输入http://开头的完整网址')
+
 
