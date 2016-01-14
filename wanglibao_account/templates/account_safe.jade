@@ -7,7 +7,7 @@ block sidebar
     //- with '账户总览' as activeItem
     include include/user_center_sidebar
 block main
-    .main_wrap.main_wrap_1
+    .phone_modify_main_wrap.main_wrap_1
         .main_title_top 身份信息
             .text 人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
             .true 手机号修改成功
@@ -44,21 +44,22 @@ block main
                     dd 原手机无法收取短信
         .info_box
             .img.img_2
-            dl
-                if id_is_valid
+            if id_is_valid
+                dl
                     dt
                         .text 实名认证
                         .ico.is_set_ico
                         span.is_set_text 已认证
                     dd *永明 370125**********
-                else
+            else
+                dl
                     dt
                         .text 实名认证
                         .ico.no_set_ico
                         span.no_set_text 待认证
                     dd 您尚未进行实名认证！
-            .button 实名认证
-    .main_wrap.main_wrap_2
+                .button 实名认证
+    .phone_modify_main_wrap.main_wrap_2
         .main_title_top 密码管理
         .info_box
             .img.img_3
@@ -92,6 +93,6 @@ block main
 
 
     //include global/g_footer
-    //script.
+    script.
         require(["/static/js/account_safe.js"])
     include include/tracking
