@@ -87,10 +87,8 @@ class Mixin(object):
         :attr:`authentication`.
         """
         for backend in self.authentication:
-            client = backend().authenticate(request)
-            if client is not None:
-                return client
-        return None
+            client, _error = backend().authenticate(request)
+            return client, _error
 
 
 class AccessTokenBaseView(OAuthView, Mixin):
@@ -266,7 +264,7 @@ class AccessTokenBaseView(OAuthView, Mixin):
                 'error': 'invalid_request',
                 'error_description': _("A secure connection is required.")})
 
-        client = self.authenticate(request)
+        client, _error = self.authenticate(request)
 
         if client is None:
             return self.error_response({'error': 'invalid_client'})

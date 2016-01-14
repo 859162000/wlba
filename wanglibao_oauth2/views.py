@@ -91,13 +91,13 @@ class AccessTokenView(AccessTokenBaseView):
                 'message': _("A secure connection is required")
             })
 
-        client = self.authenticate(request)
+        client, _error = self.authenticate(request)
         if client is None:
             return self.error_response({
                 'code': '10101',
                 'message': _('invalid client')})
 
-        form = UserAuthForm(request.POST)
+        form = UserAuthForm(request.POST, client=client)
         if not form.is_valid():
             return self.error_response(form.errors)
 

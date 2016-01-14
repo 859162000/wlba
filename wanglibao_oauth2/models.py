@@ -8,6 +8,7 @@ views in :attr:`provider.views`.
 
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 from .utils import now, short_token, long_token
 from .utils import get_token_expiry, deserialize_instance
 from .managers import AccessTokenManager
@@ -38,11 +39,15 @@ class Client(models.Model):
     client_id = models.CharField(u'客户端ID', unique=True, db_index=True, max_length=255, default=short_token)
     client_secret = models.CharField(u'客户端密钥', max_length=255, default=long_token)
     channel = models.ForeignKey(Channels, verbose_name=u'渠道', help_text=u'渠道', blank=True, null=True)
+    client_name = models.CharField(u'客户端名称', max_length=20)
     # reg_return_token = models.BooleanField(u'注册返回Token', default=False)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
 
     def __unicode__(self):
-        return self.client_id
+        return self.client_name
+
+    class Meta:
+        verbose_name_plural = u'Oauth2客户端'
 
     def get_default_token_expiry(self):
         return get_token_expiry()
@@ -71,6 +76,15 @@ class Client(models.Model):
             kwargs[name] = val
 
         return cls(**kwargs)
+
+
+class OauthUser(models.Model):
+    client = models.ForeignKey(Client, verbose_name=u'客户端')
+    user = models.ForeignKey(User, verbose_name=u'客户端')
+    created_time = models.DateTimeField(u'创建时间', auto_now=True)
+
+    class Meta:
+        verbose_name_plural = u'Oauth2用户'
 
 
 class AccessToken(models.Model):

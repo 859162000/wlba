@@ -73,6 +73,7 @@ import uuid
 import urllib
 from .utils import xunleivip_generate_sign
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
+from wanglibao_oauth2.models import OauthUser, Client
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -172,6 +173,8 @@ class CoopRegister(object):
         # 渠道提供给我们的秘钥
         self.coop_key = None
         self.call_back_url = None
+        # 传递渠道oauth客户端ID时使用的变量名
+        self.internal_channel_client_id_key = 'client_id'
 
     @property
     def channel_code(self):
@@ -198,6 +201,10 @@ class CoopRegister(object):
     @property
     def channel_user(self):
         return self.request.session.get(self.internal_channel_user_key, None)
+
+    @property
+    def channel_client_id(self):
+        return self.request.session.get(self.internal_channel_client_id_key, None)
 
     @property
     def channel_extra(self):
@@ -275,6 +282,20 @@ class CoopRegister(object):
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
+    def save_to_oauthuser(self, user):
+        client_id = self.channel_client_id
+        if client_id:
+            try:
+                client = Client.objects.get(client_id=client_id)
+                oauth_user = OauthUser()
+                oauth_user.user = user
+                oauth_user.client = client
+                oauth_user.save()
+            except Client.DoesNotExist:
+                logger.info("user[%s] save to oauthuser failed with invalid client_id [%s]" % (user.id, client_id))
+            except Exception, e:
+                logger.info("user[%s] client[%s] save to oauthuser failed with error: %s" % (user.id, client_id, e))
+
     def register_call_back(self, user):
         """
         用户注册成功后的回调
@@ -331,6 +352,7 @@ class CoopRegister(object):
         """
         self.save_to_introduceby(user, invite_code)
         self.save_to_binding(user)
+        self.save_to_oauthuser(user)
         self.register_call_back(user)
         self.clear_session()
 
@@ -1544,16 +1566,19 @@ class BaJinSheRegister(CoopRegister):
         self.c_code = 'bajinshe'
         self.internal_channel_p_id_key = 'product_id'
         self.external_channel_p_id_key = 'product_id'
-        self.external_channel_client_id_key = 'appid_id'
-        self.internal_channel_client_id_key = 'client_id'
-        self.external_channel_access_token_key = 'access_token'
-        self.internal_channel_access_token_key = 'access_token'
+        self.external_channel_client_id_key = 'appid'
+        self.channel_access_token_key = 'access_token'
         self.external_channel_user_key = 'usn'
         self.internal_channel_phone_key = 'phone'
+        self.external_channel_user_id_key = 'p_user_id'
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
         channel_user = self.request.POST.get(self.external_channel_user_key, None)
+        p_id = self.request.POST.get(self.external_channel_p_id_key, None)
+        client_id = self.request.POST.get(self.external_channel_client_id_key, None)
+        access_token = self.request.POST.get(self.channel_access_token_key, None)
+
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
 
@@ -1564,23 +1589,23 @@ class BaJinSheRegister(CoopRegister):
             self.request.session[self.internal_channel_user_key] = channel_user
             self.request.session[self.internal_channel_phone_key] = channel_user
 
-        p_id = self.request.POST.get(self.external_channel_p_id_key, None)
         if p_id:
             self.request.session[self.internal_channel_p_id_key] = p_id
 
-        client_id = self.request.POST.get(self.external_channel_client_id_key, None)
+        if not client_id:
+            client_id = self.request.GET.get(self.external_channel_client_id_key, None)
+
         if client_id:
             self.request.session[self.internal_channel_client_id_key] = client_id
 
-        access_token = self.request.POST.get(self.external_channel_access_token_key, None)
         if access_token:
-            self.request.session[self.internal_channel_access_token_key] = client_id
+            self.request.session[self.channel_access_token_key] = access_token
 
     def clear_session(self):
         super(BaJinSheRegister, self).clear_session()
         self.request.session.pop(self.internal_channel_p_id_key, None)
         self.request.session.pop(self.internal_channel_client_id_key, None)
-        self.request.session.pop(self.internal_channel_access_token_key, None)
+        self.request.session.pop(self.channel_access_token_key, None)
         self.request.session.pop(self.internal_channel_phone_key, None)
 
     def save_to_binding(self, user):

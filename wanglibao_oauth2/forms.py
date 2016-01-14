@@ -1,9 +1,8 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from wanglibao_account.utils import Crypto
-from .models import Client, RefreshToken
+from .models import Client, RefreshToken, OauthUser
 
 
 class OAuthValidationError(Exception):
@@ -76,9 +75,9 @@ class ClientAuthForm(OAuthForm):
     the client.
     """
 
-    client_id = forms.CharField(required=False)
+    client_id = forms.CharField(required=True)
 
-    def clean_client_id(self):
+    def clean(self):
         client_id = self.cleaned_data.get('client_id', '').strip()
         if not client_id:
             raise OAuthValidationError({
@@ -105,11 +104,11 @@ class UserAuthForm(OAuthForm):
     the user.
     """
 
-    user_id = forms.CharField(required=False)
-    usn = forms.CharField(required=False)
+    p_user_id = forms.CharField(required=True)
+    usn = forms.CharField(required=True)
 
     def clean(self):
-        user_id = self.cleaned_data.get('user_id').strip()
+        user_id = self.cleaned_data.get('p_user_id', '').strip()
         if not user_id:
             raise OAuthValidationError({
                 'code': '10104',
@@ -128,11 +127,11 @@ class UserAuthForm(OAuthForm):
             })
 
         try:
-            user = User.objects.get(id=user_id, wanglibaouserprofile__phone=usn)
-        except User.DoesNotExist:
+            user = OauthUser.objects.get(user_id=user_id, client=self.client, user__wanglibaouserprofile__phone=usn).user
+        except OauthUser.DoesNotExist:
             raise OAuthValidationError({
                 'code': '10104',
-                'message': _("invalid user_id or usn")
+                'message': _("invalid user_id or usn or client")
             })
         else:
             self.cleaned_data['usn'] = usn
