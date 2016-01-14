@@ -1295,12 +1295,17 @@ class WeixinAnnualBonusView(TemplateView):
             #wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
             follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=1).order_by('-create_time')
             self.template_name = 'app_praise_reward.jade'
+            if self.is_myself:
+                share_all = u'我领到一份年终奖，%s元噢！你也为自己一年的努力另一份吧！'%wx_bonus.annual_bonus
+            else:
+                share_all = u'我只想安安静静地领个年终奖，点赞（打赏我）给我发500！'
             return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows,
                      'share_name':u'我的努力需要你的一个肯定，谢谢你',
                      'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                      'share_link':settings.CALLBACK_HOST + reverse(self.url_name) + "?uid=" + self.to_openid,
                      'share_title':u'我的努力需要你的一个肯定，谢谢你',
                      'share_body':u'您的好友正在领取他的年终奖，随手一赞，助他多拿500！',
+                     'share_all': share_all,
                      'is_from_regist' : self.is_from_regist,
                     }
         else:
