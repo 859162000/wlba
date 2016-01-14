@@ -46,7 +46,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, PhoneRegisterOrBindingDetectApi)
+                            BidHasBindingForChannel, AccessUserExistsApi)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -290,7 +290,7 @@ from .views import RegisterOpenApiView
 
 urlpatterns += patterns(
     '',
-    url(r'^access_user/$', RegisterOpenApiView.as_view()),
+    url(r'^access_user/register/$', RegisterOpenApiView.as_view()),
 )
 
 # 理财金接口
@@ -314,5 +314,5 @@ urlpatterns += patterns(
 # 判断手机号是否已经绑定渠道或被注册
 urlpatterns += patterns(
     '',
-    url(r'^access_user/(?P<channel_code>[a-z0-9A-Z_]*)/$', PhoneRegisterOrBindingDetectApi.as_view()),
+    url(r'^access_user/exists/$', AccessUserExistsApi.as_view()),
 )

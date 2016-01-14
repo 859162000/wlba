@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.conf import settings
+from wanglibao_account.utils import Crypto
 from .models import Client, RefreshToken
 
 
@@ -113,6 +115,10 @@ class UserAuthForm(OAuthForm):
                 'code': '10104',
                 'message': _("invalid user_id")
             })
+        else:
+            crypto = Crypto()
+            data_buf = crypto.decode_bytes(str(user_id))
+            user_id = crypto.decrypt_mode_cbc(data_buf, settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
 
         usn = self.cleaned_data.get('usn', '').strip()
         if not usn:

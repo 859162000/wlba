@@ -65,7 +65,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
-from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes
+from wanglibao_account.utils import Crypto
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
@@ -1028,9 +1028,10 @@ class ZGDXRegister(CoopRegister):
             'plat_offer_id': plat_offer_id,
             'effect_type': effect_type,
         }
-        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
+        crypto = Crypto()
+        data_buf = crypto.encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
         params = {
-            'code': encodeBytes(encrypt_str),
+            'code': crypto.encode_bytes(data_buf),
             'partner_no': self.partner_no,
         }
 
@@ -1548,6 +1549,7 @@ class BaJinSheRegister(CoopRegister):
         self.external_channel_access_token_key = 'access_token'
         self.internal_channel_access_token_key = 'access_token'
         self.external_channel_user_key = 'usn'
+        self.internal_channel_phone_key = 'phone'
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
@@ -1555,8 +1557,12 @@ class BaJinSheRegister(CoopRegister):
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
 
+        if not channel_user:
+            channel_user = self.request.GET.get(self.external_channel_user_key, None)
+
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
+            self.request.session[self.internal_channel_phone_key] = channel_user
 
         p_id = self.request.POST.get(self.external_channel_p_id_key, None)
         if p_id:
@@ -1575,6 +1581,7 @@ class BaJinSheRegister(CoopRegister):
         self.request.session.pop(self.internal_channel_p_id_key, None)
         self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.internal_channel_access_token_key, None)
+        self.request.session.pop(self.internal_channel_phone_key, None)
 
     def save_to_binding(self, user):
         """

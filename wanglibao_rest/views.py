@@ -47,12 +47,12 @@ from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua, get_client_ip, has_binding_for_bid
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, get_channel_record
 from django.conf import settings
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
@@ -62,6 +62,7 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
+from wanglibao_account.utils import Crypto
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1697,22 +1698,42 @@ class BidHasBindingForChannel(APIView):
         return HttpResponse(json.dumps(response_data), content_type='application/json')
 
 
-class PhoneRegisterOrBindingDetectApi(APIView):
+class AccessUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
     permission_classes = ()
 
-    def get(self, request, channel_code, phone):
-        user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-        if not has_binding_for_bid(channel_code, phone) and user:
-            response_data = {
-                'user_id': user.id,
-                'ret_code': 10001,
-                'message': u'该手机号已经被抢注'
-            }
-        else:
-            response_data = {
-                'user_id': None,
-                'ret_code': 10000,
-                'message': u'该手机号可以使用'
-            }
+    def get(self, request, **kwargs):
+        channel_code = request.GET.get('promo_token', None)
+        if channel_code:
+            channel = get_channel_record(channel_code)
+            if channel:
+                phone = request.session.get('phone')
+                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                if has_binding_for_bid(channel_code, phone) and user:
+                    crypto = Crypto()
+                    data_buf = crypto.encrypt_mode_cbc(str(user.id), settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
+                    user_id = crypto.encode_bytes(data_buf)
+                    response_data = {
+                        'user_id': user_id,
+                        'ret_code': 10000,
+                        'message': u'该号已注册'
+                    }
+                else:
+                    response_data = {
+                        'user_id': None,
+                        'ret_code': 10001,
+                        'message': u'该号未注册'
+                    }
 
-        return HttpResponse(json.dumps(response_data), content_type='application/json')
+                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+            else:
+                response_data = {
+                    'user_id': None,
+                    'ret_code': 10002,
+                    'message': u'无效promo_token'
+                }
+        else:
+            return Http404(u'页面不存在')
+
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
