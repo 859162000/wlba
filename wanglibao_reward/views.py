@@ -1298,7 +1298,7 @@ class WeixinAnnualBonusView(TemplateView):
             if self.is_myself:
                 share_all = u'我领到一份年终奖，%s元噢！你也为自己一年的努力另一份吧！'%wx_bonus.annual_bonus
             else:
-                share_all = u'我只想安安静静地领个年终奖，点赞（打赏我）给我发500！'
+                share_all = u'我只想安安静静地领个年终奖，点赞给我赏500！'
             return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows,
                      'share_name':u'我的努力需要你的一个肯定，谢谢你',
                      'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
