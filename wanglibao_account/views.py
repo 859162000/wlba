@@ -2237,13 +2237,14 @@ class ValidateAccountInfoAPI(APIView):
         params = request.DATA
 
         data = {}
-        for k,v in params:
+        for k,v in params.iteritems():
             data[k]=v
         data['identifier']=profile.phone
         form = LoginAuthenticationNoCaptchaForm(request, data=data)
         if form.is_valid():
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
+            #todo
             return Response({'ret_code': 0})
         return Response(form.errors, status=400)
 
