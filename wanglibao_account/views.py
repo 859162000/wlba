@@ -32,7 +32,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
-    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,ManualModifyPhoneForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
@@ -69,7 +69,7 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
-from wanglibao_account.models import UserThreeOrder
+from wanglibao_account.models import UserThreeOrder, ManualModifyPhoneRecord
 import requests
 from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
@@ -498,6 +498,8 @@ class AccountHome(TemplateView):
         experience_amount = 0
         paid_interest = unpaid_interest = 0
 
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
+
         experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
             .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
         if experience_record.get('event__amount__sum'):
@@ -515,7 +517,9 @@ class AccountHome(TemplateView):
             'total_experience_amount': total_experience_amount,
             'experience_amount': float(experience_amount),
             'paid_interest': paid_interest,
-            'unpaid_interest': unpaid_interest
+            'unpaid_interest': unpaid_interest,
+            'experience_amortization': experience_amortization,
+            'product': experience_product,
         }
 
         return {
@@ -2194,3 +2198,103 @@ class FirstPayResultView(TemplateView):
     def get_context_data(self, **kwargs):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
+
+
+class ManualModifyPhoneTemplate(TemplateView):
+    template_name = 'phone_modify_manual.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+
+        form = ManualModifyPhoneForm()
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        return {'form':form, 'modify_phone_record':modify_phone_record}
+
+
+
+class ManualModifyPhoneAPI(APIView):
+    # permission_classes = (IsAuthenticated, )
+    permission_classes = ()
+
+    def post(self, request):
+        user = request.user
+        form = ManualModifyPhoneForm(self.request.POST, self.request.FILES)
+        if form.is_valid():
+            id_front_image = form.cleaned_data['id_front_image']
+            id_back_image = form.cleaned_data['id_back_image']
+            id_user_image = form.cleaned_data['id_user_image']
+            new_phone = form.cleaned_data['new_phone']
+            manual_record = ManualModifyPhoneRecord()
+            manual_record.user = user
+            manual_record.id_front_image = id_front_image
+            manual_record.id_back_image = id_back_image
+            manual_record.id_user_image = id_user_image
+            manual_record.new_phone = new_phone
+            manual_record.status = u'初审中'
+            manual_record.save()
+        return Response({'ret_code': 0})
+
+
+class IdentityInformationTemplate(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        return {
+            "phone": safe_phone_str(profile.phone),
+            "id_is_valid": profile.id_is_valid,
+            "trade_pwd": profile.trade_pwd == ""
+        }
+
+
+class ValidateAccountInfoTemplate(TemplateView):
+    template_name = ""
+
+    def get_context_data(self, **kwargs):
+        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
+        is_bind_card = cards.exists()
+        return {
+            'is_bind_card': is_bind_card
+        }
+
+class ValidateAccountInfoAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        form = LoginAuthenticationNoCaptchaForm(request, data=request.DATA)
+        if form.is_valid():
+            print '----------------------'
+            return Response({'ret_code': 0})
+        return Response(status=400)
+
+class SMSModifyPhoneValidateTemplate(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        return {
+            "phone": profile.phone,
+            }
+
+class SMSModifyPhoneValidateAPI(APIView):
+
+    pass
+
+class SMSModifyPhoneTemplate(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        return {
+            "new_phone": profile.phone,
+            }
+
+class SMSModifyPhoneAPI(APIView):
+    pass
+
+
+
+
+
+

@@ -9,7 +9,7 @@ $('.xunjiang-zong span').click(function () {
 $('.xunlei1 span').click(function () {
     if (getQueryString('referfrom')) {
         var refer = getQueryString('referfrom');
-        window.location.href = "http://act.vip.xunlei.com/waplogin/login.html?referfrom=" + refer
+        window.location.href = "http://act.vip.xunlei.com/vip/finance/waplogin/login.html?coop=wanglibao&referfrom=" + refer
     }
 
 });
@@ -29,14 +29,65 @@ org.ajax({
     url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
     success: function (data) {
-        console.log(data);
         if (data.ret_code == 10001) {
             $('.xunmeng3').show();
             $('.maimai-form').hide();
         }
     }
+});
+//微信分享
+var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
+org.ajax({
+    type: 'GET',
+    url: '/weixin/api/jsapi_config/',
+    dataType: 'json',
+    success: function (data) {
+        //请求成功，通过config注入配置信息,
+        wx.config({
+            debug: false,
+            appId: data.appId,
+            timestamp: data.timestamp,
+            nonceStr: data.nonceStr,
+            signature: data.signature,
+            jsApiList: jsApiList
+        });
+    }
+});
+var token１ = getQueryString('promo_token'),
+    xid１ = getQueryString('xluserid'),
+    timer１ = getQueryString('time'),
+    sig１ = getQueryString('sign'),
+    name１ = getQueryString('nickname'),
+    refer1 = getQueryString('referfrom');
+wx.ready(function () {
+
+    var //host = 'https://www.wanglibao.com',
+        host = 'https://staging.wanglibao.com',
+        shareImg = host + '/static/imgs/mobile/share_logo.png',
+        shareLink = host + '/activity/app_xunlei/?promo_token=' + token１+'&xluserid'+xid１+'&time'+timer１+'&sign'+sig１+'&nickname'+name１+'&referfrom'+refer1,
+        shareMainTit = '送你28888元体验金+1年迅雷会员',
+        shareBody = '注册即送28888元体验金，首次充值送7天迅雷白金会员，首次投资不低于1000元送1年迅雷白金会员。'
+    //分享给微信好友
+    org.onMenuShareAppMessage({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    });
+    //分享给微信朋友圈
+    org.onMenuShareTimeline({
+        title: shareMainTit,
+        link: shareLink,
+        imgUrl: shareImg
+    })
+    //分享给QQ
+    org.onMenuShareQQ({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    })
 })
-;
 org.xunlei = (function (org) {
 
     var lib = {
@@ -174,7 +225,6 @@ org.xunlei = (function (org) {
                         'nickname': name
                     },
                     success: function (data) {
-                        console.log(data)
                         if (data.ret_code == 10002 || data.ret_code == 10000) {
                             var va = $('input[name=phone]').val();
 

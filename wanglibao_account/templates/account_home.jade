@@ -163,7 +163,7 @@ block main
         .space-vertical-m
 
   else
-    .account-home-panel__no-padding
+    .account-home-panel__no-padding(style="padding-bottom:20px")
       .account-home-panel--title-bar__product
         ul.title-bar--tabs
           li.title-bar--tab
@@ -196,26 +196,23 @@ block main
               p.tyjMark 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除，
                 a(href="javascript:void(0)")#showMark 体验金领取及使用说明。
               .project_div.clearfix
-                h5 专属福利体验标
+                h5 {{experience_account.product.name}}
                 ul.project_detail.clearfix
                     li.li_one
-                      if experience_amount == 0
-                        label.rzje 28,888元
-                      else
-                        label {{experience_amount}}元
+                      label {{experience_account.experience_amount}}元
                       span 融资金额
                     li.li_two
-                        label {{product.expected_earning_rate}}%
+                        label {{experience_account.product.expected_earning_rate}}%
                         span 年化收益
                     li.li_three
-                        label {{product.period}}天
+                        label {{experience_account.product.period}}天
                         span 投资期限
                     li.li_four
-                        if experience_amount > 0
+                        if experience_account.experience_amount > 0
                             a(href='javascript:void(0)').investBtn 立即投资
                         else
                             a.invest_ed 立即投资
-              if user.is_authenticated and experience_amortization
+              if experience_amortization
                   .look_more_detail
                     .more_btn
                         label 查看历史投资项目
@@ -237,7 +234,7 @@ block main
                               td {{amo.product.name}}
                               td {{amo.principal}}
                               td {{amo.product.expected_earning_rate}}%
-                              td {{amo.product.period}}
+                              td {{amo.product.period}}天
                               if amo.settled
                                 td {{amo.interest | money_format}}/{{amo.interest | money_format}}（（元）
                               else

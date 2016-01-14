@@ -27,69 +27,81 @@ html(style="background:#efeff4")
                         .asset
                             p.asset_title 待收收益(元)
                             p.asset_count {{unpaid_interest | money_format}}
-            .markTitle
-                a(href='/activity/experience/explain/',target='_blank')
-                    i
-                    span 体验金获取及使用说明
-            .account_list
-                section.project_box
-                    .transaction_list.mb1
-                        .transaction_tit
-                            .tit_name
-                                .tit_name_div &nbsp&nbsp
-                                | {{product.name}}
-                        .transaction_cont
-                            .cont_money
-                                if experience_amount == 0
-                                    p 28,888元
+            if user.is_authenticated
+                lengths = len(experience_amortization)
+                if experience_amount != 0 or lengths > 0
+                    .markTitle
+                        a(href='/activity/experience/explain/',target='_blank')
+                            i
+                            span 体验金获取及使用说明
+                if experience_amount != 0
+                    .account_list
+                        section.project_box
+                            .transaction_list.mb1
+                                .transaction_tit
+                                    .tit_name
+                                        .tit_name_div &nbsp&nbsp
+                                        | {{product.name}}
+                                .transaction_cont
+                                    .cont_money
+                                        if experience_amount == 0
+                                            p 28,888元
+                                        else
+                                            p {{experience_amount}}
+                                        p 投资金额（元）
+                                    .cont_money.cont_money_center
+                                        p {{product.expected_earning_rate}}%
+                                        p 年化收益
+                                    .cont_money
+                                        p {{product.period}}
+                                        p 投资期限（天）
+                                if experience_amount > 0
+                                    .investment_btn.accountInvestBtn 立即投资
                                 else
-                                    p {{experience_amount}}
-                                p 投资金额（元）
-                            .cont_money.cont_money_center
-                                p {{product.expected_earning_rate}}%
-                                p 年化收益
-                            .cont_money
-                                p {{product.period}}
-                                p 投资期限（天）
-                        if experience_amount > 0
-                            .investment_btn.accountInvestBtn 立即投资
-                        else
-                            .investment_btn.accountInvestBtn 立即投资
-            if user.is_authenticated and experience_amortization
-              .account_list.investment_list
-                section.project_box
-                  for amo in experience_amortization
-                    .transaction_list
-                      .transaction_tit
-                          .tit_name
-                              .tit_name_div &nbsp&nbsp
-                              | {{amo.product.name}}
-                          .icon
-                              i
-                              em {{amo.product.period}}天
-                          .tit_time {{amo.created_time}}
-                      .transaction_cont
-                          .cont_money
-                              p {{amo.principal | money_format_int}}
-                              p 投资金额（元）
-                          .cont_money.cont_money_center
-                            if amo.settled
-                              p {{amo.interest}}
-                            else
-                              p 0.00
-                            p 已收金额（元）
-                          .cont_money
-                            if not amo.settled
-                              p {{amo.interest}}
-                            else
-                              p 0.00
-                            p 待收金额（元）
+                                    .investment_btn.investBtnEd.accountInvestBtned 立即投资
+                if experience_amortization
+                    .account_list.investment_list
+                        section.project_box
+                          for amo in experience_amortization
+                            .transaction_list
+                              .transaction_tit
+                                  .tit_name
+                                      .tit_name_div &nbsp&nbsp
+                                      | {{amo.product.name}}
+                                  .icon
+                                      i
+                                      em {{amo.product.period}}天
+                                  .tit_time {{amo.created_time}}
+                              .transaction_cont
+                                  .cont_money
+                                      p {{amo.principal | money_format_int}}
+                                      p 投资金额（元）
+                                  .cont_money.cont_money_center
+                                    if amo.settled
+                                      p {{amo.interest}}
+                                    else
+                                      p 0.00
+                                    p 已收金额（元）
+                                  .cont_money
+                                    if not amo.settled
+                                      p {{amo.interest}}
+                                    else
+                                      p 0.00
+                                    p 待收金额（元）
+                if experience_amount == 0
+                    if lengths == 0
+                        .account_no_list
+                            .no_info_div
+                                a(href='/activity/experience/explain/',target='_blank')
+                                    img(src='/static/imgs/mobile_activity/app_experience/no_data.png')
+                                    p 体验金获取及使用说明
             else
               //没有数据显示列表
               .account_no_list
-                p
-                  img(src='/static/imgs/mobile_activity/app_experience/no_data.png')
-                p 你还没有投资过体验项目
-                p 如果您通过注册或活动领取体验金
-                p 赶快点击右上角投资赚取收益吧
+                .no_info_div
+                    a(href='/activity/experience/explain/',target='_blank')
+                        img(src='/static/imgs/mobile_activity/app_experience/no_data.png')
+                        p 体验金获取及使用说明
+                //p 如果您通过注册或活动领取体验金
+                //p 赶快点击右上角投资赚取收益吧
         script(data-init="experience",src="/static/scripts/mobile_activity/account_experience.js?v=123456")
