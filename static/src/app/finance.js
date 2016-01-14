@@ -17,6 +17,7 @@ org.finance = (function (org) {
         model_canvac_opeartion: true,
         canvas_model4: null,
         init: function () {
+            lib.fetch_data()
             $('.refresh').on('click', function(){
                 window.location = window.location.href
             })
@@ -47,8 +48,12 @@ org.finance = (function (org) {
             });
         },
         fetch_data: function(){
-            org.ajaj({
+            org.ajax({
                 url: '/api/account2015/',
+                type: 'post',
+                success: function(result){
+                    console.log(result)
+                }
 
             })
         },
