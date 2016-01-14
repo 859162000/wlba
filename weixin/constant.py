@@ -114,7 +114,7 @@ Message_template = {
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": settings.CALLBACK_HOST + '/weixin/activity_ggl/',
     },
     PRODUCT_AMORTIZATION_TEMPLATE_ID:{
         "top_color":'#88ffdd',
@@ -218,7 +218,7 @@ Message_template = {
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": settings.CALLBACK_HOST + '/weixin/activity_ggl/',
     },
 
     BIND_SUCCESS_TEMPLATE_ID:{
