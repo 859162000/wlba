@@ -255,58 +255,58 @@ org.ajax({
     }
 });
 //微信分享
-//var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
-//org.ajax({
-//    type: 'GET',
-//    url: '/weixin/api/jsapi_config/',
-//    dataType: 'json',
-//    success: function (data) {
-//        //请求成功，通过config注入配置信息,
-//        wx.config({
-//            debug: false,
-//            appId: data.appId,
-//            timestamp: data.timestamp,
-//            nonceStr: data.nonceStr,
-//            signature: data.signature,
-//            jsApiList: jsApiList
-//        });
-//    }
-//});
-//var token１ = getQueryString('promo_token'),
-//    xid１ = getQueryString('xluserid'),
-//    timer１ = getQueryString('time'),
-//    sig１ = getQueryString('sign'),
-//    name１ = getQueryString('nickname'),
-//    refer1 = getQueryString('referfrom');
-//wx.ready(function () {
-//
-//    var //host = 'https://www.wanglibao.com',
-//        host = 'https://staging.wanglibao.com',
-//        shareImg = host + '/static/imgs/mobile/share_logo.png',
-//        shareLink = host + '/activity/app_xunlei/?promo_token=' + token１+'&xluserid'+xid１+'&time'+timer１+'&sign'+sig１+'&nickname'+name１+'&referfrom'+refer1,
-//        shareMainTit = '送你28888元体验金+1年迅雷会员',
-//        shareBody = '注册即送28888元体验金，首次充值送7天迅雷白金会员，首次投资不低于1000元送1年迅雷白金会员。'
-//    //分享给微信好友
-//    org.onMenuShareAppMessage({
-//        title: shareMainTit,
-//        desc: shareBody,
-//        link: shareLink,
-//        imgUrl: shareImg
-//    });
-//    //分享给微信朋友圈
-//    org.onMenuShareTimeline({
-//        title: shareMainTit,
-//        link: shareLink,
-//        imgUrl: shareImg
-//    })
-//    //分享给QQ
-//    org.onMenuShareQQ({
-//        title: shareMainTit,
-//        desc: shareBody,
-//        link: shareLink,
-//        imgUrl: shareImg
-//    })
-//})
+var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
+org.ajax({
+    type: 'GET',
+    url: '/weixin/api/jsapi_config/',
+    dataType: 'json',
+    success: function (data) {
+        //请求成功，通过config注入配置信息,
+        wx.config({
+            debug: false,
+            appId: data.appId,
+            timestamp: data.timestamp,
+            nonceStr: data.nonceStr,
+            signature: data.signature,
+            jsApiList: jsApiList
+        });
+    }
+});
+var token１ = getQueryString('promo_token'),
+    xid１ = getQueryString('xluserid'),
+    timer１ = getQueryString('time'),
+    sig１ = getQueryString('sign'),
+    name１ = getQueryString('nickname'),
+    refer1 = getQueryString('referfrom');
+wx.ready(function () {
+
+    var //host = 'https://www.wanglibao.com',
+        host = 'https://staging.wanglibao.com',
+        shareImg = host + '/static/imgs/mobile/share_logo.png',
+        shareLink = host + '/activity/app_xunlei/?promo_token=' + token１+'&xluserid'+xid１+'&time'+timer１+'&sign'+sig１+'&nickname'+name１+'&referfrom'+refer1,
+        shareMainTit = '送你28888元体验金+1年迅雷会员',
+        shareBody = '注册即送28888元体验金，首次充值送7天迅雷白金会员，首次投资不低于1000元送1年迅雷白金会员。'
+    //分享给微信好友
+    org.onMenuShareAppMessage({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    });
+    //分享给微信朋友圈
+    org.onMenuShareTimeline({
+        title: shareMainTit,
+        link: shareLink,
+        imgUrl: shareImg
+    })
+    //分享给QQ
+    org.onMenuShareQQ({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    })
+})
 org.xunlei = (function (org) {
 
     var lib = {
