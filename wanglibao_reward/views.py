@@ -1296,7 +1296,8 @@ class WeixinAnnualBonusView(TemplateView):
             follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=1).order_by('-create_time')
             self.template_name = 'app_praise_reward.jade'
             if self.is_myself:
-                share_all = u'我领到一份年终奖，%s元噢！你也为自己一年的努力另一份吧！'%wx_bonus.annual_bonus
+                ###share_all = u'我领到一份年终奖，%s元噢！你也为自己一年的努力另一份吧！'%wx_bonus.annual_bonus
+                share_all = u'我只想安安静静地领个年终奖，点赞给我赏500！'
             else:
                 share_all = u'我只想安安静静地领个年终奖，点赞给我赏500！'
             return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows,
