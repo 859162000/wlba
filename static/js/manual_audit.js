@@ -55,8 +55,9 @@
             var id_number_val = $('#id_number').val();
             var validate_code_val = $('#validate_code').val();
             var password_val = $('#password').val();
-            alert(id_number_val);
+
             alert(password_val);
+            alert(id_number_val);
             $.ajax({
                 url: '/api/manual_modify/vali_acc_info/' ,
                 type: 'POST',
