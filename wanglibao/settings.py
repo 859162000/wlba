@@ -260,7 +260,7 @@ STATICFILES_DIRS = (
 
 # Media files path
 MEDIA_ROOT = '/var/media/wanglibao/'
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 # DEFAULT_FILE_STORAGE = 'file_storage.storages.DatabaseStorage'
 DEFAULT_FILE_STORAGE = 'file_storage.storages.AliOSSStorage'
 
@@ -1279,8 +1279,8 @@ if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
 
 # settings for PHP
-PHP_UNPAID_PRINCIPLE = 'http://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
 PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
 if ENV == ENV_PRODUCTION:
-    PHP_UNPAID_PRINCIPLE = 'http://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+    PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
     PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'
