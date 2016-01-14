@@ -519,7 +519,7 @@ class CardViewSet(ModelViewSet):
         # passport user
         if not request.user.wanglibaouserprofile.id_number[0].isdigit():
             card.is_bind_yee = True
-	    card.is_bind_kuai = True
+            card.is_bind_kuai = True
 
         card.save()
 
