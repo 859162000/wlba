@@ -2233,7 +2233,6 @@ class ValidateAccountInfoAPI(APIView):
     def post(self, request):
         user = self.request.user
         profile = user.wanglibaouserprofile
-        validate_code = request.DATA.get('validate_code', "").strip()
         id_number = request.DATA.get('id_number', "").strip()
         params = request.DATA
         params['identifier']=profile.phone
@@ -2241,9 +2240,6 @@ class ValidateAccountInfoAPI(APIView):
         if form.is_valid():
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
-            status, message = validate_validation_code(profile.phone, validate_code)
-            if status != 200:
-                return Response({'message':message}, status=400)
             return Response({'ret_code': 0})
         return Response(form.errors, status=400)
 
