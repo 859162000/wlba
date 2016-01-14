@@ -232,12 +232,20 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			uid = temp[1] ? temp[1] : '';
 		}
 	}
-
+	var share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！';
+	var is_mine;
 	$.ajax({
 		url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
 		type: "GET",
 	}).done(function (xhr) {
+		
 		if(xhr.err_code==0){
+			is_mine = xhr.is_myself;
+			if(is_mine){
+				share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！';
+			}else{
+				share_friends = '求肯定，求点赞，求涨年终奖，助TA多拿500！';
+			}
 			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
 			//$('.renovate').click();
 		}else{
@@ -319,6 +327,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			$('.num_top').show();
 		}
 		$('#praise_num').val(annual_bonus);
+
+
 	}
 	/*刷新朋友圈结束*/
 	/*同意活动规则按钮*/
@@ -411,8 +421,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		shareLink = $('.share_link').text(),
 		shareMainTit = $('.share_title').text(),
 		shareBody = $('.share_body').text(),
-		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，',
 		user_info = $('.user_info').text();
+
+
+
 
 	if(user_info=='True'){
 		$('.friend_top span').text('您已注册成功，请点击<立即使用>领用您的年终奖了');
