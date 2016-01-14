@@ -234,8 +234,17 @@ org.finance = (function (org) {
     var lib = {
         process_num: 0,
         model_canvac_opeartion: true,
+        canvas_model4: null,
         init: function () {
+            alert($(window).height())
+            window.onload = function(){
+                $('.client-loding-warp').animate({
+                    opacity: 0
+                },300, function(){
+                    $(this).hide()
+                })
 
+            }
             var swiper = new Swiper('.swiper-container', {
                 paginationClickable: true,
                 direction: 'vertical',
@@ -245,20 +254,26 @@ org.finance = (function (org) {
                         lib.canvas_model3_doging()
                     }
                     if(swiper.activeIndex == 3){
-                        lib.cavas_model4()
+                        if(!lib.canvas_model4){
+                            lib.cavas_model4()
+                        }
+
                     }
 
                 }
             });
-
-
         },
         canvas_model3_doging: function () {
-            var _self = this;
-
-            function Start() {
-                _self.canvas_model3(90, 90, 70, _self.process_num);
-                t = setTimeout(Start, 30);
+            var _self = this,canvas_w = 180,canvas_r = 140,canvas_font = '34px';
+            var isAndroid = navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1; //android终端
+            if(isAndroid){
+                canvas_w = canvas_w/2
+                canvas_r = canvas_r/2
+                canvas_font = '17px'
+            }
+            function infinite(){
+                _self.canvas_model3(canvas_w/2, canvas_w/2, canvas_r/2, _self.process_num, canvas_w, canvas_font);
+                t = setTimeout(infinite, 30);
                 if (_self.process_num >= 60) {
                     clearTimeout(t);
                     _self.process_num = 0;
@@ -266,10 +281,9 @@ org.finance = (function (org) {
                 }
                 _self.process_num += 1;
             }
-
-            Start()
+            infinite()
         },
-        canvas_model3: function (x, y, radius, process) {
+        canvas_model3: function (x, y, radius, process, canvas_w, canvas_font) {
             var _self = this;
             var canvas = document.getElementById('canvas-model3');
 
@@ -278,6 +292,8 @@ org.finance = (function (org) {
 
                 if (_self.model_canvac_opeartion) {
                     canvas.getContext('2d').translate(0.5, 0.5)
+                    canvas.width = canvas_w;
+                    canvas.height = canvas_w;
                     _self.model_canvac_opeartion = false
                 }
             } else {
@@ -300,7 +316,7 @@ org.finance = (function (org) {
             cts.fill();
             cts.clearArc(x, y, radius - (radius * 0.26), 0, Math.PI * 2, true);
             //在中间写字
-            cts.font = '34px Arial'
+            cts.font = canvas_font + ' Arial'
             cts.fillStyle = '#FDF11C';
             cts.textAlign = 'center';
             cts.textBaseline = 'middle';
@@ -323,10 +339,16 @@ org.finance = (function (org) {
 				},
 
 			];
-
-            var myDoughnut = new Chart(document.getElementById("model4-canvas").getContext("2d"))
-                .Doughnut(doughnutData, {segmentShowStroke: false, onAnimationComplete: function(e){
-                }});
+            var canvas_target  = document.getElementById("model4-canvas");
+            var _self = this,canvas_w = 400,canvas_h = 400
+            var isAndroid = navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1; //android终端
+            if(isAndroid){
+                canvas_w = canvas_w/2;
+                canvas_h = canvas_h/2;
+            }
+            canvas_target.width = canvas_w;
+            canvas_target.height = canvas_h;
+            lib.canvas_model4 = new Chart(canvas_target.getContext("2d")).Doughnut(doughnutData, {segmentShowStroke: false});
         }
     }
 
