@@ -435,9 +435,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		if(go_experiencez_time==0){
 			clearTimeout();
 			if(h5_user_static){
-				window.location.href = '/activity/experience/mobile/'
+				window.location.href = '/activity/experience/account/'
 			}else{
-				window.location.href = '/weixin/login/?next=/activity/experience/mobile/'
+				window.location.href = '/weixin/login/?next=/activity/experience/account/'
 			}
 
 		}
@@ -491,12 +491,15 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		window.location.href = '/weixin_activity/weixin/bonus/';
 	});
 
+
+
 	$('.login_button').click(function(){
-		window.location.href = '/weixin/login/?next=/activity/experience/mobile/';
+		window.location.href = '/weixin/login/?next=/activity/experience/account/';
 	});
 
+
 	$('.go_experience').click(function(){
-		window.location.href = '/activity/experience/mobile/';
+		window.location.href = '/activity/experience/account/';
 	})
 
 	$('.friend_top .close').click(function(){
