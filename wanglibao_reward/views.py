@@ -1261,7 +1261,7 @@ class WeixinActivityAPIView(APIView):
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
-        when_dist_redpack = int(timezone.now())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
+        when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
         for _index in xrange(3):
             if _index == when_dist_redpack:
                 for key, value in points.items():
