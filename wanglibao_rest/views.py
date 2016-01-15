@@ -572,9 +572,9 @@ class SendVoiceCodeAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        res_code, res_text = backends.VoiceCodeVerify.verify(phone_number,
-                                                             phone_validate_code_item.validate_code,
-                                                             phone_validate_code_item.id)
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
         logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
         return Response({"ret_code": res_code, "message": res_text})
 
