@@ -5,6 +5,7 @@
 # File Name: reward.py
 # Description: 策划活动中的红包、奖品、加息券等用户奖励行为，独立在这个文件中
 #########################################################################
+from order.models import Order
 from django.utils import timezone
 from experience_gold.backends import SendExperienceGold
 from django.db import transaction
@@ -1246,25 +1247,43 @@ class WeixinActivityAPIView(APIView):
             introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token, created_at__gte=register_time).first()
         return True if introduced_by else False
 
-    def has_generate_reward_activity(self, user_id, activity):
-        activitys = WanglibaoActivityReward.objects.filter(user_id=user_id, activity=activity)
+    def has_generate_reward_activity(self, user_id, activity, order_id):
+        activitys = WanglibaoActivityReward.objects.filter(user_id=user_id, activity=activity, order_id=order_id)
         return activitys if activitys else None
 
-    def generate_reward_activity(self, user):
+    def generate_reward_activity(self, user, order_id):
         points = {
-            "0-5": ("weixin_guagua_0.5", 0.5),
-            "1-6": ("weixin_guagua_0.7", 0.7),
-            "2-7": ("weixin_guagua_0.9", 0.9),
-            "3-8": ("weixin_guagua_1.0", 1.0),
-            "4-9": ("weixin_guagua_1.2", 1.2)
+            "0-5": ("weixin_guagua_0.9", 0.9),
+            "1-6": ("weixin_guagua_1.0", 1.0),
+            "2-7": ("weixin_guagua_1.2", 1.2),
+            "3-8": ("weixin_guagua_1.5", 1.5),
+            "4-9": ("weixin_guagua_2.0", 2.0)
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
-        for key, value in points.items():
-            if str(counter) in key:
+        when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
+        for _index in xrange(3):
+            if _index == when_dist_redpack:
+                for key, value in points.items():
+                    if str(counter) in key:
+                        WanglibaoActivityReward.objects.create(
+                            order_id=order_id,
+                            user=user,
+                            redpack_event=RedPackEvent.objects.filter(name=value[0]).first(),
+                            experience=None,
+                            activity=self.activity_name,
+                            when_dist=1,
+                            left_times=1,
+                            join_times=1,
+                            channel='weixin',
+                            has_sent=False,
+                            p2p_amount=value[1]
+                        )
+                        break
+            else:
                 WanglibaoActivityReward.objects.create(
+                    order_id=order_id,
                     user=user,
-                    redpack_event=RedPackEvent.objects.filter(name=value[0]).first(),
                     experience=None,
                     activity=self.activity_name,
                     when_dist=1,
@@ -1272,22 +1291,8 @@ class WeixinActivityAPIView(APIView):
                     join_times=1,
                     channel='weixin',
                     has_sent=False,
-                    p2p_amount=value[1]
+                    p2p_amount=0
                 )
-                break
-
-        for _index in xrange(2):
-            WanglibaoActivityReward.objects.create(
-                user=user,
-                experience=None,
-                activity=self.activity_name,
-                when_dist=1,
-                left_times=1,
-                join_times=1,
-                channel='weixin',
-                has_sent=False,
-                p2p_amount=0
-            )
 
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
@@ -1301,8 +1306,17 @@ class WeixinActivityAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name)
-        activitys = _activitys if _activitys else self.generate_reward_activity(request.user)
+        order_id = request.POST.get('order_id')
+        if not Order.objects.filter(pk=order_id).first():
+            json_to_response = {
+                'code': 1001,
+                'message': u'Order ID不错在'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
+        activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
         activity_record = activitys.filter(left_times__gt=0)
 
         if activity_record.filter(left_times__gt=0).count() == 0:
@@ -1313,8 +1327,8 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         else:
             with transaction.atomic():
-                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
-                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
+                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, order_id=order_id, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
                 if record.redpack_event:
                     json_to_response = {
                         'code': 0,

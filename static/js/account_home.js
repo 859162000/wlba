@@ -10,7 +10,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
     var DataViewModel, isXunleiBindSuccess, viewModel;
     $('.more_btn').click(function() {
       return $('.tableNew').slideToggle();
@@ -37,6 +37,22 @@
       }).fail(function(data) {
         return console.log(1111);
       });
+    });
+    $.ajax({
+      url: "/qiye/profile/get/",
+      type: "GET",
+      data: {}
+    }).fail(function(data) {
+      var result;
+      result = JSON.parse(data.responseText);
+      if (result.ret_code === 20001) {
+        return $('#tyjzq').show();
+      }
+    }).success(function(data) {
+      $('#tyjzq').hide();
+      if (data.ret_code === 10000) {
+        return $('#qiyeUser i').text(data.data.company_name);
+      }
     });
     DataViewModel = (function() {
       function DataViewModel() {

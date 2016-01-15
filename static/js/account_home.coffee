@@ -9,7 +9,7 @@ require.config(
 
 require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
-         'model/portfolio', 'tools', 'lib/jquery.number.min',
+         'model/portfolio', 'tools',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
 
   $('.more_btn').click () ->
@@ -30,11 +30,25 @@ require ['jquery', 'underscore', 'knockout',
       $('#success').modal()
       $('#success').find('.close-modal').hide()
       setInterval( ->
-          $.modal.close()
-          location.reload()
+        $.modal.close()
+        location.reload()
       ,2000)
     .fail (data)->
       console.log(1111)
+
+  #  判断是否是企业用户
+  $.ajax
+    url: "/qiye/profile/get/"
+    type: "GET"
+    data: {}
+  .fail (data) ->
+    result = JSON.parse(data.responseText);
+    if result.ret_code == 20001
+      $('#tyjzq').show()
+  .success (data) ->
+    $('#tyjzq').hide()
+    if data.ret_code == 10000
+      $('#qiyeUser i').text(data.data.company_name)
 
   class DataViewModel
     constructor: ->
