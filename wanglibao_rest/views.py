@@ -313,8 +313,7 @@ class RegisterAPIView(DecryptParmsAPIView):
             # set_promo_user(request, user, invitecode=invite_code)
             # save_to_binding(user, request)
 
-        if device['device_type'] == "pc" or request.GET.get('promo_token') == 'wrp':
-            logger.debug(u'用户注册完后，开始登录：promo_token:%s, phone:%s' % (request.GET.get('promo_token'), identifier))
+        if device['device_type'] == "pc":
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
@@ -488,6 +487,10 @@ class IdValidateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({"ret_code": 30056, "message": u"企业用户无法通过此方式认证"})
+
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
         device = split_ua(request)
@@ -536,6 +539,9 @@ class IdValidateAPIView(APIView):
 
 
 class SendVoiceCodeAPIView(APIView):
+    """
+    汇讯群呼(快易通)语音短信验证码接口
+    """
     permission_classes = ()
 
     def post(self, request):
@@ -565,9 +571,11 @@ class SendVoiceCodeAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
-        logger.info("voice_code: %s" % cont)
-        return Response({"ret_code": 0, "message": "ok"})
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
+        return Response({"ret_code": res_code, "message": res_text})
 
 
 class SendVoiceCodeTwoAPIView(APIView):
@@ -812,10 +820,17 @@ class UserHasLoginAPI(APIView):
         else:
             return Response({"login": True})
 
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
 
         form = IdVerificationForm(request, request.POST)
         # 黑客程序就成功
@@ -839,8 +854,8 @@ class IdValidate(APIView):
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
-            name = form.cleaned_data['name']
-            id_number = form.cleaned_data['id_number']
+            name = form.cleaned_data['name'].strip()
+            id_number = form.cleaned_data['id_number'].strip()
 
             verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
@@ -893,10 +908,16 @@ class AdminIdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
+
         phone = request.DATA.get("phone", "")
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
-
         verify_record, error = verify_id(name, id_number)
 
         if error:
@@ -926,6 +947,11 @@ class LoginAPIView(DecryptParmsAPIView):
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+
+        # add by ChenWeiBin@20160113
+        profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
+        if profile:
+            return Response({"token": "false", "message": u"企业用户请在PC端登录"}, status=400)
 
         user = authenticate(identifier=identifier, password=password)
 

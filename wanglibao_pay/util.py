@@ -34,7 +34,6 @@ def fmt_two_amount(value):
     :return:
     """
     # 以防传入float或是其他导致错误
-
     value = str(value)
     amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
     return amount
@@ -94,3 +93,19 @@ def handle_withdraw_limit(limitstr):
         pass
     return obj
 
+def get_pc_channel_class(channel_name):
+    """
+    返回pc端的支付通道
+    :param channel_name:
+    :return:
+    """
+    from wanglibao_pay.huifu_pay import HuifuPay
+    from wanglibao_pay.kuai_pay import KuaiPay
+    from wanglibao_pay.yee_pay import YeePay
+    if channel_name == 'huifu':
+        return HuifuPay
+    elif channel_name == 'yeepay':
+        return YeePay
+    elif channel_name =='kuaipay':
+        return KuaiPay
+    return None

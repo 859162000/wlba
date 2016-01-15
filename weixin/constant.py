@@ -67,7 +67,6 @@ class MessageTemplate404(Exception):
 
 class MessageTemplate(object):
     def __init__(self, template_id, **kwargs):
-        print kwargs
         template = Message_template.get(template_id, {})
         if not template:
             raise MessageTemplate404
@@ -110,11 +109,11 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":"",
+                   "value":"恭喜您获得３次刮奖机会，点击“详情”进行刮奖",
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": "",
     },
     PRODUCT_AMORTIZATION_TEMPLATE_ID:{
         "top_color":'#88ffdd',
@@ -214,11 +213,11 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":u'您可以使用下方微信菜单进行更多体验。',
+                   "value":u'恭喜您获得３次刮奖机会，点击“详情”进行刮奖。',
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": "",
     },
 
     BIND_SUCCESS_TEMPLATE_ID:{

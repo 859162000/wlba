@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
+    'wanglibao_qiye', #add by wangxiaoqing
     'report',
     'misc',
 
@@ -135,6 +136,7 @@ INSTALLED_APPS = (
     'wanglibao_lottery',
     'daterange_filter',
     'experience_gold',
+    'wanglibao_qiye',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -686,7 +688,7 @@ CELERYBEAT_SCHEDULE = {
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
         'task': 'experience_gold.tasks.experience_repayment_plan',
-        'schedule': timedelta(minutes=5),
+        'schedule': crontab(minute=0, hour=17),
     },
     # 定期检查还有3天到期的用户优惠券,发送提醒
     'redpack_status_task_check': {
@@ -806,8 +808,8 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
-    CALLBACK_HOST = 'https://staging.wanglibao.com'
-    STATIC_FILE_HOST = 'https://staging.wanglibao.com'
+    CALLBACK_HOST = 'https://feature1.wanglibao.com'
+    STATIC_FILE_HOST = 'https://feature1.wanglibao.com'
     # MER_ID = '510743'
     # CUSTOM_ID = '000010124821'
     # huifu id 改为和生产相同
@@ -881,6 +883,11 @@ KUAI_PAY_TR3_SIGNATURE = ''
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
+
+# 汇讯群呼语音验证码(快易通)
+VOICE_HX_URL = 'http://i.huixun35.com/sdk/SMS'
+VOICE_HX_UID = '52361'
+VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
 
 # Modify by hb on 2015-11-25 for new id-verify-channel
 #ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
@@ -1149,7 +1156,10 @@ MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
 # 亚洲财经
 WLB_FOR_YZCJ_KEY = '2005'
 YZCJ_COOP_KEY = 'yzcj_2005'
-YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
+if ENV == ENV_PRODUCTION:
+    YZCJ_CALL_BACK_URL = 'http://www.asiafinance.cn/wanglibaoBg.jspx'
+else:
+    YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表

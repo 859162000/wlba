@@ -20,6 +20,20 @@ document.addEventListener('touchmove', function(e) {//禁止左右滑动
     }
 });
 //高度
+<<<<<<< HEAD
+window.onload = function(){
+    //var bHeight = (48*window.screen.width)/320;//48dp = *px
+    var $body = $("body");
+    var wHeight = $(window).height();
+    //alert((window.screen.height*320)/window.screen.width+"html,"+ screen.availHeight +","+window.screen.height+",screen.width:"+window.screen.width+"bHeight:"+bHeight);
+    if(!wHeight){
+        $body.height((window.screen.height*320)/window.screen.width);
+    }else{
+        $body.height(wHeight);
+    }
+}
+
+=======
 var bHeight = (48*window.screen.width)/320;//48dp = *px
 var wHeight = $(window).height();
 //alert($(document).height() +","+ screen.availHeight +","+window.screen.height+",screen.width:"+window.screen.width);
@@ -30,6 +44,7 @@ if(!wHeight){
 }
 
 
+>>>>>>> feature/one_card
 // 路径配置
 require.config({
     paths: {

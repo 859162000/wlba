@@ -15,24 +15,18 @@
 			mixins.shareData({title: '2016年1月年终奖', content: '终于成功领到了1月年终奖，感谢老板！'});
 
             mixins.sendUserInfo(function(data) {
+				if (data.ph == '') {
+                    $('#go_experience').click(function() {
+					   mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/account/'});
+					})
+                } else {
+                    $('#go_experience').click(function() {
+						window.location.href = '/activity/experience/account/';
+					})
+                }
+
 				$('.button').click(function(){
 					mixins.jumpToManageMoney();
-				});
-
-                if (data.ph == '') {
-                    login = false;
-					$('#go_experience').click(function() {
-                        mixins.loginApp({refresh:1, url:'/activity/experience/redirect/'});
-                    })
-
-                } else {
-                    login = true;
-                    $('#go_experience').click(function() {
-                       window.location.href = '/activity/experience/redirect/'
-                    })
-                }
-				$('#tiyanjin').click(function(){
-					window.location.href = '/activity/experience/redirect/'
 				});
             });
         },
@@ -40,15 +34,10 @@
 			$('.button').click(function(){
 				window.location.href = '/weixin/list/';
 			});
-            if(h5_user_static){
-				$('#go_experience').click(function() {
-					window.location.href = '/weixin/login/?next=/activity/experience/redirect/';
-                })
-            }else{
-                $('#go_experience').click(function() {
-					window.location.href = '/activity/experience/redirect/';
-                })
-            }
+
+			$('#go_experience').click(function() {
+				window.location.href = '/activity/experience/account/';
+			})
 
         }
     });
@@ -69,7 +58,7 @@
 				ele.removeClass('down');
 			});
 		}
-	})
+	});
 	$('#see_rule_2').on('click',function(){
 		var ele = $('.rule_wrap_2');
 		var curHeight = ele.height();
