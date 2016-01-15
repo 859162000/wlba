@@ -1327,8 +1327,8 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         else:
             with transaction.atomic():
-                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
-                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
+                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, order_id=order_id, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
                 if record.redpack_event:
                     json_to_response = {
                         'code': 0,
