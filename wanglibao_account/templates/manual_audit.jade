@@ -17,8 +17,8 @@ block main
                     label 账户登录密码
                     .box_right
                         .input_box
-                            <input id='password' class="input_phone" type="password" placeholder="请输入账户登录密码" autocomplete="off">
-                            .status
+                            <input id='password' class="input_phone" type="password" placeholder="请输入账户登录密码" autocomplete="off" disableautocomplete>
+                            .status.status_1
                                 .true
                                 .false 账户登录密码有误
                 .box
@@ -26,10 +26,10 @@ block main
                     .box_right
                         .input_box
                             <input id='id_number' class="input_phone" type="text" placeholder="请输入实名认证身份证号" autocomplete="off">
-                            .status
+                            .status.status_2
                                 .true
                                 .false 身份证信息有误
-                .box
+                .box(style='display:none')
                     label 银行卡号
                     .box_right
                         .input_box

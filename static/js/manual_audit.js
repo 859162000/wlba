@@ -55,24 +55,45 @@
             var id_number_val = $('#id_number').val();
             var validate_code_val = $('#validate_code').val();
             var password_val = $('#password').val();
+            var pass_true = false;
+            var id_true = false;
 
-            alert(password_val);
-            alert(id_number_val);
-            $.ajax({
-                url: '/api/manual_modify/vali_acc_info/' ,
-                type: 'POST',
-                data: {
-                    id_number:id_number_val,
-                    //validate_code:validate_code_val,
-                    password:password_val
-                },
-                success: function (returndata) {
-                    alert(returndata);
-                },
-                error: function (returndata) {
-                    alert(returndata);
-                }
-            });
+            if(id_number_val.length=='15'||id_number_val.length=='18'){
+                $('.status_2').hide();
+                id_true = true;
+            }else{
+                $('.status_2 .false').text('身份证位数错误');
+                $('.status_2').show();
+                id_true = false;
+            }
+
+            if(password_val.length<6){
+                $('.status_1 .false').text('密码位数错误');
+                $('.status_1').show();
+                pass_true = false;
+            }else{
+                $('.status_1').hide();
+                pass_true = true;
+            }
+
+            if(pass_true&&id_true){
+                $.ajax({
+                    url: '/api/manual_modify/vali_acc_info/' ,
+                    type: 'POST',
+                    data: {
+                        id_number:id_number_val,
+                        //validate_code:validate_code_val,
+                        password:password_val
+                    },
+                    success: function (returndata) {
+                        alert(returndata);
+                    },
+                    error: function (returndata) {
+                        alert(returndata);
+                    }
+                });
+            }
+
         })
 
     })
