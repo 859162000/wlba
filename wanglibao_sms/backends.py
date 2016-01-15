@@ -226,7 +226,7 @@ class VoiceCodeVerify(object):
             self.voice_uid, self.voice_pwd, mobile, msgid, msg
         )
 
-        response = requests.get(url)
+        response = requests.post(url)
 
         if response.status_code != 200:
             response_status = response.status_code
