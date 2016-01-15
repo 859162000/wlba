@@ -1294,7 +1294,7 @@ class WeixinActivityAPIView(APIView):
                     p2p_amount=0
                 )
 
-        return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
+        return WanglibaoActivityReward.objects.filter(user=user, order_id=order_id, activity=self.activity_name)
 
 
     def post(self, request):
