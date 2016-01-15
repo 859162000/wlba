@@ -122,7 +122,7 @@ Lottery.prototype = {
         if (!this.conNode.innerHTML.replace(/[\w\W]| /g, '')) {
             //this.conNode.appendChild(this.background);
             this.conNode.innerHTML = '';
-            console.log(this.conNode.innerHTML);
+            //console.log(this.conNode.innerHTML);
             this.conNode.appendChild(this.mask);
             this.clientRect = this.conNode ? this.conNode.getBoundingClientRect() : null;
             this.bindEvent();
@@ -213,9 +213,12 @@ Lottery.prototype = {
             });
         }
         function startTouch(){
+            var url = window.location.search;
+            var orderId = url.substring(url.lastIndexOf('=')+1, url.length);
             org.ajax({
                 type: 'post',
                 url: '/api/weixin/guaguaka/',
+                data: {"order_id": orderId},
                 dataType: 'json',
                 success: function(data){
                     console.log(data);
