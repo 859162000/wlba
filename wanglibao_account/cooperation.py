@@ -330,8 +330,9 @@ class CoopRegister(object):
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
         """
         self.save_to_introduceby(user, invite_code)
-        self.save_to_binding(user)
-        self.register_call_back(user)
+        if user.wanglibaouserprofile.utype != '3':
+            self.save_to_binding(user)
+            self.register_call_back(user)
         self.clear_session()
 
     @property
@@ -1092,7 +1093,6 @@ class RockFinanceRegister(CoopRegister):
                 raise Exception(u"misc中activities的配置参数，应是字典类型")
         else:
             raise Exception(u"misc中没有配置activities杂项")
-
         logger.debug(u"user:%s, order_id:%s, 运行开关:%s, 开放时间:%s, 结束时间:%s, 总票数:%s" % (user, order_id, is_open, start_time, end_time, amount))
 
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
@@ -3810,7 +3810,6 @@ class Rong360P2PListView(APIView):
                 'result_msg': u"没有权限访问"
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
-
 
 class XiguaP2PListView(APIView):
     """

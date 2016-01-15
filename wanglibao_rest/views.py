@@ -487,6 +487,10 @@ class IdValidateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({"ret_code": 30056, "message": u"企业用户无法通过此方式认证"})
+
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
         device = split_ua(request)
@@ -811,10 +815,17 @@ class UserHasLoginAPI(APIView):
         else:
             return Response({"login": True})
 
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
 
         form = IdVerificationForm(request, request.POST)
         # 黑客程序就成功
@@ -838,8 +849,8 @@ class IdValidate(APIView):
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
-            name = form.cleaned_data['name']
-            id_number = form.cleaned_data['id_number']
+            name = form.cleaned_data['name'].strip()
+            id_number = form.cleaned_data['id_number'].strip()
 
             verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
@@ -892,10 +903,16 @@ class AdminIdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
+
         phone = request.DATA.get("phone", "")
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
-
         verify_record, error = verify_id(name, id_number)
 
         if error:
@@ -925,6 +942,11 @@ class LoginAPIView(DecryptParmsAPIView):
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+
+        # add by ChenWeiBin@20160113
+        profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
+        if profile:
+            return Response({"token": "false", "message": u"企业用户请在PC端登录"}, status=400)
 
         user = authenticate(identifier=identifier, password=password)
 

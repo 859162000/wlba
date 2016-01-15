@@ -1,0 +1,34 @@
+extends account_home_base
+block head
+    - with '密码管理' as title
+        include include/head
+block sidebar
+    - with '密码管理' as activeItem
+        include include/user_center_sidebar
+block main
+    .panel
+        .well
+            .panel-title-bar__no-border
+                .panel-title 密码管理 > 修改登录密码
+            .panel-inner.font-s
+                form#passwordChangeForm.well-s(method="POST")
+                    table
+                        tr
+                            td.left 原登录密码
+                            td
+                                input#old-password(type="password", name="old-password", autocomplete="off")
+                        tr
+                            td.left 新登录密码
+                            td
+                                input#new-password1(type="password", name="new-password1", autocomplete="off")
+                        tr
+                            td.left 新登录密码
+                            td
+                                input#new-password2(type="password", name="new-password2", autocomplete="off")
+                        tr
+                            td
+                            td
+                                button#passwordChangeButton.button-primary(type="submit").pwd-btn 修改登录密码
+block script
+    script.
+        require(['/static/js/account_setting.js'])

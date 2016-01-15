@@ -5,7 +5,9 @@
 .aside
   width: 220px
   float: left
-  margin-right: 15px
+  margin: 15px 15px 0 0
+  background: #ffffff
+  padding-bottom: 10px
 
 .main
   float: left
@@ -220,7 +222,7 @@
   padding: 5px
 
 .bank-card
-  width: 239px
+  width: 240px
   border: 1px solid #d3d3d3
   border-radius: 5px
   overflow: hidden
@@ -230,9 +232,10 @@
 
 .add-bank-card
   @extend .bank-card
-  height: 146px
+  height: 160px
   background: #F5F5F5
   margin-right: 0px
+  cursor: pointer
 
 .del-bank-card
   font-size: $font-s
@@ -253,6 +256,28 @@
 
 .bank-card--bank-name
   font-size: $font-m
+  color: #333333
+  float: left
+  text-align: left
+  span
+    color: #E8370D
+    font-size: 11px
+    width: 39px
+    height: 16px
+    border: 1px solid #E6340E
+    line-height: 16px
+    display: inline-block
+    margin-left: 5px
+  span.bindingEd
+    border: 1px solid #429842
+    color: #429842
+  label.bankname
+    width: 112px
+    display: inline-block
+    text-overflow: ellipsis
+    white-space: nowrap
+    overflow: hidden
+    float: left
 
 .bank-card--icon
   display: inline-block
@@ -264,7 +289,7 @@
 .bank-card--info-row
   text-align: center
   font-size: $font-s
-  padding: 22.5px 0
+  padding: 24px 0
   +clearfix
 
 .bank-card--info-title
@@ -275,7 +300,7 @@
 
 .bank-card--info-value
   @extend .span8
-  color: #666
+  color: #333333
   text-align: left
   padding-left: 1em
 
@@ -291,6 +316,7 @@ $add-icon-large-width: 8px
   width: $add-icon-large-size
   height: $add-icon-large-size
   margin: 35px auto 15px auto
+  cursor: pointer
 
   &:before
     position: absolute
@@ -312,6 +338,7 @@ $add-icon-large-width: 8px
   text-align: center
   font-size: $font-m
   color: $color-denim
+  cursor: pointer
 
 .invite-num-circle
   text-align: center
@@ -585,128 +612,208 @@ $add-icon-large-width: 8px
   font-size: 12px
   color: #666666
   padding: 15px 0
-  a
-    color: #507ed7
-.project_div
-  width: 786px
-  margin: 0 auto
-  border: 1px solid #ebebeb
-  h5
-    height: 57px
-    line-height: 57px
-    color: #e4371f
-    font-size: 20px
-    text-indent: 26px
-    border-bottom: 1px solid #f2f2f2
-  ul
-    padding: 30px 0 50px
-    li
-      float: left
-      text-align: center
-      label
-        display: block
-        font-size: 22px
-        color: #4c4c4c
-      span
-        display: block
-        font-size: 14px
-        color: #a6a6a6
-      a
-        width: 156px
-        height: 42px
-        line-height: 42px
-        display: inline-block
-        background: #f45e37
-        color: #ffffff
-        border-radius: 8px
-        text-align: center
-        font-size: 18px
-        margin-top: 5px
-      a.invest_ed
-        background: #fa8162
-  .li_one
-    width: 166px
-  .li_two
-    width: 207px
-  .li_three
-    width: 179px
-  .li_four
-    width: 230px
-.look_more_detail
+
+.binding-card
+  height: 36px
+  line-height: 36px
+  color: #1E8FDE
+  font-size: 16px
   text-align: center
-  padding: 25px 0 10px
-  .more_btn
-    width: 100px
-    margin: 0 auto
-    cursor: pointer
-    label
-      font-size: 12px
-      cursor: pointer
-    span
-      background: url("/static/images/tyj.png") -79px -5px no-repeat
-      width: 15px
-      height: 12px
-      display: inline-block
-      cursor: pointer
-.explain_box
-  width: 870px
-  .explain_box_img
-    width: 870px
-    height: 550px
-    margin: 0 auto
-    .explain_content_box
-      background: #ffeed4
-      border-radius: 10px
-      padding: 66px 60px 50px
-      margin: 0 auto
-      .title_ex
-        text-align: center
-        font-size: 20px
-        color: #d03144
-      ul
-        li
-          margin-top: 20px
-          span
-            float: left
-            margin: 5px 30px 0 0
-            background: url(/static/images/tyj.png) -100px -8px
-            width: 22px
-            height: 22px
-            display: inline-block
-          .explain_content
-            float: left
-            width: 688px
-            color: #705848
-            font-size: 16px
-            line-height: 25px
-            .name
-              color: #624838
-  .close-modal
-    background: url(/static/images/tyj.png) -127px 0
-    width: 42px
-    height: 45px
+  border-top: 1px solid #D3D3D3
+  cursor: pointer
+.bank-card-manage
+  color: #666666
+  font-size: 18px
+  margin-top: 40px
+  padding:  0 0 10px 26px
+  span
+    font-size: 12px
+    color: #FA9527
+    line-height: 20px
     display: inline-block
-    position: absolute
-    top: -15px
-    right: -15px
-    text-indent: 999999px
-#success
-  width: 350px
-  text-align: center
-  padding: 10px
-  border-radius: 10px
-  .successBox
-    text-align: center
-    p
-      font-size: 22px
-      color: #3f3f41
-      span
-        background: url(/static/images/right_img.png) center center no-repeat
-        width: 228px
-        height: 228px
+    margin-left: 10px
+.manage-pop
+  color: #FA9527
+  font-size: 12px
+  padding-left: 26px
+  line-height: 22px
+  a
+    color: #1e8fde
+    cursor: default
+.kindly-reminder
+  background: #F5F5F5
+  color: #666666
+  font-size: 12px
+  margin: 60px 26px
+  padding: 25px 0 15px
+  text-indent: 143px
+  line-height: 20px
+
+.binding-box
+  margin: 90px 0 90px 218px
+  .info-title
+    font-size: 18px
+    color: #666666
+    margin-bottom: 40px
+  .binding-info
+    padding-bottom: 13px
+    .bank-detail
+      height: 42px
+      line-height: 42px
+      float: left
+      font-size: 14px
+      color: #333333
+    label,span
+      float: left
+      width: 100px
+      height: 42px
+      line-height: 42px
+      display: inline-block
+      text-align: right
+      margin-right: 20px
+    select,input
+      float: left
+      width: 270px
+      height: 42px
+      line-height: 42px
+      background: #ffffff
+      border: 1px solid #EBEBEB
+      font-size: 14px
+    select
+      color: #b6b6b6
+    select.selected
+      color: #333333
+    input
+      text-indent: 5px
+    a.btns
+      width: 270px
+      height: 42px
+      line-height: 42px
+      color: #ffffff
+      background: #E4371F
+      text-align: center
+      display: inline-block
+      margin: 17px 0 0 90px
+      font-size: 16px
+      font-weight: bold
+    span
+      color: #E4371F
+      width: 110px
+      text-align: left
+      i
+        margin: 0 5px
         display: inline-block
-        margin: 0 0 20px
-    p.succeesFonts
-      color: #fb7c00
-      font-size: 30px
-      padding-bottom: 5px
+      i.cha
+        @include account-sprite(cha)
+        width: 9px
+        height: 9px
+      i.dui
+        @include account-sprite(dui)
+        width: 12px
+        height: 9px
+  .w70
+    label
+      width: 70px
+.binding-boxs
+  margin: 60px 0 90px 176px
+  a.change-bank
+    color: #288CCA
+    font-size: 12px
+    margin-left: 15px
+  input.sem-input
+    width: 160px
+  button.get-code,button.go-get-code
+    width: 100px
+    color: #ffffff
+    background: #C7C7C7
+    font-size: 14px
+    display: inline-block
+    height: 42px
+    line-height: 42px
+    text-align: center
+    margin-left: 10px
+    float: left
+    border: 0 none
+  button.go-get-code
+    background: #FA9527
+    &:hover
+      background: #E38922
+.withdrawBox
+  margin: 0 0 0 120px
+  .binding-info
+    span
+      margin-right: 0
+.withdrawM
+  margin: 50px 0 60px
+.bindingOldCard
+  background: #ffffff
+  width: 560px
+  height: 280px
+  .binding-alert-title
+    height: 50px
+    line-height: 50px
+    background: #F5F5F5
+    font-size: 18px
+    color: #999999
+    text-align: center
+  .binding-alert-content
+    width: 390px
+    margin: 45px auto 25px
+    p
+      color: #666666
+      font-size: 14px
+      line-height: 25px
+      span
+        color: #1e8fde
+      label
+        color: #e8370d
+  .binding-alert-btn
+    text-align: center
+    a
+      width: 140px
+      display: inline-block
+      font-size: 16px
+    a.ok-btn
+      background: #E4371F
+      color: #ffffff
+      height: 40px
+      line-height: 40px
+    a.no-btn
+      background: #ffffff
+      color: #999999
+      border: 1px solid #999999
+      height: 38px
+      line-height: 38px
+      margin-left: 10px
+.goBindingBtn
+  label
+    font-size: 12px
+    margin-right: 5px
+  a
+    font-size: 12px
+    color: #1f8ccd
+.title-s
+  height: 48px
+  line-height: 48px
+  background: #F5F5F5
+  font-size: 18px
+  color: #666666
+  padding-left: 30px
+  span
+    font-size: 14px
+    color: #FA9527
+    margin-left: 10px
+.bindingError
+  color: #e7350d
+
+.w100
+  width: 100%
+  text-align: center
+
+
+
+
+
+
+
+

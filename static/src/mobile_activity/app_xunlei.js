@@ -9,7 +9,11 @@ $('.xunjiang-zong span').click(function () {
 $('.xunlei1 span').click(function () {
     if (getQueryString('referfrom')) {
         var refer = getQueryString('referfrom');
+<<<<<<< HEAD
         window.location.href = "http://act.vip.xunlei.com/vip/finance/waplogin/login.html?coop=wanglibao&referfrom=" + refer
+=======
+        window.location.href = "http://act.vip.xunlei.com/waplogin/login.html?referfrom=" + refer
+>>>>>>> feature/one_card
     }
 
 });
@@ -29,11 +33,16 @@ org.ajax({
     url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
     success: function (data) {
+<<<<<<< HEAD
+=======
+        console.log(data);
+>>>>>>> feature/one_card
         if (data.ret_code == 10001) {
             $('.xunmeng3').show();
             $('.maimai-form').hide();
         }
     }
+<<<<<<< HEAD
 });
 //微信分享
 //var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
@@ -88,6 +97,10 @@ org.ajax({
 //        imgUrl: shareImg
 //    })
 //})
+=======
+})
+;
+>>>>>>> feature/one_card
 org.xunlei = (function (org) {
 
     var lib = {
@@ -225,6 +238,10 @@ org.xunlei = (function (org) {
                         'nickname': name
                     },
                     success: function (data) {
+<<<<<<< HEAD
+=======
+                        console.log(data)
+>>>>>>> feature/one_card
                         if (data.ret_code == 10002 || data.ret_code == 10000) {
                             var va = $('input[name=phone]').val();
 

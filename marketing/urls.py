@@ -71,6 +71,7 @@ urlpatterns = patterns(
     url(r'^recharge_8000/$', TemplateView.as_view(template_name="recharge_8000.jade")),
     url(r'^double_eggs/$', TemplateView.as_view(template_name="double_eggs.jade")),
     url(r'^celebrity/$', TemplateView.as_view(template_name="celebrity.jade")),
+    url(r'^xunlei_setp/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='xunlei9')),
     url(r'^xunlei_one/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='xunlei9')),
     url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
     url(r'^damai-old/$', TemplateView.as_view(template_name="damai-old.jade")),

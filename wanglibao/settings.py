@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
+    'wanglibao_qiye', #add by wangxiaoqing
     'report',
     'misc',
 
@@ -687,7 +688,11 @@ CELERYBEAT_SCHEDULE = {
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
         'task': 'experience_gold.tasks.experience_repayment_plan',
+<<<<<<< HEAD
         'schedule': timedelta(minutes=5),
+=======
+        'schedule': crontab(minute=0, hour=17),
+>>>>>>> feature/one_card
     },
     # 定期检查还有3天到期的用户优惠券,发送提醒
     'redpack_status_task_check': {
@@ -807,8 +812,13 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
+<<<<<<< HEAD
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     STATIC_FILE_HOST = 'https://staging.wanglibao.com'
+=======
+    CALLBACK_HOST = 'https://feature1.wanglibao.com'
+    STATIC_FILE_HOST = 'https://feature1.wanglibao.com'
+>>>>>>> feature/one_card
     # MER_ID = '510743'
     # CUSTOM_ID = '000010124821'
     # huifu id 改为和生产相同

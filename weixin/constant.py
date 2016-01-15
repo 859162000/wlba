@@ -67,7 +67,6 @@ class MessageTemplate404(Exception):
 
 class MessageTemplate(object):
     def __init__(self, template_id, **kwargs):
-        print kwargs
         template = Message_template.get(template_id, {})
         if not template:
             raise MessageTemplate404

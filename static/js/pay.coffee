@@ -19,10 +19,37 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
     $('#' + $(e.target).attr('data-desc-id')).show()
 
   $('#pay').click (e)->
-    if $('#id-is-valid').val() == 'False'
-      e.preventDefault()
-      $('#id-validate').modal()
-      return
+      userStatus()
+
+  userStatus = () ->
+    if $('#id-is-valid').attr('data-type') == 'qiye'
+      if $('#id-is-valid').val() == 'False'
+        $.ajax {
+          url: '/qiye/profile/exists/'
+          data: {
+          }
+          type: 'GET'
+        }
+        .done (data)->
+          if data.ret_code == 10000
+            $.ajax {
+              url: '/qiye/profile/get/'
+              data: {
+              }
+              type: 'GET'
+            }
+            .done (data)->
+              if data.data.status != '审核通过'
+                $('.verifyHref').attr('href','/qiye/profile/edit/')
+        .fail (data)->
+          $('.verifyHref').attr('href','/qiye/info/')
+
+        $('#id-validate').modal()
+        return
+    else
+      if $('#id-is-valid').val() == 'False'
+        $('#id-validate').modal()
+        return
 
   $.validator.addMethod 'morethan100', (value, element)->
     return Number(value) >= 100
@@ -51,5 +78,4 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
       else
         $(this).val parseFloat(value).toFixed(2)
 
-  if $('#id-is-valid').val() == 'False'
-    $('#id-validate').modal()
+  userStatus()
