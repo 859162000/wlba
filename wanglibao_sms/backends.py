@@ -220,13 +220,13 @@ class VoiceCodeVerify(object):
             '107': u'参数不全'
         }
         msg_tmp = self.msg_text + ' '.join(str(voice_code))
-        msg = urllib.quote(msg_tmp.decode(sys.stdin.encoding).encode('gbk'))
+        msg = urllib.quote(msg_tmp.decode('UTF-8').encode('gbk'))
 
         url = self.voice_url + '?cmd=sendvoice&uid={}&psw={}&mobiles={}&msgid={}&msg={}'.format(
             self.voice_uid, self.voice_pwd, mobile, msgid, msg
         )
 
-        response = requests.get(url)
+        response = requests.post(url)
 
         if response.status_code != 200:
             response_status = response.status_code
