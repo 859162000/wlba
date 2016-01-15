@@ -2317,15 +2317,15 @@ class SMSModifyPhoneValidateAPI(APIView):
         new_phone = request.DATA.get('new_phone', "").strip()
         if not profile.id_is_valid or not profile.id_number:
             return Response({'message':"还没有实名认证"}, status=400)
-        if not validate_code or not id_number or not new_phone:
-            return Response({'message':"params is null"}, status=400)
+        # if not validate_code or not id_number or not new_phone:
+        #     return Response({'message':"params is null"}, status=400)
         form = LoginAuthenticationNoCaptchaForm(request, data=request.DATA)
         if form.is_valid():
             if form.get_user()!=user:
                 return Response({'message':"user is not logined user"}, status=400)
-            status, message = validate_validation_code(profile.phone, validate_code)
-            if status != 200:
-                return Response({'message':message}, status=400)
+            # status, message = validate_validation_code(profile.phone, validate_code)
+            # if status != 200:
+            #     return Response({'message':message}, status=400)
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
             new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
