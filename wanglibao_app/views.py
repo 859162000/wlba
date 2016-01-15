@@ -98,7 +98,6 @@ class AppActivateScoreImageAPIView(APIView):
                 return Response({'ret_code': 0,
                                  'message': 'ok',
                                  'image': img_url,
-                                 'user_login_status_limit':activate.user_login_status_limit
                                  })
 
         return Response({'ret_code': 20003, 'message': 'fail'})
@@ -147,6 +146,7 @@ class AppActivateImageAPIView(APIView):
             link_dest = activate.link_dest
 
             if img_url:
+                invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
                 img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
                 return Response({'ret_code': 0,
                                  'message': 'ok',
@@ -154,7 +154,7 @@ class AppActivateImageAPIView(APIView):
                                  'jump_state': jump_state,
                                  'link_dest':link_dest,
                                  'link_dest_url':activate.link_dest_h5_url,
-                                 'user_login_status_limit':activate.user_login_status_limit
+                                 'invest_flag':invest_flag,
                                  })
 
         return Response({'ret_code': 20003, 'message': 'fail'})

@@ -110,12 +110,6 @@ class AppActivate(models.Model):
         (u'6', u'体验金'),
     )
 
-    USER_LOGIN_STATUS = (
-        (u'-1', u'不限制用户登录状态'),
-        (u'0', u'用户未登录状态弹出'),
-        (u'1', u'用户登录状态弹出'),
-    )
-
     name = models.CharField(u'名称', max_length=30, help_text=u'名称')
     device = models.CharField(u'设备', max_length=15, choices=DEVICES,
                               help_text=u'活动图片应用的设备，启动页选择类型app_*，弹出页选择类型act_*')
@@ -133,7 +127,6 @@ class AppActivate(models.Model):
     start_at = models.DateTimeField(u"banner生效时间", null=True, blank=True)
     end_at = models.DateTimeField(u"banner失效时间", null=True, blank=True)
     is_used = models.BooleanField(u'是否启用', default=False, help_text=u'默认不启用')
-    user_login_status_limit = models.CharField(u'用户登录状态限制', default=u'-1', max_length=8, choices=USER_LOGIN_STATUS, help_text="用户登录状态限制")
     jump_state = models.BooleanField(u'是否开启跳转', default=False, help_text=u'默认不开启跳转,PC端也适用')
     link_dest = models.CharField(u'跳转链接', default=u'3', max_length=32, choices=LINK_CHOICES)
     link_dest_h5_url = models.CharField(u'活动浮层跳转h5页url', default=u'https://', max_length=300,
