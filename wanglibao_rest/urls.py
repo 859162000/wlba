@@ -233,8 +233,10 @@ urlpatterns = patterns(
     url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
     url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
     url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
+    url(r'^manual_modify/phone_validation_code/$', SMSModifyPhoneAPI.as_view()),
     url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
     url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
+
 )
 
 urlpatterns += patterns('',

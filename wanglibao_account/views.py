@@ -78,6 +78,7 @@ from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
+from wanglibao_account.forms import verify_captcha
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -2264,6 +2265,25 @@ class ValidateAccountInfoAPI(APIView):
             return Response({'ret_code': 0})
         return Response(form.errors, status=400)
 
+class ManualModifyPhoneValidateCode(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
+        new_phone_user = User.objects.filter(wanglibaouserprofile__phone=phone_number)
+        if new_phone_user.exists():
+            return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+
+        if not res:
+            return Response({'message': message, "type":"captcha"}, status=403)
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        return Response({'message': message, "type":"validation"}, status=status)
+
 class ManualModifyPhoneTemplate(TemplateView):
     template_name = 'phone_modify_manual.jade'
 
@@ -2345,7 +2365,7 @@ class SMSModifyPhoneValidateAPI(APIView):
                 return Response({'message':"身份证错误"}, status=400)
             new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
             if new_phone_user:
-                return Response({'message':"new phone has been registered"}, status=400)
+                return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
             #todo
             # 同卡之后要对银行卡号进行验证
             sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, status = u'短信修改手机号提交').first()
@@ -2392,7 +2412,7 @@ class SMSModifyPhoneAPI(APIView):
             return Response({'message':message}, status=400)
         new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
         if new_phone_user:
-            return Response({'message':"new phone has been registered"}, status=400)
+            return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
         with transaction.atomic(savepoint=True):
             old_phone = profile.phone
             profile.phone = new_phone
