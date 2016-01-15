@@ -187,7 +187,7 @@ class P2PTrader(object):
                                                 "keyword1": self.product.name,
                                                 "keyword2": "%s 元"%str(amount),
                                                 "keyword3": now,
-                                                "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
+                                                "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % (self.order_id),
                                                     })},
                                                 queue='celery02')
         except Exception, e:
