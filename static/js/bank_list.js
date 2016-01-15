@@ -46,6 +46,7 @@
             data: {},
             type: 'GET',
             success: function (data) {
+                $('.cardsEd').show()
                 var strHtml = '<div class="w100 clearfix">'
                 strHtml+='<div class="bank-card">'
                      +'<div class="bank-card--title-bar row">';
@@ -64,6 +65,7 @@
                 $('#add-card-button').hide()
             },
             error : function(){
+                $('.noCards').show();
                 $('#add-card-button').show()
                 $.ajax({
                     url: '/api/pay/cnp/list_new/',
