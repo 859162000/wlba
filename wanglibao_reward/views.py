@@ -1294,7 +1294,7 @@ class WeixinActivityAPIView(APIView):
                     p2p_amount=0
                 )
 
-        return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
+        return WanglibaoActivityReward.objects.filter(user=user, order_id=order_id, activity=self.activity_name)
 
 
     def post(self, request):
@@ -1337,7 +1337,7 @@ class WeixinActivityAPIView(APIView):
                         'message': u'用户抽到奖品'
                     }
                     redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
-
+                    logger.debug(u'distribute redpack for user:%s, redpack:%s' % (request.user, record.redpack_event))
                 else:
                     json_to_response = {
                         'code': 1,
