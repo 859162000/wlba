@@ -83,12 +83,10 @@
         });
 
         $('.button').click(function(){
-
             var validate_code_val = $('.input_code').val();
             var password_val = $('.password').val();
             var id_number_val = $('.id_number').val();
             var new_phone_val = $('.new_phone').val();
-
             $.ajax({
                 url: '/api/sms_modify/vali_acc_info/' ,
                 type: 'POST',
@@ -97,7 +95,6 @@
                     password:password_val,
                     id_number:id_number_val,
                     new_phone:new_phone_val
-
                 },
                 success: function (returndata) {
                     alert(returndata);
@@ -105,6 +102,7 @@
                 error: function (returndata) {
                     alert(returndata);
                 }
+
             });
         })
 
