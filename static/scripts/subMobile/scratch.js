@@ -221,7 +221,7 @@ Lottery.prototype = {
                 data: {"order_id": orderId},
                 dataType: 'json',
                 success: function(data){
-                    console.log(data);
+                    //console.log(data);
 
                     if(data.code === 0){
                         txtDom.html('人品大爆发，'+ data.amount +'%加息券已经悄悄飞到了您的账户中~');
@@ -240,7 +240,7 @@ Lottery.prototype = {
                     $("#chance-num").text(data.lefts || 0);
                 },
                 error: function(){
-                    //window.location.href="/weixin/jump_page/?message=出错了，请稍候再试";
+                    window.location.href="/weixin/jump_page/?message=出错了，请稍候再试";
                 }
             });
         }
