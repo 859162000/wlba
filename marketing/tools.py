@@ -22,6 +22,7 @@ import datetime
 import json
 from django.db.models import Sum, Count, Q
 import logging
+from django.conf import settings
 from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEMPLATE_ID
 
 from weixin.models import WeixinUser
@@ -174,7 +175,7 @@ def deposit_ok(user_id, amount, device, order_id):
 
 
 @app.task
-def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
+def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id):
     user = User.objects.filter(id=user_id).first()
     # 短信通知添加用户名
 
@@ -205,6 +206,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
                                         "keyword1":"%s 元"%str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
+                                        "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % order_id,
                                             })},
                                         queue='celery02')
 

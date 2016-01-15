@@ -56,6 +56,22 @@
       }
 >>>>>>> feature/one_card
     });
+    $.ajax({
+      url: "/qiye/profile/get/",
+      type: "GET",
+      data: {}
+    }).fail(function(data) {
+      var result;
+      result = JSON.parse(data.responseText);
+      if (result.ret_code === 20001) {
+        return $('#tyjzq').show();
+      }
+    }).success(function(data) {
+      $('#tyjzq').hide();
+      if (data.ret_code === 10000) {
+        return $('#qiyeUser i').text(data.data.company_name);
+      }
+    });
     DataViewModel = (function() {
       function DataViewModel() {
         var self;

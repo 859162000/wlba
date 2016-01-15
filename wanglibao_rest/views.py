@@ -539,6 +539,9 @@ class IdValidateAPIView(APIView):
 
 
 class SendVoiceCodeAPIView(APIView):
+    """
+    汇讯群呼(快易通)语音短信验证码接口
+    """
     permission_classes = ()
 
     def post(self, request):
@@ -568,9 +571,11 @@ class SendVoiceCodeAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
-        logger.info("voice_code: %s" % cont)
-        return Response({"ret_code": 0, "message": "ok"})
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
+        return Response({"ret_code": res_code, "message": res_text})
 
 
 class SendVoiceCodeTwoAPIView(APIView):

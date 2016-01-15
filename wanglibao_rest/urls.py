@@ -61,6 +61,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
 from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView
+from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
 
@@ -189,9 +190,10 @@ urlpatterns = patterns(
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
     url(r'^pushtest/$', PushTestView.as_view()),
-    url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
-    url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
-    url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
+    # url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
+    # url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
+    # url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
+    url(r'^voice/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^marketing/tv/$', Statistics.as_view()),
     url(r'^marketing/tv_inside/$', StatisticsInside.as_view()),
     url(r'^p2p/investrecord', InvestRecord.as_view()),
@@ -309,4 +311,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
+)
+
+#
+urlpatterns += patterns(
+    '',
+    url(r'^account2015/$', CustomerAccount2015ApiView.as_view()),
 )

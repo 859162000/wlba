@@ -601,8 +601,17 @@ class AccountHomeAPIView(APIView):
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_week = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, 
+        fund_income_month = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+
+        # 当月免费提现次数
+        fee_config = WithdrawFee().get_withdraw_fee_config()
+        free_times_per_month = int(fee_config['fee']['free_times_per_month'])
+        withdraw_success_count = int(WithdrawFee().get_withdraw_success_count(user))
+        withdraw_free_count = free_times_per_month - withdraw_success_count
+
+        if withdraw_free_count <= 0:
+            withdraw_free_count = 0
 
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
@@ -622,6 +631,7 @@ class AccountHomeAPIView(APIView):
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
             'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
+            'withdraw_free_count': withdraw_free_count,  # 当月免费提现次数
 
         }
 

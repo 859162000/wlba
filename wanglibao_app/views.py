@@ -53,12 +53,63 @@ from django.core.paginator import PageNotAnInteger, EmptyPage
 
 logger = logging.getLogger(__name__)
 
-class AppActivateImageAPIView(APIView):
-    """ app端查询启动活动图片 """
-    permission_classes = ()
+class AppActivateScoreImageAPIView(APIView):
+    """
+    app端查询启动评分活动图片
+    """
+    permission_classes = (IsAuthenticated,)
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
-    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android'}
+    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
+
+    def post(self, request):
+        size = request.DATA.get('size', '').strip()
+
+        device = split_ua(request)
+        device_type = device['device_type']
+
+        if not device_type or not size:
+            return Response({'ret_code': 20001, 'message': u'信息输入不完整'})
+
+        if device_type != 'ios' or int(size) not in (x for x in range(1, 9)):
+            return Response({'ret_code': 20002, 'message': u'参数不合法'})
+
+        if int(size) in (x for x in range(5, 9)):
+            size = str(int(size) - 4)
+            device_type = 'act_score_iso'
+
+        size = self.SIZE_MAP[size]
+
+        activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
+        if activate:
+            if size == 'img_one':
+                img_url = activate.img_one
+            elif size == 'img_two':
+                img_url = activate.img_two
+            elif size == 'img_three':
+                img_url = activate.img_three
+            elif size == 'img_four':
+                img_url = activate.img_four
+            else:
+                img_url = ''
+
+            if img_url:
+                img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
+                return Response({'ret_code': 0,
+                                 'message': 'ok',
+                                 'image': img_url,
+                                 })
+
+        return Response({'ret_code': 20003, 'message': 'fail'})
+
+
+
+class AppActivateImageAPIView(APIView):
+    """ app端查询启动活动图片 """
+    permission_classes = (IsAuthenticated,)
+
+    SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
+    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
 
     def post(self, request):
         size = request.DATA.get('size', '').strip()
@@ -95,8 +146,16 @@ class AppActivateImageAPIView(APIView):
             link_dest = activate.link_dest
 
             if img_url:
+                invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
                 img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                return Response({'ret_code': 0, 'message': 'ok', 'image': img_url, 'jump_state': jump_state, 'link_dest':link_dest})
+                return Response({'ret_code': 0,
+                                 'message': 'ok',
+                                 'image': img_url,
+                                 'jump_state': jump_state,
+                                 'link_dest':link_dest,
+                                 'link_dest_url':activate.link_dest_h5_url,
+                                 'invest_flag':invest_flag,
+                                 })
 
         return Response({'ret_code': 20003, 'message': 'fail'})
 
