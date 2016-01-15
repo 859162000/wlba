@@ -1253,11 +1253,11 @@ class WeixinActivityAPIView(APIView):
 
     def generate_reward_activity(self, user, order_id):
         points = {
-            "0-5": ("weixin_guagua_0.5", 0.5),
-            "1-6": ("weixin_guagua_0.7", 0.7),
-            "2-7": ("weixin_guagua_0.9", 0.9),
-            "3-8": ("weixin_guagua_1.0", 1.0),
-            "4-9": ("weixin_guagua_1.2", 1.2)
+            "0-5": ("weixin_guagua_0.9", 0.9),
+            "1-6": ("weixin_guagua_1.0", 1.0),
+            "2-7": ("weixin_guagua_1.2", 1.2),
+            "3-8": ("weixin_guagua_1.5", 1.5),
+            "4-9": ("weixin_guagua_2.0", 2.0)
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
