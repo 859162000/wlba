@@ -121,6 +121,8 @@ Lottery.prototype = {
 
         if (!this.conNode.innerHTML.replace(/[\w\W]| /g, '')) {
             //this.conNode.appendChild(this.background);
+            this.conNode.innerHTML = '';
+            console.log(this.conNode.innerHTML);
             this.conNode.appendChild(this.mask);
             this.clientRect = this.conNode ? this.conNode.getBoundingClientRect() : null;
             this.bindEvent();
@@ -184,15 +186,14 @@ Lottery.prototype = {
 ;;(function(){
     window.onload = function () {
         onLoadClass();
-
         var lotteryContainer = document.getElementById("lotteryContainer");
         var lottery = new Lottery('lotteryContainer', '/static/imgs/sub_weixin/activity/ggl_area.jpg', 'image', lotteryContainer.width || lotteryContainer.offsetWidth, lotteryContainer.height || lotteryContainer.offsetHeight, drawPercent, startTouch);
-        lottery.init('刮刮乐翻天 红包滚滚来', 'text');
+        lottery.init(getRandomStr(), 'text');
         var freshBtn = $('#freshBtn');
         freshBtn.click(function() {
             //drawPercentNode.innerHTML = '0%';
             document.getElementById("lotteryContainer").style.display = "block";
-            lottery.init('刮刮乐翻天 红包滚滚来', 'text');
+            lottery.init(getRandomStr(), 'text');
         });
 
         function drawPercent(percent) {
@@ -213,54 +214,38 @@ Lottery.prototype = {
         }
         function startTouch(){
             org.ajax({
-            type: 'post',
-            url: '/api/weixin/guaguaka/',
-            dataType: 'json',
-            success: function(data){
-                console.log(data);
+                type: 'post',
+                url: '/api/weixin/guaguaka/',
+                dataType: 'json',
+                success: function(data){
+                    console.log(data);
 
-                if(data.code === 0){
-                    txtDom.html('人品大爆发，'+ data.amount +'%加息券已经悄悄飞到了您的账户中~');
-                }else if(data.code === 1){
-                    var random = parseInt(Math.random()*errorArr.length);
-                    var str = errorArr[random];
-                    txtDom.html(str);
-                    errorArr.splice(random,1);
-                }else if(data.code === 1002){
-                    txtDom.html('您的人品已经用完，继续投资、提现再来碰运气吧~');
-                    closePage();
-                }else{
-                    txtDom.html('您不符合刮奖条件，仔细阅读活动规则哦~');
-                    closePage();
+                    if(data.code === 0){
+                        txtDom.html('人品大爆发，'+ data.amount +'%加息券已经悄悄飞到了您的账户中~');
+                    }else if(data.code === 1){
+                        var random = parseInt(Math.random()*errorArr.length);
+                        var str = errorArr[random];
+                        txtDom.html(str);
+                        errorArr.splice(random,1);
+                    }else if(data.code === 1002){
+                        txtDom.html('您的人品已经用完，继续投资、提现再来碰运气吧~');
+                        closePage();
+                    }else{
+                        txtDom.html('您不符合刮奖条件，仔细阅读活动规则哦~');
+                        closePage();
+                    }
+                    $("#chance-num").text(data.lefts || 0);
+                },
+                error: function(){
+                    //window.location.href="/weixin/jump_page/?message=出错了，请稍候再试";
                 }
-                $("#chance-num").text(data.lefts || 0);
-            },
-            error: function(){
-                //window.location.href="/weixin/jump_page/?message=出错了，请稍候再试";
-            }
-        });
+            });
         }
     };
 
     function getRandomStr() {
-        //org.ajax({
-        //    type: 'post',
-        //    url: '/api/weixin/guaguaka/',
-        //    dataType: 'json',
-        //    success: function(data){
-        //        console.log(data);
-        //    },
-        //    error: function(){
-        //        //window.location.href="/weixin/jump_page/?message=出错了，请稍候再试";
-        //    }
-        //});
-        //没抽到奖
-        var random = parseInt(Math.random()*errorArr.length);
-        var str = errorArr[random];
-        txtDom.html(str);
-        errorArr.splice(random,1);
-
-        return str;
+        $("#award-txt").html('');
+        return '刮刮乐';
     }
 
     $(".scratch-rule").on("click", function(){

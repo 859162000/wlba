@@ -121,6 +121,8 @@ Lottery.prototype = {
 
         if (!this.conNode.innerHTML.replace(/[\w\W]| /g, '')) {
             //this.conNode.appendChild(this.background);
+            this.conNode.innerHTML = '';
+            console.log(this.conNode.innerHTML);
             this.conNode.appendChild(this.mask);
             this.clientRect = this.conNode ? this.conNode.getBoundingClientRect() : null;
             this.bindEvent();
