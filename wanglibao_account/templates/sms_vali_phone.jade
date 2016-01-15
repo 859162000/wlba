@@ -16,7 +16,7 @@ block main
                 .box
                     label 原手机号
                     .box_right
-                        .text 180****908
+                        .text.phone_num {{phone}}
                 .box
                     label 验证码
                     .box_right
@@ -29,7 +29,7 @@ block main
                     label 账户登录密码
                     .box_right
                         .input_box
-                            <input class="input_phone" type="text" placeholder="请输入账户登录密码" autocomplete="off">
+                            <input class="input_phone password" type="password" placeholder="请输入账户登录密码" autocomplete="off">
                             .static
                                 .true
                                 .false 账户登录密码有误
@@ -37,15 +37,15 @@ block main
                     label 实名身份证号
                     .box_right
                         .input_box
-                            <input class="input_phone" type="text" placeholder="请输入身份证号" autocomplete="off">
+                            <input class="input_phone id_number" type="text" placeholder="请输入身份证号" autocomplete="off">
                             .static
                                 .true
                                 .false 身份证信息有误
-                .box
+                .box(style='display:none')
                     label 银行卡号
                     .box_right
                         .input_box
-                            <input class="input_phone" type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
+                            <input class="input_phone " type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
                             .static
                                 .true
                                 .false 银行卡号码有误
@@ -53,16 +53,16 @@ block main
                     label 新手机号
                     .box_right
                         .input_box
-                            <input class="input_phone" type="text" placeholder="请输入新手机号" autocomplete="off">
+                            <input class="input_phone new_phone" type="text" placeholder="请输入新手机号" autocomplete="off">
                             .static
                                 .true
                                 .false 新手机号码有误
                 .box
                     label
                     .box_right
-                        <input class="submit" type="submit" value="下一步"/>
+                        <input class="submit button" type="button" value="下一步"/>
 
     //include global/g_footer
-    //script.
-        require(["/static/js/account_safe.js"])
+    script.
+        require(["/static/js/sms_vali_phone.js?v=1"])
     include include/tracking

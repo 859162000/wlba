@@ -95,9 +95,9 @@
         function select_img(docObj,file_img,input_parent){
             var filename = docObj.value;
             var mime = filename.toLowerCase().substr(filename.lastIndexOf("."));
-            alert(mime);
+            //alert(mime);
             var file_size = docObj.files[0].size;
-            alert(file_size);
+            //alert(file_size);
             if(mime==".jpg"||mime==".png"||mime==".bmp"&&file_size<'2097152'){
                 setImagePreview(docObj,file_img);
                 form_status();
@@ -268,7 +268,7 @@
             if(file_1&&file_2&&file_3&&phone_true&&code_num){
                 var form =$("#form");
                 var formData = new FormData($( "#form" )[0]);
-                alert(formData);
+                //alert(formData);
                 $.ajax({
                     url: '/api/manual_modify/phone/' ,
                     type: 'POST',
