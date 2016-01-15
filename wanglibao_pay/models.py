@@ -7,6 +7,7 @@ from django.db import models
 from order.models import Order
 from wanglibao_margin.models import MarginRecord
 from wanglibao_pay.util import get_a_uuid
+from wanglibao_pay import util
 from decimal import Decimal
 
 
