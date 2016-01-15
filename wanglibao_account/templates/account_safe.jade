@@ -42,7 +42,7 @@ block main
                 dl
                     dt 人工审核
                     dd 原手机无法收取短信
-        .info_box
+        .info_box#id_valid
             .img.img_2
             if id_is_valid
                 dl
@@ -52,7 +52,7 @@ block main
                         span.is_set_text 已认证
                     dd *永明 370125**********
             else
-                dl
+                dl.id_no_valid
                     dt
                         .text 实名认证
                         .ico.no_set_ico
@@ -93,6 +93,6 @@ block main
 
 
     //include global/g_footer
-    script.
+    //script.
         require(["/static/js/account_safe.js"])
     include include/tracking
