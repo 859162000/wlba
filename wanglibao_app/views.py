@@ -57,7 +57,7 @@ class AppActivateScoreImageAPIView(APIView):
     """
     app端查询启动评分活动图片
     """
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
     DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
@@ -106,7 +106,7 @@ class AppActivateScoreImageAPIView(APIView):
 
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
     DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
