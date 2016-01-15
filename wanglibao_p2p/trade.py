@@ -191,7 +191,8 @@ class P2PTrader(object):
                                                     })},
                                                 queue='celery02')
         except Exception, e:
-            pass
+            logger.debug("=====sentTemplate=================%s"%e.message)
+
         return product_record, margin_record, equity
 
 
