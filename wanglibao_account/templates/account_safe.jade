@@ -32,12 +32,12 @@ block main
                 .button 修改
         .phone_change_wrap
             .line
-            .wrap_box.sms_wrap
+            a.wrap_box.sms_wrap(href='/accounts/sms_modify/vali_acc_info/')
                 .img
                 dl
                     dt 短信认证
                     dd 原手机可收取短信
-            .wrap_box.people_wrap
+            a.wrap_box.people_wrap(href='/accounts/manual_modify/vali_acc_info/')
                 .img
                 dl
                     dt 人工审核
@@ -92,7 +92,7 @@ block main
 
 
 
-    //include global/g_footer
-    //script.
+
+    script.
         require(["/static/js/account_safe.js"])
-    include include/tracking
+

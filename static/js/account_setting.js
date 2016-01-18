@@ -15,6 +15,13 @@
   });
 
   require(['jquery', 'jquery.validate', 'lib/backend', 'tools'], function($, validate, backend, tool) {
+    $('#setPWDA').click(function() {
+      if ($('#id-is-valid').val() === 'false') {
+        $('#id-validate').modal();
+      } else {
+        return window.location.href = '/accounts/back/';
+      }
+    });
     $('#passwordChangeButton').click(function(e) {
       var params;
       e.preventDefault();
@@ -44,7 +51,7 @@
         });
       }
     });
-    return $('#passwordChangeForm').validate({
+    $('#passwordChangeForm').validate({
       rules: {
         'old-password': {
           required: true
@@ -71,6 +78,41 @@
           equalTo: '两次密码输入不一致'
         }
       }
+    });
+
+    /*判断是否设置了交易密码 */
+    $.ajax({
+      url: "/api/profile/",
+      type: "GET",
+      data: {}
+    }).success(function(data) {
+      $('#id-is-valid').val(data.id_is_valid);
+      if (data.trade_pwd_is_set) {
+        return $('.old').show();
+      } else {
+        return $('.new').show();
+      }
+    });
+    $.ajax({
+      url: "/api/pay/the_one_card/",
+      type: "GET",
+      data: {}
+    }).fail(function() {
+      return $('#bankIsNoBind').val('false');
+    }).done(function(xhr) {
+      return $('#bankIsNoBind').val('true');
+    });
+
+    /*找回交易密码 */
+    $('#getBackTradingPwd').click(function() {
+      if ($('#bankIsNoBind').val() === 'false') {
+        return $('#goBindingBackWin').modal();
+      } else {
+        return window.location.href = '/accounts/back/';
+      }
+    });
+    return $('#temporaryNot').click(function() {
+      return $.modal.close();
     });
   });
 

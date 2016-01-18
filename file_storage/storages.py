@@ -115,5 +115,13 @@ class AliOSSStorage(Storage):
         return urljoin(self.base_url, name)
 
 
+class AliOSSStorageForCover(AliOSSStorage):
+    """阿里云文件上传，重名则覆盖"""
 
-
+    def save(self, name, content):
+        size = oss_save(name, content.file)
+        # 如果上传重名则覆盖
+        f = File.objects.get_or_create(path=name)[0]
+        f.size = size
+        f.save()
+        return name

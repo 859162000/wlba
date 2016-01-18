@@ -274,6 +274,7 @@ class PurchaseP2PMobile(DecryptParmsAPIView):
                                 url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
 
                 return Response({
+                    'ret_code': 0,
                     'data': product_info.amount,
                     'share_show': shareShow,
                     'share_url': url,

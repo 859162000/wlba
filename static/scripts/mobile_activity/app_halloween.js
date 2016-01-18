@@ -217,6 +217,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
+<<<<<<< HEAD
 ;$(function() {
     window.onload = function() {
         $('.loading').hide();
@@ -240,6 +241,18 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     });
 
+=======
+;
+
+$(function() {
+    window.onload = function() {
+        $('#wrap').show();
+        $('.no_signal_wrap').addClass('no_signal_wrap_animate');
+        step1();
+    }
+    var money = 0;
+    var this_money;
+>>>>>>> feature/one_card
     /*数字变换*/
     function gold_scroll(gold_num_change) {
         $('.num-animate').each(function() {
@@ -254,6 +267,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
     /*数字变换*/
 
+<<<<<<< HEAD
     function step1(){
         $('.boy_go').removeClass('boy_animate1');
 
@@ -271,6 +285,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     mp3.play();
                 });
             }
+=======
+    function step1() {
+        $('.boy').removeClass('boy_animate1');
+        var i = 4;
+        var timer1 = setInterval(function() {
+            i--;
+>>>>>>> feature/one_card
             if (i === 0) {
                 clearInterval(timer1);
                 $('.no_signal_wrap').hide();
@@ -282,27 +303,54 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }  
 
     function step2(){
+<<<<<<< HEAD
         $('.money_50').show().addClass('money_50_animate');
         $('.gold_num_wrap').show().addClass('gold_num_wrap_animate');
         var i = 8;
+=======
+        $('.title').addClass('title_animate');
+        $('.money_50').show().addClass('money_50_animate');
+        $('.gold_num_wrap').show().addClass('gold_num_wrap_animate');
+        var i = 12;
+>>>>>>> feature/one_card
         var timer1 = setInterval(function() {
             i--;
             if (i === 0) {
                 clearInterval(timer1);
+<<<<<<< HEAD
+=======
+                $('.bat1,.title,.money_50').hide();
+>>>>>>> feature/one_card
                 gold_scroll(money);
                 $('.gold_num_wrap .main').addClass('gold_num_main_animate');
                 step3();
             }
         },
         1000);
+<<<<<<< HEAD
     }   
 
     function step3(){
         var i = 4;
+=======
+        
+    }   
+
+    function step3(){
+        $('.bg_after').addClass('bg_after_animate1');
+        $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
+        $('.boy_stay').hide();
+        $('.boy').addClass('boy_animate1');
+        $('.choice_step1').show().addClass('choice_step_show');
+        $('.gold').show().addClass('gold_animate');
+        $('.cloud').addClass('cloud_animate1');
+        var i = 5;
+>>>>>>> feature/one_card
         var timer1 = setInterval(function() {
             i--;
             if (i === 0) {
                 clearInterval(timer1);
+<<<<<<< HEAD
                 $('.boy_go').show().addClass('boy_animate1');
                 //$('.boy_go_one').show();
                 $('.choice_step1').show().addClass('choice_step_show');
@@ -312,12 +360,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 $('.gold').show().addClass('gold_animate');
                 $('.cloud').addClass('cloud_animate1');
                 choice_step1 = true;
+=======
+                //$('.boy_stay').show();
+>>>>>>> feature/one_card
             }
         },
         1000);
     }
 
     $('.choice_step1 .choice1').click(function(){
+<<<<<<< HEAD
         if(choice_step1){
             choice_step1=false;
             $('.choice_step1').addClass('choice_step_hide');
@@ -372,11 +424,58 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $('.boy_stay').hide();
         $('.boy_go_one').hide();
         $('.boy_go').show().addClass('boy_animate2');
+=======
+        $('.choice_step1').addClass('choice_step_hide');
+        $('.gold_text').attr('data-num','70');
+        $('.gold').addClass('gold_hide');
+        $('.boy').removeClass('boy_animate1');
+        $('.gold_num_wrap .main').removeClass('gold_num_main_animate');
+        money = 50;
+        var i = 3;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 2) {
+                gold_scroll(money);
+                $('.gold_num_wrap .main').addClass('gold_num_main_animate');
+            };
+            if (i === 0) {
+                clearInterval(timer1);
+                setp4();
+            }
+        },
+        1000);
+        
+    });
+
+    $('.choice_step1 .choice2').click(function(){
+        $('.choice_step1').addClass('choice_step_hide');
+        $('.gold').addClass('gold_hide2');
+        $('.car').addClass('car_animate');
+        $('.boy').removeClass('boy_animate1');
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0){
+                clearInterval(timer1);
+                setp4();
+            }
+        },
+        1000); 
+        
+    });
+
+    function setp4(){
+        $('.boy_stay').hide(); 
+        $('.boy').addClass('boy_animate2');
+>>>>>>> feature/one_card
         $('.cloud').addClass('cloud_animate2');
         $('.bg_after').addClass('bg_after_animate2');
         $('.bg_front_wrap').addClass('bg_front_wrap_animate2');
         $('.tree1_wrap').show().addClass('tree1_wrap_animate');
+<<<<<<< HEAD
         $('.deadman').addClass('deadman_animate');
+=======
+>>>>>>> feature/one_card
         $('.choice_step2').show().addClass('choice_step_show');
         var i = 6;
         var timer1 = setInterval(function() {
@@ -386,14 +485,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 $('.gold,.car,.choice_step1').hide();
                 $('.boy_stay').show();     
                 $('.ghost').show().addClass('ghost_animate');
+<<<<<<< HEAD
                 $('.boy_go').hide().removeClass('boy_animate2');
                 choice_step2 = true;
+=======
+                $('.boy').removeClass('boy_animate2');
+>>>>>>> feature/one_card
             }
         },
         1000); 
     }
 
     $('.choice_step2 .choice1').click(function(){
+<<<<<<< HEAD
         if(choice_step2) {
             choice_step2 = false;
             $('.boy_stay').hide();
@@ -462,14 +566,77 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             i--;
             if (i === 2){
                 $('.choice_step3').show().addClass('choice_step_show');
+=======
+        $('.boy_stay').css('opacity','0');
+        $('.boy_run').show();
+        $('.choice_step2').addClass('choice_step_hide');
+        $('.boy').addClass('boy_animate2');
+        $('.cloud').addClass('cloud_animate4');
+        $('.bg_after').addClass('bg_after_animate3');
+        $('.bg_front_wrap').addClass('bg_front_wrap_animate3');
+        $('.tree1_wrap').show().addClass('tree1_wrap_animate2');
+        $('.gold_text').attr('data-num','20');
+        $('.tree2_wrap').show().addClass('tree2_wrap_animate');
+        gold_scroll(money);
+        $('.gold_num_wrap .main').addClass('gold_num_main_animate');
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0){
+                clearInterval(timer1);
+                setp5();
+                $('.gold_num_wrap .main').removeClass('gold_num_main_animate');
+            }
+        },
+        1000); 
+        setp5();
+    });
+
+    $('.choice_step2 .choice2').click(function(){
+        $('.ghost_hit').show();
+        $('.ghost').addClass('ghost_gone');
+        $('.choice_step2').addClass('choice_step_hide');
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 3){
+                $('.boy_stay').hide(); 
+                $('.boy').addClass('boy_animate3');
+                $('.cloud').addClass('cloud_animate3');
+                $('.bg_after').addClass('bg_after_animate4');
+                $('.bg_front_wrap').addClass('bg_front_wrap_animate4');
+                $('.tree1_wrap').show().addClass('tree1_wrap_animate2');
+                $('.tree2_wrap').show().addClass('tree2_wrap_animate2');
+                setp5();
+            };
+            if (i === 0){
+                clearInterval(timer1);
+                setp5();
+            }
+        },
+        1000); 
+    });
+
+    function setp5(){
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 2){
+                $('.choice_step3').show().addClass('choice_step_show');    
+>>>>>>> feature/one_card
             }
             if (i === 0){
                 clearInterval(timer1);
                 $('.boy_stay').show().css('opacity','1');
+<<<<<<< HEAD
                 $('.boy_go').hide();
                 $('.girl_wrap').show().addClass('girl_come_animate');
                 $('.girl_come').show();
                 choice_step3 = true;
+=======
+                $('.girl_wrap').show().addClass('girl_come_animate');
+                
+>>>>>>> feature/one_card
             }
         },
         1000);
@@ -477,6 +644,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 
     $('.choice_step3 .choice1').click(function(){
+<<<<<<< HEAD
         if(choice_step3) {
             choice_step3 = false;
             $('.sugar').show().addClass('sugar_animate');
@@ -523,12 +691,50 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 },
                 1000);
         }
+=======
+        $('.sugar').show().addClass('sugar_animate');
+        $('.choice_step3').addClass('choice_step_hide');
+        $('.sugar_want').addClass('sugar_want_hide');
+        this_money = $('.gold_text').attr('data-num') - 5;
+        $('.gold_text').attr('data-num',this_money);
+        money = $('.gold_text').text();
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 4){
+                gold_scroll(money);
+                $('.gold_num_wrap .main').addClass('gold_num_main_animate');   
+            }
+            if (i === 0){
+                clearInterval(timer1);
+                step6();
+            }
+        },
+        1000);
+    });
+
+    $('.choice_step3 .choice2').click(function(){
+        $('.choice_step3').addClass('choice_step_hide');
+        $('.girl_cry').show();
+        $('.girl_come').css('opacity','0');
+        money = $('.gold_text').text();
+        var i = 4;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0){
+                clearInterval(timer1);
+                step6();
+            }
+        },
+        1000);
+>>>>>>> feature/one_card
     })
 
     function step6(){
         if(money<50){
             $('.poor_wrap').show();
             $('.poor_wrap .button').show().addClass('href_button');
+<<<<<<< HEAD
             $('.poor_boy').show();
             $('.poor_text').addClass('text_animate');
         }else{
@@ -590,3 +796,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     })
 
 })();
+=======
+        }else{
+            $('.rich_wrap').show();
+            $('.rich_wrap .button').show().addClass('href_button');
+        }
+    }
+
+})
+>>>>>>> feature/one_card

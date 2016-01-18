@@ -1,0 +1,173 @@
+doctype html
+html(style='background:#f5f5f5;height:100%;overflow:hidden;')
+  head
+    title 2015投资记
+    include include/app_header.jade
+  body(style='position: relative;height: 100%;')
+    .client-loding-warp
+      .client-loading-center
+        .client-loading.swiper-slide-active
+          .loading-animate.ele-rotate-loading
+          .loading-aue 数据统计中..等一等！
+
+    .client-finance
+      .swiper-container.swiper-container-vertical
+        .swiper-wrapper
+          //第一页
+          .swiper-slide.swiper-first
+            .finance-logo.ele-txt
+            .finance-rocket
+            .finance-stars
+            .finance-lion.ele-ballon
+            .finance-floor
+            .finance-page-chicken.ele-txt2 去看看，2015年我在网利宝的那些事儿
+            .touch-next
+          //第二页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model2
+              .finance-head
+                .star-head
+                .head-title 这一年，我在网利宝
+              .finance-model2-title
+                span 亲爱的张张张
+              .finance-model2-list 您是网利宝第 <i class= 'yellow'>66668888</i> 位注册用户
+              .finance-model-dotted
+                .dotted-item
+                  .dotted-circle
+                  .dotted-line.ele-line
+                  .dotted-circle
+              .finance-model2-list 投资总额： <i class= 'yellow'>￥88888888.00</i> <br>击败99%的投资人
+              .finance-model-dotted
+                .dotted-item
+                  .dotted-circle
+                  .dotted-line.ele-line
+                  .dotted-circle
+              .finance-model2-list 投资总收益： <i class= 'yellow'>￥88888888.00</i> <br>这个数字会惨遭嫉妒
+
+            img(src='/static/imgs/app/finance/earth_lion.png').finance-earth
+            .finance-page-chicken.ele-txt2 回顾我的致富之路
+            .touch-next
+
+          //第三页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model3
+              .finance-head
+                .star-head
+                .head-title 土豪致富秘笈
+              .finance-model3-list 秘笈1:做土豪，必先勤劳（全年投资次数／周期）
+              .finance-model3-rotate
+                .rotate-item
+                  .item-warp
+                    .model3-circle-icon.ele-rotate
+                    .model3-rotate-text 37次
+                  .item-dec 全年投资次数
+                .rotate-item
+                  .item-warp
+                    .model3-circle-icon
+                    .model3-rotate-text 37次
+                  .item-dec 全年投资次数
+              .finance-model-dotted
+                .dotted-item
+                  .dotted-circle
+                  .dotted-line.ele-line
+                  .dotted-circle
+              .finance-model3-list.finance-model3-space 秘笈2:不光勤劳，出手要豪（单笔投资最大额度）
+              .finance-model3-canvas
+                .finance-canvas-list
+                  .max-finance ¥1,000,000.00
+                .finance-canvas-list
+                  canvas(id="canvas-model3")
+              .item-dec.finance-model3-space 出手豪气超过80%投资人
+            .finance-page-chicken.ele-txt2 分析我的性格色彩，紧抱自己大腿
+            .touch-next
+          //第四页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model4
+              .finance-head
+                .star-head
+                .head-title 最爱：长期优选
+              .finance-model4-canvas
+                canvas( id="model4-canvas", height="400", width="400")
+              .finance-model4-data-item
+                .model4-data-list
+                  span.model4-circle.model4-circle-sort
+                  span.data-list-data 短期（<90天）：
+                  sapn.data-sort 80%
+                .model4-data-list
+                  span.model4-circle.model4-circle-mid
+                  span.data-list-data 中期（90≤投资区间<180天）：
+                  sapn.data-mid  15%
+                .model4-data-list
+                  span.model4-circle.model4-circle-long
+                  span.data-list-data 长标（≥180天）：
+                  sapn.data-long 5%
+              .finance-model-arithmetic 百分比＝投资区间投资金额／2015总投资额
+              .finance-page-chicken.ele-txt2 分析我的性格色彩，紧抱自己大腿
+              .touch-next
+          //第五页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model5
+              .finance-head
+                .star-head
+                .head-title 全民淘金，赚佣金
+              .finance-model5-lead
+              .finance-model-cravat.finance-model-cravat-space
+                .cravat-cue 茕茕孑立
+                .cravat-icon
+                .cravat-alert.ele-txt 形容全民淘金邀请到的好友很多很热闹得像人才市场一样。
+              .finance-model2-list.model5-space 邀请好友： <i class= 'yellow'>3人</i>
+              .finance-model2-list.model5-space 佣金总额： <i class= 'yellow'>66668888</i>
+              .finance-page-chicken.ele-txt2 其实，劳动所得并不是最重要的
+              .touch-next
+          //第六页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model6
+              .finance-head
+                .star-head
+                .head-title 重要的不是劳动所得赚多少<br>而是不劳而获薅多少
+              .model6-yangmao
+                .finance-model2-list 一年薅了： <i class= 'yellow'>4000.26</i>根羊毛
+                .finance-model-arithmetic 网利宝羊毛汇率：1根羊毛＝1元
+
+              .model6-yang-icon.ele-fadeIn
+                .sheep-icon
+                .sheep-icon
+                .sheep-icon
+                .sheep-icon
+                .sheep-icon
+              .finance-public-aue 薅羊毛战斗力： <i class= 'yellow'>五只羊</i>
+              .finance-model-bold-text
+                span 尽管如此，还是错过了：<br>
+                span 至少<i class= 'yellow'>7800</i>根羊毛<br>
+                span 错过<i class= 'yellow'>260.1%</i>加息机会
+              .finance-mode-btnl-aue.model6-aue-space.ele-txt 号召天下：我要独占羊群
+
+          //第七页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model7
+              .finance-head
+                .star-head
+                .head-title 作为网利宝第<i class= 'yellow'>8000</i>位注册用户<br>获封“2015最干净账单”
+            img(src='/static/imgs/app/finance/none_model7_lead.png').model7-lead
+            .finance-model-cravat.finance-model7-cravat-space
+                .cravat-cue 两袖清风，家徒四壁
+            .finance-mode-btnl-aue.ele-txt 君子固穷，赠人玫瑰
+          //第八页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model8
+              .finance-head
+                .star-head
+                .head-title 2015年，我很忙....
+              .finance-last-head 2015年，我婉绝拒了主席的阅兵仪式，推脱了黄教主的婚礼，放弃了饰演梅长苏的机会...因为这一年我真的很忙，我废寝忘食，呕心沥血地在薅网利宝的羊毛。
+              .finance-public-aue 一年，<i class= 'yellow'>张张张</i>薅了
+              .finance-last-bold <i class= 'yellow'>1234567.00</i>根羊毛
+              .finance-model-arithmetic 网利宝羊毛汇率：1根羊毛＝1元
+            .last-layout
+              .finance-mode-btnl-aue.ele-txt 大家一起来薅羊毛
+              .finance-last-message.ele-txt2 来网利宝APP，查看2015年投资记录
+            img(src='/static/imgs/app/finance/earth_lion2.png').finance-earth.finance-earth2
+            img(src='/static/imgs/app/finance/earth_lion2_default.png').finance-earth.finance-earth-efault
+    // banner javascript
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script(src="/static/src/app/echarts/Chart.min.js")
+    script(src='/static/scripts/app/finance.js?v=201512181', data-init='finance')

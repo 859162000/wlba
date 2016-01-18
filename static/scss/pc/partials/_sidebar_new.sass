@@ -1,0 +1,114 @@
+@mixin active-style
+  color: #e7350d
+  .icon1
+    @include account-sprite(icon1_hover)
+  .icon2
+    @include account-sprite(icon2_hover)
+  .icon3
+    @include account-sprite(icon3_hover)
+  .icon4
+    @include account-sprite(icon4_hover)
+  .icon5
+    @include account-sprite(icon5_hover)
+  .icon6
+    @include account-sprite(icon6_hover)
+  .icon7
+    @include account-sprite(icon7_hover)
+  .icon8
+    @include account-sprite(icon8_hover)
+  .icon9
+    @include account-sprite(icon9_hover)
+  .icon10
+    @include account-sprite(icon10_hover)
+  .icon11
+    @include account-sprite(icon11_hover)
+  .icon12
+    @include account-sprite(icon12_hover)
+  .icon13
+    @include account-sprite(icon13_hover)
+.sidebar-item-title
+  height: 50px
+  line-height: 50px
+  a
+    font-size: 18px
+    display: inline-block
+    border-left: 3px solid #ffffff
+    text-align: center
+    width: 217px
+.activeA
+  a
+    color: #e7350d
+    border-left: 3px solid #e7350d
+.box
+  .box-title
+    font-size: 16px
+    color: #999999
+    text-indent: 21px
+    padding-top: 32px
+    border-top: 1px solid #ebebeb
+  .sidebar
+    a
+      color: #666666
+      display: inline-block
+      line-height: 45px
+      position: relative
+      span
+        font-size: 16px
+        cursor: pointer
+        width: 140px
+        border-bottom: 1px dashed #ebebeb
+        display: inline-block
+        margin-left: 5px
+        text-align: left
+      .last
+        border: 0 none
+      em
+        width: 22px
+        height: 22px
+        display: inline-block
+        vertical-align: -6px
+        margin-left: 49px
+        cursor: pointer
+      .icon1
+        @include account-sprite(icon1)
+      .icon2
+        @include account-sprite(icon2)
+      .icon3
+        @include account-sprite(icon3)
+      .icon4
+        @include account-sprite(icon4)
+      .icon5
+        @include account-sprite(icon5)
+      .icon6
+        @include account-sprite(icon6)
+      .icon7
+        @include account-sprite(icon7)
+      .icon8
+        @include account-sprite(icon8)
+      .icon9
+        @include account-sprite(icon9)
+      .icon10
+        @include account-sprite(icon10)
+      .icon11
+        @include account-sprite(icon11)
+      .icon12
+        @include account-sprite(icon12)
+      .icon13
+        @include account-sprite(icon13)
+      i
+        position: absolute
+        background: red
+        border-radius: 50%
+        line-height: 12px
+        font-size: 9px
+        left: 124px
+        color: #ffffff
+        top: 5px
+        padding: 2px
+      &:hover
+        +active-style
+
+  .active
+    a
+      +active-style
+

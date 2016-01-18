@@ -212,7 +212,9 @@ def _is_version_satisfied(request):
     if device['device_type'] == 'android' and _above_version(device['app_version'], '2.6.0'):
         #2.6.0版本起，支持交易密码
         return True
-    if device['device_type'] == 'pc':
+    # no trade_pwd for pc first pay
+    if device['device_type'] == 'pc' and PayInfo.objects.filter(
+            user=request.user, status=PayInfo.SUCCESS).exists():
         return True
     return False
 
