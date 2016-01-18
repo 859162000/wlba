@@ -2402,13 +2402,13 @@ class SMSModifyPhoneTemplate(TemplateView):
             }
 
 class SMSModifyPhoneAPI(APIView):
+    permission_classes = (IsAuthenticated, )
     def post(self, request):
         user = request.user
         new_phone = request.DATA.get('new_phone', "").strip()
         sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status = u'短信修改手机号提交').first()
         if not sms_modify_record:
             return Response({'message':u"还没有短信申请修改手机号"}, status=400)
-
         profile = user.wanglibaouserprofile
         validate_code = request.DATA.get('validate_code', "").strip()
         if not validate_code:
@@ -2426,6 +2426,7 @@ class SMSModifyPhoneAPI(APIView):
             PhoneValidateCode.objects.filter(phone=old_phone).delete()
             sms_modify_record.status=u'短信修改手机号成功'
             sms_modify_record.save()
-            return {'message':'ok'}
+            #todo force user login again
+            return Response({'message':'ok'})
 
 
