@@ -11,11 +11,7 @@
     var login = false;
     wlb.ready({
         app: function(mixins) {
-<<<<<<< HEAD
 			mixins.shareData({title: '双旦来了，翻倍狂欢', content: '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。'});
-=======
-			//mixins.shareData({title: '双旦来了，翻倍狂欢', content: '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。'});
->>>>>>> feature/one_card
 
             mixins.sendUserInfo(function(data) {
 				$('.link_licai').click(function(){
@@ -28,14 +24,9 @@
                 if (data.ph == '') {
                     login = false;
 					$('.recharge_button').click(function() {
-<<<<<<< HEAD
                         mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/app_double_eggs'});
                     })
 
-=======
-                        mixins.loginApp();
-                    })
->>>>>>> feature/one_card
                 } else {
                     login = true;
                     $('.recharge_button').click(function() {

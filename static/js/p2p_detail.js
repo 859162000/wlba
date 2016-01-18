@@ -225,15 +225,6 @@
               data: {},
               type: 'GET'
             }).done(function(data) {
-<<<<<<< HEAD
-              return tool.modalAlert({
-                height: '364px',
-                title: '温馨提示',
-                msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功',
-                callback_ok: function() {
-                  if (data.category === '酒仙众筹标') {
-                    return window.location.href = "/accounts/home/jiuxian/";
-=======
               if (data.ret_code === 10000) {
                 return $.ajax({
                   url: '/qiye/profile/get/',
@@ -242,7 +233,6 @@
                 }).done(function(data) {
                   if (data.data.status !== '审核通过') {
                     return window.location.href = '/qiye/profile/edit/';
->>>>>>> feature/one_card
                   } else {
                     return purchaseFun();
                   }

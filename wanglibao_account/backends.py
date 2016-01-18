@@ -190,11 +190,7 @@ class ProductionIDVerifyV2BackEnd(object):
 
         record.save()
 
-<<<<<<< HEAD
         return record, message
-=======
-        return record, None
->>>>>>> feature/one_card
 
 
 def parse_id_verify_response_v2(text):
@@ -266,7 +262,6 @@ class MyHttpsAdapter(HTTPAdapter):
                                        ssl_version=ssl.PROTOCOL_TLSv1)
 
 
-<<<<<<< HEAD
 def check_birth_date_for_id(id_number):
     """根据身份证判断出生日期是否合法"""
 
@@ -283,8 +278,6 @@ def check_birth_date_for_id(id_number):
     return False
 
 
-=======
->>>>>>> feature/one_card
 def check_age_for_id(id_number):
     """根据身份证计算年龄并判断"""
 
@@ -407,13 +400,10 @@ def get_verify_result(id_number, name):
     # if not check_result:
     #     return verify_result, id_photo, _error
 
-<<<<<<< HEAD
     # 身份证出生日期合法性校验
     if not check_birth_date_for_id(id_number):
         return verify_result, id_photo, u'身份证出生日期不合法'
 
-=======
->>>>>>> feature/one_card
     # 根据身份证号出生日期判断用户是否大于或等于18周岁
     if not check_age_for_id(id_number):
         return verify_result, id_photo, u'该用户未满18周岁'

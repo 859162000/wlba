@@ -18,13 +18,8 @@
     }
   });
 
-<<<<<<< HEAD
-  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, tool, placeholder, validate) {
-    var max_amount, min_amount;
-=======
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
     var addFormValidateor, max_amount, min_amount, _refreshCode, _showModal;
->>>>>>> feature/one_card
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {

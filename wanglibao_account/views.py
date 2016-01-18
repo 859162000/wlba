@@ -2313,6 +2313,3 @@ class SMSModifyPhoneAPI(APIView):
 
 
 
-=======
-
->>>>>>> feature/one_card
