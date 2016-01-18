@@ -1,5 +1,59 @@
-<<<<<<< HEAD
-.xl-backtop{width:50px;height:251px;position:fixed;right:0px;bottom:100px;z-index:999;cursor:default;display:none}.xl-backtop span{display:inline-block;width:100%;height:64px}.xl-backtop .backtop{background:#b22621;width:27px;color:#fff;text-align:center;padding:10px 0;margin:10px 0 10px 10px;border-radius:15px}.xl-backtop .sev-backtop{background:#ff5252;font-size:14px}.xl-backtop .erweima{width:146px;height:186px;position:absolute;top:73px;left:-158px;background:url("/static/images/weixin-nqr.png") no-repeat center center;display:none}.xl-backtop a{display:inline-block}.xl-backtop .seven-ten{background:url("/static/imgs/pc_activity/xunlei/seven/sev_com5.png") no-repeat -952px -95px;display:inline-block;width:100%;height:64px}.bid{width:100%}.bid .banner{background:url("/static/imgs/pc_activity/bid/bid-banner.jpg?v=20151118") center center no-repeat;height:858px;position:relative}.bid .banner .banner-title{width:346px;height:70px;position:absolute;top:786px;left:50%;margin-left:-173px}.bid .banner .banner-title p{color:#fff;font-size:30px;text-align:center;line-height:70px}.bid .bid-main{width:1100px;margin:0 auto}.bid .bid-main .bid-main-title{text-align:center;font-size:18px;color:#fff;line-height:86px}.bid .bid-main .main-img{width:100%;height:188px}.bid .bid-main .main-img .main-img1,.bid .bid-main .main-img .main-img2,.bid .bid-main .main-img .main-img3{width:322px;height:150px;float:left}.bid .bid-main .main-img .main-img1 P,.bid .bid-main .main-img .main-img2 P,.bid .bid-main .main-img .main-img3 P{font-size:30px;color:#fff;text-align:center;line-height:150px}.bid .bid-main .main-img .main-img1{background:url("/static/imgs/pc_activity/bid/bid-topjiang.png") no-repeat -6px -4px}.bid .bid-main .main-img .main-img2{background:url("/static/imgs/pc_activity/bid/bid-topjiang.png") no-repeat -335px -4px;margin-left:68px}.bid .bid-main .main-img .main-img3{background:url("/static/imgs/pc_activity/bid/bid-topjiang.png") no-repeat -663px -4px;float:right}.bid .bid-main .bidmain-img1{clear:both;width:100%;height:124px}.bid .bid-main .bidmain-img1 .img1{background:url("/static/imgs/pc_activity/bid/bid-button.png") center center no-repeat;width:260px;height:64px;position:absolute;left:50%;margin-left:-130px}.bid .bid-main .bidmain-img1 .img1:hover{background:url("/static/imgs/pc_activity/bid/bid-button1.png") center center no-repeat}.bid .bid-main .bidmain-img1 .img1 a{display:block;text-align:center;color:#fff;font-size:18px;line-height:62px}.bid .bid-main .bidmain-img1 h2{font-size:18px;text-align:center;line-height:26px;color:#fff;padding-top:103px}.bid .bid-main .bidmain-img1 .bidjiaxi{color:#cc3e38;text-decoration:underline}.bid .bid-main .bidmain-img2{width:100%;position:relative;margin-bottom:68px}.bid .bid-main .bidmain-img2 .img2-ribbon{width:346px;height:70px;background:url("/static/imgs/pc_activity/bid/bid-title.png") center center no-repeat;position:absolute;left:50%;margin-left:-173px}.bid .bid-main .bidmain-img2 .img2-ribbon p{text-align:center;font-size:30px;color:#fff;line-height:70px}.bid .bid-main .bidmain-img2 h1{font-size:18px;text-align:center;line-height:70px;color:#fff;padding-top:70px}.bid .bid-main .bidmain-img2 .bid-platform{background:url("/static/imgs/pc_activity/bid/bid-platform1.png") center center no-repeat;height:376px}.bid .bid-main .bidmain-img2 .bid-platform1{background:url("/static/imgs/pc_activity/bid/bid-platform.png") center center no-repeat;height:664px}.bid .bid-main .bid-guizhe{width:100%;margin-top:60px}.bid .bid-main .bid-guizhe h2{font-size:24px;color:#646464;margin-left:-10px}.bid .bid-main .bid-guizhe ul li{font-size:16px;color:#646464}.bid .bid-main .bid-yangshi{display:none}.bid .bid-footer{background:url("/static/imgs/pc_activity/bid/bid-footer.jpg?v=20151118") center center no-repeat;height:283px}
-=======
-.xl-backtop{width:50px;height:251px;position:fixed;right:0px;bottom:100px;z-index:999;cursor:default;display:none}.xl-backtop span{display:inline-block;width:100%;height:64px}.xl-backtop .backtop{background:#b22621;width:27px;color:#fff;text-align:center;padding:10px 0;margin:10px 0 10px 10px;border-radius:15px}.xl-backtop .sev-backtop{background:#ff5252;font-size:14px}.xl-backtop .erweima{width:146px;height:186px;position:absolute;top:73px;left:-158px;background:url("/static/images/weixin-nqr.png") no-repeat center center;display:none}.xl-backtop a{display:inline-block}.xl-backtop .seven-ten{background:url("/static/imgs/pc_activity/xunlei/seven/sev_com5.png") no-repeat -952px -95px;display:inline-block;width:100%;height:64px}.bid{width:100%}.bid .banner{background:url("/static/imgs/pc_activity/bid/bid-banner.jpg") center center no-repeat;height:858px;position:relative}.bid .banner .banner-title{width:346px;height:70px;position:absolute;top:786px;left:50%;margin-left:-173px}.bid .banner .banner-title p{color:#fff;font-size:30px;text-align:center;line-height:70px}.bid .bid-main{width:1100px;margin:0 auto}.bid .bid-main .bid-main-title{text-align:center;font-size:18px;color:#fff;line-height:86px}.bid .bid-main .main-img{width:100%;height:188px}.bid .bid-main .main-img .main-img1,.bid .bid-main .main-img .main-img2,.bid .bid-main .main-img .main-img3{width:322px;height:150px;float:left}.bid .bid-main .main-img .main-img1 P,.bid .bid-main .main-img .main-img2 P,.bid .bid-main .main-img .main-img3 P{font-size:30px;color:#fff;text-align:center;line-height:150px}.bid .bid-main .main-img .main-img1{background:url("/static/imgs/pc_activity/bid/bid-topjiang.png") no-repeat -6px -4px}.bid .bid-main .main-img .main-img2{background:url("/static/imgs/pc_activity/bid/bid-topjiang.png") no-repeat -335px -4px;margin-left:68px}.bid .bid-main .main-img .main-img3{background:url("/static/imgs/pc_activity/bid/bid-topjiang.png") no-repeat -663px -4px;float:right}.bid .bid-main .bidmain-img1{clear:both;width:100%;height:124px}.bid .bid-main .bidmain-img1 .img1{background:url("/static/imgs/pc_activity/bid/bid-button.png") center center no-repeat;width:260px;height:64px;position:absolute;left:50%;margin-left:-130px}.bid .bid-main .bidmain-img1 .img1:hover{background:url("/static/imgs/pc_activity/bid/bid-button1.png") center center no-repeat}.bid .bid-main .bidmain-img1 .img1 a{display:block;text-align:center;color:#fff;font-size:18px;line-height:62px}.bid .bid-main .bidmain-img1 h2{font-size:18px;text-align:center;line-height:26px;color:#fff;padding-top:103px}.bid .bid-main .bidmain-img1 .bidjiaxi{color:#cc3e38;text-decoration:underline}.bid .bid-main .bidmain-img2{width:100%;position:relative;margin-bottom:68px}.bid .bid-main .bidmain-img2 .img2-ribbon{width:346px;height:70px;background:url("/static/imgs/pc_activity/bid/bid-title.png") center center no-repeat;position:absolute;left:50%;margin-left:-173px}.bid .bid-main .bidmain-img2 .img2-ribbon p{text-align:center;font-size:30px;color:#fff;line-height:70px}.bid .bid-main .bidmain-img2 h1{font-size:18px;text-align:center;line-height:70px;color:#fff;padding-top:70px}.bid .bid-main .bidmain-img2 .bid-platform{background:url("/static/imgs/pc_activity/bid/bid-platform1.png") center center no-repeat;height:376px}.bid .bid-main .bidmain-img2 .bid-platform1{background:url("/static/imgs/pc_activity/bid/bid-platform.png") center center no-repeat;height:664px}.bid .bid-main .bid-guizhe{width:100%;margin-top:60px}.bid .bid-main .bid-guizhe h2{font-size:24px;color:#646464;margin-left:-10px}.bid .bid-main .bid-guizhe ul li{font-size:16px;color:#646464}.bid .bid-main .bid-yangshi{display:none}.bid .bid-footer{background:url("/static/imgs/pc_activity/bid/bid-footer.jpg") center center no-repeat;height:283px}
->>>>>>> feature/one_card
+/*
+Syntax error: The line was indented 2 levels deeper than the previous line.
+        on line 5 of /Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/partials/_bid.sass
+        from line 2 of /Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/bid.sass
+
+1: /Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/bid.sass
+
+Backtrace:
+/Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/partials/_bid.sass:5
+/Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/bid.sass:2
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/engine.rb:457:in `tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/engine.rb:345:in `_to_tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/engine.rb:274:in `to_tree'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:225:in `visit_import'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:37:in `visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:53:in `map'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:53:in `visit_children'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:109:in `block in visit_children'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:121:in `with_environment'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:108:in `visit_children'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:37:in `block in visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:128:in `visit_root'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/base.rb:37:in `visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/visitors/perform.rb:7:in `visit'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/tree/root_node.rb:20:in `render'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/engine.rb:315:in `_render'
+/Library/Ruby/Gems/2.0.0/gems/sass-3.2.14/lib/sass/engine.rb:262:in `render'
+/Library/Ruby/Gems/2.0.0/gems/compass-import-once-1.0.5/lib/compass/import-once/engine.rb:17:in `block in render'
+/Library/Ruby/Gems/2.0.0/gems/compass-import-once-1.0.5/lib/compass/import-once/engine.rb:29:in `with_import_scope'
+/Library/Ruby/Gems/2.0.0/gems/compass-import-once-1.0.5/lib/compass/import-once/engine.rb:16:in `render'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:140:in `block (2 levels) in compile'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:126:in `timed'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:139:in `block in compile'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/logger.rb:45:in `red'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:138:in `compile'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:118:in `compile_if_required'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:103:in `block (2 levels) in run'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:101:in `each'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:101:in `block in run'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:126:in `timed'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/compiler.rb:100:in `run'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/commands/update_project.rb:45:in `perform'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/commands/base.rb:18:in `execute'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/commands/project_base.rb:19:in `execute'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/exec/sub_command_ui.rb:43:in `perform!'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/lib/compass/exec/sub_command_ui.rb:15:in `run!'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/bin/compass:30:in `block in <top (required)>'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/bin/compass:44:in `call'
+/Library/Ruby/Gems/2.0.0/gems/compass-0.12.3/bin/compass:44:in `<top (required)>'
+/usr/local/bin/compass:23:in `load'
+/usr/local/bin/compass:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: The line was indented 2 levels deeper than the previous line.\A         on line 5 of /Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/partials/_bid.sass\A         from line 2 of /Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/bid.sass\A \A 1: /Users/snow/Documents/project/wanglibao-backend/static/scss/pc_activity/bid.sass"; }

@@ -66,16 +66,16 @@
         };
 
         $('.get_code').click(function(){
+
             $('.status_code').hide();
             var phone = $('.phone_num').text();
-
             $('.get_code').attr('disabled', 'disabled').addClass('wait');
             time_count = 60;
             timerFunction();
             setInterval(timerFunction, 1000);
 
             $.ajax({
-                url: '/api/phone_validation_code/' + phone + '/',
+                url: '/api/manual_modify/phone_validation_code/'+phone+'/',
                 type: 'POST',
                 success: function (xhr) {
                 }
@@ -83,14 +83,19 @@
         });
 
         $('.button').click(function(){
+            $('.title_phone span.text_1').text('短信将发送至');
+            $('.title_phone span.text_2').hide();
             var validate_code_val = $('.input_code').val();
+            var phone = $('.phone_num').text();
             $.ajax({
-                url: '/api/sms_modify/vali_acc_info/' ,
+                url: '/api/sms_modify/phone/'+phone+'/' ,
                 type: 'POST',
                 data: {
                     validate_code:validate_code_val,
                 },
                 success: function (returndata) {
+                    $('.title_phone span.text_1').text('短信已经发送至');
+                    $('.title_phone span.text_2').show();
                     alert(returndata);
                 },
                 error: function (returndata) {

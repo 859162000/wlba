@@ -32,17 +32,17 @@ block main
                 .button 修改
         .phone_change_wrap
             .line
-            .wrap_box.sms_wrap
+            a.wrap_box.sms_wrap(href='/accounts/sms_modify/vali_acc_info/')
                 .img
                 dl
                     dt 短信认证
                     dd 原手机可收取短信
-            .wrap_box.people_wrap
+            a.wrap_box.people_wrap(href='/accounts/manual_modify/vali_acc_info/')
                 .img
                 dl
                     dt 人工审核
                     dd 原手机无法收取短信
-        .info_box
+        .info_box#id_valid
             .img.img_2
             if id_is_valid
                 dl
@@ -52,7 +52,7 @@ block main
                         span.is_set_text 已认证
                     dd *永明 370125**********
             else
-                dl
+                dl.id_no_valid
                     dt
                         .text 实名认证
                         .ico.no_set_ico
@@ -92,5 +92,7 @@ block main
 
 
 
+
     script.
         require(["/static/js/account_safe.js"])
+

@@ -222,7 +222,7 @@
                 setInterval(timerFunction, 1000);
 
                 $.ajax({
-                    url: '/api/phone_validation_code/' + phone.val() + '/',
+                    url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
                     type: 'POST',
                     success: function (xhr) {
 
