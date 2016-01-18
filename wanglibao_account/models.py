@@ -240,6 +240,9 @@ class ManualModifyPhoneRecord(models.Model):
     remarks = models.CharField(max_length=64, blank=True, help_text=u'客服在审核过程中的备注')
     created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
     update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
+    class Meta:
+        verbose_name_plural = u'人工修改手机号'
+        ordering = ('-created_at',)
 
 class SMSModifyPhoneRecord(models.Model):
     STATUS_CHOICES = (
@@ -254,7 +257,9 @@ class SMSModifyPhoneRecord(models.Model):
 
     created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
     update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
-
+    class Meta:
+        verbose_name_plural = u'短信修改手机号'
+        ordering = ('-created_at',)
 
 
 #发给所有人
