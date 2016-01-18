@@ -253,7 +253,6 @@ org.ajax({
             $('.maimai-form').hide();
         }
     }
-<<<<<<< HEAD
 });
 //微信分享
 var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
@@ -308,10 +307,6 @@ wx.ready(function () {
         imgUrl: shareImg
     })
 })
-=======
-})
-;
->>>>>>> feature/one_card
 org.xunlei = (function (org) {
 
     var lib = {
@@ -435,12 +430,8 @@ org.xunlei = (function (org) {
                     xid = getQueryString('xluserid'),
                     timer = getQueryString('time'),
                     sig = getQueryString('sign'),
-<<<<<<< HEAD
                     namer = getQueryString('nickname'),
                     name =decodeURIComponent(namer);
-=======
-                    name = getQueryString('nickname');
->>>>>>> feature/one_card
 
                 var get_ticket_ajax = {};
                 get_ticket_ajax = {
