@@ -76,7 +76,7 @@
             setInterval(timerFunction, 1000);
 
             $.ajax({
-                url: '/api/manual_modify/phone_validation_code/'+phone+'/',
+                url: '/api/manual_modify/phone_validation_code/'+phone,
                 type: 'POST',
                 success: function (xhr) {
                     $('.title_phone span.text_1').text('短信已经发送至');
@@ -89,7 +89,7 @@
             var validate_code_val = $('.input_code').val();
             var phone = $('.phone_num').text();
             $.ajax({
-                url: '/api/sms_modify/phone/'+phone+'/' ,
+                url: '/api/sms_modify/phone/'+phone+'/?new_phone='+phone+'/' ,
                 type: 'POST',
                 data: {
                     validate_code:validate_code_val,
