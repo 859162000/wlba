@@ -130,3 +130,82 @@ class WanglibaoActivityReward(models.Model):
         verbose_name = u'发奖记录表'
         verbose_name_plural = u'发奖记录表'
 
+class WeixinAnnualBonus(models.Model):
+    openid = models.CharField(u'微信用户标识', max_length=128, unique=True)
+    nickname = models.CharField(u'用户昵称', max_length=64, null=True)
+    headimgurl = models.URLField(u'用户头像', null=True)
+    phone = models.CharField(u'手机号码', max_length=64, unique=True)
+    user = models.ForeignKey(User, default=None, null=True, db_index=True)
+    #user_id = models.IntegerField(default=None, null=True, db_index=True)
+    is_new = models.BooleanField(u'是否新用户', default=False)
+    is_max = models.BooleanField(u'年终奖是否已封顶', default=False)
+    is_pay = models.BooleanField(u'是否已领取', default=False)
+    min_annual_bonus = models.IntegerField(u'Min年终奖', default=1000)
+    max_annual_bonus = models.IntegerField(u'Max年终奖', default=1000)
+    annual_bonus = models.IntegerField(u'年终奖', default=1000)
+    good_vote = models.IntegerField(u'好评数', default=0)
+    bad_vote = models.IntegerField(u'差评数', default=0)
+    create_time = models.DateTimeField(u'创建时间', null=True)
+    share_count = models.IntegerField(u'分享数', default=0)
+    visit_time = models.DateTimeField(u'最近分享时间', null=True)
+    visit_count = models.IntegerField(u'访问数', default=0)
+    visit_time = models.DateTimeField(u'最近访问时间', null=True)
+    update_time = models.DateTimeField(u'最近评价时间', null=True)
+    pay_time = models.DateTimeField(u'领取时间', null=True)
+
+    def toJSON(self):
+        import json
+        return json.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
+
+    def toJSON_filter(self, filters=None):
+        fields = []
+        if filters:
+            for field in filters:
+                fields.append(field)
+        else:
+            for field in self._meta.fields:
+                fields.append(field.name)
+
+        d = {}
+        for attr in fields:
+            d[attr] = getattr(self, attr)
+
+        #import json
+        #return json.dumps(d)
+        return d
+
+class WeixinAnnulBonusVote(models.Model):
+    to_openid = models.CharField(u'受评微信用户标识', max_length=128, null=False, db_index=True)
+    from_openid = models.CharField(u'评价微信用户标识', max_length=128, null=False, db_index=True)
+    from_nickname = models.CharField(u'评价微信用户昵称', max_length=64, null=True)
+    from_headimgurl = models.URLField(u'评价微信用户头像', null=True)
+    from_ipaddr = models.CharField(u'评价来源IP地址', max_length=128, null=True)
+    is_good_vote = models.BooleanField(u'是否好评', default=True)
+    current_good_vote = models.IntegerField(u'当前好评数', default=0)
+    current_bad_vote = models.IntegerField(u'当前差评数', default=0)
+    current_annual_bonus = models.IntegerField(u'当前年终奖', default=1000)
+    create_time = models.DateTimeField(u'评价时间', null=True)
+
+    class Meta:
+        unique_together = (("from_openid", "to_openid"),)  # 联合唯一索引
+
+    def toJSON(self):
+        import json
+        return json.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
+
+    def toJSON_filter(self, filters=None):
+        fields = []
+        if filters:
+            for field in filters:
+                fields.append(field)
+        else:
+            for field in self._meta.fields:
+                fields.append(field.name)
+
+        d = {}
+        for attr in fields:
+            d[attr] = getattr(self, attr)
+
+        import json
+        return json.dumps(d)
+
