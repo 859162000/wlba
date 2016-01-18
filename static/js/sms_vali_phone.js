@@ -97,6 +97,7 @@
                     new_phone:new_phone_val
                 },
                 success: function (returndata) {
+                    window.location.href = '/accounts/sms_modify/phone/';
                     alert(returndata);
                 },
                 error: function (returndata) {

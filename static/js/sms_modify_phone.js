@@ -66,7 +66,8 @@
         };
 
         $('.get_code').click(function(){
-
+            $('.title_phone span.text_1').text('短信将发送至');
+            $('.title_phone span.text_2').hide();
             $('.status_code').hide();
             var phone = $('.phone_num').text();
             $('.get_code').attr('disabled', 'disabled').addClass('wait');
@@ -78,13 +79,13 @@
                 url: '/api/manual_modify/phone_validation_code/'+phone+'/',
                 type: 'POST',
                 success: function (xhr) {
+                    $('.title_phone span.text_1').text('短信已经发送至');
+                    $('.title_phone span.text_2').show();
                 }
             });
         });
 
         $('.button').click(function(){
-            $('.title_phone span.text_1').text('短信将发送至');
-            $('.title_phone span.text_2').hide();
             var validate_code_val = $('.input_code').val();
             var phone = $('.phone_num').text();
             $.ajax({
@@ -94,8 +95,7 @@
                     validate_code:validate_code_val,
                 },
                 success: function (returndata) {
-                    $('.title_phone span.text_1').text('短信已经发送至');
-                    $('.title_phone span.text_2').show();
+                    window.location.href = '/accounts/security/';
                     alert(returndata);
                 },
                 error: function (returndata) {
