@@ -7,14 +7,11 @@ html
     include global/g_head
     - endwith
     meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no")
-    link(rel="stylesheet",href="/static/styles/pc_activity/damai.css?v=20151113")
+    link(rel="stylesheet",href="/static/styles/pc_activity/damai.css?v=20151114")
   body(style="background:#1f1f1d")
     - csrf_token
     include global/g_nav
     .damai-wrap
-      .www(style='width: 700px;z-index: 3;position: absolute;top: 114px;left: 50%;margin-left: -350px;')
-        .player#player
-          #canver
       .damai-banner.damai-banner1
     include global/g_footer
     include include/tracking

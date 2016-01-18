@@ -8,7 +8,7 @@
         }
     });
 
-    require(['jquery','/static/test/jwplayer.js'], function ($,jwplayer) {
+    require(['jquery', '/static/test/jwplayer.js'], function ($, jwplayer) {
         var csrfSafeMethod, getCookie, sameOrigin,
             getCookie = function (name) {
                 var cookie, cookieValue, cookies, i;
@@ -86,6 +86,36 @@
 
             });
         };
+        var u = navigator.userAgent;
+        function flashChecker() {
+            var hasFlash = 0;
+            var flashVersion = 0;
+            if (document.all) {
+                var swf = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+                if (swf) {
+                    hasFlash = 1;
+                    VSwf = swf.GetVariable("$version");
+                    flashVersion = parseInt(VSwf.split(" ")[1].split(",")[0]);
+                }
+            } else {
+                if (navigator.plugins && navigator.plugins.length > 0) {
+                    var swf = navigator.plugins["Shockwave Flash"];
+                    if (swf) {
+                        hasFlash = 1;
+                        var words = swf.description.split(" ");
+                        for (var i = 0; i < words.length; ++i) {
+                            if (isNaN(parseInt(words[i]))) continue;
+                            flashVersion = parseInt(words[i]);
+                        }
+                    }
+                }
+            }
+            return {
+                f: hasFlash,
+                v: flashVersion
+            };
+        }
+
         function IsPC() {
             var userAgentInfo = navigator.userAgent;
             var Agents = ["Android", "iPhone",
@@ -100,25 +130,30 @@
             }
             return flag;
         }
+
         window.jwplayer = $.extend(jwplayer, {'key': "F4UVreRdsAfmJwi9PjMJ8FXZOeG7ox0PN4l/Ig=="});
         if (navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") == -1) {
-            console.log(11)
-            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
+            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8" >';
             $('#player').append(str);
         } else if (!IsPC()) {
             var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
             $('#player').append(str);
         } else {
-            console.log(12);
+            var fls = flashChecker();
+            var s = "";
+            if (!fls.f) alert("您没有安装flash,请下载flashplayer,并观看！");
+
             var w = $('#player').width();
             var h = w * 9 / 16;
             $('#player').height(h);
             var playerInstance = jwplayer('canver');
             playerInstance.setup({
                 autostart: true,
-                file: "rtmp://damai.rtmplive.ks-cdn.com/live/sd_1",
+                file: "rtmp://damai.live.ks-cdn.com/live/hd_1",
                 width: '100%',
-                height: '100%'
+                height: '100%',
+                primary: "flash",
+                androidhls: true
             });
         }
     });

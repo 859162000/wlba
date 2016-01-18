@@ -154,6 +154,7 @@ $header-height: 150px
 
 .panel-inner
   display: block
+  margin-top: 40px
 
 .panel-inner-center
   @extend .panel-inner
@@ -223,3 +224,54 @@ a.panel-sub-tab
   font-size: $font-xs
   padding: 10px 5px
   margin: 10px 0
+
+.pwd-management
+  padding: 30px 80px 115px
+  span
+    width: 57px
+    height: 49px
+    display: inline-block
+    float: left
+  .span1
+    @include account-sprite(pwd1)
+  .span2
+    @include account-sprite(pwd2)
+    height: 42px
+  .info-fonts
+    float: left
+    margin-left: 14px
+    line-height: 25px
+    .p1
+      font-size: 16px
+      color: #333333
+    .p2
+      font-size: 14px
+      color: #999999
+  a
+    width: 100px
+    height: 38px
+    display: inline-block
+    border: 1px solid #e4371f
+    font-size: 16px
+    color: #e4371f
+    float: right
+    text-align: center
+    line-height: 38px
+    margin: 8px 0 0 10px
+  .pwd-div2
+    margin-top: 57px
+    .info-fonts
+      line-height: 22px
+    .btns
+      width: 220px
+      float: right
+      .bg
+        background: #e4371f
+        color: #ffffff
+.pwd-btn
+  height: 40px
+  line-height: 40px
+  padding: 0px
+  width: 170px
+  margin-top: 10px
+
