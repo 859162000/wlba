@@ -291,8 +291,8 @@ def card_bind_list(request):
 
     try:
         # 查询易宝已经绑定卡
-        res = YeeShortPay().bind_card_query(user=user)
-        if res['ret_code'] not in (0, 20011): return res
+       # res = YeeShortPay().bind_card_query(user=user)
+       # if res['ret_code'] not in (0, 20011): return res
        # if 'data' in res and 'cardlist' in res['data']:
        #     yee_card_no_list = []
        #     for car in res['data']['cardlist']:
