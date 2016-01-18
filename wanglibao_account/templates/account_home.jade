@@ -195,23 +195,24 @@ block main
                       p.align-center.desc 待收收益（元）
               p.tyjMark 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除，
                 a(href="javascript:void(0)")#showMark 体验金领取及使用说明。
-              .project_div.clearfix
-                h5 {{experience_account.product.name}}
-                ul.project_detail.clearfix
-                    li.li_one
-                      label {{experience_account.experience_amount}}元
-                      span 融资金额
-                    li.li_two
-                        label {{experience_account.product.expected_earning_rate}}%
-                        span 年化收益
-                    li.li_three
-                        label {{experience_account.product.period}}天
-                        span 投资期限
-                    li.li_four
-                        if experience_account.experience_amount > 0
-                            a(href='javascript:void(0)').investBtn 立即投资
-                        else
-                            a.invest_ed 立即投资
+              if experience_account.experience_amount != 0
+                  .project_div.clearfix
+                    h5 {{experience_account.product.name}}
+                    ul.project_detail.clearfix
+                        li.li_one
+                          label {{experience_account.experience_amount}}元
+                          span 融资金额
+                        li.li_two
+                            label {{experience_account.product.expected_earning_rate}}%
+                            span 年化收益
+                        li.li_three
+                            label {{experience_account.product.period}}天
+                            span 投资期限
+                        li.li_four
+                            if experience_account.experience_amount > 0
+                                a(href='javascript:void(0)').investBtn 立即投资
+                            else
+                                a.invest_ed 立即投资
               if experience_amortization
                   .look_more_detail
                     .more_btn

@@ -4,7 +4,7 @@ from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 from wanglibao_activity.views import WeixinGGLTemplate
 import views, activity_views, manage_views, sub_views, base, main_views
-
+from experience_gold.views import ExperienceGoldView
 urlpatterns = patterns(
     '',
     url(r'^join/(?P<account_key>\w+)/$', views.WeixinJoinView.as_view(), name='weixin_join'),
@@ -84,7 +84,7 @@ urlpatterns = patterns(
     url(r'^sub_recharge/$', login_required(main_views.RechargeTemplate.as_view(template_name="service_recharge.jade"), login_url="/weixin/sub_login_redirect/"), name="sub_recharge"),
     url(r'^sub_list/$', login_required(main_views.FwhP2PlistTemplate.as_view(template_name="service_list.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_detail/(?P<template>\w+)/(?P<id>\w+)/$', login_required(views.P2PDetailView.as_view(source='fwh'), login_url="/weixin/sub_login_redirect/")),
-
+    url(r'^sub_experience/(?P<template>(account))/$', login_required(ExperienceGoldView.as_view(), login_url='/weixin/sub_login_redirect/')),
     url(r'^sub_transaction/(?P<status>\w+)/$', login_required(views.WeixinTransaction.as_view(template_name="service_transaction_repay.jade", source='fwh'), login_url="/weixin/sub_login_redirect/")),
 
     url(r'^sub_reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(template_name="service_reward.jade"), login_url="/weixin/sub_login_redirect/")),
