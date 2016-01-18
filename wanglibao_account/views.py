@@ -2308,7 +2308,7 @@ class ManualModifyPhoneAPI(APIView):
         profile = user.wanglibaouserprofile
         if not profile.id_is_valid or not profile.id_number:
             return Response({'message':"还没有实名认证"}, status=400)
-        form = ManualModifyPhoneForm(self.request.POST, self.request.FILES)
+        form = ManualModifyPhoneForm(self.request.DATA, self.request.FILES)
         if form.is_valid():
             id_front_image = form.cleaned_data['id_front_image']
             id_back_image = form.cleaned_data['id_back_image']
@@ -2328,7 +2328,7 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.save()
             return Response({'ret_code': 0})
         else:
-            return Response(form.error_messages, status=400)
+            return Response(form.errors, status=400)
 
 
 class SMSModifyPhoneValidateTemplate(TemplateView):
@@ -2343,7 +2343,7 @@ class SMSModifyPhoneValidateTemplate(TemplateView):
             'is_bind_card': is_bind_card,
             }
 
-class SMSModifyPhoneValidateAPI(APIView):
+class ModifyPhoneValidateAPI(APIView):
     def post(self, request):
         user = request.user
         profile = user.wanglibaouserprofile

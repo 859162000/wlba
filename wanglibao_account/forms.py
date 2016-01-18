@@ -452,6 +452,7 @@ class ManualModifyPhoneForm(forms.Form):
                     self.error_messages['new phone has been registered'],
                     code='new phone has been registered'
                 )
+        return new_phone
 
     def clean_validate_code(self):
         if 'new_phone' in self.cleaned_data:
@@ -471,5 +472,5 @@ class ManualModifyPhoneForm(forms.Form):
                         self.error_messages['validate must not be null'],
                         code='validate_code_error',
                     )
-        return self.cleaned_data
+            return validate_code
 
