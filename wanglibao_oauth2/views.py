@@ -116,6 +116,7 @@ class AccessTokenView(AccessTokenBaseView):
         except Exception, e:
             logger.info("oauth2 access token failed with request_data[%s] client[%s] user[%s]" %
                         (request.POST, client.id, user.id))
+            logger.info(e)
             return self.error_response({
                 'code': '50001',
                 'message': _('api error')
@@ -131,7 +132,7 @@ class TokenLoginOpenApiView(APIView):
         client_id = data.get('client_id', '').strip()
         phone = data.get('phone', '').strip()
 
-        response_data = oauth_token_login(phone, client_id, token)
+        response_data = oauth_token_login(request, phone, client_id, token)
 
         return HttpResponse(renderers.JSONRenderer().render(response_data,
                                                             'application/json'))

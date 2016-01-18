@@ -21,6 +21,7 @@ import logging
 from weixin.base import ChannelBaseTemplate
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_rest.utils import has_register_for_phone
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -273,6 +274,7 @@ def landpage_view(request):
     :param request:
     :return:
     """
+
     request_data = request.GET
     channel_code = request_data.get('promo_token', None)
     action = request_data.get('action', None)

@@ -1571,19 +1571,18 @@ class BaJinSheRegister(CoopRegister):
         self.external_channel_user_key = 'usn'
         self.internal_channel_phone_key = 'phone'
         self.external_channel_user_id_key = 'p_user_id'
+        self.external_channel_order_id_key = 'p_user_id'
+        self.external_channel_user_id_key = 'p_user_id'
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
-        channel_user = self.request.POST.get(self.external_channel_user_key, None)
-        p_id = self.request.POST.get(self.external_channel_p_id_key, None)
+        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
+        p_id = self.request.REQUEST.get(self.external_channel_p_id_key, None)
         client_id = self.request.POST.get(self.external_channel_client_id_key, None)
-        access_token = self.request.POST.get(self.channel_access_token_key, None)
+        access_token = self.request.REQUEST.get(self.channel_access_token_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
-
-        if not channel_user:
-            channel_user = self.request.GET.get(self.external_channel_user_key, None)
 
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
@@ -1591,9 +1590,6 @@ class BaJinSheRegister(CoopRegister):
 
         if p_id:
             self.request.session[self.internal_channel_p_id_key] = p_id
-
-        if not client_id:
-            client_id = self.request.GET.get(self.external_channel_client_id_key, None)
 
         if client_id:
             self.request.session[self.internal_channel_client_id_key] = client_id

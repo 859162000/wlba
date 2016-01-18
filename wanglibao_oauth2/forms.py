@@ -146,7 +146,7 @@ class RefreshTokenGrantForm(OAuthForm):
 
     refresh_token = forms.CharField(required=False)
 
-    def clean_refresh_token(self):
+    def clean(self):
         token = self.cleaned_data.get('refresh_token', '').strip()
 
         if not token:

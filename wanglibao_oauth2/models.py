@@ -80,7 +80,7 @@ class Client(models.Model):
 
 class OauthUser(models.Model):
     client = models.ForeignKey(Client, verbose_name=u'客户端')
-    user = models.ForeignKey(User, verbose_name=u'客户端')
+    user = models.ForeignKey(User)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
 
     class Meta:
@@ -110,6 +110,7 @@ class AccessToken(models.Model):
     token = models.CharField(max_length=255, default=long_token, db_index=True)
     client = models.ForeignKey(Client)
     expires = models.DateTimeField()
+    created_time = models.DateTimeField(u'创建时间', auto_now=True)
 
     objects = AccessTokenManager()
 
@@ -160,6 +161,7 @@ class RefreshToken(models.Model):
     access_token = models.OneToOneField(AccessToken, related_name='refresh_token')
     client = models.ForeignKey(Client)
     expired = models.BooleanField(default=False)
+    created_time = models.DateTimeField(u'创建时间', auto_now=True)
 
     def __unicode__(self):
         return self.token

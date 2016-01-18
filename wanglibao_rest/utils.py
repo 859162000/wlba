@@ -124,7 +124,7 @@ def process_for_bajinshe_landpage(request, channel_code):
 
     if phone and client_id and access_token:
         try:
-            oauth_token_login(phone, client_id, access_token)
+            oauth_token_login(request, phone, client_id, access_token)
         except Exception, e:
             logger.info('internal request oauth failed with error %s' % e)
 
