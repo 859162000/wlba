@@ -71,7 +71,7 @@
                     type: 'POST',
                     success: function (data) {
                         var strHtml = '';
-                        if(data.ret_code == 0 || data.ret_code == 20011){
+                        if(data.ret_code == 0){
                             var strHtml = ''
                             $.each(data.cards,function(i,o){
                               strHtml+='<div class="bank-card">'
