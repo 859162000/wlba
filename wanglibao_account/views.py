@@ -2251,7 +2251,6 @@ class ValidateAccountInfoAPI(APIView):
         profile = user.wanglibaouserprofile
         id_number = request.DATA.get('id_number', "").strip()
         params = request.DATA
-
         data = {}
         for k,v in params.iteritems():
             data[k]=v
@@ -2265,7 +2264,7 @@ class ValidateAccountInfoAPI(APIView):
             return Response({'ret_code': 0})
         return Response(form.errors, status=400)
 
-class ManualModifyPhoneValidateCode(APIView):
+class ModifyPhoneValidateCode(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, phone):
@@ -2343,7 +2342,9 @@ class SMSModifyPhoneValidateTemplate(TemplateView):
             'is_bind_card': is_bind_card,
             }
 
-class ModifyPhoneValidateAPI(APIView):
+class SMSModifyPhoneValidateAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
     def post(self, request):
         user = request.user
         profile = user.wanglibaouserprofile
@@ -2352,15 +2353,20 @@ class ModifyPhoneValidateAPI(APIView):
         new_phone = request.DATA.get('new_phone', "").strip()
         if not profile.id_is_valid or not profile.id_number:
             return Response({'message':"还没有实名认证"}, status=400)
-        # if not validate_code or not id_number or not new_phone:
-        #     return Response({'message':"params is null"}, status=400)
-        form = LoginAuthenticationNoCaptchaForm(request, data=request.DATA)
+        if not validate_code or not id_number or not new_phone:
+            return Response({'message':"params is null"}, status=400)
+        params = request.DATA
+        data = {}
+        for k,v in params.iteritems():
+            data[k]=v
+        data['identifier']=profile.phone
+        form = LoginAuthenticationNoCaptchaForm(request, data=data)
         if form.is_valid():
             if form.get_user()!=user:
                 return Response({'message':"user is not logined user"}, status=400)
-            # status, message = validate_validation_code(profile.phone, validate_code)
-            # if status != 200:
-            #     return Response({'message':message}, status=400)
+            status, message = validate_validation_code(profile.phone, validate_code)
+            if status != 200:
+                return Response({'message':message}, status=400)
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
             new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
