@@ -10,16 +10,19 @@ block head
 block sidebar
   - with '账户总览' as activeItem
     include include/user_center_sidebar
-
 block main
   .account-home-panel
     .account-home-panel--title-bar
-      span.nickname {{user | safe_phone}}
-      if user.wanglibaouserprofile.id_is_valid
-        span.verified 已实名认证
+      if user.wanglibaouserprofile.utype == '3'
+        span.nickname#qiyeUser 企业用户：
+          i
       else
-        span
-          a#name-hight(href="/accounts/register/first/") 立即进行实名认证
+          span.nickname {{user | safe_phone}}
+          if user.wanglibaouserprofile.id_is_valid
+            span.verified 已实名认证
+          else
+            span
+              a#name-hight(href="/accounts/id_verify/") 立即进行实名认证
 
     .card-panel
       .total-asset-money-card
@@ -62,7 +65,7 @@ block main
         ul.title-bar--tabs
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 理财专区
-          li.title-bar--tab
+          li.title-bar--tab#tyjzq(style="display:none")
             a.title-bar--tab--anchor(href="/accounts/home/experience/") 体验金专区
             i
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
@@ -272,6 +275,7 @@ block main
             p.succeesFonts 恭喜您投资成功！
             p 到期后体验金自动收回
             p 收益自动发放
+
 block script
   script.
     require(["/static/js/account_home.js"])

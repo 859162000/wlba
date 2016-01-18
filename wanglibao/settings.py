@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
+    'wanglibao_qiye', #add by wangxiaoqing
     'report',
     'misc',
 
@@ -687,7 +688,7 @@ CELERYBEAT_SCHEDULE = {
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
         'task': 'experience_gold.tasks.experience_repayment_plan',
-        'schedule': timedelta(minutes=5),
+        'schedule': crontab(minute=0, hour=17),
     },
     # 定期检查还有3天到期的用户优惠券,发送提醒
     'redpack_status_task_check': {

@@ -278,6 +278,7 @@ class AppShareViewError(TemplateView):
         except:
             phone = ''
         url = self.request.get_host() + '/aws/?p=' + identifier
+
         return {
             'phone': phone,
             'url': url

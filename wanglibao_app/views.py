@@ -330,7 +330,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
             month_group.sort(key=lambda x: x['term_date'])
 
         return Response({'ret_code': 0,
-                         'data': amo_list, 
+                         'data': amo_list,
                          'month_group': month_group,
                          'current_month': current_month,
                          })
