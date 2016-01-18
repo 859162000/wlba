@@ -144,18 +144,17 @@ class AppActivateImageAPIView(APIView):
                 img_url = ''
             jump_state = activate.jump_state
             link_dest = activate.link_dest
-
             if img_url:
                 invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
-                img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                return Response({'ret_code': 0,
-                                 'message': 'ok',
-                                 'image': img_url,
-                                 'jump_state': jump_state,
-                                 'link_dest':link_dest,
-                                 'link_dest_url':activate.link_dest_h5_url,
-                                 'invest_flag':invest_flag,
-                                 })
+                if activate.user_invest_limit==-1 or (activate.user_invest_limit==0 and not invest_flag) or (activate.user_invest_limit==1 and invest_flag):
+                    img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
+                    return Response({'ret_code': 0,
+                                     'message': 'ok',
+                                     'image': img_url,
+                                     'jump_state': jump_state,
+                                     'link_dest':link_dest,
+                                     'link_dest_url':activate.link_dest_h5_url,
+                                     })
 
         return Response({'ret_code': 20003, 'message': 'fail'})
 
