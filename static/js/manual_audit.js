@@ -86,6 +86,7 @@
                         password:password_val
                     },
                     success: function (returndata) {
+                        window.location.href = '/accounts/manual_modify/phone/';
                         alert(returndata);
                     },
                     error: function (returndata) {

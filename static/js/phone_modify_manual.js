@@ -279,6 +279,7 @@
                     processData: false,
                     success: function (returndata) {
                         alert(returndata);
+                        window.location.href = '/accounts/security/';
                     },
                     error: function (returndata) {
                         alert(returndata);
