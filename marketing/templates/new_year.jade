@@ -1,0 +1,25 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include global/g_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/new_year.css?v=20160118")
+    body(style="background:#e0403c")
+        include global/g_nav
+        .new-year-content
+            .content-m
+                h3 网利宝拜年群红包，惊喜一整月
+                p 微信支付宝红包没抢够？让网利财神宝宝给你发！这个春节，网利宝宝Lion , 将化身财神爷，走近千家万群，送红包，送祝福，送年终奖….. 给您拜年！
+                p.p-title 怎么参加？
+                p 扫码加网利财神宝宝为好友，将它邀请到您的亲朋友好友、饭友同学群（群内人数必须30以上）；财神宝宝将会在群内送祝福，送福利，不定期邂逅新年红包雨，和除夕压岁钱！
+                p.p-title 自建网利宝投资俱乐部，拿投资好礼。
+                p 网利宝用户也可邀请自己的投资好友，共同建立一个投资俱乐部（群内人数必须30以上），除了新年期间能享受到比普通用户群更多的红包外，还能享受一定的投资福利。
+                .erweima
+                    span
+                p.pop-font 扫码加网利财神宝宝的微信，拿新年福利！
+        include global/g_footer
+        script.
+            require(['/static/src/pc/experience_gold.js?v=2015121011'])
