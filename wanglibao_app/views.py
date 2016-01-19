@@ -599,7 +599,9 @@ class SendValidationCodeView(APIView):
         if not res:
             return Response({"ret_code": 40044, "message": message})
 
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         if status != 200:
             return Response({"ret_code": 30044, "message": message})
 
