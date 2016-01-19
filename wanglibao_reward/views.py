@@ -40,6 +40,7 @@ from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
 from urllib import urlencode,quote
+from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -1350,7 +1351,6 @@ class WeixinActivityAPIView(APIView):
                 record.save()
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
 class WeixinAnnualBonusView(TemplateView):
     openid = ''
     nick_name = ''
@@ -1379,9 +1379,9 @@ class WeixinAnnualBonusView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         # === Only for test ===
-        wxid = self.request.GET.get('wxid')
-        if wxid and wxid!='undefined':
-            self.from_openid = wxid
+        ###wxid = self.request.GET.get('wxid')
+        ###if wxid and wxid!='undefined':
+        ###    self.from_openid = wxid
             #self.nick_name = wxid
             #self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
 
@@ -1716,7 +1716,6 @@ class WeixinAnnualBonusView(TemplateView):
         self.from_openid = self.openid
 
         return self.dispatch(request, *args, **kwargs)
-
 
 import re
 class SinicValidate(object):
