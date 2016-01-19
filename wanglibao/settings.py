@@ -1146,6 +1146,7 @@ XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
 
 # 脉脉
 WLB_FOR_MAIMAI1_KEY = '2004'
