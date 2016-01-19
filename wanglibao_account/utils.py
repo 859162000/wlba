@@ -731,9 +731,11 @@ class ZGDXAdminCallback(object):
             'plat_offer_id': plat_offer_id,
             'effect_type': effect_type,
         }
-        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
+
+        crypto = Crypto()
+        data_buf = crypto.encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
         params = {
-            'code': encodeBytes(encrypt_str),
+            'code': crypto.encode_bytes(data_buf),
             'partner_no': self.partner_no,
         }
 
@@ -798,3 +800,38 @@ class ZGDXAdminCallback(object):
         else:
             self.binding_card_call_back(obj)
             self.purchase_call_back(obj)
+
+
+def get_bajinshe_access_token(coop_id, coop_key, order_id):
+    access_token = None
+    message = None
+
+    coop_access_token_url = settings.BAJINSHE_ACCESS_TOKEN_URL
+
+    data = {
+        'platform': coop_id,
+        'key': coop_key,
+        'order_id': order_id,
+    }
+
+    headers = {
+       'Content-Type': 'application/json',
+    }
+
+    res = requests.post(url=coop_access_token_url, data=json.dumps(data), headers=headers)
+    logger.info("bajinshe access token url [%s]" % res.url)
+    logger.info("bajinshe access token request data [%s]" % data)
+    res_status_code = res.status_code
+    if res_status_code == 200:
+        res_data = res.json()
+        if res_data['code'] == '10000':
+            access_token = res_data.get('access_token', None)
+            message = res_data.get('msg', '')
+        else:
+            logger.info("bajinshe access token faild return %s" % res_data)
+    else:
+        message = 'bad request %s' % res_status_code
+        logger.info("bajinshe access token connect faild with status code[%s]" % res_status_code)
+        logger.info(res.text)
+
+    return access_token, message

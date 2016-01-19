@@ -695,6 +695,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_unavailable_3_days',
         'schedule': crontab(minute=0, hour=11),
     },
+    # 定期向八金社推送标的信息
+    'p2p-product-push-5-minutes': {
+        'task': 'wanglibao_p2p.tasks.bajinshe_product_push_to_coop',
+        'schedule': timedelta(minutes=1),
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -1158,6 +1163,10 @@ else:
 
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
+BAJINSHE_COOP_ID = 'wanglibao'
+BAJINSHE_COOP_KEY = '3795dd52-3ad9-47cf-9fe7-67d69566c1ba'
+BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
+BAJINSHE_PRODUCT_PULL_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
