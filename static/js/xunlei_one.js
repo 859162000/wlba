@@ -364,10 +364,7 @@
             referfrom = getQueryString('referfrom')
         $.ajax({
             url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xluserid + '&ext2=' + referfrom,
-            type: "GET",
-            success: function (data) {
-                   console.log(data);
-                }
+            type: "GET"
         })
         function getCode() {//得到用户信息的二维码
             var original_id = document.getElementById("original_id").value;

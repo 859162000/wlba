@@ -37,9 +37,8 @@ org.ajax({
     }
 });
 org.ajax({
-    url: 'http://dypay.vip.xunlei.com/user/vipstat/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
-    dataType: "jsonp",
-    jsonp: "jsonpcallback"
+    url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
+    type: "GET"
 });
 
 //微信分享
