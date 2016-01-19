@@ -8,6 +8,9 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding unique constraint on 'Bank', fields ['gate_id']
+        db.create_unique(u'wanglibao_pay_bank', ['gate_id'])
+
         # Adding field 'Card.is_the_one_card'
         db.add_column(u'wanglibao_pay_card', 'is_the_one_card',
                       self.gf('django.db.models.fields.BooleanField')(default=False),
@@ -15,6 +18,9 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        # Removing unique constraint on 'Bank', fields ['gate_id']
+        db.delete_unique(u'wanglibao_pay_bank', ['gate_id'])
+
         # Deleting field 'Card.is_the_one_card'
         db.delete_column(u'wanglibao_pay_card', 'is_the_one_card')
 
@@ -80,7 +86,8 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "('-sort_order',)", 'object_name': 'Bank'},
             'channel': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'gate_id': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
+            'gate_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '8'}),
+            'have_company_channel': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'huifu_bind_code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
             'huifu_bind_limit': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '500', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -95,6 +102,15 @@ class Migration(SchemaMigration):
             'yee_bind_code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
             'yee_bind_limit': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '500', 'blank': 'True'})
         },
+        u'wanglibao_pay.blacklistcard': {
+            'Meta': {'object_name': 'BlackListCard'},
+            'card_no': ('django.db.models.fields.CharField', [], {'max_length': '25', 'db_index': 'True'}),
+            'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'ip': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
+            'message': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'})
+        },
         u'wanglibao_pay.card': {
             'Meta': {'object_name': 'Card'},
             'add_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -106,7 +122,7 @@ class Migration(SchemaMigration):
             'is_default': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_the_one_card': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'last_update': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
-            'no': ('django.db.models.fields.CharField', [], {'max_length': '25'}),
+            'no': ('django.db.models.fields.CharField', [], {'max_length': '25', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
             'yee_bind_id': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50', 'blank': 'True'})
         },
@@ -138,7 +154,15 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'Jk3PY8uxQz2nXAGl73tlnA'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'T9AiL19SQrin9eYVuj178w'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'})
+        },
+        u'wanglibao_pay.whitelistcard': {
+            'Meta': {'object_name': 'WhiteListCard'},
+            'card_no': ('django.db.models.fields.CharField', [], {'max_length': '25', 'db_index': 'True'}),
+            'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'message': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'})
         },
         u'wanglibao_pay.withdrawcard': {
             'Meta': {'object_name': 'WithdrawCard'},
@@ -168,7 +192,7 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'C1RfeAC7RJO_jBuKyuRYkQ'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'Cw6tx5ecSYO6JPrbkyHW3g'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
             'withdrawcard': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_pay.WithdrawCard']", 'on_delete': 'models.PROTECT'})
         }
     }
