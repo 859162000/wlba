@@ -172,8 +172,36 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                       remember_me : remember_me
                   }
                 }).done(function() {
-                  var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
-                  window.location.href = next;
+                    $.ajax({
+                      url: '/qiye/profile/exists/',
+                      type: "GET",
+                      data: {
+                      }
+                    }).done(function(data) {
+                        if(data.ret_code == 10000){
+                            $.ajax({
+                              url: '/qiye/profile/get/',
+                              type: "GET",
+                              data: {
+                              }
+                            }).done(function(data) {
+                                if(data.data.status == '审核通过'){
+                                     window.location.href = '/accounts/home/';
+                                }else{
+                                    window.location.href = '/qiye/profile/edit/';
+                                }
+                            })
+                        }
+                    }).fail(function(data){
+                        var result = JSON.parse(data.responseText);
+                        if(result.ret_code == 20001){
+                            var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                            window.location.href = next;
+                        }else{
+                            window.location.href = '/qiye/info/';
+                        }
+                    })
+
                 }).fail(function(xhr) {
                     var result = JSON.parse(xhr.responseText);
                     if(result.message.__all__ != undefined){
@@ -336,58 +364,98 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         })
         //提交注册表单
         $('#registerSubmit').on('click',function(){
-            var error = $('#registerForm').find('.loginError');
-             if(checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm','re')){
-                if($("#agreement").is(':checked')) {
-                    error.text('');
-                    var identifier, captcha_0,captcha_1,password, validate_code,invitecode;
-                    identifier = $('#registerMobile').val();
-                    captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
-                    captcha_1 = $('#registerForm').find('#registerCode').val();
-                    password = $('.registerPwd').val();
-                    validate_code = $('#registerSMSCode').val();
-                    invitecode = $('#invitecode').val();
-                    $.ajax({
-                        url: '/accounts/register/ajax/',
-                        type: "POST",
-                        data: {
-                            identifier : identifier,
-                            captcha_0 : captcha_0,
-                            captcha_1 : captcha_1,
-                            password: password,
-                            validate_code: validate_code,
-                            invitecode : invitecode
-                        }
-                    }).done(function () {
-                        //window.location = '/';
-                        /*
-                          var arr = location.search;
-                          if (arr != '') {
-                              window.location = arr.split('=')[1];
-                          } else {
-                              window.location = '/';
-                          }
-                         */
-                        var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
-                        window.location.href = next;
+            var btnSelf = $(this);
+            if(!btnSelf.hasClass('.submitFormStyleNo')) {
+                if (!$('.login-form').hasClass('qiyeLogin')) {
+                    var error = $('#registerForm').find('.loginError');
+                    if (checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
+                        if ($("#agreement").is(':checked')) {
+                            error.text('');
+                            var identifier, captcha_0, captcha_1, password, validate_code, invitecode;
+                            identifier = $('#registerMobile').val();
+                            captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
+                            captcha_1 = $('#registerForm').find('#registerCode').val();
+                            password = $('.registerPwd').val();
+                            validate_code = $('#registerSMSCode').val();
+                            invitecode = $('#invitecode').val();
+                            btnSelf.addClass('submitFormStyleNo');
+                            $.ajax({
+                                url: '/accounts/register/ajax/',
+                                type: "POST",
+                                data: {
+                                    identifier: identifier,
+                                    captcha_0: captcha_0,
+                                    captcha_1: captcha_1,
+                                    password: password,
+                                    validate_code: validate_code,
+                                    invitecode: invitecode
+                                }
+                            }).done(function () {
+                                var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
+                                window.location.href = next;
 
-                    }).fail(function (xhr) {
-                        var result = JSON.parse(xhr.responseText);
-                        if(result.message.invitecode != undefined){
-                            error.text(result.message.invitecode)
-                        }else if(result.message.identifier != undefined){
-                            error.text(result.message.identifier)
-                        }else if(result.message.captcha_1 != undefined){
-                            error.text(result.message.captcha_1)
-                        }else{
-                            error.text(result.message.validate_code)
+                            }).fail(function (xhr) {
+                                var result = JSON.parse(xhr.responseText);
+                                if (result.message.invitecode != undefined) {
+                                    error.text(result.message.invitecode)
+                                } else if (result.message.identifier != undefined) {
+                                    error.text(result.message.identifier)
+                                } else if (result.message.captcha_1 != undefined) {
+                                    error.text(result.message.captcha_1)
+                                } else {
+                                    error.text(result.message.validate_code)
+                                }
+                                btnSelf.removeClass('submitFormStyleNo')
+                            });
+                        } else {
+                            error.text('请查看网利宝注册协议');
                         }
-                    });
-                }else{
-                    error.text('请查看网利宝注册协议');
+                    }
+                } else {
+                    qiyeLoginFun();
                 }
-             }
+            }
+
         })
+    }
+    qiyeLoginFun = function(){
+        var error = $('#registerForm').find('.loginError');
+        if (checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
+            error.text('');
+            var identifier, captcha_0, captcha_1, password, validate_code;
+            identifier = $('#registerMobile').val();
+            captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
+            captcha_1 = $('#registerForm').find('#registerCode').val();
+            password = $('.registerPwd').val();
+            validate_code = $('#registerSMSCode').val();
+            $.ajax({
+                url: '/accounts/register/ajax/',
+                type: "POST",
+                data: {
+                    identifier: identifier,
+                    captcha_0: captcha_0,
+                    captcha_1: captcha_1,
+                    password: password,
+                    validate_code: validate_code,
+                    user_type: '3'
+                }
+            }).done(function () {
+                var next = _getQueryStringByName('next') == '' ? '/qiye/info/' : _getQueryStringByName('next');
+                window.location.href = next;
+
+            }).fail(function (xhr) {
+                var result = JSON.parse(xhr.responseText);
+                if (result.message.invitecode != undefined) {
+                    error.text(result.message.invitecode)
+                } else if (result.message.identifier != undefined) {
+                    error.text(result.message.identifier)
+                } else if (result.message.captcha_1 != undefined) {
+                    error.text(result.message.captcha_1)
+                } else {
+                    error.text(result.message.validate_code)
+                }
+            });
+        }
     }
     $('.minNavLeft').hasClass('curr') ? loginInitFun() : registerInitFun();
 });

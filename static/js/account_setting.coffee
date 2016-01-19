@@ -11,15 +11,20 @@ require.config
     "tools": ['jquery.modal']
 
 require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, backend, tool)->
+  $('#setPWDA').click ()->
+    if $('#id-is-valid').val() == 'false'
+      $('#id-validate').modal()
+      return
+    else
+       window.location.href = '/accounts/back/'
   $('#passwordChangeButton').click (e)->
     e.preventDefault()
 
     if $('#passwordChangeForm').valid()
       params =
-          old_password: $('#old-password').val()
-          new_password1: $('#new-password1').val()
-          new_password2: $('#new-password2').val()
-
+        old_password: $('#old-password').val()
+        new_password1: $('#new-password1').val()
+        new_password2: $('#new-password2').val()
       backend.changePassword params
       .done ->
         $('#passwordChangeForm').find('input').val('')
@@ -50,4 +55,35 @@ require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, bac
       'new-password2':
         required: '不能为空'
         equalTo: '两次密码输入不一致'
+
+  ###判断是否设置了交易密码###
+  $.ajax
+    url: "/api/profile/"
+    type: "GET"
+    data: {
+    }
+  .success (data) ->
+    $('#id-is-valid').val(data.id_is_valid);
+    if data.trade_pwd_is_set
+      $('.old').show()
+    else
+      $('.new').show()
+  $.ajax
+      url: "/api/pay/the_one_card/"
+      type: "GET"
+      data: {}
+    .fail ()->
+      $('#bankIsNoBind').val('false')
+    .done (xhr) ->
+      $('#bankIsNoBind').val('true')
+
+  ###找回交易密码###
+  $('#getBackTradingPwd').click ->
+    if $('#bankIsNoBind').val() == 'false'
+      $('#goBindingBackWin').modal();
+    else
+      window.location.href = '/accounts/back/'
+  $('#temporaryNot').click ->
+    $.modal.close()
+
 

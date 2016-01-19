@@ -1,0 +1,36 @@
+extends account_home_base
+block head
+    - with '密码管理' as title
+        include include/head
+block sidebar
+    - with '密码管理' as activeItem
+        include include/user_center_sidebar
+block main
+    .panel
+        .well
+            .panel-title-bar__no-border
+                .panel-title 密码管理 > 修改交易密码
+            .panel-inner.font-s
+                form#passwordChangeForm.well-s(method="POST")
+                    table
+                        tr
+                            td.left 原交易密码
+                            td
+                                input#old_trade_pwd(type="password", name="old_trade_pwd", autocomplete="off")
+                                input(type="hidden",name="action_type",value="2")
+                                input(type="hidden",name="requirement_check",value="0")
+                        tr
+                            td.left 新交易密码
+                            td
+                                input#new_trade_pwd(type="password", name="new_trade_pwd", autocomplete="off")
+                        tr
+                            td.left 确认新交易密码
+                            td
+                                input#new_trade_pwd2(type="password", name="new_trade_pwd2", autocomplete="off")
+                        tr
+                            td
+                            td
+                                button#passwordChangeButton.button-primary(type="submit",tag='1').pwd-btn 修改交易密码
+block script
+    script.
+        require(['/static/js/back_trading.js'])

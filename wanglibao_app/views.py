@@ -57,8 +57,7 @@ class AppActivateScoreImageAPIView(APIView):
     """
     app端查询启动评分活动图片
     """
-    permission_classes = (IsAuthenticated,)
-
+    permission_classes = ()
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
     DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
 
@@ -144,18 +143,17 @@ class AppActivateImageAPIView(APIView):
                 img_url = ''
             jump_state = activate.jump_state
             link_dest = activate.link_dest
-
             if img_url:
                 invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
-                img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                return Response({'ret_code': 0,
-                                 'message': 'ok',
-                                 'image': img_url,
-                                 'jump_state': jump_state,
-                                 'link_dest':link_dest,
-                                 'link_dest_url':activate.link_dest_h5_url,
-                                 'invest_flag':invest_flag,
-                                 })
+                if activate.user_invest_limit==-1 or (activate.user_invest_limit==0 and not invest_flag) or (activate.user_invest_limit==1 and invest_flag):
+                    img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
+                    return Response({'ret_code': 0,
+                                     'message': 'ok',
+                                     'image': img_url,
+                                     'jump_state': jump_state,
+                                     'link_dest':link_dest,
+                                     'link_dest_url':activate.link_dest_h5_url,
+                                     })
 
         return Response({'ret_code': 20003, 'message': 'fail'})
 
@@ -330,7 +328,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
             month_group.sort(key=lambda x: x['term_date'])
 
         return Response({'ret_code': 0,
-                         'data': amo_list, 
+                         'data': amo_list,
                          'month_group': month_group,
                          'current_month': current_month,
                          })

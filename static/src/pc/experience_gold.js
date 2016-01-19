@@ -84,14 +84,26 @@
             type: "POST",
             data: {}
          }).done(function (xhr) {
-            $('#success').modal()
-            $('#success').find('.close-modal').hide()
-            setInterval(function(){
-                $.modal.close()
-                /*$('.investBtn').text('已投资'+ xhr.data.amount +'元').addClass('invest_ed').removeClass('investBtn')
-                $('.income_fonts').show().text('将于'+ xhr.data.term_date +'收益'+ xhr.data.interest +'元')*/
-                location.reload();
-            },2000)
+            if(xhr.data.ret_code > 0){
+                return tool.modalAlert({
+                    title: '温馨提示',
+                    msg: xhr.data.message
+                });
+            }else{
+                $('#success').modal()
+                $('#success').find('.close-modal').hide()
+                setInterval(function(){
+                    $.modal.close()
+                    /*$('.investBtn').text('已投资'+ xhr.data.amount +'元').addClass('invest_ed').removeClass('investBtn')
+                    $('.income_fonts').show().text('将于'+ xhr.data.term_date +'收益'+ xhr.data.interest +'元')*/
+                    location.reload();
+                },2000)
+            }
+         }).fail(function(xhr){
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: xhr.data.message
+            });
          })
       })
       /*展开更多*/
