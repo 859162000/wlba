@@ -63,9 +63,9 @@
             hasCallBack: true,
             callBack: function () {
                 if ($('#register_submit').hasClass('buttom-mm')) {
-                    if(getQueryString('referfrom')){
-                        var refer=getQueryString('referfrom');
-                         window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao&referfrom="+refer;
+                    if (getQueryString('referfrom')) {
+                        var refer = getQueryString('referfrom');
+                        window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao&referfrom=" + refer;
                     }
 
                 } else {
@@ -360,7 +360,12 @@
             getCode();
 
         }
-
+        var xluserid = getQueryString('xluserid'),
+            referfrom = getQueryString('referfrom')
+        $.ajax({
+            url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xluserid + '&ext2=' + referfrom,
+            type: "GET"
+        })
         function getCode() {//得到用户信息的二维码
             var original_id = document.getElementById("original_id").value;
             var code = document.getElementById("weixin_code").value;
