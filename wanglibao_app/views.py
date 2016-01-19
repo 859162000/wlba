@@ -50,6 +50,10 @@ from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
+import re
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
@@ -991,6 +995,25 @@ class AppDataModuleView(TemplateView):
 
     """ 数据魔方 """
     template_name = 'client_data_cube.jade'
+
+class AppFinanceView(TemplateView):
+
+    """ 投资记 """
+    template_name = 'client_animate_finance.jade'
+
+    def get(self, request, *args, **kwargs):
+
+        device_list = ['wlbapp']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return super(AppFinanceView, self).get(request, *args, **kwargs)
+        #return super(AppFinanceView, self).get(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse('app_finance'))
+
+
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'
