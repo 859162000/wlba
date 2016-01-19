@@ -360,18 +360,21 @@
             getCode();
 
         }
-        //$.ajax({
-        //
-        //    url: 'http://dypay.vip.xunlei.com/user/vipstat/?source=pv_wanglibao&ext=501&ext2=referfrom',
-        //
-        //    dataType: "jsonp",
-        //
-        //    jsonp: "jsonpcallback",
-        //
-        //
-        //
-        //})
-
+        function getQueryString(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+        }
+        var xluserid = getQueryString('xluserid'),
+            referfrom = getQueryString('referfrom')
+        $.ajax({
+            url: 'http://dypay.vip.xunlei.com/user/vipstat/?source=pv_wanglibao&ext=' + xluserid + '&ext2=' + referfrom,
+            dataType: "jsonp",
+            jsonp: "jsonpcallback"
+        })
         function getCode() {//得到用户信息的二维码
             var original_id = document.getElementById("original_id").value;
             var code = document.getElementById("weixin_code").value;
