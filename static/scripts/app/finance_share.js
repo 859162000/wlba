@@ -227,7 +227,7 @@ var weChatShare = (function(org){
             success : function(data) {
                 //请求成功，通过config注入配置信息,
                 wx.config({
-                    debug: true,
+                    debug: false,
                     appId: data.appId,
                     timestamp: data.timestamp,
                     nonceStr: data.nonceStr,
@@ -240,7 +240,7 @@ var weChatShare = (function(org){
             var host = 'https://www.wanglibao.com/',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = window.location.href,
-                shareMainTit = '2015年，含辛茹苦、呕心沥血的我，我终于拥有了自己的荣誉标签:...',
+                shareMainTit = '2015年，我终于拥有了自己的荣誉标签:...',
                 shareBody = '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。';
             //分享给微信好友
             org.onMenuShareAppMessage({

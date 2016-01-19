@@ -97,9 +97,9 @@ org.finance = (function (org) {
                         var name = _self.set_limit_style(account.tz_sterm_percent, account.tz_mterm_percent, account.tz_lterm_percent)
                         $('.model4-head-name').text(name)
                         //page4
-                        $('.invite_count').text(account.invite_count)
-                        $('.invite_income').text(account.invite_income)
-                        var message = _self.set_invite_count_style(account.invite_count)
+                        $('.invite_count').text(account.tz_sterm_point)
+                        $('.invite_income').text(account.tz_mterm_point)
+                        var message = _self.set_invite_count_style(account.tz_lterm_point)
                         $('.cravat-cue-detail').text(message.name)
                         $('.cravat-alert').text(message.detail)
                         //page5
@@ -279,7 +279,7 @@ wlb.ready({
             })
         }
 
-        mixins.shareData({title: '2015年，含辛茹苦、呕心沥血的我，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
+        mixins.shareData({title: '2015年，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 $('.client-login-alert').show().on('click', function () {
