@@ -63,6 +63,7 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
+import urllib
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1568,3 +1569,39 @@ class BidHasBindingForChannel(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class CoopPvApi(APIView):
+
+    permission_classes = ()
+
+    def get(self, request, channel_code):
+        if channel_code == 'xunlei9':
+            req_data = self.request.GET
+            source = req_data.get('source', None)
+            ext = req_data.get('ext', None)
+            ext2 = req_data.get('ext2', None)
+            if source and ext and ext2:
+                coop_pv_url = settings.XUNLEI9_PV_URL
+                data = {
+                    'source': source,
+                    'ext': ext,
+                    'ext2': ext2,
+                }
+                data = urllib.urlencode(data)
+                res = requests.get(url=coop_pv_url, params=data)
+                res_status_code = res.status_code
+                if res_status_code != 200:
+                    logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
+                else:
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'ok',
+                    }
+                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+        response_data = {
+            'ret_code': 50001,
+            'message': 'failed',
+        }
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
