@@ -5,7 +5,7 @@ html(style="background: #3a2741")
         title 网利宝
         include include/app_head
         link(href="/static/styles/mobile_activity/swiper.min.css", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010801", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=011901", rel="stylesheet")
         - csrf_token
     body
         .fix_wrap(style='width: 100%;height: 100%;background: #3a2741;position: fixed;left: 0;top: 0;z-index: 9999')
@@ -38,8 +38,8 @@ html(style="background: #3a2741")
                     if is_myself
                         .step_me
                             .title 不能够给自己点赞哦
-                            .share_button 分享集赞
-                            .now_use 立即使用
+                            .share_button 分享集赞拿更多
+                            .now_use 集赞完成立即使用
                     else
                         .take_mine_reward
                             input.phone#phone_number(type='text' placeholder='请输入手机号')
@@ -58,9 +58,10 @@ html(style="background: #3a2741")
                         .step_me
                             .line_bottom
                             .title_text1 每天签到拿网利宝体验金<br>随时查看账户收益
-                            // Will be modified in online - by hb on 2015-01-06
-                            //img.code_img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
-                            img.code_img(src="/static/imgs/admin/qrcode_for_gh_3b82a2651647_258.jpeg")
+                            .code_img
+                                img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
+                            // Only for alpha-test
+                            //img.code_img(src="/static/imgs/admin/qrcode_for_gh_3b82a2651647_258.jpeg")
                             .title_text2 长按二维码关注
                     img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
             .share_wrap
@@ -123,9 +124,9 @@ html(style="background: #3a2741")
             .share_info.share_title {{share_title}}
             .share_info.share_body {{share_body}}
             .share_info.share_all {{share_all}}
-            .user_info {{is_from_regist}}
+            .share_info.user_info {{is_from_regist}}
             include include/tracking
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/swiper.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=011403")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=011901")

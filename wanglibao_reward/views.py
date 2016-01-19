@@ -40,6 +40,7 @@ from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
 from urllib import urlencode,quote
+from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -1350,7 +1351,6 @@ class WeixinActivityAPIView(APIView):
                 record.save()
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
 class WeixinAnnualBonusView(TemplateView):
     openid = ''
     nick_name = ''
@@ -1379,9 +1379,9 @@ class WeixinAnnualBonusView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         # === Only for test ===
-        wxid = self.request.GET.get('wxid')
-        if wxid and wxid!='undefined':
-            self.from_openid = wxid
+        ###wxid = self.request.GET.get('wxid')
+        ###if wxid and wxid!='undefined':
+        ###    self.from_openid = wxid
             #self.nick_name = wxid
             #self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
 
@@ -1458,12 +1458,20 @@ class WeixinAnnualBonusView(TemplateView):
                         'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
                         'share_title':u'您的好友邀请您参加分享领取年终奖活动',
                         'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！',
+                        'share_all': u'分享集赞拿年终奖，集赞越多，奖金越高！',
                         }
             else:
                 self.template_name = 'app_praise_reward.jade'
                 return { 'err_code':103, 'err_messege':u'异常请求', 'is_myself':self.is_myself,  }
 
     def apply_bonus(self):
+        # Add by hb on 2015-01-19
+        wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
+        wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
+        if wx_bonus:
+            rep = { 'err_code':205, 'err_messege':u'您已经申请过年终奖了', 'wx_user':wx_bonus, }
+            return HttpResponse(json.dumps(rep), content_type='application/json')
+
         phone = self.request.GET.get('phone')
         #TODO: 手机号码有效性检查
         isMobilePhone = False
@@ -1600,7 +1608,7 @@ class WeixinAnnualBonusView(TemplateView):
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             if wx_bonus.is_pay:
-                rep = { 'err_code':403, 'err_messege':u'您已经领取过了' }
+                rep = { 'err_code':403, 'err_messege':u'您已经领取过了，年终奖已存入网利宝账户：%s 中，点击按钮立即查看'%wx_bonus.phone }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册
@@ -1716,7 +1724,6 @@ class WeixinAnnualBonusView(TemplateView):
         self.from_openid = self.openid
 
         return self.dispatch(request, *args, **kwargs)
-
 
 import re
 class SinicValidate(object):

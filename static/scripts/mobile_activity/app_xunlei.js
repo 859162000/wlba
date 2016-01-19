@@ -243,7 +243,8 @@ function getQueryString(name) {
 }
 
 var token = getQueryString('promo_token'),
-    xid = getQueryString('xluserid')
+    xid = getQueryString('xluserid'),
+    referfrom = getQueryString('referfrom')
 org.ajax({
     url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
@@ -253,8 +254,12 @@ org.ajax({
             $('.maimai-form').hide();
         }
     }
-<<<<<<< HEAD
 });
+org.ajax({
+    url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
+    type: "GET"
+});
+
 //微信分享
 var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
 org.ajax({
@@ -284,7 +289,7 @@ wx.ready(function () {
 
     var host = 'https://www.wanglibao.com',
         shareImg = host + '/static/imgs/mobile/share_logo.png',
-        shareLink = host + '/activity/app_xunlei/?promo_token=' + tokenq+'&xluserid='+xidq+'&time='+timerq+'&sign='+sigq+'&nickname='+nameq+'&referfrom='+referq,
+        shareLink = host + '/activity/app_xunlei/?promo_token=' + tokenq + '&xluserid=' + xidq + '&time=' + timerq + '&sign=' + sigq + '&nickname=' + nameq + '&referfrom=' + referq,
         shareMainTit = '送你28888元体验金+1年迅雷会员',
         shareBody = '注册即送28888元体验金，首次充值送7天迅雷白金会员，首次投资不低于1000元送1年迅雷白金会员。'
     //分享给微信好友
@@ -308,10 +313,6 @@ wx.ready(function () {
         imgUrl: shareImg
     })
 })
-=======
-})
-;
->>>>>>> feature/one_card
 org.xunlei = (function (org) {
 
     var lib = {
@@ -435,12 +436,8 @@ org.xunlei = (function (org) {
                     xid = getQueryString('xluserid'),
                     timer = getQueryString('time'),
                     sig = getQueryString('sign'),
-<<<<<<< HEAD
                     namer = getQueryString('nickname'),
-                    name =decodeURIComponent(namer);
-=======
-                    name = getQueryString('nickname');
->>>>>>> feature/one_card
+                    name = decodeURIComponent(namer);
 
                 var get_ticket_ajax = {};
                 get_ticket_ajax = {

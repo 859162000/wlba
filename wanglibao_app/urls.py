@@ -35,8 +35,8 @@ urlpatterns = patterns(
     url(r'^explore/$', AppExploreView.as_view()),
     url(r'^about/$', AppAboutView.as_view()),
     url(r'^team/$', AppManagementView.as_view()),
-    url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
-    url(r'^phone_validation_code_no_captcha/(?P<phone>\d{11})/$', SendValidationCodeNoCaptchaView.as_view()),
+    url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),  # APP注册短信验证码
+    url(r'^phone_validation_code_no_captcha/(?P<phone>\d{11})/$', SendValidationCodeNoCaptchaView.as_view()),  # 提现短信验证码
     url(r'^rate/$', AppIncomeRateAPIView.as_view()),
     url(r'^phone/upload/$', AppPhoneBookUploadAPIView.as_view()),
     url(r'^phone/query/$', AppPhoneBookQueryAPIView.as_view()),

@@ -63,6 +63,7 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
+import urllib
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -145,9 +146,11 @@ class TestSendRegisterValidationCodeView(APIView):
         phone_validate_code_item.save()
         return Response({"ret_code":0, "message":"ok", "vcode":phone_validate_code_item.validate_code})
 
+
 class SendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
+    该接口须要先验证图片验证码
     """
     permission_classes = ()
     # throttle_classes = (UserRateThrottle,)
@@ -172,11 +175,14 @@ class SendRegisterValidationCodeView(APIView):
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
 
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
-        return Response({'message': message, "type":"validation"}, status=status)
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
+        return Response({'message': message, "type": "validation"}, status=status)
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
+
 
 class WeixinSendRegisterValidationCodeView(APIView):
     """
@@ -201,20 +207,12 @@ class WeixinSendRegisterValidationCodeView(APIView):
                                 "error_number": ErrorNumber.duplicate
                             }, status=400)
 
-        #phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        #if phone_validate_code_item:
-        #    count = phone_validate_code_item.code_send_count
-        #    if count > 6:
-        #        return Response({
-        #                            "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-        #                            "error_number": ErrorNumber.duplicate
-        #                        }, status=400)
-
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({
                             'message': message
                         }, status=status)
-
 
 
 class RegisterAPIView(DecryptParmsAPIView):
@@ -551,6 +549,14 @@ class SendVoiceCodeAPIView(APIView):
 
         if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
             return Response({"ret_code": 30112, "message": u"手机号输入有误"})
+
+        # 验证图片验证码
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({"ret_code": 30114, "message": message})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
         if phone_validate_code_item:
@@ -1560,3 +1566,39 @@ class BidHasBindingForChannel(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class CoopPvApi(APIView):
+
+    permission_classes = ()
+
+    def get(self, request, channel_code):
+        if channel_code == 'xunlei9':
+            req_data = self.request.GET
+            source = req_data.get('source', None)
+            ext = req_data.get('ext', None)
+            ext2 = req_data.get('ext2', None)
+            if source and ext and ext2:
+                coop_pv_url = settings.XUNLEI9_PV_URL
+                data = {
+                    'source': source,
+                    'ext': ext,
+                    'ext2': ext2,
+                }
+                data = urllib.urlencode(data)
+                res = requests.get(url=coop_pv_url, params=data)
+                res_status_code = res.status_code
+                if res_status_code != 200:
+                    logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
+                else:
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'ok',
+                    }
+                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+        response_data = {
+            'ret_code': 50001,
+            'message': 'failed',
+        }
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')

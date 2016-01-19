@@ -22,9 +22,8 @@
 		shareLink = $('.share_link').text(),
 		shareMainTit = $('.share_title').text(),
 		shareBody = $('.share_body').text(),
-		share_friends = '我领到一份年终奖，你也为自己一年的努力另一份吧！';
+		share_friends = $('.share_all').text();
 
-	var is_myself;
 	var phone_num;
 	/*申请领取*/
 	$('#go_receive').click(function(){
