@@ -1467,8 +1467,8 @@ class WeixinAnnualBonusView(TemplateView):
     def apply_bonus(self):
         # Add by hb on 2015-01-19
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
-        wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
         if wx_bonus:
+            wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
             rep = { 'err_code':205, 'err_messege':u'您已经申请过年终奖了', 'wx_user':wx_bonus, }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
