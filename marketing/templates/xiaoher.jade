@@ -1,0 +1,65 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/stylesheets/xiaoher.css?v=201511121")
+    body(style="background:#3d396b")
+        include global/g_nav
+        #wrap_box
+            #main_box
+                img.logo_img(src="/static/imgs/pc_activity/xiaoher/logo_img.png")
+                img.title_img_1(src="/static/imgs/pc_activity/xiaoher/title_1.png")
+                .step_wrap
+                    .step_box.step_box_left
+                        .box
+                            dl
+                                dt Step1
+                                dd 注册网利宝帐号
+                            img.step_img(src="/static/imgs/pc_activity/xiaoher/step_1.png")
+                    .step_box.step_box_center
+                        .box
+                            dl
+                                dt Step2
+                                dd 充值资金到账户
+                            img.step_img(src="/static/imgs/pc_activity/xiaoher/step_2.png")
+                    .step_box.step_box_right
+                        .box
+                            dl
+                                dt Step3
+                                dd 选择投资标
+                            img.step_img(src="/static/imgs/pc_activity/xiaoher/step_3.png")
+                    .step_box.step_box_left
+                        .box
+                            dl
+                                dt Step4
+                                dd 投资1000元及以上
+                            img.step_img(src="/static/imgs/pc_activity/xiaoher/step_4.png")
+                    .step_box.step_box_center
+                        .box
+                            dl
+                                dt Step5
+                                dd 获得100元免单券
+                            img.step_img(src="/static/imgs/pc_activity/xiaoher/step_5.png")
+                    .step_box.step_box_right
+                        .box
+                            dl
+                                dt Step6
+                                dd 购物享免单
+                            img.step_img(src="/static/imgs/pc_activity/xiaoher/step_6.png")
+                .rule_wrap
+                    img.title_img_2(src="/static/imgs/pc_activity/xiaoher/title_2.png")
+                    .act_rule
+                        p!='<span class="number">1.</span>手机号为网利宝唯一账户，通过小荷特卖电脑端官网、小荷特卖手机客户端用户参与活动均可享受活动红包福利；'
+                        p!='<span class="number">2.</span>新用户单笔首次投资1000元及以上得100元小荷特卖免单券，小荷特卖免单券统一以站内信形式通知，每个免单券<br><span class="number"></span>仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；'
+                        p!='<span class="number">3.</span>免单券限定自领取日起3月内购物有效； '
+                        p!='<span class="number">4.</span>本活动可与网利宝其他优惠活动同时享用。'
+                        p!='<span class="number">5.</span>刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现，网利宝对此活动享有最终解释权。'
+                        p.small ＊本活动最终解释权在法律允许范围内归网利宝所有。
+                    img.rule_img(src="/static/imgs/pc_activity/xiaoher/rule_img.png")
+        .get_coupon
+            a(href='/accounts/register/?promo_token=xiaohehd') 领取100元购物券
+        include global/g_footer
