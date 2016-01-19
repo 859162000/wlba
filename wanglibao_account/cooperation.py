@@ -175,6 +175,8 @@ class CoopRegister(object):
         self.call_back_url = None
         # 传递渠道oauth客户端ID时使用的变量名
         self.internal_channel_client_id_key = 'client_id'
+        self.channel_access_token_key = 'access_token'
+
 
     @property
     def channel_code(self):
@@ -1564,22 +1566,29 @@ class BaJinSheRegister(CoopRegister):
     def __init__(self, request):
         super(BaJinSheRegister, self).__init__(request)
         self.c_code = 'bajinshe'
-        self.internal_channel_p_id_key = 'product_id'
-        self.external_channel_p_id_key = 'product_id'
+        self.channel_product_id_key = 'product_id'
         self.external_channel_client_id_key = 'appid'
-        self.channel_access_token_key = 'access_token'
         self.external_channel_user_key = 'usn'
         self.internal_channel_phone_key = 'phone'
         self.external_channel_user_id_key = 'p_user_id'
-        self.external_channel_order_id_key = 'p_user_id'
-        self.external_channel_user_id_key = 'p_user_id'
+        self.external_channel_order_id_key = 'orderNum'
+        self.internal_channel_order_id_key = 'order_id'
+
+    @property
+    def oauth2_client_id(self):
+        return self.request.session.get(self.internal_channel_client_id_key, None)
+
+    @property
+    def channel_order_id(self):
+        return self.request.session.get(self.internal_channel_order_id_key, None)
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
         channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
-        p_id = self.request.REQUEST.get(self.external_channel_p_id_key, None)
-        client_id = self.request.POST.get(self.external_channel_client_id_key, None)
+        p_id = self.request.REQUEST.get(self.channel_product_id_key, None)
+        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
         access_token = self.request.REQUEST.get(self.channel_access_token_key, None)
+        channel_order_id = self.request.REQUEST.get(self.external_channel_order_id_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1589,7 +1598,7 @@ class BaJinSheRegister(CoopRegister):
             self.request.session[self.internal_channel_phone_key] = channel_user
 
         if p_id:
-            self.request.session[self.internal_channel_p_id_key] = p_id
+            self.request.session[self.channel_product_id_key] = p_id
 
         if client_id:
             self.request.session[self.internal_channel_client_id_key] = client_id
@@ -1597,12 +1606,16 @@ class BaJinSheRegister(CoopRegister):
         if access_token:
             self.request.session[self.channel_access_token_key] = access_token
 
+        if channel_order_id:
+            self.request.session[self.internal_channel_order_id_key] = channel_order_id
+
     def clear_session(self):
         super(BaJinSheRegister, self).clear_session()
-        self.request.session.pop(self.internal_channel_p_id_key, None)
+        self.request.session.pop(self.channel_product_id_key, None)
         self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.channel_access_token_key, None)
         self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_order_id_key, None)
 
     def save_to_binding(self, user):
         """
@@ -1623,6 +1636,29 @@ class BaJinSheRegister(CoopRegister):
                 binding.save()
                 # logger.debug('save user %s to binding'%user)
 
+    def bajinshe_call_back(self, user, order_id):
+        channel_order_id = self.channel_order_id
+        oauth2_client_id = self.oauth2_client_id
+        if channel_order_id:
+            oauth_user = OauthUser.objects.filter(client__client_id=oauth2_client_id, user=user).first()
+            if oauth_user:
+                # 创建渠道订单记录
+                channel_recode = get_user_channel_record(user.id)
+                order = UserThreeOrder(user=user,
+                                       order_on=channel_recode,
+                                       request_no=order_id,
+                                       thrid_order_id=channel_order_id)
+                order.save()
+
+    def register_call_back(self, user):
+        Binding.objects.filter()
+
+    def purchase_call_back(self, user, order_id):
+        self.bajinshe_call_back(user, order_id)
+
+    def recharge_call_back(self, user, order_id):
+        self.bajinshe_call_back(user, order_id)
+
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
@@ -1633,7 +1669,9 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,]
 
+
 #######################第三方用户查询#####################
+
 
 class CoopQuery(APIView):
     """

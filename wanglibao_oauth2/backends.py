@@ -45,7 +45,4 @@ class AccessTokenBackend(ModelBackend):
         except AccessToken.DoesNotExist:
             return None
         else:
-            if default_token_generator.check_token(user, token):
-                return user
-            else:
-                return None
+            return user

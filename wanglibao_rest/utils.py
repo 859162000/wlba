@@ -11,6 +11,7 @@ from wanglibao_redis.backend import redis_backend
 from wanglibao_oauth2.tools import oauth_token_login
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
+from marketing.utils import get_user_channel_record
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +125,12 @@ def process_for_bajinshe_landpage(request, channel_code):
 
     if phone and client_id and access_token:
         try:
-            oauth_token_login(request, phone, client_id, access_token)
+            is_auth, message = oauth_token_login(request, phone, client_id, access_token)
+            if is_auth:
+                channel = get_user_channel_record(request.user.id)
+                if channel:
+                    request.session[channel]
+
         except Exception, e:
             logger.info('internal request oauth failed with error %s' % e)
 

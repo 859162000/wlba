@@ -275,7 +275,7 @@ def landpage_view(request):
     :return:
     """
 
-    request_data = request.GET
+    request_data = request.REQUEST
     channel_code = request_data.get('promo_token', None)
     action = request_data.get('action', None)
     url = reverse('index')
@@ -315,8 +315,6 @@ def landpage_view(request):
                     url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
                 else:
                     url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
-            else:
-                CoopRegister(request).process_for_clear_session(request.user)
         else:
             url = reverse(activity_page) + "?promo_token=" + channel_code
 

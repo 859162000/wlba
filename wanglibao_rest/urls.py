@@ -46,7 +46,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, AccessUserExistsApi)
+                            BidHasBindingForChannel, AccessUserExistsApi, LandOpenApi)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -315,4 +315,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^access_user/exists/$', AccessUserExistsApi.as_view()),
+)
+
+# 渠道着陆页中间跳转接口
+urlpatterns += patterns(
+    '',
+    url(r'^landpage/$', LandOpenApi.as_view()),
 )

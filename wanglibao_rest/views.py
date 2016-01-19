@@ -63,6 +63,7 @@ import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
 from wanglibao_account.utils import Crypto
+from wanglibao.views import landpage_view
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1744,3 +1745,16 @@ class AccessUserExistsApi(APIView):
             return Http404(u'页面不存在')
 
         return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+
+
+class LandOpenApi(APIView):
+    """
+    渠道跳转页，
+    确定渠道来源，记录访问时间到redis中，
+    跳转活动页
+    """
+
+    permission_classes = ()
+
+    def post(self, request):
+        return landpage_view(request)

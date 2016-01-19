@@ -7,16 +7,17 @@ from django.contrib.auth import login as auth_login
 
 
 def oauth_token_login(request, phone, client_id, token):
+    is_auth = False
+    message = None
     response_data = {}
     user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
     if user:
         user = authenticate(token=token, client_id=client_id, user_id=user.id)
         if user and user.is_authenticated():
             auth_login(request, user)
-            response_data = {'code': '10000',
-                             'message': _('ok')}
+            is_auth = True
+            message = 'ok'
     else:
-        response_data = {'code': '10210',
-                         'message': _('Token error')}
+        message = 'invalid phone number'
 
-    return response_data
+    return is_auth, message
