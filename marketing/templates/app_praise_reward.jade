@@ -3,7 +3,36 @@ doctype html
 html(style="background: #3a2741")
     head
         title 网利宝
-        include include/app_head
+        meta(charset="utf-8")
+        meta(name="format-detection" content="telephone=no,email=no")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        script.
+            (function () {
+                var b = navigator.userAgent;
+                ipad = b.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+                iphone = !ipad && b.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+                uc = navigator.userAgent.indexOf("UCBrowser") > -1 ? true : false;
+                ios = ipad || iphone;
+                var d = 1, a = 1, c;
+                if (ios) {
+                    if (window.devicePixelRatio >= 2) {
+                        d *= 1;
+                        a *= 1
+                    }
+                } else {
+                    if (uc) {
+                        if (window.devicePixelRatio >= 2) {
+                            d *= 1;
+                            a *= 1
+                        }
+                    }
+                }
+                c = '<meta name="viewport" content="initial-scale=' + d + ", maximum-scale=" + d + ", minimum-scale=" + d + ', width=device-width, user-scalable=no" />';
+                document.write(c);
+                document.documentElement.style.fontSize = 20 * a + "px"
+            })();
+        link(href="/static/styles/mobile_activity/app.css?v=20160113", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css", rel="stylesheet")
         link(href="/static/styles/mobile_activity/app_praise_reward.css?v=011901", rel="stylesheet")
         - csrf_token
@@ -94,6 +123,7 @@ html(style="background: #3a2741")
                         .apply_button 去看看我的年终奖
                         .login_button 登录
                         .go_experience 领取成功
+                        .new_user_text 新用户领取28888体验金
             .rule_wrap
                 .main
                     .text
