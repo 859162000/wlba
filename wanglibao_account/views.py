@@ -499,7 +499,6 @@ class AccountHome(TemplateView):
         paid_interest = unpaid_interest = 0
 
         experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
-
         experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
             .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
         if experience_record.get('event__amount__sum'):
@@ -602,8 +601,17 @@ class AccountHomeAPIView(APIView):
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_week = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, 
+        fund_income_month = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+
+        # 当月免费提现次数
+        fee_config = WithdrawFee().get_withdraw_fee_config()
+        free_times_per_month = int(fee_config['fee']['free_times_per_month'])
+        withdraw_success_count = int(WithdrawFee().get_withdraw_success_count(user))
+        withdraw_free_count = free_times_per_month - withdraw_success_count
+
+        if withdraw_free_count <= 0:
+            withdraw_free_count = 0
 
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
@@ -623,6 +631,7 @@ class AccountHomeAPIView(APIView):
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
             'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
+            'withdraw_free_count': withdraw_free_count,  # 当月免费提现次数
 
         }
 
@@ -1382,6 +1391,7 @@ def ajax_register(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
+                user_type = form.cleaned_data.get('user_type', '0')
 
                 if request.POST.get('IGNORE_PWD', '') and not password:
                     password = generate_random_password(6)
@@ -1389,9 +1399,12 @@ def ajax_register(request):
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
-                user = create_user(identifier, password, nickname)
+                user = create_user(identifier, password, nickname, user_type)
                 if not user:
                     return HttpResponse(messenger('error'))
+
+                if user_type == '3':
+                    invitecode = 'qyzh'
 
                 # 处理第三方渠道的用户信息
                 CoopRegister(request).all_processors_for_user_register(user, invitecode)
@@ -1625,9 +1638,12 @@ class IdVerificationView(TemplateView):
 
     def form_valid(self, form):
         user = self.request.user
+        # add by ChenWeiBin@2010105
+        if user.wanglibaouserprofile.utype == '3':
+            return {"ret_code": 30056, "message": u"企业用户无法通过此方式认证"}
 
-        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
-        user.wanglibaouserprofile.name = form.cleaned_data.get('name')
+        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number').strip()
+        user.wanglibaouserprofile.name = form.cleaned_data.get('name').strip()
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.id_valid_time = timezone.now()
         user.wanglibaouserprofile.save()
@@ -2190,7 +2206,6 @@ class ThirdOrderQueryApiView(APIView):
             }
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
-
 
 class FirstPayResultView(TemplateView):
     template_name = 'register_three.jade'

@@ -11,6 +11,13 @@ from weixin.util import _generate_ajax_template
 from .utils import get_queryset_paginator, get_sorts_for_activity_show
 from django.db.models import Q
 
+class WeixinGGLTemplate(TemplateView):
+    template_name = ''
+    def get_context_data(self, **kwargs):
+        order_id = self.request.GET.get('order_id')
+        return {
+           'order_id': order_id
+        }
 
 class TemplatesFormatTemplate(TemplateView):
     def get_context_data(self, **kwargs):

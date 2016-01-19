@@ -1,4 +1,4 @@
-org.ui = (function(){
+ org.ui = (function(){
     var lib = {
         _alert: function(txt, callback,difference){
             var alertFram = '';

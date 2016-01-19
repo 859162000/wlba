@@ -24,7 +24,8 @@ function getQueryString(name) {
 }
 
 var token = getQueryString('promo_token'),
-    xid = getQueryString('xluserid')
+    xid = getQueryString('xluserid'),
+    referfrom = getQueryString('referfrom')
 org.ajax({
     url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
@@ -35,6 +36,11 @@ org.ajax({
         }
     }
 });
+org.ajax({
+    url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
+    type: "GET"
+});
+
 //微信分享
 var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
 org.ajax({
@@ -53,18 +59,18 @@ org.ajax({
         });
     }
 });
-var token１ = getQueryString('promo_token'),
-    xid１ = getQueryString('xluserid'),
-    timer１ = getQueryString('time'),
-    sig１ = getQueryString('sign'),
-    name１ = getQueryString('nickname'),
-    refer1 = getQueryString('referfrom');
+
+var tokenq = getQueryString('promo_token'),
+    xidq = getQueryString('xluserid'),
+    timerq = getQueryString('time'),
+    sigq = getQueryString('sign'),
+    nameq = getQueryString('nickname'),
+    referq = getQueryString('referfrom');
 wx.ready(function () {
 
-    var //host = 'https://www.wanglibao.com',
-        host = 'https://staging.wanglibao.com',
+    var host = 'https://www.wanglibao.com',
         shareImg = host + '/static/imgs/mobile/share_logo.png',
-        shareLink = host + '/activity/app_xunlei/?promo_token=' + token１+'&xluserid'+xid１+'&time'+timer１+'&sign'+sig１+'&nickname'+name１+'&referfrom'+refer1,
+        shareLink = host + '/activity/app_xunlei/?promo_token=' + tokenq + '&xluserid=' + xidq + '&time=' + timerq + '&sign=' + sigq + '&nickname=' + nameq + '&referfrom=' + referq,
         shareMainTit = '送你28888元体验金+1年迅雷会员',
         shareBody = '注册即送28888元体验金，首次充值送7天迅雷白金会员，首次投资不低于1000元送1年迅雷白金会员。'
     //分享给微信好友
@@ -211,7 +217,8 @@ org.xunlei = (function (org) {
                     xid = getQueryString('xluserid'),
                     timer = getQueryString('time'),
                     sig = getQueryString('sign'),
-                    name = getQueryString('nickname');
+                    namer = getQueryString('nickname'),
+                    name = decodeURIComponent(namer);
 
                 var get_ticket_ajax = {};
                 get_ticket_ajax = {
