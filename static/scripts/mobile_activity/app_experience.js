@@ -217,7 +217,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;org.ui = (function(){
+; org.ui = (function(){
     var lib = {
         _alert: function(txt, callback,difference){
             var alertFram = '';

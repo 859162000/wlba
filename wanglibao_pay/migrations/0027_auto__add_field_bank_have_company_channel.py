@@ -147,7 +147,7 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'f50YCk-YRfSV3pQ1BNmYgQ'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'lF_FQx8HSwS2pJ2_H729dg'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'})
         },
         u'wanglibao_pay.whitelistcard': {
             'Meta': {'object_name': 'WhiteListCard'},
@@ -185,7 +185,7 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'on_delete': 'models.PROTECT'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'eKY2VAikR-KT9_JZHldJCw'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'82W8IPJxTPKNVYYoTUfYCw'", 'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
             'withdrawcard': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_pay.WithdrawCard']", 'on_delete': 'models.PROTECT'})
         }
     }

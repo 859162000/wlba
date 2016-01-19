@@ -89,7 +89,7 @@ html
         .well
           .pull-left(data-url='{{request.url}}')
             -csrf_token
-            button.button-audit(type="submit", style="width:220px; height:40px; font-size:16px;") 审 核
+            button.button-audit(type="submit", style="width:220px; height:40px; font-size:16px;") 审核通过
 
           a.button-default.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回
       script(src="/static/js/lib/jquery.min.js")

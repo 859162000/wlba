@@ -22,11 +22,12 @@
             .wechat-hover-dec 下载网利宝APP
 
     .g-samll-end
+      a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
       a(href='/data_cube/',target="_blank").samll-nav-guide 平台数据
       a(href='/pc_guide/').samll-nav-guide 新手指引
       a(href='/help/').samll-nav-guide 帮助中心
       if user.is_authenticated
-        a(href='/accounts/home/').samll-nav-user {{user | display_name}}
+        a(href='/accounts/home/').samll-nav-user.checkLoginStatus {{user | display_name}}
         a(href='/accounts/logout?next=/').samll-nav-logout 退出
       else
         a(href='/accounts/login/').samll-nav-user 登录
@@ -41,17 +42,18 @@
       .g-user
         if activeItem == "我的账户"
           myacount = 'highlight'
-        a(href="/accounts/home", class='{{myacount}}').user-nav
+        a(href="/accounts/home", class='{{myacount}}')#checkUserType.user-nav
           i.icon.iconfont.icon-user
           span.user-text 我的账户
           i.icon.iconfont.icon-down
-        ul.g-nav-user-nav
+        ul.g-nav-user-nav#minNavs
           mixin liItem(url, text)
             li
               a(href=url)=text
           +liItem('/pay/banks/', '我要充值')
           +liItem('/pay/withdraw/', '我要提现')
-          +liItem('/accounts/auto_tender/', '自动投标')
+          if user.wanglibaouserprofile.utype != '3'
+            +liItem('/accounts/auto_tender/', '自动投标')
           +liItem('/accounts/transaction/p2p/', '交易记录')
 
     .g-nav-box
@@ -64,8 +66,6 @@
             a(href=link)= name
               if news
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
-
-
 
       +nav-item('首页', '/')
       +nav-item('理财专区', '/p2p/list/')

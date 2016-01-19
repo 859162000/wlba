@@ -26,6 +26,7 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, RepaymentAPIView
+from wanglibao_pay.third_pay import  TheOneCardAPIView
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
@@ -47,7 +48,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                                  BidHasBindingForChannel)
+                                  BidHasBindingForChannel, CoopPvApi)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -183,6 +184,8 @@ urlpatterns = patterns(
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', csrf_exempt(KuaiShortPayCallbackView.as_view()), name="kuai-deposit-callback"),
+    # 同卡进出
+    url(r'^pay/the_one_card/$', TheOneCardAPIView.as_view()),
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
@@ -314,4 +317,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^account2015/$', CustomerAccount2015ApiView.as_view()),
+)
+
+# 渠道页面pv统计接口
+urlpatterns += patterns(
+    '',
+    url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
 )

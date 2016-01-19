@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
+    'wanglibao_qiye', #add by wangxiaoqing
     'report',
     'misc',
 
@@ -687,7 +688,7 @@ CELERYBEAT_SCHEDULE = {
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
         'task': 'experience_gold.tasks.experience_repayment_plan',
-        'schedule': timedelta(minutes=5),
+        'schedule': crontab(minute=0, hour=17),
     },
     # 定期检查还有3天到期的用户优惠券,发送提醒
     'redpack_status_task_check': {
@@ -1145,6 +1146,7 @@ XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
 
 # 脉脉
 WLB_FOR_MAIMAI1_KEY = '2004'

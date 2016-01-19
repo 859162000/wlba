@@ -52,6 +52,5 @@ urlpatterns = patterns(
 
     url(r'^data_cube/$', AppDataModuleView.as_view()),#数据魔方
     url(r'^finance/$', TemplateView.as_view(template_name="client_animate_finance.jade")),
-
 )
 

@@ -3,11 +3,11 @@
 doctype html
 block head
 
-body
+body(style='background: #e3e3e3;')
   include global/g_nav
   include announcement_block
   .space-vertical-s
-  .row
+  .row.clearfix
     .aside
       block sidebar
 
@@ -18,3 +18,5 @@ body
   block script
   include global/g_footer
   include include/tracking
+  script.
+    require(['/static/src/pc/account.js'])
