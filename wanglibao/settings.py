@@ -698,7 +698,7 @@ CELERYBEAT_SCHEDULE = {
     # 定期向八金社推送标的信息
     'p2p-product-push-5-minutes': {
         'task': 'wanglibao_p2p.tasks.bajinshe_product_push_to_coop',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
 }
 

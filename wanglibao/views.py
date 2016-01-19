@@ -291,30 +291,33 @@ def landpage_view(request):
                     logger.info(e)
 
         # 判断是否属于交易操作
-        if action and action in ['purchase', 'deposit', 'withdraw']:
-            if action == 'purchase':
-                product_id = request.session.get('product_id', '')
-                if product_id:
-                    url = reverse('p2p detail', kwargs={'id': product_id})
-            elif action == 'deposit':
-                url = reverse('pay-banks')
-            elif action == 'withdraw':
-                url = reverse('withdraw')
+        if action:
+            if action in ['purchase', 'deposit', 'withdraw']:
+                if action == 'purchase':
+                    product_id = request.session.get('product_id', '')
+                    if product_id:
+                        url = reverse('p2p detail', kwargs={'id': product_id})
+                elif action == 'deposit':
+                    url = reverse('pay-banks')
+                elif action == 'withdraw':
+                    url = reverse('withdraw')
 
-            # 判断用户是否为登录状态
-            if not request.user.is_authenticated():
-                # 判断手机号是否已经注册
-                phone = request.session.get('channel_user', None)
-                if phone:
-                    phone_has_register = has_register_for_phone(phone)
-                else:
-                    phone_has_register = False
+                # 判断用户是否为登录状态
+                if not request.user.is_authenticated():
+                    # 判断手机号是否已经注册
+                    phone = request.session.get('channel_user', None)
+                    if phone:
+                        phone_has_register = has_register_for_phone(phone)
+                    else:
+                        phone_has_register = False
 
-                # 如果手机号还未被注册，则引导用户注册，否则，引导用户登录
-                if phone_has_register:
-                    url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
-                else:
-                    url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
+                    # 如果手机号还未被注册，则引导用户注册，否则，引导用户登录
+                    if phone_has_register:
+                        url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
+                    else:
+                        url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
+            elif action == 'register':
+                url = reverse('auth_register') + "?promo_token=" + channel_code
         else:
             url = reverse(activity_page) + "?promo_token=" + channel_code
 
