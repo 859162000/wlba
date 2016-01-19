@@ -250,6 +250,14 @@
 					$('.regist_button').show().css('display','block');
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
+				}else if(xhr.err_code==403){
+					if(h5_user_static){
+						$('.go_experience').show();
+					}else{
+						$('.login_button').show();
+					}
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
