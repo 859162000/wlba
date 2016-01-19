@@ -81,6 +81,8 @@ urlpatterns = patterns(
     url(r'^damai-video/$', TemplateView.as_view(template_name="damai-video.jade")),
     url(r'^video-test/$', TemplateView.as_view(template_name="video-test.html")),
     url(r'^zhuanshi/$', TemplateView.as_view(template_name="zhuanshi.html")),
+    url(r'^new_year/$', TemplateView.as_view(template_name="new_year.jade")),
+
 )
 
 # app URL

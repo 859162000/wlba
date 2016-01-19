@@ -7,6 +7,7 @@ from django.db import models
 from order.models import Order
 from wanglibao_margin.models import MarginRecord
 from wanglibao_pay.util import get_a_uuid
+from wanglibao_pay import util
 from decimal import Decimal
 
 
@@ -65,7 +66,22 @@ class Bank(models.Model):
 
     @classmethod
     def get_bind_channel_banks(cls):
-        return Bank.objects.all().exclude(channel__isnull=True).exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
+        banks = Bank.objects.all().exclude(channel__isnull=True).exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
+        rs = []
+        for bank in banks:
+            obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
+            if bank.channel == 'kuaipay' and bank.kuai_limit:
+                obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
+            elif bank.channel == 'huifu' and bank.huifu_bind_limit:
+                obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
+            elif bank.channel == 'yeepay' and bank.yee_bind_limit:
+                obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
+            else:
+                # 只返回已经有渠道的银行
+                continue
+
+            rs.append(obj)
+        return rs
 
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号', db_index=True)
