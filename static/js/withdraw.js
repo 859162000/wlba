@@ -173,11 +173,6 @@
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
     });
-    $('.withdraw-button').click(function() {
-      if (!$(this).hasClass('no-click')) {
-        return $('#withdraw-form').submit();
-      }
-    });
     $(".voice").on('click', '.voice-validate', function(e) {
       var element, url;
       e.preventDefault();
