@@ -80,6 +80,7 @@ urlpatterns = patterns(
     url(r'^january_reward/$', TemplateView.as_view(template_name="january_reward.jade")),
     url(r'^damai-video/$', TemplateView.as_view(template_name="damai-video.jade")),
     url(r'^video-test/$', TemplateView.as_view(template_name="video-test.html")),
+    url(r'^zhuanshi/$', TemplateView.as_view(template_name="zhuanshi.html")),
 )
 
 # app URL
