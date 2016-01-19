@@ -82,9 +82,9 @@ org.finance = (function (org) {
 
                         //page1
                         $('.zc_ranking').text(account.zc_ranking)
-                        $('.tz_amount').text(account.tz_amount)
+                        $('.tz_amount').text( '￥'+ account.tz_amount)
                         $('.tz_ranking_percent').text(account.tz_ranking_percent)
-                        $('.income_total').text(account.income_total)
+                        $('.income_total').text('￥'+ account.income_total)
                         //page2
                         $('.tz_times').text(account.tz_times)
                         $('.tz_avg_times').text(account.tz_avg_time)
