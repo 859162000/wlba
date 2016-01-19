@@ -144,24 +144,10 @@ def list_bank(request):
 
 def list_bank_new(request):
     banks = Bank.get_bind_channel_banks()
-    rs = []
-    for bank in banks:
-        obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
-        if bank.channel == 'kuaipay' and bank.kuai_limit:
-            obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
-        elif bank.channel == 'huifu' and bank.huifu_bind_limit:
-            obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
-        elif bank.channel == 'yeepay' and bank.yee_bind_limit:
-            obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
-        else:
-            # 只返回已经有渠道的银行
-            continue
 
-        rs.append(obj)
-
-    if not rs:
+    if not banks:
         return {"ret_code": 20051, "message": "没有可选择的银行"}
-    return {"ret_code": 0, "message": "ok", "banks": rs}
+    return {"ret_code": 0, "message": "ok", "banks": banks}
 
 #def handle_kuai_bank_limit(limitstr):
 #    obj = {}
