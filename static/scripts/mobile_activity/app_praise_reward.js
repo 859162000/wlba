@@ -274,7 +274,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*刷新数据*/
 	$('.renovate').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
 		$(this).addClass('renovate_rotate');
 		$.ajax({
 			url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
@@ -343,7 +343,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	var praise_num = $('#praise_num').val();
 	/*投票*/
 	$('.praise_left').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -362,7 +362,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 
 	$('.praise_right').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
 		$.ajax({
 			url: '/weixin_activity/weixin/bonus/?act=vote&type=0&uid='+uid+'&wxid='+wxid,
 			type: "GET",
@@ -384,7 +384,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*申请我的年终奖*/
 	var phone_number;
 	$('.take_mine_button').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
 		phone_number = $('#phone_number').val();
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
@@ -447,7 +447,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*领取我的年终奖*/
 	$('.now_use').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=pay&wxid='+wxid,
@@ -458,22 +458,23 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').show();
 					$('.friend_top .close').hide();
 					if(h5_user_static){
-						$('.go_experience').show();
+						$('.go_experience,.new_user_text').show();
 					}else{
-						$('.login_button').show();
+						$('.login_button,.new_user_text').show();
 					}
 					//go_experience();
 					//倒数3秒跳转到体验金页面
 
 				}else if(xhr.err_code==404){
 					$('.regist_button').show().css('display','block');
+					$('.new_user_text').show();
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else if(xhr.err_code==403){
 					if(h5_user_static){
-						$('.go_experience').show();
+						$('.go_experience,.new_user_text').show();
 					}else{
-						$('.login_button').show();
+						$('.login_button,.new_user_text').show();
 					}
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
