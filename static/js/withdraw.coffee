@@ -142,10 +142,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     timerFunction()
     intervalId = setInterval timerFunction, 1000
 
-  $('.withdraw-button').click ()->
-    if(!$(this).hasClass('no-click'))
-      $('#withdraw-form').submit()
-
   $(".voice").on 'click', '.voice-validate', (e)->
     e.preventDefault()
 
