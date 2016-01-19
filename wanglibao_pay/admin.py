@@ -114,13 +114,15 @@ class CardAdmin(admin.ModelAdmin):
         return obj.user.wanglibaouserprofile.phone
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        return [f.name for f in self.model._meta.fields]
+        editable_fields = ['is_bind_kuai', 'is_bind_yee', 'is_the_one_card']
+        return [f.name for f in self.model._meta.fields if f.name not in
+                editable_fields]
 
     get_phone.short_description = u'手机'
 
