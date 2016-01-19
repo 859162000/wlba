@@ -5,7 +5,7 @@ html(style="background: #3a2741")
         title 网利宝
         include include/app_head
         link(href="/static/styles/mobile_activity/swiper.min.css", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010801", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=011901", rel="stylesheet")
         - csrf_token
     body
         .fix_wrap(style='width: 100%;height: 100%;background: #3a2741;position: fixed;left: 0;top: 0;z-index: 9999')
@@ -58,7 +58,8 @@ html(style="background: #3a2741")
                         .step_me
                             .line_bottom
                             .title_text1 每天签到拿网利宝体验金<br>随时查看账户收益
-                            img.code_img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
+                            .code_img
+                                img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
                             // Only for alpha-test
                             //img.code_img(src="/static/imgs/admin/qrcode_for_gh_3b82a2651647_258.jpeg")
                             .title_text2 长按二维码关注
