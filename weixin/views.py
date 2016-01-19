@@ -22,6 +22,7 @@ from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PEquity, P2PProduct
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_pay.third_pay import card_bind_list
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
@@ -60,6 +61,7 @@ from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEven
                              TemplateSendJobFinishEvent)
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
+from wanglibao_profile.models import WanglibaoUserProfile
 from weixin.tasks import detect_product_biding, sentTemplate
 from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
 from weixin.util import FWH_UNBIND_URL, filter_emoji
@@ -344,13 +346,12 @@ class WeixinJoinView(View):
         return reply
 
     def getSubscribeArticle(self):
+        big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
         m = Misc.objects.filter(key='weixin_yuebao_info').first()
         big_data_url = 'http://mp.weixin.qq.com/s?__biz=MzA5NzE4NTIzMQ==&mid=400880736&idx=2&sn=8960f12d794c90492ed5cedd1561afc4&scene=1&srcid=1204pU1pDJsV4RyaK2WesNTN&key=ac89cba618d2d9768a249f64106fa7c4857db09c6013d1e43374d9c0dc4cfa7ba992e13d9b8c7826b109ee3729ef35a4&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=yHIDIChmoYlIXIUjkPF6XZwcg%2FcSi09vHTBNTyHS5BwL1%2B91EHyr90ZMXi3OEp4J'
         if m and m.value:
             info = json.loads(m.value)
             big_data_url = info['big_data_url']
-        big_data_img_url = "https://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=401567106&idx=3&sn=04e0a33078fed2aaa430ca7c20d4a986&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=afXDbJQe2V9L4zegq2HDoIInqfZPdaDGd52Ml9I9dyXREnBCuI1lWuXmt%2B41znOQ"
-
 
         A_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gIdMuibjodyEeWdavoBO0uvAdfpMzaCNjfreoT4APezdbu6hasMTibTWxw/0?wx_fmt=jpeg"
         A_url = "http://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=206425012&idx=1&sn=8ee1a55847e4a94d8c8941a7d051e821&scene=1&srcid=1201B5VHp3R7TDdlsog0bxFT&key=ac89cba618d2d976324fb9d2339235db9d6008530c972dec224dc69f371b8a75a6be336e5e4f2da34cd417cdd2b77ca6&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=5%2BegJdyHvw97jvM495sqVRvpdvtQ4vl9QykfsV21yy2tgNbUcnPTyAjchjglUkg3"
@@ -409,10 +410,6 @@ class WeixinJoinView(View):
         if war:
             is_today_signin = True
         return is_today_signin
-
-
-
-
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -612,7 +609,6 @@ class WeixinJsapiConfig(APIView):
         return Response(data)
 
 
-
 class WeixinLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
@@ -621,6 +617,14 @@ class WeixinLoginAPI(APIView):
         return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
+        # add by ChenWeiBin@20160113
+        phone = request.POST.get('identifier', '')
+        profile = WanglibaoUserProfile.objects.filter(phone=phone, utype='3').first()
+        if profile:
+            return Response({
+                "code": u"企业用户请在PC端登录",
+            }, status=400)
+
         form = self._form(request)
 
         if form.is_valid():
@@ -1125,19 +1129,40 @@ class WeixinAccountSecurity(TemplateView):
     template_name = 'weixin_security.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_cards = Card.objects.filter(user__exact=self.request.user).count()
-        return {
-            'p2p_cards': p2p_cards,
-        }
+        is_one = ''
+        try:
+            p2p_cards = card_bind_list(self.request)['cards']
+            for card in p2p_cards:
+                if card['is_the_one_card']:
+                    is_one = True
+            if is_one:
+                card_count = 1
+            else:
+                card_count = len(p2p_cards)
+        except:
+            card_count = 0
 
+        return {
+            'p2p_cards': card_count,
+            'is_one': is_one
+        }
 
 class WeixinAccountBankCard(TemplateView):
     template_name = 'weixin_bankcard.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        is_one = ''
+        p2p_cards = ''
+        try:
+            p2p_cards = card_bind_list(self.request)['cards']
+            for card in p2p_cards:
+                if card['is_the_one_card']:
+                    is_one = True
+        except:
+            result = ''
         return {
             'p2p_cards': p2p_cards,
+            'is_one': is_one
         }
 
 

@@ -30,6 +30,11 @@ class ProfileView(APIView):
         profile = user.wanglibaouserprofile
 
         idn = profile.id_number
+        if idn and not idn[0].isdigit():
+            is_mainland_user = False 
+        else:
+            is_mainland_user = True 
+
         if len(idn) == 18:
             id_number = "%s********%s" % (idn[:6], idn[-4:])
         elif len(idn) == 15:
@@ -60,7 +65,8 @@ class ProfileView(APIView):
             "gesture_pwd": str_add_md5(str(profile.gesture_pwd)),
             "gesture_is_enabled": profile.gesture_is_enabled,
             "promo_token":user.promotiontoken.token,
-            'trade_pwd_is_set': trade_pwd_is_set(profile.user_id)
+            'trade_pwd_is_set': trade_pwd_is_set(profile.user_id),
+            'is_mainland_user': is_mainland_user,
         }
         return Response(dic)
         #serializer = ProfileSerializer(user.wanglibaouserprofile)

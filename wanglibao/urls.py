@@ -105,6 +105,7 @@ urlpatterns = patterns(
 
     url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
     url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),
+    url(r'^qiye/', include('wanglibao_qiye.urls')),
 )
 
 urlpatterns += patterns(

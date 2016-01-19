@@ -1,3 +1,11 @@
+.fix_wrap
+  width: 100%
+  height: 100%
+  background: #3a2741
+  position: fixed
+  left: 0
+  top: 0
+  z-index: 9999
 .body_wrap
   width: 100%
   .praise_wrap
@@ -7,8 +15,8 @@
       width: 100%
       display: block
       position: absolute
-      top: 0%
-      left: 0%
+      top: -1px
+      left: 0
       z-index: 1
     .i_want_reward
       width: 85.3%
@@ -65,24 +73,27 @@
         .footer_bg
           width: 100%
           display: block
-          position: fixed
+          //position: fixed
+          position: relative
           left: 0
           bottom: 0
           z-index: 2
-          @media screen and (max-height: 569px)
+          @media screen and (max-device-height: 481px)
             position: relative
+
         .footer_logo
-          position: fixed
+          //position: fixed
+          position: absolute
           bottom: 0.8rem
           left: 41.2%
           width: 17.6%
           display: block
           z-index: 3
-          @media screen and (max-height: 569px)
+          @media screen and (max-device-height: 481px)
             position: absolute
+            bottom: 0.8rem
   .invitation_page
     width: 100%
-    display: none
     .top_wrap
       width: 100%
       display: block
@@ -98,6 +109,11 @@
         left: 0
         top: 25%
         z-index: 2
+        border-radius: 50%
+        img
+          display: block
+          width: 100%
+          opacity: 0
       .worker
         width: 100%
         display: block
@@ -145,9 +161,54 @@
           color: #fcdc3d
           font-size: 0.9rem
           padding-left: 0.2rem
-        input
+        .input_wrap
+          position: relative
           width: 45.3%
           float: left
+          height: 2.75rem
+          @media screen and (max-device-width: 450px)
+            width: 58%
+          @media screen and (max-device-width: 415px)
+            width: 55%
+          @media screen and (max-device-width: 401px)
+            width: 53%
+          @media screen and (max-device-width: 385px)
+            width: 50%
+          @media screen and (max-device-width: 380px)
+            width: 45.3%
+          span.num_top
+            position: absolute
+            right: -0.25rem
+            bottom: 0.4rem
+            color: #02F0FA
+            font-size: 0.5rem
+            line-height: 0.7rem
+            display: none
+          span.float
+            position: absolute
+            left: 0.55rem
+            top: -0.125rem
+            color: #fcdc3d
+            font-size: 0.7rem
+            line-height: 1.125rem
+            width: 100%
+            text-align: center
+            opacity: 0
+            -webkit-transform: translateY(0)
+            transform: translateY(0)
+          .float_animate
+            -webkit-animation-name: float
+            animation-name: float
+            -webkit-animation-duration: 1s
+            animation-duration: 1s
+            -webkit-animation-timing-function: linear
+            animation-timing-function: linear
+            -webkit-animation-fill-mode: both
+            animation-fill-mode: both
+            -webkit-animation-iteration-count: 1
+            animation-iteration-count: 1
+        input
+          width: 100%
           color: #fcdc3d
           font-size: 0.9rem
           height: 2.25rem
@@ -163,28 +224,19 @@
           width: 1.6rem
           display: block
           float: right
-          margin: 0.7rem 3.3% 0 0
+          margin: 0.5rem 3.3% 0 0
         .renovate_rotate
-          -webkit-animation-name: rotate_ico
-          animation-name: rotate_ico
+          -webkit-animation-name: renovate_ico
+          animation-name: renovate_ico
+          -webkit-animation-duration: 2s
+          animation-duration: 2s
           -webkit-animation-timing-function: linear
           animation-timing-function: linear
           -webkit-animation-fill-mode: both
           animation-fill-mode: both
-        @keyframes rotate_ico
-          0%
-            transfrom: rotate(0deg)
-          50%
-            transform: rotate(180deg)
-          100%
-            transform: rotate(360deg)
-        @-webkit-keyframes rotate_ico
-          0%
-            -webkit-transfrom: rotate(0deg)
-          50%
-            -webkit-transform: rotate(180deg)
-          100%
-            -webkit-transform: rotate(360deg)
+          -webkit-animation-iteration-count: infinite
+          animation-iteration-count: infinite
+
     .praise_wrap
       clear: both
       width: 92%
@@ -204,6 +256,14 @@
           position: absolute
           left: 13%
           top: 0.65rem
+        span.num
+          position: absolute
+          left: 35%
+          top: 0
+          height: 2.75rem
+          line-height: 2.55rem
+          color: #f96ff1
+          font-size: 0.8rem
         .text
           position: absolute
           left: 61%
@@ -273,6 +333,7 @@
         img
           display: block
           width: 100%
+          border-raidus: 50%
       #mycarousel-next
         width: 0.9rem
         display: block
@@ -320,7 +381,7 @@
     left: 0
     top: 0
     z-index: 99
-    background: rgba(0,0,0,0.5)
+    background: rgba(0,0,0,0.6)
     display: none
     .share_text
       position: absolute
@@ -391,7 +452,7 @@
     z-index: 99
     width: 100%
     height: 100%
-    background: rgba(0,0,0,0.5)
+    background: rgba(0,0,0,0.6)
     display: none
     .bg
       width: 100%
@@ -427,25 +488,45 @@
   .friend_top
     position: fixed
     left: 0
-    top: 50%
+    top: 0
     z-index: 99
-    text-align: center
-    margin: -0.8rem 0 0 0
     width: 100%
     display: none
-    .text
-      padding: 1rem
-      background: #ccc
-      color: #483153
-      line-height: 1rem
-      font-size: 0.9rem
-      border-radius: 10px
-  .step_me
-    display: none
+    height: 100%
+    background: rgba(0,0,0,0.6)
+    .main
+      position: absolute
+      left: 0
+      top: 50%
+      width: 100%
+      margin: -3.2rem 0 0 0
+      text-align: center
+      .text
+        padding: 1rem
+        background: #ccc
+        color: #483153
+        line-height: 1.2rem
+        font-size: 0.9rem
+        border-radius: 10px
+        width: 85%
+        display: block
+        margin: 0 auto
+        position: relative
+        span
+          width: 100%
+          line-height: 1.2rem
+          font-size: 0.85rem
+          color: #483153
+        img
+          position: absolute
+          right: -0.6rem
+          top: -0.6rem
+          z-index: 100
+          width: 1.2rem
+          display: block
   .take_mine_reward
     width: 79.3%
     margin: 1rem auto
-    display: none
     .phone
       width: 100%
       height: 2.5rem
@@ -486,7 +567,8 @@
       height: 1rem
       line-height: 1rem
       font-size: 0.75rem
-    a
+    .rule
+      color: #02b4f6
       height: 1rem
       font-size: 0.75rem
       line-height: 1rem
@@ -499,21 +581,23 @@
   display: inline-block
   margin-left: 6%
   height: 2rem
-  @media screen and (max-width: 1025px)
+  @media screen and (max-device-width: 1025px)
     height: 5.83rem
-  @media screen and (max-width: 769px)
+  @media screen and (max-device-width: 769px)
     height: 5rem
-  @media screen and (max-width: 415px)
+  @media screen and (max-device-width: 450px)
     height: 2.45rem
-  @media screen and (max-width: 396px)
+  @media screen and (max-device-width: 415px)
+    height: 2.45rem
+  @media screen and (max-device-width: 396px)
     height: 2.3rem
-  @media screen and (max-width: 376px)
+  @media screen and (max-device-width: 376px)
     height: 2.16rem
-  @media screen and (max-width: 361px)
+  @media screen and (max-device-width: 361px)
     height: 2.05rem
-  @media screen and (max-width: 351px)
+  @media screen and (max-device-width: 351px)
     height: 1.95rem
-  @media screen and (max-width: 331px)
+  @media screen and (max-device-width: 331px)
     height: 1.8rem
 .user_wrap
   width: 100%
@@ -525,44 +609,295 @@
     height: 1.8rem
     float: left
     display: block
-    @media screen and (max-width: 1025px)
+    @media screen and (max-device-width: 1025px)
       width: 5.83rem
       height: 5.83rem
-    @media screen and (max-width: 769px)
+    @media screen and (max-device-width: 769px)
       width: 5rem
       height: 5rem
-    @media screen and (max-width: 415px)
+    @media screen and (max-device-width: 450px)
       width: 2.45rem
       height: 2.45rem
-    @media screen and (max-width: 396px)
+    @media screen and (max-device-width: 415px)
+      width: 2.45rem
+      height: 2.45rem
+    @media screen and (max-device-width: 396px)
       width: 2.3rem
       height: 2.3rem
-    @media screen and (max-width: 376px)
+    @media screen and (max-device-width: 376px)
       width: 2.16rem
       height: 2.16rem
-    @media screen and (max-width: 361px)
+    @media screen and (max-device-width: 361px)
       width: 2.05rem
       margin: 0 0.3rem 0
-    @media screen and (max-width: 351px)
+    @media screen and (max-device-width: 351px)
       width: 1.95rem
       margin: 0 0.3rem 0
-    @media screen and (max-width: 341px)
+    @media screen and (max-device-width: 341px)
       width: 1.95rem
       margin: 0 0.27rem 0
-    @media screen and (max-width: 331px)
+    @media screen and (max-device-width: 331px)
       width: 1.8rem
       margin: 0 0.27rem 0
     .user
       width: 100%
       display: block
+      border-radius: 50%
+@-webkit-keyframes renovate_ico
+  0%
+    -webkit-transfrom: rotate(0deg)
 
+  50%
+    -webkit-transform: rotate(180deg)
 
+  100%
+    -webkit-transform: rotate(360deg)
 
+@keyframes renovate_ico
+  0%
+    transfrom: rotate(0deg)
 
+  50%
+    transform: rotate(180deg)
 
+  100%
+    transform: rotate(360deg)
+@-webkit-keyframes float
+  0%
+    -webkit-transform: translateY(0)
+    opacity: 0
+  30%
+    opacity: 1
+  80%
+    opacity: 1
+  100%
+    -webkit-transform: translateY(-1rem)
+    opacity: 0
 
-
-
+@keyframes float
+  0%
+    transform: translateY(0)
+    opacity: 0
+  30%
+    opacity: 1
+  80%
+    opacity: 1
+  100%
+    transform: translateY(-1rem)
+    opacity: 0
+.jcarousel-skin-tango
+  display: none
+.share_info
+  position: fixed
+  left: 0
+  top: -100%
+  z-index: -2
+  font-size: 0.3rem
+.rule_wrap
+  position: fixed
+  left: 0
+  top: 0
+  z-index: 99
+  width: 100%
+  display: none
+  height: 100%
+  background: rgba(0,0,0,0.6)
+  .main
+    position: absolute
+    left: 0
+    top: 15%
+    width: 100%
+    height: 100%
+    .text
+      padding: 0.5rem
+      background: #ccc
+      color: #483153
+      line-height: 1.2rem
+      font-size: 0.9rem
+      border-radius: 10px
+      width: 85%
+      height: 70%
+      display: block
+      margin: 0 auto
+      position: relative
+      .text_wrap
+        overflow-y: auto
+        width: 100%
+        margin-top: 0.2rem
+        height: 100%
+        p.title
+          width: 100%
+          text-align: center
+          line-height: 1.2rem
+          font-size: 0.9rem
+          padding: 0.5rem 0
+        .info
+          width: 100%
+          font-size: 0.7rem
+          line-height: 0.9rem
+          dl
+            width: 100%
+            padding: 0.5rem
+            dt
+              font-size: 0.7rem
+              line-height: 0.9rem
+            dd
+              font-size: 0.7rem
+              line-height: 0.9rem
+    .close
+      position: absolute
+      right: 5%
+      top: -0.6rem
+      z-index: 100
+      width: 1.2rem
+      display: block
+      margin-left: 0.6rem
+.swiper-container
+  width: 80%
+  height: 3.5rem
+  display: block
+.swiper-container
+  margin: 0 auto
+  position: relative
+  overflow: hidden
+  z-index: 1
+.swiper-wrapper
+  position: relative
+  width: 100%
+  margin: 0 auto
+  display: block
+  height: 100%
+  z-index: 1
+  display: -webkit-box
+  display: -moz-box
+  display: -ms-flexbox
+  display: -webkit-flex
+  display: flex
+  -webkit-transition-property: -webkit-transform
+  -moz-transition-property: -moz-transform
+  -o-transition-property: -o-transform
+  -ms-transition-property: -ms-transform
+  transition-property: transform
+  -webkit-box-sizing: content-box
+  -moz-box-sizing: content-box
+  box-sizing: content-box
+.swiper-container-android .swiper-slide, .swiper-wrapper
+  -webkit-transform: translate3d(0,0,0)
+  -moz-transform: translate3d(0,0,0)
+  -o-transform: translate(0,0)
+  -ms-transform: translate3d(0,0,0)
+  transform: translate3d(0,0,0)
+.swiper-slide
+  -webkit-flex-shrink: 0
+  -ms-flex: 0 0 auto
+  flex-shrink: 0
+  width: 100%
+  height: 100%
+  position: relative
+.swiper-slide
+  text-align: center
+  font-size: 18px
+  background: none
+  height: 3.5rem
+  display: -webkit-box
+  display: -ms-flexbox
+  display: -webkit-flex
+  display: flex
+  -webkit-box-pack: center
+  -ms-flex-pack: center
+  -webkit-justify-content: center
+  justify-content: center
+  -webkit-box-align: center
+  -ms-flex-align: center
+  -webkit-align-items: center
+  align-items: center
+  position: relative
+.swiper-slide img
+  display: block
+  height: 2rem
+  position: absolute
+  top: 50%
+  left: 50%
+  margin: -1rem 0 0 -1rem
+  border-radius: 50%
+.swiper-button-next
+  position: absolute
+  top: 50%
+  right: 5%
+  display: block
+  height: 1rem
+  margin-top: -0.5rem
+  z-index: 10
+  cursor: pointer
+  width: auto
+  background-image: none
+.swiper-button-prev
+  position: absolute
+  top: 50%
+  left: 5%
+  display: block
+  height: 1rem
+  margin-top: -0.5rem
+  z-index: 10
+  cursor: pointer
+  width: auto
+  background-image: none
+.gundong
+  width: 100%
+  height: 3.5rem
+  position: relative
+  left: 0
+  top: 0
+.swiper-wrapper .friends_length
+  width: 16.6%
+.regist_button
+  width: 4rem
+  display: block
+  margin: 1rem auto 0
+  height: 1.5rem
+  font-size: 0.9rem
+  text-align: center
+  line-height: 1.5rem
+  background: #483153
+  color: #fff
+  border-radius: 1rem
+  display: none
+.apply_button
+  width: 9rem
+  display: block
+  margin: 1rem auto 0
+  height: 1.5rem
+  font-size: 0.9rem
+  text-align: center
+  line-height: 1.5rem
+  background: #483153
+  color: #fff
+  border-radius: 1rem
+  display: none
+.login_button
+  width: 4rem
+  display: block
+  margin: 1rem auto 0
+  height: 1.5rem
+  font-size: 0.9rem
+  text-align: center
+  line-height: 1.5rem
+  background: #483153
+  color: #fff
+  border-radius: 1rem
+  display: none
+.go_experience
+  width: 7rem
+  display: block
+  margin: 1rem auto 0
+  height: 1.5rem
+  font-size: 0.9rem
+  text-align: center
+  line-height: 1.5rem
+  background: #483153
+  color: #fff
+  border-radius: 1rem
+  display: none
 
 
 

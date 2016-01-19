@@ -3,6 +3,7 @@
 
 from django.conf.urls import patterns, include, url
 from rest_framework.routers import DefaultRouter
+from django.views.generic import TemplateView
 from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, AppDayListView, AppGuardView,
                                  AppGuideView, AppSecureView, AppExploreView, AppP2PProductViewSet, AppRecommendViewSet,
                                  SendValidationCodeView, AppIncomeRateAPIView, AppPhoneBookUploadAPIView,
@@ -10,7 +11,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppAboutView, AppManagementView, AppLogoutAPIView, AppQuestionsView,
                                  AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
                                  AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppAreaView,
-                                 AppAreaApiView, AppMemorabiliaView, AppDataModuleView)
+                                 AppAreaApiView, AppMemorabiliaView, AppDataModuleView, AppActivateScoreImageAPIView)
 
 router = DefaultRouter()
 
@@ -23,6 +24,7 @@ urlpatterns = patterns(
     '',
     url(r'', include(router.urls)),
     url(r'^preload/$', AppActivateImageAPIView.as_view()),
+    url(r'^preload_score/$', AppActivateScoreImageAPIView.as_view()),
     url(r'^repayment/$', AppRepaymentAPIView.as_view()),
     url(r'^repayment_plan/all/$', AppRepaymentPlanAllAPIView.as_view()),
     url(r'^repayment_plan/month/$', AppRepaymentPlanMonthAPIView.as_view()),
@@ -49,5 +51,6 @@ urlpatterns = patterns(
     url(r'^app_memorabilia/$', AppMemorabiliaView.as_view(), name='app_memorabilia'),
 
     url(r'^data_cube/$', AppDataModuleView.as_view()),#数据魔方
+    url(r'^finance/$', TemplateView.as_view(template_name="client_animate_finance.jade")),
 )
 

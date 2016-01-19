@@ -219,75 +219,302 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;(function(org) {
 
-	//alert($(window).width());
+	var url_search = window.location.search;
+	var searchArray = url_search.substring(1).split("&");
+	var wxid;
+	var uid;
+	for (var i = 0; i < searchArray.length; i++) {
+		var temp = searchArray[i].split('=');
+		if (temp[0] == 'wxid') {
+			wxid = temp[1] ? temp[1] : '';
+		}
+		if (temp[0] == 'uid') {
+			uid = temp[1] ? temp[1] : '';
+		}
+	}
 
-	/*滚动图*/
-	function mycarousel_initCallback(carousel) {
-		jQuery('.jcarousel-control a').bind('click', function() {
-			carousel.scroll(jQuery.jcarousel.intval(jQuery(this).text()));
-			return false;
-		});
-		jQuery('.jcarousel-scroll select').bind('change', function() {
-			carousel.options.scroll = jQuery.jcarousel.intval(this.options[this.selectedIndex].value);
-			return false;
-		});
-		jQuery('#mycarousel-next').bind('click', function() {
-			carousel.next();
-			return false;
-		});
-		jQuery('#mycarousel-prev').bind('click', function() {
-			carousel.prev();
-			return false;
-		});
+	$.ajax({
+		url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
+		type: "GET",
+	}).done(function (xhr) {
+		
+		if(xhr.err_code==0){
+
+			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+		}else{
+			//$('.friend_top span').text(xhr.err_messege);
+			//$('.friend_top').fadeIn();
+		}
+	});
+
+	window.onload = function() {
+		$('.fix_wrap').hide();
+		var user_num = $('.swiper-slide').length;
 	};
-	jQuery(document).ready(function() {
-		jQuery("#mycarousel").jcarousel({
-		wrap: 'circular',
-		scroll: 1,
-		initCallback: mycarousel_initCallback,
-		buttonNextHTML: null,
-		buttonPrevHTML: null
-		});
-	})
-	/*滚动图结束*/
 
-
-	//$.ajax({
-	//	url: 'weixin_activity/weixin/bonus/?uid=',
-	//	type: "POST",
-	//	data: {
-	//		//action : 'AWARD_DONE'
-	//	}
-	//}).done(function (xhr) {
-	//
-	//});
-
-	$('#get_phone').val();
-	//得到手机号
+	var h5_user_static;
+    org.ajax({
+        url: '/api/user_login/',
+        type: 'post',
+        success: function(data1) {
+            h5_user_static = data1.login;
+        }
+    });
 
 	var is_myself = false;
 
-	$('#go_receive').click(function(){
-		$('.praise_wrap').hide();
-		$('.invitation_page').show();
-		if(is_myself){
-			$('.take_mine_reward').show();
-
-		}else{
-			$('.step_me').show();
-		}
-	});
-	//去领取按钮
-
+	/*分享*/
 	$('.share_button').click(function(){
 		$('.share_wrap').show();
 	});
 	$('.share_wrap').click(function(){
 		$(this).hide();
 	});
+	/*结束分享*/
 
+	/*刷新数据*/
 	$('.renovate').click(function(){
-		$(this).addClass('')
+		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		$(this).addClass('renovate_rotate');
+		$.ajax({
+			url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
+			type: "GET",
+		}).done(function (xhr) {
+			if(xhr.err_code==0){
+				$('.renovate').removeClass('renovate_rotate');
+				$('#praise_num').val(xhr.wx_user.annual_bonus);
+				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+				$('#zan_num').text(xhr.wx_user.good_vote);
+				$('#cha_num').text(xhr.wx_user.bad_vote);
+			}else{
+				$('.renovate').removeClass('renovate_rotate');
+				$('.friend_top span').text(xhr.err_messege);
+				$('.friend_top').fadeIn();
+			}
+		});
+	})
+	/*刷新数据结束*/
+
+	/*刷新朋友圈*/
+	function renovate_friends(friends_length,friends_img,is_max,annual_bonus){
+
+		var str='';
+		var follow_one='';
+		for(var i=0; i<friends_length; i++){
+			follow_one = friends_img[i];
+			str +='<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>'
+		}
+
+		var swiper = new Swiper('.swiper-container', {
+			initialSlide : 0,
+			slidesPerView: 6,
+			nextButton: '.swiper-button-next',
+			prevButton: '.swiper-button-prev',
+			loop: false
+		});
+		swiper.removeAllSlides();
+		swiper.appendSlide(str);
+		swiper.update();
+		swiper.slideTo(0, 100, false);
+		if(is_max){
+			$('.num_top').show();
+		}
+		$('#praise_num').val(annual_bonus);
+
+
+	}
+	/*刷新朋友圈结束*/
+	/*同意活动规则按钮*/
+	$('.checkbox').click(function(){
+		if($(this).hasClass('checkbox_select')){
+			$(this).removeClass('checkbox_select');
+		}else{
+			$(this).addClass('checkbox_select');
+		}
+	});
+	/*同意活动规则按钮结束*/
+
+	/*邀请好友弹窗关闭*/
+	$('.share_wrap .close').click(function(){
+		$('.share_wrap').hide();
+	});
+	/*邀请好友弹窗关闭结束*/
+
+	var praise_num = $('#praise_num').val();
+	/*投票*/
+	$('.praise_left').click(function(){
+		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+			$.ajax({
+				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
+				type: "GET",
+			}).done(function (xhr) {
+				if(xhr.err_code==0){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+					$('#praise_num').val(xhr.wx_user.annual_bonus);
+					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+					$('#zan_num').text(xhr.wx_user.good_vote);
+				}else{
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+				}
+			});
+	});
+
+	$('.praise_right').click(function(){
+		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		$.ajax({
+			url: '/weixin_activity/weixin/bonus/?act=vote&type=0&uid='+uid+'&wxid='+wxid,
+			type: "GET",
+		}).done(function (xhr) {
+			if(xhr.err_code==0){
+				$('.friend_top span').text(xhr.err_messege);
+				$('.friend_top').fadeIn();
+				$('#praise_num').val(xhr.wx_user.annual_bonus);
+				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+				$('#cha_num').text(xhr.wx_user.bad_vote);
+			}else{
+				$('.friend_top span').text(xhr.err_messege);
+				$('.friend_top').fadeIn();
+			}
+		});
+	});
+	/*投票结束*/
+
+	/*申请我的年终奖*/
+	var phone_number;
+	$('.take_mine_button').click(function(){
+		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		phone_number = $('#phone_number').val();
+		if($('.checkbox').hasClass('checkbox_select')){
+			$.ajax({
+				url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_number+'&wxid='+wxid,
+				type: "GET",
+			}).done(function (xhr) {
+				if(xhr.err_code==0){
+					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
+				}else if(xhr.err_code==205){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+					$('.apply_button').show();
+				}else{
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+				}
+			});
+		}else{
+			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
+			$('.friend_top').fadeIn();
+		}
+	});
+	/*申请我的年终奖结束*/
+
+	var shareName = $('.share_name').text(),
+		shareImg = $('.share_img').text(),
+		shareLink = $('.share_link').text(),
+		shareMainTit = $('.share_title').text(),
+		shareBody = $('.share_body').text(),
+		user_info = $('.user_info').text();
+		share_friends = $('.share_all').text();
+
+
+
+	if(user_info=='True'){
+		$('.friend_top span').text('您已注册成功，请点击<立即使用>领用您的年终奖了');
+		$('.friend_top').show();
+	}else{
+		if(uid!=undefined){
+			$('.shine_wrap').show();
+		}
+	}
+
+	/*倒数3秒跳转体验金页面*/
+	var go_experiencez_time = 3;
+	function go_experience(){
+		go_experiencez_time -= 1;
+		if(go_experiencez_time==0){
+			clearTimeout();
+			if(h5_user_static){
+				window.location.href = '/activity/experience/account/'
+			}else{
+				window.location.href = '/weixin/login/?next=/activity/experience/account/'
+			}
+
+		}
+		setTimeout("go_experience()",1000);
+	}
+	/*倒数3秒跳转体验金页面结束*/
+
+	/*领取我的年终奖*/
+	$('.now_use').click(function(){
+		$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+		if($('.checkbox').hasClass('checkbox_select')){
+			$.ajax({
+				url: '/weixin_activity/weixin/bonus/?act=pay&wxid='+wxid,
+				type: "GET",
+			}).done(function (xhr) {
+				if(xhr.err_code==0){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').show();
+					$('.friend_top .close').hide();
+					if(h5_user_static){
+						$('.go_experience').show();
+					}else{
+						$('.login_button').show();
+					}
+					//go_experience();
+					//倒数3秒跳转到体验金页面
+
+				}else if(xhr.err_code==404){
+					$('.regist_button').show().css('display','block');
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+				}else{
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+				}
+			});
+		}else{
+			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
+			$('.friend_top').fadeIn();
+		}
+	});
+
+	/*领取我的年终奖结束*/
+
+	$('.regist_button,.apply_button,.login_button,.go_experience').hide();
+	$('.regist_button').click(function(){
+		window.location.href = '/weixin/regist/?next=/weixin_activity/weixin/bonus/from_regist/&promo_token=h5dianzan';
+	});
+
+	$('.apply_button').click(function(){
+		window.location.href = '/weixin_activity/weixin/bonus/';
+	});
+
+
+
+	$('.login_button').click(function(){
+		window.location.href = '/weixin/login/?next=/activity/experience/account/';
+	});
+
+
+	$('.go_experience').click(function(){
+		window.location.href = '/activity/experience/account/';
+	})
+
+	$('.friend_top .close').click(function(){
+		$('.friend_top').hide();
+	});
+
+	$('.shine_wrap .close').click(function(){
+		$('.shine_wrap').hide();
+	});
+
+	$('.rule').click(function(){
+		$('.rule_wrap').show();
+	});
+	$('.rule_wrap .close').click(function(){
+		$('.rule_wrap').hide();
 	});
 
 
@@ -309,12 +536,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
-			shareName = '双旦来了，翻倍狂欢',
-			shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
-			shareLink = host + '/activity/app_praise_reward/',
-			shareMainTit = '双旦来了，翻倍狂欢',
-			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -324,7 +545,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '双旦来了，翻倍狂欢',
+			title: share_friends,
 			link : shareLink,
 			imgUrl: shareImg
 		})

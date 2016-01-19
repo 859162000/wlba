@@ -25,21 +25,26 @@ def experience_repayment_plan():
     now = datetime.now()
     # start = local_to_utc(datetime(now.year, now.month, now.day - 1, 17, 0, 0), 'normal')
     end = local_to_utc(datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
-    amortizations = ExperienceAmortization.objects.filter(settled=False).filter(term_date__lt=end)
-    for amo in amortizations:
+    with transaction.atomic():
+        amortizations = ExperienceAmortization.objects.filter(settled=False).filter(term_date__lt=end).select_for_update()
+        for amo in amortizations:
 
-        try:
-            amo.settled = True
-            amo.settlement_time = timezone.now()
-            amo.save()
+            try:
+                amo.settled = True
+                amo.settlement_time = timezone.now()
+                amo.save()
 
-            if amo.interest > 0:
-                # 体验金利息计入用户账户余额
-                with transaction.atomic():
+                if amo.interest > 0:
+                    # 体验金利息计入用户账户余额
                     description = u"体验金利息入账:%s元" % amo.interest
                     user_margin_keeper = MarginKeeper(amo.user)
                     user_margin_keeper.deposit(amo.interest, description=description, catalog=u"体验金利息入账")
 
-        except Exception, e:
-            logger.error(u"experience repayment error, amortization id : %s , message: %s" % (amo.id, e.message))
+            # 发站内信
+            # TODO 等待短信通道切换后再加
 
+            except Exception, e:
+                logger.error(u"experience repayment error, amortization id : %s , message: %s" % (amo.id, e.message))
+
+        # 发短信
+        # TODO 等待短信通道切换后再加

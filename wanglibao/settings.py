@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
+    'wanglibao_qiye', #add by wangxiaoqing
     'report',
     'misc',
 
@@ -136,6 +137,7 @@ INSTALLED_APPS = (
     'wanglibao_lottery',
     'daterange_filter',
     'experience_gold',
+    'wanglibao_qiye',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -688,7 +690,7 @@ CELERYBEAT_SCHEDULE = {
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
         'task': 'experience_gold.tasks.experience_repayment_plan',
-        'schedule': timedelta(minutes=5),
+        'schedule': crontab(minute=0, hour=17),
     },
     # 定期检查还有3天到期的用户优惠券,发送提醒
     'redpack_status_task_check': {
@@ -888,6 +890,11 @@ KUAI_PAY_TR3_SIGNATURE = ''
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
+
+# 汇讯群呼语音验证码(快易通)
+VOICE_HX_URL = 'http://i.huixun35.com/sdk/SMS'
+VOICE_HX_UID = '52361'
+VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
 
 # Modify by hb on 2015-11-25 for new id-verify-channel
 #ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
@@ -1146,6 +1153,7 @@ XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
 
 # 脉脉
 WLB_FOR_MAIMAI1_KEY = '2004'

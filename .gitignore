@@ -15,5 +15,3 @@ env/
 .sass-cache
 static/node_modules/
 deploy/local_*.py
-api_list
-api_access

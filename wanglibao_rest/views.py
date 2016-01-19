@@ -64,6 +64,7 @@ from weixin.models import WeixinUser
 from weixin.util import bindUser
 from wanglibao_account.utils import Crypto
 from wanglibao.views import landpage_view
+import urllib
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -314,8 +315,7 @@ class RegisterAPIView(DecryptParmsAPIView):
             # set_promo_user(request, user, invitecode=invite_code)
             # save_to_binding(user, request)
 
-        if device['device_type'] == "pc" or request.GET.get('promo_token') == 'wrp':
-            logger.debug(u'用户注册完后，开始登录：promo_token:%s, phone:%s' % (request.GET.get('promo_token'), identifier))
+        if device['device_type'] == "pc":
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
@@ -489,6 +489,10 @@ class IdValidateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({"ret_code": 30056, "message": u"企业用户无法通过此方式认证"})
+
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
         device = split_ua(request)
@@ -537,6 +541,9 @@ class IdValidateAPIView(APIView):
 
 
 class SendVoiceCodeAPIView(APIView):
+    """
+    汇讯群呼(快易通)语音短信验证码接口
+    """
     permission_classes = ()
 
     def post(self, request):
@@ -546,6 +553,14 @@ class SendVoiceCodeAPIView(APIView):
 
         if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
             return Response({"ret_code": 30112, "message": u"手机号输入有误"})
+
+        # 验证图片验证码
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({"ret_code": 30114, "message": message})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
         if phone_validate_code_item:
@@ -566,9 +581,11 @@ class SendVoiceCodeAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
-        logger.info("voice_code: %s" % cont)
-        return Response({"ret_code": 0, "message": "ok"})
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
+        return Response({"ret_code": res_code, "message": res_text})
 
 
 class SendVoiceCodeTwoAPIView(APIView):
@@ -817,6 +834,12 @@ class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
 
         form = IdVerificationForm(request, request.POST)
         # 黑客程序就成功
@@ -840,8 +863,8 @@ class IdValidate(APIView):
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
-            name = form.cleaned_data['name']
-            id_number = form.cleaned_data['id_number']
+            name = form.cleaned_data['name'].strip()
+            id_number = form.cleaned_data['id_number'].strip()
 
             verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
@@ -894,10 +917,16 @@ class AdminIdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
+
         phone = request.DATA.get("phone", "")
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
-
         verify_record, error = verify_id(name, id_number)
 
         if error:
@@ -927,6 +956,11 @@ class LoginAPIView(DecryptParmsAPIView):
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+
+        # add by ChenWeiBin@20160113
+        profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
+        if profile:
+            return Response({"token": "false", "message": u"企业用户请在PC端登录"}, status=400)
 
         user = authenticate(identifier=identifier, password=password)
 
@@ -1758,3 +1792,39 @@ class LandOpenApi(APIView):
 
     def post(self, request):
         return landpage_view(request)
+
+
+class CoopPvApi(APIView):
+
+    permission_classes = ()
+
+    def get(self, request, channel_code):
+        if channel_code == 'xunlei9':
+            req_data = self.request.GET
+            source = req_data.get('source', None)
+            ext = req_data.get('ext', None)
+            ext2 = req_data.get('ext2', None)
+            if source and ext and ext2:
+                coop_pv_url = settings.XUNLEI9_PV_URL
+                data = {
+                    'source': source,
+                    'ext': ext,
+                    'ext2': ext2,
+                }
+                data = urllib.urlencode(data)
+                res = requests.get(url=coop_pv_url, params=data)
+                res_status_code = res.status_code
+                if res_status_code != 200:
+                    logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
+                else:
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'ok',
+                    }
+                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+        response_data = {
+            'ret_code': 50001,
+            'message': 'failed',
+        }
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')

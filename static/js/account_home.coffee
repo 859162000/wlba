@@ -9,7 +9,7 @@ require.config(
 
 require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
-         'model/portfolio', 'tools', 'lib/jquery.number.min',
+         'model/portfolio', 'tools',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
 
   $('.more_btn').click () ->
@@ -30,11 +30,26 @@ require ['jquery', 'underscore', 'knockout',
       $('#success').modal()
       $('#success').find('.close-modal').hide()
       setInterval( ->
-          $.modal.close()
-          location.reload()
+        $.modal.close()
+        location.reload()
       ,2000)
     .fail (data)->
       console.log(1111)
+
+
+  #  判断是否是企业用户
+  $.ajax
+    url: "/qiye/profile/get/"
+    type: "GET"
+    data: {}
+  .fail (data) ->
+    result = JSON.parse(data.responseText);
+    if result.ret_code == 20001
+      $('#tyjzq').show()
+  .success (data) ->
+    $('#tyjzq').hide()
+    if data.ret_code == 10000
+      $('#qiyeUser i').text(data.data.company_name)
 
   class DataViewModel
     constructor: ->
@@ -100,6 +115,22 @@ require ['jquery', 'underscore', 'knockout',
 
   viewModel = new DataViewModel()
   ko.applyBindings viewModel
+
+  ###  backend.fundInfo()
+  .done (data)->
+    totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"])
+    $("#total_asset").text($.number(totalAsset, 2))
+    $("#fund_total_asset").text($.number(data["fund_total_asset"], 2))
+    $("#fund_total_asset_title").text($.number(data["fund_total_asset"], 2))
+    $("#total_income").text($.number(data["total_income"], 2))
+    $("#fund_income_week").text($.number(data["fund_income_week"], 2))
+    $("#fund_income_month").text($.number(data["fund_income_month"], 2))
+    return
+  .fail (data)->
+    tool.modalAlert({title: '温馨提示', msg: '基金获取失败，请刷新重试！', callback_ok: ()->
+              location.reload()
+          })
+    return###
 
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()

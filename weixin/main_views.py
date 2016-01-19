@@ -26,6 +26,7 @@ from wanglibao_rest import utils
 from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL
 from wanglibao_pay.models import Bank
+from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger("weixin")
 
@@ -94,6 +95,15 @@ class WXLoginAPI(APIView):
     def post(self, request):
         form = self._form(request)
         data = {}
+
+        # add by ChenWeiBin@20160113
+        phone = request.POST.get('identifier', '')
+        profile = WanglibaoUserProfile.objects.filter(phone=phone, utype='3').first()
+        if profile:
+            return Response({'re_code': -1,
+                             'errmessage': u'企业用户请在PC端登录'
+                             }, status=400)
+
         if form.is_valid():
             user = form.get_user()
             try:
