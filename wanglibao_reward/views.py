@@ -1608,7 +1608,7 @@ class WeixinAnnualBonusView(TemplateView):
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             if wx_bonus.is_pay:
-                rep = { 'err_code':403, 'err_messege':u'您已经领取过了，年终奖已存入网利宝账户：%s 中，点击按钮立即查看'%wx_bonus.phone }
+                rep = { 'err_code':403, 'err_messege':u'您已经领取过了，年终奖已存入网利宝账户<br>登录账户%s，赚取收益吧'%wx_bonus.phone }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册
@@ -1640,7 +1640,7 @@ class WeixinAnnualBonusView(TemplateView):
 
             wx_bonus_json = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-            rep = { 'err_code':0, 'err_messege':u'年终奖已存入网利宝账户：%s 中，登录后才可以使用哦'%wx_bonus.phone, 'wx_user':wx_bonus_json, }
+            rep = { 'err_code':0, 'err_messege':u'恭喜通过年终考核<br>登录账户%s，赚取收益吧'%wx_bonus.phone, 'wx_user':wx_bonus_json, }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def query_bonus(self):
