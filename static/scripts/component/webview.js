@@ -96,6 +96,15 @@ var wlb = (function () {
             });
         },
         /**
+         * 跳到发现页
+         * @param callback
+         */
+        jumpToDiscoverView: function (callback) {
+            this.bridge.callHandler('jumpToDiscoverView', function (response) {
+                callback && callback(response)
+            });
+        },
+        /**
          * 判断是否登陆
          * 目前该接口有问题，暂不使用，用senduserinfo先替代
          * @param data  可不传
@@ -110,7 +119,7 @@ var wlb = (function () {
         },
         /**
          * 获取分享信息
-         * @param data {title: 活动标题, content: 活动描述}
+         * @param data {title: 活动标题, content: 活动描述, shareUrl:'指定分享的url'}
          */
         shareData: function (data) {
             this.bridge.registerHandler('shareData', function (backdata, responseCallback) {
