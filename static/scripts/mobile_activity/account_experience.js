@@ -258,67 +258,71 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         alert : lib._alert
     }
 })();
-var h5_user_static;
-org.ajax({
-    url: '/api/user_login/',
-    type: 'post',
-    success: function(data1) {
-        h5_user_static = data1.login;
-    }
-});
 var login = false;
 wlb.ready({
     app: function (mixins) {
+        function connect(data) {
+            org.ajax({
+                url: '/accounts/token/login/ajax/',
+                type: 'post',
+                data: {
+                    token: data.tk,
+                    secret_key: data.secretToken,
+                    ts: data.ts
+                },
+                success: function (data) {
+                    org.experience.init()
+                }
+            })
+        }
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
+                mixins.registerApp({refresh:1, url:''});
             } else {
                 login = true;
-                initFun();
+                connect(data)
             }
         })
     },
     other: function(){
-        initFun();
+        org.experience.init()
     }
 })
-function initFun() {
-    org.experience = (function (org) {
-        var lib = {
-            init: function () {
-                lib._goInvest()
-            },
-            _goInvest: function () {
-                /*投资*/
-                $('.accountInvestBtn').on('click', function () {
-                    org.ajax({
-                        url: '/api/experience/buy/',
-                        type: 'POST',
-                        data: {},
-                        success: function (data) {
-                            if (data.ret_code > 0) {
-                                org.ui.alert(data.message, '', '4')
-                            } else {
-                                org.ui.alert('', '', '2')
-                                setTimeout(function () {
-                                    $('#alert-cont,#popubMask').hide();
-                                    location.reload();
-                                }, 2000)
-                            }
-                        },
-                        error: function (data) {
+org.experience = (function (org) {
+    var lib = {
+        init: function () {
+            lib._goInvest()
+        },
+        _goInvest: function () {
+            /*投资*/
+            $('.accountInvestBtn').on('click', function () {
+                org.ajax({
+                    url: '/api/experience/buy/',
+                    type: 'POST',
+                    data: {},
+                    success: function (data) {
+                        if (data.ret_code > 0) {
                             org.ui.alert(data.message, '', '4')
+                        } else {
+                            org.ui.alert('', '', '2')
+                            setTimeout(function () {
+                                $('#alert-cont,#popubMask').hide();
+                                location.reload();
+                            }, 2000)
                         }
-                    });
-                })
-            }
+                    },
+                    error: function (data) {
+                        org.ui.alert(data.message, '', '4')
+                    }
+                });
+            })
         }
-        return {
-            init: lib.init
-        }
-    })(org);
-}
+    }
+    return {
+        init: lib.init
+    }
+})(org);
 $.each($('script'), function(){
     var src = $(this).attr('src');
     if(src){

@@ -1456,8 +1456,8 @@ class WeixinAnnualBonusView(TemplateView):
                         'share_name':u'您的好友邀请您参加分享领取年终奖活动',
                         'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                         'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
-                        'share_title':u'您的好友邀请您参加分享领取年终奖活动',
-                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！',
+                        'share_title':u'分享集赞拿年终奖',
+                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，集赞越多，奖金越高',
                         'share_all': u'分享集赞拿年终奖，集赞越多，奖金越高！',
                         }
             else:
@@ -1614,7 +1614,7 @@ class WeixinAnnualBonusView(TemplateView):
             # 如果用户未注册，引导用户前去注册
             user_profile = WanglibaoUserProfile.objects.filter(phone=wx_bonus.phone).first()
             if not user_profile:
-                rep = { 'err_code':404, 'err_messege':u'请使用手机号%s注册后再领取'%wx_bonus.phone }
+                rep = { 'err_code':404, 'err_messege':u'恭喜通过年终考核<br>注册账户%s，赚取收益吧'%wx_bonus.phone }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 以体验金形式发放年终奖

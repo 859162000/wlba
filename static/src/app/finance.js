@@ -86,6 +86,7 @@ org.finance = (function (org) {
                         $('.tz_ranking_percent').text(account.tz_ranking_percent)
                         $('.income_total').text('￥'+ account.income_total)
                         //page2
+                        $('.user-name').text('亲爱的'+ account.user_name)
                         $('.tz_times').text(account.tz_times)
                         $('.tz_avg_times').text(account.tz_avg_time)
                         $('.tz_max_amount').text(account.tz_max_amount)
