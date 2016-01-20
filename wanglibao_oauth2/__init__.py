@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
 from django.core.exceptions import ObjectDoesNotExist
-from . import constants
+import constants
 from .utils import now
 from .forms import RefreshTokenGrantForm
 from .forms import UserAuthForm
