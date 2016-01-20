@@ -1337,12 +1337,20 @@ class WeixinAnnualBonusView(TemplateView):
                         'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
                         'share_title':u'您的好友邀请您参加分享领取年终奖活动',
                         'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！',
+                        'share_all': u'分享集赞拿年终奖，集赞越多，奖金越高！',
                         }
             else:
                 self.template_name = 'app_praise_reward.jade'
                 return { 'err_code':103, 'err_messege':u'异常请求', 'is_myself':self.is_myself,  }
 
     def apply_bonus(self):
+        # Add by hb on 2015-01-19
+        wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
+        if wx_bonus:
+            wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
+            rep = { 'err_code':205, 'err_messege':u'您已经申请过年终奖了', 'wx_user':wx_bonus, }
+            return HttpResponse(json.dumps(rep), content_type='application/json')
+
         phone = self.request.GET.get('phone')
         #TODO: 手机号码有效性检查
         isMobilePhone = False
@@ -1479,7 +1487,7 @@ class WeixinAnnualBonusView(TemplateView):
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             if wx_bonus.is_pay:
-                rep = { 'err_code':403, 'err_messege':u'您已经领取过了' }
+                rep = { 'err_code':403, 'err_messege':u'您已经领取过了<br>登录账户%s，赚取收益吧'%wx_bonus.phone }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册
@@ -1511,7 +1519,7 @@ class WeixinAnnualBonusView(TemplateView):
 
             wx_bonus_json = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-            rep = { 'err_code':0, 'err_messege':u'年终奖已存入网利宝账户：%s 中，登录后才可以使用哦'%wx_bonus.phone, 'wx_user':wx_bonus_json, }
+            rep = { 'err_code':0, 'err_messege':u'恭喜通过年终考核<br>登录账户%s，赚取收益吧'%wx_bonus.phone, 'wx_user':wx_bonus_json, }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def query_bonus(self):
