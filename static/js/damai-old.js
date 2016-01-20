@@ -133,10 +133,10 @@
 
         window.jwplayer = $.extend(jwplayer, {'key': "F4UVreRdsAfmJwi9PjMJ8FXZOeG7ox0PN4l/Ig=="});
         if (navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") == -1) {
-            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8" >';
+            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://pl.youku.com/playlist/m3u8?vid=347298192&type=mp4&ts=1453270222&keyframe=0&ep=dyaRGUuKVswC5yLXjD8bMX20ISUIXP0O8R2MidNrAtQmTeq7&sid=545327022218412fafeb7&token=2524&ctype=12&ev=1&oip=3550324874" >';
             $('#player').append(str);
         } else if (!IsPC()) {
-            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://damai.hlslive.ks-cdn.com/live/hd_1/index.m3u8">';
+            var str = '<video  autoplay webkit-playsinline controls id="video" src="http://pl.youku.com/playlist/m3u8?vid=347298192&type=mp4&ts=1453270222&keyframe=0&ep=dyaRGUuKVswC5yLXjD8bMX20ISUIXP0O8R2MidNrAtQmTeq7&sid=545327022218412fafeb7&token=2524&ctype=12&ev=1&oip=3550324874">';
             $('#player').append(str);
         } else {
             var fls = flashChecker();
@@ -149,7 +149,7 @@
             var playerInstance = jwplayer('canver');
             playerInstance.setup({
                 autostart: true,
-                file: "rtmp://damai.live.ks-cdn.com/live/hd_1",
+                file: "http://pl.youku.com/playlist/m3u8?vid=347298192&type=mp4&ts=1453270222&keyframe=0&ep=dyaRGUuKVswC5yLXjD8bMX20ISUIXP0O8R2MidNrAtQmTeq7&sid=545327022218412fafeb7&token=2524&ctype=12&ev=1&oip=3550324874",
                 width: '100%',
                 height: '100%',
                 primary: "flash",
