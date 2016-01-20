@@ -11,6 +11,13 @@ html(style="background:#efeff4")
             (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
         link(href="/static/styles/app/webview.css?v=2016011501", rel="stylesheet")
         body
+            .client-login-alert
+              .login-alert-warp
+                .login-alert-body
+                  .login--alert-head
+                    img(src='/static/imgs/app/finance/sleep_lion.png')
+                    .alert-head-aue 你还没有登录哦，登录获取更多资讯吧
+                  .login--alert-opeartion 我知道了
             .account
                 .account_top
                     .asset_content
