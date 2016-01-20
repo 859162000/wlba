@@ -14,7 +14,8 @@
             {"qVal": "上签","title":"吉祥","detail":"梅花数点 泽如时雨 吉人天相"},
             {"qVal": "上上签 ","title":"福聚","detail":"日转千阶 洞房花烛<br />久旱逢雨 他乡故知"},
         ];
-        var inx = parseInt(Math.random()*7);
+        var inx = parseInt(Math.random()*6);
+
         //console.log(inx,val[inx].qVal,val[inx].title, val[inx].detail.replace("<br />"," "));
 
         jqDom.find("div.top").text(val[inx].qVal);//签
@@ -44,7 +45,7 @@
         return isRight;
     }
     function weixin_share(shareTit,fn){
-        alert(shareTit);
+        //alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
         var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
         org.ajax({
@@ -129,7 +130,7 @@
             $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
             return false;
         }
-        $.ajax({
+        org.ajax({
             type: "GET",
             url: '/api/user_exists/'+tel,
             dataType: 'json',
