@@ -2,6 +2,7 @@
     var jqDom = $("div.mammon-jq");
     var page2 = $("div.mammon-page2");
     function shareBack(){
+        alert(1);
         $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
         page2.show();
     }
@@ -107,8 +108,6 @@
             })
         })
     }
-
-    weixin_share();
 
     getVal();
 
