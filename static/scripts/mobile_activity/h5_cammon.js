@@ -295,7 +295,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    alert("分享成功");
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             });
             //分享给微信朋友圈
@@ -304,7 +307,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             });
             //分享给QQ
@@ -314,7 +319,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             })
         })

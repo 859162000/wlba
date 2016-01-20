@@ -76,7 +76,10 @@
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    alert("分享成功");
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             });
             //分享给微信朋友圈
@@ -85,7 +88,9 @@
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             });
             //分享给QQ
@@ -95,7 +100,9 @@
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             })
         })
