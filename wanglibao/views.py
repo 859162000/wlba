@@ -5,7 +5,7 @@ from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, TimelySiteData
-from marketing.utils import pc_data_generator
+from marketing.utils import pc_data_generator, utype_is_mobile
 from misc.views import MiscRecommendProduction
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_p2p.models import P2PProduct, P2PRecord
@@ -21,7 +21,6 @@ import logging
 from weixin.base import ChannelBaseTemplate
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_rest.utils import has_register_for_phone
-from .utils import utype_is_mobile
 import json
 
 logger = logging.getLogger(__name__)
