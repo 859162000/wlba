@@ -1614,7 +1614,7 @@ class WeixinAnnualBonusView(TemplateView):
             # 如果用户未注册，引导用户前去注册
             user_profile = WanglibaoUserProfile.objects.filter(phone=wx_bonus.phone).first()
             if not user_profile:
-                rep = { 'err_code':404, 'err_messege':u'请使用手机号%s注册后再领取'%wx_bonus.phone }
+                rep = { 'err_code':404, 'err_messege':u'恭喜通过年终考核<br>注册账户%s，赚取收益吧'%wx_bonus.phone }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 以体验金形式发放年终奖
