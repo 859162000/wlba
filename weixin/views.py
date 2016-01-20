@@ -273,7 +273,6 @@ class WeixinJoinView(View):
                     _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
                     seg = SendExperienceGold(w_user.user)
                     experience_event = self.getSignExperience_gold()
-                    raise Exception()
                     if experience_event:
                         seg.send(experience_event.id)
                         txt = u"恭喜您，签到成功！\n" \
