@@ -15,7 +15,7 @@
             {"qVal": "上上签 ","title":"福聚","detail":"日转千阶 洞房花烛<br />久旱逢雨 他乡故知"},
         ];
         var inx = parseInt(Math.random()*7);
-        console.log(inx,val[inx].qVal,val[inx].title);
+        console.log(inx,val[inx].qVal,val[inx].title, val[inx].detail.replace("<br />"," "));
 
         jqDom.find("div.top").text(val[inx].qVal);//签
         jqDom.find("div.bottom").text(val[inx].title);
@@ -44,6 +44,7 @@
         return isRight;
     }
     function weixin_share(shareTit,fn){
+        alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
         var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
         org.ajax({
@@ -99,6 +100,7 @@
             })
         })
     }
+
     weixin_share();
 
     getVal();
