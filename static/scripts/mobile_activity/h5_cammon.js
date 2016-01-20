@@ -351,7 +351,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $.ajax({
             type: "GET",
             url: '/api/user_exists/'+tel,
-            dataType: '',
+            dataType: 'json',
             success: function(data){
                 if(data.existing){
                     tp.hide();

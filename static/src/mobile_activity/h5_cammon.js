@@ -132,7 +132,7 @@
         $.ajax({
             type: "GET",
             url: '/api/user_exists/'+tel,
-            dataType: '',
+            dataType: 'json',
             success: function(data){
                 if(data.existing){
                     tp.hide();
