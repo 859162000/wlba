@@ -136,6 +136,7 @@ INSTALLED_APPS = (
     'wanglibao_lottery',
     'daterange_filter',
     'experience_gold',
+    'wanglibao_qiye',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -807,8 +808,8 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
-    CALLBACK_HOST = 'https://feature1.wanglibao.com'
-    STATIC_FILE_HOST = 'https://feature1.wanglibao.com'
+    CALLBACK_HOST = 'https://staging.wanglibao.com'
+    STATIC_FILE_HOST = 'https://staging.wanglibao.com'
     # MER_ID = '510743'
     # CUSTOM_ID = '000010124821'
     # huifu id 改为和生产相同
@@ -1140,6 +1141,7 @@ XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
 
 # 脉脉
 WLB_FOR_MAIMAI1_KEY = '2004'
