@@ -288,7 +288,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
 				$('.renovate').removeClass('renovate_rotate');
-				$('.friend_top span').text(xhr.err_messege);
+				$('.friend_top span').html(xhr.err_messege);
 				$('.friend_top').fadeIn();
 			}
 		});
@@ -349,13 +349,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
-					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top span').html(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
 					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
 					$('#zan_num').text(xhr.wx_user.good_vote);
 				}else{
-					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top span').html(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}
 			});
@@ -368,13 +368,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			type: "GET",
 		}).done(function (xhr) {
 			if(xhr.err_code==0){
-				$('.friend_top span').text(xhr.err_messege);
+				$('.friend_top span').html(xhr.err_messege);
 				$('.friend_top').fadeIn();
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
 				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
 				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
-				$('.friend_top span').text(xhr.err_messege);
+				$('.friend_top span').html(xhr.err_messege);
 				$('.friend_top').fadeIn();
 			}
 		});
@@ -403,7 +403,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				}
 			});
 		}else{
-			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
+			$('.friend_top span').html('请点击，我同意网利宝年终奖活动规则');
 			$('.friend_top').fadeIn();
 		}
 	});
@@ -420,7 +420,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 
 	if(user_info=='True'){
-		$('.friend_top span').text('您已注册成功，请点击<立即使用>领用您的年终奖了');
+		$('.friend_top span').html('您已注册成功，请点击<立即使用>领用您的年终奖了');
 		$('.friend_top').show();
 	}else{
 		if(uid!=undefined){
@@ -484,7 +484,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				}
 			});
 		}else{
-			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
+			$('.friend_top span').html('请点击，我同意网利宝年终奖活动规则');
 			$('.friend_top').fadeIn();
 		}
 	});
