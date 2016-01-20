@@ -127,6 +127,30 @@ var wlb = (function () {
             });
         },
         /**
+         * 调用分享按钮
+         * @function touchShare
+         * @param data 自定义分享信息
+         * @param callback 回调
+         */
+        touchShare: function(data, callback){
+            var options = this._setData(data, callback);
+            this.bridge.callHandler('touchShare', options.post, function (response) {
+                var responseData  = Mixin.filterJSON(response);
+                options.callback && options.callback(responseData);
+            });
+        },
+        /**
+         * 注册登录取消
+         * @param data {title: 活动标题, content: 活动描述, shareUrl:'指定分享的url'}
+         */
+        cancel: function (data, callback) {
+            this.bridge.registerHandler('cancel', function (backdata, responseCallback) {
+                responseCallback(data);
+                var responseData  = Mixin.filterJSON(backdata);
+                callback && callback(responseData)
+            });
+        },
+        /**
          * 获取用户信息
          * @param data 可不传
          * @param callback 返回[secretToken, ts, ph, tk]

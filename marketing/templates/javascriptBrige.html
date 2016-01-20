@@ -39,6 +39,7 @@
             <div id='regist' class="btn">注册页(未登录才弹)</div>
             <div id='todiscover' class="btn">发现页</div>
             <div id='finance' class="btn">理财专区</div>
+            <div id='cancel' class="btn">取消操作</div>
             <div id='share' class="btn">分享自定义</div>
             <div id='islogin' class="btn">查看登录状态</div>
             <div id='getuser' class="btn">获取用户信息</div>
@@ -53,7 +54,7 @@
             <a class="btn" href="wanglibao://view?url=http://www.baidu.com">跳转到活动详情</a>
         </div>
 
-        <script src="/static/scripts/component/webview.js"></script>
+        <script src="/static/scripts/component/webview.js?v=222"></script>
 
 
         <script>
@@ -78,9 +79,16 @@
                      $('finance').onclick=function(){
                          mixins.jumpToManageMoney()
                      }
+
                      $('share').onclick=function(){
-                         mixins.shareData({title: 'briger-test', content: 'briger-test', shareUrl:'http://www.baidu.com?test=222'})
+                         mixins.touchShare({title: 'briger-test', content: 'briger-test', shareUrl:'http://www.baidu.com?test=222'}, function(data){
+                             $('log').innerHTML = JSON.stringify(data)
+                         })
                      }
+                     //取消操作
+                     mixins.cancel({}, function(data){
+                         $('log').innerHTML = JSON.stringify(data)
+                     })
 
                      $('islogin').onclick=function(){
                          mixins.authenticated(function(data){
