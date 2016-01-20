@@ -416,7 +416,8 @@ class WithdrawCompleteView(TemplateView):
                 "user_name": name,
                 "phone": user.wanglibaouserprofile.phone,
                 "amount": amount,
-                "bank_name": card.bank.name
+                "bank_name": card.bank.name,
+                "order_id": order.id
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -1165,7 +1166,8 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "user_name": name,
                 "phone": request.user.wanglibaouserprofile.phone,
                 "amount": result['amount'],
-                "bank_name": result['bank_name']
+                "bank_name": result['bank_name'],
+                "order_id": result['order_id']
             })
         return Response(result)
 

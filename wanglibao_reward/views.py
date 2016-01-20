@@ -1230,6 +1230,127 @@ class XunleiActivityAPIView(APIView):
                 record.save()
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+
+class WeixinActivityAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(WeixinActivityAPIView, self).__init__()
+        self.activity_name = 'weixin_guaguaka'
+
+    def introduced_by_with(self, user_id, promo_token, register_time=None):
+        """
+            register_time:为None表示不需要关注用户的注册时间
+        """
+        if not register_time:
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token).first()
+        else:
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token, created_at__gte=register_time).first()
+        return True if introduced_by else False
+
+    def has_generate_reward_activity(self, user_id, activity, order_id):
+        activitys = WanglibaoActivityReward.objects.filter(user_id=user_id, activity=activity, order_id=order_id)
+        return activitys if activitys else None
+
+    def generate_reward_activity(self, user, order_id):
+        points = {
+            "0-5": ("weixin_guagua_0.9", 0.9),
+            "1-6": ("weixin_guagua_1.0", 1.0),
+            "2-7": ("weixin_guagua_1.2", 1.2),
+            "3-8": ("weixin_guagua_1.5", 1.5),
+            "4-9": ("weixin_guagua_2.0", 2.0)
+        }
+        records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
+        counter = (records.count()+1) % 10
+        when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
+        for _index in xrange(3):
+            if _index == when_dist_redpack:
+                for key, value in points.items():
+                    if str(counter) in key:
+                        WanglibaoActivityReward.objects.create(
+                            order_id=order_id,
+                            user=user,
+                            redpack_event=RedPackEvent.objects.filter(name=value[0]).first(),
+                            experience=None,
+                            activity=self.activity_name,
+                            when_dist=1,
+                            left_times=1,
+                            join_times=1,
+                            channel='weixin',
+                            has_sent=False,
+                            p2p_amount=value[1]
+                        )
+                        break
+            else:
+                WanglibaoActivityReward.objects.create(
+                    order_id=order_id,
+                    user=user,
+                    experience=None,
+                    activity=self.activity_name,
+                    when_dist=1,
+                    left_times=1,
+                    join_times=1,
+                    channel='weixin',
+                    has_sent=False,
+                    p2p_amount=0
+                )
+
+        return WanglibaoActivityReward.objects.filter(user=user, order_id=order_id, activity=self.activity_name)
+
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'code': 1000,
+                'message': u'用户没有登录'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        order_id = request.POST.get('order_id')
+        if not Order.objects.filter(pk=order_id).first():
+            json_to_response = {
+                'code': 1001,
+                'message': u'Order ID不错在'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
+        activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
+        activity_record = activitys.filter(left_times__gt=0)
+
+        if activity_record.filter(left_times__gt=0).count() == 0:
+            json_to_response = {
+                'code': 1002,
+                'messge': u'用户的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        else:
+            with transaction.atomic():
+                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
+                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, order_id=order_id, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+                if record.redpack_event:
+                    json_to_response = {
+                        'code': 0,
+                        'lefts': sum_left["amount_sum"]-1,
+                        'amount': "%s" % (record.redpack_event.amount,),
+                        'message': u'用户抽到奖品'
+                    }
+                    redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
+                    logger.debug(u'distribute redpack for user:%s, redpack:%s' % (request.user, record.redpack_event))
+                else:
+                    json_to_response = {
+                        'code': 1,
+                        'lefts': sum_left["amount_sum"]-1,
+                        'message': u'此次没有得到奖品'
+                    }
+
+                record.left_times = 0
+                record.has_sent = True
+                record.save()
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
 class WeixinAnnualBonusView(TemplateView):
     openid = ''
     nick_name = ''
@@ -1335,8 +1456,8 @@ class WeixinAnnualBonusView(TemplateView):
                         'share_name':u'您的好友邀请您参加分享领取年终奖活动',
                         'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                         'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
-                        'share_title':u'您的好友邀请您参加分享领取年终奖活动',
-                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！',
+                        'share_title':u'分享集赞拿年终奖',
+                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，集赞越多，奖金越高',
                         'share_all': u'分享集赞拿年终奖，集赞越多，奖金越高！',
                         }
             else:
@@ -1493,7 +1614,7 @@ class WeixinAnnualBonusView(TemplateView):
             # 如果用户未注册，引导用户前去注册
             user_profile = WanglibaoUserProfile.objects.filter(phone=wx_bonus.phone).first()
             if not user_profile:
-                rep = { 'err_code':404, 'err_messege':u'请使用手机号%s注册后再领取'%wx_bonus.phone }
+                rep = { 'err_code':404, 'err_messege':u'恭喜通过年终考核<br>注册账户%s，赚取收益吧'%wx_bonus.phone }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 以体验金形式发放年终奖

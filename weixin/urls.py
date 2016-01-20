@@ -2,6 +2,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
+from wanglibao_activity.views import WeixinGGLTemplate
 import views, activity_views, manage_views, sub_views, base, main_views
 from experience_gold.views import ExperienceGoldView
 urlpatterns = patterns(
@@ -92,6 +93,11 @@ urlpatterns = patterns(
     #微站 api
     url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),
     url(r'api/fwh/p2p_ajax_list/$', main_views.P2PListFWH.as_view(), name='fwh_p2p_ajax_list'),
+
+    #刮刮乐
+    url(r'^activity_ggl/$', login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
+                                          ),name='activity_ggl'),
+    # url(r'^activity_ggl/$', TemplateView.as_view(template_name="service_scratch.jade")),
 
 )
 
