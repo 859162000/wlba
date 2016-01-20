@@ -251,11 +251,12 @@
 					$('.new_user_text').show();
 					$('.friend_top span').html(xhr.err_messege);
 					$('.friend_top').fadeIn();
+
 				}else if(xhr.err_code==403){
 					if(h5_user_static){
-						$('.go_experience,.new_user_text').show();
+						$('.go_experience').show();
 					}else{
-						$('.login_button,.new_user_text').show();
+						$('.login_button').show();
 					}
 					$('.friend_top span').html(xhr.err_messege);
 					$('.friend_top').fadeIn();
