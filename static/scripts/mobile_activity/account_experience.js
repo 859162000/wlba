@@ -258,6 +258,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         alert : lib._alert
     }
 })();
+var h5_user_static;
+org.ajax({
+    url: '/api/user_login/',
+    type: 'post',
+    success: function(data1) {
+        h5_user_static = data1.login;
+    }
+});
 var login = false;
 wlb.ready({
     app: function (mixins) {

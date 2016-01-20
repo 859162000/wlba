@@ -39,6 +39,14 @@ org.ui = (function(){
         alert : lib._alert
     }
 })();
+var h5_user_static;
+org.ajax({
+    url: '/api/user_login/',
+    type: 'post',
+    success: function(data1) {
+        h5_user_static = data1.login;
+    }
+});
 var login = false;
 wlb.ready({
     app: function (mixins) {
