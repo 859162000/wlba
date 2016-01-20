@@ -2,14 +2,13 @@
     require.config({
         paths: {
             jquery: 'lib/jquery.min',
-			'fileinput': 'lib/fileinput'
+
         },
         shim: {
             'jquery.modal': ['jquery'],
-			'fileinput': ['jquery']
         }
     });
-    require(['jquery','fileinput'],
+    require(['jquery'],
     function($, re) {
 
 		var csrfSafeMethod, getCookie, sameOrigin,
@@ -52,83 +51,292 @@
           }
       });
 
-        var h5_user_static;
+        var h5_user_status;
 		$.ajax({
 			url: '/api/user_login/',
 			type: 'post',
 			success: function (data1) {
-				h5_user_static = data1.login;
+				h5_user_status = data1.login;
 			}
 		})
 
-//		$('.button').click(function(){
+        var id_front_image,id_back_image,id_user_image,id_bank_image,new_phone;
+        var docObj,imgObjPreview;
+
+        var file_1 = document.getElementById("id_front_image").value;
+        var file_2 = document.getElementById("id_back_image").value;
+        var file_3 = document.getElementById("id_user_image").value;
+        var phone_true = false;
+        var code_num = $('.input_code').val();
+
+        var id_front_image_input = document.getElementById("id_front_image");
+        var file_img_1 = document.getElementById("file_img_1");
+        var input_parent_1 = $('.input_box_1');
+        var id_back_image_input = document.getElementById("id_back_image");
+        var file_img_2 = document.getElementById("file_img_2");
+        var input_parent_2 = $('.input_box_2');
+        var id_user_image_input = document.getElementById("id_user_image");
+        var file_img_3 = document.getElementById("file_img_3");
+        var input_parent_3 = $('.input_box_3');
+
+        $('#id_front_image').bind('change',function(){
+            select_img(id_front_image_input,file_img_1,input_parent_1);
+        })
+
+        $('#id_back_image').bind('change',function(){
+            select_img(id_back_image_input,file_img_2,input_parent_2);
+        })
+
+        $('#id_user_image').bind('change',function(){
+            select_img(id_user_image_input,file_img_3,input_parent_3);
+        })
+
+        var error_file_status;
+        function select_img(docObj,file_img,input_parent){
+            var filename = docObj.value;
+            var mime = filename.toLowerCase().substr(filename.lastIndexOf("."));
+            //alert(mime);
+            var file_size = docObj.files[0].size;
+            //alert(file_size);
+            if(mime==".jpg"||mime==".png"||mime==".bmp"&&file_size<'2097152'){
+                setImagePreview(docObj,file_img);
+                form_status();
+            }else{
+                docObj.value ='';
+                if(mime==".jpg"||mime==".png"||mime==".bmp"){
+                    error_file_status = '上传文件太大';
+                }else{
+                    error_file_status = '上传文件格式错误';
+                }
+                if(input_parent.hasClass('input_box_1')){
+                    $('#user_img_1').hide();
+                    $('.error_right_file_1').show().text(error_file_status);
+                }
+                if(input_parent.hasClass('input_box_2')){
+                    $('#user_img_2').hide();
+                    $('.error_right_file_2').show().text(error_file_status);
+                }
+                if(input_parent.hasClass('input_box_3')){
+                    $('#user_img_3').hide();
+                    $('.error_right_file_3').show().text(error_file_status);
+                }
+                //return false;
+            }
+        }
+
+
+        function setImagePreview(docObj,imgObjPreview) {
+                if(docObj.files &&docObj.files[0])
+                {
+                //火狐下，直接设img属性
+                imgObjPreview.style.display = 'block';
+                imgObjPreview.style.width = '158px';
+                //imgObjPreview.style.height = '100px';
+                //imgObjPreview.src = docObj.files[0].getAsDataURL();
+
+                //火狐7以上版本不能用上面的getAsDataURL()方式获取，需要一下方式
+                imgObjPreview.src = window.URL.createObjectURL(docObj.files[0]);
+                }
+                else
+                {
+                //IE下，使用滤镜
+                docObj.select();
+                var imgSrc = document.selection.createRange().text;
+                var localImagId = document.getElementById("localImag");
+                //必须设置初始大小
+                localImagId.style.width = "158px";
+                //localImagId.style.height = "100px";
+                //图片异常的捕捉，防止用户修改后缀来伪造图片
+
+
+
+                try{
+                localImagId.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                localImagId.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgSrc;
+                }
+                catch(e)
+                {
+                alert("您上传的图片格式不正确，请重新选择!");
+                return false;
+                }
+                imgObjPreview.style.display = 'none';
+                document.selection.empty();
+                }
+                var img_url = imgObjPreview.src;
+                if(docObj.id=='id_front_image'){
+                    id_front_image = img_url;
+                    $('#user_img_1').show();
+                    $('.error_right_file_1').hide();
+                }else if(docObj.id=='id_back_image'){
+                    id_back_image = img_url;
+                    $('#user_img_2').show();
+                    $('.error_right_file_2').hide();
+                }else if(docObj.id=='id_user_image'){
+                    id_user_image = img_url;
+                    $('#user_img_3').show();
+                    $('.error_right_file_3').hide();
+                }
+                return true;
+            }
+
+        /*输入手机号，验证码*/
+        var myreg = /^(((12[0-9]{1}|)|(13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1})|(14[57]{1})|(17[0678]{1}))+\d{8})$/;
+        $('.input_phone').on('focus',function(){
+           $('.get_code').text('获取验证码').removeAttr('disabled').removeClass('wait');
+        });
+
+
+        $('.input_phone').blur(function(){
+            if(!myreg.test($(".input_phone").val()))
+            {
+                $('.error_phone').show();
+                phone_true = false;
+            }else{
+                $('.error_phone').hide();
+                phone_true = true;
+                $('.status_code').hide();
+            }
+            form_status();
+        });
+
+        var time_count = 60;
+        var timerFunction = function () {
+            if (time_count >= 1) {
+                time_count--;
+                return $('.get_code').text(time_count + '秒后可重发');
+            } else {
+                clearInterval(timerFunction);
+                $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+                //return $(document.body).trigger('from:captcha');
+            }
+        };
+
+        $('.get_code').click(function(){
+            if(phone_true){
+                $('.status_code').hide();
+                var phone = $('.input_phone');
+
+                $('.get_code').attr('disabled', 'disabled').addClass('wait');
+                time_count = 60;
+                timerFunction();
+                setInterval(timerFunction, 1000);
+
+                $.ajax({
+                    url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
+                    type: 'POST',
+                    success: function (xhr) {
+
+                }});
+            }else{
+                $('.status_code .false').text('请先输入正确的手机号');
+                $('.status_code').show().children('.true').hide();
+            }
+
+        });
+
+        $('.input_code').on('focus',function(){
+           form_status();
+        });
+
+
+        $('.input_code').blur(function(){
+            form_status();
+        })
+        /*输入手机号，验证码结束*/
+
+        function form_status(){
+            file_1 = document.getElementById("id_front_image").value;
+            file_2 = document.getElementById("id_back_image").value;
+            file_3 = document.getElementById("id_user_image").value;
+            code_num = $('.input_code').val();
+            if(file_1&&file_2&&file_3&&phone_true&&code_num) {
+                $('.error_form').hide();
+            }else{
+                $('.error_form').show();
+            }
+
+        }
+
+
+        $('.button').click(function(){
+
+            //alert(file_1);
+            //alert(file_2);
+            //alert(file_3);
+            //alert(phone_true);
+            //alert(code_num);
+            if(file_1&&file_2&&file_3&&phone_true&&code_num){
+                var form =$("#form");
+                var formData = new FormData($( "#form" )[0]);
+                //alert(formData);
+                $.ajax({
+                    url: '/api/manual_modify/phone/' ,
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (returndata) {
+                        alert(returndata);
+                        window.location.href = '/accounts/security/';
+                    },
+                    error: function (returndata) {
+                        alert(returndata);
+                    }
+                });
+            }else{
+                $('.error_form').show();
+            }
+
+            //alert(form.action);
 //            $.ajax({
-//                url: '/api/manual_modify/phone/',
-//                type: 'post',
-//                success: function (data1) {
-//
+//                url:'/api/manual_modify/phone/',
+//                type:'post',
+//                data: form.serialize(),
+//                dataType: 'json',
+//                success:function(data){
+//                    alert('1');
+//                },
+//                error:function(data){
+//                    alert('2');
 //                }
 //            })
-//		})
-
-
-
-        $('.main_title_top').click(function(){
-            alert($('#id_id_back_image').val());
-            var img_url = $('#id_id_back_image').val();
-            $('#img').attr('src',img_url);
         });
+
+        //$('#form').submit(function(){
+        //    alert($(this).serialize());
+        //    return false;
+        //});
+
+
+        //$('.button').click(function(){
+        //    //alert(id_front_image);
+        //    //alert(id_back_image);
+        //    //alert(id_user_image);
+        //    //alert(id_bank_image);
+        //    var new_phone = $('.input_phone').val();
+        //    var new_code = $('.new_code').val();
+        //    $.ajax({
+        //        url: '/api/manual_modify/phone/',
+        //        type: 'post',
+        //        data: {
+        //            'id_front_image': id_front_image,
+        //            'id_back_image': id_back_image,
+        //            'id_user_image': id_user_image,
+        //            //'id_bank_image': id_bank_image,
+        //            'new_phone': new_phone,
+        //            'validate_code': new_code
+        //        },
+        //        success: function (data1) {
+		//
+        //        }
+        //    });
+        //})
+
 
         window.onload=function(){
 
-            var result_1 = document.getElementById("user_img_1");
-			var result_2 = document.getElementById("user_img_2");
-			var result_3 = document.getElementById("user_img_3");
-			var result_4 = document.getElementById("user_img_4");
-            var input_1 = document.getElementById("id_front_image");
-			var input_2 = document.getElementById("id_back_image");
-			var input_3 = document.getElementById("id_user_image");
-			var input_4 = document.getElementById("id_bank_image");
-
-            if(typeof FileReader==='undefined'){
-                $('.upload_img').html('抱歉，你的浏览器不支持 FileReader');
-                input_1.setAttribute('disabled','disabled');
-				input_2.setAttribute('disabled','disabled');
-				input_3.setAttribute('disabled','disabled');
-				input_4.setAttribute('disabled','disabled');
-            }else{
-                input_1.addEventListener('change',readFile,false);
-				input_2.addEventListener('change',readFile,false);
-				input_3.addEventListener('change',readFile,false);
-				input_4.addEventListener('change',readFile,false);
-            }
-
-            function readFile(){
-				var this_name=this.name;
-				//alert(this_name);
-                var file = this.files[0];
-                if(!/image\/\w+/.test(file.type)){
-                    alert("文件必须为图片！");
-                    return false;
-                }
-                var reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function(e){
-					if(this_name=='id_front_image'){
-						$('#user_img_1').show();
-                    	result_1.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}else if(this_name=='id_back_image'){
-						$('#user_img_2').show();
-                    	result_2.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}else if(this_name=='id_user_image'){
-						$('#user_img_3').show();
-                    	result_3.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}else if(this_name=='id_bank_image'){
-						$('#user_img_4').show();
-                    	result_4.innerHTML = '<img src="'+this.result+'" alt=""/>';
-					}
-                }
-            }
 
         }
 

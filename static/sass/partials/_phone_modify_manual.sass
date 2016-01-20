@@ -3,27 +3,68 @@
   margin-top: 15px
   display: inline-block
   width: 100%
-.phone_modify_main_title_top
-  width: 100%
-  color: #666
-  line-height: 26px
-  font-size: 18px
-  padding: 38px 0 38px 50px
-.phone_modify_form_wrap
+
+  .main_title_top
+    width: 100%
+    color: #666
+    line-height: 26px
+    font-size: 18px
+    padding: 38px 0 38px 50px
+
+    .text
+      display: inline-block
+      line-height: 17px
+      font-size: 13px
+      color: #fd9827
+      margin-left: 26px
+      background: url("/static/images/account_safe/ico.png") no-repeat -58px -17px
+      padding-left: 19px
+      position: relative
+      top: -2.5px
+      left: 0
+      display: none
+    .true
+      padding: 0 10px
+      background: #fd9827
+      border-radius: 10px
+      font-size: 13px
+      text-align: center
+      line-height: 20px
+      height: 20px
+      display: inline-block
+      color: #fff
+      position: relative
+      top: -2.5px
+      margin-left: 20px
+.form_wrap
   padding-left: 168px
   .title_top
     line-height: 20px
     color: #999
     font-size: 12px
     padding-bottom: 4px
-
+  form
+    width: 100%
+    color: #666
+    line-height: 26px
+    font-size: 18px
+    padding: 38px 0 38px 50px
+.form_wrap
+  padding-left: 168px
+  font-size: 0
+  margin-bottom: 90px
+  .title_top
+    line-height: 20px
+    color: #999
+    font-size: 12px
+    padding-bottom: 10px
   form
     width: 100%
     .box
       width: 100%
       clear: both
       display: inline-block
-      padding-bottom: 10px
+      padding-bottom: 15px
       label
         width: 118px
         float: left
@@ -58,6 +99,7 @@
             width: 88px
             height: 34px
             font-size: 14px
+            float: left
           .input
             position: absolute
             left: 0
@@ -100,6 +142,9 @@
           width: 106px
           margin-left: 10px
           cursor: pointer
+        .wait
+          background: #999
+          border-color: #fff
         .title
           color: #bfbfbf
           font-size: 12px
@@ -114,10 +159,9 @@
           line-height: 40px
           color: #fff
           font-size: 16px
-          margin-bottom: 90px
           background: #e4371f
           cursor: pointer
-        .static
+        .status
           height: 16px
           position: relative
           left: 0px
@@ -126,6 +170,8 @@
           display: block
           margin-left: 15px
           display: none
+          font-size: 12px
+          color: #999
           .true
             width: 12px
             height: 16px
@@ -138,6 +184,30 @@
             display: block
             float: left
             padding-left: 13px
+        .error_title
+          clear: both
+          width: 100%
+          line-height: 18px
+          color: #e4371f
+          font-size: 12px
+          background: url("/static/images/account_safe/ico.png") no-repeat -71px -34px
+          padding-left: 13px
+          display: none
+          height: 18px
+          position: relative
+          top: 5px
+
+        .error_right_title
+          float: left
+          line-height: 16px
+          color: #e4371f
+          font-size: 12px
+          background: url("/static/images/account_safe/ico.png") no-repeat -71px -35px
+          padding-left: 13px
+          position: relative
+          top: 10px
+          left: 0
+          margin-left: 5px
     .upload_img
       width: 158px
       display: none
@@ -146,3 +216,14 @@
       img
         width: 100%
         display: block
+.form_margin
+  padding-left: 260px
+  .title_phone
+    color: #fd9827
+    font-size: 14px
+    line-height: 24px
+  form.form_left
+    .box
+      label
+        text-align: left
+        width: 50px

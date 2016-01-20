@@ -13,7 +13,7 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
                             AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI,
-                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI)
+                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -48,7 +48,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                                  BidHasBindingForChannel, CoopPvApi)
+                                  BidHasBindingForChannel)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -115,14 +115,13 @@ urlpatterns = patterns(
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
     url(r'^check_password/$', PasswordCheckView.as_view()),
     url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
-    url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),  # 发送短信验证码
-    url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),  # 注册发短信验证码
+    url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
+    url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
 
-    url(r'^weixin/phone_validation_code/register/(?P<phone>\d{11})/$',
-        WeixinSendRegisterValidationCodeView.as_view()),  # 微信注册发短信验证码
+    url(r'^weixin/phone_validation_code/register/(?P<phone>\d{11})/$', WeixinSendRegisterValidationCodeView.as_view()),
 
-    url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),  # 测试手机号是否注册
+    url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
 
     url(r'^user_login/$', UserHasLoginAPI.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
@@ -234,8 +233,10 @@ urlpatterns = patterns(
     url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
     url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
     url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
+    url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
     url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
     url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
+
 )
 
 urlpatterns += patterns('',
@@ -318,10 +319,4 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^account2015/$', CustomerAccount2015ApiView.as_view()),
-)
-
-# 渠道页面pv统计接口
-urlpatterns += patterns(
-    '',
-    url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
 )
