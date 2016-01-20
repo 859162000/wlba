@@ -59,7 +59,12 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                mixins.registerApp({refresh:1, url:''});
+                $('.client-login-alert').show().on('click', function () {
+                    mixins.registerApp({refresh: 1, url: ''})
+                })
+                $('.login--alert-opeartion').on('click', function () {
+                    $('.client-login-alert').hide()
+                })
             } else {
                 login = true;
                 connect(data)
