@@ -458,9 +458,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').show();
 					$('.friend_top .close').hide();
 					if(h5_user_static){
-						$('.go_experience,.new_user_text').show();
+						$('.go_experience').show();
 					}else{
-						$('.login_button,.new_user_text').show();
+						$('.login_button').show();
 					}
 					//go_experience();
 					//倒数3秒跳转到体验金页面
@@ -526,7 +526,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	$('.rule_wrap .close').click(function(){
 		$('.rule_wrap').hide();
 	});
-
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
