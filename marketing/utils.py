@@ -198,7 +198,7 @@ def utype_is_mobile(request):
     is_mobile = False
     ua = request.META.get('HTTP_USER_AGENT', '')
     if ua:
-        user_agent = parse()
+        user_agent = parse(ua)
         if user_agent.is_mobile:
             is_mobile = True
 
