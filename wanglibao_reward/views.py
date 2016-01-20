@@ -1456,8 +1456,8 @@ class WeixinAnnualBonusView(TemplateView):
                         'share_name':u'您的好友邀请您参加分享领取年终奖活动',
                         'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
                         'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
-                        'share_title':u'您的好友邀请您参加分享领取年终奖活动',
-                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！',
+                        'share_title':u'分享集赞拿年终奖',
+                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，集赞越多，奖金越高',
                         'share_all': u'分享集赞拿年终奖，集赞越多，奖金越高！',
                         }
             else:
