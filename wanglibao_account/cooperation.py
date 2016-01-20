@@ -1664,6 +1664,56 @@ class BaJinSheRegister(CoopRegister):
         self.bajinshe_call_back(user, order_id)
 
 
+class RenRenLiRegister(CoopRegister):
+    def __init__(self, request):
+        super(RenRenLiRegister, self).__init__(request)
+        self.c_code = 'renrenli'
+        self.external_channel_client_id_key = 'Cust_id'
+        self.external_channel_user_key = 'Phone'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_sign_key = 'Sign'
+        self.internal_channel_sign_key = 'sign'
+        self.external_channel_access_token_key = 'Access_tokens'
+        self.internal_channel_access_token_key = 'access_token'
+        self.external_channel_user_id_key = 'Cust_key'
+        self.internal_channel_user_id_key = 'c_user_id'
+
+    def save_to_session(self):
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
+        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
+        access_token = self.request.REQUEST.get(self.external_channel_access_token_key, None)
+        sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
+        c_user_id = self.request.REQUEST.get(self.external_channel_user_id_key, None)
+
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+            self.request.session[self.internal_channel_phone_key] = channel_user
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+        if access_token:
+            self.request.session[self.internal_channel_access_token_key] = access_token
+
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        if c_user_id:
+            self.request.session[self.internal_channel_user_id_key] = c_user_id
+
+    def clear_session(self):
+        super(RenRenLiRegister, self).clear_session()
+        self.request.session.pop(self.internal_channel_client_id_key, None)
+        self.request.session.pop(self.internal_channel_access_token_key, None)
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_user_id_key, None)
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
@@ -1671,7 +1721,8 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister, BaJinSheRegister,]
+                          YZCJRegister, RockFinanceRegister, BaJinSheRegister,
+                          RenRenLiRegister,]
 
 
 #######################第三方用户查询#####################

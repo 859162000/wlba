@@ -4,7 +4,7 @@ import hashlib
 import logging
 from datetime import timedelta
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
@@ -17,10 +17,18 @@ from .models import AccessToken
 from .models import RefreshToken
 from .forms import RefreshTokenGrantForm, UserAuthForm
 from .utils import now
-from .tools import oauth_token_login
+from .tools import oauth_token_login, oauth_token_login_v2
 import constants
+from django.core.urlresolvers import reverse
+from django.conf import settings
+from wanglibao_account.utils import Crypto
 
 logger = logging.getLogger(__name__)
+
+
+def create_access_token(user, client):
+    token = default_token_generator.make_token(user)
+    return AccessToken.objects.create(user=user, client=client, token=token)
 
 
 class AccessTokenView(AccessTokenBaseView):
@@ -42,15 +50,11 @@ class AccessTokenView(AccessTokenBaseView):
             at = AccessToken.objects.get(user=user, client=client, expires__gt=now())
         except AccessToken.DoesNotExist:
             # None found... make a new one!
-            at = self.create_access_token(request, user, client)
+            at = create_access_token(user, client)
             self.create_refresh_token(request, user, at, client)
 
             # raise OAuthError({'error': 'invalid_grant'})
         return at
-
-    def create_access_token(self, request, user, client):
-        token = default_token_generator.make_token(user)
-        return AccessToken.objects.create(user=user, client=client, token=token)
 
     def create_refresh_token(self, request, user, access_token, client):
         return RefreshToken.objects.create(
@@ -132,7 +136,40 @@ class TokenLoginOpenApiView(APIView):
         client_id = data.get('client_id', '').strip()
         phone = data.get('phone', '').strip()
 
-        response_data = oauth_token_login(request, phone, client_id, token)
+        is_auth, message = oauth_token_login(request, phone, client_id, token)
+        if is_auth:
+            response_data = {
+                'code': 10000,
+                'message': 'ok',
+            }
+        else:
+            response_data = {
+                'code': 10001,
+                'message': message,
+            }
+
+        return HttpResponse(renderers.JSONRenderer().render(response_data,
+                                                            'application/json'))
+
+
+class TokenLoginOpenApiViewV2(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        data = request.session
+        token = data.get('access_token', '').strip()
+        c_user_id = data.get('c_user_id', '').strip()
+        crypto = Crypto()
+        data_buf = crypto.decode_bytes(str(c_user_id))
+        user_id = crypto.decrypt_mode_cbc(data_buf, settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
+        is_auth, message = oauth_token_login_v2(request, user_id, token)
+        if is_auth:
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            response_data = {
+                'code': 10001,
+                'message': message,
+            }
 
         return HttpResponse(renderers.JSONRenderer().render(response_data,
                                                             'application/json'))

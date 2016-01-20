@@ -2,7 +2,7 @@
 
 from django.conf.urls import patterns, url
 from django.views.decorators.csrf import csrf_exempt
-from .views import AccessTokenView, TokenLoginOpenApiView
+from .views import AccessTokenView, TokenLoginOpenApiView, TokenLoginOpenApiViewV2
 
 
 urlpatterns = patterns(
@@ -13,4 +13,7 @@ urlpatterns = patterns(
 
     url('^login/$', TokenLoginOpenApiView.as_view(),
         name='oauth2_token_login'),
+
+    url('^login/v2/$', TokenLoginOpenApiViewV2.as_view(),
+        name='oauth2_token_login_v2'),
 )

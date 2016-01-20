@@ -1,8 +1,14 @@
+# encoding: utf-8
+
+import hashlib
 from django import forms
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 from django.conf import settings
 from wanglibao_account.utils import Crypto
 from .models import Client, RefreshToken, OauthUser
+from wanglibao_account.utils import detect_identifier_type
+from marketing.utils import get_channel_record
 
 
 class OAuthValidationError(Exception):
@@ -165,3 +171,61 @@ class RefreshTokenGrantForm(OAuthForm):
             else:
                 self.cleaned_data['refresh_token'] = token
                 return self.cleaned_data
+
+
+class OauthUserRegisterForm(OAuthForm):
+    channel_code = forms.CharField(max_length=30, error_messages={'required': u'promo_token参数是必须的'})
+    client_id = forms.CharField(max_length=50, error_messages={'required': u'client参数是必须的'})
+    sign = forms.CharField(max_length=50, error_messages={'required': u'sign参数是必须的'})
+    phone = forms.CharField(max_length=11, error_messages={'required': u'phone参数是必须的'})
+
+    def clean_channel_code(self):
+        channel_code = self.cleaned_data['channel_code']
+        if not get_channel_record(channel_code):
+            raise forms.ValidationError(
+                message=u'无效渠道码',
+                code=10002,
+            )
+
+        return channel_code
+
+    def clean_client_id(self):
+        client_id = self.cleaned_data['client_id']
+        try:
+            self.client = Client.objects.get(client_id=client_id)
+        except Client.DoesNotExist:
+            raise forms.ValidationError(
+                message=u'无效client_id',
+                code=10003,
+            )
+
+        return client_id
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone', '').strip()
+        if detect_identifier_type(phone) == 'phone':
+            if User.objects.filter(wanglibaouserprofile__phone=phone).exists():
+                raise forms.ValidationError(
+                    message=u'该手机号已经注册',
+                    code=10004,
+                )
+        else:
+            raise forms.ValidationError(
+                message=u'无效手机号',
+                code=10005,
+            )
+
+        return phone
+
+    def check_sign(self, sign):
+        client_id = self.cleaned_data['client_id']
+        client_secret = self.client.client_secret
+        phone = self.cleaned_data['phone']
+        local_sign = hashlib.md5(str(client_id)+str(phone)+str(client_secret)).hexdigest()
+        if sign == local_sign:
+            return True
+        else:
+            return False
+
+    def get_client(self):
+        return self.client
