@@ -53,8 +53,10 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
+                $('.aaa').text('111111111111')
+                //mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/account/'});
             } else {
+                $('.aaa').text('222222222222')
                 login = true;
                 initFun();
             }
