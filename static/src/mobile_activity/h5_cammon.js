@@ -132,7 +132,7 @@
         }
         org.ajax({
             type: "GET",
-            url: '/api/user_exists/'+tel,
+            url: '/api/user_exists/'+ tel + '/',
             dataType: 'json',
             success: function(data){
                 if(data.existing){
