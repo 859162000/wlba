@@ -1170,6 +1170,7 @@ else:
     YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
 # 八金社
+WLB_FOR_BAJINSHE_KEY = '2006'
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
 BAJINSHE_COOP_ID = 'wanglibao'
 BAJINSHE_COOP_KEY = '3795dd52-3ad9-47cf-9fe7-67d69566c1ba'

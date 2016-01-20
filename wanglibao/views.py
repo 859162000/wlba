@@ -21,6 +21,7 @@ import logging
 from weixin.base import ChannelBaseTemplate
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_rest.utils import has_register_for_phone
+from .utils import utype_is_mobile
 import json
 
 logger = logging.getLogger(__name__)
@@ -292,15 +293,21 @@ def landpage_view(request):
 
         # 判断是否属于交易操作
         if action:
+            is_mobile = utype_is_mobile(request)
             if action in ['purchase', 'deposit', 'withdraw']:
                 if action == 'purchase':
                     product_id = request.session.get('product_id', '')
                     if product_id:
-                        url = reverse('p2p detail', kwargs={'id': product_id})
+                        if is_mobile:
+                            url = reverse('weixin_p2p_detail', kwargs={'id': product_id, 'template': 'buy'})
+                        else:
+                            url = reverse('p2p detail', kwargs={'id': product_id})
                 elif action == 'deposit':
-                    url = reverse('pay-banks')
+                    action_uri = 'weixin_recharge_first' if is_mobile else 'pay-banks'
+                    url = reverse(action_uri)
                 elif action == 'withdraw':
-                    url = reverse('withdraw')
+                    action_uri = 'weixin_recharge_first' if is_mobile else 'withdraw'
+                    url = reverse(action_uri)
 
                 # 判断用户是否为登录状态
                 if not request.user.is_authenticated():
@@ -317,7 +324,8 @@ def landpage_view(request):
                     else:
                         url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
             elif action == 'register':
-                url = reverse('auth_register') + "?promo_token=" + channel_code
+                action_uri = 'weixin_register' if is_mobile else 'auth_register'
+                url = reverse(action_uri) + "?promo_token=" + channel_code
         else:
             url = reverse(activity_page) + "?promo_token=" + channel_code
 
