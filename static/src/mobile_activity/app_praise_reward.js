@@ -43,7 +43,6 @@
     });
 
 	var is_myself = false;
-
 	/*分享*/
 	$('.share_button').click(function(){
 		$('.share_wrap').show();

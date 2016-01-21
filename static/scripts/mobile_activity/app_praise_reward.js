@@ -262,7 +262,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     });
 
 	var is_myself = false;
-
 	/*分享*/
 	$('.share_button').click(function(){
 		$('.share_wrap').show();
