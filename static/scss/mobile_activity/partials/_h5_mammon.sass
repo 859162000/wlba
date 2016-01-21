@@ -1,0 +1,307 @@
+@keyframes csShake
+  0%
+    transform: translate(5px,5px)
+  25%
+    transform: translate(-5px,0)
+  50%
+    transform: translate(5px,-5px)
+  75%
+    transform: translate(3px,5px)
+  100%
+    transform: translate(0,0)
+@-webkit-keyframes csShake
+  0%
+    -webkit-transform: translate(5px,5px)
+  25%
+    -webkit-transform: translate(-5px,0)
+  50%
+    -webkit-transform: translate(5px,-5px)
+  75%
+    -webkit-transform: translate(3px,5px)
+  100%
+    -webkit-transform: translate(0,0)
+@-webkit-keyframes csRotate
+  0%
+    -webkit-transform: rotate(0deg)
+  100%
+    -webkit-transform: rotate(360deg)
+@keyframes csRotate
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(360deg)
+
+.h5-mammon
+  background: #a43d3f url("/static/imgs/mobile_activity/mammon/cs_bg.jpg") no-repeat
+  background-size: 100% auto
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  .shake
+    -webkit-animation: csShake 2s linear backwards infinite
+    animation: csShake 2s linear backwards infinite
+  .circle-box
+    -webkit-animation: csRotate 1s linear backwards 3
+    animation: csRotate 1s linear backwards 3
+  .red-btn
+    background: #eb4959
+    text-align: center
+    padding: 0.5rem 2rem
+    color: #fff
+    border-radius: 0.25rem
+  .yellow-btn
+    background: #ffc429
+    color: #9f1e37
+    font-size: 0.65rem
+    height: 2rem
+    line-height: 2rem
+    text-align: center
+    border-radius: 0.25rem
+  ::-webkit-input-placeholder
+    color: #fff
+  .load-box
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: #fff
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    .load-item
+      width: 2rem
+      height: 2rem
+      background: url("/static/imgs/mobile_activity/mammon/load.gif") center center no-repeat
+      background-size: contain
+  .mammon-tit
+    margin: 17% auto
+    width: 10.5rem
+    font-size: 0.65rem
+    color: #fff
+    line-height: 1.15rem
+    .big-tit
+      font-size: 1.05rem
+    .txt
+      font-size: 0.9rem
+  .mammon-img
+    //background: url("/static/imgs/mobile_activity/mammon/cs_img.png") center top no-repeat
+    width: 60%
+    //height: 13.35rem
+    background-size: contain
+    position: absolute
+    left: 20%
+    top: 5.6rem
+    img
+      //opacity: 0
+  .mammon-xl
+    position: absolute
+    width: 50%
+    left: 25%
+    bottom: 3rem
+    img
+      width: 100%
+  .mammon-yb
+    position: absolute
+    width: 12rem
+    height: 12rem
+    left: 50%
+    margin-left: -6rem
+    bottom: 0.7rem
+    .shake-box
+      width: 3.5rem
+      position: absolute
+      bottom: 0
+      left: 50%
+      margin-left: -1.75rem
+    .shake-tit
+      font-size: 0.6rem
+      color: #fff
+      width: 100%
+      text-align: center
+    img
+      width: 3.5rem
+      bottom: 0
+  @mixin altBg
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: rgba(0,0,0,0.7)
+    display: none
+    -webkit-box-align: center
+    -webkit-box-pack: center
+  .mammon-jq
+    +altBg
+    .mammon-main
+      height: 15.65rem
+      width: 100%
+      position: relative
+      .jq-box
+        text-align: center
+        color: #7e332e
+        height: 100%
+        width: 3.5rem
+        background: url("/static/imgs/mobile_activity/mammon/cs_qBg.png") center top no-repeat
+        background-size: 100% 100%
+        margin: 0 auto
+        .top
+          width: 100%
+          height: 8.5rem
+          padding: 2.5rem 1rem 0
+          font-size: 1.2rem
+        .bottom
+          width: 100%
+          height: 5.5rem
+          font-size: 1.8rem
+      .js-btn
+        width: 3rem
+        height: 3rem
+        line-height: 3rem
+        text-align: center
+        border-radius: 3rem
+        background: #eb4959
+        font-size: 0.8rem
+        color: #fff
+        position: absolute
+        right: 1.8rem
+        bottom: 0
+  .mammon-share,.mammon-error
+    +altBg
+    .share-mian
+      background: #fff3e8
+      color: #7e5836
+      font-size: 0.65rem
+      line-height: 1.2rem
+      margin: 0 auto
+      width: 90%
+      border-radius: 0.25rem
+      padding: 2.5rem 1rem 1.5rem
+      position: relative
+      .close
+        position: absolute
+        right: 0.8rem
+        top: 0.8rem
+        text-align: center
+        font-weight: bold
+        font-size: 1rem
+        height: 1.2rem
+        width: 1.2rem
+      .share-txt
+        text-align: center
+      .share-box
+        text-align: center
+        margin-top: 1rem
+  .mammon-page1
+    display: none
+  .mammon-page2
+    display: none
+    .mammon-tit
+      text-align: center
+      height: 4.5rem
+      line-height: 1.5rem
+    .mammon-redPack
+      padding-top: 1.8rem
+    .mammon-inp-box
+      margin-top: -2rem
+      padding: 3rem 2.9rem 1rem
+      width: 100%
+      background-color: #a43d3f
+      .tel-inp
+        display: block
+        width: 100%
+        height: 2rem
+        border: 0
+        background: #b25a5c
+        color: #fff
+        font-size: 0.65rem
+        text-align: center
+        border-radius: 0.25rem
+      .yellow-btn
+        display: block
+        margin-top: 0.7rem
+  .yellow-txt
+    color: #ffc429
+  .mammon-page3
+    display: none
+    .mammon-tit
+      text-align: center
+      margin-top: 2.1rem
+      font-size: 0.8rem
+      line-height: 1.5rem
+    .mammon-code
+      width: 100%
+      text-align: center
+      .tit
+        color: #fff
+        font-size: 0.8rem
+        line-height: 2rem
+        padding-top: 1rem
+      .code-img
+        background: #a43d3f
+        img
+          width: 55%
+  .mammon-page4
+    display: none
+    .mammon-tit
+      margin-top: 13%
+      line-height: 1.2rem
+      text-align: left
+    .mammon-ok, .look-btn-box
+      text-align: center
+    .mammon-ok
+      position: relative
+      .fwh1
+        margin-top: -0.8rem
+      .fwh2
+        z-index: 2
+        position: absolute
+        right: 15%
+        bottom: 18%
+      .fwh-bg
+        position: absolute
+        z-index: -1
+        bottom: 0
+        height: 7rem
+        width: 100%
+        background: #a43d3f
+    .look-btn-box
+      background-color: #a43d3f
+      color: #fff
+      font-size: 0.65rem
+    .look-btn-box
+      padding: 1rem 0
+      .yellow-btn
+        display: block
+        margin: 0 12%
+    .mammon-btm
+      background: #8c3537
+      color: #f6c977
+      font-size: 0.6rem
+      line-height: 1rem
+      padding: 1rem
+
+@media screen and (min-width: 750px)
+  .h5-mammon
+    .mammon-page1
+      .mammon-img
+        top: 20%
+    .mammon-page2 
+      .mammon-redPack
+        padding-top: 15%
+    .mammon-page3
+      .mammon-tit
+        margin-top: 15%
+      .mammon-code .tit
+        padding-top: 10%
+    .mammon-page4
+      .mammon-tit
+        margin-top: 15%
+
+
+
+
+

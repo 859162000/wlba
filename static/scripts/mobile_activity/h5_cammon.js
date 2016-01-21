@@ -217,355 +217,166 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function(org) {
+;(function(){
+    var jqDom = $("div.mammon-jq");
+    var page2 = $("div.mammon-page2");
+    function shareBack(){
+        $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
+        page2.show();
+    }
+    function getVal(){
+        var val = [
+            {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
+            {"qVal": "中签","title":"荣归","detail":"学富五车题雁塔<br />衣锦还乡会有时"},
+            {"qVal": "上签","title":"利是","detail":"得鸿运 利仕途 能旺夫"},
+            {"qVal": "上签","title":"致祥","detail":"竹报三多 和睦融洽 可致吉祥"},
+            {"qVal": "上签","title":"吉祥","detail":"梅花数点 泽如时雨 吉人天相"},
+            {"qVal": "上上签 ","title":"福聚","detail":"日转千阶 洞房花烛<br />久旱逢雨 他乡故知"},
+        ];
+        var inx = parseInt(Math.random()*6);
 
-	var url_search = window.location.search;
-	var searchArray = url_search.substring(1).split("&");
-	var wxid;
-	var uid;
-	for (var i = 0; i < searchArray.length; i++) {
-		var temp = searchArray[i].split('=');
-		if (temp[0] == 'wxid') {
-			wxid = temp[1] ? temp[1] : '';
-		}
-		if (temp[0] == 'uid') {
-			uid = temp[1] ? temp[1] : '';
-		}
-	}
+        //console.log(inx,val[inx].qVal,val[inx].title, val[inx].detail.replace("<br />"," "));
 
-	$.ajax({
-		url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
-		type: "GET",
-	}).done(function (xhr) {
-		
-		if(xhr.err_code==0){
+        jqDom.find("div.top").text(val[inx].qVal);//签
+        jqDom.find("div.bottom").text(val[inx].title);
 
-			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
-		}else{
-			//$('.friend_top span').text(xhr.err_messege);
-			//$('.friend_top').fadeIn();
-		}
-	});
+        page2.find("div.big-tit").text(val[inx].title);
+        page2.find("div.qian-cont").html(val[inx].detail);
 
-	window.onload = function() {
-		$('.fix_wrap').hide();
-		var user_num = $('.swiper-slide').length;
-	};
+        weixin_share(val[inx].detail.replace("<br />"," "),shareBack);//微信分享
+    }
+    $("div.shake-box").click(function(){
+        var self = $(this);
+        self.find("p.shake-tit").hide();
+        self.parents("div.mammon-yb").addClass("circle-box");
+        showJp(self.find("img"));
+    });
+    function showJp(self){//显示 签
+        setTimeout(function(){
+            self.removeClass("shake");
+            $("div.mammon-jq").css("display","-webkit-box");
+        },3000);
+    }
+    function checkTel(val){
+        var isRight = false,
+            re = new RegExp(/^[1][0-9]{10}$/);
+        re.test($.trim(val)) ? isRight = true : isRight = false;
+        return isRight;
+    }
+    function weixin_share(shareTit,fn){
+        //alert(shareTit);
+        var weiURL = '/weixin/api/jsapi_config/';
+        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+        org.ajax({
+            type: 'GET',
+            url: weiURL,
+            dataType: 'json',
+            success: function (data) {
+                //请求成功，通过config注入配置信息,
+                wx.config({
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.signature,
+                    jsApiList: jsApiList
+                });
+            }
+        });
+        wx.ready(function () {
+            var host = 'https://staging.wanglibao.com',
+                shareImg = host + '/static/imgs/mobile_activity/mammon/cs_img.png',
+                shareLink = host + '/activity/weixin_mammon/',
+                shareMainTit = shareTit ? ('《财神说：'+shareTit +'》') : '《财神说：接财神、测财运、领开运红包》',
+                shareBody = shareTit;
+            //分享给微信好友
+            org.onMenuShareAppMessage({
+                title: "《财神说：接财神、测财运、领开运红包》",
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    //alert("分享成功");
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
+                }
+            });
+            //分享给微信朋友圈
+            org.onMenuShareTimeline({
+                title: shareMainTit,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
+                }
+            });
+            //分享给QQ
+            org.onMenuShareQQ({
+                title: shareMainTit,
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
+                }
+            })
+        })
+    }
 
-	var h5_user_static;
-    org.ajax({
-        url: '/api/user_login/',
-        type: 'post',
-        success: function(data1) {
-            h5_user_static = data1.login;
-        }
+    getVal();
+
+    //点击解签
+    $(".js-btn").click(function(){
+        $(this).parents(".mammon-jq").hide();
+        $("div.mammon-share").css("display","-webkit-box");
+    });
+    //关闭弹出层
+    $(".js-close").click(function(){
+        $(this).parents(".alt-box").hide();
     });
 
-	var is_myself = false;
+    //手机号 检测是否是新用户
+    $(".js-checkUser").click(function(){
+        var self = $(this);
+        var tel = self.siblings(".tel-inp").val();
+        var tp = self.parents("div.mammon-page2");
+        if(!checkTel(tel)){
+            $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
+            return false;
+        }
+        org.ajax({
+            type: "GET",
+            url: '/api/user_exists/'+ tel + '/',
+            dataType: 'json',
+            success: function(data){
+                if(data.existing){
+                    tp.hide();
+                    tp.siblings("div.mammon-page3").show();
+                }else{
+                    tp.hide();
+                    tp.siblings("div.mammon-page4").show().find("#page4-tel").text(tel);
+                }
+            }
+        });
+    });
 
-	/*分享*/
-	$('.share_button').click(function(){
-		$('.share_wrap').show();
-	});
-	$('.share_wrap').click(function(){
-		$(this).hide();
-	});
-	/*结束分享*/
-
-	/*刷新数据*/
-	$('.renovate').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
-		$(this).addClass('renovate_rotate');
-		$.ajax({
-			url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
-			type: "GET",
-		}).done(function (xhr) {
-			if(xhr.err_code==0){
-				$('.renovate').removeClass('renovate_rotate');
-				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
-				$('#zan_num').text(xhr.wx_user.good_vote);
-				$('#cha_num').text(xhr.wx_user.bad_vote);
-			}else{
-				$('.renovate').removeClass('renovate_rotate');
-				$('.friend_top span').html(xhr.err_messege);
-				$('.friend_top').fadeIn();
-			}
-		});
-	})
-	/*刷新数据结束*/
-
-	/*刷新朋友圈*/
-	function renovate_friends(friends_length,friends_img,is_max,annual_bonus){
-
-		var str='';
-		var follow_one='';
-		for(var i=0; i<friends_length; i++){
-			follow_one = friends_img[i];
-			str +='<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>'
-		}
-
-		var swiper = new Swiper('.swiper-container', {
-			initialSlide : 0,
-			slidesPerView: 6,
-			nextButton: '.swiper-button-next',
-			prevButton: '.swiper-button-prev',
-			loop: false
-		});
-		swiper.removeAllSlides();
-		swiper.appendSlide(str);
-		swiper.update();
-		swiper.slideTo(0, 100, false);
-		if(is_max){
-			$('.num_top').show();
-		}
-		$('#praise_num').val(annual_bonus);
-
-
-	}
-	/*刷新朋友圈结束*/
-	/*同意活动规则按钮*/
-	$('.checkbox').click(function(){
-		if($(this).hasClass('checkbox_select')){
-			$(this).removeClass('checkbox_select');
-		}else{
-			$(this).addClass('checkbox_select');
-		}
-	});
-	/*同意活动规则按钮结束*/
-
-	/*邀请好友弹窗关闭*/
-	$('.share_wrap .close').click(function(){
-		$('.share_wrap').hide();
-	});
-	/*邀请好友弹窗关闭结束*/
-
-	var praise_num = $('#praise_num').val();
-	/*投票*/
-	$('.praise_left').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
-			$.ajax({
-				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
-				type: "GET",
-			}).done(function (xhr) {
-				if(xhr.err_code==0){
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
-					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
-					$('#zan_num').text(xhr.wx_user.good_vote);
-				}else{
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
-				}
-			});
-	});
-
-	$('.praise_right').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
-		$.ajax({
-			url: '/weixin_activity/weixin/bonus/?act=vote&type=0&uid='+uid+'&wxid='+wxid,
-			type: "GET",
-		}).done(function (xhr) {
-			if(xhr.err_code==0){
-				$('.friend_top span').html(xhr.err_messege);
-				$('.friend_top').fadeIn();
-				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
-				$('#cha_num').text(xhr.wx_user.bad_vote);
-			}else{
-				$('.friend_top span').html(xhr.err_messege);
-				$('.friend_top').fadeIn();
-			}
-		});
-	});
-	/*投票结束*/
-
-	/*申请我的年终奖*/
-	var phone_number;
-	$('.take_mine_button').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
-		phone_number = $('#phone_number').val();
-		if($('.checkbox').hasClass('checkbox_select')){
-			$.ajax({
-				url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_number+'&wxid='+wxid,
-				type: "GET",
-			}).done(function (xhr) {
-				if(xhr.err_code==0){
-					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
-				}else if(xhr.err_code==205){
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
-					$('.apply_button').show();
-				}else{
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
-				}
-			});
-		}else{
-			$('.friend_top span').html('请点击，我同意网利宝年终奖活动规则');
-			$('.friend_top').fadeIn();
-		}
-	});
-	/*申请我的年终奖结束*/
-
-	var shareName = $('.share_name').text(),
-		shareImg = $('.share_img').text(),
-		shareLink = $('.share_link').text(),
-		shareMainTit = $('.share_title').text(),
-		shareBody = $('.share_body').text(),
-		user_info = $('.user_info').text();
-		share_friends = $('.share_all').text();
-
-
-
-	if(user_info=='True'){
-		$('.friend_top span').html('您已注册成功，请点击<立即使用>领用您的年终奖了');
-		$('.friend_top').show();
-	}else{
-		if(uid!=undefined){
-			$('.shine_wrap').show();
-		}
-	}
-
-	/*倒数3秒跳转体验金页面*/
-	var go_experiencez_time = 3;
-	function go_experience(){
-		go_experiencez_time -= 1;
-		if(go_experiencez_time==0){
-			clearTimeout();
-			if(h5_user_static){
-				window.location.href = '/activity/experience/account/'
-			}else{
-				window.location.href = '/weixin/login/?next=/activity/experience/account/'
-			}
-
-		}
-		setTimeout("go_experience()",1000);
-	}
-	/*倒数3秒跳转体验金页面结束*/
-
-	/*领取我的年终奖*/
-	$('.now_use').click(function(){
-		$('.regist_button,.apply_button,.login_button,.go_experience,.new_user_text').hide();
-		if($('.checkbox').hasClass('checkbox_select')){
-			$.ajax({
-				url: '/weixin_activity/weixin/bonus/?act=pay&wxid='+wxid,
-				type: "GET",
-			}).done(function (xhr) {
-				if(xhr.err_code==0){
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').show();
-					$('.friend_top .close').hide();
-					if(h5_user_static){
-						$('.go_experience').show();
-					}else{
-						$('.login_button').show();
-					}
-					//go_experience();
-					//倒数3秒跳转到体验金页面
-
-				}else if(xhr.err_code==404){
-					$('.regist_button').show().css('display','block');
-					$('.new_user_text').show();
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
-
-				}else if(xhr.err_code==403){
-					if(h5_user_static){
-						$('.go_experience').show();
-					}else{
-						$('.login_button').show();
-					}
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
-				}else{
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
-				}
-			});
-		}else{
-			$('.friend_top span').html('请点击，我同意网利宝年终奖活动规则');
-			$('.friend_top').fadeIn();
-		}
-	});
-
-	/*领取我的年终奖结束*/
-
-	$('.regist_button,.apply_button,.login_button,.go_experience').hide();
-	$('.regist_button').click(function(){
-		window.location.href = '/weixin/regist/?next=/weixin_activity/weixin/bonus/from_regist/&promo_token=h5dianzan';
-	});
-
-	$('.apply_button').click(function(){
-		window.location.href = '/weixin_activity/weixin/bonus/';
-	});
-
-
-
-	$('.login_button').click(function(){
-		window.location.href = '/weixin/login/?next=/activity/experience/account/';
-	});
-
-
-	$('.go_experience').click(function(){
-		window.location.href = '/activity/experience/account/';
-	})
-
-	$('.friend_top .close').click(function(){
-		$('.friend_top').hide();
-	});
-
-	$('.shine_wrap .close').click(function(){
-		$('.shine_wrap').hide();
-	});
-
-	$('.rule').click(function(){
-		$('.rule_wrap').show();
-	});
-	$('.rule_wrap .close').click(function(){
-		$('.rule_wrap').hide();
-	});
-
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-	org.ajax({
-		type : 'GET',
-		url : '/weixin/api/jsapi_config/',
-		dataType : 'json',
-		success : function(data) {
-			//请求成功，通过config注入配置信息,
-			wx.config({
-				debug: false,
-				appId: data.appId,
-				timestamp: data.timestamp,
-				nonceStr: data.nonceStr,
-				signature: data.signature,
-				jsApiList: jsApiList
-			});
-		}
-	});
-	wx.ready(function(){
-		//分享给微信好友
-		org.onMenuShareAppMessage({
-			title: shareMainTit,
-			desc: shareBody,
-			link: shareLink,
-			imgUrl: shareImg
-		});
-		//分享给微信朋友圈
-		org.onMenuShareTimeline({
-			title: share_friends,
-			link : shareLink,
-			imgUrl: shareImg
-		})
-		//分享给QQ
-		org.onMenuShareQQ({
-			title: shareMainTit,
-			desc: shareBody,
-			link : shareLink,
-			imgUrl: shareImg
-		})
-	})
-})(org);
-
-
+    //加载中
+    //var len = 0;
+    //$("img").each(function(i,self){
+    //    $(self)[0].onload = function(){
+    //        len ++;
+    //        console.log(len,$("img").length);
+    //        if(len === $("img").length){
+    //            $("#load-box").hide().siblings("div.mammon-page1").show();
+    //        }
+    //    };
+    //});
+    $(function(){
+        $("#load-box").hide().siblings("div.mammon-page1").show();
+    })
+})();

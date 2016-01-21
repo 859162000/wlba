@@ -1,0 +1,69 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    title 接财神、测财运、领开运红包
+    include include/app_head
+  body.h5-mammon
+    .load-box#load-box
+      .load-item
+    .mammon-page1
+      .mammon-tit 过年期间拜财神，用开运物，以顺时针的方式，在香炉上方划圆三圈，可利於开运！
+      .mammon-img
+        img(src="/static/imgs/mobile_activity/mammon/cs_img.png" style="width:100%")
+      .mammon-xl
+        img(src="/static/imgs/mobile_activity/mammon/cs_xl.png")
+      .mammon-yb
+        .shake-box
+          p.shake-tit 点我点我
+          img(src="/static/imgs/mobile_activity/mammon/cs_yb.png").shake
+    .mammon-page2
+      .mammon-tit
+        .big-tit 福 聚
+        .txt.qian-cont 日转千阶 洞房花烛<br />久旱逢雨 他乡故知
+      .mammon-redPack
+        img(src="/static/imgs/mobile_activity/mammon/cs_redPack.jpg" style="width:100%;")
+      .mammon-inp-box
+        input(type="tel",placeholder="请输入手机号").tel-inp
+        a(href="javascript:;").yellow-btn.js-checkUser 开红包
+    .mammon-page3
+      .mammon-tit 没有抽中 <span class="yellow-txt">=> <=</span><br />你把运气都藏起来了吧？<br />没关系！关注<span class="yellow-txt">网利宝服务号</span><br /><span class="yellow-txt">20元</span>投资红包立刻拿！
+      .mammon-code
+        .tit 长按以下二维码
+        .code-img
+          img(src="/static/imgs/mobile_activity/mammon/cs_code.jpg")
+    .mammon-page4
+      .mammon-tit 你接财你接财神获得的开运红包，已存入你网利宝 <span class="yellow-txt" id="page4-tel">15801573718</span> 的账户中，为8000-28888元不等的体验金，快点击立即查看，到<span class="yellow-txt">我的体验金</span>项目页，看看自己的运气吧！
+      .mammon-ok
+        img(src="/static/imgs/mobile_activity/mammon/cs_fwh.jpg",style="width:48%").fwh1
+        img(src="/static/imgs/mobile_activity/mammon/cs_fwh2.png",style="width:40%").fwh2
+        .fwh-bg
+      .look-btn-box
+        //a(href="javascript:;").yellow-btn 立即查看
+        img(src="/static/imgs/mobile_activity/mammon/cs_code.jpg",style="width:48%")
+        p 长按二维码立即赢取
+      .mammon-btm 网利宝：投资自己是一笔隐形财富，理财是一种生活态度。<br />为你100%的努力，再多12%的收益。<br />关注网利宝服务号：每天签到领领福利，随时查看账户收益。
+
+    .mammon-error.alt-box
+      .share-mian
+        .close.js-close &times;
+        .share-txt
+        .share-box
+          a(href="javascript:;").red-btn.js-close 我知道了
+    .mammon-jq
+      .mammon-main
+        .jq-box
+          .top 上上签
+          .bottom 福聚
+        .js-btn 解签
+    .mammon-share.alt-box
+      .share-mian
+        .close.js-close &times;
+        .share-txt
+          p 转发给你的朋友，家人，为他们祈福求财。
+          p 转发可解签，并领取开运礼包。
+        .share-box
+          a(href="javascript:;").red-btn.js-close 我知道了
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(src="/static/scripts/mobile_activity/h5_cammon.js?v=201601213")
