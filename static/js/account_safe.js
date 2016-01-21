@@ -1,7 +1,7 @@
 (function() {
     require.config({
         paths: {
-            jquery: 'lib/jquery.min',
+            jquery: '/static/js/lib/jquery.min',
 
         },
         shim: {
@@ -10,7 +10,6 @@
     });
     require(['jquery'],
     function($, re) {
-
 		var csrfSafeMethod, getCookie, sameOrigin,
           getCookie = function (name) {
               var cookie, cookieValue, cookies, i;
