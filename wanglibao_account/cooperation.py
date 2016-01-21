@@ -1257,6 +1257,7 @@ class WeixinRedpackRegister(CoopRegister):
         else:
             pass
 
+
 class XunleiVipRegister(CoopRegister):
     def __init__(self, request):
         super(XunleiVipRegister, self).__init__(request)
@@ -1316,9 +1317,9 @@ class XunleiVipRegister(CoopRegister):
         :return:
         """
 
+        channel_name = self.channel_name
         if self.is_xunlei_user:
             channel_user = self.channel_user
-            channel_name = self.channel_name
             bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
             if channel_name and channel_user and len(channel_user) <= bid_len:
                 binding = Binding()
@@ -1329,11 +1330,11 @@ class XunleiVipRegister(CoopRegister):
                 # logger.debug('save user %s to binding'%user)
                 return True
 
-            logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
-                        (user.id, channel_user, channel_name))
+            logger.info("%s binding faild with user[%s], channel_user[%s]" %
+                        (channel_name, user.id, channel_user))
         else:
-            logger.info("xunlei9 binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
-                        (user.id, self.channel_user, self.channel_time, self.channel_sign))
+            logger.info("%s binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
+                        (channel_name, user.id, self.channel_user, self.channel_time, self.channel_sign))
 
     def binding_for_after_register(self, user):
         """
@@ -1397,7 +1398,7 @@ class XunleiVipRegister(CoopRegister):
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
 
     def recharge_call_back(self, user, order_id):
-        logger.info("XunleiVip-Enter recharge_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
+        logger.info("XunleiVip-Enter recharge_call_back for user[%s], order_id[%s]" % (user.id, order_id))
         # 判断用户是否首次充值
         penny = Decimal(0.01).quantize(Decimal('.01'))
         pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
@@ -1453,6 +1454,12 @@ class XunleiVipRegister(CoopRegister):
                         "content": message_content,
                         "mtype": "activity"
                     })
+
+
+class XunleiMobileRegister(XunleiVipRegister):
+    def __init__(self, request):
+        super(XunleiMobileRegister, self).__init__(request)
+        self.c_code = 'mxunlei'
 
 
 class MaimaiRegister(CoopRegister):
