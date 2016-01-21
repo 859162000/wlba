@@ -120,6 +120,9 @@
     $(".js-close").click(function(){
         $(this).parents(".alt-box").hide();
     });
+    $(".js-showShare").click(function(){
+        $(this).parents(".alt-box").hide().siblings("div.mammon-share2").show();
+    });
 
     //手机号 检测是否是新用户
     $(".js-checkUser").click(function(){
