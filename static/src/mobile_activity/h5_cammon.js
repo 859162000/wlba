@@ -55,7 +55,7 @@
             success: function (data) {
                 //请求成功，通过config注入配置信息,
                 wx.config({
-                    debug: true,
+                    debug: false,
                     appId: data.appId,
                     timestamp: data.timestamp,
                     nonceStr: data.nonceStr,
