@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -253,14 +253,17 @@ wlb.ready({
 
     },
     other: function () {
+        var boy = $(document.body).height();
+        $('#two-mov-ice').css({'height': boy});
         org.ajax({
-        url: '/api/user_login/',
-        type: 'post',
-        success: function(data1) {
-            con
-            h5_user_static = data1.login;
-        }
-    });
+            url: '/api/user_login/',
+            type: 'post',
+            success: function (data1) {
+                if(data1.login==true){
+                    //alert(123)
+                };
+            }
+        });
 
     }
 })

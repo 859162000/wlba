@@ -947,10 +947,71 @@
         font-size: 0.6rem
         color: #9b9b9b
         line-height: 0.9rem
-
-
-
-
+.title_box
+  position: fixed
+  left: 0
+  top: 0
+  z-index: 99
+  width: 100%
+  display: none
+  height: 100%
+  .main
+    position: absolute
+    left: 0
+    top: 50%
+    width: 100%
+    margin: -3.2rem 0 0 0
+    text-align: center
+    .text
+      padding: 1rem
+      background: #ccc
+      color: #483153
+      line-height: 1.2rem
+      font-size: 0.9rem
+      border-radius: 10px
+      width: 85%
+      display: block
+      margin: 0 auto
+      position: relative
+.title_box_animate
+  -webkit-animation-name: title_box_animate
+  animation-name: title_box_animate
+  -webkit-animation-duration: 2s
+  animation-duration: 2s
+  -webkit-animation-timing-function: ease-in
+  animation-timing-function: ease-in
+  -webkit-animation-delay: 0.2s
+  animation-delay: 0.2s
+  -webkit-animation-fill-mode: both
+  animation-fill-mode: both
+  -webkit-transform: translateY(1rem)
+  transform: translateY(1rem)
+@-webkit-keyframes title_box_animate
+  0%
+    -webkit-transform: translateY(1rem)
+    opacity: 0
+  20%
+    -webkit-transform: translateY(0px)
+    opacity: 1
+  80%
+    -webkit-transform: translateY(0px)
+    opacity: 1
+  100%
+    -webkit-transform: translateY(-1rem)
+    opacity: 0
+@keyframes title_box_animate
+  0%
+    transform: translateY(1rem)
+    opacity: 0
+  20%
+    transform: translateY(0px)
+    opacity: 1
+  80%
+    transform: translateY(0px)
+    opacity: 1
+  100%
+    transform: translateY(-1rem)
+    opacity: 0
 
 
 

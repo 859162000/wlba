@@ -34,14 +34,17 @@ wlb.ready({
 
     },
     other: function () {
+        var boy = $(document.body).height();
+        $('#two-mov-ice').css({'height': boy});
         org.ajax({
-        url: '/api/user_login/',
-        type: 'post',
-        success: function(data1) {
-            con
-            h5_user_static = data1.login;
-        }
-    });
+            url: '/api/user_login/',
+            type: 'post',
+            success: function (data1) {
+                if(data1.login==true){
+                    //alert(123)
+                };
+            }
+        });
 
     }
 })
