@@ -34,7 +34,7 @@ html(style="background: #3a2741")
             })();
         link(href="/static/styles/mobile_activity/app.css?v=20160113", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=012101", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=012102", rel="stylesheet")
         - csrf_token
     body
         .fix_wrap(style='width: 100%;height: 100%;background: #3a2741;position: fixed;left: 0;top: 0;z-index: 9999')
@@ -92,6 +92,7 @@ html(style="background: #3a2741")
                             // Only for alpha-test
                             //img.code_img(src="/static/imgs/admin/qrcode_for_gh_3b82a2651647_258.jpeg")
                             .title_text2 长按二维码关注
+                    img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
                     .introduction_wrap
                         .box
                             img(src="/static/imgs/mobile_activity/app_365_gu/advantage_1.png")
@@ -113,7 +114,6 @@ html(style="background: #3a2741")
                             dl
                                 dt 高收益
                                 dd 37倍银行活期收益<br>100元起投0手续
-                    img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
 
             .share_wrap
                 .share_text
@@ -131,11 +131,11 @@ html(style="background: #3a2741")
                         span.img
                             img(src="/static/imgs/mobile_activity/app_praise_reward/share_ico.png")
                         span.text 发送给朋友
-            .shine_wrap
-                img.bg(src="/static/imgs/mobile_activity/app_praise_reward/shine.png")
-                img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
-                .title 助力好友年终奖，你也可以领
-                .text 够努力，够会赚 ，赞TA<br>还需要继续努力，差评
+            //.shine_wrap
+            //    img.bg(src="/static/imgs/mobile_activity/app_praise_reward/shine.png")
+            //    img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
+            //    .title 助力好友年终奖，你也可以领
+            //    .text 够努力，够会赚 ，赞TA<br>还需要继续努力，差评
             .friend_top
                 .main
                     .text
@@ -178,4 +178,4 @@ html(style="background: #3a2741")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/swiper.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=012101")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=012102")
