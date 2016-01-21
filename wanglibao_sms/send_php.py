@@ -72,16 +72,17 @@ class PHPSendSMS(SMSBackEnd):
 
         post_data['data'] = data_messages
         post_data['sign'] = sign
+        post_data_json = json.dumps(post_data)
 
         headers = {'content-type': 'application/json'}
-
-        response = requests.post(PHP_SMS_HOST, json.dumps(post_data), headers=headers)
+        response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers)
 
         status_code = response.status_code
         res_text = json.loads(response.text)
 
         # 写入日志
-        logger.debug(">>>> php send sms: {} === send node: {} === res status: {} === res text: {}".format(
+        logger.debug(">>>> json data: {}".format(post_data_json))
+        logger.debug("<<<< {}; rule_id: {}; status_code: {}; response_text: {}".format(
             datetime.now(), rule_id, status_code, res_text
         ))
         return status_code, res_text
