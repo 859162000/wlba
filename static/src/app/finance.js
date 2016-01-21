@@ -17,7 +17,6 @@ org.finance = (function (org) {
         model_canvac_opeartion: true,
         canvas_model4: null,
         init: function () {
-            $('.refresh').html($(window).height())
             lib.fetch_data();
             lib.listen_handle()
         },
@@ -241,15 +240,15 @@ org.finance = (function (org) {
         cavas_model4: function (sort, mid, long) {
             var doughnutData = [
                 {
-                    value: 30,
+                    value: sort,
                     color: "#f35b47"
                 },
                 {
-                    value: 40,
+                    value: mid,
                     color: "#FFBA26"
                 },
                 {
-                    value: 30,
+                    value: long,
                     color: "#4877c8"
                 },
 
