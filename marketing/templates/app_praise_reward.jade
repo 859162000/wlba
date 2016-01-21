@@ -44,7 +44,10 @@ html(style="background: #3a2741")
                     img.fly_img(src="/static/imgs/mobile_activity/app_praise_reward/work_bg.png")
                     img.man(src='{{wx_user.headimgurl}}')
                     .worker
-                        .text 年终考核进行中……
+                        if is_myself
+                            .text 年终考核进行中......
+                        else
+                            .text 冲刺8000年终奖，一赞发500！
                 .operation_wrap
                     .reward_wrap
                         img.gold(src="/static/imgs/mobile_activity/app_praise_reward/gold.png")

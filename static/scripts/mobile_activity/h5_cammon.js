@@ -308,7 +308,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    alert(2);
                     if(fn && (typeof fn == "function")){
+                        alert(22);
                         fn();
                     }
                 }
@@ -320,7 +322,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    alert(1);
                     if(fn && (typeof fn == "function")){
+                        alert(3);
                         fn();
                     }
                 }
