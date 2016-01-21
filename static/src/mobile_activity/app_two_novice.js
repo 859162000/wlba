@@ -34,6 +34,14 @@ wlb.ready({
 
     },
     other: function () {
+        org.ajax({
+        url: '/api/user_login/',
+        type: 'post',
+        success: function(data1) {
+            con
+            h5_user_static = data1.login;
+        }
+    });
 
     }
 })

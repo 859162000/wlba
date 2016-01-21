@@ -363,7 +363,7 @@
         var xluserid = getQueryString('xluserid'),
             referfrom = getQueryString('referfrom')
         $.ajax({
-            url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xluserid + '&ext2=' + referfrom,
+            url: '/api/coop_pv/'+token+'/?source=pv_wanglibao&ext=' + xluserid + '&ext2=' + referfrom,
             type: "GET"
         })
         function getCode() {//得到用户信息的二维码
