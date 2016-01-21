@@ -2237,8 +2237,9 @@ class ValidateAccountInfoTemplate(TemplateView):
     template_name = ""
 
     def get_context_data(self, **kwargs):
-        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
-        is_bind_card = cards.exists()
+        # cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
         return {
             'is_bind_card': is_bind_card
         }
@@ -2290,11 +2291,11 @@ class ManualModifyPhoneTemplate(TemplateView):
         user = self.request.user
         profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        # modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
         return {
                 'form':form,
                 'user_name':profile.name,
-                'modify_phone_record':modify_phone_record
+                # 'modify_phone_record':modify_phone_record
                 }
 
 
@@ -2335,8 +2336,8 @@ class SMSModifyPhoneValidateTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         profile = user.wanglibaouserprofile
-        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
-        is_bind_card = cards.exists()
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
         return {
             "phone": profile.phone,
             'is_bind_card': is_bind_card,
@@ -2351,6 +2352,7 @@ class SMSModifyPhoneValidateAPI(APIView):
         validate_code = request.DATA.get('validate_code', "").strip()
         id_number = request.DATA.get('id_number', "").strip()
         new_phone = request.DATA.get('new_phone', "").strip()
+
         if not profile.id_is_valid or not profile.id_number:
             return Response({'message':"还没有实名认证"}, status=400)
         if not validate_code or not id_number or not new_phone:
@@ -2374,6 +2376,11 @@ class SMSModifyPhoneValidateAPI(APIView):
                 return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
             #todo
             # 同卡之后要对银行卡号进行验证
+            card = Card.objects.filter(user=request.user, is_the_one_card=True)
+            if card.exists():
+                card_no = request.DATA.get('card_no', "").strip()
+                if not card_no or card_no != card.no:
+                    return Response({'message':"银行卡号错误"}, status=400)
             sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, status = u'短信修改手机号提交').first()
             if not sms_modify_record:
                 sms_modify_record = SMSModifyPhoneRecord()
@@ -2419,6 +2426,11 @@ class SMSModifyPhoneAPI(APIView):
         new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
         if new_phone_user:
             return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+        card = Card.objects.filter(user=request.user, is_the_one_card=True)
+        if card.exists():
+            card_no = request.DATA.get('card_no', "").strip()
+            if not card_no or card_no != card.no:
+                return Response({'message':"银行卡号错误"}, status=400)
         with transaction.atomic(savepoint=True):
             old_phone = profile.phone
             profile.phone = new_phone
