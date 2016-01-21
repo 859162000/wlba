@@ -205,7 +205,7 @@
 		$('.friend_top').show();
 	}else{
 		if(uid!=undefined){
-			$('.shine_wrap').show();
+			//$('.shine_wrap').show();
 		}
 	}
 
