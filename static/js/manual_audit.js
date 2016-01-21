@@ -2,7 +2,6 @@
     require.config({
         paths: {
             jquery: '/static/js/lib/jquery.min',
-
         },
         shim: {
             'jquery.modal': ['jquery'],
