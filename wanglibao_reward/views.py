@@ -41,6 +41,7 @@ from weixin.models import WeixinUser
 import requests
 from urllib import urlencode,quote
 from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
+from wanglibao_margin.models import MarginRecord
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -1308,10 +1309,10 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         order_id = request.POST.get('order_id')
-        if not Order.objects.filter(pk=order_id).first():
+        if not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
             json_to_response = {
                 'code': 1001,
-                'message': u'Order ID不错在'
+                'message': u'Order和User不匹配'
             }
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
