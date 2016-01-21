@@ -34,7 +34,7 @@ html(style="background: #3a2741")
             })();
         link(href="/static/styles/mobile_activity/app.css?v=20160113", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=012102", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=012103", rel="stylesheet")
         - csrf_token
     body
         .fix_wrap(style='width: 100%;height: 100%;background: #3a2741;position: fixed;left: 0;top: 0;z-index: 9999')
@@ -45,7 +45,7 @@ html(style="background: #3a2741")
                     img.man(src='{{wx_user.headimgurl}}')
                     .worker
                         if is_myself
-                            .text 年终考核进行中......
+                            .text 年终考核进行中……
                         else
                             .text 冲刺8000年终奖，一赞发500！
                 .operation_wrap
@@ -149,6 +149,9 @@ html(style="background: #3a2741")
                         .login_button 登录
                         .go_experience 领取成功
                         .new_user_text 注册再得28888体验金
+            .title_box
+                .main
+                    .text 测试
             .rule_wrap
                 .main
                     .text
@@ -181,4 +184,4 @@ html(style="background: #3a2741")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/swiper.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=012102")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=012103")
