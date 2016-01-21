@@ -182,6 +182,7 @@ urlpatterns += patterns(
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
     url(r'^weixin_mammon/$', TemplateView.as_view(template_name="h5_mammon.jade")),
+    url(r'^app_two_novice/$', TemplateView.as_view(template_name="app_two_novice.jade")),
 
 )
 # app with webview
