@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -288,11 +288,11 @@ org.finance = (function (org) {
                             _self.swiper_init([6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) > 0){
+                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.invite_income) > 0){
                             _self.swiper_init([1,2,3,6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) <= 0){
+                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.invite_income) <= 0){
                             _self.swiper_init([1,2,3,4,5])
                         }
 
