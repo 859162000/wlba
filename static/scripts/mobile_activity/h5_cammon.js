@@ -287,11 +287,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile_activity/mammon/cs_img.png',
                 shareLink = host + '/activity/weixin_mammon/',
-                shareMainTit = shareTit ? ('《财神说：'+shareTit +'》') : '《财神说：接财神、测财运、领开运红包》',
+                shareMainTit = shareTit ? ('财神说：'+shareTit) : '财神说：接财神、测财运、领开运红包',
                 shareBody = shareTit;
             //分享给微信好友
             org.onMenuShareAppMessage({
-                title: "《财神说：接财神、测财运、领开运红包》",
+                title: "财神说：接财神、测财运、领开运红包",
                 desc: shareBody,
                 link: shareLink,
                 imgUrl: shareImg,
