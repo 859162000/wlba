@@ -253,8 +253,8 @@ org.ajax({
             org.ajax({
                 url: '/api/has_binding/xunlei9/' + xid + '/',
                 type: 'GET',
-                success: function () {
-                    if (data.ret_code == 10001) {
+                success: function (data1) {
+                    if (data1.ret_code == 10001) {
                         $('.xunmeng3').show();
                         $('.maimai-form').hide();
                     }
