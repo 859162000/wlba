@@ -245,6 +245,8 @@ def send_income_message_sms():
     phones_list = []
     messages_list = []
     if incomes:
+        i = 0
+        data_messages = {}
         for income in incomes:
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile')\
@@ -254,10 +256,21 @@ def send_income_message_sms():
             if not name:
                 from wanglibao.templatetags.formatters import safe_phone_str
                 name = safe_phone_str(phone)
-            phones_list.append(phone)
-            messages_list.append(messages.sms_income(name,
-                                                     income.get('invite__count'),
-                                                     income.get('earning__sum')))
+
+            data_messages[i] = {
+                'user_id': phone,
+                'user_type': 'phone',
+                'params': {
+                    'name': name,
+                    'count': income.get('invite__count'),
+                    'amount': income.get('earning__sum')
+                }
+            }
+            i += 1
+            # phones_list.append(phone)
+            # messages_list.append(messages.sms_income(name,
+            #                                          income.get('invite__count'),
+            #                                          income.get('earning__sum')))
 
             # 发送站内信
             title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
@@ -269,11 +282,13 @@ def send_income_message_sms():
             })
 
         # 批量发送短信
-        send_messages.apply_async(kwargs={
-            "phones": phones_list,
-            "messages": messages_list,
-            "ext": 666
-        })
+        # 功能推送id: 3
+        PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
+        # send_messages.apply_async(kwargs={
+        #     "phones": phones_list,
+        #     "messages": messages_list,
+        #     "ext": 666
+        # })
 
 
 @app.task
@@ -340,18 +355,31 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
     # 获取没有投资的用户
     users = registered_users.exclude(id__in=ids)
 
-    phones_list = []
+    data_messages = {}
+    i = 0
     for user in users:
-        try:
-            phones_list.append(user.wanglibaouserprofile.phone)
-        except Exception, e:
-            print e
-            pass
-    send_messages.apply_async(kwargs={
-        'phones': phones_list,
-        'messages': [messages.user_invest_alert()],
-        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-    })
+        data_messages[i] = {
+            'user_id': user.wanglibaouserprofile.phone,
+            'user_type': 'phone',
+            'params': {}
+        }
+        i += 1
+
+    # 功能推送id: 2
+    PHPSendSMS().send_sms(rule_id=2, data_messages=data_messages)
+
+    # phones_list = []
+    # for user in users:
+    #     try:
+    #         phones_list.append(user.wanglibaouserprofile.phone)
+    #     except Exception, e:
+    #         print e
+    #         pass
+    # send_messages.apply_async(kwargs={
+    #     'phones': phones_list,
+    #     'messages': [messages.user_invest_alert()],
+    #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+    # })
 
 
 @app.task
