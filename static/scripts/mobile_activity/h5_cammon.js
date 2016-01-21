@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -224,6 +224,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
         page2.show();
     }
+    
     function getVal(){
         var val = [
             {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
