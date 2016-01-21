@@ -278,10 +278,13 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
+                $('.aa').text('aa')
                 mixins.loginApp({refresh:1, url:''});
+                $('.bb').text('cc')
             } else {
                 login = true;
                 connect(data)
+                $('.aa').text('bb')
                 mixins.sendUserInfo('is_authenticated','')
             }
         })
@@ -294,6 +297,9 @@ org.experience = (function (org) {
     var lib = {
         init: function () {
             lib._goInvest()
+            $('.cc').click(function(){
+                location.reload()
+            })
         },
         _goInvest: function () {
             /*投资*/
