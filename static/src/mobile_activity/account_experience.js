@@ -59,10 +59,11 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                mixins.registerApp({refresh:1, url:''});
+                mixins.loginApp({refresh:1, url:''});
             } else {
                 login = true;
                 connect(data)
+                mixins.sendUserInfo('is_authenticated','')
             }
         })
     },

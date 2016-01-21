@@ -217,118 +217,151 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;org.ui = (function(){
-    var lib = {
-        _alert: function(txt, callback,difference){
-            var alertFram = '';
-            if(document.getElementById("alert-cont")){
-                document.getElementById("alert-cont").innerHTML = '';
-                document.getElementById("popubMask").style.display = "block";
-                document.getElementById("alert-cont").style.display = "block";
-                alertFram = document.getElementById("alert-cont");
-                shield = document.getElementById("popubMask");
-            }else{
-                var shield = document.createElement("DIV");
-                shield.id = "popubMask";
-                shield.style.cssText="position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;height:100%";
-                alertFram = document.createElement("DIV");
-                alertFram.id="alert-cont";
-            }
-            if(difference == 2){
-                strHtml = "<div id='alertTxt' class='popub-txt investWin'><p><img src='/static/imgs/mobile_activity/app_experience/right.png'/></p>";
-                strHtml+="<p class='successFonts'>恭喜您投资成功！</p><p>到期后体验金自动收回</p><p>收益自动发放</p></div>";
-            }else if(difference == 4){
-                strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
-            }
-            alertFram.innerHTML = strHtml;
-            document.body.appendChild(alertFram);
-            document.body.appendChild(shield);
-
-            $('.close_btn').on('click',function(){
-                alertFram.style.display = "none";
-                shield.style.display = "none";
-                callback && callback();
-            })
-            document.body.onselectstart = function(){return false;};
-        }
+;(function(){
+    var jqDom = $("div.mammon-jq");
+    var page2 = $("div.mammon-page2");
+    function shareBack(){
+        $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
+        page2.show();
     }
+    function getVal(){
+        var val = [
+            {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
+            {"qVal": "中签","title":"荣归","detail":"学富五车题雁塔<br />衣锦还乡会有时"},
+            {"qVal": "上签","title":"利是","detail":"得鸿运 利仕途 能旺夫"},
+            {"qVal": "上签","title":"致祥","detail":"竹报三多 和睦融洽 可致吉祥"},
+            {"qVal": "上签","title":"吉祥","detail":"梅花数点 泽如时雨 吉人天相"},
+            {"qVal": "上上签 ","title":"福聚","detail":"日转千阶 洞房花烛<br />久旱逢雨 他乡故知"},
+        ];
+        var inx = parseInt(Math.random()*6);
 
-    return {
-        alert : lib._alert
+        //console.log(inx,val[inx].qVal,val[inx].title, val[inx].detail.replace("<br />"," "));
+
+        jqDom.find("div.top").text(val[inx].qVal);//签
+        jqDom.find("div.bottom").text(val[inx].title);
+
+        page2.find("div.big-tit").text(val[inx].title);
+        page2.find("div.qian-cont").html(val[inx].detail);
+
+        weixin_share(val[inx].detail.replace("<br />"," "),shareBack);//微信分享
     }
-})();
-var login = false;
-wlb.ready({
-    app: function (mixins) {
-        function connect(data) {
-            org.ajax({
-                url: '/accounts/token/login/ajax/',
-                type: 'post',
-                data: {
-                    token: data.tk,
-                    secret_key: data.secretToken,
-                    ts: data.ts
-                },
-                success: function (data) {
-                    org.experience.init()
+    $("div.shake-box").click(function(){
+        var self = $(this);
+        self.find("p.shake-tit").hide();
+        self.parents("div.mammon-yb").addClass("circle-box");
+        showJp(self.find("img"));
+    });
+    function showJp(self){//显示 签
+        setTimeout(function(){
+            self.removeClass("shake");
+            $("div.mammon-jq").css("display","-webkit-box");
+        },6000);
+    }
+    function checkTel(val){
+        var isRight = false,
+            re = new RegExp(/^[1][0-9]{10}$/);
+        re.test($.trim(val)) ? isRight = true : isRight = false;
+        return isRight;
+    }
+    function weixin_share(shareTit,fn){
+        //alert(shareTit);
+        var weiURL = '/weixin/api/jsapi_config/';
+        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+        org.ajax({
+            type: 'GET',
+            url: weiURL,
+            dataType: 'json',
+            success: function (data) {
+                //请求成功，通过config注入配置信息,
+                wx.config({
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.signature,
+                    jsApiList: jsApiList
+                });
+            }
+        });
+        wx.ready(function () {
+            var host = 'https://staging.wanglibao.com',
+                shareImg = host + '/static/imgs/mobile_activity/mammon/cs_img.png',
+                shareLink = host + '/activity/weixin_mammon/',
+                shareMainTit = shareTit ? ('《财神说：'+shareTit +'》') : '《财神说：接财神、测财运、领开运红包》',
+                shareBody = shareTit;
+            //分享给微信好友
+            org.onMenuShareAppMessage({
+                title: "《财神说：接财神、测财运、领开运红包》",
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    //alert("分享成功");
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
+                }
+            });
+            //分享给微信朋友圈
+            org.onMenuShareTimeline({
+                title: shareMainTit,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
+                }
+            });
+            //分享给QQ
+            org.onMenuShareQQ({
+                title: shareMainTit,
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             })
-        }
-        mixins.sendUserInfo(function (data) {
-            if (data.ph == '') {
-                login = false;
-                mixins.loginApp({refresh:1, url:''});
-            } else {
-                login = true;
-                connect(data)
-                mixins.sendUserInfo('is_authenticated','')
-            }
         })
-    },
-    other: function(){
-        org.experience.init()
     }
-})
-org.experience = (function (org) {
-    var lib = {
-        init: function () {
-            lib._goInvest()
-        },
-        _goInvest: function () {
-            /*投资*/
-            $('.accountInvestBtn').on('click', function () {
-                org.ajax({
-                    url: '/api/experience/buy/',
-                    type: 'POST',
-                    data: {},
-                    success: function (data) {
-                        if (data.ret_code > 0) {
-                            org.ui.alert(data.message, '', '4')
-                        } else {
-                            org.ui.alert('', '', '2')
-                            setTimeout(function () {
-                                $('#alert-cont,#popubMask').hide();
-                                location.reload();
-                            }, 2000)
-                        }
-                    },
-                    error: function (data) {
-                        org.ui.alert(data.message, '', '4')
-                    }
-                });
-            })
+
+    getVal();
+
+    //点击解签
+    $(".js-btn").click(function(){
+        $(this).parents(".mammon-jq").hide();
+        $("div.mammon-share").css("display","-webkit-box");
+    });
+    //关闭弹出层
+    $(".js-close").click(function(){
+        $(this).parents(".alt-box").hide();
+    });
+
+    //手机号 检测是否是新用户
+    $(".js-checkUser").click(function(){
+        var self = $(this);
+        var tel = self.siblings(".tel-inp").val();
+        var tp = self.parents("div.mammon-page2");
+        if(!checkTel(tel)){
+            $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
+            return false;
         }
-    }
-    return {
-        init: lib.init
-    }
-})(org);
-$.each($('script'), function(){
-    var src = $(this).attr('src');
-    if(src){
-        if($(this).attr('data-init') && org[$(this).attr('data-init')]){
-            org[$(this).attr('data-init')].init();
-        }
-    }
-})
+        org.ajax({
+            type: "GET",
+            url: '/api/user_exists/'+ tel + '/',
+            dataType: 'json',
+            success: function(data){
+                if(data.existing){
+                    tp.hide();
+                    tp.siblings("div.mammon-page3").show();
+                }else{
+                    tp.hide();
+                    tp.siblings("div.mammon-page4").show().find("#page4-tel").text(tel);
+                }
+            }
+        });
+    });
+})();

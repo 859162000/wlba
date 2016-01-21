@@ -281,8 +281,8 @@ class WeixinJoinView(View):
                               u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
                         reply = create_reply(txt, self.msg)
                     else:
-                        reply = -1
-                        logger.debug(u'用户签到没有领到体验金')
+                        reply = create_reply(u'恭喜您，签到成功！', self.msg)
+                        logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
                 else:
                     txt = u"今日已经签到，明日再来"
                     reply = create_reply(txt, self.msg)
