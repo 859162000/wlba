@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import time
 from django import forms
 from django.contrib import admin
 import datetime
@@ -287,6 +288,25 @@ class ActivityBannerPosForm(forms.ModelForm):
     second_left = forms.ModelChoiceField(queryset=queryset, label=u'副推左', required=True)
     second_right = forms.ModelChoiceField(queryset=queryset, label=u'副推右', required=True)
 
+    def is_valid_time(self, activity):
+        now = time.strftime(time.localtime(), "%Y-%m-%d %H:%M:%S")
+        activity_shows = ActivityBannerPosition.objects.filter(start_at__lt=now).values(activity, 'id').order_by('-id')
+        times = []
+        for item in activity_shows:
+            times.append((int(time.mktime(time.strptime(item.start_at, "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(item.end_at, "%Y-%m-%d %H:%M:%S")))))
+
+        times = sorted(times, key=lambda item: item[0])
+
+        end_time = times[0][1]
+        for _index in xrange(1, len(times)):
+            if times[_index][0]-end_time != 1:
+                return False
+            else:
+                end_time = times[_index][1]
+
+        return True
+
+
     def clean_main(self):
         main = self.cleaned_data.get('main')
         second_left = self.cleaned_data.get('second_left')
@@ -295,6 +315,9 @@ class ActivityBannerPosForm(forms.ModelForm):
         act_list = [second_left, second_right]
         if main in act_list:
             raise forms.ValidationError(u'活动不能重复')
+
+        if main and not self.is_valid_time('main'):
+            raise forms.ValidationError(u'主banner时间设置不联系')
 
         return main
 
@@ -307,6 +330,8 @@ class ActivityBannerPosForm(forms.ModelForm):
         if second_left in act_list:
             raise forms.ValidationError(u'活动不能重复')
 
+        if second_left and not self.is_valid_time('second_left'):
+            raise forms.ValidationError(u'左副banner时间设置不连续')
         return second_left
 
     def clean_second_right(self):
@@ -318,6 +343,8 @@ class ActivityBannerPosForm(forms.ModelForm):
         if second_right in act_list:
             raise forms.ValidationError(u'活动不能重复')
 
+        if second_right and not self.is_valid_time('right_left'):
+            raise forms.ValidationError(u'右副banner时间设置不连续')
         return second_right
 
     class Meta:

@@ -96,6 +96,15 @@ var wlb = (function () {
             });
         },
         /**
+         * 跳到发现页  app2.7.6版本
+         * @param callback
+         */
+        jumpToDiscoverView: function (callback) {
+            this.bridge.callHandler('jumpToDiscoverView', function (response) {
+                callback && callback(response)
+            });
+        },
+        /**
          * 判断是否登陆
          * 目前该接口有问题，暂不使用，用senduserinfo先替代
          * @param data  可不传
@@ -109,12 +118,25 @@ var wlb = (function () {
             });
         },
         /**
-         * 获取分享信息
-         * @param data {title: 活动标题, content: 活动描述}
+         * 获取分享信息 app2.7.6版本
+         * @param data {title: 活动标题, content: 活动描述, shareUrl:'指定分享的url'}
          */
         shareData: function (data) {
             this.bridge.registerHandler('shareData', function (backdata, responseCallback) {
                 responseCallback(data);
+            });
+        },
+        /**
+         * 调用分享按钮 app2.7.6版本
+         * @function touchShare
+         * @param data 自定义分享信息
+         * @param callback 回调
+         */
+        touchShare: function(data, callback){
+            var options = this._setData(data, callback);
+            this.bridge.callHandler('touchShare', options.post, function (response) {
+                var responseData  = Mixin.filterJSON(response);
+                options.callback && options.callback(responseData);
             });
         },
         /**

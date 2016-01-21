@@ -1,0 +1,43 @@
+- load formatters
+doctype html
+html(style="background:#fecf4f")
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 网利宝
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        script.
+            (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+        link(href="/static/styles/mobile_activity/app.css?v=20160120", rel="stylesheet")
+        body
+            - csrf_token
+            .new-year-feast
+                img(src='/static/imgs/mobile_activity/feast/banner.jpg').banner
+                .title
+                    span
+                p.title-fonts 团圆最期待，开锅赢红包！快来点击喜欢的大餐，
+                p.title-fonts 赢全民盛宴豪华组合好礼！
+                .pot-div.clearfix
+                    .pot-s.pot-one
+                        p.award-name 小年饭
+                        p.award-content 新年好运来
+                    .pot-s.pot-two
+                        p.award-name 年夜饭
+                        p.award-content 团圆乐融融
+                    .pot-s.pot-three
+                        p.award-name 团年饭
+                        p.award-content 猴年第一锅
+                    .pot-s.pot-four
+                        p.award-name 拜年饭
+                        p.award-content 月满合家欢
+                    .arrow
+    script(src="/static/scripts/component/webview.js?v=20151215")
+    script(data-init="experience",src="/static/scripts/mobile_activity/app_experience.js?v=775561212665ddddwewe7222777")
+    script.
+        var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+        if (ios) {
+            document.getElementById('ios-show').style.display = 'block';
+        }

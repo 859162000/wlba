@@ -258,6 +258,41 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         alert : lib._alert
     }
 })();
+var login = false;
+wlb.ready({
+    app: function (mixins) {
+        function connect(data) {
+            org.ajax({
+                url: '/accounts/token/login/ajax/',
+                type: 'post',
+                data: {
+                    token: data.tk,
+                    secret_key: data.secretToken,
+                    ts: data.ts
+                },
+                success: function (data) {
+                    org.experience.init()
+                }
+            })
+        }
+        mixins.sendUserInfo(function (data) {
+            if (data.ph == '') {
+                login = false;
+                $('.aa').text('未登录')
+                mixins.loginApp({refresh:1, url:''});
+            } else {
+                login = true;
+                connect(data)
+                $('.aa').text('登录')
+                $('.bb').text(data.tk)
+                //mixins.sendUserInfo('is_authenticated','')
+            }
+        })
+    },
+    other: function(){
+        org.experience.init()
+    }
+})
 org.experience = (function (org) {
     var lib = {
         init: function () {

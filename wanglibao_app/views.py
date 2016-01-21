@@ -50,6 +50,10 @@ from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
+import re
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +149,7 @@ class AppActivateImageAPIView(APIView):
             link_dest = activate.link_dest
             if img_url:
                 invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
-                if activate.user_invest_limit==-1 or (activate.user_invest_limit==0 and not invest_flag) or (activate.user_invest_limit==1 and invest_flag):
+                if activate.user_invest_limit=='-1' or (activate.user_invest_limit=='0' and not invest_flag) or (activate.user_invest_limit=='1' and invest_flag):
                     img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
                     return Response({'ret_code': 0,
                                      'message': 'ok',
@@ -599,7 +603,9 @@ class SendValidationCodeView(APIView):
         if not res:
             return Response({"ret_code": 40044, "message": message})
 
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         if status != 200:
             return Response({"ret_code": 30044, "message": message})
 
@@ -991,6 +997,25 @@ class AppDataModuleView(TemplateView):
 
     """ 数据魔方 """
     template_name = 'client_data_cube.jade'
+
+class AppFinanceView(TemplateView):
+
+    """ 投资记 """
+    template_name = 'client_animate_finance.jade'
+
+    def get(self, request, *args, **kwargs):
+
+        device_list = ['wlbapp']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return super(AppFinanceView, self).get(request, *args, **kwargs)
+        return super(AppFinanceView, self).get(request, *args, **kwargs)
+        #return HttpResponseRedirect(reverse('app_finance'))
+
+
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'

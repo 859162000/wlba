@@ -358,10 +358,14 @@
       margin: 0.85rem 0
       line-height: 0.8rem
       text-align: center
+      height: 1.6rem
     .code_img
       width: 33.8%
       display: block
       margin: 0 auto
+      img
+        width: 100%
+        display: block
     .title_text2
       width: 100%
       color: #EEBBFF
@@ -369,6 +373,7 @@
       margin: 0.85rem 0 0
       line-height: 0.8rem
       text-align: center
+      height: 1.6rem
     .footer_logo
       width: 17.6%
       display: block
@@ -449,11 +454,12 @@
     position: fixed
     left: 0
     top: 0
-    z-index: 99
-    width: 100%
-    height: 100%
-    background: rgba(0,0,0,0.6)
+    z-index: -99
+    width: 0%
+    height: 0%
+    background: rgba(0,0,0,0.8)
     display: none
+    overflow: hidden
     .bg
       width: 100%
       position: absolute
@@ -515,7 +521,7 @@
         span
           width: 100%
           line-height: 1.2rem
-          font-size: 0.85rem
+          font-size: 0.8rem
           color: #483153
         img
           position: absolute
@@ -703,6 +709,7 @@
   height: 100%
   background: rgba(0,0,0,0.6)
   .main
+
     position: absolute
     left: 0
     top: 15%
@@ -853,7 +860,7 @@
 .regist_button
   width: 4rem
   display: block
-  margin: 1rem auto 0
+  margin: 0.7rem auto
   height: 1.5rem
   font-size: 0.9rem
   text-align: center
@@ -877,7 +884,19 @@
 .login_button
   width: 4rem
   display: block
-  margin: 1rem auto 0
+  margin: 0.7rem auto
+  height: 1.5rem
+  font-size: 0.9rem
+  text-align: center
+  line-height: 1.5rem
+  background: #483153
+  color: #fff
+  border-radius: 1rem
+  display: none
+.go_experience
+  width: 7rem
+  display: block
+  margin: 0.7rem auto
   height: 1.5rem
   font-size: 0.9rem
   text-align: center
@@ -898,7 +917,36 @@
   color: #fff
   border-radius: 1rem
   display: none
-
+.new_user_text
+  width: 100%
+  margin-top: 0.5rem
+  line-height: 0.8rem
+  font-size: 0.75rem
+  text-align: center
+  display: none
+.introduction_wrap
+  width: 100%
+  padding: 0 0.2rem
+  .box
+    float: left
+    width: 50%
+    padding-bottom: 0.7rem
+    img
+      width: 54%
+      display: block
+      margin: 0 auto
+    dl
+      width: 100%
+      text-align: center
+      dt
+        font-size: 0.7rem
+        color: #bababa
+        padding-top: 0.2rem
+        line-height: 1.5rem
+      dd
+        font-size: 0.6rem
+        color: #9b9b9b
+        line-height: 0.9rem
 
 
 

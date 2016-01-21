@@ -462,7 +462,7 @@ org.xunlei = (function (org) {
                     }
                 }
                 ops = {
-                    url: '/api/register/?promo_token=xunlei9',
+                    url: '/api/register/',
                     type: 'POST',
                     data: {
                         'identifier': _self.$phone.val(),

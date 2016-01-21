@@ -146,9 +146,11 @@ class TestSendRegisterValidationCodeView(APIView):
         phone_validate_code_item.save()
         return Response({"ret_code":0, "message":"ok", "vcode":phone_validate_code_item.validate_code})
 
+
 class SendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
+    该接口须要先验证图片验证码
     """
     permission_classes = ()
     # throttle_classes = (UserRateThrottle,)
@@ -173,11 +175,14 @@ class SendRegisterValidationCodeView(APIView):
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
 
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
-        return Response({'message': message, "type":"validation"}, status=status)
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
+        return Response({'message': message, "type": "validation"}, status=status)
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
+
 
 class WeixinSendRegisterValidationCodeView(APIView):
     """
@@ -202,20 +207,12 @@ class WeixinSendRegisterValidationCodeView(APIView):
                                 "error_number": ErrorNumber.duplicate
                             }, status=400)
 
-        #phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        #if phone_validate_code_item:
-        #    count = phone_validate_code_item.code_send_count
-        #    if count > 6:
-        #        return Response({
-        #                            "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-        #                            "error_number": ErrorNumber.duplicate
-        #                        }, status=400)
-
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({
                             'message': message
                         }, status=status)
-
 
 
 class RegisterAPIView(DecryptParmsAPIView):
@@ -828,6 +825,17 @@ class UserHasLoginAPI(APIView):
             return Response({"login": False})
         else:
             return Response({"login": True})
+
+class HasValidationAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        profile = WanglibaoUserProfile.objects.filter(user=user).first()
+        if profile.id_is_valid:
+            return Response({"ret_code": 0, "message": u"您已认证通过"})
+        else:
+            return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)

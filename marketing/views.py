@@ -60,6 +60,7 @@ from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
@@ -3026,15 +3027,12 @@ class ThunderBindingApi(APIView):
 
 import math
 class CustomerAccount2015ApiView(APIView):
-    """
-    迅雷用户绑定接口
-    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         error_code = 0
         error_message = u''
-        account_dict = u''
+        account_dict = dict()
 
         user = self.request.user
         if user and user.id:
@@ -3088,8 +3086,21 @@ class CustomerAccount2015ApiView(APIView):
                 error_code=0
                 error_message=u'Success'
             else:
-                error_code=405
-                error_message=u'Account not found'
+                error_code=0
+                error_message=u'未统计的2016年新注册用户'
+                zc_ranking = User.objects.filter(id__lte=user_id).count()
+                account_dict['zc_ranking'] = zc_ranking
+                account_dict['tz_amount'] = 0
+                account_dict['income_reward'] = 0
+
+            profile = user.wanglibaouserprofile
+            user_name = u'网利宝用户'
+            if profile:
+                if profile.id_is_valid:
+                    user_name= profile.name
+                else:
+                    user_name = safe_phone_str(profile.phone)
+                account_dict['user_name'] = user_name
         else:
             error_code=404
             error_message=u'User not found'
