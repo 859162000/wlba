@@ -233,6 +233,26 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	}
 
+	var is_animate = true;
+	function title_box_animate(text){
+		if(is_animate){
+			is_animate = false;
+			$('.title_box .text').html(text);
+			$('.title_box').show().addClass('title_box_animate');
+			var i = 2;
+			var timer1 = setInterval(function() {
+				i--;
+				if (i === 0) {
+					clearInterval(timer1);
+					$('.title_box').removeClass('title_box_animate').hide();
+					is_animate = true;
+				}
+			},
+			1000);
+		}
+
+    }
+
 	$.ajax({
 		url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
 		type: "GET",
@@ -348,14 +368,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
+					title_box_animate(xhr.err_messege);
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
 					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
 					$('#zan_num').text(xhr.wx_user.good_vote);
 				}else{
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
+					title_box_animate(xhr.err_messege);
 				}
 			});
 	});
@@ -367,14 +385,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			type: "GET",
 		}).done(function (xhr) {
 			if(xhr.err_code==0){
-				$('.friend_top span').html(xhr.err_messege);
-				$('.friend_top').fadeIn();
+				title_box_animate(xhr.err_messege);
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
 				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
 				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
-				$('.friend_top span').html(xhr.err_messege);
-				$('.friend_top').fadeIn();
+				title_box_animate(xhr.err_messege);
 			}
 		});
 	});
@@ -397,13 +413,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').fadeIn();
 					$('.apply_button').show();
 				}else{
-					$('.friend_top span').html(xhr.err_messege);
-					$('.friend_top').fadeIn();
+					title_box_animate(xhr.err_messege);
 				}
 			});
 		}else{
-			$('.friend_top span').html('请点击，我同意网利宝年终奖活动规则');
-			$('.friend_top').fadeIn();
+			title_box_animate('请点击，我同意网利宝年终奖活动规则');
 		}
 	});
 	/*申请我的年终奖结束*/
