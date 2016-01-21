@@ -2,17 +2,8 @@
 doctype html
 html(style="background:#efeff4")
     head
-        meta(name="format-detection" content="telephone=no,email=no")
-        title 网利宝
-        meta(charset="utf-8")
-        meta(content="telephone=no,email=no" ,name="format-detection")
-        meta(content="yes" ,name="apple-mobile-web-app-capable")
-        script.
-            (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
-        link(href="/static/styles/app/webview.css?v=2016011501", rel="stylesheet")
+        include include/app_header.jade
         body
-            .aa
-            .bb
             .account
                 .account_top
                     .asset_content
@@ -99,4 +90,4 @@ html(style="background:#efeff4")
                 //p 如果您通过注册或活动领取体验金
                 //p 赶快点击右上角投资赚取收益吧
         script(src="/static/scripts/component/webview.js?v=20160120")
-        script(data-init="experience",src="/static/scripts/mobile_activity/account_experience.js?v=789658496")
+        script(data-init="experience",src="/static/scripts/mobile_activity/account_experience.js?v=122365254")
