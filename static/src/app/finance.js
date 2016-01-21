@@ -17,7 +17,7 @@ org.finance = (function (org) {
         model_canvac_opeartion: true,
         canvas_model4: null,
         init: function () {
-
+            $('.refresh').html($(window).height())
             lib.fetch_data();
             lib.listen_handle()
         },
@@ -55,8 +55,6 @@ org.finance = (function (org) {
 
             swiper.removeSlide(rm_page);
             swiper.update(true)
-            $('.refresh').html($('.swiper-slide').length)
-
 
         },
         fetch_data: function () {
@@ -238,19 +236,20 @@ org.finance = (function (org) {
             cts.textBaseline = 'middle';
             cts.moveTo(x, y);
             cts.fillText(process + "%", x, y);
+
         },
         cavas_model4: function (sort, mid, long) {
             var doughnutData = [
                 {
-                    value: sort,
+                    value: 30,
                     color: "#f35b47"
                 },
                 {
-                    value: mid,
+                    value: 40,
                     color: "#FFBA26"
                 },
                 {
-                    value: long,
+                    value: 30,
                     color: "#4877c8"
                 },
 
