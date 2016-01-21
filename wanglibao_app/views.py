@@ -1012,8 +1012,8 @@ class AppFinanceView(TemplateView):
             match = re.search(device, user_agent)
             if match and match.group():
                 return super(AppFinanceView, self).get(request, *args, **kwargs)
-        #return super(AppFinanceView, self).get(request, *args, **kwargs)
-        return HttpResponseRedirect(reverse('app_finance'))
+        return super(AppFinanceView, self).get(request, *args, **kwargs)
+        #return HttpResponseRedirect(reverse('app_finance'))
 
 
 

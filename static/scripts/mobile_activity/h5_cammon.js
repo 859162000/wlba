@@ -233,8 +233,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             {"qVal": "上签","title":"吉祥","detail":"梅花数点 泽如时雨 吉人天相"},
             {"qVal": "上上签 ","title":"福聚","detail":"日转千阶 洞房花烛<br />久旱逢雨 他乡故知"},
         ];
-        var inx = parseInt(Math.random()*7);
-        console.log(inx,val[inx].qVal,val[inx].title);
+        var inx = parseInt(Math.random()*6);
+
+        //console.log(inx,val[inx].qVal,val[inx].title, val[inx].detail.replace("<br />"," "));
 
         jqDom.find("div.top").text(val[inx].qVal);//签
         jqDom.find("div.bottom").text(val[inx].title);
@@ -254,7 +255,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         setTimeout(function(){
             self.removeClass("shake");
             $("div.mammon-jq").css("display","-webkit-box");
-        },6000);
+        },3000);
     }
     function checkTel(val){
         var isRight = false,
@@ -263,8 +264,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         return isRight;
     }
     function weixin_share(shareTit,fn){
+        //alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
-        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
+        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
         org.ajax({
             type: 'GET',
             url: weiURL,
@@ -294,7 +296,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    //alert("分享成功");
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             });
             //分享给微信朋友圈
@@ -303,7 +308,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             });
             //分享给QQ
@@ -313,12 +320,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    fn && (typeof fn == "function") && fn();
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             })
         })
     }
-    weixin_share();
 
     getVal();
 
@@ -341,10 +349,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
             return false;
         }
-        $.ajax({
+        org.ajax({
             type: "GET",
-            url: '/api/user_exists/'+tel,
-            dataType: '',
+            url: '/api/user_exists/'+ tel + '/',
+            dataType: 'json',
             success: function(data){
                 if(data.existing){
                     tp.hide();
@@ -356,4 +364,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         });
     });
+
+    //加载中
+    //var len = 0;
+    //$("img").each(function(i,self){
+    //    $(self)[0].onload = function(){
+    //        len ++;
+    //        console.log(len,$("img").length);
+    //        if(len === $("img").length){
+    //            $("#load-box").hide().siblings("div.mammon-page1").show();
+    //        }
+    //    };
+    //});
+    $(function(){
+        $("#load-box").hide().siblings("div.mammon-page1").show();
+    })
 })();

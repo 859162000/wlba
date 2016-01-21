@@ -10,7 +10,9 @@ from marketing.models import InviteCode, GiftOwnerGlobalInfo, IntroducedBy
 from wanglibao_sms.utils import send_validation_code
 from misc.models import Misc
 from marketing.models import Reward
+from experience_gold.models import ExperienceEvent
 from wanglibao_redpack.models import RedPackEvent
+from wanglibao_activity.models import Activity, ActivityRule
 
 class TestMarketingAPI(TestCase):
     def setUp(self):
@@ -88,6 +90,24 @@ class TestMarketingAPI(TestCase):
             user_id=1
         )
 
+
+        activity = Activity.objects.create(
+            code='activity',
+            is_lottery=True,
+            chances=3,
+            rewards=2)
+
+        redpack = RedPackEvent.objects.create(
+            name='redpack'
+        )
+        ActivityRule.objects.create(
+            activity=activity,
+            trigger_node='register',
+            is_used=True,
+            redpack=redpack.id,
+            probability=0.05
+        )
+
     def test_rock_finance(self):
         client = Client()
         client.login(username="Tester", password="123456")
@@ -104,4 +124,10 @@ class TestMarketingAPI(TestCase):
         client = Client()
         client.login(username='Tester', password="123456")
         response = client.post("/api/xunlei/2016/1/")
+        print response.content
+
+    def test_auto_distribute_reward(self):
+        client =Client()
+        client.login(username='Tester', password="123456")
+        response = client.post("/api/reward/auto/")
         print response.content

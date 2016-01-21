@@ -299,40 +299,49 @@ org.finance = (function (org) {
                             _self.swiper_init([1,2,3,4,5])
                         }
 
-                        //page1
-                        $('.zc_ranking').text(account.zc_ranking)
-                        $('.tz_amount').text( '￥'+ account.tz_amount)
-                        $('.tz_ranking_percent').text(account.tz_ranking_percent)
-                        $('.income_total').text('￥'+ account.income_total)
-                        //page2
-                        $('.user-name').text('亲爱的'+ account.user_name)
-                        $('.tz_times').text(account.tz_times)
-                        $('.tz_avg_times').text(account.tz_avg_time)
-                        $('.tz_max_amount').text(account.tz_max_amount)
-                        $('.tz_max_ranking_percent').text(Math.floor(account.tz_max_ranking_percent))
-                        //page3
-                        $('.tz_sterm_percent').text(account.tz_sterm_percent)
-                        $('.tz_mterm_percent').text(account.tz_mterm_percent)
-                        $('.tz_lterm_percent').text(account.tz_lterm_percent)
-                        var name = _self.set_limit_style(account.tz_sterm_percent, account.tz_mterm_percent, account.tz_lterm_percent)
-                        $('.model4-head-name').text(name)
-                        //page4
-                        $('.invite_count').text(account.tz_sterm_point)
-                        $('.invite_income').text(account.tz_mterm_point)
-                        var message = _self.set_invite_count_style(account.tz_lterm_point)
-                        $('.cravat-cue-detail').text(message.name)
-                        $('.cravat-alert').text(message.detail)
-                        //page5
-                        $('.income_reward').text(account.income_reward)
-                        $('.income_hb_expire').text(account.income_hb_expire)
-                        $('.income_jxq_expire').text(account.income_jxq_expire)
-                        var sheep_count = _self.set_sheep_style(account.income_reward)
-                        for (var i = 0; i < sheep_count; i++) {
-                            $('.model6-yang-icon').append("<div class='sheep-icon'></div>")
-                        }
-                        var chinese_num = ['一', '二', '三', '四', '五']
-                        $('.sheep-account').text(chinese_num[sheep_count - 1] + '只羊')
+                        function append_data(){
+                            //page1
+                            $('.zc_ranking').text(account.zc_ranking)
+                            $('.tz_amount').text( '￥'+ account.tz_amount)
+                            $('.tz_ranking_percent').text(account.tz_ranking_percent)
+                            $('.income_total').text('￥'+ account.income_total)
+                            //page2
+                            $('.user-name').text('亲爱的'+ account.user_name)
+                            $('.tz_times').text(account.tz_times)
+                            $('.tz_avg_times').text(account.tz_avg_time)
+                            $('.tz_max_amount').text(account.tz_max_amount)
+                            $('.tz_max_ranking_percent').text(Math.floor(account.tz_max_ranking_percent))
+                            //page3
+                            $('.tz_sterm_percent').text(account.tz_sterm_percent)
+                            $('.tz_mterm_percent').text(account.tz_mterm_percent)
+                            $('.tz_lterm_percent').text(account.tz_lterm_percent)
+                            var name = _self.set_limit_style(account.tz_sterm_point, account.tz_mterm_point, account.tz_lterm_point)
+                            $('.model4-head-name').text(name)
+                            //page4
+                            $('.invite_count').text(account.invite_count)
+                            $('.invite_income').text(account.invite_income)
 
+                                var message = _self.set_invite_count_style(account.invite_count)
+                                $('.cravat-cue-detail').text(message.name)
+                                $('.cravat-alert').text(message.detail)
+
+
+                            //page5
+                            $('.income_reward').text(account.income_reward)
+                            $('.income_hb_expire').text(account.income_hb_expire)
+                            $('.income_jxq_expire').text(account.income_jxq_expire)
+                            var sheep_count = _self.set_sheep_style(account.income_reward)
+                            for (var i = 0; i < sheep_count; i++) {
+                                $('.model6-yang-icon').append("<div class='sheep-icon'></div>")
+                            }
+                            var chinese_num = ['一', '二', '三', '四', '五']
+                            $('.sheep-account').text(chinese_num[sheep_count - 1] + '只羊')
+                        }
+                        try{
+                            append_data()
+                        }catch(e){
+                            console.log('数据异常')
+                        }
                         $('.client-loding-warp').animate({
                             opacity: 0
                         }, 300, function () {
@@ -398,7 +407,7 @@ org.finance = (function (org) {
             function infinite() {
                 _self.canvas_model3(canvas_w / 2, canvas_w / 2, canvas_r / 2, _self.process_num, canvas_w, canvas_font);
                 t = setTimeout(infinite, 30);
-
+                first = false
                 if (_self.process_num >= percent) {
                     clearTimeout(t);
                     _self.process_num = 0;
@@ -453,7 +462,7 @@ org.finance = (function (org) {
             var doughnutData = [
                 {
                     value: sort,
-                    color: "#4877C8"
+                    color: "#f35b47"
                 },
                 {
                     value: mid,
@@ -461,7 +470,7 @@ org.finance = (function (org) {
                 },
                 {
                     value: long,
-                    color: "#F35B47"
+                    color: "#4877c8"
                 },
 
             ];

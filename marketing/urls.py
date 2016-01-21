@@ -179,7 +179,7 @@ urlpatterns += patterns(
     url(r'^app_january_reward/$', TemplateView.as_view(template_name="app_january_reward.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
-    #url(r'^weixin_mammon/$', TemplateView.as_view(template_name="h5_mammon.jade")),
+    url(r'^weixin_mammon/$', TemplateView.as_view(template_name="h5_mammon.jade")),
 
 )
 # app with webview
