@@ -1,8 +1,8 @@
 @keyframes csShake
   0%
-    transform: translate(10px,5px)
+    transform: translate(5px,5px)
   25%
-    transform: translate(-10px,0)
+    transform: translate(-5px,0)
   50%
     transform: translate(5px,-5px)
   75%
@@ -11,9 +11,9 @@
     transform: translate(0,0)
 @-webkit-keyframes csShake
   0%
-    -webkit-transform: translate(10px,5px)
+    -webkit-transform: translate(5px,5px)
   25%
-    -webkit-transform: translate(-10px,0)
+    -webkit-transform: translate(-5px,0)
   50%
     -webkit-transform: translate(5px,-5px)
   75%
@@ -43,8 +43,8 @@
     -webkit-animation: csShake 2s linear backwards infinite
     animation: csShake 2s linear backwards infinite
   .circle-box
-    -webkit-animation: csRotate 2s linear backwards 3
-    animation: csRotate 2s linear backwards 3
+    -webkit-animation: csRotate 1s linear backwards 3
+    animation: csRotate 1s linear backwards 3
   .red-btn
     background: #eb4959
     text-align: center
@@ -62,7 +62,7 @@
   ::-webkit-input-placeholder
     color: #fff
   .mammon-tit
-    margin: 2.5rem auto
+    margin: 17% auto
     width: 10.5rem
     font-size: 0.65rem
     color: #fff
@@ -184,14 +184,15 @@
     display: none
     .mammon-tit
       text-align: center
+      height: 4.5rem
       line-height: 1.5rem
     .mammon-redPack
       padding-top: 1.8rem
     .mammon-inp-box
-      position: absolute
-      bottom: 1.5rem
+      margin-top: -2rem
+      padding: 3rem 2.9rem 1rem
       width: 100%
-      padding: 0 2.9rem
+      background-color: #a43d3f
       .tel-inp
         display: block
         width: 100%
@@ -228,7 +229,7 @@
   .mammon-page4
     display: none
     .mammon-tit
-      margin-top: 2.1rem
+      margin-top: 13%
       line-height: 1.2rem
       text-align: left
     .mammon-ok, .look-btn-box
@@ -257,7 +258,19 @@
       line-height: 1rem
       padding: 1rem
 
-
+@media screen and (min-width: 750px)
+  .h5-mammon
+    .mammon-page2 
+      .mammon-redPack
+        padding-top: 15%
+    .mammon-page3
+      .mammon-tit
+        margin-top: 15%
+      .mammon-code .tit
+        padding-top: 10%
+    .mammon-page4
+      .mammon-tit
+        margin-top: 15%
 
 
 

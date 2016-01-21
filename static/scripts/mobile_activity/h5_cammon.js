@@ -255,7 +255,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         setTimeout(function(){
             self.removeClass("shake");
             $("div.mammon-jq").css("display","-webkit-box");
-        },6000);
+        },3000);
     }
     function checkTel(val){
         var isRight = false,
