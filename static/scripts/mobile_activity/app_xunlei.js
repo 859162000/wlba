@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -256,7 +256,7 @@ org.ajax({
     }
 });
 org.ajax({
-    url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
+    url: '/api/coop_pv/'+token+'/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
     type: "GET"
 });
 
@@ -462,7 +462,7 @@ org.xunlei = (function (org) {
                     }
                 }
                 ops = {
-                    url: '/api/register/?promo_token=xunlei9',
+                    url: '/api/register/',
                     type: 'POST',
                     data: {
                         'identifier': _self.$phone.val(),

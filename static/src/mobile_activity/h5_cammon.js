@@ -5,6 +5,7 @@
         $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
         page2.show();
     }
+    
     function getVal(){
         var val = [
             {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
@@ -55,7 +56,7 @@
             success: function (data) {
                 //请求成功，通过config注入配置信息,
                 wx.config({
-                    debug: false,
+                    debug: true,
                     appId: data.appId,
                     timestamp: data.timestamp,
                     nonceStr: data.nonceStr,
@@ -89,7 +90,9 @@
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    alert(2);
                     if(fn && (typeof fn == "function")){
+                        alert(22);
                         fn();
                     }
                 }
@@ -101,7 +104,9 @@
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    alert(1);
                     if(fn && (typeof fn == "function")){
+                        alert(3);
                         fn();
                     }
                 }

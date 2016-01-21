@@ -37,7 +37,7 @@ org.ajax({
     }
 });
 org.ajax({
-    url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
+    url: '/api/coop_pv/'+token+'/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
     type: "GET"
 });
 
@@ -243,7 +243,7 @@ org.xunlei = (function (org) {
                     }
                 }
                 ops = {
-                    url: '/api/register/?promo_token=xunlei9',
+                    url: '/api/register/',
                     type: 'POST',
                     data: {
                         'identifier': _self.$phone.val(),

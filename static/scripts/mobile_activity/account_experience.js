@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -278,11 +278,14 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
+                $('.aa').text('未登录')
                 mixins.loginApp({refresh:1, url:''});
             } else {
                 login = true;
                 connect(data)
-                mixins.sendUserInfo('is_authenticated','')
+                $('.aa').text('登录')
+                $('.bb').text(data.tk)
+                //mixins.sendUserInfo('is_authenticated','')
             }
         })
     },

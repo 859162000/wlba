@@ -17,7 +17,6 @@ org.finance = (function (org) {
         model_canvac_opeartion: true,
         canvas_model4: null,
         init: function () {
-
             lib.fetch_data();
             lib.listen_handle()
         },
@@ -55,8 +54,6 @@ org.finance = (function (org) {
 
             swiper.removeSlide(rm_page);
             swiper.update(true)
-            $('.refresh').html($('.swiper-slide').length)
-
 
         },
         fetch_data: function () {
@@ -72,11 +69,11 @@ org.finance = (function (org) {
                             _self.swiper_init([6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) > 0){
+                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.invite_income) > 0){
                             _self.swiper_init([1,2,3,6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) <= 0){
+                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.invite_income) <= 0){
                             _self.swiper_init([1,2,3,4,5])
                         }
 
@@ -238,6 +235,7 @@ org.finance = (function (org) {
             cts.textBaseline = 'middle';
             cts.moveTo(x, y);
             cts.fillText(process + "%", x, y);
+
         },
         cavas_model4: function (sort, mid, long) {
             var doughnutData = [
