@@ -1577,7 +1577,7 @@ class WeixinAnnualBonusView(TemplateView):
                 )
 
                 if not flag:
-                    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
+                    rep = { 'err_code':305, 'err_messege':u'您已经评价过了，不能重复评价', }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
 
                 wx_bonus.update_time = timezone.now()
@@ -1589,12 +1589,16 @@ class WeixinAnnualBonusView(TemplateView):
             #    return HttpResponse(json.dumps(rep), content_type='application/json')
             except Exception, ex:
                 logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
-                rep = { 'err_code':306, 'err_messege':'系统繁忙，请稍后重试', }
+                rep = { 'err_code':306, 'err_messege':u'系统繁忙，请稍后重试', }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-        rep = { 'err_code':0, 'err_messege':'评价成功', 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
+        if vote_type==1:
+            vote_message = u'你已帮好友多拿了500，输入手机号你也可以领！'
+        else:
+            vote_message = u'你已扣除好友500年终奖，这是对TA的激励'
+        rep = { 'err_code':0, 'err_messege':vote_message, 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def pay_bonus(self):
@@ -1610,6 +1614,10 @@ class WeixinAnnualBonusView(TemplateView):
 
             if wx_bonus.is_pay:
                 rep = { 'err_code':403, 'err_messege':u'您已经领取过了<br>登录账户%s，赚取收益吧'%wx_bonus.phone }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
+
+            if wx_bonus.annual_bonus < wx_bonus.max_annual_bonus:
+                rep = { 'err_code':403, 'err_messege':u'集满8000才能通过年终考核，继续分享集赞吧！' }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册

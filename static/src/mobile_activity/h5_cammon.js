@@ -68,11 +68,11 @@
             var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile_activity/mammon/cs_img.png',
                 shareLink = host + '/activity/weixin_mammon/',
-                shareMainTit = shareTit ? ('《财神说：'+shareTit +'》') : '《财神说：接财神、测财运、领开运红包》',
+                shareMainTit = shareTit ? ('财神说：'+shareTit) : '财神说：接财神、测财运、领开运红包',
                 shareBody = shareTit;
             //分享给微信好友
             org.onMenuShareAppMessage({
-                title: "《财神说：接财神、测财运、领开运红包》",
+                title: "财神说：接财神、测财运、领开运红包",
                 desc: shareBody,
                 link: shareLink,
                 imgUrl: shareImg,
@@ -120,6 +120,9 @@
     $(".js-close").click(function(){
         $(this).parents(".alt-box").hide();
     });
+    $(".js-showShare").click(function(){
+        $(this).parents(".alt-box").hide().siblings("div.mammon-share2").show();
+    });
 
     //手机号 检测是否是新用户
     $(".js-checkUser").click(function(){
@@ -145,4 +148,19 @@
             }
         });
     });
+
+    //加载中
+    //var len = 0;
+    //$("img").each(function(i,self){
+    //    $(self)[0].onload = function(){
+    //        len ++;
+    //        console.log(len,$("img").length);
+    //        if(len === $("img").length){
+    //            $("#load-box").hide().siblings("div.mammon-page1").show();
+    //        }
+    //    };
+    //});
+    $(function(){
+        $("#load-box").hide().siblings("div.mammon-page1").show();
+    })
 })();

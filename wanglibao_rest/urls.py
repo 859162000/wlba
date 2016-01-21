@@ -39,7 +39,7 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
+                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
@@ -147,6 +147,7 @@ urlpatterns = patterns(
     url(r'^bank/list_new/$', BankListNewAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
+    url(r'^has_validate/', HasValidationAPIView.as_view()),
     url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
