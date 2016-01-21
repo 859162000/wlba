@@ -224,6 +224,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
         page2.show();
     }
+    
     function getVal(){
         var val = [
             {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
