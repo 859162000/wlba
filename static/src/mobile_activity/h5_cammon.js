@@ -145,4 +145,19 @@
             }
         });
     });
+
+    //加载中
+    //var len = 0;
+    //$("img").each(function(i,self){
+    //    $(self)[0].onload = function(){
+    //        len ++;
+    //        console.log(len,$("img").length);
+    //        if(len === $("img").length){
+    //            $("#load-box").hide().siblings("div.mammon-page1").show();
+    //        }
+    //    };
+    //});
+    $(function(){
+        $("#load-box").hide().siblings("div.mammon-page1").show();
+    })
 })();
