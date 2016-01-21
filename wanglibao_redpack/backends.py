@@ -18,7 +18,8 @@ from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, Inter
 from wanglibao_p2p.models import P2PRecord, P2PProduct, P2PEquity
 from marketing import helper
 from wanglibao_sms import messages
-from wanglibao_sms.tasks import send_messages
+# from wanglibao_sms.tasks import send_messages
+from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_account import message as inside_message
 from wanglibao_pay.util import fmt_two_amount
 from misc.models import Misc
@@ -337,11 +338,25 @@ def _send_message(user, event, end_time):
         rtype = u'%加息券'
     if event.rtype == 'percent':
         coupon_amount = event.highest_amount
-    send_messages.apply_async(kwargs={
-        'phones': [user.wanglibaouserprofile.phone],
-        'messages': [messages.red_packet_get_alert(coupon_amount, rtype)],
-        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-    })
+
+    data_messages = {
+        0: {
+            'user_id': user.wanglibaouserprofile.phone,
+            'user_type': 'phone',
+            'params': {
+                'amount': coupon_amount,
+                'rtype': rtype
+            }
+        }
+    }
+    # 功能推送id: 4
+    PHPSendSMS().send_sms(rule_id=4, data_messages=data_messages)
+
+    # send_messages.apply_async(kwargs={
+    #     'phones': [user.wanglibaouserprofile.phone],
+    #     'messages': [messages.red_packet_get_alert(coupon_amount, rtype)],
+    #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+    # })
     if event.rtype == 'percent':
         title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
     elif event.rtype == 'interest_coupon':
