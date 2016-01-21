@@ -1576,7 +1576,8 @@ class CoopPvApi(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code):
-        if channel_code == 'xunlei9':
+        channel_codes = ('xunlei9', 'mxunlei')
+        if channel_code in channel_codes:
             req_data = self.request.GET
             source = req_data.get('source', None)
             ext = req_data.get('ext', None)
