@@ -1,0 +1,114 @@
+<html>
+    <head>
+        <title>api调试页面专用</title>
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    </head>
+    <style>
+        body{
+            font-size: 28px;
+            padding: 10px;
+        }
+        .btn, a, #log{
+            display: block;
+            background: #13B614;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            padding: 14px 0;
+            text-decoration: none;
+        }
+        #log{
+            background: #ccc;
+            color: #000;
+            padding: 30px 0;
+            word-wrap: break-word;
+            word-break: normal;
+        }
+
+        h4{ text-align:center; color: #47B5D6 }
+        #webView, #link-url{  display: none; }
+    </style>
+    <body>
+
+        <div id="webView">
+            <h4>javascriptBrige</h4>
+            <div id='log'>log(当前环境为网利宝app－webview)</div>
+            <div id='login' class="btn">登陆页(未登录才弹)</div>
+            <div id='regist' class="btn">注册页(未登录才弹)</div>
+            <div id='todiscover' class="btn">发现页</div>
+            <div id='finance' class="btn">理财专区</div>
+            <div id='cancel' class="btn">取消操作</div>
+            <div id='share' class="btn">分享自定义</div>
+            <div id='islogin' class="btn">查看登录状态</div>
+            <div id='getuser' class="btn">获取用户信息</div>
+        </div>
+
+        <div id ='link-url'>
+            <h4>link url </h4>
+            <div id='log'>log(当前环境非网利宝app)</div>
+            <a class="btn" href="wanglibao://index">跳转到首页</a>
+            <a class="btn" href="wanglibao://list">跳转到理财页</a>
+            <a class="btn" href="wanglibao://discover ">跳转到发现页</a>
+            <a class="btn" href="wanglibao://view?url=http://www.baidu.com">跳转到活动详情</a>
+        </div>
+
+        <script src="/static/scripts/component/webview.js?v=22222"></script>
+
+
+        <script>
+            function $(target){
+                return document.getElementById(target)
+            }
+
+             wlb.ready({
+                 app: function(mixins){
+                     $('webView').style.display = 'block';
+
+                     $('login').onclick=function(){
+                         mixins.loginApp({refresh:1})
+                     }
+
+                     $('regist').onclick=function(){
+                         mixins.registerApp({refresh:1})
+                     }
+                     $('todiscover').onclick=function(){
+                         mixins.jumpToDiscoverView()
+                     }
+                     $('finance').onclick=function(){
+                         mixins.jumpToManageMoney()
+                     }
+
+                     $('share').onclick=function(){
+                         mixins.touchShare({title: 'briger-test', content: 'briger-test', shareUrl:'http://www.baidu.com?test=222'}, function(data){
+                             $('log').innerHTML = JSON.stringify(data)
+                         })
+                     }
+
+                     //取消操作
+                     mixins.cancel({}, function(data){
+                         $('log').innerHTML = JSON.stringify(data)
+                     })
+
+
+                     $('islogin').onclick=function(){
+                         mixins.authenticated(function(data){
+                            $('log').innerHTML = JSON.stringify(data)
+                        })
+                     }
+
+                     $('getuser').onclick=function(){
+                         mixins.sendUserInfo(function(data){
+                            $('log').innerHTML = JSON.stringify(data)
+                        })
+                     }
+
+                 },
+                 other: function(){
+                    $('link-url').style.display = 'block';
+                 }
+             })
+        </script>
+    </body>
+</html>

@@ -47,8 +47,10 @@ import json
 import uuid
 import urllib
 import logging
+import traceback
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
+from django.db import transaction
 from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
@@ -248,12 +250,28 @@ class WeixinJoinView(View):
             reply = create_reply(articles, self.msg)
 
         if self.msg.key == 'sign_in':
-            # try:
-                if self.checkIsTodaySignIn(w_user, user):
-                    txt = u"今日已经签到，明日再来"
-                    reply = create_reply(txt, self.msg)
-                else:
-                    seg = SendExperienceGold(user)
+            reply = self.process_sign_in(w_user.openid)
+        if self.msg.key == 'my_experience_gold':
+            seg = SendExperienceGold(user)
+            amount = seg.get_amount()
+            txt = u"您的帐号：%s\n" \
+                  u"体验金金额：%s元"%(user.wanglibaouserprofile.phone, amount)
+            reply = create_reply(txt, self.msg)
+
+        return reply
+
+    def process_sign_in(self, openid):
+        reply = -1
+        try:
+            with transaction.atomic():
+                w_user = WeixinUser.objects.select_for_update().filter(openid=openid).first()
+                now = datetime.datetime.now()
+                start = datetime.datetime(now.year,now.month, now.day)
+                end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
+                war = WeiXinUserActionRecord.objects.filter(user_id=w_user.user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+                if not war:
+                    _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
+                    seg = SendExperienceGold(w_user.user)
                     experience_event = self.getSignExperience_gold()
                     if experience_event:
                         seg.send(experience_event.id)
@@ -263,20 +281,19 @@ class WeixinJoinView(View):
                               u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
                         reply = create_reply(txt, self.msg)
                     else:
-                        reply = -1
-                        logger.debug(u'用户签到没有领到体验金')
-                    _process_record(w_user, user, 'sign_in', u"用户签到")
-            # except Exception, e:
-            #     reply = -1
-            #     logger.debug(u"用户签到领体验金抛出异常")
-        if self.msg.key == 'my_experience_gold':
-            seg = SendExperienceGold(user)
-            amount = seg.get_amount()
-            txt = u"您的帐号：%s\n" \
-                  u"体验金金额：%s元"%(user.wanglibaouserprofile.phone, amount)
-            reply = create_reply(txt, self.msg)
-
+                        reply = create_reply(u'恭喜您，签到成功！', self.msg)
+                        logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
+                else:
+                    txt = u"今日已经签到，明日再来"
+                    reply = create_reply(txt, self.msg)
+        except Exception,e:
+            logger.debug(traceback.format_exc())
         return reply
+
+        # except Exception, e:
+        #     reply = -1
+        #     logger.debug(u"用户签到领体验金抛出异常")
+
 
     @checkBindDeco
     def check_service_subscribe(self, w_user=None, user=None):
@@ -395,21 +412,6 @@ class WeixinJoinView(View):
             random_int = random.randint(0, length-1)
             return experience_events[random_int]
         return None
-    def checkIsTodaySignIn(self, w_user, user):
-        now = datetime.datetime.now()
-
-        start = datetime.datetime(now.year,now.month, now.day)
-        end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
-
-        war = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
-
-        # experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
-        #                                                   created_at__lt=end, created_at__gt=start).all()
-
-        is_today_signin = False
-        if war:
-            is_today_signin = True
-        return is_today_signin
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

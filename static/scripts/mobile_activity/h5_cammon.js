@@ -217,307 +217,151 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;CanvasRenderingContext2D.prototype.clear = function () {
-    this.save();
-    this.globalCompositeOperation = 'destination-out';
-    this.fillStyle = 'black';
-    this.fill();
-    this.restore();
-};
-CanvasRenderingContext2D.prototype.clearArc = function (x, y, radius, startAngle, endAngle, anticlockwise) {
-    this.beginPath();
-    this.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-    this.clear();
-};
+;(function(){
+    var jqDom = $("div.mammon-jq");
+    var page2 = $("div.mammon-page2");
+    function shareBack(){
+        $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
+        page2.show();
+    }
+    function getVal(){
+        var val = [
+            {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
+            {"qVal": "中签","title":"荣归","detail":"学富五车题雁塔<br />衣锦还乡会有时"},
+            {"qVal": "上签","title":"利是","detail":"得鸿运 利仕途 能旺夫"},
+            {"qVal": "上签","title":"致祥","detail":"竹报三多 和睦融洽 可致吉祥"},
+            {"qVal": "上签","title":"吉祥","detail":"梅花数点 泽如时雨 吉人天相"},
+            {"qVal": "上上签 ","title":"福聚","detail":"日转千阶 洞房花烛<br />久旱逢雨 他乡故知"},
+        ];
+        var inx = parseInt(Math.random()*6);
 
-org.finance = (function (org) {
-    var lib = {
-        process_num: 0,
-        model_canvac_opeartion: true,
-        canvas_model4: null,
-        init: function () {
+        //console.log(inx,val[inx].qVal,val[inx].title, val[inx].detail.replace("<br />"," "));
 
-            lib.fetch_data();
-            lib.listen_handle()
-        },
-        listen_handle: function(){
-            $('.finance-mode-btnl-aue').on('click', function(){
-                $('.client-share-model').show()
-            })
-            $('.client-share-model').on('click', function(){
-                $(this).hide()
-            })
+        jqDom.find("div.top").text(val[inx].qVal);//签
+        jqDom.find("div.bottom").text(val[inx].title);
 
-        },
-        swiper_init: function(rm_page){
+        page2.find("div.big-tit").text(val[inx].title);
+        page2.find("div.qian-cont").html(val[inx].detail);
 
-            var swiper = new Swiper('.swiper-container', {
-                direction: 'vertical',
-                initialSlide: 0,
-                onSlideChangeEnd: function (swiper) {
-
-                    if (swiper.activeIndex == 2) {
-                        var canvas_model3_data = $('.tz_max_ranking_percent').text() * 1;
-                        lib.canvas_model3_doging(canvas_model3_data)
-                    }
-                    if (swiper.activeIndex == 3) {
-                        if (!lib.canvas_model4) {
-                            var sort = $('.tz_sterm_percent').text() * 1;
-                            var mid = $('.tz_mterm_percent').text() * 1;
-                            var long = $('.tz_lterm_percent').text() * 1;
-                            lib.cavas_model4(sort, mid, long)
-                        }
-
+        weixin_share(val[inx].detail.replace("<br />"," "),shareBack);//微信分享
+    }
+    $("div.shake-box").click(function(){
+        var self = $(this);
+        self.find("p.shake-tit").hide();
+        self.parents("div.mammon-yb").addClass("circle-box");
+        showJp(self.find("img"));
+    });
+    function showJp(self){//显示 签
+        setTimeout(function(){
+            self.removeClass("shake");
+            $("div.mammon-jq").css("display","-webkit-box");
+        },6000);
+    }
+    function checkTel(val){
+        var isRight = false,
+            re = new RegExp(/^[1][0-9]{10}$/);
+        re.test($.trim(val)) ? isRight = true : isRight = false;
+        return isRight;
+    }
+    function weixin_share(shareTit,fn){
+        //alert(shareTit);
+        var weiURL = '/weixin/api/jsapi_config/';
+        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+        org.ajax({
+            type: 'GET',
+            url: weiURL,
+            dataType: 'json',
+            success: function (data) {
+                //请求成功，通过config注入配置信息,
+                wx.config({
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.signature,
+                    jsApiList: jsApiList
+                });
+            }
+        });
+        wx.ready(function () {
+            var host = 'https://staging.wanglibao.com',
+                shareImg = host + '/static/imgs/mobile_activity/mammon/cs_img.png',
+                shareLink = host + '/activity/weixin_mammon/',
+                shareMainTit = shareTit ? ('《财神说：'+shareTit +'》') : '《财神说：接财神、测财运、领开运红包》',
+                shareBody = shareTit;
+            //分享给微信好友
+            org.onMenuShareAppMessage({
+                title: "《财神说：接财神、测财运、领开运红包》",
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    //alert("分享成功");
+                    if(fn && (typeof fn == "function")){
+                        fn();
                     }
                 }
             });
-
-            swiper.removeSlide(rm_page);
-            swiper.update(true)
-            $('.refresh').html($('.swiper-slide').length)
-
-
-        },
-        fetch_data: function () {
-            var _self = this;
-            org.ajax({
-                url: '/api/account2015/',
-                type: 'post',
-                success: function (result) {
-                    if (result.error_code == 0) {
-                        var account = result.account;
-                        //判断用户类型
-                        if(parseInt(account.tz_amount) > 0){
-                            _self.swiper_init([6])
-                        }
-
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) > 0){
-                            _self.swiper_init([1,2,3,6])
-                        }
-
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) <= 0){
-                            _self.swiper_init([1,2,3,4,5])
-                        }
-
-                        //page1
-                        $('.zc_ranking').text(account.zc_ranking)
-                        $('.tz_amount').text( '￥'+ account.tz_amount)
-                        $('.tz_ranking_percent').text(account.tz_ranking_percent)
-                        $('.income_total').text('￥'+ account.income_total)
-                        //page2
-                        $('.user-name').text('亲爱的'+ account.user_name)
-                        $('.tz_times').text(account.tz_times)
-                        $('.tz_avg_times').text(account.tz_avg_time)
-                        $('.tz_max_amount').text(account.tz_max_amount)
-                        $('.tz_max_ranking_percent').text(Math.floor(account.tz_max_ranking_percent))
-                        //page3
-                        $('.tz_sterm_percent').text(account.tz_sterm_percent)
-                        $('.tz_mterm_percent').text(account.tz_mterm_percent)
-                        $('.tz_lterm_percent').text(account.tz_lterm_percent)
-                        var name = _self.set_limit_style(account.tz_sterm_percent, account.tz_mterm_percent, account.tz_lterm_percent)
-                        $('.model4-head-name').text(name)
-                        //page4
-                        $('.invite_count').text(account.tz_sterm_point)
-                        $('.invite_income').text(account.tz_mterm_point)
-                        var message = _self.set_invite_count_style(account.tz_lterm_point)
-                        $('.cravat-cue-detail').text(message.name)
-                        $('.cravat-alert').text(message.detail)
-                        //page5
-                        $('.income_reward').text(account.income_reward)
-                        $('.income_hb_expire').text(account.income_hb_expire)
-                        $('.income_jxq_expire').text(account.income_jxq_expire)
-                        var sheep_count = _self.set_sheep_style(account.income_reward)
-                        for (var i = 0; i < sheep_count; i++) {
-                            $('.model6-yang-icon').append("<div class='sheep-icon'></div>")
-                        }
-                        var chinese_num = ['一', '二', '三', '四', '五']
-                        $('.sheep-account').text(chinese_num[sheep_count - 1] + '只羊')
-
-                        $('.client-loding-warp').animate({
-                            opacity: 0
-                        }, 300, function () {
-                            $(this).hide()
-                        })
-
+            //分享给微信朋友圈
+            org.onMenuShareTimeline({
+                title: shareMainTit,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    if(fn && (typeof fn == "function")){
+                        fn();
                     }
                 }
-
-            })
-        },
-        set_limit_style: function (sort, mid, long) {
-            if (long >= sort && long >= mid) {
-                return '最爱：长期优选'
-            }
-            if (mid >= sort && mid > long) {
-                return '最爱：中期稳健'
-            }
-            if (sort > mid && sort > long) {
-                return '最爱：短期灵活'
-            }
-        },
-        set_invite_count_style: function (count) {
-            var
-                name = ['茕茕孑立', '门可罗雀', '门庭若市'],
-                detail = ['孤身一人，一个全民淘金好友都没邀请到。', '全民淘金所邀请好友数稀少。', '全民淘金邀请到的好友很多热闹得像人才市场一样。']
-            if (count == 0) {
-                return {
-                    name: name[0],
-                    detail: detail[0]
-                }
-            }
-            if (count >= 1 && count <= 10) {
-                return {
-                    name: name[1],
-                    detail: detail[1]
-                }
-            }
-
-            if (count >= 10) {
-                return {
-                    name: name[2],
-                    detail: detail[2]
-                }
-            }
-
-        },
-        set_sheep_style: function (amount) {
-            if (amount <= 100) return 1;
-            if (amount > 100 && amount <= 500) return 2;
-            if (amount > 500 && amount <= 5000) return 3;
-            if (amount > 500 && amount <= 5000) return 4;
-            if (amount > 50000) return 5
-        },
-        canvas_model3_doging: function (percent) {
-            var _self = this, canvas_w = 140, canvas_r = 140, canvas_font = '34px';
-            var isAndroid = navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1; //android终端
-            if (isAndroid) {
-                canvas_w = canvas_w / 2
-                canvas_r = canvas_r / 2
-                canvas_font = '17px'
-            }
-            function infinite() {
-                _self.canvas_model3(canvas_w / 2, canvas_w / 2, canvas_r / 2, _self.process_num, canvas_w, canvas_font);
-                t = setTimeout(infinite, 30);
-
-                if (_self.process_num >= percent) {
-                    clearTimeout(t);
-                    _self.process_num = 0;
-                    return;
-                }
-                _self.process_num += 1;
-            }
-
-            infinite()
-        },
-        canvas_model3: function (x, y, radius, process, canvas_w, canvas_font) {
-            var _self = this;
-            var canvas = document.getElementById('canvas-model3');
-
-            if (canvas.getContext) {
-                var cts = canvas.getContext('2d');
-
-                if (_self.model_canvac_opeartion) {
-                    canvas.getContext('2d').translate(0.5, 0.5)
-                    canvas.width = canvas_w;
-                    canvas.height = canvas_w;
-                    _self.model_canvac_opeartion = false
-                }
-            } else {
-                return;
-            }
-
-            cts.beginPath();
-            cts.moveTo(x, y);
-            cts.arc(x, y, radius, 0, Math.PI * 2, false);
-            cts.closePath();
-            cts.fillStyle = '#D8D8D8';
-            cts.fill();
-
-            cts.beginPath();
-            cts.moveTo(x, y);
-            endAgl = Math.PI * 2 * process / 100
-            cts.arc(x, y, radius, 0, endAgl, false);
-            cts.closePath();
-            cts.fillStyle = '#FDF11C';
-            cts.fill();
-            cts.clearArc(x, y, radius - (radius * 0.26), 0, Math.PI * 2, true);
-            //在中间写字
-            cts.font = canvas_font + ' Arial'
-            cts.fillStyle = '#FDF11C';
-            cts.textAlign = 'center';
-            cts.textBaseline = 'middle';
-            cts.moveTo(x, y);
-            cts.fillText(process + "%", x, y);
-        },
-        cavas_model4: function (sort, mid, long) {
-            var doughnutData = [
-                {
-                    value: sort,
-                    color: "#4877C8"
-                },
-                {
-                    value: mid,
-                    color: "#FFBA26"
-                },
-                {
-                    value: long,
-                    color: "#F35B47"
-                },
-
-            ];
-            var canvas_target = document.getElementById("model4-canvas");
-            var _self = this, canvas_w = 300, canvas_h = 300
-            var isAndroid = navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Adr') > -1; //android终端
-            if (isAndroid) {
-                canvas_w = canvas_w / 2;
-                canvas_h = canvas_h / 2;
-            }
-            canvas_target.width = canvas_w;
-            canvas_target.height = canvas_h;
-            lib.canvas_model4 = new Chart(canvas_target.getContext("2d")).Doughnut(doughnutData, {segmentShowStroke: false});
-        }
-    }
-    return {
-        init: lib.init
-    }
-})(org);
-wlb.ready({
-    app: function (mixins) {
-        function connect(data) {
-            org.ajax({
-                url: '/accounts/token/login/ajax/',
-                type: 'post',
-                data: {
-                    token: data.tk,
-                    secret_key: data.secretToken,
-                    ts: data.ts
-                },
-                success: function (data) {
-
-                    org.finance.init()
+            });
+            //分享给QQ
+            org.onMenuShareQQ({
+                title: shareMainTit,
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg,
+                success: function(){
+                    if(fn && (typeof fn == "function")){
+                        fn();
+                    }
                 }
             })
-        }
-
-        mixins.shareData({title: '2015年，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
-        mixins.sendUserInfo(function (data) {
-            if (data.ph == '') {
-                $('.client-login-alert').show().on('click', function () {
-                    mixins.loginApp({refresh: 1, url: ''})
-                })
-                $('.login--alert-opeartion').on('click', function () {
-                    $('.client-login-alert').hide()
-                })
-
-            } else {
-                connect(data)
-            }
         })
-
-
-    },
-    other: function () {
-        org.finance.init()
     }
-})
 
+    getVal();
+
+    //点击解签
+    $(".js-btn").click(function(){
+        $(this).parents(".mammon-jq").hide();
+        $("div.mammon-share").css("display","-webkit-box");
+    });
+    //关闭弹出层
+    $(".js-close").click(function(){
+        $(this).parents(".alt-box").hide();
+    });
+
+    //手机号 检测是否是新用户
+    $(".js-checkUser").click(function(){
+        var self = $(this);
+        var tel = self.siblings(".tel-inp").val();
+        var tp = self.parents("div.mammon-page2");
+        if(!checkTel(tel)){
+            $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
+            return false;
+        }
+        org.ajax({
+            type: "GET",
+            url: '/api/user_exists/'+ tel + '/',
+            dataType: 'json',
+            success: function(data){
+                if(data.existing){
+                    tp.hide();
+                    tp.siblings("div.mammon-page3").show();
+                }else{
+                    tp.hide();
+                    tp.siblings("div.mammon-page4").show().find("#page4-tel").text(tel);
+                }
+            }
+        });
+    });
+})();

@@ -86,6 +86,7 @@ org.finance = (function (org) {
                         $('.tz_ranking_percent').text(account.tz_ranking_percent)
                         $('.income_total').text('￥'+ account.income_total)
                         //page2
+                        $('.user-name').text('亲爱的'+ account.user_name)
                         $('.tz_times').text(account.tz_times)
                         $('.tz_avg_times').text(account.tz_avg_time)
                         $('.tz_max_amount').text(account.tz_max_amount)
@@ -138,7 +139,7 @@ org.finance = (function (org) {
         set_invite_count_style: function (count) {
             var
                 name = ['茕茕孑立', '门可罗雀', '门庭若市'],
-                detail = ['形容孤身一人，一个全民淘金好友都没邀请到。', '形容全民淘金所邀请好友数稀少。', '形容全民淘金邀请到的好友很多热闹得像人才市场一样。']
+                detail = ['孤身一人，一个全民淘金好友都没邀请到。', '全民淘金所邀请好友数稀少。', '全民淘金邀请到的好友很多热闹得像人才市场一样。']
             if (count == 0) {
                 return {
                     name: name[0],
