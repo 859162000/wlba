@@ -63,7 +63,7 @@
         $('.two-buttonu').click(function(){
             $('#two-mov-ice').show();
             $('.mov').html('扫下方服务号二维码，进行关注');
-             //window.location.href = '/activity/experience/mobile/';
+
         })
         $('.ice-button').click(function(){
              $('#two-mov-ice').hide();
@@ -71,18 +71,23 @@
         $('.two-buttonb').click(function(){
              verify()
         })
-        verify()
         function verify(){
             $.ajax({
-                url: '/api/id_validation/',
+                url: '/api/has_validate/',
                 type: 'POST',
                 success: function (data) {
                     console.log(data)
+                   if(data.ret_code==0){
+                       $('#two-mov-ice').show();
+                       $('.mov').html('您已是实名认证用户，无需再认证');
+                   }else if(data.ret_code==1){
+                       window.location.href = '/accounts/id_verify/';
+                   }
                 }
 
             })
 
-        }///accounts/id_verify/
+        }
 
 
 
