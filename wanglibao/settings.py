@@ -1177,6 +1177,11 @@ BAJINSHE_COOP_KEY = '3795dd52-3ad9-47cf-9fe7-67d69566c1ba'
 BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
 BAJINSHE_PRODUCT_PULL_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
 
+# 人人利
+WLB_FOR_RENRENLI_KEY = '2007'
+RENRENLI_CALL_BACK_URL = 'http://openapi.amoydao.com/zlo/getp2pinfo/getsubscribe/'
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None

@@ -67,6 +67,7 @@ from wanglibao.views import landpage_view
 import urllib
 from wanglibao_oauth2.forms import OauthUserRegisterForm
 from wanglibao_oauth2.views import create_access_token
+from wanglibao_account.cooperation import get_uid_for_coop
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1697,9 +1698,12 @@ class OauthUserRegisterApi(APIView):
                         "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
                     })
 
-                    crypto = Crypto()
-                    data_buf = crypto.encrypt_mode_cbc(str(user.id), settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
-                    tid = crypto.encode_bytes(data_buf)
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    tid = get_uid_for_coop(user.id)
                     callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
                     response_data = {
                         'Code': 101,

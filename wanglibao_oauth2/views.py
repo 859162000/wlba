@@ -21,7 +21,7 @@ from .tools import oauth_token_login, oauth_token_login_v2
 import constants
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from wanglibao_account.utils import Crypto
+from wanglibao_account.models import Binding
 
 logger = logging.getLogger(__name__)
 
@@ -158,17 +158,23 @@ class TokenLoginOpenApiViewV2(APIView):
     def get(self, request):
         data = request.session
         token = data.get('access_token', '').strip()
+        channel_code = data.get('channel_code', '').strip()
         c_user_id = data.get('c_user_id', '').strip()
-        crypto = Crypto()
-        data_buf = crypto.decode_bytes(str(c_user_id))
-        user_id = crypto.decrypt_mode_cbc(data_buf, settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
-        is_auth, message = oauth_token_login_v2(request, user_id, token)
-        if is_auth:
-            return HttpResponseRedirect(reverse('index'))
+        binding = Binding.objects.filter(btype=channel_code, bid=c_user_id).first()
+        if binding:
+            user_id = binding.user.id
+            is_auth, message = oauth_token_login_v2(request, user_id, token)
+            if is_auth:
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                response_data = {
+                    'code': 10001,
+                    'message': message,
+                }
         else:
             response_data = {
-                'code': 10001,
-                'message': message,
+                'code': 10002,
+                'message': u'无效渠道用户标识',
             }
 
         return HttpResponse(renderers.JSONRenderer().render(response_data,

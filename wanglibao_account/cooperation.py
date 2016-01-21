@@ -55,7 +55,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, YZCJ_CALL_BACK_URL, YZCJ_COOP_KEY,\
-     XUNLEIVIP_LOGIN_URL
+     XUNLEIVIP_LOGIN_URL, RENRENLI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
                                     xunleivip_callback
@@ -1668,6 +1668,7 @@ class RenRenLiRegister(CoopRegister):
     def __init__(self, request):
         super(RenRenLiRegister, self).__init__(request)
         self.c_code = 'renrenli'
+        self.call_back_url = RENRENLI_CALL_BACK_URL
         self.external_channel_client_id_key = 'Cust_id'
         self.external_channel_user_key = 'Phone'
         self.internal_channel_phone_key = 'phone'
@@ -1712,6 +1713,50 @@ class RenRenLiRegister(CoopRegister):
         self.request.session.pop(self.internal_channel_phone_key, None)
         self.request.session.pop(self.internal_channel_sign_key, None)
         self.request.session.pop(self.internal_channel_user_id_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = get_uid_for_coop(user.id)
+        channel_name = self.channel_name
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+
+    def purchase_call_back(self, user, order_id):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            try:
+                p2p_record = P2PRecord.objects.get(user_id=user.id, order_id=order_id, catalog=u'申购').select_related()
+            except P2PRecord.DoesNotExist:
+                p2p_record = None
+
+            user_profile = WanglibaoUserProfile.objects.filter(user_id=user.id).first()
+            phone = user_profile.phone if user_profile else ''
+
+            if p2p_record:
+                data = {
+                    'User_name': phone,
+                    'Order_no': order_id,
+                    'Pro_name': p2p_record.product.name,
+                    'Pro_id': p2p_record.product.id,
+                    'Invest_money': p2p_record.amount,
+                    'Rate': p2p_record.product.expected_earning_rate,
+                    'Invest_start_date': '',
+                    'Invest_end_date': '',
+                    'Back_money': '',
+                    'Back_last_date': '',
+                    'Cust_key': binding.bid,
+                }
+
 
 
 # 注册第三方通道
@@ -4089,3 +4134,37 @@ class XiguaP2PQueryView(APIView):
             ret['dataList'] = data_list
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class CoopAmortizationCallback(object):
+    """
+    渠道用户标的回款后第三方回调处理
+    """
+    def __init__(self):
+        self.c_code = None
+
+    def amortization_call_back(self, user, order_id):
+        pass
+
+    @property
+    def processors(self):
+        return [processor_class() for processor_class in coop_processor_classes]
+
+    def get_user_channel_processor(self, user):
+        """
+        返回该用户的渠道处理器
+        """
+        channel = get_user_channel_record(user.id)
+        if channel:
+            channel_code = channel.code
+            for channel_processor in self.processors:
+                if channel_processor.c_code == channel_code:
+                    return channel_processor
+
+    def process_for_purchase(self, user, order_id):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.purchase_call_back(user, order_id)
+        except:
+            logger.exception('channel bind purchase process error for user %s'%(user.id))
