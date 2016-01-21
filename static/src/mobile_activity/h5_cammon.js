@@ -89,7 +89,9 @@
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    alert(2);
                     if(fn && (typeof fn == "function")){
+                        alert(22);
                         fn();
                     }
                 }
@@ -101,7 +103,9 @@
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    alert(1);
                     if(fn && (typeof fn == "function")){
+                        alert(3);
                         fn();
                     }
                 }
