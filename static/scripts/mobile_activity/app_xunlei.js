@@ -249,7 +249,7 @@ org.ajax({
     url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
     success: function (data) {
-        if (data.ret_code !== 10001) {
+        if (data.ret_code == 10000) {
             org.ajax({
                 url: '/api/has_binding/xunlei9/' + xid + '/',
                 type: 'GET',
@@ -260,6 +260,9 @@ org.ajax({
                     }
                 }
             })
+        }else{
+            $('.xunmeng3').show();
+            $('.maimai-form').hide();
         }
     }
 });
