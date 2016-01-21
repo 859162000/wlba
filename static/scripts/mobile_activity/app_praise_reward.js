@@ -424,7 +424,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$('.friend_top').show();
 	}else{
 		if(uid!=undefined){
-			$('.shine_wrap').show();
+			//$('.shine_wrap').show();
 		}
 	}
 
