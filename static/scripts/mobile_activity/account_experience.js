@@ -278,11 +278,14 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
+                $('.aa').text('未登录')
                 mixins.loginApp({refresh:1, url:''});
             } else {
                 login = true;
                 connect(data)
-                mixins.sendUserInfo('is_authenticated','')
+                $('.aa').text('登录')
+                $('.bb').text(data.tk)
+                //mixins.sendUserInfo('is_authenticated','')
             }
         })
     },
