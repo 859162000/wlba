@@ -1617,7 +1617,7 @@ class WeixinAnnualBonusView(TemplateView):
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             if wx_bonus.annual_bonus < wx_bonus.max_annual_bonus:
-                rep = { 'err_code':403, 'err_messege':u'集满8000才能通过年终考核，继续分享集赞吧！' }
+                rep = { 'err_code':407, 'err_messege':u'集满8000才能通过年终考核，继续分享集赞吧！' }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册
