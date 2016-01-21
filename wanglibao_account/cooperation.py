@@ -219,10 +219,8 @@ class CoopRegister(object):
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
-        print ">>>>>>>>>>>>a", channel_code, self.request.session.get('channel_code')
         channel_user = self.request.GET.get(self.external_channel_user_key, None)
         if channel_code:
-            print ">>>>>>>>>>>>>c", channel_code
             self.request.session[self.internal_channel_key] = channel_code
             # logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
         if channel_user:
@@ -1464,32 +1462,6 @@ class XunleiMobileRegister(XunleiVipRegister):
     def __init__(self, request):
         super(XunleiMobileRegister, self).__init__(request)
         self.c_code = 'mxunlei'
-
-    def save_to_binding(self, user):
-        """
-        处理从url获得的渠道参数
-        :param user:
-        :return:
-        """
-
-        channel_name = self.channel_name
-        if self.is_xunlei_user:
-            channel_user = self.channel_user
-            bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-            if channel_name and channel_user and len(channel_user) <= bid_len:
-                binding = Binding()
-                binding.user = user
-                binding.btype = channel_name
-                binding.bid = channel_user
-                binding.save()
-                # logger.debug('save user %s to binding'%user)
-                return True
-
-            logger.info("%s binding faild with user[%s], channel_user[%s]" %
-                        (channel_name, user.id, channel_user))
-        else:
-            logger.info("%s binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
-                        (channel_name, user.id, self.channel_user, self.channel_time, self.channel_sign))
 
 
 class MaimaiRegister(CoopRegister):
