@@ -106,7 +106,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
     if activity_list:
         for activity in activity_list:
 
-            if activity.is_lottery:
+            if False and activity.is_lottery:
                 handle_lottery_distribute(activity, trigger_node)
 
             if activity.is_all_channel is False and trigger_node not in ('p2p_audit', 'repaid'):
@@ -126,7 +126,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                 activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node,
                                                              is_used=True).order_by('-id')
 
-            activity_rules = activity_rules.exclude(activity__is_lottery=True)
+            #activity_rules = activity_rules.exclude(activity__is_lottery=True)  等需要开放优化功能的时候，放开 add by yihen
 
             if activity_rules:
                 for rule in activity_rules:

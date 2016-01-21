@@ -826,6 +826,17 @@ class UserHasLoginAPI(APIView):
         else:
             return Response({"login": True})
 
+class HasValidationAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        profile = WanglibaoUserProfile.objects.filter(user=user).first()
+        if profile.id_is_valid:
+            return Response({"ret_code": 0, "message": u"您已认证通过"})
+        else:
+            return Response({"ret_code": 1, "message": u"您没有认证通过"})
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
