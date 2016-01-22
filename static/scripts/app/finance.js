@@ -346,6 +346,10 @@ org.finance = (function (org) {
                         })
 
                     }
+
+                    if(result.error_code == 404){
+                        finance_alert.show('没有发现该用户')
+                    }
                 }
 
             })
@@ -488,6 +492,24 @@ org.finance = (function (org) {
         init: lib.init
     }
 })(org);
+
+finance_alert = (function(){
+    var $alert_body  =   $('.client-login-alert');
+    var show = function(title, callback, data){
+        $alert_body.show()
+        $('.alert-head-aue').text(title)
+
+        $('.login--alert-opeartion').one('click', function(){
+            $alert_body.hide()
+            callback && callback(data)
+        })
+    }
+
+    return {
+        show: show
+    }
+})()
+
 wlb.ready({
     app: function (mixins) {
         function connect(data) {
@@ -509,12 +531,9 @@ wlb.ready({
         mixins.shareData({title: '2015年，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
-                $('.client-login-alert').show().on('click', function () {
-                    mixins.loginApp({refresh: 1, url: ''})
-                })
-                $('.login--alert-opeartion').on('click', function () {
-                    $('.client-login-alert').hide()
-                })
+                finance_alert.show('你还没有登录哦，登录获取更多资讯吧', function(mixin){
+                    mixin.loginApp({refresh: 1, url: ''})
+                },mixins)
 
             } else {
                 connect(data)
