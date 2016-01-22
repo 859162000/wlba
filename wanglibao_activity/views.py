@@ -130,15 +130,19 @@ class PcActivityAreaView(TemplateView):
 
         activity_list = get_sorts_for_activity_show(activity_list)
         now =timezone.now()
-        banner = ActivityBannerPosition.objects.all(main__start_at__lte=now, main__end_at__gt=now, second_left__start_at__lte=now, second_left__end_at__gt=now, second_right__start_at__lte=now, second_right__end_at__gt=now).select_related().first()
-
+        main_banner = ActivityBannerPosition.objects.filter(main__start_at__lte=now, main__end_at__gt=now).select_related().first()
+        left_banner = ActivityBannerPosition.objects.filter(second_right__start_at__lte=now, second_right__end_at__gt=now).select_related().first()
+        right_banner = ActivityBannerPosition.objects.filter(second_right__start_at__lte=now, second_right__end_at__gt=now).select_related().first()
         limit = 6
         page = 1
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
-
+        print ">>>>>>>>>>", main_banner, left_banner, right_banner
         return {
-            'banner': banner,
+            'main_banner': main_banner,
+            'left_banner': left_banner,
+            'right_banner': right_banner,
+
             'results': activity_list[:limit],
             'all_page': all_page,
             'page': page,
