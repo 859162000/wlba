@@ -55,7 +55,7 @@
             success: function (data) {
                 //请求成功，通过config注入配置信息,
                 wx.config({
-                    debug: true,
+                    debug: false,
                     appId: data.appId,
                     timestamp: data.timestamp,
                     nonceStr: data.nonceStr,
@@ -131,7 +131,7 @@
     //手机号 检测是否是新用户
     $(".js-checkUser").click(function(){
         var self = $(this);
-        var tel = self.siblings(".tel-inp").val();
+        var tel = $.trim(self.siblings(".tel-inp").val());
         var tp = self.parents("div.mammon-page2");
         if(!checkTel(tel)){
             $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
