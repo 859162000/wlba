@@ -1257,6 +1257,7 @@ class WeixinRedpackRegister(CoopRegister):
         else:
             pass
 
+
 class XunleiVipRegister(CoopRegister):
     def __init__(self, request):
         super(XunleiVipRegister, self).__init__(request)
@@ -1316,9 +1317,9 @@ class XunleiVipRegister(CoopRegister):
         :return:
         """
 
+        channel_name = self.channel_name
         if self.is_xunlei_user:
             channel_user = self.channel_user
-            channel_name = self.channel_name
             bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
             if channel_name and channel_user and len(channel_user) <= bid_len:
                 binding = Binding()
@@ -1329,11 +1330,11 @@ class XunleiVipRegister(CoopRegister):
                 # logger.debug('save user %s to binding'%user)
                 return True
 
-            logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
-                        (user.id, channel_user, channel_name))
+            logger.info("%s binding faild with user[%s], channel_user[%s]" %
+                        (channel_name, user.id, channel_user))
         else:
-            logger.info("xunlei9 binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
-                        (user.id, self.channel_user, self.channel_time, self.channel_sign))
+            logger.info("%s binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
+                        (channel_name, user.id, self.channel_user, self.channel_time, self.channel_sign))
 
     def binding_for_after_register(self, user):
         """
@@ -1397,14 +1398,15 @@ class XunleiVipRegister(CoopRegister):
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
 
     def recharge_call_back(self, user, order_id):
-        logger.info("XunleiVip-Enter recharge_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
+        channel = get_user_channel_record(user)
+        logger.info("%s-Enter recharge_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
         # 判断用户是否首次充值
         penny = Decimal(0.01).quantize(Decimal('.01'))
         pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                           status=PayInfo.SUCCESS).order_by('create_time').first()
 
         if pay_info and pay_info.order_id == int(order_id):
-            logger.info("XunleiVip-If amount for xunlei9: [%s], [%s]" % (order_id, pay_info.amount))
+            logger.info("%s-If amount for [%s], [%s]" % (channel.code, order_id, pay_info.amount))
             # 判断充值金额是否大于100
             pay_amount = int(pay_info.amount)
             if pay_amount >= 100:
@@ -1428,7 +1430,8 @@ class XunleiVipRegister(CoopRegister):
                     })
 
     def purchase_call_back(self, user, order_id):
-        logger.info("XunleiVip-Enter purchase_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
+        channel = get_user_channel_record(user)
+        logger.info("%s-Enter purchase_call_back for [%s], [%s]" % (channel.code, user.id, order_id))
         # 判断是否首次投资
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
         if p2p_record and p2p_record.order_id == int(order_id):
@@ -1453,6 +1456,12 @@ class XunleiVipRegister(CoopRegister):
                         "content": message_content,
                         "mtype": "activity"
                     })
+
+
+class XunleiMobileRegister(XunleiVipRegister):
+    def __init__(self, request):
+        super(XunleiMobileRegister, self).__init__(request)
+        self.c_code = 'mxunlei'
 
 
 class MaimaiRegister(CoopRegister):
@@ -1535,7 +1544,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister,]
+                          YZCJRegister, RockFinanceRegister, XunleiMobileRegister, ]
 
 #######################第三方用户查询#####################
 
