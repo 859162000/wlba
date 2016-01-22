@@ -339,18 +339,10 @@ def _send_message(user, event, end_time):
     if event.rtype == 'percent':
         coupon_amount = event.highest_amount
 
-    data_messages = {
-        0: {
-            'user_id': user.wanglibaouserprofile.phone,
-            'user_type': 'phone',
-            'params': {
-                'amount': coupon_amount,
-                'rtype': rtype
-            }
-        }
-    }
-    # 功能推送id: 4
-    PHPSendSMS().send_sms(rule_id=4, data_messages=data_messages)
+    # 发送短信,功能推送id: 4
+    # 模板中的参数变量必须以 name=value 的形式传入
+    phone = user.wanglibaouserprofile.phone
+    PHPSendSMS().send_sms_one(4, phone, 'phone', amount=coupon_amount, rtype=rtype)
 
     # send_messages.apply_async(kwargs={
     #     'phones': [user.wanglibaouserprofile.phone],

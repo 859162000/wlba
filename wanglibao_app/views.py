@@ -769,7 +769,8 @@ class AppPhoneBookAlertApiView(APIView):
                 if not (user_book.alert_at and user_book.alert_at > local_to_utc(datetime.now(), 'min')):
                     # self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
                     # 邀请投资提醒短信
-                    self._send_sms(5, phone, name=send_name)
+                    # 模板中的参数变量必须以 name=value 的形式传入
+                    PHPSendSMS().send_sms_one(5, phone, 'phone',  name=send_name)
                     user_book.alert_at = timezone.now()
                     user_book.is_used = True
                     user_book.save()
@@ -784,7 +785,9 @@ class AppPhoneBookAlertApiView(APIView):
 
                 if not user_book.is_register and not (user_book.invite_at and user_book.invite_at > local_to_utc(datetime.now(), 'min')):
                     # 邀请注册提醒短信
-                    self._send_sms(6, phone, name=send_name, aws=base64.b64encode(profile.phone)[0:-1])
+                    # 模板中的参数变量必须以 name=value 的形式传入
+                    aws = base64.b64encode(profile.phone)[0:-1]
+                    PHPSendSMS().send_sms_one(6, phone, 'phone', name=send_name, aws=aws)
                     user_book.invite_at = timezone.now()
                     user_book.save()
 
@@ -793,23 +796,10 @@ class AppPhoneBookAlertApiView(APIView):
             logger.error(e.message)
             return Response({'ret_code': 20003, 'message': u'内部程序错误'})
 
-    @staticmethod
-    def _send_sms(rule_id, phone, **kwargs):
-        data_messages = {
-            0: {
-                'user_id': phone,
-                'user_type': 'phone',
-                'params': {
-                    key: kwargs[key] for key in kwargs.keys()
-                }
-            }
-        }
-        # 功能推送id: rule_id
-        PHPSendSMS().send_sms(rule_id=rule_id, data_messages=data_messages)
-
 
 class AppInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
+
     def post(self, request, **kwargs):
         dic = account_backends.broker_invite_list(request.user)
         users = dic['users']

@@ -87,6 +87,46 @@ class PHPSendSMS(SMSBackEnd):
         ))
         return status_code, res_text
 
+    @classmethod
+    def send_sms_one(cls, rule_id, user_id, user_type, **kwargs):
+        if not rule_id or not user_id or not user_type:
+            logger.debug(">>>> 参数不全,发送失败 ")
+            return
+
+        if not user_type:
+            user_type = 'phone'
+
+        data_messages = {
+            0: {
+                'user_id': user_id,
+                'user_type': user_type,
+                'params': {
+                    key: kwargs[key] for key in kwargs.keys()
+                }
+            }
+        }
+        # 功能推送id: rule_id
+        cls.send_sms(rule_id=rule_id, data_messages=data_messages)
+
+    @classmethod
+    def send_sms_msg_one(cls, rule_id, user_id, user_type, msg):
+        if not rule_id or not user_id or not user_type or not msg:
+            logger.debug(">>>> 参数不全,发送失败 ")
+            return
+
+        if not user_type:
+            user_type = 'phone'
+
+        data_messages = {
+            0: {
+                'user_id': user_id,
+                'user_type': user_type,
+                'msg': msg
+            }
+        }
+        # 功能推送id: rule_id
+        cls.send_sms(rule_id=rule_id, data_messages=data_messages)
+
 
 def generate_random_str(count):
     """
