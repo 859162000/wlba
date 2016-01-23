@@ -46,6 +46,12 @@ module.exports = function( grunt ) {
                         src: '*.js',
                         dest: 'scripts/app/dist/'
                     },
+                    {
+                        expand: true,
+                        cwd: 'scripts/component/',
+                        src: '*.js',
+                        dest: 'scripts/component/dist/'
+                    },
                 ]
 
             }
