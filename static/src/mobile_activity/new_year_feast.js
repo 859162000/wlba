@@ -136,6 +136,12 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
+                    var url = location.href;
+                    var times = url.split("?");
+                    if(times[1] != 1){
+                        url += "?1";
+                        self.location.replace(url);
+                    }
                     org.feast.init()
                 }
             })
