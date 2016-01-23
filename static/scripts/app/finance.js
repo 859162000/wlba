@@ -527,7 +527,6 @@ wlb.ready({
                 }
             })
         }
-
         mixins.shareData({title: '2015年，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
