@@ -303,7 +303,7 @@ org.feast = (function (org) {
                          $('.pot-s').addClass('selectEd')
                      }
                  }else{
-                     window.location.href = '/weixin/login/?next=/activity/new_year_feast/';
+                     window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                  }
              })
         },
@@ -330,11 +330,21 @@ org.feast = (function (org) {
             $('.packets-btn a').click(function(){
                 if(!$(this).hasClass('selectEd')) {
                     if ($('#authenticated').val() == 'True') {
+                        var id = $(this).attr('data-id');
                         var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>'
-                        org.ui.alert(txt, '', '3')
+                        org.ajax({
+                            url: '/api/wlb_reward/hm_banque/',
+                            type: 'post',
+                            data: {
+                                redpack_id : id
+                            },
+                            success: function (data) {
+                               org.ui.alert(txt, '', '3')
+                            }
+                        })
                         $('.packets-btn a').addClass('selectEd')
                     } else {
-                        window.location.href = '/weixin/login/?next=/activity/new_year_feast/';
+                        window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                     }
                 }
             })
