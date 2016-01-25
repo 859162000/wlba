@@ -1957,15 +1957,17 @@ class HMBanquetRewardAPI(APIView):
                         user = self.request.user,
                     )
                 gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
-                if not gift_record.redpack_record_id:
-                    status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, event, device_type)
-                    if not status:
-                        return Response({"ret_code":4, 'message':messege})
-                    gift_record.redpack_record_id = redpack_record_id
-                    gift_record.redpack_record_id_time = timezone.now()
-                    return Response({"ret_code":0, 'message':"success"})
-                else:
+                if gift_record.redpack_record_id:
                     return Response({"ret_code":1, "message":"今天已经领过了"})
+
+                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, event, device_type)
+                if not status:
+                    return Response({"ret_code":4, 'message':messege})
+                gift_record.redpack_record_id = redpack_record_id
+                gift_record.redpack_record_id_time = timezone.now()
+                gift_record.save()
+                return Response({"ret_code":0, 'message':"success"})
+
         except Exception, e:
             logger.debug(traceback.format_exc())
             return Response({"ret_code":4, "message":"error"})
