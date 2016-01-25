@@ -235,11 +235,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 alertFram.id="alert-cont";
             }
             if(difference == 2){
-                var strHtml = "<div id='packets' class='packets clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
+                var strHtml = "<div id='packets' class='packets alertT30 clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
                             +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财卷”及“体验金专区”查看</p>"
                             +"<div class='close-b close-min'></div></div>";
             }else if(difference == 3){
-                var strHtml ="<div id='packets' class='packets alertT30 clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
+                var strHtml ="<div id='packets' class='packets clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
                     +"<div class='close-b close-max'></div></div>"
             }
             alertFram.innerHTML = strHtml;
@@ -329,11 +329,14 @@ org.feast = (function (org) {
         },
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
-                if($('#authenticated').val() == 'True'){
-                    var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>'
-                    org.ui.alert(txt, '', '3')
-                }else{
-                    window.location.href = '/weixin/login/?next=/activity/new_year_feast/';
+                if(!$(this).hasClass('selectEd')) {
+                    if ($('#authenticated').val() == 'True') {
+                        var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>'
+                        org.ui.alert(txt, '', '3')
+                        $('.packets-btn a').addClass('selectEd')
+                    } else {
+                        window.location.href = '/weixin/login/?next=/activity/new_year_feast/';
+                    }
                 }
             })
         }
