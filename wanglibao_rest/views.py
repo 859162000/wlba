@@ -559,13 +559,14 @@ class SendVoiceCodeAPIView(APIView):
             return Response({"ret_code": 30114, "message": message})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        # 语音验证码次数不加1
         if phone_validate_code_item:
             count = phone_validate_code_item.code_send_count
-            if count >= 6:
+            if count >= 10:
                 return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
 
-            phone_validate_code_item.code_send_count += 1
-            phone_validate_code_item.save()
+            # phone_validate_code_item.code_send_count += 1
+            # phone_validate_code_item.save()
         else:
             now = timezone.now()
             phone_validate_code_item = PhoneValidateCode()
@@ -573,7 +574,7 @@ class SendVoiceCodeAPIView(APIView):
             phone_validate_code_item.validate_code = validate_code
             phone_validate_code_item.phone = phone_number
             phone_validate_code_item.last_send_time = now
-            phone_validate_code_item.code_send_count = 1
+            # phone_validate_code_item.code_send_count = 1
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
