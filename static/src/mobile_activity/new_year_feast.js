@@ -20,7 +20,7 @@ org.ui = (function(){
                             +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财卷”及“体验金专区”查看</p>"
                             +"<div class='close-b close-min'></div></div>";
             }else if(difference == 3){
-                var strHtml ="<div id='packets' class='packets clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
+                var strHtml ="<div id='packets' class='packets alertT30 clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
                     +"<div class='close-b close-max'></div></div>"
             }
             alertFram.innerHTML = strHtml;
