@@ -11,4 +11,7 @@ urlpatterns = patterns(
 
     url(r'^weixin/bonus/$', views.WeixinAnnualBonusView.as_view(), name='weixin_annual_bonus'),
     url(r'^weixin/bonus/from_regist/$', views.WeixinAnnualBonusView.as_view(), name='weixin_annual_bonus_from_regist'),
+
+    url(r'^qm_banquet/$', views.QMBanquetTemplate.as_view(), name='qm_banquet'),
+
 )

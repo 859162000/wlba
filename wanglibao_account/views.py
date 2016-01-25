@@ -504,7 +504,8 @@ class AccountHome(TemplateView):
         if experience_record.get('event__amount__sum'):
             experience_amount = experience_record.get('event__amount__sum')
 
-        experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
+        experience_amortization = ExperienceAmortization.objects.filter(user=user)\
+            .select_related('product').order_by('-created_time')
         if experience_amortization:
             paid_interest = reduce(lambda x, y: x + y,
                                    [e.interest for e in experience_amortization if e.settled is True], 0)
