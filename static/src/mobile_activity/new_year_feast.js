@@ -181,11 +181,11 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://staging.wanglibao.com/',
+            var host = 'https://staging.wanglibao.com/activity/new_year_feast/',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = window.location.href,
-                shareMainTit = '团圆宴会',
-                shareBody = '团圆宴会团圆宴会团圆宴会团圆宴会团圆宴会';
+                shareMainTit = '新年红包宴，每天可领一次福气大礼包。',
+                shareBody = '每天一次机会，开锅领奖。红包、加息券、体验金100%必中。';
             //分享给微信好友
             org.onMenuShareAppMessage({
                 title: shareMainTit,
@@ -195,7 +195,7 @@ var weChatShare = (function(org){
             });
             //分享给微信朋友圈
             org.onMenuShareTimeline({
-                title: shareMainTit,
+                title: '新年红包宴，每天可领一次福气大礼包。',
                 link : shareLink,
                 imgUrl: shareImg
             })
