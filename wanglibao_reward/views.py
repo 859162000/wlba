@@ -45,6 +45,7 @@ from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
+from rest_framework.permissions import IsAuthenticated
 import traceback
 logger = logging.getLogger('wanglibao_reward')
 
@@ -1807,6 +1808,7 @@ class QMBanquetRewardAPI(APIView):
     """
     全民盛宴api
     """
+    permission_classes = (IsAuthenticated, )
     activity_codes = ['qmsy_redpack', 'qmsy_redpack1']
     activity = None
 
@@ -1904,6 +1906,7 @@ class HMBanquetRewardAPI(APIView):
     """
     豪门盛宴api
     """
+    permission_classes = (IsAuthenticated, )
     activity_code = 'hmsy_redpack'
     activity = None
 
