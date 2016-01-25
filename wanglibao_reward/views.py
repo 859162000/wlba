@@ -1231,6 +1231,127 @@ class XunleiActivityAPIView(APIView):
                 record.save()
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+
+class WeixinActivityAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(WeixinActivityAPIView, self).__init__()
+        self.activity_name = 'weixin_guaguaka'
+
+    def introduced_by_with(self, user_id, promo_token, register_time=None):
+        """
+            register_time:为None表示不需要关注用户的注册时间
+        """
+        if not register_time:
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token).first()
+        else:
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token, created_at__gte=register_time).first()
+        return True if introduced_by else False
+
+    def has_generate_reward_activity(self, user_id, activity, order_id):
+        activitys = WanglibaoActivityReward.objects.filter(user_id=user_id, activity=activity, order_id=order_id)
+        return activitys if activitys else None
+
+    def generate_reward_activity(self, user, order_id):
+        points = {
+            "0-5": ("weixin_guagua_0.9", 0.9),
+            "1-6": ("weixin_guagua_1.0", 1.0),
+            "2-7": ("weixin_guagua_1.2", 1.2),
+            "3-8": ("weixin_guagua_1.5", 1.5),
+            "4-9": ("weixin_guagua_2.0", 2.0)
+        }
+        records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
+        counter = (records.count()+1) % 10
+        when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
+        for _index in xrange(3):
+            if _index == when_dist_redpack:
+                for key, value in points.items():
+                    if str(counter) in key:
+                        WanglibaoActivityReward.objects.create(
+                            order_id=order_id,
+                            user=user,
+                            redpack_event=RedPackEvent.objects.filter(name=value[0]).first(),
+                            experience=None,
+                            activity=self.activity_name,
+                            when_dist=1,
+                            left_times=1,
+                            join_times=1,
+                            channel='weixin',
+                            has_sent=False,
+                            p2p_amount=value[1]
+                        )
+                        break
+            else:
+                WanglibaoActivityReward.objects.create(
+                    order_id=order_id,
+                    user=user,
+                    experience=None,
+                    activity=self.activity_name,
+                    when_dist=1,
+                    left_times=1,
+                    join_times=1,
+                    channel='weixin',
+                    has_sent=False,
+                    p2p_amount=0
+                )
+
+        return WanglibaoActivityReward.objects.filter(user=user, order_id=order_id, activity=self.activity_name)
+
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'code': 1000,
+                'message': u'用户没有登录'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        order_id = request.POST.get('order_id')
+        if not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
+            json_to_response = {
+                'code': 1001,
+                'message': u'Order和User不匹配'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
+        activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
+        activity_record = activitys.filter(left_times__gt=0)
+
+        if activity_record.filter(left_times__gt=0).count() == 0:
+            json_to_response = {
+                'code': 1002,
+                'messge': u'用户的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        else:
+            with transaction.atomic():
+                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
+                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, order_id=order_id, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+                if record.redpack_event:
+                    json_to_response = {
+                        'code': 0,
+                        'lefts': sum_left["amount_sum"]-1,
+                        'amount': "%s" % (record.redpack_event.amount,),
+                        'message': u'用户抽到奖品'
+                    }
+                    redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
+                    logger.debug(u'distribute redpack for user:%s, redpack:%s' % (request.user, record.redpack_event))
+                else:
+                    json_to_response = {
+                        'code': 1,
+                        'lefts': sum_left["amount_sum"]-1,
+                        'message': u'此次没有得到奖品'
+                    }
+
+                record.left_times = 0
+                record.has_sent = True
+                record.save()
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
 class WeixinAnnualBonusView(TemplateView):
     openid = ''
     nick_name = ''
@@ -1426,19 +1547,33 @@ class WeixinAnnualBonusView(TemplateView):
                 #    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
                 #    return HttpResponse(json.dumps(rep), content_type='application/json')
 
+                vote_message = u'感谢您的评价！'
                 if vote_type==1:
                     wx_bonus.good_vote += 1
                     if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus += 500
+                        vote_message = u'你已帮好友多拿了500，输入手机号你也可以领！'
                         if wx_bonus.annual_bonus >= wx_bonus.max_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
                             wx_bonus.is_max = True
+                    else:
+                        if wx_bonus.is_pay:
+                           vote_message = u'您的好友已领走年终奖，感谢您的点赞！'
+                        elif wx_bonus.is_max:
+                           vote_message = u'您的好友年终奖已封顶，感谢您的点赞！'
                 else:
                     wx_bonus.bad_vote += 1
                     if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus -= 500
-                        if wx_bonus.annual_bonus <= wx_bonus.min_annual_bonus:
+                        vote_message = u'你已扣除好友500年终奖，这是对TA的激励'
+                        if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
+                            vote_message = u'还是给TA留点年终奖吧，感谢您对TA的激励！'
+                    else:
+                        if wx_bonus.is_pay:
+                           vote_message = u'您的好友已领走年终奖，感谢您对TA的激励！'
+                        elif wx_bonus.is_max:
+                           vote_message = u'您的好友年终奖已封顶，感谢您对TA的激励！'
 
                 wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
                     defaults={
@@ -1473,10 +1608,10 @@ class WeixinAnnualBonusView(TemplateView):
 
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-        if vote_type==1:
-            vote_message = u'你已帮好友多拿了500，输入手机号你也可以领！'
-        else:
-            vote_message = u'你已扣除好友500年终奖，这是对TA的激励'
+        ##if vote_type==1:
+        ##    vote_message = u'你已帮好友多拿了500，输入手机号你也可以领！'
+        ##else:
+        ##    vote_message = u'你已扣除好友500年终奖，这是对TA的激励'
         rep = { 'err_code':0, 'err_messege':vote_message, 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
