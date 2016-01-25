@@ -7,14 +7,18 @@
     .g-samll-start
       .samll-nav-hotline 客服热线 ： 400-858-8066
 
-      .samll-nav-wechat.samll-nav-animate 关注有惊喜
+      .samll-nav-wechat.samll-nav-animate
+        span 关注有惊喜
+        span.icon-weixin-version2
         .samll-wechat-hover
           .wechat-hover-body
             .wechat-hover-san
             img(src='/static/imgs/pc/nav/wechat_server.jpg')
             .wechat-hover-dec 关注网利宝微信
 
-      .samll-nav-app.samll-nav-animate 网利宝APP
+      .samll-nav-app.samll-nav-animate
+        span 网利宝APP
+        span.icon-app
         .samll-wechat-hover
           .wechat-hover-body
             .wechat-hover-san
@@ -30,8 +34,11 @@
         a(href='/accounts/home/').samll-nav-user.checkLoginStatus {{user | display_name}}
         a(href='/accounts/logout?next=/').samll-nav-logout 退出
       else
-        a(href='/accounts/login/').samll-nav-user 登录
+        a(href='/accounts/login/').samll-nav-user.samll-user-red 登录
         a(href='/accounts/register/').samll-nav-logout 免费注册
+
+
+
 
 .g-nav-warp
   .g-nav
@@ -43,7 +50,10 @@
         if activeItem == "我的账户"
           myacount = 'highlight'
         a(href="/accounts/home", class='{{myacount}}')#checkUserType.user-nav
-          i.icon.iconfont.icon-user
+          if user.is_authenticated
+            i.user-icon-img-active
+          else
+            i.user-icon-img
           span.user-text 我的账户
           i.icon.iconfont.icon-down
         ul.g-nav-user-nav#minNavs
@@ -73,4 +83,5 @@
       +nav-item('活动专区', '/activity/area/', 'new')
       +nav-item('安全保障', '/security')
 
+  .g-nav-multicolour-line
 

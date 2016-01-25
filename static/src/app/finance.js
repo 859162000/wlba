@@ -209,8 +209,10 @@ org.finance = (function (org) {
 
                 if (_self.model_canvac_opeartion) {
                     canvas.getContext('2d').translate(0.5, 0.5)
+                    cts.globalCompositeOperation= 'source-atop';
                     canvas.width = canvas_w;
                     canvas.height = canvas_w;
+
                     _self.model_canvac_opeartion = false
                 }
             } else {
