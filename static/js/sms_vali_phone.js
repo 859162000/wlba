@@ -77,6 +77,7 @@
                 url: '/api/phone_validation_code/' + phone + '/',
                 type: 'POST',
                 success: function (xhr) {
+
                 }
             });
         });
@@ -86,15 +87,31 @@
             var password_val = $('.password').val();
             var id_number_val = $('.id_number').val();
             var new_phone_val = $('.new_phone').val();
+            var card_no;
+            var post_data;
+            if($('input.bind_card').length>0){
+            //当用户有同卡进出时
+                card_no = $('.bind_card').val();
+                post_data = {
+                    'validate_code':validate_code_val,
+                    'password':password_val,
+                    'id_number':id_number_val,
+                    'new_phone':new_phone_val,
+                    'card_no':card_no
+                };
+            }else {
+                post_data = {
+                    'validate_code': validate_code_val,
+                    'password': password_val,
+                    'id_number': id_number_val,
+                    'new_phone': new_phone_val
+                }
+            }
+
             $.ajax({
                 url: '/api/sms_modify/vali_acc_info/' ,
                 type: 'POST',
-                data: {
-                    validate_code:validate_code_val,
-                    password:password_val,
-                    id_number:id_number_val,
-                    new_phone:new_phone_val
-                },
+                data: post_data,
                 success: function (returndata) {
                     window.location.href = '/accounts/sms_modify/phone/';
                     //alert(returndata);

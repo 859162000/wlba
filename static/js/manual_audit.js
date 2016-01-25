@@ -74,15 +74,28 @@
                 pass_true = true;
             }
 
+            var card_no;
+            var post_data;
+            if($('input.bind_card').length>0){
+            //当用户有同卡进出时
+                card_no = $('.bind_card').val();
+                post_data = {
+                    'id_number':id_number_val,
+                    'password':password_val,
+                    'card_no':card_no
+                };
+            }else {
+                post_data = {
+                    'id_number':id_number_val,
+                    'password':password_val
+                }
+            }
+
             if(pass_true&&id_true){
                 $.ajax({
                     url: '/api/manual_modify/vali_acc_info/' ,
                     type: 'POST',
-                    data: {
-                        id_number:id_number_val,
-                        //validate_code:validate_code_val,
-                        password:password_val
-                    },
+                    data: post_data,
                     success: function (returndata) {
                         window.location.href = '/accounts/manual_modify/phone/';
                         //alert(returndata);

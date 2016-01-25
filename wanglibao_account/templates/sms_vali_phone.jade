@@ -44,14 +44,15 @@ block main
                                     .status
                                         .true
                                         .false 身份证信息有误
-                        .box(style='display:none')
-                            label 银行卡号
-                            .box_right
-                                .input_box
-                                    <input class="input_phone " type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
-                                    .status
-                                        .true
-                                        .false 银行卡号码有误
+                        if is_bind_card
+                            .box
+                                label 银行卡号
+                                .box_right
+                                    .input_box
+                                        <input class="input_phone bind_card" type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
+                                        .status
+                                            .true
+                                            .false 银行卡号码有误
                         .box
                             label 新手机号
                             .box_right
