@@ -105,7 +105,7 @@ org.feast = (function (org) {
                 }
             })
             $('#projectList').click(function(){
-                window.location.href = '/weixin/list/?next=/activity/new_year_feast/';
+                window.location.href = '/weixin/list/';
             })
         },
         _receiveFun: function(){
@@ -147,12 +147,12 @@ wlb.ready({
         }
 
         mixins.sendUserInfo(function (data) {
+            $('#projectList').on('click',function(){
+                mixins.jumpToManageMoney();
+            })
             if (data.ph == '') {
                 $('.pot-s,.packets-btn a').on('click',function(){
                     mixins.loginApp({refresh: 1, url: ''})
-                })
-                $('#projectList').on('click',function(){
-                    mixins.jumpToManageMoney()
                 })
             } else {
                 connect(data)
