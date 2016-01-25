@@ -97,10 +97,10 @@
                 },
                 success: function (returndata) {
                     window.location.href = '/accounts/sms_modify/phone/';
-                    alert(returndata);
+                    //alert(returndata);
                 },
                 error: function (returndata) {
-                    alert(returndata);
+                    //alert(returndata);
                 }
 
             });

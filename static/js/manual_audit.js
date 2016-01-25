@@ -40,8 +40,6 @@
           return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
       };
 
-
-
       $.ajaxSetup({
           beforeSend: function (xhr, settings) {
               if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
@@ -49,6 +47,7 @@
               }
           }
       });
+
 
         $('.button').click(function(){
             var id_number_val = $('#id_number').val();
@@ -61,13 +60,13 @@
                 $('.status_2').hide();
                 id_true = true;
             }else{
-                $('.status_2 .false').text('身份证位数错误');
+                $('.status_2 .false').show().text('身份证位数错误').prev().hide();
                 $('.status_2').show();
                 id_true = false;
             }
 
             if(password_val.length<6){
-                $('.status_1 .false').text('密码位数错误');
+                $('.status_1 .false').show().text('密码位数错误').prev().hide();
                 $('.status_1').show();
                 pass_true = false;
             }else{
@@ -86,10 +85,10 @@
                     },
                     success: function (returndata) {
                         window.location.href = '/accounts/manual_modify/phone/';
-                        alert(returndata);
+                        //alert(returndata);
                     },
                     error: function (returndata) {
-                        alert(returndata);
+                        //alert(returndata);
                     }
                 });
             }

@@ -3,6 +3,8 @@
   margin-top: 15px
   display: inline-block
   width: 100%
+  .margin_top_box
+    margin-top: 50px
   .main_title_top
     width: 100%
     color: #666
@@ -34,20 +36,7 @@
       position: relative
       top: -2.5px
       margin-left: 20px
-.form_wrap
-  padding-left: 168px
-  .title_top
-    line-height: 20px
-    color: #999
-    font-size: 12px
-    padding-bottom: 4px
-  form
-    width: 100%
-    color: #666
-    line-height: 26px
-    font-size: 18px
-    padding: 38px 0 38px 50px
-.form_wrap
+.phone_modify_main_wrap .form_wrap
   padding-left: 168px
   font-size: 0
   margin-bottom: 90px
@@ -55,9 +44,13 @@
     line-height: 20px
     color: #999
     font-size: 12px
-    padding-bottom: 10px
+    padding: 20px 0 10px 80px
   form
     width: 100%
+    color: #666
+    line-height: 26px
+    font-size: 18px
+    padding: 8px 0 38px 50px
     .box
       width: 100%
       clear: both
@@ -159,6 +152,8 @@
           font-size: 16px
           background: #e4371f
           cursor: pointer
+        .submit:hover
+          background: #b72a0a
         .status
           height: 16px
           position: relative
@@ -178,10 +173,11 @@
             float: left
           .false
             height: 16px
-            background: url("/static/images/account_safe/ico.png") no-repeat -71px -34px
+            background: url("/static/images/account_safe/ico.png") no-repeat -71px -35px
             display: block
             float: left
             padding-left: 13px
+            line-height: 16px
         .error_title
           clear: both
           width: 100%
@@ -214,14 +210,17 @@
       img
         width: 100%
         display: block
-.form_margin
+.phone_modify_main_wrap .form_margin
   padding-left: 260px
   .title_phone
     color: #fd9827
     font-size: 14px
     line-height: 24px
+    padding-left: 50px
   form.form_left
     .box
       label
         text-align: left
         width: 50px
+
+

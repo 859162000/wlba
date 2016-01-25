@@ -224,8 +224,12 @@
                     url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
                     type: 'POST',
                     success: function (xhr) {
-
-                }});
+                        $('.error_form').hide();
+                    },
+                    error: function (xhr) {
+                        $('.error_form').text(xhr.message).show();
+                    }
+                });
             }else{
                 $('.status_code .false').text('请先输入正确的手机号');
                 $('.status_code').show().children('.true').hide();
@@ -248,12 +252,6 @@
             file_2 = document.getElementById("id_back_image").value;
             file_3 = document.getElementById("id_user_image").value;
             code_num = $('.input_code').val();
-            if(file_1&&file_2&&file_3&&phone_true&&code_num) {
-                $('.error_form').hide();
-            }else{
-                $('.error_form').show();
-            }
-
         }
 
 
@@ -277,67 +275,21 @@
                     contentType: false,
                     processData: false,
                     success: function (returndata) {
-                        alert(returndata);
+                        //alert(returndata);
                         window.location.href = '/accounts/security/';
                     },
                     error: function (returndata) {
-                        alert(returndata);
+
                     }
                 });
             }else{
-                $('.error_form').show();
+                $('.error_form').text('请填写完整').show();
             }
 
-            //alert(form.action);
-//            $.ajax({
-//                url:'/api/manual_modify/phone/',
-//                type:'post',
-//                data: form.serialize(),
-//                dataType: 'json',
-//                success:function(data){
-//                    alert('1');
-//                },
-//                error:function(data){
-//                    alert('2');
-//                }
-//            })
+
         });
 
-        //$('#form').submit(function(){
-        //    alert($(this).serialize());
-        //    return false;
-        //});
 
-
-        //$('.button').click(function(){
-        //    //alert(id_front_image);
-        //    //alert(id_back_image);
-        //    //alert(id_user_image);
-        //    //alert(id_bank_image);
-        //    var new_phone = $('.input_phone').val();
-        //    var new_code = $('.new_code').val();
-        //    $.ajax({
-        //        url: '/api/manual_modify/phone/',
-        //        type: 'post',
-        //        data: {
-        //            'id_front_image': id_front_image,
-        //            'id_back_image': id_back_image,
-        //            'id_user_image': id_user_image,
-        //            //'id_bank_image': id_bank_image,
-        //            'new_phone': new_phone,
-        //            'validate_code': new_code
-        //        },
-        //        success: function (data1) {
-		//
-        //        }
-        //    });
-        //})
-
-
-        window.onload=function(){
-
-
-        }
 
     })
 
