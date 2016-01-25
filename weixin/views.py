@@ -356,7 +356,7 @@ class WeixinJoinView(View):
                 _process_scene_record(w_user, scene_id)
 
         if not reply:
-            if user:
+            if not user:
                 txt = self.getBindTxt(fromUserName)
             else:
                 txt = self.getUnBindTxt(fromUserName, user.wanglibaouserprofile.phone)
