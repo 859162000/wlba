@@ -226,7 +226,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
     function getVal(){
         var val = [
-            {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
+            {"qVal": "中签","title":"鸿运","detail":"福致心灵 鸿喜云集 新年开运"},
             {"qVal": "中签","title":"荣归","detail":"学富五车题雁塔<br />衣锦还乡会有时"},
             {"qVal": "上签","title":"利是","detail":"得鸿运 利仕途 能旺夫"},
             {"qVal": "上签","title":"致祥","detail":"竹报三多 和睦融洽 可致吉祥"},
@@ -338,6 +338,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $(".js-btn").click(function(){
         $(this).parents(".mammon-jq").hide();
         $("div.mammon-share").css("display","-webkit-box");
+        _hmt.push(['_trackEvent', '解签', 'click', 'weixin_mammon']);
     });
     //关闭弹出层
     $(".js-close").click(function(){
@@ -383,7 +384,18 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     //        }
     //    };
     //});
+    function is_weixin(){
+        var ua = navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i)=="micromessenger") {
+            return true;
+        } else {
+            return false;
+        }
+    }
     $(function(){
         $("#load-box").hide().siblings("div.mammon-page1").show();
+        if(!is_weixin()){
+            $("#mammon-weixin").css("display","-webkit-box");
+        }
     })
 })();
