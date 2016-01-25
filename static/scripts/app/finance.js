@@ -288,12 +288,14 @@ org.finance = (function (org) {
                             _self.swiper_init([6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) > 0){
-                            _self.swiper_init([1,2,3,6])
-                        }
+                        if(parseInt(account.tz_amount) <= 0){
+                            if(parseInt(account.income_reward) > 0 || parseInt(account.invite_income) > 0){
+                                _self.swiper_init([1,2,3,6])
+                            }
+                            if(parseInt(account.income_reward) <= 0 && parseInt(account.invite_income) <= 0){
+                                _self.swiper_init([1,2,3,4,5])
+                            }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) <= 0){
-                            _self.swiper_init([1,2,3,4,5])
                         }
 
                         function append_data(){
@@ -405,6 +407,8 @@ org.finance = (function (org) {
                 canvas_r = canvas_r / 2
                 canvas_font = '17px'
             }
+
+
             function infinite() {
                 _self.canvas_model3(canvas_w / 2, canvas_w / 2, canvas_r / 2, _self.process_num, canvas_w, canvas_font);
                 t = setTimeout(infinite, 30);
