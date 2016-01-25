@@ -45,7 +45,6 @@ org.feast = (function (org) {
         arrow : $('.arrow'),
         init: function () {
             lib._potAward();
-            lib._lookMoreInfoFun();
             lib._receiveFun();
         },
         /*开锅箭头样式*/
@@ -124,10 +123,12 @@ org.feast = (function (org) {
     }
     return {
         init: lib.init,
-        arrowStyle: lib._arrowStyle
+        arrowStyle: lib._arrowStyle,
+        lookMoreInfoFun: lib._lookMoreInfoFun
     }
 })(org);
 org.feast.arrowStyle(1,'default');
+org.feast.lookMoreInfoFun();
 wlb.ready({
     app: function (mixins) {
         function connect(data) {
