@@ -1748,11 +1748,15 @@ class AdminSendMessageView(TemplateView):
             # 发送短信
             content_sms = request.POST.get("content_sms", "")
             if content_sms:
-                send_messages.apply_async(kwargs={
-                    'phones': [phone],
-                    'messages': [content_sms + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD],
-                    'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-                })
+                # 发送短信,功能推送id: 7
+                # 直接发送短信内容
+                from wanglibao_sms.send_php import PHPSendSMS
+                PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content_sms)
+                # send_messages.apply_async(kwargs={
+                #     'phones': [phone],
+                #     'messages': [content_sms + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD],
+                #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+                # })
                 msg_sms += u'短信发送成功'
 
             # 发送站内信

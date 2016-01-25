@@ -8,18 +8,18 @@ from decimal import Decimal
 from django.utils import timezone
 from django.db.models import Q, Sum
 from django.db import transaction
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.template import Template, Context
 from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
-from wanglibao_redpack import backends as redpack_backends
+# from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
 from wanglibao_p2p.models import P2PRecord, P2PEquity, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_sms.tasks import send_messages
+# from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages as sms_messages
 from wanglibao_rest.utils import decide_device
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
@@ -809,7 +809,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD)
+            sms = Template(sms_template)
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
@@ -837,12 +837,17 @@ def _send_message_template(user, title, content):
     })
 
 
-def _send_sms_template(phones, content):
-    send_messages.apply_async(kwargs={
-        "phones": [phones, ],
-        "messages": [content, ],
-        "ext": 666
-    })
+def _send_sms_template(phone, content):
+    # 发送短信,功能推送id: 7
+    # 直接发送短信内容
+    from wanglibao_sms.send_php import PHPSendSMS
+    PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content)
+
+    # send_messages.apply_async(kwargs={
+    #     "phones": [phone, ],
+    #     "messages": [content, ],
+    #     "ext": 666
+    # })
 
 
 def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):
