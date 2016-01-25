@@ -1,32 +1,37 @@
 (function() {
     require.config({
-        paths: {
-            jquery: '/static/js/lib/jquery.min',
-        },
-        shim: {
-            'jquery.modal': ['jquery'],
-        }
-    });
-    require(['jquery'],
-    function($, re) {
-		var csrfSafeMethod, getCookie, sameOrigin,
-          getCookie = function (name) {
-              var cookie, cookieValue, cookies, i;
-              cookieValue = null;
-              if (document.cookie && document.cookie !== "") {
-                  cookies = document.cookie.split(";");
-                  i = 0;
-                  while (i < cookies.length) {
-                      cookie = $.trim(cookies[i]);
-                      if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                          break;
-                      }
-                      i++;
+    paths: {
+      jquery: 'lib/jquery.min',
+      'jquery.validate': 'lib/jquery.validate.min',
+      'jquery.modal': 'lib/jquery.modal.min',
+      tools: 'lib/modal.tools'
+    },
+    shim: {
+      'jquery.validate': ['jquery'],
+      'jquery.modal': ['jquery'],
+      "tools": ['jquery.modal']
+    }
+  });
+
+  require(['jquery', 'lib/modal', 'jquery.validate', 'lib/backend', 'tools'], function($, modal, validate, backend, tool) {
+    var csrfSafeMethod, getCookie, sameOrigin,
+      getCookie = function (name) {
+          var cookie, cookieValue, cookies, i;
+          cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+              cookies = document.cookie.split(";");
+              i = 0;
+              while (i < cookies.length) {
+                  cookie = $.trim(cookies[i]);
+                  if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
                   }
+                  i++;
               }
-              return cookieValue;
-          };
+          }
+          return cookieValue;
+      };
       csrfSafeMethod = function (method) {
           return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
       };
