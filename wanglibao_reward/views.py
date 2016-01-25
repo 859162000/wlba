@@ -1863,12 +1863,10 @@ class QMBanquetRewardAPI(APIView):
                         if activity_rule.gift_type == "experience_gold":
                             experience_record_ids = ""
                             experience_record_id = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
-                            if experience_record_id:
-                                experience_record_ids+=experience_record_id
-                                gift_record.experience_record_ids = experience_record_ids
-                            else:
+                            if not experience_record_id:
                                 raise Exception(experience_event_id=activity_rule.redpack, activity_code=self.activity.code, errmsg='QMBanquetRewardAPI post experience_event not exist')
-
+                            experience_record_ids+=experience_record_id
+                            gift_record.experience_record_ids = experience_record_ids
                     gift_record.activity_code = self.activity.code
                     gift_record.activity_code_time = timezone.now()
                     gift_record.save()
@@ -1933,20 +1931,24 @@ class HMBanquetRewardAPI(APIView):
 
         device = split_ua(self.request)
         device_type = device['device_type']
-        with transaction.atomic():
-            now_date = timezone.now().date()
-            gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
-            if not gift_record.exists():
-                ActivityRewardRecord.objects.create(
-                    user = self.request.user,
-                )
-            gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
-            if not gift_record.redpack_rule:
-                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, event, device_type)
-                if status:
+        try:
+            with transaction.atomic():
+                now_date = timezone.now().date()
+                gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
+                if not gift_record.exists():
+                    ActivityRewardRecord.objects.create(
+                        user = self.request.user,
+                    )
+                gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
+                if not gift_record.redpack_record_id:
+                    status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, event, device_type)
+                    if not status:
+                        raise Exception(redpack_event_id=redpack_event_id, errmsg=messege)
                     gift_record.redpack_record_id = redpack_record_id
                     gift_record.redpack_record_id_time = timezone.now()
-                    return {"ret_code":0, 'data':{}}
-                return {"ret_code":7, "message":messege}
-            else:
-                return {"ret_code":1, "message":"今天已经领过了"}
+                    return {"ret_code":0, 'message':"success"}
+                else:
+                    return {"ret_code":1, "message":"今天已经领过了"}
+        except Exception, e:
+            logger.debug(traceback.format_exc())
+            return {"ret_code":4, "message":"error"}
