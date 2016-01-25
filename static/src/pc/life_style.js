@@ -60,21 +60,19 @@ point();
        $('#them-box').hide();
        $('#heart-box').hide();
        $('.ul-point').attr('data-num','lei-box')
-       point()
+       point();
      }else if($(this).index() == 1){
        $('#them-box').show();
        $('#lei-box').hide();
        $('#heart-box').hide();
        $('.ul-point').attr('data-num','them-box')
        point();
-       tab('#them-box');
      }else{
        $('#heart-box').show();
        $('#lei-box').hide();
        $('#them-box').hide();
        $('.ul-point').attr('data-num','heart-box')
-       point()
-       tab('#heart-box');
+       point();
      }
   })
 
@@ -132,11 +130,11 @@ point();
 
     $(window).scroll(function(){
         if (sum == 0 && $(window).scrollTop()>50){
-            $('body,html').stop().animate({'scrollTop':h_win+'px'},80,function(){
+            $('body,html').stop().animate({'scrollTop':h_win+'px'},50,function(){
                 sum = 1;
             })
         }else if(sum ==1 && $(window).scrollTop()<h_win){
-            $('body,html').stop().animate({'scrollTop':0+'px'},80,function(){
+            $('body,html').stop().animate({'scrollTop':0+'px'},50,function(){
                 sum = 0;
             })
         }
