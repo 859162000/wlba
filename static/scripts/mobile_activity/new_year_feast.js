@@ -263,7 +263,6 @@ org.feast = (function (org) {
     var lib = {
         arrow : $('.arrow'),
         init: function () {
-            lib._arrowStyle(1,'default');
             lib._potAward();
             lib._lookMoreInfoFun();
             lib._receiveFun();
@@ -285,7 +284,7 @@ org.feast = (function (org) {
         /*开锅赢福利*/
         _potAward:function(){
              $('.pot-s').click(function(){
-                 if($('.authenticated').length > 0){
+                 if($('#authenticated').val() == 'True'){
                     if(!$('.pot-s').hasClass('selectEd')){
                          var index = $(this).attr('index');
                          var i = 1,j = 0;
@@ -330,7 +329,7 @@ org.feast = (function (org) {
         },
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
-                if($('.authenticated').length > 0) {
+                if($('#authenticated').val() == 'True'){
                     var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>'
                     org.ui.alert(txt, '', '3')
                 }else{
@@ -340,9 +339,11 @@ org.feast = (function (org) {
         }
     }
     return {
-        init: lib.init
+        init: lib.init,
+        arrowStyle: lib._arrowStyle
     }
 })(org);
+org.feast.arrowStyle(1,'default');
 wlb.ready({
     app: function (mixins) {
         function connect(data) {
@@ -355,12 +356,7 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
-                    var url = location.href;
-                    var times = url.split("?");
-                    if(times[1] != 1){
-                        url += "?1";
-                        self.location.replace(url);
-                    }
+                    $('#authenticated').val('True');
                     org.feast.init()
                 }
             })
