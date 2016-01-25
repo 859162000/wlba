@@ -235,7 +235,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 alertFram.id="alert-cont";
             }
             if(difference == 2){
-                var strHtml = "<div id='packets' class='packets clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
+                var strHtml = "<div id='packets' class='packets alertT30 clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
                             +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财卷”及“体验金专区”查看</p>"
                             +"<div class='close-b close-min'></div></div>";
             }else if(difference == 3){
@@ -263,9 +263,7 @@ org.feast = (function (org) {
     var lib = {
         arrow : $('.arrow'),
         init: function () {
-            lib._arrowStyle(1,'default');
             lib._potAward();
-            lib._lookMoreInfoFun();
             lib._receiveFun();
         },
         /*开锅箭头样式*/
@@ -285,7 +283,7 @@ org.feast = (function (org) {
         /*开锅赢福利*/
         _potAward:function(){
              $('.pot-s').click(function(){
-                 if($('.authenticated').length > 0){
+                 if($('#authenticated').val() == 'True'){
                     if(!$('.pot-s').hasClass('selectEd')){
                          var index = $(this).attr('index');
                          var i = 1,j = 0;
@@ -325,24 +323,31 @@ org.feast = (function (org) {
                 }
             })
             $('#projectList').click(function(){
-                window.location.href = '/weixin/list/?next=/activity/new_year_feast/';
+                window.location.href = '/weixin/list/';
             })
         },
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
-                if($('.authenticated').length > 0) {
-                    var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>'
-                    org.ui.alert(txt, '', '3')
-                }else{
-                    window.location.href = '/weixin/login/?next=/activity/new_year_feast/';
+                if(!$(this).hasClass('selectEd')) {
+                    if ($('#authenticated').val() == 'True') {
+                        var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>'
+                        org.ui.alert(txt, '', '3')
+                        $('.packets-btn a').addClass('selectEd')
+                    } else {
+                        window.location.href = '/weixin/login/?next=/activity/new_year_feast/';
+                    }
                 }
             })
         }
     }
     return {
-        init: lib.init
+        init: lib.init,
+        arrowStyle: lib._arrowStyle,
+        lookMoreInfoFun: lib._lookMoreInfoFun
     }
 })(org);
+org.feast.arrowStyle(1,'default');
+org.feast.lookMoreInfoFun();
 wlb.ready({
     app: function (mixins) {
         function connect(data) {
@@ -355,24 +360,19 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
-                    var url = location.href;
-                    var times = url.split("?");
-                    if(times[1] != 1){
-                        url += "?1";
-                        self.location.replace(url);
-                    }
+                    $('#authenticated').val('True');
                     org.feast.init()
                 }
             })
         }
 
         mixins.sendUserInfo(function (data) {
+            $('#projectList').on('click',function(){
+                mixins.jumpToManageMoney();
+            })
             if (data.ph == '') {
                 $('.pot-s,.packets-btn a').on('click',function(){
                     mixins.loginApp({refresh: 1, url: ''})
-                })
-                $('#projectList').on('click',function(){
-                    mixins.jumpToManageMoney()
                 })
             } else {
                 connect(data)
@@ -385,3 +385,49 @@ wlb.ready({
         org.feast.init()
     }
 })
+var weChatShare = (function(org){
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
+        org.ajax({
+            type : 'GET',
+            url : '/weixin/api/jsapi_config/',
+            dataType : 'json',
+            success : function(data) {
+                //请求成功，通过config注入配置信息,
+                wx.config({
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.signature,
+                    jsApiList: jsApiList
+                });
+            }
+        });
+        wx.ready(function(){
+            var host = 'https://staging.wanglibao.com/activity/new_year_feast/',
+                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+                shareLink = window.location.href,
+                shareMainTit = '新年红包宴，每天可领一次福气大礼包。',
+                shareBody = '每天一次机会，开锅领奖。红包、加息券、体验金100%必中。';
+            //分享给微信好友
+            org.onMenuShareAppMessage({
+                title: shareMainTit,
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg
+            });
+            //分享给微信朋友圈
+            org.onMenuShareTimeline({
+                title: '新年红包宴，每天可领一次福气大礼包。',
+                link : shareLink,
+                imgUrl: shareImg
+            })
+            //分享给QQ
+            org.onMenuShareQQ({
+                title: shareMainTit,
+                desc: shareBody,
+                link : shareLink,
+                imgUrl: shareImg
+            })
+        })
+})(org);
