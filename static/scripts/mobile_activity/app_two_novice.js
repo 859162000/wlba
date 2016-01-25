@@ -232,7 +232,7 @@ wlb.ready({
     app: function (mixins) {
         $('.two-buttonmon,.two-buttontt').click(function () {
             mixins.jumpToManageMoney();
-        })
+        });
 
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
