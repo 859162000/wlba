@@ -69,11 +69,11 @@ org.finance = (function (org) {
                             _self.swiper_init([6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.invite_income) > 0){
+                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) > 0){
                             _self.swiper_init([1,2,3,6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) < 0){
+                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) <= 0){
                             _self.swiper_init([1,2,3,4,5])
                         }
 
@@ -149,7 +149,7 @@ org.finance = (function (org) {
         set_invite_count_style: function (count) {
             var
                 name = ['茕茕孑立', '门可罗雀', '门庭若市'],
-                detail = ['孤身一人，一个全民淘金好友都没邀请到。', '全民淘金所邀请好友数稀少。', '全民淘金邀请到的好友很多热闹得像人才市场一样。']
+                detail = ['孤身一人，一个全民淘金好友都没邀请到。', '全民淘金所邀请好友数稀少。', '全民淘金邀请到的好友很多,热闹得像人才市场一样。']
             if (count == 0) {
                 return {
                     name: name[0],
