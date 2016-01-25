@@ -124,8 +124,9 @@
     img
       width: 3.5rem
       bottom: 0
+      
   @mixin altBg
-    position: absolute
+    position: fixed
     top: 0
     left: 0
     width: 100%
@@ -169,7 +170,7 @@
         position: absolute
         right: 1.8rem
         bottom: 0
-  .mammon-error
+  .mammon-error,.mammon-alt
     +altBg
     .share-mian
       background: #fff3e8

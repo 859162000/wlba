@@ -33,6 +33,15 @@ html
         document.write(c);
         document.documentElement.style.fontSize = 20 * a + "px"
       })();
+      //百度统计
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "//hm.baidu.com/hm.js?7ebbd4a8cd5bfd5bbef9d415e0847eb3";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+
     link(href="/static/styles/mobile_activity/app.css?v=201601216", rel="stylesheet")
     - csrf_token
   body.h5-mammon
@@ -87,7 +96,7 @@ html
         .jq-box
           .top 上上签
           .bottom 福聚
-        .js-btn 解签
+        .js-btn#js-tongji 解签
     //.mammon-share.alt-box
     //  .share-mian
     //    .close.js-close &times;
@@ -96,6 +105,13 @@ html
     //      p 转发可解签，并领取开运礼包。
     //    .share-box
     //      a(href="javascript:;").red-btn.js-showShare 我知道了
+    .mammon-alt.alt-box#mammon-weixin
+      .share-mian
+        .close.js-close &times;
+        .share-txt
+          p 温馨提示：财运签活动只有在微信中，才能正常分享哦～
+        .share-box
+          a(href="javascript:;").red-btn.js-showShare 我知道了
     .mammon-share
       .share-icon
         img(src="/static/imgs/mobile_activity/mammon/share-icon.png",style="max-width:60%")
@@ -104,4 +120,4 @@ html
         p 转发可解签，并领取开运礼包。
 
     script(src="/static/src/mobile/lib/weixin/wx.js")
-    script(src="/static/scripts/mobile_activity/h5_cammon.js?v=20160121193")
+    script(src="/static/scripts/mobile_activity/h5_cammon.js?v=20160125")
