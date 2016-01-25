@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -271,6 +271,12 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
+                    var url = location.href;
+                    var times = url.split("?");
+                    if(times[1] != 1){
+                        url += "?1";
+                        self.location.replace(url);
+                    }
                     org.experience.init()
                 }
             })
@@ -278,7 +284,7 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                mixins.registerApp({refresh:1, url:''});
+                mixins.loginApp({refresh:1, url:''});
             } else {
                 login = true;
                 connect(data)

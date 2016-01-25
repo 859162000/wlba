@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -255,7 +255,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         setTimeout(function(){
             self.removeClass("shake");
             $("div.mammon-jq").css("display","-webkit-box");
-        },6000);
+        },3000);
     }
     function checkTel(val){
         var isRight = false,
@@ -287,11 +287,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile_activity/mammon/cs_img.png',
                 shareLink = host + '/activity/weixin_mammon/',
-                shareMainTit = shareTit ? ('《财神说：'+shareTit +'》') : '《财神说：接财神、测财运、领开运红包》',
+                shareMainTit = shareTit ? ('财神说：'+shareTit) : '财神说：接财神、测财运、领开运红包',
                 shareBody = shareTit;
             //分享给微信好友
             org.onMenuShareAppMessage({
-                title: "《财神说：接财神、测财运、领开运红包》",
+                title: "财神说：接财神、测财运、领开运红包",
                 desc: shareBody,
                 link: shareLink,
                 imgUrl: shareImg,
@@ -308,7 +308,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    //alert(2);
                     if(fn && (typeof fn == "function")){
+                        //alert(22);
                         fn();
                     }
                 }
@@ -320,7 +322,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
+                    //alert(1);
                     if(fn && (typeof fn == "function")){
+                        //alert(3);
                         fn();
                     }
                 }
@@ -339,11 +343,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $(".js-close").click(function(){
         $(this).parents(".alt-box").hide();
     });
+    $(".js-showShare").click(function(){
+        $(this).parents(".alt-box").hide().siblings("div.mammon-share2").show();
+    });
 
     //手机号 检测是否是新用户
     $(".js-checkUser").click(function(){
         var self = $(this);
-        var tel = self.siblings(".tel-inp").val();
+        var tel = $.trim(self.siblings(".tel-inp").val());
         var tp = self.parents("div.mammon-page2");
         if(!checkTel(tel)){
             $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
@@ -364,4 +371,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         });
     });
+
+    //加载中
+    //var len = 0;
+    //$("img").each(function(i,self){
+    //    $(self)[0].onload = function(){
+    //        len ++;
+    //        console.log(len,$("img").length);
+    //        if(len === $("img").length){
+    //            $("#load-box").hide().siblings("div.mammon-page1").show();
+    //        }
+    //    };
+    //});
+    $(function(){
+        $("#load-box").hide().siblings("div.mammon-page1").show();
+    })
 })();

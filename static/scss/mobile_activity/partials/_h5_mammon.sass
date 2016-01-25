@@ -1,8 +1,8 @@
 @keyframes csShake
   0%
-    transform: translate(10px,5px)
+    transform: translate(5px,5px)
   25%
-    transform: translate(-10px,0)
+    transform: translate(-5px,0)
   50%
     transform: translate(5px,-5px)
   75%
@@ -11,9 +11,9 @@
     transform: translate(0,0)
 @-webkit-keyframes csShake
   0%
-    -webkit-transform: translate(10px,5px)
+    -webkit-transform: translate(5px,5px)
   25%
-    -webkit-transform: translate(-10px,0)
+    -webkit-transform: translate(-5px,0)
   50%
     -webkit-transform: translate(5px,-5px)
   75%
@@ -43,8 +43,8 @@
     -webkit-animation: csShake 2s linear backwards infinite
     animation: csShake 2s linear backwards infinite
   .circle-box
-    -webkit-animation: csRotate 2s linear backwards 3
-    animation: csRotate 2s linear backwards 3
+    -webkit-animation: csRotate 1s linear backwards 3
+    animation: csRotate 1s linear backwards 3
   .red-btn
     background: #eb4959
     text-align: center
@@ -61,8 +61,23 @@
     border-radius: 0.25rem
   ::-webkit-input-placeholder
     color: #fff
+  .load-box
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: #fff
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    .load-item
+      width: 2rem
+      height: 2rem
+      background: url("/static/imgs/mobile_activity/mammon/load.gif") center center no-repeat
+      background-size: contain
   .mammon-tit
-    margin: 2.5rem auto
+    margin: 17% auto
     width: 10.5rem
     font-size: 0.65rem
     color: #fff
@@ -72,13 +87,15 @@
     .txt
       font-size: 0.9rem
   .mammon-img
-    background: url("/static/imgs/mobile_activity/mammon/cs_img.png") center top no-repeat
+    //background: url("/static/imgs/mobile_activity/mammon/cs_img.png") center top no-repeat
     width: 60%
-    height: 13.35rem
+    //height: 13.35rem
     background-size: contain
     position: absolute
     left: 20%
     top: 5.6rem
+    img
+      //opacity: 0
   .mammon-xl
     position: absolute
     width: 50%
@@ -152,7 +169,7 @@
         position: absolute
         right: 1.8rem
         bottom: 0
-  .mammon-share,.mammon-error
+  .mammon-error
     +altBg
     .share-mian
       background: #fff3e8
@@ -178,20 +195,38 @@
       .share-box
         text-align: center
         margin-top: 1rem
+  .mammon-share
+    +altBg
+    .share-icon
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      text-align: right
+      padding: 1rem 1rem 0 0
+    .share-txt
+      color: #fff
+      font-size: 0.8rem
+      width: 90%
+      text-align: left
+      padding: 0 1rem
+    .txt-lft
+      text-align: left
   .mammon-page1
-    //display: none
+    display: none
   .mammon-page2
     display: none
     .mammon-tit
       text-align: center
+      height: 4.5rem
       line-height: 1.5rem
     .mammon-redPack
       padding-top: 1.8rem
     .mammon-inp-box
-      position: absolute
-      bottom: 1.5rem
+      margin-top: -2rem
+      padding: 3rem 2.9rem 1rem
       width: 100%
-      padding: 0 2.9rem
+      background-color: #a43d3f
       .tel-inp
         display: block
         width: 100%
@@ -223,12 +258,13 @@
         line-height: 2rem
         padding-top: 1rem
       .code-img
+        background: #a43d3f
         img
           width: 55%
   .mammon-page4
     display: none
     .mammon-tit
-      margin-top: 2.1rem
+      margin-top: 13%
       line-height: 1.2rem
       text-align: left
     .mammon-ok, .look-btn-box
@@ -238,9 +274,17 @@
       .fwh1
         margin-top: -0.8rem
       .fwh2
+        z-index: 2
         position: absolute
         right: 15%
         bottom: 18%
+      .fwh-bg
+        position: absolute
+        z-index: -1
+        bottom: 0
+        height: 7rem
+        width: 100%
+        background: #a43d3f
     .look-btn-box
       background-color: #a43d3f
       color: #fff
@@ -257,7 +301,22 @@
       line-height: 1rem
       padding: 1rem
 
-
+@media screen and (min-width: 750px)
+  .h5-mammon
+    .mammon-page1
+      .mammon-img
+        top: 20%
+    .mammon-page2 
+      .mammon-redPack
+        padding-top: 15%
+    .mammon-page3
+      .mammon-tit
+        margin-top: 15%
+      .mammon-code .tit
+        padding-top: 10%
+    .mammon-page4
+      .mammon-tit
+        margin-top: 15%
 
 
 

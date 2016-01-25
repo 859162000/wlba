@@ -41,6 +41,7 @@ from weixin.models import WeixinUser
 import requests
 from urllib import urlencode,quote
 from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
+from wanglibao_margin.models import MarginRecord
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -1308,10 +1309,10 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         order_id = request.POST.get('order_id')
-        if not Order.objects.filter(pk=order_id).first():
+        if not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
             json_to_response = {
                 'code': 1001,
-                'message': u'Order ID不错在'
+                'message': u'Order和User不匹配'
             }
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
@@ -1546,19 +1547,33 @@ class WeixinAnnualBonusView(TemplateView):
                 #    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
                 #    return HttpResponse(json.dumps(rep), content_type='application/json')
 
+                vote_message = u'感谢您的评价！'
                 if vote_type==1:
                     wx_bonus.good_vote += 1
                     if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus += 500
+                        vote_message = u'你已帮好友多拿了500，输入手机号你也可以领！'
                         if wx_bonus.annual_bonus >= wx_bonus.max_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
                             wx_bonus.is_max = True
+                    else:
+                        if wx_bonus.is_pay:
+                           vote_message = u'您的好友已领走年终奖，感谢您的点赞！'
+                        elif wx_bonus.is_max:
+                           vote_message = u'您的好友年终奖已封顶，感谢您的点赞！'
                 else:
                     wx_bonus.bad_vote += 1
                     if not wx_bonus.is_pay and not wx_bonus.is_max:
                         wx_bonus.annual_bonus -= 500
-                        if wx_bonus.annual_bonus <= wx_bonus.min_annual_bonus:
+                        vote_message = u'你已扣除好友500年终奖，这是对TA的激励'
+                        if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
                             wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
+                            vote_message = u'还是给TA留点年终奖吧，感谢您对TA的激励！'
+                    else:
+                        if wx_bonus.is_pay:
+                           vote_message = u'您的好友已领走年终奖，感谢您对TA的激励！'
+                        elif wx_bonus.is_max:
+                           vote_message = u'您的好友年终奖已封顶，感谢您对TA的激励！'
 
                 wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
                     defaults={
@@ -1576,7 +1591,7 @@ class WeixinAnnualBonusView(TemplateView):
                 )
 
                 if not flag:
-                    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
+                    rep = { 'err_code':305, 'err_messege':u'您已经评价过了，不能重复评价', }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
 
                 wx_bonus.update_time = timezone.now()
@@ -1588,12 +1603,16 @@ class WeixinAnnualBonusView(TemplateView):
             #    return HttpResponse(json.dumps(rep), content_type='application/json')
             except Exception, ex:
                 logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
-                rep = { 'err_code':306, 'err_messege':'系统繁忙，请稍后重试', }
+                rep = { 'err_code':306, 'err_messege':u'系统繁忙，请稍后重试', }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-        rep = { 'err_code':0, 'err_messege':'评价成功', 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
+        ##if vote_type==1:
+        ##    vote_message = u'你已帮好友多拿了500，输入手机号你也可以领！'
+        ##else:
+        ##    vote_message = u'你已扣除好友500年终奖，这是对TA的激励'
+        rep = { 'err_code':0, 'err_messege':vote_message, 'wx_user':wx_bonus, 'follow':self.getGoodvoteToJson() }
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def pay_bonus(self):
@@ -1609,6 +1628,10 @@ class WeixinAnnualBonusView(TemplateView):
 
             if wx_bonus.is_pay:
                 rep = { 'err_code':403, 'err_messege':u'您已经领取过了<br>登录账户%s，赚取收益吧'%wx_bonus.phone }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
+
+            if wx_bonus.annual_bonus < wx_bonus.max_annual_bonus:
+                rep = { 'err_code':407, 'err_messege':u'集满8000才能通过年终考核，继续分享集赞吧！' }
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册

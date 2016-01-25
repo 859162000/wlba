@@ -826,6 +826,17 @@ class UserHasLoginAPI(APIView):
         else:
             return Response({"login": True})
 
+class HasValidationAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        profile = WanglibaoUserProfile.objects.filter(user=user).first()
+        if profile.id_is_valid:
+            return Response({"ret_code": 0, "message": u"您已认证通过"})
+        else:
+            return Response({"ret_code": 1, "message": u"您没有认证通过"})
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -1573,7 +1584,8 @@ class CoopPvApi(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code):
-        if channel_code == 'xunlei9':
+        channel_codes = ('xunlei9', 'mxunlei')
+        if channel_code in channel_codes:
             req_data = self.request.GET
             source = req_data.get('source', None)
             ext = req_data.get('ext', None)

@@ -52,6 +52,12 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
+                    var url = location.href;
+                    var times = url.split("?");
+                    if(times[1] != 1){
+                        url += "?1";
+                        self.location.replace(url);
+                    }
                     org.experience.init()
                 }
             })
@@ -59,7 +65,7 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                mixins.registerApp({refresh:1, url:''});
+                mixins.loginApp({refresh:1, url:''});
             } else {
                 login = true;
                 connect(data)
