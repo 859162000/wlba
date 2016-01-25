@@ -292,7 +292,7 @@ org.finance = (function (org) {
                             _self.swiper_init([1,2,3,6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) <= 0){
+                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) < 0){
                             _self.swiper_init([1,2,3,4,5])
                         }
 
@@ -428,8 +428,10 @@ org.finance = (function (org) {
 
                 if (_self.model_canvac_opeartion) {
                     canvas.getContext('2d').translate(0.5, 0.5)
+                    cts.globalCompositeOperation= 'source-atop';
                     canvas.width = canvas_w;
                     canvas.height = canvas_w;
+
                     _self.model_canvac_opeartion = false
                 }
             } else {
