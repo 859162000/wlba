@@ -1882,7 +1882,7 @@ class QMBanquetRewardAPI(APIView):
 
 
 class QMBanquetTemplate(TemplateView):
-    template_name = ''
+    template_name = 'new_year_feast.jade'
     activity_code = 'hmsy_redpack'
     def get_context_data(self, **kwargs):
         activity = Activity.objects.filter(code=self.activity_code).first()
@@ -1891,12 +1891,12 @@ class QMBanquetTemplate(TemplateView):
             activity_rules = ActivityRule.objects.filter(activity=activity).all()
             for activity_rule in activity_rules:
                 if activity_rule.gift_type == "redpack":
-                    redpack_record_ids = ""
                     redpack_ids = activity_rule.redpack.split(',')
                     for redpack_id in redpack_ids:
                         redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                         if redpack_event:
                             redpacks.append({'redpack_id':redpack_id, "amount":redpack_event.amount, 'invest_amount':redpack_event.invest_amount, "rtype":redpack_event.rtype})
+        sorted(redpacks, lambda x,y:cmp(x['amount'],y['amount']))
         return {
             "redpacks":redpacks,
         }
