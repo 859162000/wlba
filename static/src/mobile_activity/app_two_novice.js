@@ -108,7 +108,7 @@ wlb.ready({
                         $('.mov').html('您已是实名认证用户，无需再认证');
                     } else if (data.ret_code == 1) {
                         $('#two-mov-ice').show();
-                        $('.mov').html('请到“我的账户”－“设置”内进行实名认证');
+                        $('.mov').html('请到“我的账户”内进行实名认证');
                     }
                 }
 
