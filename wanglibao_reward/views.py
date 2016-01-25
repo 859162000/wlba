@@ -26,7 +26,7 @@ from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao import settings
-from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder
+from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder, ActivityRewardRecord
 from wanglibao_redpack.models import RedPackEvent
 from experience_gold.models import ExperienceEvent
 from wanglibao_activity.models import Activity, ActivityRule
@@ -45,6 +45,7 @@ from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
+import traceback
 logger = logging.getLogger('wanglibao_reward')
 
 class WeixinShareDetailView(TemplateView):
@@ -1787,7 +1788,6 @@ class SinicValidate(object):
         return re.match(regex or self.email_regex, message)
 
 
-# from .models import ActivityRecord
 
 class QMBanquetRewardAPI(APIView):
     """
@@ -1804,8 +1804,6 @@ class QMBanquetRewardAPI(APIView):
             self.activity = Activity.objects.filter(code=activity_code).first()
         except Exception, reason:
             self.exception_msg(reason, u'获得activity的实体报异常')
-    def debug_msg(self, msg=u'None'):
-        logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, msg))
 
     @property
     def current_function_name(self):
@@ -1814,14 +1812,10 @@ class QMBanquetRewardAPI(APIView):
     def exception_msg(self, reason, msg=u'None'):
         logger.exception("class:%s, function:%s, reason,%s, msg:%s" %(self.__class__.__name__, self.current_function_name, reason, msg))
 
-
-    def post(self):
-        local_now = datetime.now()
-        today_start = local_to_utc(local_now, 'min')
-        today_end = local_to_utc(local_now, 'max')
-        with transaction.atomic():
-            gift = WanglibaoUserGift.objects.filter(get_time__gte=today_start, get_time__lte=today_end, user=self.request.user, activity__code__in=self.activity_codes).first()
-            if not gift:
+    def post(self, request):
+        now_date = timezone.now().date()
+        try:
+            with transaction.atomic():
                 code = self.get_random_activity_code()
                 self.get_activity_by_code(code)
                 if not self.activity:
@@ -1829,42 +1823,69 @@ class QMBanquetRewardAPI(APIView):
                 if self.activity.is_stopped:
                     logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, u'活动已经暂停了'))
                     return {"ret_code":2, "message":"活动已经暂停了"}
-                WanglibaoUserGift.objects.create(
-                    activity = self.activity,
-                    user = self.request.user,
-                    valid = 1,
-                )
-            gift = WanglibaoUserGift.objects.select_for_update().filter(get_time__gte=today_start, get_time__lte=today_end, user=self.request.user, activity__code__in=self.activity_codes).first()
-            if gift.valid==1:
-                if not self.activity:
-                    self.get_activity_by_code(gift.activity.code)
-                if not self.activity:
-                    return {"ret_code":3, "message":"活动配置code=%s没有取到"%gift.activity.code}
-                if self.activity.is_stopped:
-                    logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, u'活动已经暂停了'))
-                    return {"ret_code":2, "message":"活动已经暂停了"}
-                activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
-                device = split_ua(self.request)
-                device_type = device['device_type']
-                for activity_rule in activity_rules:
-                    activity_backend._send_gift(self.request.user, activity_rule, device_type, is_full=False, amount=0)
+                gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
+                if not gift_record.exists():
+                    ActivityRewardRecord.objects.create(
+                        user = self.request.user,
+                    )
+                gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
+                if not gift_record.activity_code:
+                    activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
+                    device = split_ua(self.request)
+                    device_type = device['device_type']
+                    for activity_rule in activity_rules:
+                        if activity_rule.gift_type == "redpack":
+                            redpack_record_ids = ""
+                            redpack_ids = activity_rule.redpack.split(',')
+                            for redpack_id in redpack_ids:
+                                redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                                if not redpack_event:
+                                    raise Exception(redpack_event_id=redpack_id, activity_code=self.activity.code, errmsg='QMBanquetRewardAPI post redpack_event not exist')
+                                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, redpack_event, device_type)
+                                if not status:
+                                    raise Exception(redpack_event_id=redpack_id, errmsg=messege)
+                                redpack_record_ids += redpack_record_id
+                            gift_record.redpack_record_ids = redpack_record_ids
+                        if activity_rule.gift_type == "experience_gold":
+                            experience_record_ids = ""
+                            experience_record_id = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+                            if experience_record_id:
+                                experience_record_ids+=experience_record_id
+                                gift_record.experience_record_ids = experience_record_ids
+                            else:
+                                raise Exception(experience_event_id=activity_rule.redpack, activity_code=self.activity.code, errmsg='QMBanquetRewardAPI post experience_event not exist')
 
-                    # if activity_rule.gift_type == 'redpack':
-                    #     redpack_backends.give_activity_redpack_new(self.request.user, activity_rule.redpack, device_type)
-                    # if activity_rule.gift_type == "experience_gold":
-                    #    try:
-                    #        ids = activity_rule.redpack.split(',')
-                    #         SendExperienceGold(self.request.user).send(pk=activity_rule.redpack)
-                    #    except Exception, ex:
-                    #         logger.exception("SendExperienceGold [%s, %s] Except: [%s]" % (self.request.user, activity_rule.redpack.id, ex))
-                    #         # rep = { 'err_code':406, 'err_messege':u'领取失败，请联系客服(406)' }
-                gift.valid = 0
-                gift.save()
-                return {"ret_code":0, 'data':{}}
-            if gift.valid==0:
-                return {"ret_code":1, "message":"今天已经领过了"}
-        return {"ret_code":4, "message":"error"}
+                    gift_record.activity_code = self.activity.code
+                    gift_record.activity_code_time = timezone.now()
+                    gift_record.save()
+                    return {"ret_code":0, 'data':{}}
+                else:
+                    return {"ret_code":1, "message":"今天已经领过了"}
+        except Exception, e:
+            logger.debug(traceback.format_exc())
+            return {"ret_code":4, "message":"error"}
 
+
+
+class QMBanquetTemplate(TemplateView):
+    template_name = ''
+    activity_code = 'hmsy_redpack'
+    def get_context_data(self, **kwargs):
+        activity = Activity.objects.filter(code=self.activity_code).first()
+        redpacks = []
+        if activity:
+            activity_rules = ActivityRule.objects.filter(activity=activity).all()
+            for activity_rule in activity_rules:
+                if activity_rule.gift_type == "redpack":
+                    redpack_record_ids = ""
+                    redpack_ids = activity_rule.redpack.split(',')
+                    for redpack_id in redpack_ids:
+                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                        if redpack_event:
+                            redpacks.append({'redpack_id':redpack_id, "amount":redpack_event.amount, 'invest_amount':redpack_event.invest_amount, "rtype":redpack_event.rtype})
+        return {
+            "redpacks":redpacks,
+        }
 
 class HMBanquetRewardAPI(APIView):
     """
@@ -1895,30 +1916,23 @@ class HMBanquetRewardAPI(APIView):
         event = RedPackEvent.objects.filter(id=redpack_event_id).first()
         if not event:
             return {"ret_code":6, "message":"没有ｉｄ为%s的红包"%redpack_event_id}
-        local_now = datetime.now()
-        today_start = local_to_utc(local_now, 'min')
-        today_end = local_to_utc(local_now, 'max')
+
         device = split_ua(self.request)
         device_type = device['device_type']
         with transaction.atomic():
-            gift = WanglibaoUserGift.objects.filter(get_time__gte=today_start, get_time__lte=today_end, user=self.request.user, activity__code=self.activity_code).first()
-            if not gift:
-                WanglibaoUserGift.objects.create(
-                    activity = self.activity,
+            now_date = timezone.now().date()
+            gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
+            if not gift_record.exists():
+                ActivityRewardRecord.objects.create(
                     user = self.request.user,
-                    valid = 1,
                 )
-            gift = WanglibaoUserGift.objects.select_for_update().filter(get_time__gte=today_start, get_time__lte=today_end, user=self.request.user, activity__code=self.activity_code).first()
-            if gift.valid==1:
+            gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
+            if not gift_record.redpack_rule:
                 status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, event, device_type)
                 if status:
-                    gift.redpack_record_id = redpack_record_id
-                else:
-                    raise Exception()
-                gift.valid = 0
-                gift.save()
-                return {"ret_code":0, 'data':{}}
-            if gift.valid==0:
+                    gift_record.redpack_record_id = redpack_record_id
+                    gift_record.redpack_record_id_time = timezone.now()
+                    return {"ret_code":0, 'data':{}}
+                return {"ret_code":7, "message":messege}
+            else:
                 return {"ret_code":1, "message":"今天已经领过了"}
-        return {"ret_code":4, "message":"error"}
-
