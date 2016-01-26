@@ -290,11 +290,16 @@ class ActivityBannerPosForm(forms.ModelForm):
 
     def is_valid_time(self, act_banner):
         now = timezone.now()
-        banners = ActivityBannerPosition.objects.filter(start_at__lt=now).values(act_banner, 'id').order_by('-id')
+        banner_positions = ActivityBannerPosition.objects.all().order_by('-id')
         times = []
-        for banner in banners:
-            activity = ActivityShow.objects.filter(pk=banner['id'])
-            times.append((int(time.mktime(time.strptime(activity.start_at, "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(activity.end_at, "%Y-%m-%d %H:%M:%S")))))
+
+        for banner_position in banner_positions:
+            banner = getattr(banner_position, act_banner, None)
+            if banner and banner.start_at < now:
+                times.append((int(time.mktime(time.strptime(str(banner.start_at), "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(str(banner.end_at), "%Y-%m-%d %H:%M:%S")))))
+
+        this_banner = self.cleaned_data.get(act_banner)
+        times.append((int(time.mktime(time.strptime(str(this_banner.start_at)[:-6], "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(str(this_banner.end_at)[:-6], "%Y-%m-%d %H:%M:%S")))))
 
         times = sorted(times, key=lambda item: item[0])
 
