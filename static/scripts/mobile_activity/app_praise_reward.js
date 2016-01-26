@@ -260,7 +260,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		
 		if(xhr.err_code==0){
 
-			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+			renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus,xhr.wx_user.is_pay);
 		}else{
 			//$('.friend_top span').text(xhr.err_messege);
 			//$('.friend_top').fadeIn();
@@ -302,7 +302,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus,xhr.wx_user.is_pay);
 				$('#zan_num').text(xhr.wx_user.good_vote);
 				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
@@ -315,7 +315,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*刷新数据结束*/
 
 	/*刷新朋友圈*/
-	function renovate_friends(friends_length,friends_img,is_max,annual_bonus){
+	function renovate_friends(friends_length,friends_img,is_max,annual_bonus,is_pay){
 
 		var str='';
 		var follow_one='';
@@ -335,8 +335,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		swiper.appendSlide(str);
 		swiper.update();
 		swiper.slideTo(0, 100, false);
-		if(is_max){
-			$('.num_top').show();
+		if(is_pay){
+			$('.num_top').text('已领取').show();
+		}else if(is_max){
+			$('.num_top').text('已封顶').show();
 		}
 		$('#praise_num').val(annual_bonus);
 
@@ -370,7 +372,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				if(xhr.err_code==0){
 					title_box_animate(xhr.err_messege);
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+					renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus,xhr.wx_user.is_pay);
 					$('#zan_num').text(xhr.wx_user.good_vote);
 				}else{
 					title_box_animate(xhr.err_messege);
@@ -387,7 +389,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			if(xhr.err_code==0){
 				title_box_animate(xhr.err_messege);
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus);
+				renovate_friends(xhr.follow.length,xhr.follow,xhr.wx_user.is_max,xhr.wx_user.annual_bonus,xhr.wx_user.is_pay);
 				$('#cha_num').text(xhr.wx_user.bad_vote);
 			}else{
 				title_box_animate(xhr.err_messege);

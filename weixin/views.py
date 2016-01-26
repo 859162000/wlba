@@ -355,11 +355,12 @@ class WeixinJoinView(View):
             if scene_id:
                 _process_scene_record(w_user, scene_id)
 
-        if not reply and not user:
-            txt = self.getBindTxt(fromUserName)
-            reply = create_reply(txt, self.msg)
         if not reply:
-            reply = -1
+            if not user:
+                txt = self.getBindTxt(fromUserName)
+            else:
+                txt = u"您的微信当前绑定帐号为：%s"%user.wanglibaouserprofile.phone
+            reply = create_reply(txt, self.msg)
         return reply
 
     def getSubscribeArticle(self):

@@ -60,7 +60,8 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView
+from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -275,6 +276,8 @@ urlpatterns += patterns(
     url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
     url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
+    url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
+    url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
 )
 
 
