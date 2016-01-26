@@ -209,3 +209,17 @@ class WeixinAnnulBonusVote(models.Model):
         import json
         return json.dumps(d)
 
+class ActivityRewardRecord(models.Model):
+    user = models.ForeignKey(User, db_index=True)
+    create_date = models.DateField(u'创建日期', auto_now_add=True,  db_index=True)
+    activity_code = models.CharField(u'活动代码*', max_length=64, null=True)
+    activity_code_time = models.DateTimeField(u'领取activity_code对应奖品时间', null=True)
+    redpack_record_ids = models.CharField(u'活动代码对应的领取优惠券流水ｉｄ', max_length=64, null=True)
+    experience_record_ids = models.CharField(u'活动代码对应的领取体验金流水ｉｄ', max_length=64, null=True)
+    redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID', null=True)
+    redpack_record_id_time = models.DateTimeField(u'领取redpack_rule对应奖品时间', null=True)
+
+
+    class Meta:
+        unique_together = (("user", "create_date"),)  # 联合唯一索引
+
