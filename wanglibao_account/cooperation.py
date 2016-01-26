@@ -356,10 +356,6 @@ class CoopRegister(object):
         self.save_to_binding(user)
         self.save_to_oauthuser(user)
         self.register_call_back(user)
-        if user.wanglibaouserprofile.utype != '3':
-            self.save_to_binding(user)
-            self.register_call_back(user)
-
         self.clear_session()
 
     @property
