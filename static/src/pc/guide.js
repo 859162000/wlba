@@ -1,11 +1,7 @@
 require.config({
   paths: {
-    'jquery.fullPage': 'lib/jquery.fullPage.min',
-    'videojs': 'lib/video.min',
+    'videojs': 'lib/video.min'
 
-  },
-  shim: {
-    'jquery.fullPage': ['jquery'],
   }
 });
 
