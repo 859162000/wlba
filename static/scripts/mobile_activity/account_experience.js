@@ -284,7 +284,7 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                mixins.loginApp({refresh:0, url:''});
+                mixins.loginApp({refresh:1, url:''});
             } else {
                 login = true;
                 connect(data)
