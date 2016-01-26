@@ -5,7 +5,6 @@ html(style="background:#fecf4f")
         include include/app_header.jade
         link(href="/static/styles/mobile_activity/app.css?v=20160120", rel="stylesheet")
         body
-            - csrf_token
             input(type='hidden',value='{{user.is_authenticated}}')#authenticated
             .new-year-feast
                 img(src='/static/imgs/mobile_activity/feast/banner.jpg').banner
