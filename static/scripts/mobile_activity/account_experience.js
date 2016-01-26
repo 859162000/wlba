@@ -281,15 +281,19 @@ wlb.ready({
                 }
             })
         }
-        mixins.sendUserInfo(function (data) {
-            if (data.ph == '') {
-                login = false;
-                mixins.loginApp({refresh:1, url:''});
-            } else {
-                login = true;
-                connect(data)
-            }
-        })
+        function checkLoginStatus(){
+            mixins.sendUserInfo(function (data) {
+                if (data.ph == '') {
+                    login = false;
+                    mixins.loginApp({refresh:0, url:''},function(){
+                        checkLoginStatus()
+                    });
+                } else {
+                    login = true;
+                    connect(data)
+                }
+            })
+        }
     },
     other: function(){
         org.experience.init()
