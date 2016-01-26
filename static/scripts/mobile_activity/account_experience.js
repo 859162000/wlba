@@ -261,7 +261,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 var login = false;
 wlb.ready({
     app: function (mixins) {
-        function connect(data) {
+        function connect(data,counts) {
             org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
@@ -271,27 +271,34 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
-                    //var url = location.href;
-                    //var times = url.split("?");
-                    //if(times[1] != 1){
-                    //    url += "?1";
-                    //    self.location.replace(url);
-                    //}
-                    window.location.href ='/activity/experience/account/'
+                    if(counts == 'second'){
+                        window.location.href ='/activity/experience/account/';
+                    }else{
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
+                    }
                     org.experience.init()
                 }
             })
         }
-        function checkLoginStatus(){
+        function checkLoginStatus(counts){
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
                     mixins.loginApp({refresh:0, url:''},function(){
-                        checkLoginStatus()
+                        checkLoginStatus('second')
                     });
                 } else {
                     login = true;
-                    connect(data)
+                    if(counts == 'second'){
+                        connect(data,'second')
+                    }else{
+                        connect(data)
+                    }
                 }
             })
         }
