@@ -22,34 +22,26 @@ block main
                         .true 手机号修改成功
                 .info_box.margin_top_box.is_open
                     .img.img_1
-                    if phone
-                        dl
-                            dt
-                                .text 手机号
-                                .ico.is_set_ico
-                                span.is_set_text 已绑定
-                            dd {{phone}}
-                        .button 修改
-                    else
-                        dl
-                            dt
-                                .text 手机号
-                                .ico.no_set_ico
-                                span.no_set_text 未绑定
-                            dd {{phone}}
-                        .button 修改
-                .phone_change_wrap
-                    .line
-                    a.wrap_box.sms_wrap(href='/accounts/sms_modify/vali_acc_info/')
-                        .img
-                        dl
-                            dt 短信认证
-                            dd 原手机可收取短信
-                    a.wrap_box.people_wrap(href='/accounts/manual_modify/vali_acc_info/')
-                        .img
-                        dl
-                            dt 人工审核
-                            dd 原手机无法收取短信
+                    dl
+                        dt
+                            .text 手机号
+                            .ico.is_set_ico
+                            span.is_set_text 已绑定
+                        dd {{phone}}
+                    .button.phone_change_button 修改
+                if id_is_valid
+                    .phone_change_wrap
+                        .line
+                        a.wrap_box.sms_wrap(href='/accounts/sms_modify/vali_acc_info/')
+                            .img
+                            dl
+                                dt 短信认证
+                                dd 原手机可收取短信
+                        a.wrap_box.people_wrap(href='/accounts/manual_modify/vali_acc_info/')
+                            .img
+                            dl
+                                dt 人工审核
+                                dd 原手机无法收取短信
                 .info_box#id_valid
                     .img.img_2
                     if id_is_valid
@@ -66,47 +58,7 @@ block main
                                 .ico.no_set_ico
                                 span.no_set_text 待认证
                             dd 您尚未进行实名认证！
-                        .button 实名认证
-                if id_is_valid = false
-                    .panel-annotation
-                        p 根据法律，网上投资必须进行实名认证。
-                        p 请花15秒钟完成免费的实名认证，以方便日后投资理财。
-
-                      if counter >= 3
-                        p 验证次数到达限额。请拨打客服电话进行人工验证。4008-588-066
-
-                      .space-vertical-l
-                      .row
-                        form#validate_id_form.form.span8(method="POST")
-                          - csrf_token
-                          .form-row
-                            .span2(style="line-height:40px")
-                              label 真实姓名
-                            .span6
-                              input#id_name(type='text', name='name', placeholder='真实姓名')
-                              .form-row-error
-                          .form-row
-                            .span2 &nbsp;
-                            .span10-omega.orange-text 您的姓名必须与银行卡的开户名一致，否则将无法成功提现。
-                          .form-row
-                            .span2(style="line-height:40px")
-                              label 身份证号
-                            .span6
-                              input#id_id_number(type='text', name='id_number', placeholder='身份证号')
-                              .form-row-error
-                          //.form-row
-                          //  .span3(style="line-height:40px")
-                          //    label 验证码
-                          //  .span9-omega
-                          //    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                          //    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入答案", maxlength="4",style="width:100px")
-                          //    img.captcha.captcha-img(alt="captcha", src="")
-                          //    a.captcha-refresh(type="button", title="点击刷新验证码")
-                          //    .form-row-error
-                          .form-row
-                            .span2 &nbsp;
-                            .span6
-                              button#validate_id_button.button-primary.span12(type="submit") 提交
+                        a.button(href='/accounts/id_verify/') 实名认证
     .phone_modify_main_wrap.phone_modify_main_wrap_2
         .panel
             .well
@@ -152,7 +104,9 @@ block main
                       p 为保证您的资金安全，请先进行实名认证
                       .space-vertical-l
                       a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
-
+    .phone_modify_popup
+        .phone_modify_popup_text 请先完成实名认证
+        .phone_modify_bg
     script.
         require(["/static/js/account_safe.js?v=20160012501"])
 
