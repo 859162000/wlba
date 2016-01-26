@@ -1317,19 +1317,21 @@ class WeixinActivityAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
-        activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
-        activity_record = activitys.filter(left_times__gt=0)
+        with transaction.atomic():
+            _order = Order.objects.select_for_update().get(pk=order_id).first()
+            _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
+            activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
+            activity_record = activitys.filter(left_times__gt=0)
 
-        if activity_record.filter(left_times__gt=0).count() == 0:
-            json_to_response = {
-                'code': 1002,
-                'messge': u'用户的抽奖机会已经用完了',
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        else:
-            with transaction.atomic():
-                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
+            if activity_record.filter(left_times__gt=0).count() == 0:
+                json_to_response = {
+                    'code': 1002,
+                    'messge': u'用户的抽奖机会已经用完了',
+                }
+                _order.save()
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            else:
+                record = WanglibaoActivityReward.objects.filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
                 sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, order_id=order_id, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
                 if record.redpack_event:
                     json_to_response = {
@@ -1350,7 +1352,8 @@ class WeixinActivityAPIView(APIView):
                 record.left_times = 0
                 record.has_sent = True
                 record.save()
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                _order.save()
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class WeixinAnnualBonusView(TemplateView):
     openid = ''
