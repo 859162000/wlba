@@ -62,7 +62,9 @@ html
           cls = ""
         if user.is_authenticated
           li(class="{{cls}} lis{{idx}}" )
-            h5 {{type.amount}}元红包
+            h5
+              amount = int(type['amount'])
+              | {{amount}}元红包
             a(href="javascript:void(0);",data_id='{{type.redpack_id}}') 立即领取
             span 单笔投资{{type.invest_amount}}万元可用
             .parper_img(class="imgs{{idx}}")
