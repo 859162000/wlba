@@ -394,20 +394,23 @@ wlb.ready({
                 }
             })
         }
-
-        mixins.sendUserInfo(function (data) {
-            $('#projectList').on('click',function(){
-                mixins.jumpToManageMoney();
-            })
-            if (data.ph == '') {
-                $('.pot-s,.packets-btn a').on('click',function(){
-                    mixins.loginApp({refresh: 1, url: ''})
+        function checkLoginStatus() {
+            mixins.sendUserInfo(function (data) {
+                $('#projectList').on('click', function () {
+                    mixins.jumpToManageMoney();
                 })
-            } else {
-                connect(data)
-            }
-        })
-
+                if (data.ph == '') {
+                    $('.pot-s,.packets-btn a').on('click', function () {
+                        mixins.loginApp({refresh: 0, url: ''},function(){
+                            checkLoginStatus()
+                        })
+                    })
+                } else {
+                    connect(data)
+                }
+            })
+        }
+        checkLoginStatus();
 
     },
     other: function () {
