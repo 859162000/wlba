@@ -18,8 +18,10 @@ block main
             .well
                 .panel-title-bar__no-border
                     .panel-title 身份信息
-                        .text 人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
-                        .true 手机号修改成功
+                        if modify_phone_state = 2
+                            .text 人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
+                        if modify_phone_state = 1
+                            .true 手机号修改成功
                 .info_box.margin_top_box.is_open
                     .img.img_1
                     dl
