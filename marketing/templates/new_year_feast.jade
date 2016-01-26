@@ -58,42 +58,23 @@ html(style="background:#fecf4f")
                     span
                 p.title-fonts 5大红包全席宴，多领多得多投多赚！
                 .packets-feast.clearfix
-                    .packets-div.mr13.clearfix
-                        p.packets-num 1000元红包
-                        p.packets-btn
-                            a(href='javascript:void(0)') 立即领取
-                        p.packets-used 单笔投资满10万可用
-                        p.packets-icon.icon1
-                            span
-                    .packets-div.mr13.clearfix
-                        p.packets-num 3000元红包
-                        p.packets-btn
-                            a(href='javascript:void(0)') 立即领取
-                        p.packets-used 单笔投资满20万可用
-                        p.packets-icon.icon2
-                            span
-                    .packets-div.clearfix
-                        p.packets-num 8000元红包
-                        p.packets-btn
-                            a(href='javascript:void(0)') 立即领取
-                        p.packets-used 单笔投资满40万可用
-                        p.packets-icon.icon3
-                            span
-                .packets-feast.clearfix.w75
-                    .packets-div.mr13.clearfix
-                        p.packets-num 15,000元红包
-                        p.packets-btn
-                            a(href='javascript:void(0)') 立即领取
-                        p.packets-used 单笔投资满70万可用
-                        p.packets-icon.icon4
-                            span
-                    .packets-div.clearfix
-                        p.packets-num 22,000元红包
-                        p.packets-btn
-                            a(href='javascript:void(0)') 立即领取
-                        p.packets-used 单笔投资满100万可用
-                        p.packets-icon.icon5
-                            span
+                    redpacks = enumerate(redpacks)
+                    for index, redpack in redpacks
+                        if index == 2 or index == 4
+                            styles = ''
+                        else
+                            styles = 'mr13'
+                        .packets-div.clearfix(class='{{styles}}')
+                            p.packets-num
+                                amount = int(redpack['amount'])
+                                | {{amount}}元红包
+                            p.packets-btn
+                                a(href='javascript:void(0)',data-id='{{redpack.redpack_id}}') 立即领取
+                            p.packets-used
+                                invest_amount = redpack['invest_amount'] / 10000
+                                | 单笔投资满{{invest_amount}}万可用
+                            p.packets-icon(class='icon{{index}}')
+                                span
                 p.title-fonts 备注：活动期新老用户均可领取享用
                 p.title-fonts （每天每个红包限领一次，每天均可来领，红包限投3月及以上标期）
                 .rule-div

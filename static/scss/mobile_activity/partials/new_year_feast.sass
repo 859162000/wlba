@@ -15,6 +15,8 @@
     margin-top: 1rem
     span
       background: url(/static/imgs/mobile_activity/feast/title2.png) center top no-repeat
+      background-size: 100% 100%
+      width: 90%
       height: 1rem
   .title-fonts
     text-align: center
@@ -51,6 +53,10 @@
       -webkit-box-flex: 1
       -webkit-box-align: center
       -webkit-box-pack: center
+      //transition: left 0.5s,top 0.5s
+      //-moz-transition: left 0.5s,top 0.5s
+      //-webkit-transition: left 0.5s,top 0.5s
+      //-o-transition: left 0.5s,top 0.5s
       .award-name
         font-size: .75rem
         padding-top: 2.15rem
@@ -106,17 +112,16 @@
       color: #2a00ff
       text-decoration: underline
   .packets-feast
-    padding: 0 .5rem
-    display: -webkit-box
-    margin-top: 1rem
+    padding: 0 .1rem
+    text-align: center
     .packets-div
+      margin-top: 1rem
       background: url(/static/imgs/mobile_activity/feast/card.png) center center no-repeat
       background-size: 100% 100%
       height: 6.925rem
       text-align: center
-      -webkit-box-flex: 1
-      -webkit-box-align: center
-      -webkit-box-pack: center
+      display: inline-block
+      width: 28%
       .packets-num
         color: #ffdc15
         font-size: .7rem
@@ -141,6 +146,10 @@
           width: 90%
           display: inline-block
           margin-top: .4rem
+      .icon0
+        span
+          background: url(/static/imgs/mobile_activity/feast/icon0.png) center center no-repeat
+          background-size: 100% 100%
       .icon1
         span
           background: url(/static/imgs/mobile_activity/feast/icon1.png) center center no-repeat
@@ -157,12 +166,8 @@
         span
           background: url(/static/imgs/mobile_activity/feast/icon4.png) center center no-repeat
           background-size: 100% 100%
-      .icon5
-        span
-          background: url(/static/imgs/mobile_activity/feast/icon5.png) center center no-repeat
-          background-size: 100% 100%
     .mr13
-      margin-right: .8rem
+      margin-right: .5rem
   .w75
     width: 68%
     margin: 1rem  auto .5rem
@@ -228,6 +233,9 @@
   .title-s
     font-size: .7rem
     margin: 1.5rem 0 0.3rem
+  .error-s
+    margin: 2rem 0 0.3rem
+    font-size: .75rem
   .pop-fonts
   font-size: .525rem
 .alertT30

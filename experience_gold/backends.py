@@ -183,7 +183,7 @@ class SendExperienceGold(object):
                     "content": content,
                     "mtype": "activity"
                 })
-                return record.id
+                return record.id, experience_event
 
     def get_amount(self):
         now = timezone.now()
