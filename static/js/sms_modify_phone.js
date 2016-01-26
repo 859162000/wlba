@@ -63,11 +63,11 @@
                 //return $(document.body).trigger('from:captcha');
             }
         };
-
+        var result;
         $('.get_code').click(function(){
+            $('.status_code').hide();
             $('.title_phone span.text_1').text('短信将发送至');
             $('.title_phone span.text_2').hide();
-            $('.status_code').hide();
             var phone = $('.phone_num').text();
             $('.get_code').attr('disabled', 'disabled').addClass('wait');
             time_count = 60;
@@ -78,13 +78,32 @@
                 url: '/api/manual_modify/phone_validation_code/'+phone+'/',
                 type: 'POST',
                 success: function (xhr) {
-                    $('.title_phone span.text_1').text('短信已经发送至');
-                    $('.title_phone span.text_2').show();
+                    if(xhr.status==200){
+                        $('.status_code').hide();
+                        $('.title_phone span.text_1').text('短信已经发送至');
+                        $('.title_phone span.text_2').show();
+                    }else{
+                        clearInterval(timerFunction);
+                        time_count = 0;
+                        $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+                    }
+                },
+                error: function (xhr) {
+                    result = JSON.parse(xhr.responseText);
+                    $('.status_code .true').hide();
+                    $('.status_code .false').text(result.message).show();
+                    $('.status_code').show();
+
+                    clearInterval(timerFunction);
+                    time_count = 0;
+                    $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
                 }
             });
+
         });
 
         $('.button').click(function(){
+            $('.error_form').hide();
             var validate_code_val = $('.input_code').val();
             var phone = $('.phone_num').text();
             $.ajax({
@@ -94,12 +113,22 @@
                     new_phone: phone,
                     validate_code:validate_code_val
                 },
-                success: function (returndata) {
-                    window.location.href = '/accounts/security/';
-                    alert(returndata);
+                success: function (xhr) {
+
+                    if(xhr.status==200){
+                        $('.error_form').hide();
+                        $('.status_code .true').show();
+                        $('.status_code .false').hide();
+                        $('.status_code').show();
+                        window.location.href = '/accounts/security/';
+                    }else{
+                        result = JSON.parse(xhr.responseText);
+                        $('.error_form').text(result.message).show();
+                    }
                 },
-                error: function (returndata) {
-                    alert(returndata);
+                error: function (xhr) {
+                    result = JSON.parse(xhr.responseText);
+                    $('.error_form').text(result.message).show();
                 }
 
             });

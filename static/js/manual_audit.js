@@ -50,8 +50,9 @@
 
 
         $('.button').click(function(){
+            $('.error_form').hide();
+
             var id_number_val = $('#id_number').val();
-            var validate_code_val = $('#validate_code').val();
             var password_val = $('#password').val();
             var pass_true = false;
             var id_true = false;
@@ -96,12 +97,18 @@
                     url: '/api/manual_modify/vali_acc_info/' ,
                     type: 'POST',
                     data: post_data,
-                    success: function (returndata) {
-                        window.location.href = '/accounts/manual_modify/phone/';
-                        //alert(returndata);
+                    success: function (xhr) {
+                        if(xhr.status=200){
+                            window.location.href = '/accounts/manual_modify/phone/';
+                        }else{
+                            result = JSON.parse(xhr.responseText);
+                            $('.error_form').text(result.message).show();
+                        }
+
                     },
-                    error: function (returndata) {
-                        //alert(returndata);
+                    error: function (xhr) {
+                        result = JSON.parse(xhr.responseText);
+                        $('.error_form').text(result.message).show();
                     }
                 });
             }

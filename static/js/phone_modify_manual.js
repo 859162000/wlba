@@ -99,7 +99,6 @@
             //alert(file_size);
             if(mime==".jpg"||mime==".png"||mime==".bmp"&&file_size<'2097152'){
                 setImagePreview(docObj,file_img);
-                form_status();
             }else{
                 docObj.value ='';
                 if(mime==".jpg"||mime==".png"||mime==".bmp"){
@@ -109,15 +108,15 @@
                 }
                 if(input_parent.hasClass('input_box_1')){
                     $('#user_img_1').hide();
-                    $('.error_right_file_1').show().text(error_file_status);
+                    $('.error_right_file_1').text(error_file_status).show();
                 }
                 if(input_parent.hasClass('input_box_2')){
                     $('#user_img_2').hide();
-                    $('.error_right_file_2').show().text(error_file_status);
+                    $('.error_right_file_2').text(error_file_status).show();
                 }
                 if(input_parent.hasClass('input_box_3')){
                     $('#user_img_3').hide();
-                    $('.error_right_file_3').show().text(error_file_status);
+                    $('.error_right_file_3').text(error_file_status).show();
                 }
                 //return false;
             }
@@ -195,7 +194,6 @@
                 phone_true = true;
                 $('.status_code').hide();
             }
-            form_status();
         });
 
         var time_count = 60;
@@ -210,6 +208,7 @@
             }
         };
 
+        var result;
         $('.get_code').click(function(){
             if(phone_true){
                 $('.status_code').hide();
@@ -224,10 +223,28 @@
                     url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
                     type: 'POST',
                     success: function (xhr) {
-                        $('.error_form').hide();
+                        if(xhr.status==200){
+                            $('.error_form').hide();
+                        }else{
+                            result = JSON.parse(xhr.responseText);
+                            $('.status_code .true').hide();
+                            $('.status_code .false').text(result.message).show();
+                            $('.status_code').show();
+
+                            clearInterval(timerFunction);
+                            time_count = 0;
+                            $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+                        }
+
                     },
                     error: function (xhr) {
-                        $('.error_form').text(xhr.message).show();
+                        result = JSON.parse(xhr.responseText);
+                        $('.error_form').text(result.message).show();
+
+                        clearInterval(timerFunction);
+                        time_count = 0;
+                        $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+
                     }
                 });
             }else{
@@ -237,31 +254,16 @@
 
         });
 
-        $('.input_code').on('focus',function(){
-           form_status();
-        });
-
-
-        $('.input_code').blur(function(){
-            form_status();
-        })
         /*输入手机号，验证码结束*/
 
-        function form_status(){
+
+        $('.button').click(function(){
+            $('.error_form').hide();
             file_1 = document.getElementById("id_front_image").value;
             file_2 = document.getElementById("id_back_image").value;
             file_3 = document.getElementById("id_user_image").value;
             code_num = $('.input_code').val();
-        }
 
-
-        $('.button').click(function(){
-
-            //alert(file_1);
-            //alert(file_2);
-            //alert(file_3);
-            //alert(phone_true);
-            //alert(code_num);
             if(file_1&&file_2&&file_3&&phone_true&&code_num){
                 var form =$("#form");
                 var formData = new FormData($( "#form" )[0]);
@@ -274,16 +276,27 @@
                     cache: false,
                     contentType: false,
                     processData: false,
-                    success: function (returndata) {
-                        //alert(returndata);
-                        window.location.href = '/accounts/security/';
-                    },
-                    error: function (returndata) {
+                    success: function (xhr) {
+                        if(xhr.status==200){
+                            $('.error_form').hide();
 
+                            $('.status .false').hide();
+                            $('.status .true').show();
+                            $('.status').show();
+
+                            window.location.href = '/accounts/security/';
+                        }else{
+                            result = JSON.parse(xhr.responseText);
+                            $('.error_form').text(result.message).show();
+                        }
+                    },
+                    error: function (xhr) {
+                        result = JSON.parse(xhr.responseText);
+                        $('.error_form').text(result.message).show();
                     }
                 });
             }else{
-                $('.error_form').text('请填写完整').show();
+                $('.error_form').text('请将表单填写完整').show();
             }
 
 

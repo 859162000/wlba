@@ -63,9 +63,9 @@
                 //return $(document.body).trigger('from:captcha');
             }
         };
-
+        var result;
         $('.get_code').click(function(){
-            $('.status_code').hide();
+            $('.phone_code .status').hide();
             var phone = $('.phone_num').text();
 
             $('.get_code').attr('disabled', 'disabled').addClass('wait');
@@ -77,12 +77,34 @@
                 url: '/api/phone_validation_code/' + phone + '/',
                 type: 'POST',
                 success: function (xhr) {
+                    if(xhr.status==200){
+                        $('.phone_code .status').hide();
+                    }else{
+                        result = JSON.parse(xhr.responseText);
+                        $('.phone_code .status .true').hide();
+                        $('.phone_code .status .false').text(result.message).show();
+                        $('.phone_code .status').show();
 
+                        clearInterval(timerFunction);
+                        time_count = 0;
+                        $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+                    }
+                },
+                error: function (xhr) {
+                    result = JSON.parse(xhr.responseText);
+                    $('.phone_code .status .true').hide();
+                    $('.phone_code .status .false').text(result.message).show();
+                    $('.phone_code .status').show();
+
+                    clearInterval(timerFunction);
+                    time_count = 0;
+                    $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
                 }
             });
         });
 
         $('.button').click(function(){
+            $('.error_form').hide();
             var validate_code_val = $('.input_code').val();
             var password_val = $('.password').val();
             var id_number_val = $('.id_number').val();
@@ -112,12 +134,23 @@
                 url: '/api/sms_modify/vali_acc_info/' ,
                 type: 'POST',
                 data: post_data,
-                success: function (returndata) {
-                    window.location.href = '/accounts/sms_modify/phone/';
-                    //alert(returndata);
+                success: function (xhr) {
+
+                    if(xhr.status==200){
+                        $('.error_form').hide();
+                        $('.status .false').hide();
+                        $('.status .true').show();
+                        $('.status').show();
+                        window.location.href = '/accounts/sms_modify/phone/';
+                    }else{
+                        result = JSON.parse(xhr.responseText);
+                        $('.error_form').text(result.message).show();
+                    }
+
                 },
-                error: function (returndata) {
-                    //alert(returndata);
+                error: function (xhr) {
+                    result = JSON.parse(xhr.responseText);
+                    $('.error_form').text(result.message).show();
                 }
 
             });
