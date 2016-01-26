@@ -2239,6 +2239,8 @@ class IdentityInformationTemplate(TemplateView):
             "id_is_valid": profile.id_is_valid,
             "trade_pwd": profile.trade_pwd != "",
             "modify_phone_state": modify_phone_state,
+            'name': profile.name,
+            "id_number": profile.id_number,
         }
 
 

@@ -52,7 +52,7 @@ block main
                                 .text 实名认证
                                 .ico.is_set_ico
                                 span.is_set_text 已认证
-                            dd *永明 370125**********
+                            dd {{user.wanglibaouserprofile.name | safe_name}} {{user.wanglibaouserprofile.id_number | safe_id}}
                     else
                         dl.id_no_valid
                             dt
