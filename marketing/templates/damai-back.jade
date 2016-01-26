@@ -1,0 +1,100 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include global/g_head
+    - endwith
+    meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no")
+    link(rel="stylesheet",href="/static/styles/pc_activity/damai-back.css?v=20151114")
+    link(href="/static/styles/pc/video-js.min.css", rel="stylesheet", type="text/css")
+
+  body(style="background:#1f1f1d")
+    - csrf_token
+    include global/g_nav
+    .damai-wrap
+      .damia-back-voi
+        .damia-back-vo
+          video( id="really-cool-video", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="390", height="264", data-setup='{"language":"zh"}' )
+              source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_rock.mp4", type='video/mp4')
+              source(src='https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_rock.mp4', type='video/ogg')
+              p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,safari,ie9以上等)！
+      .damaiback-banner
+      .damaiback-banner1
+        .back
+          .back1
+            p.back-text1 小老虎 & Soulspeak是世界上最严肃的说唱歌手、创造力爆满的超级音乐制作人。小老虎是中国第一批接触Hip-Hop文化的践行者，也是中国最好的Freestyle说唱歌手之一，曾获得中国MC Battle大赛“龙虎斗”两届总冠军；Soulspeak是来自洛杉矶的美籍华裔超级音乐制作人，早在2005年，便在洛杉矶当地的Hip-Hop及电子音乐圈占据一席之地。
+            p.back-text2.text2 代表作：
+            p.back-text2 《说唱艺术》 《北京咳嗽》
+            p.back-text2 《尿在红尘里》 《逍遥客》
+            p.back-text2 《为你出生入死九十九次》
+          .back1
+            p.back-text1 反光镜（Reflector），1997年成立，音乐风格深受GREEN DAY、NOFX等著名乐队的影响，曾作为第一支中国PUNK乐队在美国中西部7个城市进行了巡演，并在全国十余个城市成功巡演，反响强烈，曾获第11届音乐风云榜最佳摇滚乐队、第18届东方风云榜最佳乐队。
+            p.back-text2.text3 代表作：
+            p.back-text2 《NO!NO!NO!》 《BLING BLING BLING 》
+            p.back-text2 《猛犸》 《时髦人都好FANCY》
+            p.back-text2 《我想拉着你的手》
+          .back1
+            p.back-text1 简迷离(Gemini) 是国内第一支中法组合，打破了中国组合蓝色血脉的传统礼数。时尚前卫的个人造型、中西合璧的音乐理念，独树一帜的音乐风格，将音乐、文学和视觉进行了完美得拼接，成为了一股不容小觑的音乐旋风。
+            p.back-text2.text4 代表作：
+            p.back-text2 《怪兽不跳舞》 《太阳系小孩》
+            p.back-text2 《达芬奇密码》 《私人生活》
+            p.back-text2 《甜蜜蜜》
+      .damaiback-banner2
+        .banner-back
+          p.topback 在这场专为投资用户打造的摇滚演唱会上，
+          p 金融的理性+摇滚的奔放，让现场观众感受到了一种永不言败的力量，激发出了他们勇往直前、积极向上的冲天豪气。
+          p 对严谨理性的投资用户来说，“摇滚”的奔放、激情、动感，无疑是激发灵感、释放激情的绝佳平台。
+        .banner-back1
+          p 演唱会开始，国内首支中法电子摇滚组合“简迷离”率先出场。
+          p 没有经过情绪的酝酿，开场便嗨，引来观众的欢呼与尖叫，激情瞬间点燃，尤其是女主唱Suna慵懒的嗓音配上迷幻而又独特的表演
+          p 风格，让全场爆发出肢体与灵魂共振的魔力。
+      .damaiback-banner3
+        .back-banner3
+        .back-banner4
+        .back-banner5
+        .back-banner4
+        .back-banner6
+        .back-banner4
+        .back-banner7
+        .back-banner4
+        .back-banner8
+        .back-banner4
+        .back-banner
+          .main
+          .main-main
+            p.maintop 小老虎/Soulspeak的出场像是把情绪变成了游吟诗，让人在激情狂欢之后进入对现实和未来的沉思。
+            p 他们的饶舌跟摇滚不同，说唱风像是娓娓道来，只有真正投入的人才能懂得。因为他们的歌不仅融入了更多电子乐的风格，
+            p 连歌词都非常俏皮有感觉。
+          .main1
+          .main-main
+            p 中国老牌朋克“反光镜”的出场让全场彻底嗨爆。
+            p 他们极具特色的张口第一句就是高潮，随着歌曲的精彩上演，跟着High就是分分钟的事！
+
+          .main2
+          .main-main
+            p 好的摇滚演唱会，不仅能让人享受美妙绝伦的音乐，更能让人的思想得到洗涤升华。
+            p 当然收获不仅如此，现场不少投资用户还得到了表演乐队亲笔签名的CD和T-shirt，这不仅是倍儿有面子的事情，
+            p 更是非常值得纪念的事情，因为在网利宝投资还能获得相当不错的收益哦！
+
+          .main3
+          .main-main
+            p “UP”—网利宝摇滚演唱会是给投资用户带来的一场精彩的视听盛宴，
+            p 更是资本和娱乐的又一次跨界融合成功案例。当晚，演唱会的火爆让网利宝备受关注，不少粉丝把工作人员围得水泄不通，
+            p 咨询网利宝的产品与收益情况，甚至现场注册投资。
+
+          .main4
+          .main-main.main-main12
+            p 网利宝金融摇滚夜以“UP”做为主题，是因为“UP”蕴含着振奋精神、积极向上的意思，
+            p 通过举办金融与摇滚相结合的演奏会，网利宝希望投资用户不仅感受到摇滚的奔放、激情，更能以积极的心态迎接2016年的到来！
+          .main-main.main-main12
+            p 摇滚夜虽已结束，但我们对未来的希望与信心未减，
+            p 2017年，网利宝期待与你再见！
+          a(href='http://www.yangtse.com/jdnews/csnews/2016/01/2211659.html', target='_blank').back-button 媒体报道
+
+
+    include global/g_footer
+    include include/tracking
+    script.
+      require(["/static/src/pc/guide.js?v=22"])

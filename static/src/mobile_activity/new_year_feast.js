@@ -17,7 +17,7 @@ org.ui = (function(){
             }
             if(difference == 2){
                 var strHtml = "<div id='packets' class='packets alertT30 clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
-                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财卷”及“体验金专区”查看</p>"
+                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财券”及“体验金专区”查看</p>"
                             +"<div class='close-b close-min'></div></div>";
             }else if(difference == 3){
                 var strHtml ="<div id='packets' class='packets clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
@@ -90,7 +90,7 @@ org.feast = (function (org) {
                                         i++,j++;
                                     },500)
                                     $('.pot-s').addClass('selectEd')
-                                }else if(data.ret_code == 1){
+                                }else{
                                     org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
                                 }
                             }
@@ -134,7 +134,7 @@ org.feast = (function (org) {
                             if(data.ret_code == 0){
                                 var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>';
                                 org.ui.alert(txt, '', '3')
-                            }else if(data.ret_code == 1){
+                            }else{
                                 org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
                             }
                         }
