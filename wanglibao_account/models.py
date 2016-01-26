@@ -228,7 +228,7 @@ class ManualModifyPhoneRecord(models.Model):
         (u"复审通过", u"复审通过"),
         (u"复审驳回", u"复审驳回"),
     )
-    # 初审中　初审待定　初审驳回　初审通过　复审中 复审通过 复审驳回
+    # 待初审　初审待定　初审驳回　待复审　复审通过 复审驳回
     user = models.ForeignKey(User)
     id_front_image = models.ImageField(upload_to='id_front', blank=True, verbose_name=u'身份证正面照片', help_text=u'身份证正面照片')
     id_back_image = models.ImageField(upload_to='id_back', blank=True, verbose_name=u'身份证反面照片', help_text=u'身份证反面照片')

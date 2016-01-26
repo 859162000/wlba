@@ -2226,12 +2226,19 @@ class IdentityInformationTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         profile = user.wanglibaouserprofile
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"待初审", u"初审待定", u"待复审"])
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        modify_phone_state = 0
+        if modify_phone_record:
+            if modify_phone_record.status == u'复审通过':
+                modify_phone_state = 1
+            if modify_phone_record.status in [u'待初审', u'初审待定', u'待复审']:
+                modify_phone_state = 2
+
         return {
             "phone": safe_phone_str(profile.phone),
             "id_is_valid": profile.id_is_valid,
             "trade_pwd": profile.trade_pwd != "",
-            "has_manual_modify_record": modify_phone_record.exists(),
+            "modify_phone_state": modify_phone_state,
         }
 
 
