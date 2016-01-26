@@ -65,32 +65,39 @@ org.feast = (function (org) {
         _potAward:function(){
              $('.pot-s').click(function(){
                  if($('#authenticated').val() == 'True'){
-                    if(!$('.pot-s').hasClass('selectEd')){
-                         var index = $(this).attr('index');
-                         var i = 1,j = 0;
-                         var timer = setInterval(function(){
-                            i == 4 ? i = 0 : i = i;
-                            if((j>3) && (i == (index - 1))){
-                                clearInterval(timer);
-                                //<p>150元红包</p><p>400元红包</p><p>1%加息券</p><p>1.8%加息券</p><p>888元体验金</p>
-                                setTimeout(function(){
-                                    var txt = '<p>100元红包</p><p>300元红包</p><p>1.2%加息券</p><p>2%加息券</p><p>888元体验金</p>';
-                                     org.ajax({
-                                        url: '/api/wlb_reward/qm_banque/',
-                                        type: 'post',
-                                        data: {},
-                                        success: function (data) {
-                                            org.ui.alert(txt, '', '2')
-                                        }
-                                    })
-                                    $('.pot-s').removeClass('selectEd')
-                                },500)
-                            }
-                            lib._arrowStyle(i+1)
-                            i++,j++;
-                         },500)
-                         $('.pot-s').addClass('selectEd')
-                     }
+                     org.ajax({
+                         url: '/api/wlb_reward/qm_banque/',
+                         type: 'post',
+                         data: {},
+                         success: function (data) {
+                             if (data.ret_code == 0) {
+                                 if(!$('.pot-s').hasClass('selectEd')) {
+                                     var index = $(this).attr('index');
+                                     var i = 1, j = 0;
+                                     var timer = setInterval(function () {
+                                         i == 4 ? i = 0 : i = i;
+                                         if ((j > 3) && (i == (index - 1))) {
+                                             clearInterval(timer);
+                                             setTimeout(function () {
+                                                 var txt = ''
+                                                 $.each(data.redpack_txts, function (i, o) {
+                                                     txt += '<p>' + o + '</p>'
+                                                 })
+                                                 org.ui.alert(txt, '', '2')
+                                                 $('.pot-s').removeClass('selectEd')
+                                             }, 500)
+                                         }
+                                         lib._arrowStyle(i + 1)
+                                         i++, j++;
+                                     }, 500)
+                                 }
+                             } else if (data.ret_code == 1) {
+                                 org.ui.alert('<p class="error-s">' + data.message + '</p>', '', '3')
+
+                             }
+                         }
+                     })
+                     $('.pot-s').addClass('selectEd')
                  }else{
                      window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                  }
