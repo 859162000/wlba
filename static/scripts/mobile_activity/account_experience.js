@@ -273,9 +273,13 @@ wlb.ready({
                 success: function (data) {
                     var url = location.href;
                     var times = url.split("?");
-                    if(times[1] != 1){
-                        url += "?1";
-                        self.location.replace(url);
+                    if(times[1] == ''){
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
+                    }else{
+                        window.location.href = '/activity/experience/account/'
                     }
                     org.experience.init()
                 }
