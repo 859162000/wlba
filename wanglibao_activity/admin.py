@@ -7,6 +7,7 @@ import datetime
 from django.utils import timezone
 from import_export import resources, fields
 from import_export.admin import ExportMixin
+from django.contrib.admin import widgets
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, \
     ActivityImages, WapActivityTemplates, ActivityShow, ActivityBannerPosition
 import models as m
@@ -232,8 +233,8 @@ class ActivityShowForm(forms.ModelForm):
     pc_template = forms.CharField(label=u'PC-活动详情页模板名称*', max_length=255, required=False)
     app_detail_link = forms.CharField(label=u'APP-活动详情页链接*', max_length=255, required=False)
     app_template = forms.CharField(label=u'APP-活动详情页模板名称*', max_length=255, required=False)
-    start_at = forms.DateTimeField(label=u'活动页面展示开始时间*', required=False)
-    end_at = forms.DateTimeField(label=u'活动页面展示结束时间*', required=False)
+    start_at = forms.DateTimeField(label=u'活动页面展示开始时间*', widget=widgets.AdminSplitDateTime)
+    end_at = forms.DateTimeField(label=u'活动页面展示结束时间*', widget=widgets.AdminSplitDateTime)
 
     def clean_pc_detail_link(self):
         is_pc = self.cleaned_data.get('is_pc')
@@ -316,19 +317,17 @@ class ActivityBannerPosForm(forms.ModelForm):
         else:
             banner_dsc = u'副推右'
 
-        banners = ActivityBannerPosition.objects.all().select_related().order_by('%s__start_at' % banner_type)
-        before_end_time = None
+        act_start_at = self_activity_show.start_at
+        act_end_at = self_activity_show.end_at
+        banners = ActivityBannerPosition.objects.all().select_related()
         for banner in banners:
             activity_show = getattr(banner, banner_type, None)
             if activity_show and activity_show != self_activity_show:
-                start_time = activity_show.start_at
-                end_time = activity_show.end_at
-                if before_end_time:
-                    if start_time >= before_end_time:
-                        raise forms.ValidationError(u'活动展示(%s, %s)%sBanner展示时间冲突' % (
-                            self_activity_show, activity_show, banner_dsc))
-
-                before_end_time = end_time
+                db_act_start_at = activity_show.start_at
+                db_act_end_at = activity_show.end_at
+                if db_act_start_at < act_start_at < db_act_end_at or db_act_start_at < act_end_at < db_act_end_at:
+                    raise forms.ValidationError(u'活动展示(%s, %s)%sBanner展示时间冲突' % (
+                        self_activity_show, activity_show, banner_dsc))
 
     def clean_main(self):
         main = self.cleaned_data.get('main')
