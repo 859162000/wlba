@@ -292,7 +292,6 @@ wlb.ready({
             }
         })
 
-        checkLoginStatus()
     },
     other: function(){
         org.experience.init()
