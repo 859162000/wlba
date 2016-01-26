@@ -1817,7 +1817,7 @@ class QMBanquetRewardAPI(APIView):
     activity = None
 
     def get_random_activity_code(self):
-        return self.activity_codes[random.randint(0, 2)]
+        return self.activity_codes[random.randint(0, 1)]
 
     def get_activity_by_code(self, activity_code):
         try:
