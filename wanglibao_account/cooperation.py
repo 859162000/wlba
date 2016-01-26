@@ -58,7 +58,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL, RENRENLI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback
+                                    xunleivip_callback, common_callback_for_post
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -1750,13 +1750,15 @@ class RenRenLiRegister(CoopRegister):
                     'Pro_id': p2p_record.product.id,
                     'Invest_money': p2p_record.amount,
                     'Rate': p2p_record.product.expected_earning_rate,
-                    'Invest_start_date': '',
-                    'Invest_end_date': '',
-                    'Back_money': '',
-                    'Back_last_date': '',
+                    'Invest_start_date': int(time.mktime(p2p_record.create_time.timetuple())),
+                    'Invest_end_date': int(time.mktime(p2p_record.product.end_time.timetuple())),
+                    # 'Back_money': '',
+                    # 'Back_last_date': '',
                     'Cust_key': binding.bid,
                 }
 
+                common_callback_for_post.apply_async(
+                    kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
 
 # 注册第三方通道
