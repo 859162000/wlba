@@ -42,7 +42,7 @@ org.ui = (function(){
 var login = false;
 wlb.ready({
     app: function (mixins) {
-        function connect(data,counts) {
+        function connect(data) {
             org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
@@ -52,39 +52,26 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
-                    if(counts == 'second'){
-                        window.location.href ='/activity/experience/account/';
-                    }else{
-                        var url = location.href;
-                        var times = url.split("?");
-                        if(times[1] != 1){
-                            url += "?1";
-                            self.location.replace(url);
-                        }
+                    var url = location.href;
+                    var times = url.split("?");
+                    if(times[1] != 1){
+                        url += "?1";
+                        self.location.replace(url);
                     }
                     org.experience.init()
                 }
             })
         }
-        function checkLoginStatus(counts){
-            mixins.sendUserInfo(function (data) {
-                if (data.ph == '') {
-                    login = false;
-                    mixins.loginApp({refresh:0, url:''},function(){
-                        checkLoginStatus('second')
-                    });
-                } else {
-                    login = true;
-                    if(counts == 'second'){
-                        connect(data,'second')
-                    }else{
-                        connect(data)
-                    }
-                }
-            })
-        }
+        mixins.sendUserInfo(function (data) {
+            if (data.ph == '') {
+                login = false;
+                mixins.loginApp({refresh:1, url:''});
+            } else {
+                login = true;
+                connect(data)
+            }
+        })
 
-        checkLoginStatus()
     },
     other: function(){
         org.experience.init()
