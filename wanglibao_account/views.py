@@ -2226,10 +2226,12 @@ class IdentityInformationTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         profile = user.wanglibaouserprofile
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"待初审", u"初审待定", u"待复审"])
         return {
             "phone": safe_phone_str(profile.phone),
             "id_is_valid": profile.id_is_valid,
-            "trade_pwd": profile.trade_pwd != ""
+            "trade_pwd": profile.trade_pwd != "",
+            "has_manual_modify_record": modify_phone_record.exists(),
         }
 
 
@@ -2262,6 +2264,14 @@ class ValidateAccountInfoAPI(APIView):
                 return Response({'message':"身份证错误"}, status=400)
             #todo
             # 同卡之后要对银行卡号进行验证
+            card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+            if card.exists():
+                card_no = request.DATA.get('card_no', "").strip()
+                if not card_no:
+                    return Response({'message': "绑卡用户需要提供绑定的银行卡号"}, status=400)
+                card = card.first()
+                if card.no != card_no:
+                    return Response({'message': "银行卡号输入错误"}, status=400)
             return Response({'ret_code': 0})
         return Response(form.errors, status=400)
 
@@ -2356,7 +2366,7 @@ class SMSModifyPhoneValidateAPI(APIView):
         if not profile.id_is_valid or not profile.id_number:
             return Response({'message':"还没有实名认证"}, status=400)
         if not validate_code or not id_number or not new_phone:
-            return Response({'message':"params is null"}, status=400)
+            return Response({'message':"参数为空"}, status=400)
         params = request.DATA
         data = {}
         for k,v in params.iteritems():
@@ -2365,7 +2375,7 @@ class SMSModifyPhoneValidateAPI(APIView):
         form = LoginAuthenticationNoCaptchaForm(request, data=data)
         if form.is_valid():
             if form.get_user()!=user:
-                return Response({'message':"user is not logined user"}, status=400)
+                return Response({'message':"用户错误"}, status=400)
             status, message = validate_validation_code(profile.phone, validate_code)
             if status != 200:
                 return Response({'message':message}, status=400)
@@ -2376,11 +2386,15 @@ class SMSModifyPhoneValidateAPI(APIView):
                 return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
             #todo
             # 同卡之后要对银行卡号进行验证
-            card = Card.objects.filter(user=request.user, is_the_one_card=True)
+            card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
             if card.exists():
                 card_no = request.DATA.get('card_no', "").strip()
-                if not card_no or card_no != card.no:
-                    return Response({'message':"银行卡号错误"}, status=400)
+                if not card_no:
+                    return Response({'message': "绑卡用户需要提供绑定的银行卡号"}, status=400)
+                card = card.first()
+                if card.no != card_no:
+                    return Response({'message': "银行卡号输入错误"}, status=400)
+
             sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, status = u'短信修改手机号提交').first()
             if not sms_modify_record:
                 sms_modify_record = SMSModifyPhoneRecord()
@@ -2419,7 +2433,7 @@ class SMSModifyPhoneAPI(APIView):
         profile = user.wanglibaouserprofile
         validate_code = request.DATA.get('validate_code', "").strip()
         if not validate_code:
-            return Response({'message':"validate_code is null"}, status=400)
+            return Response({'message':"验证码不能为空"}, status=400)
         status, message = validate_validation_code(new_phone, validate_code)
         if status != 200:
             return Response({'message':message}, status=400)
