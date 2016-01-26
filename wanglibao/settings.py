@@ -1179,6 +1179,8 @@ BAJINSHE_PRODUCT_PULL_URL = 'http://test.jr360.com/json/v1/external/ProductServi
 
 # 人人利
 WLB_FOR_RENRENLI_KEY = '2007'
+RENRENLI_COOP_ID = 'zlo_RrNuG'
+RENRENLI_COOP_KEY = 'zlopwd_ZAQ5bzRa'
 if ENV == ENV_PRODUCTION:
     pass
 else:

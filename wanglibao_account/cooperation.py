@@ -55,7 +55,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, YZCJ_CALL_BACK_URL, YZCJ_COOP_KEY,\
-     XUNLEIVIP_LOGIN_URL, RENRENLI_CALL_BACK_URL
+     XUNLEIVIP_LOGIN_URL, RENRENLI_CALL_BACK_URL, RENRENLI_COOP_ID, RENRENLI_COOP_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
                                     xunleivip_callback, common_callback_for_post
@@ -74,8 +74,18 @@ import urllib
 from .utils import xunleivip_generate_sign
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 from wanglibao_oauth2.models import OauthUser, Client
+import json
 
 logger = logging.getLogger('wanglibao_cooperation')
+
+
+def get_client(channel_code):
+    try:
+        client = Client.objects.get(channel__code=channel_code)
+    except Client.DoesNotExist:
+        client = None
+
+    return client
 
 
 def get_uid_for_coop(user_id):
@@ -1664,6 +1674,8 @@ class RenRenLiRegister(CoopRegister):
     def __init__(self, request):
         super(RenRenLiRegister, self).__init__(request)
         self.c_code = 'renrenli'
+        self.coop_id = RENRENLI_COOP_ID
+        self.coop_key = RENRENLI_COOP_KEY
         self.call_back_url = RENRENLI_CALL_BACK_URL
         self.external_channel_client_id_key = 'Cust_id'
         self.external_channel_user_key = 'Phone'
@@ -1730,21 +1742,25 @@ class RenRenLiRegister(CoopRegister):
     def purchase_call_back(self, user, order_id):
         binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
-            try:
-                p2p_record = P2PRecord.objects.get(user_id=user.id, order_id=order_id, catalog=u'申购').select_related()
-            except P2PRecord.DoesNotExist:
-                p2p_record = None
+            p2p_record = P2PRecord.objects.filter(user_id=user.id,
+                                                  order_id=order_id,
+                                                  catalog=u'申购').select_related('product').first()
 
-            user_profile = WanglibaoUserProfile.objects.filter(user_id=user.id).first()
-            phone = user_profile.phone if user_profile else ''
+            channel_code = binding.btype
+            client = get_client(channel_code)
+            if not client:
+                logger.info("%s purchase call back failed with wrong not found client" % channel_code)
+                return
 
             if p2p_record:
+                user_profile = WanglibaoUserProfile.objects.filter(user_id=user.id).first()
+                phone = user_profile.phone if user_profile else ''
                 data = {
                     'User_name': phone,
                     'Order_no': order_id,
                     'Pro_name': p2p_record.product.name,
                     'Pro_id': p2p_record.product.id,
-                    'Invest_money': p2p_record.amount,
+                    'Invest_money': float(p2p_record.amount),
                     'Rate': p2p_record.product.expected_earning_rate,
                     'Invest_start_date': int(time.mktime(p2p_record.create_time.timetuple())),
                     'Invest_end_date': int(time.mktime(p2p_record.product.end_time.timetuple())),
@@ -1753,8 +1769,15 @@ class RenRenLiRegister(CoopRegister):
                     'Cust_key': binding.bid,
                 }
 
+                params = {
+                    'Data': json.dumps([data]),
+                    'Cust_id': client.client_id,
+                    'Sign_type': 'MD5',
+                    'Sign': hashlib.md5(self.coop_id+self.coop_key+client.client_id+client.client_secret).hexdigest(),
+                }
+
                 common_callback_for_post.apply_async(
-                    kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
 # 注册第三方通道
