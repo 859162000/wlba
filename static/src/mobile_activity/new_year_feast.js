@@ -64,24 +64,37 @@ org.feast = (function (org) {
         /*开锅赢福利*/
         _potAward:function(){
              $('.pot-s').click(function(){
+                 var index = $(this).attr('index');
                  if($('#authenticated').val() == 'True'){
                     if(!$('.pot-s').hasClass('selectEd')){
-                         var index = $(this).attr('index');
-                         var i = 1,j = 0;
-                         var timer = setInterval(function(){
-                            i == 4 ? i = 0 : i = i;
-                            if((j>3) && (i == (index - 1))){
-                                clearInterval(timer);
-                                //<p>150元红包</p><p>400元红包</p><p>1%加息券</p><p>1.8%加息券</p><p>888元体验金</p>
-                                setTimeout(function(){
-                                    var txt = '<p>100元红包</p><p>300元红包</p><p>1.2%加息券</p><p>2%加息券</p><p>888元体验金</p>';
-                                    org.ui.alert(txt, '', '2')
-                                },500)
+                         org.ajax({
+                            url: '/api/wlb_reward/qm_banque/',
+                            type: 'post',
+                            data: {},
+                            success: function (data) {
+                                if(data.ret_code == 0){
+                                    var i = 1,j = 0,txt='';
+                                    $.each(data.redpack_txts,function(i,o){
+                                       txt+='<p>'+ o +'</p>'
+                                    })
+                                    var timer = setInterval(function(){
+                                        i == 4 ? i = 0 : i = i;
+                                        if((j>3) && (i == (index - 1))){
+                                            clearInterval(timer);
+                                            setTimeout(function(){
+                                                org.ui.alert(txt, '', '2')
+                                                $('.pot-s').removeClass('selectEd')
+                                            },500)
+                                        }
+                                        lib._arrowStyle(i+1)
+                                        i++,j++;
+                                    },500)
+                                    $('.pot-s').addClass('selectEd')
+                                }else if(data.ret_code == 1){
+                                    org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
+                                }
                             }
-                            lib._arrowStyle(i+1)
-                            i++,j++;
-                         },500)
-                         $('.pot-s').addClass('selectEd')
+                         })
                      }
                  }else{
                      window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
@@ -109,24 +122,25 @@ org.feast = (function (org) {
         },
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
-                if(!$(this).hasClass('selectEd')) {
-                    if ($('#authenticated').val() == 'True') {
-                        var id = $(this).attr('data-id');
-                        var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>'
-                        org.ajax({
-                            url: '/api/wlb_reward/hm_banque/',
-                            type: 'post',
-                            data: {
-                                redpack_id : id
-                            },
-                            success: function (data) {
-                               org.ui.alert(txt, '', '3')
+                if ($('#authenticated').val() == 'True') {
+                    var id = $(this).attr('data-id');
+                    org.ajax({
+                        url: '/api/wlb_reward/hm_banque/',
+                        type: 'post',
+                        data: {
+                            redpack_id : id
+                        },
+                        success: function (data) {
+                            if(data.ret_code == 0){
+                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>';
+                                org.ui.alert(txt, '', '3')
+                            }else if(data.ret_code == 1){
+                                org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
                             }
-                        })
-                        $('.packets-btn a').addClass('selectEd')
-                    } else {
-                        window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
-                    }
+                        }
+                    })
+                } else {
+                    window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                 }
             })
         }
@@ -151,7 +165,12 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
-                    $('#authenticated').val('True');
+                    var url = location.href;
+                    var times = url.split("?");
+                    if(times[1] != 1){
+                        url += "?1";
+                        self.location.replace(url);
+                    }
                     org.feast.init()
                 }
             })

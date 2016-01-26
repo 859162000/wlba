@@ -574,7 +574,7 @@ class SendVoiceCodeAPIView(APIView):
             phone_validate_code_item.validate_code = validate_code
             phone_validate_code_item.phone = phone_number
             phone_validate_code_item.last_send_time = now
-            # phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.code_send_count = 1
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
