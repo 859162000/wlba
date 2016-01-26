@@ -559,13 +559,14 @@ class SendVoiceCodeAPIView(APIView):
             return Response({"ret_code": 30114, "message": message})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        # 语音验证码次数不加1
         if phone_validate_code_item:
             count = phone_validate_code_item.code_send_count
-            if count >= 6:
+            if count >= 10:
                 return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
 
-            phone_validate_code_item.code_send_count += 1
-            phone_validate_code_item.save()
+            # phone_validate_code_item.code_send_count += 1
+            # phone_validate_code_item.save()
         else:
             now = timezone.now()
             phone_validate_code_item = PhoneValidateCode()
@@ -1584,7 +1585,8 @@ class CoopPvApi(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code):
-        if channel_code == 'xunlei9':
+        channel_codes = ('xunlei9', 'mxunlei')
+        if channel_code in channel_codes:
             req_data = self.request.GET
             source = req_data.get('source', None)
             ext = req_data.get('ext', None)

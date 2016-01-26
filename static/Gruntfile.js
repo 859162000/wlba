@@ -5,7 +5,7 @@ module.exports = function( grunt ) {
         compass: {
             dist: {
                 options: {
-                    config: 'config_weixin.rb'
+                    config: 'config.rb'
                 }
             }
         },
@@ -45,6 +45,12 @@ module.exports = function( grunt ) {
                         cwd: 'scripts/app/',
                         src: '*.js',
                         dest: 'scripts/app/dist/'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'scripts/component/',
+                        src: '*.js',
+                        dest: 'scripts/component/dist/'
                     },
                 ]
 

@@ -1,0 +1,248 @@
+$g-nav-height: 80px
+
+$g-nav-height-fixed: 60px
+
+.g-nav-warp
+  height: $g-nav-height
+  background: $bg-d3
+  position: relative
+  z-index: 100
+  -webkit-transform: translateZ(0)
+  color: #474e5e
+  .g-nav
+    width: 1102px
+    margin: 0 auto
+    +clearfix()
+    a
+      &:link, &:visited
+        color: $bg-d1
+      &:hover, &:active
+        color: $t-d2
+        cursor: pointer
+    a.highlight
+      color: $t-d2
+  .g-logo-box
+    width: 400px
+    height: 79px
+    float: left
+    img
+      width: 100%
+      height: 100%
+    .logo_s
+      display: none
+
+  .g-nav-box
+    float: right
+    overflow: hidden
+    a
+      position: relative
+      float: left
+      text-align: center
+      font-size: $font-m
+      padding: 0 20px
+      line-height: $g-nav-height
+      height: $g-nav-height
+    .nav-news
+      position: absolute
+      top: 14px
+      right: 2px
+      width: 29px
+      height: 17px
+  .g-user-warp
+    margin-left: 40px
+    float: right
+  .g-user
+    position: relative
+    font-size: $font-m
+    &:hover, &:active
+      .g-nav-user-nav
+        display: block
+  .user-nav
+    text-align: center
+    line-height: $g-nav-height
+    height: $g-nav-height
+    display: inline-block
+    width: 150px
+    .user-text
+      display: inline-block
+      vertical-align: middle
+      margin: 0 5px
+    .user-icon-img, .user-icon-img-active
+      display: inline-block
+      width: 37px
+      height: 37px
+      background: url("/static/imgs/pc/nav/user.png") no-repeat center center
+      vertical-align: middle
+    .user-icon-img-active
+      background: url("/static/imgs/pc/nav/user_active.png") no-repeat center center
+    .icon-down
+      font-size: $font-xs
+      color: #bfbfbf
+      vertical-align: middle
+  .g-nav-user-nav
+    position: absolute
+    top: $g-nav-height - 1px
+    right: 0
+    background: #fff
+    z-index: 11
+    +box-shadow(0 3px 6px rgba(0,0,0,.2))
+    display: none
+    a
+      display: block
+      width: 150px
+      text-align: center
+      +line-height(50)
+      &:hover, &:active
+        background: $bg-d15
+        color: $bg-d1
+
+
+.g-nav-fixed
+  position: fixed
+  width: 100%
+  height: $g-nav-height-fixed
+  top: -$g-nav-height-fixed
+  z-index: 100
+  +box-shadow(0 3px 6px rgba(0,0,0,.2))
+  .g-logo-box
+    height: 59px
+    .logo_s
+      display: block
+    .logo_l
+      display: none
+  .g-nav-box
+    a
+      line-height: $g-nav-height-fixed
+      height: $g-nav-height-fixed
+    .nav-news
+      top: 5px
+  .user-nav
+    line-height: $g-nav-height-fixed
+    height: $g-nav-height-fixed
+  .g-nav-user-nav
+    top: $g-nav-height-fixed - 1px
+
+
+
+.g-small-nav-warp
+  width: 100%
+  height: 35px
+  border-bottom: 1px solid #e3e3e3
+  background: #fafafa
+
+  .g-small-nav
+    width: 1102px
+    height: 100%
+    margin: 0 auto
+    +clearfix()
+    font-size: 12px
+    color: #999
+
+  .g-samll-start
+    height: 100%
+    float: left
+    line-height: 34px
+
+  .g-samll-end
+    float: right
+    line-height: 34px
+
+  .samll-nav-hotline, .samll-nav-wechat, .samll-nav-app
+    position: relative
+    display: inline-block
+    margin-right: 30px
+  .samll-nav-hotline
+    background: url("/static/imgs/pc/nav/hotline.png") no-repeat left center
+    padding-left: 25px
+
+  .icon-weixin-version2, .icon-app
+    width: 20px
+    height: 19px
+    display: inline-block
+    vertical-align: middle 
+    background: url("/static/imgs/pc/nav/hovers.png") no-repeat right center
+    -webkit-transition: all 0.5s ease-in-out
+    -moz-transition: all 0.5s ease-in-out
+    -o-transition: all 0.5s ease-in-out
+    transition: all 0.5s ease-in-out
+    margin-left: 10px
+  .icon-weixin-version2
+    background-position: 0 0
+  .icon-app
+    background-position: 0 -88px
+
+  .samll-nav-guide, .samll-nav-user, .samll-nav-logout
+    position: relative
+    display: inline-block
+    padding: 0 10px
+    &:link, &:visited
+      color: #999
+    &:hover
+      color: #fff
+      background: #db493f
+
+  .samll-nav-guide, .samll-nav-user
+    &:before
+      content: ''
+      position: absolute
+      top: 50%
+      right: -1px
+      width: 1px
+      height: 10px
+      background: #e3e3e3
+      margin-top: -5px
+  .samll-user-red
+    color: #db493f
+    &:link, &:visited
+      color: #db493f
+    &:hover
+      color: #fff
+  .samll-wechat-hover
+    display: none
+    position: absolute
+    top: 52px
+    right: -24px
+    z-index: 1000
+    background: #fff
+    .wechat-hover-body
+      position: relative
+      border: 1px solid #e3e3e3
+      padding: 5px
+      img
+        display: block
+
+    .wechat-hover-san
+      position: absolute
+      top: -11px
+      right: 25px
+      width: 15px
+      height: 11px
+      background: url('/static/imgs/pc/nav/sanjiao.png') no-repeat center
+    .wechat-hover-dec
+      line-height: 25px
+      text-align: center
+      color: #333333
+
+.samll-nav-animate
+  &:hover
+    .samll-wechat-hover
+      display: block
+    .icon-weixin-version2
+      background-position: 0 -39px
+    .icon-app
+      background-position: 0 -127px
+
+.g-nav-multicolour-line
+  height: 1px
+  background: #d94943
+  background: -moz-linear-gradient(90deg,#a0c85e,#507dd7,#d94943, #ed862f, #f3cf54)
+  background: -webkit-gradient(linear,0% 0%, 0% 0%, from(#507dd7), to(#d94943))
+  background: -webkit-linear-gradient(90deg,#000,#f00 50%,#090)
+  background: -o-linear-gradient(90deg,#a0c85e,#507dd7,#d94943,#ed862f,#f3cf54  )
+  background: -ms-linear-gradient(90deg,#a0c85e,#507dd7,#d94943, #ed862f, #f3cf54)
+  background: linear-gradient(90deg,#a0c85e,#507dd7,#d94943, #ed862f, #f3cf54)
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#507dd7', endColorstr='#d94943',GradientType=1)
+
+\:root
+  .g-nav-multicolour-line
+    filter: none

@@ -52,23 +52,31 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
+                    var url = location.href;
+                    var times = url.split("?");
+                    if(times[1] != 1){
+                        url += "?1";
+                        self.location.replace(url);
+                    }
                     org.experience.init()
                 }
             })
         }
-        mixins.sendUserInfo(function (data) {
-            if (data.ph == '') {
-                login = false;
-                $('.aa').text('未登录')
-                mixins.loginApp({refresh:1, url:''});
-            } else {
-                login = true;
-                connect(data)
-                $('.aa').text('登录')
-                $('.bb').text(data.tk)
-                //mixins.sendUserInfo('is_authenticated','')
-            }
-        })
+        function checkLoginStatus(){
+            mixins.sendUserInfo(function (data) {
+                if (data.ph == '') {
+                    login = false;
+                    mixins.loginApp({refresh:0, url:''},function(){
+                        checkLoginStatus()
+                    });
+                } else {
+                    login = true;
+                    connect(data)
+                }
+            })
+        }
+
+        checkLoginStatus()
     },
     other: function(){
         org.experience.init()

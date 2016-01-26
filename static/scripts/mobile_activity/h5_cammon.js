@@ -224,10 +224,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $("div.mammon-page1, div.mammon-jq, div.mammon-share").hide();
         page2.show();
     }
-    
     function getVal(){
         var val = [
-            {"qVal": "中签","title":"鸿运","detail":"福致心灵，鸿喜云集，新年开运"},
+            {"qVal": "中签","title":"鸿运","detail":"福致心灵 鸿喜云集 新年开运"},
             {"qVal": "中签","title":"荣归","detail":"学富五车题雁塔<br />衣锦还乡会有时"},
             {"qVal": "上签","title":"利是","detail":"得鸿运 利仕途 能旺夫"},
             {"qVal": "上签","title":"致祥","detail":"竹报三多 和睦融洽 可致吉祥"},
@@ -275,7 +274,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             success: function (data) {
                 //请求成功，通过config注入配置信息,
                 wx.config({
-                    debug: true,
+                    debug: false,
                     appId: data.appId,
                     timestamp: data.timestamp,
                     nonceStr: data.nonceStr,
@@ -309,9 +308,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    alert(2);
+                    //alert(2);
                     if(fn && (typeof fn == "function")){
-                        alert(22);
+                        //alert(22);
                         fn();
                     }
                 }
@@ -323,9 +322,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 link: shareLink,
                 imgUrl: shareImg,
                 success: function(){
-                    alert(1);
+                    //alert(1);
                     if(fn && (typeof fn == "function")){
-                        alert(3);
+                        //alert(3);
                         fn();
                     }
                 }
@@ -339,6 +338,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $(".js-btn").click(function(){
         $(this).parents(".mammon-jq").hide();
         $("div.mammon-share").css("display","-webkit-box");
+        _hmt.push(['_trackEvent', '解签', 'click', 'weixin_mammon']);
     });
     //关闭弹出层
     $(".js-close").click(function(){
@@ -351,7 +351,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     //手机号 检测是否是新用户
     $(".js-checkUser").click(function(){
         var self = $(this);
-        var tel = self.siblings(".tel-inp").val();
+        var tel = $.trim(self.siblings(".tel-inp").val());
         var tp = self.parents("div.mammon-page2");
         if(!checkTel(tel)){
             $("div.mammon-error").css("display","-webkit-box").find(".share-txt").html("请正确填写手机号");
@@ -384,7 +384,18 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     //        }
     //    };
     //});
+    function is_weixin(){
+        var ua = navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i)=="micromessenger") {
+            return true;
+        } else {
+            return false;
+        }
+    }
     $(function(){
         $("#load-box").hide().siblings("div.mammon-page1").show();
+        if(!is_weixin()){
+            $("#mammon-weixin").css("display","-webkit-box");
+        }
     })
 })();
