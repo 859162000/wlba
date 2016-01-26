@@ -271,29 +271,26 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
+                    org.experience.init()
+                }
+            })
+        }
+        mixins.sendUserInfo(function (data) {
+            if (data.ph == '') {
+                login = false;
+                mixins.loginApp({refresh:0, url:''},function(){
                     var url = location.href;
                     var times = url.split("?");
                     if(times[1] != 1){
                         url += "?1";
                         self.location.replace(url);
                     }
-                    org.experience.init()
-                }
-            })
-        }
-        function checkLoginStatus(){
-            mixins.sendUserInfo(function (data) {
-                if (data.ph == '') {
-                    login = false;
-                    mixins.loginApp({refresh:0, url:''},function(){
-                        checkLoginStatus()
-                    });
-                } else {
-                    login = true;
-                    connect(data)
-                }
-            })
-        }
+                });
+            } else {
+                login = true;
+                connect(data)
+            }
+        })
 
         checkLoginStatus()
     },
