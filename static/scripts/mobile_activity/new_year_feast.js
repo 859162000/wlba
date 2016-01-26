@@ -283,40 +283,38 @@ org.feast = (function (org) {
         /*开锅赢福利*/
         _potAward:function(){
              $('.pot-s').click(function(){
+                 var index = $(this).attr('index');
                  if($('#authenticated').val() == 'True'){
-                     org.ajax({
-                         url: '/api/wlb_reward/qm_banque/',
-                         type: 'post',
-                         data: {},
-                         success: function (data) {
-                             if (data.ret_code == 0) {
-                                 if(!$('.pot-s').hasClass('selectEd')) {
-                                     var index = $(this).attr('index');
-                                     var i = 1, j = 0;
-                                     var timer = setInterval(function () {
-                                         i == 4 ? i = 0 : i = i;
-                                         if ((j > 3) && (i == (index - 1))) {
-                                             clearInterval(timer);
-                                             setTimeout(function () {
-                                                 var txt = ''
-                                                 $.each(data.redpack_txts, function (i, o) {
-                                                     txt += '<p>' + o + '</p>'
-                                                 })
-                                                 org.ui.alert(txt, '', '2')
-                                                 $('.pot-s').removeClass('selectEd')
-                                             }, 500)
-                                         }
-                                         lib._arrowStyle(i + 1)
-                                         i++, j++;
-                                     }, 500)
-                                 }
-                             } else if (data.ret_code == 1) {
-                                 org.ui.alert('<p class="error-s">' + data.message + '</p>', '', '3')
-
-                             }
-                         }
-                     })
-                     $('.pot-s').addClass('selectEd')
+                    if(!$('.pot-s').hasClass('selectEd')){
+                         org.ajax({
+                            url: '/api/wlb_reward/qm_banque/',
+                            type: 'post',
+                            data: {},
+                            success: function (data) {
+                                if(data.ret_code == 0){
+                                    var i = 1,j = 0,txt='';
+                                    $.each(data.redpack_txts,function(i,o){
+                                       txt+='<p>'+ o +'</p>'
+                                    })
+                                    var timer = setInterval(function(){
+                                        i == 4 ? i = 0 : i = i;
+                                        if((j>3) && (i == (index - 1))){
+                                            clearInterval(timer);
+                                            setTimeout(function(){
+                                                org.ui.alert(txt, '', '2')
+                                                $('.pot-s').removeClass('selectEd')
+                                            },500)
+                                        }
+                                        lib._arrowStyle(i+1)
+                                        i++,j++;
+                                    },500)
+                                    $('.pot-s').addClass('selectEd')
+                                }else if(data.ret_code == 1){
+                                    org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
+                                }
+                            }
+                         })
+                     }
                  }else{
                      window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                  }
