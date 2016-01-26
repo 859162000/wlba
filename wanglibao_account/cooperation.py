@@ -330,9 +330,8 @@ class CoopRegister(object):
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
         """
         self.save_to_introduceby(user, invite_code)
-        if user.wanglibaouserprofile.utype != '3':
-            self.save_to_binding(user)
-            self.register_call_back(user)
+        self.save_to_binding(user)
+        self.register_call_back(user)
         self.clear_session()
 
     @property
