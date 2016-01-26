@@ -82,7 +82,6 @@ urlpatterns = patterns(
     url(r'^new_year/$', TemplateView.as_view(template_name="new_year.jade")),
     url(r'^life_style/$', TemplateView.as_view(template_name="life_style.jade")),
     url(r'^two-novice/$', TemplateView.as_view(template_name="two-novice.jade")),
-    url(r'^new_ameal/$', TemplateView.as_view(template_name="new_ameal.jade")),
     url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
     url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
 

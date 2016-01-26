@@ -1323,7 +1323,7 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         with transaction.atomic():
-            _order = Order.objects.select_for_update().get(pk=order_id).first()
+            _order = Order.objects.select_for_update().filter(pk=order_id).first()
             _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
             activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
             activity_record = activitys.filter(left_times__gt=0)
@@ -1817,7 +1817,7 @@ class QMBanquetRewardAPI(APIView):
     activity = None
 
     def get_random_activity_code(self):
-        return self.activity_codes[random.randint(0, 2)]
+        return self.activity_codes[random.randint(0, 1)]
 
     def get_activity_by_code(self, activity_code):
         try:
@@ -1867,21 +1867,21 @@ class QMBanquetRewardAPI(APIView):
                                     return Response({"ret_code":6,"message":messege})
                                 redpack_text = "None"
                                 if redpack_event.rtype == 'interest_coupon':
-                                    redpack_text = "%s加息券"%int(redpack_event.amount)
+                                    redpack_text = "%s%%加息券"%int(redpack_event.amount)
                                 if redpack_event.rtype == 'percent':
-                                    redpack_text = "%s元红包"%int(redpack_event.amount)
+                                    redpack_text = "%s%%百分比红包"%int(redpack_event.amount)
                                 if redpack_event.rtype == 'direct':
-                                    redpack_text = "%s百分比红包"%int(redpack_event.amount)
+                                    redpack_text = "%s元红包"%int(redpack_event.amount)
                                 redpack_txts.append(redpack_text)
-                                redpack_record_ids += redpack_record_id
+                                redpack_record_ids += str(redpack_record_id)
                             gift_record.redpack_record_ids = redpack_record_ids
                         if activity_rule.gift_type == "experience_gold":
                             experience_record_ids = ""
-                            experience_record_id = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+                            experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
                             if not experience_record_id:
                                 return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
-                            redpack_txts.append('%s元体验金')
-                            experience_record_ids+=experience_record_id
+                            redpack_txts.append('%s元体验金'%experience_event.amount)
+                            experience_record_ids+=str(experience_record_id)
                             gift_record.experience_record_ids = experience_record_ids
                     gift_record.activity_code = self.activity.code
                     gift_record.activity_code_time = timezone.now()
