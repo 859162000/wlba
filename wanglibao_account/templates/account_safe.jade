@@ -30,7 +30,7 @@ block main
                             .ico.is_set_ico
                             span.is_set_text 已绑定
                         dd {{phone}}
-                    if modify_phone_state = 0
+                    if modify_phone_state != 2
                         .button.phone_change_button 修改
                 if id_is_valid
                     .phone_change_wrap
