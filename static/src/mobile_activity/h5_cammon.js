@@ -65,7 +65,7 @@
             }
         });
         wx.ready(function () {
-            var host = 'https://staging.wanglibao.com',
+            var host = 'https://www.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile_activity/mammon/cs_img.png',
                 shareLink = host + '/activity/weixin_mammon/',
                 shareMainTit = shareTit ? ('财神说：'+shareTit) : '财神说：接财神、测财运、领开运红包',
