@@ -63,16 +63,28 @@ html
         if user.is_authenticated
           li(class="{{cls}} lis{{idx}}" )
             h5
-              amount = int(type['amount'])
-              | {{amount}}元红包
+              amount = type['amount']
+              | {{amount|money}}红包
             a(href="javascript:void(0);",data_id='{{type.redpack_id}}') 立即领取
-            span 单笔投资{{type.invest_amount}}万元可用
+            span
+              invest_amount = type['invest_amount']
+              if invest_amount > 10000
+                |单笔投资{{type.invest_amount|convert_to_10k}}可用
+              else
+                |单笔投资{{type.invest_amount|money}}可用
             .parper_img(class="imgs{{idx}}")
         else
           li(class="{{cls}} lis{{idx}}" )
-            h5 {{type.amount}}元红包
+            h5
+              amount = type['amount']
+              | {{amount|money}}红包
             a(href="/accounts/login/?next=/weixin_activity/new_ameal/",data_id='') 立即领取
-            span 单笔投资{{type.invest_amount}}万元可用
+            span
+              invest_amount = type['invest_amount']
+              if invest_amount > 10000
+                |单笔投资{{type.invest_amount|convert_to_10k}}可用
+              else
+                |单笔投资{{type.invest_amount|money}}可用
             .parper_img(class="imgs{{idx}}")
 
     p.years_prompt 备注：活动期新老用户均可领取享用（每天每个红包限领一次，每天均可来领，红包限投三个月以上标期）
