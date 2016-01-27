@@ -78,21 +78,15 @@
                 url: '/api/manual_modify/phone_validation_code/'+phone+'/',
                 type: 'POST',
                 success: function (xhr) {
-                    if(xhr.status==200){
-                        $('.status_code').hide();
-                        $('.title_phone span.text_1').text('短信已经发送至');
-                        $('.title_phone span.text_2').show();
-                    }else{
-                        clearInterval(timerFunction);
-                        time_count = 0;
-                        $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
-                    }
+
+                    $('.error_form').hide();
+                    $('.title_phone span.text_1').text('短信已经发送至');
+                    $('.title_phone span.text_2').show();
+
                 },
                 error: function (xhr) {
                     result = JSON.parse(xhr.responseText);
-                    $('.status_code .true').hide();
-                    $('.status_code .false').text(result.message).show();
-                    $('.status_code').show();
+                    $('.error_form').text(result.message).show();
 
                     clearInterval(timerFunction);
                     time_count = 0;
@@ -115,16 +109,12 @@
                 },
                 success: function (xhr) {
 
-                    if(xhr.status==200){
-                        $('.error_form').hide();
-                        $('.status_code .true').show();
-                        $('.status_code .false').hide();
-                        $('.status_code').show();
-                        window.location.href = '/accounts/security/';
-                    }else{
-                        result = JSON.parse(xhr.responseText);
-                        $('.error_form').text(result.message).show();
-                    }
+                    $('.error_form').hide();
+                    $('.status_code .true').show();
+                    $('.status_code .false').hide();
+                    $('.status_code').show();
+                    window.location.href = '/accounts/security/';
+
                 },
                 error: function (xhr) {
                     result = JSON.parse(xhr.responseText);

@@ -223,19 +223,7 @@
                     url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
                     type: 'POST',
                     success: function (xhr) {
-                        if(xhr.status==200){
-                            $('.error_form').hide();
-                        }else{
-                            result = JSON.parse(xhr.responseText);
-                            $('.status_code .true').hide();
-                            $('.status_code .false').text(result.message).show();
-                            $('.status_code').show();
-
-                            clearInterval(timerFunction);
-                            time_count = 0;
-                            $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
-                        }
-
+                        $('.error_form').hide();
                     },
                     error: function (xhr) {
                         result = JSON.parse(xhr.responseText);
@@ -277,18 +265,14 @@
                     contentType: false,
                     processData: false,
                     success: function (xhr) {
-                        if(xhr.status==200){
-                            $('.error_form').hide();
 
-                            $('.status .false').hide();
-                            $('.status .true').show();
-                            $('.status').show();
+                        $('.error_form').hide();
 
-                            window.location.href = '/accounts/security/';
-                        }else{
-                            result = JSON.parse(xhr.responseText);
-                            $('.error_form').text(result.message).show();
-                        }
+                        $('.status .false').hide();
+                        $('.status .true').show();
+                        $('.status').show();
+                        window.location.href = '/accounts/security/';
+
                     },
                     error: function (xhr) {
                         result = JSON.parse(xhr.responseText);
