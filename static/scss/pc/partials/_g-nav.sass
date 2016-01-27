@@ -165,8 +165,9 @@ $g-nav-height-fixed: 60px
   .g-samll-end
     float: right
     line-height: 34px
-    @media screen and (max-width: 1350px)
-      padding-right: 20px
+    @supports (-webkit-transform: scale(.8)) or (transform: scale(.8))
+      @media screen and (max-width: 1350px)
+        padding-right: 20px
 
   .samll-nav-hotline, .samll-nav-wechat, .samll-nav-app
     position: relative
@@ -305,12 +306,14 @@ $g-nav-height-fixed: 60px
 
   .leo-layout-left
     left: -140px
-    @media screen and (max-width: 1350px)
-      left: -110px
+    @supports (-webkit-transform: scale(.8)) or (transform: scale(.8))
+      @media screen and (max-width: 1350px)
+        left: -110px
   .leo-layout-right
     right: -140px
-    @media screen and (max-width: 1350px)
-      right: -115px
+    @supports (-webkit-transform: scale(.8)) or (transform: scale(.8))
+      @media screen and (max-width: 1350px)
+        right: -115px
 
   .leo-layout
     pointer-events: none
@@ -318,10 +321,11 @@ $g-nav-height-fixed: 60px
     height: 400px
     top: -34px
     z-index: 99999
-    @media screen and (max-width: 1350px)
-      top: -70px
-      -webkit-transform: scale(.8)
-      transform: scale(.8)
+    @supports (-webkit-transform: scale(.8)) or (transform: scale(.8))
+      @media screen and (max-width: 1350px)
+        top: -70px
+        -webkit-transform: scale(.8)
+        transform: scale(.8)
 
   .leo-ears
     left: 13px
