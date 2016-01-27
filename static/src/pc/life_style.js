@@ -4,17 +4,15 @@
 
 require.config({
   paths: {
-    'slim': 'lib/jquery.slimscroll',
     'scrollify': 'lib/jquery.fullPage.min',
     'videojs': 'lib/video.min'
   },
   shim: {
-    'slim': ['jquery'],
     'scrollify': ['jquery']
   }
 });
 
-require(['jquery','videojs','slim','scrollify'], function($, videojs, slim, scrollify) {
+require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   //视屏播放
   $('#really-cool-video').height(283);
   $('#really-cool-video2').height(283);
@@ -28,8 +26,7 @@ require(['jquery','videojs','slim','scrollify'], function($, videojs, slim, scro
   $('.show-box h1').css({"height":$(window).height()/3});
 
   $('#fullpage').fullpage({
-    normalScrollElements :'#main-box',
-    scrollOverflow : true
+    normalScrollElements :'#main-box'
   })
 
   var h_win = $(window).height();
