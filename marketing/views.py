@@ -3100,6 +3100,7 @@ class CustomerAccount2015ApiView(APIView):
                 account_dict['zc_ranking'] = zc_ranking
                 account_dict['tz_amount'] = 0
                 account_dict['income_reward'] = 0
+                account_dict['income_reward'] = 0
 
             profile = user.wanglibaouserprofile
             user_name = u'网利宝用户'
