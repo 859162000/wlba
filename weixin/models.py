@@ -173,13 +173,19 @@ class WeiXinChannel(models.Model):
 
 
 class QrCode(models.Model):
-    ACCOUNTS = (
+    if settings.ENV == settings.ENV_PRODUCTION:
+        ACCOUNTS = (
         ('gh_f758af6347b6', '网利宝服务号'),
         ('gh_77c09ff2f3a3', '网利宝订阅号'),
-        ('gh_32e9dc3fab8e', '王小青测试号'),
-        ('gh_3b82a2651647', '霍梅梅测试号'),
-        ('gh_9e8ff84237cd', '曹玉娇测试号'),
-    )
+        )
+    else:
+        ACCOUNTS = (
+            ('gh_9e8ff84237cd', '曹玉娇测试号'),
+            ('gh_32e9dc3fab8e', '王小青测试号'),
+            ('gh_3b82a2651647', '霍梅梅测试号'),
+            ('gh_d3d05c71a967', 'staging测试号'),
+        )
+
     account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True, choices=ACCOUNTS)
     ticket = models.CharField('ticket', max_length=512, null=False)
     expire_at = models.DateTimeField('ticket过期时间', auto_now_add=True, blank=True, null=True)

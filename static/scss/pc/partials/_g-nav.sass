@@ -4,27 +4,34 @@ $g-nav-height-fixed: 60px
 
 .g-nav-warp
   height: $g-nav-height
-  background: $bg-d3
+  background: #d13523
   position: relative
   z-index: 100
   -webkit-transform: translateZ(0)
-  border-bottom: 1px solid #e5e5e5
-  color: #474e5e
+  color: #fff
   .g-nav
     width: 1102px
     margin: 0 auto
     +clearfix()
+
+  .user-nav
+    &:link, &:visited
+      color: #fff
+    &:hover, &:active
+      color: #fff
+      cursor: pointer
+  .g-nav-user-nav
     a
       &:link, &:visited
         color: $bg-d1
       &:hover, &:active
         color: $t-d2
         cursor: pointer
-    a.highlight
-      color: $t-d2
+  a.highlight
+    color: #fff
   .g-logo-box
     width: 400px
-    height: 79px
+    height: 80px
     float: left
     img
       width: 100%
@@ -34,7 +41,7 @@ $g-nav-height-fixed: 60px
 
   .g-nav-box
     float: right
-    overflow: hidden
+    //overflow: hidden
     a
       position: relative
       float: left
@@ -43,6 +50,13 @@ $g-nav-height-fixed: 60px
       padding: 0 20px
       line-height: $g-nav-height
       height: $g-nav-height
+      &:hover
+        .link-name
+          color: #d13523
+        .reel-item
+          visibility: visible
+          .reel-body
+            width: 80px
     .nav-news
       position: absolute
       top: 14px
@@ -68,12 +82,17 @@ $g-nav-height-fixed: 60px
       display: inline-block
       vertical-align: middle
       margin: 0 5px
-    .icon-user
-      font-size: 30px
+    .user-icon-img, .user-icon-img-active
+      display: inline-block
+      width: 37px
+      height: 37px
+      background: url("/static/imgs/pc/nav/user.png") no-repeat center center
       vertical-align: middle
+    .user-icon-img-active
+      background: url("/static/imgs/pc/nav/user_active.png") no-repeat center center
     .icon-down
       font-size: $font-xs
-      color: #bfbfbf
+      color: #ffbbb3
       vertical-align: middle
   .g-nav-user-nav
     position: absolute
@@ -99,9 +118,13 @@ $g-nav-height-fixed: 60px
   height: $g-nav-height-fixed
   top: -$g-nav-height-fixed
   z-index: 100
+  .leo-layout
+    visibility: hidden
   +box-shadow(0 3px 6px rgba(0,0,0,.2))
+  .link-name
+    line-height: 62px
   .g-logo-box
-    height: 59px
+    height: 60px
     .logo_s
       display: block
     .logo_l
@@ -124,7 +147,7 @@ $g-nav-height-fixed: 60px
   width: 100%
   height: 35px
   border-bottom: 1px solid #e3e3e3
-  background: #fff
+  background: #fafafa
 
   .g-small-nav
     width: 1102px
@@ -132,7 +155,7 @@ $g-nav-height-fixed: 60px
     margin: 0 auto
     +clearfix()
     font-size: 12px
-    color: #282828
+    color: #999
 
   .g-samll-start
     height: 100%
@@ -150,23 +173,32 @@ $g-nav-height-fixed: 60px
   .samll-nav-hotline
     background: url("/static/imgs/pc/nav/hotline.png") no-repeat left center
     padding-left: 25px
-  .samll-nav-wechat
-    background: url("/static/imgs/pc/nav/wechat.png") no-repeat right center
-    padding-right: 28px
-    &:hover
-      background: url("/static/imgs/pc/nav/wechat_hover.png") no-repeat right center
-  .samll-nav-app
-    background: url("/static/imgs/pc/nav/app.png") no-repeat right center
-    padding-right: 28px
-    &:hover
-      background: url("/static/imgs/pc/nav/app_hover.png") no-repeat right center
+
+  .icon-weixin-version2, .icon-app
+    width: 20px
+    height: 19px
+    display: inline-block
+    vertical-align: middle 
+    background: url("/static/imgs/pc/nav/hovers.png") no-repeat right center
+    -webkit-transition: all 0.5s ease-in-out
+    -moz-transition: all 0.5s ease-in-out
+    -o-transition: all 0.5s ease-in-out
+    transition: all 0.5s ease-in-out
+    margin-left: 10px
+  .icon-weixin-version2
+    background-position: 0 0
+  .icon-app
+    background-position: 0 -88px
+
   .samll-nav-guide, .samll-nav-user, .samll-nav-logout
     position: relative
     display: inline-block
     padding: 0 10px
+    &:link, &:visited
+      color: #999
     &:hover
       color: #fff
-      background: #4e7cda
+      background: #db493f
 
   .samll-nav-guide, .samll-nav-user
     &:before
@@ -178,7 +210,12 @@ $g-nav-height-fixed: 60px
       height: 10px
       background: #e3e3e3
       margin-top: -5px
-
+  .samll-user-red
+    color: #db493f
+    &:link, &:visited
+      color: #db493f
+    &:hover
+      color: #fff
   .samll-wechat-hover
     display: none
     position: absolute
@@ -209,3 +246,372 @@ $g-nav-height-fixed: 60px
   &:hover
     .samll-wechat-hover
       display: block
+    .icon-weixin-version2
+      background-position: 0 -39px
+    .icon-app
+      background-position: 0 -127px
+
+.g-nav-multicolour-line
+  height: 1px
+  background: #d94943
+  background: -moz-linear-gradient(90deg,#a0c85e,#507dd7,#d94943, #ed862f, #f3cf54)
+  background: -webkit-gradient(linear,0% 0%, 0% 0%, from(#507dd7), to(#d94943))
+  background: -webkit-linear-gradient(90deg,#a0c85e,#507dd7,#d94943,#ed862f,#f3cf54  )
+  background: -o-linear-gradient(90deg,#a0c85e,#507dd7,#d94943,#ed862f,#f3cf54  )
+  background: -ms-linear-gradient(90deg,#a0c85e,#507dd7,#d94943, #ed862f, #f3cf54)
+  background: linear-gradient(90deg,#a0c85e,#507dd7,#d94943, #ed862f, #f3cf54)
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#507dd7', endColorstr='#d94943',GradientType=1)
+
+\:root
+  .g-nav-multicolour-line
+    filter: none
+
+//卷轴
+.link-name
+  position: relative
+  z-index: 33
+  color: #fff
+  line-height: 82px
+.reel-item
+  visibility: hidden
+  position: absolute
+  top: 0
+  left: 50%
+  width: 94px
+  margin-left: -47px
+  z-index: 22
+  span
+    display: inline-block
+  .reel
+    width: 7px
+    height: 45px
+    background: url("/static/imgs/pc/newyear/hover_icon.png") no-repeat center center
+    vertical-align: middle
+  .reel-body
+    width: 0px
+    height: 32px
+    background: #f7caab
+    vertical-align: middle
+    transition: width .6s
+
+//狮子头动画
+.g-year-layout
+  position: relative
+
+  .leo-layout,.leo-ears, .leo-face, .leo-before, .leo-light, .couplet
+    position: absolute
+
+  .leo-layout-left
+    left: -130px
+  .leo-layout-right
+    right: -130px
+  .leo-layout
+    pointer-events: none
+    width: 160px
+    height: 400px
+    top: -34px
+    z-index: 99999
+
+  .leo-ears
+    left: 13px
+    width: 132px
+    height: 102px
+    background: url("/static/imgs/pc/newyear/leo_ears.png") no-repeat center center
+    z-index: 3
+  .leo-face
+    top: 5px
+    left: 10px
+    width: 138px
+    height: 122px
+    background: url("/static/imgs/pc/newyear/leo_face.png") no-repeat center center
+    z-index: 5
+  .leo-before
+    top: 88px
+    left: 16px
+    width: 123px
+    height: 66px
+    background: url("/static/imgs/pc/newyear/leo_before.png") no-repeat center center
+    z-index: 2
+  .leo-light
+    top: 120px
+    width: 25px
+    height: 77px
+    background: url("/static/imgs/pc/newyear/leo_light.png") no-repeat center center
+    z-index: 1
+  .light-right
+    right: 4px
+  .couplet-warp
+    position: absolute
+    top: 65px
+    left: 18px
+    width: 119px
+    height: 500px
+    overflow: hidden
+    z-index: 4
+  .couplet
+    width: 119px
+    height: 500px
+    top: 0
+    left: 0
+    -webkit-transform: translate3d(0, -420px, 0)
+    transform: translate3d(0, -420px, 0)
+
+  .couplet-left
+    background: url("/static/imgs/pc/newyear/couplet_left.png") no-repeat center center
+  .couplet-right
+    background: url("/static/imgs/pc/newyear/couplet_right.png") no-repeat center center
+
+.g-new-year-bottom-warp
+  display: none
+  position: fixed
+  bottom: 0
+  left: 0
+  width: 100%
+  z-index: 99999
+  .new-year-bottom-left
+    position: absolute
+    left: 0
+    bottom: 0
+    display: block
+    width: 697px
+    height: 289px
+
+  .new-year-bottom-right
+    position: absolute
+    right: 0
+    bottom: 0
+    display: block
+    width: 517px
+    height: 256px
+.leo-imgs
+  display: none
+
+.new-year-animate-active, .new-year-animate-even
+  .leo-ears
+    animation-name: leoEars
+    -webkit-animation-name: leoEars
+    animation-duration: .5s
+    -webkit-animation-duration: .5s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+  .leo-face
+    animation-name: leoFace
+    -webkit-animation-name: leoFace
+    animation-duration: .5s
+    -webkit-animation-duration: .5s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+  .light-left
+    animation-name: leoLightLeft
+    -webkit-animation-name: leoLightLeft
+    animation-duration: .5s
+    -webkit-animation-duration: .5s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+  .light-right
+    animation-name: leoLightRight
+    -webkit-animation-name: leoLightRight
+    animation-duration: .5s
+    -webkit-animation-duration: .5s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+  .couplet
+    animation-name: couplet
+    -webkit-animation-name: couplet
+    animation-duration: 2s
+    -webkit-animation-duration: 2s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+  .leo-before
+    animation-name: leoBefore
+    -webkit-animation-name: leoBefore
+    animation-duration: .5s
+    -webkit-animation-duration: .5s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+.new-year-animate-even
+  .couplet
+    animation-name: coupletEven
+    -webkit-animation-name: coupletEven
+    animation-duration: 2s
+    -webkit-animation-duration: 2s
+    animation-timing-function: linear
+    -webkit-animation-timing-function: linear
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+
+@-webkit-keyframes leoEars
+  0%, 50%, 100%
+    -webkit-transform: rotate3d(0, 0, 1, 0deg)
+    transform: rotate3d(0, 0, 1, 0deg)
+  25%
+    -webkit-transform: rotate3d(0, 0, 1,6deg)
+    transform: rotate3d(0, 0, 1,6deg)
+  75%
+    -webkit-transform: rotate3d(0, 0,1, -6deg)
+    transform: rotate3d(0, 0, 1,-6deg)
+
+@keyframes leoEars
+  0%, 50%, 100%
+    -webkit-transform: rotate3d(0, 0, 1, 0deg)
+    transform: rotate3d(0, 0, 1, 0deg)
+  25%
+    -webkit-transform: rotate3d(0, 0, 1,6deg)
+    transform: rotate3d(0, 0, 1,6deg)
+  75%
+    -webkit-transform: rotate3d(0, 0,1, -6deg)
+    transform: rotate3d(0, 0, 1,-6deg)
+
+@-webkit-keyframes leoFace
+  0%, 50%, 100%
+    -webkit-transform: rotate3d(0, 0, 1, 0deg)
+    transform: rotate3d(0, 0, 1, 0deg)
+  25%
+    -webkit-transform: rotate3d(0, 0, 1, -10deg)
+    transform: rotate3d(0, 0, 1, -10deg)
+  75%
+    -webkit-transform: rotate3d(0, 0,1, 10deg)
+    transform: rotate3d(0, 0, 1,10deg)
+
+@keyframes leoFace
+  0%, 50%, 100%
+    -webkit-transform: rotate3d(0, 0, 1, 0deg)
+    transform: rotate3d(0, 0, 1, 0deg)
+  25%
+    -webkit-transform: rotate3d(0, 0, 1, -10deg)
+    transform: rotate3d(0, 0, 1, -10deg)
+  75%
+    -webkit-transform: rotate3d(0, 0,1, 10deg)
+    transform: rotate3d(0, 0, 1,10deg)
+
+
+@-webkit-keyframes leoLightLeft
+  0%, 50%, 100%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+  25%
+    -webkit-transform: translate3d(6px, 6px, 0)
+    transform: translate3d(6px, 6px, 0)
+  75%
+    -webkit-transform: translate3d(-6px, -6px, 0)
+    transform: translate3d(-6px, -6px, 0)
+
+@keyframes leoLightLeft
+  0%, 50%, 100%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+  25%
+    -webkit-transform: translate3d(6px, 6px, 0)
+    transform: translate3d(6px, 6px, 0)
+  75%
+    -webkit-transform: translate3d(-6px, -6px, 0)
+    transform: translate3d(-6px, -6px, 0)
+
+@-webkit-keyframes leoLightRight
+  0%, 50%, 100%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+  25%
+    -webkit-transform: translate3d(6px, -6px, 0)
+    transform: translate3d(6px, -6px, 0)
+  75%
+    -webkit-transform: translate3d(-6px, 6px, 0)
+    transform: translate3d(-6px, 6px, 0)
+
+@keyframes leoLightRight
+  0%, 50%, 100%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+  25%
+    -webkit-transform: translate3d(6px, -6px, 0)
+    transform: translate3d(6px, -6px, 0)
+  75%
+    -webkit-transform: translate3d(-6px, 6px, 0)
+    transform: translate3d(-6px, 6px, 0)
+
+
+@-webkit-keyframes couplet
+
+  0%
+    -webkit-transform: translate3d(0, -420px, 0)
+    transform: translate3d(0, -420px, 0)
+
+  75%
+    -webkit-transform: translate3d(0, -5px, 0)
+    transform: translate3d(0, -5px, 0)
+
+  90%
+    -webkit-transform: translate3d(0, 5px, 0)
+    transform: translate3d(0, 5px, 0)
+
+  to
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+
+@keyframes couplet
+  0%
+    -webkit-transform: translate3d(0, -420px, 0)
+    transform: translate3d(0, -420px, 0)
+
+  75%
+    -webkit-transform: translate3d(0, -5px, 0)
+    transform: translate3d(0, -5px, 0)
+
+  90%
+    -webkit-transform: translate3d(0, 5px, 0)
+    transform: translate3d(0, 5px, 0)
+
+  to
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+
+@-webkit-keyframes coupletEven
+
+  0%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+
+  to
+    -webkit-transform: translate3d(0, -420px, 0)
+    transform: translate3d(0, -420px, 0)
+
+@keyframes coupletEven
+  0%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+
+  to
+    -webkit-transform: translate3d(0, -420px, 0)
+    transform: translate3d(0, -420px, 0)
+
+@-webkit-keyframes leoBefore
+  0%, 100%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+  50%
+    -webkit-transform: translate3d(0, -4px, 0)
+    transform: translate3d(0, -4px, 0)
+
+@keyframes leoBefore
+  0%, 100%
+    -webkit-transform: translate3d(0, 0, 0)
+    transform: translate3d(0, 0, 0)
+  50%
+    -webkit-transform: translate3d(0, -4px, 0)
+    transform: translate3d(0, -4px, 0)

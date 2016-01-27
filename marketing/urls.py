@@ -83,6 +83,7 @@ urlpatterns = patterns(
     url(r'^life_style/$', TemplateView.as_view(template_name="life_style.jade")),
     url(r'^two-novice/$', TemplateView.as_view(template_name="two-novice.jade")),
     url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
+    url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
 
 
 )
@@ -178,7 +179,6 @@ urlpatterns += patterns(
     url(r'^app_xunlei/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunlei.jade")),
     url(r'^app_send_reward/$', TemplateView.as_view(template_name="app_send_reward.jade")),
     url(r'^app_january_reward/$', TemplateView.as_view(template_name="app_january_reward.jade")),
-    url(r'^new_year_feast/$', TemplateView.as_view(template_name="new_year_feast.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
     url(r'^weixin_mammon/$', TemplateView.as_view(template_name="h5_mammon.jade")),
