@@ -1867,9 +1867,9 @@ class QMBanquetRewardAPI(APIView):
                                     return Response({"ret_code":6,"message":messege})
                                 redpack_text = "None"
                                 if redpack_event.rtype == 'interest_coupon':
-                                    redpack_text = "%s%%加息券"%int(redpack_event.amount)
+                                    redpack_text = "%s%%加息券"%redpack_event.amount
                                 if redpack_event.rtype == 'percent':
-                                    redpack_text = "%s%%百分比红包"%int(redpack_event.amount)
+                                    redpack_text = "%s%%百分比红包"%redpack_event.amount
                                 if redpack_event.rtype == 'direct':
                                     redpack_text = "%s元红包"%int(redpack_event.amount)
                                 redpack_txts.append(redpack_text)
@@ -1880,7 +1880,7 @@ class QMBanquetRewardAPI(APIView):
                             experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
                             if not experience_record_id:
                                 return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
-                            redpack_txts.append('%s元体验金'%experience_event.amount)
+                            redpack_txts.append('%s元体验金'%int(experience_event.amount))
                             experience_record_ids+=str(experience_record_id)
                             gift_record.experience_record_ids = experience_record_ids
                     gift_record.activity_code = self.activity.code
