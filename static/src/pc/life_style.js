@@ -16,9 +16,13 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   //视屏播放
 //  $('#really-cool-video').height(283);
 //  $('#really-cool-video2').height(283);
-  var player = videojs('really-cool-video', { /* Options */ }, function() {
+//  var player = videojs('really-cool-video', { /* Options */ }, function() {
 //    console.log('Good to go!');
-  });
+//  });
+
+  $('.tv-box1').on('click',function(){
+    $(this).children('.black').hide()
+  })
 
   //判断高度
   var _index = $(".section").length-1;
