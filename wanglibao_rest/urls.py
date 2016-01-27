@@ -48,7 +48,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, AccessUserExistsApi, LandOpenApi, CoopPvApi)
+                            BidHasBindingForChannel, AccessUserExistsApi, LandOpenApi, CoopPvApi, OauthUserRegisterApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -297,14 +297,6 @@ urlpatterns += patterns(
 )
 
 
-from .views import RegisterOpenApiView
-
-
-urlpatterns += patterns(
-    '',
-    url(r'^access_user/register/$', RegisterOpenApiView.as_view()),
-)
-
 # 理财金接口
 urlpatterns += patterns(
     '',
@@ -346,4 +338,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
+)
+
+# oauth用户注册接口
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/register/$', OauthUserRegisterApi.as_view()),
 )

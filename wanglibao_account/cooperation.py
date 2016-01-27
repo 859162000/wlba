@@ -55,10 +55,10 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, YZCJ_CALL_BACK_URL, YZCJ_COOP_KEY,\
-     XUNLEIVIP_LOGIN_URL
+     XUNLEIVIP_LOGIN_URL, RENRENLI_CALL_BACK_URL, RENRENLI_COOP_ID, RENRENLI_COOP_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback
+                                    xunleivip_callback, common_callback_for_post
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -74,8 +74,18 @@ import urllib
 from .utils import xunleivip_generate_sign
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 from wanglibao_oauth2.models import OauthUser, Client
+import json
 
 logger = logging.getLogger('wanglibao_cooperation')
+
+
+def get_client(channel_code):
+    try:
+        client = Client.objects.get(channel__code=channel_code)
+    except Client.DoesNotExist:
+        client = None
+
+    return client
 
 
 def get_uid_for_coop(user_id):
@@ -356,10 +366,6 @@ class CoopRegister(object):
         self.save_to_binding(user)
         self.save_to_oauthuser(user)
         self.register_call_back(user)
-        if user.wanglibaouserprofile.utype != '3':
-            self.save_to_binding(user)
-            self.register_call_back(user)
-
         self.clear_session()
 
     @property
@@ -1664,6 +1670,116 @@ class BaJinSheRegister(CoopRegister):
         self.bajinshe_call_back(user, order_id)
 
 
+class RenRenLiRegister(CoopRegister):
+    def __init__(self, request):
+        super(RenRenLiRegister, self).__init__(request)
+        self.c_code = 'renrenli'
+        self.coop_id = RENRENLI_COOP_ID
+        self.coop_key = RENRENLI_COOP_KEY
+        self.call_back_url = RENRENLI_CALL_BACK_URL
+        self.external_channel_client_id_key = 'Cust_id'
+        self.external_channel_user_key = 'Phone'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_sign_key = 'Sign'
+        self.internal_channel_sign_key = 'sign'
+        self.external_channel_access_token_key = 'Access_tokens'
+        self.internal_channel_access_token_key = 'access_token'
+        self.external_channel_user_id_key = 'Cust_key'
+        self.internal_channel_user_id_key = 'c_user_id'
+
+    def save_to_session(self):
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
+        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
+        access_token = self.request.REQUEST.get(self.external_channel_access_token_key, None)
+        sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
+        c_user_id = self.request.REQUEST.get(self.external_channel_user_id_key, None)
+
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+            self.request.session[self.internal_channel_phone_key] = channel_user
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+        if access_token:
+            self.request.session[self.internal_channel_access_token_key] = access_token
+
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        if c_user_id:
+            self.request.session[self.internal_channel_user_id_key] = c_user_id
+
+    def clear_session(self):
+        super(RenRenLiRegister, self).clear_session()
+        self.request.session.pop(self.internal_channel_client_id_key, None)
+        self.request.session.pop(self.internal_channel_access_token_key, None)
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_user_id_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = get_uid_for_coop(user.id)
+        channel_name = self.channel_name
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+
+    def purchase_call_back(self, user, order_id):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            p2p_record = P2PRecord.objects.filter(user_id=user.id,
+                                                  order_id=order_id,
+                                                  catalog=u'申购').select_related('product').first()
+
+            channel_code = binding.btype
+            client = get_client(channel_code)
+            if not client:
+                logger.info("%s purchase call back failed with wrong not found client" % channel_code)
+                return
+
+            if p2p_record:
+                user_profile = WanglibaoUserProfile.objects.filter(user_id=user.id).first()
+                phone = user_profile.phone if user_profile else ''
+                data = {
+                    'User_name': phone,
+                    'Order_no': order_id,
+                    'Pro_name': p2p_record.product.name,
+                    'Pro_id': p2p_record.product.id,
+                    'Invest_money': float(p2p_record.amount),
+                    'Rate': p2p_record.product.expected_earning_rate,
+                    'Invest_start_date': int(time.mktime(p2p_record.create_time.timetuple())),
+                    'Invest_end_date': int(time.mktime(p2p_record.product.end_time.timetuple())),
+                    # 'Back_money': '',
+                    # 'Back_last_date': '',
+                    'Cust_key': binding.bid,
+                }
+
+                params = {
+                    'Data': json.dumps([data]),
+                    'Cust_id': client.client_id,
+                    'Sign_type': 'MD5',
+                    'Sign': hashlib.md5(self.coop_id+self.coop_key+client.client_id+client.client_secret).hexdigest(),
+                }
+
+                common_callback_for_post.apply_async(
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
@@ -1671,7 +1787,8 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister, BaJinSheRegister,]
+                          YZCJRegister, RockFinanceRegister, BaJinSheRegister,
+                          RenRenLiRegister,]
 
 
 #######################第三方用户查询#####################
@@ -4038,3 +4155,37 @@ class XiguaP2PQueryView(APIView):
             ret['dataList'] = data_list
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class CoopAmortizationCallback(object):
+    """
+    渠道用户标的回款后第三方回调处理
+    """
+    def __init__(self):
+        self.c_code = None
+
+    def amortization_call_back(self, user, order_id):
+        pass
+
+    @property
+    def processors(self):
+        return [processor_class() for processor_class in coop_processor_classes]
+
+    def get_user_channel_processor(self, user):
+        """
+        返回该用户的渠道处理器
+        """
+        channel = get_user_channel_record(user.id)
+        if channel:
+            channel_code = channel.code
+            for channel_processor in self.processors:
+                if channel_processor.c_code == channel_code:
+                    return channel_processor
+
+    def process_for_purchase(self, user, order_id):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.purchase_call_back(user, order_id)
+        except:
+            logger.exception('channel bind purchase process error for user %s'%(user.id))

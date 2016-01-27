@@ -65,9 +65,25 @@ from weixin.util import bindUser
 from wanglibao_account.utils import Crypto
 from wanglibao.views import landpage_view
 import urllib
+from wanglibao_oauth2.forms import OauthUserRegisterForm
+from wanglibao_oauth2.views import create_access_token
+from wanglibao_account.cooperation import get_uid_for_coop
 
 
 logger = logging.getLogger('wanglibao_rest')
+
+
+def generate_random_password(length):
+    if length < 0:
+        raise Exception(u"生成随机密码的长度有误")
+
+    random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    password = ""
+    index = 0
+    while index < length:
+            password += str(random_list[randint(0,len(random_list)-1)])
+            index += 1
+    return password
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -222,18 +238,6 @@ class WeixinSendRegisterValidationCodeView(APIView):
 class RegisterAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
-    def generate_random_password(self, length):
-        if length < 0:
-            raise Exception("生成随机密码的长度有误")
-
-        random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = ""
-        index = 0
-        while index < length:
-                password += str(random_list[randint(0,len(random_list)-1)])
-                index += 1
-        return password
-
     def post(self, request, *args, **kwargs):
         """ 
             modified by: Yihen@20150812
@@ -251,7 +255,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         password = password.strip()
         validate_code = validate_code.strip()
         if request.DATA.get('IGNORE_PWD', '') and not password:
-            password = self.generate_random_password(6)
+            password = generate_random_password(6)
             logger.debug('系统为用户 %s 生成的随机密码是：%s' % (identifier, password))
 
         if not identifier or not password or not validate_code:
@@ -1357,167 +1361,6 @@ class GuestCheckView(APIView):
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
 
 
-import hashlib
-from random import randint
-
-from django.contrib.auth import authenticate
-
-from wanglibao_account.utils import create_user
-from wanglibao_oauth2.models import Client
-
-
-def generate_random_password(length=6):
-    length = int(length)
-
-    if length <= 0:
-        raise Exception(u'密码长度不能小于或等于0')
-
-    return ''.join([str(randint(0, 9)) for i in range(length)])
-
-
-class RegisterOpenApiView(APIView):
-    permission_classes = ()
-
-    def _generate_sign(self, client_id, identifier, key):
-        return hashlib.md5(client_id+identifier+key).hexdigest()
-
-    def _cleaned_sign(self, client_id, identifier, key, sign):
-        response_data = {}
-        _sign = self._generate_sign(client_id, identifier, key)
-
-        if _sign != sign:
-            response_data = {
-                'code': '40008',
-                'message': u'签名错误'
-            }
-
-        return response_data
-
-    def _cleaned_identifier(self, identifier):
-        """
-        since identifier must be a phone number
-        So checking the format here is important
-        """
-
-        response_data = {}
-        users = None
-
-        identifier_type = detect_identifier_type(identifier)
-
-        if identifier_type == 'phone':
-            users = User.objects.filter(wanglibaouserprofile__phone=identifier)
-        else:
-            response_data = {
-                'code': '40002',
-                'message': u'不是有效的手机号'
-            }
-
-        if users and len(users) != 0:
-            response_data = {
-                'code': '40003',
-                'message': u'该手机号已被注册'
-            }
-
-        return response_data
-
-    def _clean_validate_code(self, identifier, v_code):
-        identifier_type = detect_identifier_type(identifier)
-        response_data = {}
-
-        if identifier_type == 'phone':
-            phone = identifier
-            _status, message = validate_validation_code(phone, v_code)
-
-            if _status != 200:
-                response_data = {
-                    'code': '40000',
-                    'message': u'验证码错误'
-                }
-
-        return response_data
-
-    def cleaned_data(self, client_id, sign, identifier, v_code):
-        if not client_id:
-            response_data = {
-                'code': '40005',
-                'message': u'平台标识不能为空'
-            }
-        elif not sign:
-            response_data = {
-                'code': '40007',
-                'message': u'签名不能为空'
-            }
-        elif not identifier:
-            response_data = {
-                'code': '40001',
-                'message': u'用户名不能为空'
-            }
-        elif not v_code:
-            response_data = {
-                'code': '40009',
-                'message': u'验证码不能为空'
-            }
-        else:
-            response_data = self._cleaned_identifier(identifier)
-            if not response_data:
-                response_data = self._clean_validate_code(identifier, v_code)
-
-                if not response_data:
-                    try:
-                        client = Client.objects.get(client_id=client_id)
-                    except Client.DoesNotExist:
-                        return {
-                            'code': '40006',
-                            'message': u'无效平台标识'
-                        }
-
-                    client_id = client.client_id
-                    client_secret = client.client_secret
-                    response_data = self._cleaned_sign(client_id, identifier, client_secret, sign)
-
-        return response_data
-
-    def post(self, request):
-        data = request.POST
-        client_id = data.get('client_id', '').strip()
-        sign = data.get('signature', '').strip()
-        identifier = data.get('identifier', '').strip()
-        v_code = data.get('validate_code', '').strip()
-
-        response_data = self.cleaned_data(client_id, sign, identifier, v_code)
-        if not response_data:
-            password = generate_random_password()
-            user = create_user(identifier, password, '')
-
-            if user:
-                # 处理第三方渠道的用户信息
-                # CoopRegister(request).all_processors_for_user_register(user, invite_code)
-
-                # 防作弊处理
-                # if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
-                #     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
-
-                response_data = {
-                    'code': '10000',
-                    'message': u'success',
-                    'usn': identifier,
-                    'user_id': user.id
-                }
-
-                # 向用户发送随机生成的注册密码的短信消息
-                send_messages.apply_async(kwargs={
-                    "phones": [identifier, ],
-                    "messages": [password, ]
-                })
-            else:
-                response_data = {
-                    'code': '40010',
-                    'message': u'用户创建失败'
-                }
-
-        return HttpResponse(renderers.JSONRenderer().render(response_data,
-                                                            'application/json'))
-
 class InnerSysHandler(object):
     def ip_valid(self, request):
         INNER_IP = ("182.92.179.24", "10.171.37.235")
@@ -1828,3 +1671,66 @@ class CoopPvApi(APIView):
             'message': 'failed',
         }
         return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+
+
+class OauthUserRegisterApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        data = request.session
+        form = OauthUserRegisterForm(data)
+        if form.is_valid():
+            sign = form.cleaned_data['sign']
+            if form.check_sign(sign):
+                phone = form.cleaned_data['phone']
+                channel_code = form.cleaned_data['channel_code']
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                client = form.get_client()
+                if user:
+                    device = split_ua(request)
+                    if device['device_type'] == "pc":
+                        auth_user = authenticate(identifier=phone, password=password)
+                        auth_login(request, auth_user)
+
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    tid = get_uid_for_coop(user.id)
+                    callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
+                    response_data = {
+                        'Code': 101,
+                        'message': u'成功',
+                        'Cust_key': tid,
+                        'Access_tokens': create_access_token(user, client).token,
+                        'Callback_url': callback_url,
+                    }
+
+                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+                else:
+                    response_data = {
+                        'Code': 10009,
+                        'message': u'注册失败',
+                    }
+            else:
+                response_data = {
+                    'Code': 10008,
+                    'message': u'签名错误',
+                }
+        else:
+            form_errors = form.errors
+            form_error_keys = form_errors.keys()
+            form_error = form_errors[form_error_keys[0]][0]
+            response_data = {
+                'Code': 10010,
+                'message': form_error,
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

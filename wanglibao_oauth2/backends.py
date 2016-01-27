@@ -46,3 +46,21 @@ class AccessTokenBackend(ModelBackend):
             return None
         else:
             return user
+
+
+class AccessTokenBackendV2(ModelBackend):
+    """
+    Authenticate a user via access token and client object.
+    """
+
+    def authenticate(self, token, user_id):
+        print token, user_id, ">>>>>>>>>>>>>>"
+        try:
+            user = AccessToken.objects.get(token=token,
+                                           expires__gt=now(),
+                                           user_id=user_id
+                                           ).user
+        except AccessToken.DoesNotExist:
+            return None
+        else:
+            return user
