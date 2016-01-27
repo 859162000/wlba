@@ -1,0 +1,42 @@
+doctype html
+html(style='background:#f5f5f5;height:100%;overflow:hidden;')
+  head
+    title 2015投资记
+    include include/app_header.jade
+  body(style='position: relative;height: 100%;')
+    .refresh(style='position:fixed;top:0;left:0;padding: .5rem; background: #ccc;color: #fff;z-index:10; display:none;') 刷新
+    .client-loding-warp
+      .client-loading-center
+        .client-loading.swiper-slide-active
+          .loading-animate
+          .loading-aue 数据统计中..等一等！
+
+    .client-finance
+      .swiper-container.swiper-container-vertical
+        .swiper-wrapper
+          //第九页
+          .swiper-slide.swiper-other.swiper-white
+            .finance-model9
+              .share-page-head
+                img(src='/static/imgs/app/finance/share_logo.png').share-logo
+                .share-head-title 2015年我的荣誉标签
+              .share-tv-warp
+                .share-tv
+                  .touch-icon
+                  .tv-cont
+                    .tv-cont-title
+                      span.tv-title 神经兮兮
+                    .tv-cont-dec 总是看起来神叨叨的，对理财那点事非常敏感，总是不停地在规避自己眼中的“危险”。别人笑我太疯癫，我笑别人太天真。
+                .tv-use-dec 点击观看查看自己的名号吧！
+              .share-page-look
+            .last-layout
+              a(href='http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653').finance-mode-btnl-aue.ele-txt 查看我的投资记
+              .finance-last-message.ele-txt2 来网利宝APP，查看2015年投资记录
+            img(src='/static/imgs/app/finance/earth_lion2_default.png').finance-earth.finance-earth-efault
+    // banner javascript
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(src='/static/scripts/app/dist/finance_share.js?v=2015122181')
+    script.
+      var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+      document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F55fcf0f3d843f47b4785c7ec44de129c' type='text/javascript'%3E%3C/script%3E"));

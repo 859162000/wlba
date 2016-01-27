@@ -217,7 +217,8 @@ class IndexView(TemplateView):
             'announcements': annos,
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
-            'p2p_total_asset': float(p2p_total_asset + fund_total_asset)
+            'p2p_total_asset': float(p2p_total_asset + fund_total_asset),
+            'index': True
         }
 
     def get(self, request, *args, **kwargs):

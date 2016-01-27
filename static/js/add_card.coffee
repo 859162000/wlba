@@ -114,7 +114,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         type: 'post'
       }
       .done (xhr)->
-        if xhr.ret_code == 0
+        if xhr.ret_code == 0 || xhr.ret_code == 2200
           location.reload()
         else
          tool.modalAlert({title: '温馨提示', msg: xhr.message})

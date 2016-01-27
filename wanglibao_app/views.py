@@ -5,6 +5,7 @@ __author__ = 'zhanghe'
 
 import logging
 import json
+import base64
 
 from datetime import datetime, timedelta
 from marketing.models import IntroducedBy
@@ -38,7 +39,8 @@ from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
 from wanglibao_sms import messages as sms_messages
 from wanglibao_sms.utils import send_validation_code
-from wanglibao_sms.tasks import send_messages
+# from wanglibao_sms.tasks import send_messages
+from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
@@ -50,6 +52,10 @@ from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
+import re
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +151,7 @@ class AppActivateImageAPIView(APIView):
             link_dest = activate.link_dest
             if img_url:
                 invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
-                if activate.user_invest_limit==-1 or (activate.user_invest_limit==0 and not invest_flag) or (activate.user_invest_limit==1 and invest_flag):
+                if activate.user_invest_limit=='-1' or (activate.user_invest_limit=='0' and not invest_flag) or (activate.user_invest_limit=='1' and invest_flag):
                     img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
                     return Response({'ret_code': 0,
                                      'message': 'ok',
@@ -599,7 +605,9 @@ class SendValidationCodeView(APIView):
         if not res:
             return Response({"ret_code": 40044, "message": message})
 
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         if status != 200:
             return Response({"ret_code": 30044, "message": message})
 
@@ -759,7 +767,10 @@ class AppPhoneBookAlertApiView(APIView):
             # 投资提醒
             if int(flag) == 1:
                 if not (user_book.alert_at and user_book.alert_at > local_to_utc(datetime.now(), 'min')):
-                    self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
+                    # self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
+                    # 邀请投资提醒短信
+                    # 模板中的参数变量必须以 name=value 的形式传入
+                    PHPSendSMS().send_sms_one(5, phone, 'phone',  name=send_name)
                     user_book.alert_at = timezone.now()
                     user_book.is_used = True
                     user_book.save()
@@ -773,7 +784,10 @@ class AppPhoneBookAlertApiView(APIView):
                     user_book.save()
 
                 if not user_book.is_register and not (user_book.invite_at and user_book.invite_at > local_to_utc(datetime.now(), 'min')):
-                    self._send_sms(phone, sms_messages.sms_alert_invite(name=send_name, phone=profile.phone))
+                    # 邀请注册提醒短信
+                    # 模板中的参数变量必须以 name=value 的形式传入
+                    aws = base64.b64encode(profile.phone)[0:-1]
+                    PHPSendSMS().send_sms_one(6, phone, 'phone', name=send_name, aws=aws)
                     user_book.invite_at = timezone.now()
                     user_book.save()
 
@@ -782,16 +796,10 @@ class AppPhoneBookAlertApiView(APIView):
             logger.error(e.message)
             return Response({'ret_code': 20003, 'message': u'内部程序错误'})
 
-    def _send_sms(self, phone, sms):
-        send_messages.apply_async(kwargs={
-            'phones': [phone],
-            'messages': [sms],
-            'ext': 666  # 营销类短信发送必须增加ext参数,值为666
-        })
-
 
 class AppInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
+
     def post(self, request, **kwargs):
         dic = account_backends.broker_invite_list(request.user)
         users = dic['users']
@@ -991,6 +999,25 @@ class AppDataModuleView(TemplateView):
 
     """ 数据魔方 """
     template_name = 'client_data_cube.jade'
+
+class AppFinanceView(TemplateView):
+
+    """ 投资记 """
+    template_name = 'client_animate_finance.jade'
+
+    def get(self, request, *args, **kwargs):
+
+        device_list = ['wlbapp']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return super(AppFinanceView, self).get(request, *args, **kwargs)
+        #return super(AppFinanceView, self).get(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse('app_finance'))
+
+
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'

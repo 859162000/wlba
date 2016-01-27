@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -249,14 +249,25 @@ org.ajax({
     url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
     success: function (data) {
-        if (data.ret_code == 10001) {
+        if (data.ret_code == 10000) {
+            org.ajax({
+                url: '/api/has_binding/xunlei9/' + xid + '/',
+                type: 'GET',
+                success: function (data1) {
+                    if (data1.ret_code == 10001) {
+                        $('.xunmeng3').show();
+                        $('.maimai-form').hide();
+                    }
+                }
+            })
+        }else{
             $('.xunmeng3').show();
             $('.maimai-form').hide();
         }
     }
 });
 org.ajax({
-    url: '/api/coop_pv/xunlei9/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
+    url: '/api/coop_pv/' + token + '/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
     type: "GET"
 });
 
@@ -462,7 +473,7 @@ org.xunlei = (function (org) {
                     }
                 }
                 ops = {
-                    url: '/api/register/?promo_token=xunlei9',
+                    url: '/api/register/',
                     type: 'POST',
                     data: {
                         'identifier': _self.$phone.val(),

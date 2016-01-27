@@ -10,6 +10,10 @@ from rest_framework.response import Response
 from weixin.util import _generate_ajax_template
 from .utils import get_queryset_paginator, get_sorts_for_activity_show
 from django.db.models import Q
+from wanglibao_account import message as inside_message
+from experience_gold.backends import SendExperienceGold
+from wanglibao_redpack import backends as redpack_backends
+import json
 
 class WeixinGGLTemplate(TemplateView):
     template_name = ''
@@ -125,16 +129,20 @@ class PcActivityAreaView(TemplateView):
                                                     ).select_related('activity')
 
         activity_list = get_sorts_for_activity_show(activity_list)
-
-        banner = ActivityBannerPosition.objects.all().select_related().first()
-
+        now =timezone.now()
+        main_banner = ActivityBannerPosition.objects.filter(main__start_at__lte=now, main__end_at__gt=now).select_related().first()
+        left_banner = ActivityBannerPosition.objects.filter(second_right__start_at__lte=now, second_right__end_at__gt=now).select_related().first()
+        right_banner = ActivityBannerPosition.objects.filter(second_right__start_at__lte=now, second_right__end_at__gt=now).select_related().first()
         limit = 6
         page = 1
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
-
+        print ">>>>>>>>>>", main_banner, left_banner, right_banner
         return {
-            'banner': banner,
+            'main_banner': main_banner,
+            'left_banner': left_banner,
+            'right_banner': right_banner,
+
             'results': activity_list[:limit],
             'all_page': all_page,
             'page': page,
@@ -182,6 +190,62 @@ class ActivityAreaApi(APIView):
             'list_count': data_count
         })
 
+
+class AutoDistributeRewardAPIView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        user = request.user
+        if not user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登陆，请先登陆',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        activity = request.POST.get('activity', None)
+        from wanglibao_reward.models import WanglibaoActivityReward
+
+        rewards = WanglibaoActivityReward.objects.filter(acitivity=activity, is_used=False)
+        if not rewards:
+            to_json_response = {
+                'ret_code': 1001,
+                'message': u'用户的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        reward = rewards.first()
+        if reward.reward:
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": reward.reward.type,
+                "content": reward.reward.content,
+                "mtype": "activity"
+            })
+            reward.reward.is_used = True
+            reward.reward.save()
+
+
+        if reward.experience_glod:
+            SendExperienceGold(request.user).send(reward.experience_glod.id)
+
+        if reward.redpack_event:
+            redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
+
+        reward.has_sent = True
+
+        to_json_response = {
+            'ret_code': 0,
+            'message': u'发送奖品',
+            'reward': reward.reward.content if reward.reward else None,
+            'redpack': reward.redpack_event.amount if reward.redpack_event else None,
+            'exp_glod': reward.experience_glod.amount if reward.experience_glod else None,
+            'left': rewards.count()-1,
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 # class ActivityDetailView(TemplateView):
 #     def get_context_data(self, platform, id, **kwargs):

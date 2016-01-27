@@ -80,6 +80,9 @@ class Activity(models.Model):
     product_ids = models.CharField(u'指定产品ID', max_length=200, blank=True, default='',
                                    help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
+    is_lottery = models.BooleanField(u'是否为抽奖活动', default=False)
+    chances = models.IntegerField(u'抽奖次数', default=0, blank=True, null=True)
+    rewards = models.IntegerField(u'获奖次数', default=0, blank=True, null=True)
     channel = models.CharField(u'渠道名称', max_length=800, blank=True,
                                help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao-other，多个渠道用英文逗号间隔')
     is_all_channel = models.BooleanField(u'所有渠道', default=False, help_text=u'如果勾选“所有渠道”，则系统不再限定渠道')
@@ -111,6 +114,8 @@ class Activity(models.Model):
             raise ValidationError(u'选择指定产品时，需要填写产品的ID，多个ID之间用英文逗号间隔')
         if self.is_stopped:
             self.stopped_at = timezone.now()
+        if self.chances < self.rewards:
+            raise ValidationError(u'获奖次数不能大于抽奖次数')
 
     def activity_status(self):
         now = timezone.now()
@@ -152,6 +157,7 @@ class ActivityRule(models.Model):
     redpack = models.CharField(u'对应活动ID', max_length=200, blank=True,
                                help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，否则会导致无法发放<br/>\
                                如需要多个ID则用英文逗号隔开,如:1,2,3')
+    probability = models.FloatField(u'获奖概率', default=0, blank=True, null=True)
     reward = models.CharField(u'奖品类型名称', max_length=200, blank=True,
                               help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
     income = models.FloatField(u'金额或比率', default=0, blank=True,

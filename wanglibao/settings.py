@@ -424,6 +424,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/experience_gold.log',
             'formatter': 'verbose'
         },
+        'wanglibao_sms': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_sms.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -432,7 +438,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_sms': {
-            'handlers': ['file'],
+            'handlers': ['wanglibao_sms', 'console'],
             'level': 'DEBUG',
         },
         'shumi': {

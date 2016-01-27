@@ -39,7 +39,7 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
+                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
@@ -61,7 +61,8 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView
+from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -116,13 +117,14 @@ urlpatterns = patterns(
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
     url(r'^check_password/$', PasswordCheckView.as_view()),
     url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
-    url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
-    url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
+    url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),  # 发送短信验证码
+    url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),  # 注册发短信验证码
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
 
-    url(r'^weixin/phone_validation_code/register/(?P<phone>\d{11})/$', WeixinSendRegisterValidationCodeView.as_view()),
+    url(r'^weixin/phone_validation_code/register/(?P<phone>\d{11})/$',
+        WeixinSendRegisterValidationCodeView.as_view()),  # 微信注册发短信验证码
 
-    url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
+    url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),  # 测试手机号是否注册
 
     url(r'^user_login/$', UserHasLoginAPI.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
@@ -147,6 +149,7 @@ urlpatterns = patterns(
     url(r'^bank/list_new/$', BankListNewAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
+    url(r'^has_validate/', HasValidationAPIView.as_view()),
     url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
@@ -274,6 +277,8 @@ urlpatterns += patterns(
     url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
     url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
+    url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
+    url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
 )
 
 
