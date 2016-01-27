@@ -83,6 +83,7 @@ urlpatterns = patterns(
     url(r'^life_style/$', TemplateView.as_view(template_name="life_style.jade")),
     url(r'^two-novice/$', TemplateView.as_view(template_name="two-novice.jade")),
     url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
+    url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
 
 
 )
