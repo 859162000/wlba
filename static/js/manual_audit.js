@@ -98,13 +98,7 @@
                     type: 'POST',
                     data: post_data,
                     success: function (xhr) {
-                        if(xhr.status=200){
-                            window.location.href = '/accounts/manual_modify/phone/';
-                        }else{
-                            result = JSON.parse(xhr.responseText);
-                            $('.error_form').text(result.message).show();
-                        }
-
+                        window.location.href = '/accounts/manual_modify/phone/';
                     },
                     error: function (xhr) {
                         result = JSON.parse(xhr.responseText);

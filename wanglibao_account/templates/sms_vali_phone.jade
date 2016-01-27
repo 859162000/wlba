@@ -32,8 +32,8 @@ block main
                             label 账户登录密码
                             .box_right
                                 .input_box
-                                    <input class="input_phone password" type="password" placeholder="请输入账户登录密码" autocomplete="off">
-                                    .status
+                                    <input class="input_phone password" type="text" onfocus="this.type='password'" placeholder="请输入账户登录密码" autocomplete="off" >
+                                    .status.status_2
                                         .true
                                         .false 账户登录密码有误
                         .box
@@ -41,7 +41,7 @@ block main
                             .box_right
                                 .input_box
                                     <input class="input_phone id_number" type="text" placeholder="请输入身份证号" autocomplete="off">
-                                    .status
+                                    .status.status_3
                                         .true
                                         .false 身份证信息有误
                         if is_bind_card
