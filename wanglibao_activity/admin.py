@@ -232,6 +232,8 @@ class ActivityShowForm(forms.ModelForm):
     pc_template = forms.CharField(label=u'PC-活动详情页模板名称*', max_length=255, required=False)
     app_detail_link = forms.CharField(label=u'APP-活动详情页链接*', max_length=255, required=False)
     app_template = forms.CharField(label=u'APP-活动详情页模板名称*', max_length=255, required=False)
+    start_at = forms.DateTimeField(label=u'活动页面展示开始时间*', required=False)
+    end_at = forms.DateTimeField(label=u'活动页面展示结束时间*', required=False)
 
     def clean_pc_detail_link(self):
         is_pc = self.cleaned_data.get('is_pc')
@@ -269,6 +271,24 @@ class ActivityShowForm(forms.ModelForm):
 
         return app_template
 
+    def clean_start_at(self):
+        start_at = self.cleaned_data.get('start_at')
+        end_at = self.cleaned_data.get('end_at')
+        if start_at and end_at:
+            if start_at > end_at:
+                raise forms.ValidationError(u'活动展示开始时间必须小于结束时间')
+
+        return start_at
+
+    def clean_end_at(self):
+        start_at = self.cleaned_data.get('start_at')
+        end_at = self.cleaned_data.get('end_at')
+        if start_at and end_at:
+            if start_at > end_at:
+                raise forms.ValidationError(u'活动展示结束时间必须大于开始时间')
+
+        return end_at
+
     class Meta:
         forms.model = ActivityShow
 
@@ -288,30 +308,27 @@ class ActivityBannerPosForm(forms.ModelForm):
     second_left = forms.ModelChoiceField(queryset=queryset, label=u'副推左', required=True)
     second_right = forms.ModelChoiceField(queryset=queryset, label=u'副推右', required=True)
 
-    def is_valid_time(self, act_banner):
-        now = timezone.now()
-        banner_positions = ActivityBannerPosition.objects.all().order_by('-id')
-        times = []
+    def is_valid_time(self, self_activity_show, banner_type):
+        if banner_type == 'main':
+            banner_dsc = u'主推'
+        elif banner_type == 'second_left':
+            banner_dsc = u'副推左'
+        else:
+            banner_dsc = u'副推右'
 
-        for banner_position in banner_positions:
-            banner = getattr(banner_position, act_banner, None)
-            if banner and banner.start_at < now:
-                times.append((int(time.mktime(time.strptime(str(banner.start_at), "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(str(banner.end_at), "%Y-%m-%d %H:%M:%S")))))
+        banners = ActivityBannerPosition.objects.all().select_related().order_by('%s__start_at' % banner_type)
+        before_end_time = None
+        for banner in banners:
+            activity_show = getattr(banner, banner_type, None)
+            if activity_show and activity_show != self_activity_show:
+                start_time = activity_show.start_at
+                end_time = activity_show.end_at
+                if before_end_time:
+                    if start_time >= before_end_time:
+                        raise forms.ValidationError(u'活动展示(%s, %s)%sBanner展示时间冲突' % (
+                            self_activity_show, activity_show, banner_dsc))
 
-        this_banner = self.cleaned_data.get(act_banner)
-        times.append((int(time.mktime(time.strptime(str(this_banner.start_at)[:-6], "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(str(this_banner.end_at)[:-6], "%Y-%m-%d %H:%M:%S")))))
-
-        times = sorted(times, key=lambda item: item[0])
-
-        end_time = times[0][1]
-        for _index in xrange(1, len(times)):
-            if times[_index][0]-end_time != 1:
-                return False
-            else:
-                end_time = times[_index][1]
-
-        return True
-
+                before_end_time = end_time
 
     def clean_main(self):
         main = self.cleaned_data.get('main')
@@ -322,8 +339,7 @@ class ActivityBannerPosForm(forms.ModelForm):
         if main in act_list:
             raise forms.ValidationError(u'活动不能重复')
 
-        if main and not self.is_valid_time('main'):
-            raise forms.ValidationError(u'主banner时间设置不连续')
+        self.is_valid_time(main, 'main')
 
         return main
 
@@ -336,8 +352,8 @@ class ActivityBannerPosForm(forms.ModelForm):
         if second_left in act_list:
             raise forms.ValidationError(u'活动不能重复')
 
-        if second_left and not self.is_valid_time('second_left'):
-            raise forms.ValidationError(u'左副banner时间设置不连续')
+        self.is_valid_time(second_left, 'second_left')
+
         return second_left
 
     def clean_second_right(self):
@@ -349,8 +365,8 @@ class ActivityBannerPosForm(forms.ModelForm):
         if second_right in act_list:
             raise forms.ValidationError(u'活动不能重复')
 
-        if second_right and not self.is_valid_time('right_left'):
-            raise forms.ValidationError(u'右副banner时间设置不连续')
+        self.is_valid_time(second_right, 'second_right')
+
         return second_right
 
     class Meta:

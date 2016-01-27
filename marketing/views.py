@@ -2990,7 +2990,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        if channel_code and (channel_code == user_channel.code and channel_user
+        if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
