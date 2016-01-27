@@ -2335,10 +2335,11 @@ class ManualModifyPhoneAPI(APIView):
             new_phone = form.cleaned_data['new_phone']
             modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"待初审", u"初审待定", u"待复审"]).first()
             if modify_phone_record:
-                return Response({'message': u"您之前申请的人工修改手机号的请求还未处理完毕"}, status=400)
+                return Response({'message': u"您之前申请的人工修改手机号的请求还未处理完毕,请联系网利宝客服"}, status=400)
             #todo
             manual_record = ManualModifyPhoneRecord()
             manual_record.user = user
+            manual_record.phone = profile.phone
             manual_record.id_front_image = id_front_image
             manual_record.id_back_image = id_back_image
             manual_record.id_user_image = id_user_image
@@ -2404,10 +2405,11 @@ class SMSModifyPhoneValidateAPI(APIView):
                 if card.no != card_no:
                     return Response({'message': "银行卡号输入错误"}, status=400)
 
-            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, status = u'短信修改手机号提交').first()
+            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
             if not sms_modify_record:
                 sms_modify_record = SMSModifyPhoneRecord()
                 sms_modify_record.user = user
+                sms_modify_record.phone = profile.phone
                 sms_modify_record.status = u'短信修改手机号提交'
                 sms_modify_record.new_phone = new_phone
                 sms_modify_record.save()
@@ -2422,8 +2424,9 @@ class SMSModifyPhoneTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         user = self.request.user
+        profile = user.wanglibaouserprofile
         new_phone = ""
-        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, status = u'短信修改手机号提交').first()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
         if sms_modify_record:
             new_phone = sms_modify_record.new_phone
 
