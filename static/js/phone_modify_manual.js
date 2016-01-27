@@ -97,7 +97,8 @@
             //alert(mime);
             var file_size = docObj.files[0].size;
             //alert(file_size);
-            if(mime==".jpg"||mime==".png"||mime==".bmp"&&file_size<'2097152'){
+            if((mime==".jpg"||mime==".png"||mime==".bmp")&&file_size<'2097152'){
+
                 setImagePreview(docObj,file_img);
             }else{
                 docObj.value ='';
