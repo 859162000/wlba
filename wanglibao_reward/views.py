@@ -1323,7 +1323,7 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         with transaction.atomic():
-            _order = Order.objects.select_for_update().get(pk=order_id).first()
+            _order = Order.objects.select_for_update().filter(pk=order_id).first()
             _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
             activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
             activity_record = activitys.filter(left_times__gt=0)

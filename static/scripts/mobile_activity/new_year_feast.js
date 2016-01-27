@@ -236,7 +236,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
             if(difference == 2){
                 var strHtml = "<div id='packets' class='packets alertT30 clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
-                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财卷”及“体验金专区”查看</p>"
+                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财券”及“体验金专区”查看</p>"
                             +"<div class='close-b close-min'></div></div>";
             }else if(difference == 3){
                 var strHtml ="<div id='packets' class='packets clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
@@ -283,40 +283,38 @@ org.feast = (function (org) {
         /*开锅赢福利*/
         _potAward:function(){
              $('.pot-s').click(function(){
+                 var index = $(this).attr('index');
                  if($('#authenticated').val() == 'True'){
-                     org.ajax({
-                         url: '/api/wlb_reward/qm_banque/',
-                         type: 'post',
-                         data: {},
-                         success: function (data) {
-                             if (data.ret_code == 0) {
-                                 if(!$('.pot-s').hasClass('selectEd')) {
-                                     var index = $(this).attr('index');
-                                     var i = 1, j = 0;
-                                     var timer = setInterval(function () {
-                                         i == 4 ? i = 0 : i = i;
-                                         if ((j > 3) && (i == (index - 1))) {
-                                             clearInterval(timer);
-                                             setTimeout(function () {
-                                                 var txt = ''
-                                                 $.each(data.redpack_txts, function (i, o) {
-                                                     txt += '<p>' + o + '</p>'
-                                                 })
-                                                 org.ui.alert(txt, '', '2')
-                                                 $('.pot-s').removeClass('selectEd')
-                                             }, 500)
-                                         }
-                                         lib._arrowStyle(i + 1)
-                                         i++, j++;
-                                     }, 500)
-                                 }
-                             } else if (data.ret_code == 1) {
-                                 org.ui.alert('<p class="error-s">' + data.message + '</p>', '', '3')
-
-                             }
-                         }
-                     })
-                     $('.pot-s').addClass('selectEd')
+                    if(!$('.pot-s').hasClass('selectEd')){
+                         org.ajax({
+                            url: '/api/wlb_reward/qm_banque/',
+                            type: 'post',
+                            data: {},
+                            success: function (data) {
+                                if(data.ret_code == 0){
+                                    var i = 1,j = 0,txt='';
+                                    $.each(data.redpack_txts,function(i,o){
+                                       txt+='<p>'+ o +'</p>'
+                                    })
+                                    var timer = setInterval(function(){
+                                        i == 4 ? i = 0 : i = i;
+                                        if((j>3) && (i == (index - 1))){
+                                            clearInterval(timer);
+                                            setTimeout(function(){
+                                                org.ui.alert(txt, '', '2')
+                                                $('.pot-s').removeClass('selectEd')
+                                            },500)
+                                        }
+                                        lib._arrowStyle(i+1)
+                                        i++,j++;
+                                    },500)
+                                    $('.pot-s').addClass('selectEd')
+                                }else{
+                                    org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
+                                }
+                            }
+                         })
+                     }
                  }else{
                      window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                  }
@@ -355,7 +353,7 @@ org.feast = (function (org) {
                             if(data.ret_code == 0){
                                 var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>';
                                 org.ui.alert(txt, '', '3')
-                            }else if(data.ret_code == 1){
+                            }else{
                                 org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
                             }
                         }
@@ -386,7 +384,8 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
-                    var url = location.href,times = url.split("?");
+                    var url = location.href;
+                    var times = url.split("?");
                     if(times[1] != 1){
                         url += "?1";
                         self.location.replace(url);

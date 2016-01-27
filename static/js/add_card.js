@@ -141,7 +141,7 @@
           },
           type: 'post'
         }).done(function(xhr) {
-          if (xhr.ret_code === 0 || xhr.ret_code === 2200) {
+          if (xhr.ret_code === 0 || xhr.ret_code === 22000) {
             location.reload();
           } else {
             tool.modalAlert({
