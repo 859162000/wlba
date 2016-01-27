@@ -14,16 +14,16 @@ require.config({
 
 require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   //视屏播放
-  $('#really-cool-video').height(283);
-  $('#really-cool-video2').height(283);
+//  $('#really-cool-video').height(283);
+//  $('#really-cool-video2').height(283);
   var player = videojs('really-cool-video', { /* Options */ }, function() {
 //    console.log('Good to go!');
   });
 
   //判断高度
   var _index = $(".section").length-1;
-  $('.tv-box1,.tv-box2').css({"height":299});
-  $('.show-box h1').css({"height":$(window).height()/3});
+  $('.tv-box1,.tv-box2').css({"height":355});
+  $('.show-box h1').css({"height":$(window).height()/4});
 
   $('#fullpage').fullpage({
     normalScrollElements :'#main-box'
