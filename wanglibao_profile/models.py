@@ -95,6 +95,12 @@ class Account2015(models.Model):
     invite_count = models.IntegerField(u'邀请好友数', default=0, null=False)
     invite_income = models.DecimalField(u'邀请好友总佣金', default=0.00, null=False, max_digits=20, decimal_places=2)
 
+    first_visit_time = models.DateTimeField(u'首次访问时间', null=True)
+    first_visit_ipaddr = models.CharField(u'首次访问来源IP地址', null=True, max_length=20)
+    last_visit_time = models.DateTimeField(u'最近访问时间', null=True)
+    last_visit_ipaddr = models.CharField(u'最近访问来源IP地址', null=True, max_length=20)
+    total_visit_count = models.IntegerField(u'总计访问次数', default=0, null=False, db_index=True)
+
     def toJSON_filter(self, jsondump=False, include=None, exclude=None):
         fields = []
         for field in self._meta.fields:

@@ -84,6 +84,7 @@ from marketing.utils import pc_data_generator
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
+from wanglibao_rest.utils import get_client_ip
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2989,7 +2990,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        if channel_code and (channel_code == user_channel.code and channel_user
+        if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
@@ -3083,6 +3084,19 @@ class CustomerAccount2015ApiView(APIView):
                     account_dict['tz_sterm_point'] = aa
                     account_dict['tz_mterm_point'] = bb
                     account_dict['tz_lterm_point'] = cc
+
+                    try:
+                        account.total_visit_count += 1
+                        if not account.first_visit_time:
+                            account.first_visit_time = timezone.now()
+                            account.first_visit_ipaddr = get_client_ip(request)
+                        else:
+                            account.last_visit_time = timezone.now()
+                            account.last_visit_ipaddr = get_client_ip(request)
+                        account.save()
+                    except Exception, ex:
+                        logger.exception("=20150127= Failed to save account2015 visited record: [%s], [%s]", user_id, ex)
+
                 error_code=0
                 error_message=u'Success'
             else:
@@ -3092,6 +3106,7 @@ class CustomerAccount2015ApiView(APIView):
                 account_dict['zc_ranking'] = zc_ranking
                 account_dict['tz_amount'] = 0
                 account_dict['income_reward'] = 0
+                account_dict['invite_income'] = 0
 
             profile = user.wanglibaouserprofile
             user_name = u'网利宝用户'
