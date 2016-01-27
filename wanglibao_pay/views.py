@@ -79,7 +79,10 @@ class BankListView(TemplateView):
         default_bank = Bank.get_deposit_banks().filter(
             name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
-        bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        try:
+            bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        except:
+            bank_num = 14
         context.update({
             'default_bank': default_bank,
             'banks': Bank.get_deposit_banks()[:bank_num],
