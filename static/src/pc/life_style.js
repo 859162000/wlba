@@ -27,7 +27,7 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
 
   $('#fullpage').fullpage({
     normalScrollElements :'#main-box'
-  })
+  });
 
   var h_win = $(window).height();
   var Top = $('.banner').offset().top;
@@ -139,6 +139,14 @@ point();
       $('.ul-point ul li').eq(sum).addClass('point-hight').siblings().removeClass('point-hight');
 
     });
+
+    $('.ul-point ul li').on('click',function(){
+      sum = $(this).index();
+      $(this).addClass('point-hight').siblings().removeClass('point-hight');
+      $(ele).animate({'left':-1100*sum+'px'})
+
+
+    })
 
 
   }
