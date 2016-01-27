@@ -34,6 +34,7 @@ from marketing.tops import Top
 from utils import local_to_utc
 from wanglibao_reward.models import WanglibaoWeixinRelative
 # used for reward
+from wanglibao_profile.models import Account2015
 from weixin.models import WeixinAccounts
 import cStringIO
 from wanglibao_account.utils import FileObject
@@ -59,6 +60,7 @@ from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
@@ -3015,3 +3017,87 @@ class ThunderBindingApi(APIView):
                     % (user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+import math
+class CustomerAccount2015ApiView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        error_code = 0
+        error_message = u''
+        account_dict = dict()
+
+        user = self.request.user
+        if user and user.id:
+            user_id = user.id
+            account = Account2015.objects.filter(user_id=user_id).first()
+            if account:
+                account_dict = account.toJSON_filter()
+                if account.tz_times>0:
+                    account_dict['tz_avg_time'] = round(365.0/float(account.tz_times), 2)
+                if account.tz_amount>0:
+                    a = round(account.tz_sterm_amount / account.tz_amount * 100, 2)
+                    b = round(account.tz_mterm_amount / account.tz_amount * 100, 2)
+                    c = round(account.tz_lterm_amount / account.tz_amount * 100, 2)
+
+                    aa = math.ceil(a)
+                    bb = math.ceil(b)
+                    cc = math.ceil(c)
+
+                    abc = aa + bb +cc
+                    if abc>100 and abc<=101:
+                        max_value = max(aa, bb, cc)
+                        if aa==max_value:
+                            aa = aa - 1
+                        elif bb==max_value:
+                            bb = bb - 1
+                        elif cc==max_value:
+                            cc = cc - 1
+                    elif abc>101 and abc<=102:
+                        min_value = min(aa, bb, cc)
+                        if aa==min_value:
+                            bb = bb - 1
+                            cc = cc - 1
+                        elif bb==min_value:
+                            aa = aa - 1
+                            cc = cc - 1
+                        elif cc==min_value:
+                            aa = aa - 1
+                            bb = bb - 1
+                    elif abc>102:
+                            aa = aa - 1
+                            bb = bb - 1
+                            cc = cc - 1
+
+                    account_dict['tz_sterm_percent'] = a
+                    account_dict['tz_mterm_percent'] = b
+                    account_dict['tz_lterm_percent'] = c
+
+                    account_dict['tz_sterm_point'] = aa
+                    account_dict['tz_mterm_point'] = bb
+                    account_dict['tz_lterm_point'] = cc
+                error_code=0
+                error_message=u'Success'
+            else:
+                error_code=0
+                error_message=u'未统计的2016年新注册用户'
+                zc_ranking = User.objects.filter(id__lte=user_id).count()
+                account_dict['zc_ranking'] = zc_ranking
+                account_dict['tz_amount'] = 0
+                account_dict['income_reward'] = 0
+
+            profile = user.wanglibaouserprofile
+            user_name = u'网利宝用户'
+            if profile:
+                if profile.id_is_valid:
+                    user_name= profile.name
+                else:
+                    user_name = safe_phone_str(profile.phone)
+                account_dict['user_name'] = user_name
+        else:
+            error_code=404
+            error_message=u'User not found'
+
+        resp = {"error_code":error_code, "error_message":error_message, "account":account_dict}
+        return HttpResponse(json.dumps(resp, sort_keys=True), content_type='application/json')
