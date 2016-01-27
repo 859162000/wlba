@@ -288,12 +288,18 @@ class ActivityBannerPosForm(forms.ModelForm):
     second_left = forms.ModelChoiceField(queryset=queryset, label=u'副推左', required=True)
     second_right = forms.ModelChoiceField(queryset=queryset, label=u'副推右', required=True)
 
-    def is_valid_time(self, activity):
-        now = time.strftime(time.localtime(), "%Y-%m-%d %H:%M:%S")
-        activity_shows = ActivityBannerPosition.objects.filter(start_at__lt=now).values(activity, 'id').order_by('-id')
+    def is_valid_time(self, act_banner):
+        now = timezone.now()
+        banner_positions = ActivityBannerPosition.objects.all().order_by('-id')
         times = []
-        for item in activity_shows:
-            times.append((int(time.mktime(time.strptime(item.start_at, "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(item.end_at, "%Y-%m-%d %H:%M:%S")))))
+
+        for banner_position in banner_positions:
+            banner = getattr(banner_position, act_banner, None)
+            if banner and banner.start_at < now:
+                times.append((int(time.mktime(time.strptime(str(banner.start_at), "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(str(banner.end_at), "%Y-%m-%d %H:%M:%S")))))
+
+        this_banner = self.cleaned_data.get(act_banner)
+        times.append((int(time.mktime(time.strptime(str(this_banner.start_at)[:-6], "%Y-%m-%d %H:%M:%S"))), int(time.mktime(time.strptime(str(this_banner.end_at)[:-6], "%Y-%m-%d %H:%M:%S")))))
 
         times = sorted(times, key=lambda item: item[0])
 
@@ -317,7 +323,7 @@ class ActivityBannerPosForm(forms.ModelForm):
             raise forms.ValidationError(u'活动不能重复')
 
         if main and not self.is_valid_time('main'):
-            raise forms.ValidationError(u'主banner时间设置不联系')
+            raise forms.ValidationError(u'主banner时间设置不连续')
 
         return main
 

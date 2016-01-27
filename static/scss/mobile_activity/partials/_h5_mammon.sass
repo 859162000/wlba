@@ -124,8 +124,9 @@
     img
       width: 3.5rem
       bottom: 0
+
   @mixin altBg
-    position: absolute
+    position: fixed
     top: 0
     left: 0
     width: 100%
@@ -157,6 +158,7 @@
           width: 100%
           height: 5.5rem
           font-size: 1.8rem
+          padding: 0 0.6rem
       .js-btn
         width: 3rem
         height: 3rem
@@ -169,7 +171,7 @@
         position: absolute
         right: 1.8rem
         bottom: 0
-  .mammon-error
+  .mammon-error,.mammon-alt
     +altBg
     .share-mian
       background: #fff3e8
@@ -240,6 +242,11 @@
       .yellow-btn
         display: block
         margin-top: 0.7rem
+    .mammon-promote
+      background-color: #a43d3f
+      color: #fff
+      font-size: 0.6rem
+      padding: 0 1rem 1rem
   .yellow-txt
     color: #ffc429
   .mammon-page3

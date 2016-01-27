@@ -69,12 +69,14 @@ org.finance = (function (org) {
                             _self.swiper_init([6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.invite_income) > 0){
-                            _self.swiper_init([1,2,3,6])
-                        }
+                        if(parseInt(account.tz_amount) <= 0){
+                            if(parseInt(account.income_reward) > 0 || parseInt(account.invite_income) > 0){
+                                _self.swiper_init([1,2,3,6])
+                            }
+                            if(parseInt(account.income_reward) <= 0 && parseInt(account.invite_income) <= 0){
+                                _self.swiper_init([1,2,3,4,5])
+                            }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.invite_income) <= 0){
-                            _self.swiper_init([1,2,3,4,5])
                         }
 
                         function append_data(){
@@ -127,6 +129,10 @@ org.finance = (function (org) {
                         })
 
                     }
+
+                    if(result.error_code == 404){
+                        finance_alert.show('没有发现该用户')
+                    }
                 }
 
             })
@@ -145,7 +151,7 @@ org.finance = (function (org) {
         set_invite_count_style: function (count) {
             var
                 name = ['茕茕孑立', '门可罗雀', '门庭若市'],
-                detail = ['孤身一人，一个全民淘金好友都没邀请到。', '全民淘金所邀请好友数稀少。', '全民淘金邀请到的好友很多热闹得像人才市场一样。']
+                detail = ['孤身一人，一个全民淘金好友都没邀请到。', '全民淘金所邀请好友数稀少。', '全民淘金邀请到的好友很多,热闹得像人才市场一样。']
             if (count == 0) {
                 return {
                     name: name[0],
@@ -182,6 +188,8 @@ org.finance = (function (org) {
                 canvas_r = canvas_r / 2
                 canvas_font = '17px'
             }
+
+
             function infinite() {
                 _self.canvas_model3(canvas_w / 2, canvas_w / 2, canvas_r / 2, _self.process_num, canvas_w, canvas_font);
                 t = setTimeout(infinite, 30);
@@ -205,8 +213,10 @@ org.finance = (function (org) {
 
                 if (_self.model_canvac_opeartion) {
                     canvas.getContext('2d').translate(0.5, 0.5)
+                    cts.globalCompositeOperation= 'source-atop';
                     canvas.width = canvas_w;
                     canvas.height = canvas_w;
+
                     _self.model_canvac_opeartion = false
                 }
             } else {
@@ -269,6 +279,24 @@ org.finance = (function (org) {
         init: lib.init
     }
 })(org);
+
+finance_alert = (function(){
+    var $alert_body  =   $('.client-login-alert');
+    var show = function(title, callback, data){
+        $alert_body.show()
+        $('.alert-head-aue').text(title)
+
+        $('.login--alert-opeartion').one('click', function(){
+            $alert_body.hide()
+            callback && callback(data)
+        })
+    }
+
+    return {
+        show: show
+    }
+})()
+
 wlb.ready({
     app: function (mixins) {
         function connect(data) {
@@ -286,16 +314,12 @@ wlb.ready({
                 }
             })
         }
-
         mixins.shareData({title: '2015年，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
-                $('.client-login-alert').show().on('click', function () {
-                    mixins.loginApp({refresh: 1, url: ''})
-                })
-                $('.login--alert-opeartion').on('click', function () {
-                    $('.client-login-alert').hide()
-                })
+                finance_alert.show('你还没有登录哦，登录获取更多资讯吧', function(mixin){
+                    mixin.loginApp({refresh: 1, url: ''})
+                },mixins)
 
             } else {
                 connect(data)

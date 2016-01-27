@@ -33,6 +33,15 @@ html
         document.write(c);
         document.documentElement.style.fontSize = 20 * a + "px"
       })();
+      //百度统计
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "//hm.baidu.com/hm.js?7ebbd4a8cd5bfd5bbef9d415e0847eb3";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+
     link(href="/static/styles/mobile_activity/app.css?v=201601216", rel="stylesheet")
     - csrf_token
   body.h5-mammon
@@ -57,10 +66,11 @@ html
       .mammon-inp-box
         input(type="tel",placeholder="请输入手机号").tel-inp
         a(href="javascript:;").yellow-btn.js-checkUser 开红包
+      .mammon-promote 一个人只能领一次：同一个微信号绑定一个手机号只能领一次
     .mammon-page3
       .mammon-tit 没有抽中 <span class="yellow-txt">=> <=</span><br />你把运气都藏起来了吧？<br />没关系！关注<span class="yellow-txt">网利宝服务号</span><br /><span class="yellow-txt">20元</span>投资红包立刻拿！
       .mammon-code
-        .tit 长按以下二维码
+        .tit 长按以下二维码<br />每天签到领取体验金
         .code-img
           img(src="/static/imgs/mobile_activity/mammon/cs_code.jpg",style="width:48%")
     .mammon-page4
@@ -87,7 +97,7 @@ html
         .jq-box
           .top 上上签
           .bottom 福聚
-        .js-btn 解签
+        .js-btn#js-tongji 解签
     //.mammon-share.alt-box
     //  .share-mian
     //    .close.js-close &times;
@@ -96,6 +106,13 @@ html
     //      p 转发可解签，并领取开运礼包。
     //    .share-box
     //      a(href="javascript:;").red-btn.js-showShare 我知道了
+    .mammon-alt.alt-box#mammon-weixin
+      .share-mian
+        .close.js-close &times;
+        .share-txt
+          p 温馨提示：财运签活动只有在微信中，才能正常分享哦～
+        .share-box
+          a(href="javascript:;").red-btn.js-showShare 我知道了
     .mammon-share
       .share-icon
         img(src="/static/imgs/mobile_activity/mammon/share-icon.png",style="max-width:60%")
@@ -104,4 +121,4 @@ html
         p 转发可解签，并领取开运礼包。
 
     script(src="/static/src/mobile/lib/weixin/wx.js")
-    script(src="/static/scripts/mobile_activity/h5_cammon.js?v=2016012119")
+    script(src="/static/scripts/mobile_activity/h5_cammon.js?v=20160126")

@@ -18,6 +18,7 @@ html(style='background:#f5f5f5;height:100%;overflow:hidden;')
             .alert-head-aue 你还没有登录哦，登录获取更多资讯吧
           .login--alert-opeartion 我知道了
 
+
     .client-share-model
         img(src='/static/imgs/app/finance/client_share.png').share-img
     .client-finance
@@ -109,7 +110,7 @@ html(style='background:#f5f5f5;height:100%;overflow:hidden;')
                   sapn.data-mid  <span class='tz_mterm_percent'></span>%
                 .model4-data-list
                   span.model4-circle.model4-circle-long
-                  span.data-list-data 长标（标的期限 ≥ 180天）：
+                  span.data-list-data 长期（标的期限 ≥ 180天）：
                   sapn.data-long <span class='tz_lterm_percent'></span>%
               .finance-model-arithmetic 百分比＝投资区间投资金额／2015总投资额
               .finance-page-chicken.ele-txt2 做了一年辛苦的菲佣，查看血汗钱
@@ -169,10 +170,14 @@ html(style='background:#f5f5f5;height:100%;overflow:hidden;')
               .finance-mode-btnl-aue.ele-txt 大家一起来薅羊毛
               .finance-last-message.ele-txt2 来网利宝APP，查看2015年投资记录
             img(src='/static/imgs/app/finance/earth_lion2_default.png').finance-earth.finance-earth-efault
+
     // banner javascript
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
     script(src="/static/src/app/echarts/Chart.min.js")
-    script(src="/static/scripts/component/webview.js?v=2222")
-    script(src='/static/scripts/app/finance.js?v=25228221', data-init='finance')
+    script(src="/static/scripts/component/dist/webview.js?v=2222")
+    script(src='/static/scripts/app/dist/finance.js?v=2522899221')
+    script.
+      var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+      document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F55fcf0f3d843f47b4785c7ec44de129c' type='text/javascript'%3E%3C/script%3E"));
 
                

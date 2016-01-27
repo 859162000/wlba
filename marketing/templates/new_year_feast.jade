@@ -2,16 +2,10 @@
 doctype html
 html(style="background:#fecf4f")
     head
-        meta(name="format-detection" content="telephone=no,email=no")
-        title 网利宝
-        meta(charset="utf-8")
-        meta(content="telephone=no,email=no" ,name="format-detection")
-        meta(content="yes" ,name="apple-mobile-web-app-capable")
-        script.
-            (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+        include include/app_header.jade
         link(href="/static/styles/mobile_activity/app.css?v=20160120", rel="stylesheet")
         body
-            - csrf_token
+            input(type='hidden',value='{{user.is_authenticated}}')#authenticated
             .new-year-feast
                 img(src='/static/imgs/mobile_activity/feast/banner.jpg').banner
                 .title
@@ -19,21 +13,80 @@ html(style="background:#fecf4f")
                 p.title-fonts 团圆最期待，开锅赢红包！快来点击喜欢的大餐，
                 p.title-fonts 赢全民盛宴豪华组合好礼！
                 .pot-div.clearfix
-                    .pot-s.pot-one
-                        p.award-name 小年饭
-                        p.award-content 新年好运来
-                    .pot-s.pot-two
-                        p.award-name 年夜饭
-                        p.award-content 团圆乐融融
-                    .pot-s.pot-three
-                        p.award-name 团年饭
-                        p.award-content 猴年第一锅
-                    .pot-s.pot-four
-                        p.award-name 拜年饭
-                        p.award-content 月满合家欢
-                    .arrow
-    script(src="/static/scripts/component/webview.js?v=20151215")
-    script(data-init="experience",src="/static/scripts/mobile_activity/app_experience.js?v=775561212665ddddwewe7222777")
+                    .top-div.clearfix
+                        .pot-s.pot-one.mr5(index='2')
+                            p.award-name 小年饭
+                            p.award-content 新年好运来
+                        .pot-s.pot-two(index='1')
+                            p.award-name 年夜饭
+                            p.award-content 团圆乐融融
+                    .middle-fonts 点击开锅赢福利
+                    .bottom-div.clearfix
+                        .pot-s.pot-three.mr5(index='3')
+                            p.award-name 团年饭
+                            p.award-content 猴年第一锅
+                        .pot-s.pot-four(index='4')
+                            p.award-name 拜年饭
+                            p.award-content 月满合家欢
+                    .arrow(style='display:none')
+                .rule-content 备注：活动期间每天均可来领，每天限领一次，立即查看
+                .rule-btn
+                    span#lookMoreInfo 豪华组合好礼规则》
+                .moreInfo.clearfix
+                    .rule-div
+                        .rule-title
+                            span 理财金领取和使用规则
+                        p 1、新老用户均可参与，活动期间内每天均可领取，每天限领一次，理财金自动发放到相应账户并站内信通知；
+                        p 2、理财金只能在相关活动页投体验标使用（体验标为10%年化收益，1天期限），投标时不能使用其他理财券，理财金自发放日起15日内有效；
+                        p 3、理财金需用户手动投资，投资时系统将自动按理财金总额一次性投标完成。
+                          a(href='javascript:void(0)')#projectList 立即前往理财金投资页面
+                          | ；
+                        p 4、理财金投资完毕后，当日开始计算利息，到期日17点回款。还款本金系统自动回收，利息收益系统自动发放到用户账户；
+                        p 5、理财金利息收益和正常账户余额一样，可正常投资和提现。
+                    .rule-div
+                        .rule-title
+                            span 红包和加息券规则
+                        p 1、红包有效期：2016年2月4日0：00-2016年2月15日24:00；
+                        p 2、所有红包为直抵红包，有使用门槛。直抵红包在投资中可直抵现金使用，详情使用方法请见我的账户-理财券红包列表查看；
+                        p 3、红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
+                        p 4、加息券在电脑端和手机端均可使用，一券一标永久加息。投标时选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+                        p 5、投资一个项目时，红包不可叠加使用，也不可与加息券叠加使用；
+                        p 6、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+                        p 7、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+                .title.title2
+                    span
+                p.title-fonts 5大红包全席宴，多领多得多投多赚！
+                .packets-feast.clearfix
+                    redpacks = enumerate(redpacks)
+                    for index, redpack in redpacks
+                        if index == 2 or index == 4
+                            styles = ''
+                        else
+                            styles = 'mr13'
+                        .packets-div.clearfix(class='{{styles}}')
+                            p.packets-num
+                                amount = int(redpack['amount'])
+                                | {{amount}}元红包
+                            p.packets-btn
+                                a(href='javascript:void(0)',data-id='{{redpack.redpack_id}}') 立即领取
+                            p.packets-used
+                                invest_amount = redpack['invest_amount'] / 10000
+                                | 单笔投资满{{invest_amount}}万可用
+                            p.packets-icon(class='icon{{index}}')
+                                span
+                p.title-fonts 备注：活动期新老用户均可领取享用
+                p.title-fonts （每天每个红包限领一次，每天均可来领，红包限投3月及以上标期）
+                .rule-div
+                    .rule-title
+                        span 活动规则
+                    p 1、红包有效期：2016年2月4日0：00-2016年2月15日24:00；
+                    p 2、活动期间，新老用户均可参加活动，活动期间全民盛宴和豪门盛宴福利每位用户每天限领一次，每天均可领取。
+                    p 3、红包和加息券只限投正常期限理财标获得和使用，不可用于定存宝和债转等产品，使用详情可见我的账户--理财券列表。
+                    p 4、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                    p.rule_content_bt#ios-show(style='display:none') 5、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(src="/static/scripts/component/webview.js?v=2222")
+    script(data-init="feast",src="/static/scripts/mobile_activity/new_year_feast.js?v=8888965968")
     script.
         var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,

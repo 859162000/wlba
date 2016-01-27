@@ -84,6 +84,7 @@ from marketing.utils import pc_data_generator
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
+from wanglibao_rest.utils import get_client_ip
 reload(sys)
 
 class YaoView(TemplateView):
@@ -3083,6 +3084,19 @@ class CustomerAccount2015ApiView(APIView):
                     account_dict['tz_sterm_point'] = aa
                     account_dict['tz_mterm_point'] = bb
                     account_dict['tz_lterm_point'] = cc
+
+                    try:
+                        account.total_visit_count += 1
+                        if not account.first_visit_time:
+                            account.first_visit_time = timezone.now()
+                            account.first_visit_ipaddr = get_client_ip(request)
+                        else:
+                            account.last_visit_time = timezone.now()
+                            account.last_visit_ipaddr = get_client_ip(request)
+                        account.save()
+                    except Exception, ex:
+                        logger.exception("=20150127= Failed to save account2015 visited record: [%s], [%s]", user_id, ex)
+
                 error_code=0
                 error_message=u'Success'
             else:

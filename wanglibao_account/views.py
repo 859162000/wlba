@@ -504,7 +504,8 @@ class AccountHome(TemplateView):
         if experience_record.get('event__amount__sum'):
             experience_amount = experience_record.get('event__amount__sum')
 
-        experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
+        experience_amortization = ExperienceAmortization.objects.filter(user=user)\
+            .select_related('product').order_by('-created_time')
         if experience_amortization:
             paid_interest = reduce(lambda x, y: x + y,
                                    [e.interest for e in experience_amortization if e.settled is True], 0)
@@ -607,7 +608,7 @@ class AccountHomeAPIView(APIView):
         # 当月免费提现次数
         fee_config = WithdrawFee().get_withdraw_fee_config()
         free_times_per_month = int(fee_config['fee']['free_times_per_month'])
-        withdraw_success_count = int(WithdrawFee().get_withdraw_success_count(user))
+        withdraw_success_count = int(WithdrawFee().get_withdraw_count(user))
         withdraw_free_count = free_times_per_month - withdraw_success_count
 
         if withdraw_free_count <= 0:
@@ -1756,11 +1757,15 @@ class AdminSendMessageView(TemplateView):
             # 发送短信
             content_sms = request.POST.get("content_sms", "")
             if content_sms:
-                send_messages.apply_async(kwargs={
-                    'phones': [phone],
-                    'messages': [content_sms + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD],
-                    'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-                })
+                # 发送短信,功能推送id: 7
+                # 直接发送短信内容
+                from wanglibao_sms.send_php import PHPSendSMS
+                PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content_sms)
+                # send_messages.apply_async(kwargs={
+                #     'phones': [phone],
+                #     'messages': [content_sms + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD],
+                #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+                # })
                 msg_sms += u'短信发送成功'
 
             # 发送站内信
