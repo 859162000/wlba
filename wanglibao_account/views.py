@@ -2282,7 +2282,10 @@ class ValidateAccountInfoAPI(APIView):
                 if card.no != card_no:
                     return Response({'message': "银行卡号输入错误"}, status=400)
             return Response({'ret_code': 0})
-        return Response(form.errors, status=400)
+        message = form.errors
+        for key, value in form.errors.iteritems():
+            message = ",".join(value)
+        return Response({"message":message}, status=400)
 
 class ModifyPhoneValidateCode(APIView):
     permission_classes = (IsAuthenticated, )
@@ -2348,7 +2351,10 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.save()
             return Response({'ret_code': 0})
         else:
-            return Response(form.errors, status=400)
+            message = form.errors
+            for key, value in form.errors.iteritems():
+                message = ",".join(value)
+            return Response({"message":message}, status=400)
 
 
 class SMSModifyPhoneValidateTemplate(TemplateView):
@@ -2418,7 +2424,7 @@ class SMSModifyPhoneValidateAPI(APIView):
                 sms_modify_record.save()
             return Response({"message":'ok'})
 
-        return Response(form.errors, status=400)
+        return Response({"message":form.errors}, status=400)
 
 class SMSModifyPhoneTemplate(TemplateView):
 
