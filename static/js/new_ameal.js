@@ -47,23 +47,26 @@
             }
           }
         });
+        var is = 0;
         $(".years_pot_minbox").on("click",function(){
             var data = $(this).attr("data");
-            isdata(data)
-            ajaxfn(null, "/api/wlb_reward/qm_banque/", function(data){
-                var txt=data.message;
-                if(data.ret_code == 0) {
-                    $.each(data.redpack_txts,function(idx,val){
-                        var text="<li>"+val+"</li>";
-                        $(".years_smkal").show().find("ul").append(text);
-                    })
-                }else{
-                    $('.years_smak').show().find("h3").text(txt);
-                    $('.years_smak').find("p").text("进入“我的账户”--“理财券”“体验金专区”查看");
-                }
-                $(".cover_layer").show();
-            })
-
+            if(is == 0){
+                isdata(data);
+                ajaxfn(null, "/api/wlb_reward/qm_banque/", function(data){
+                    var txt=data.message;
+                    if(data.ret_code == 0) {
+                        $.each(data.redpack_txts,function(idx,val){
+                            var text="<li>"+val+"</li>";
+                            $(".years_smkal").show().find("ul").append(text);
+                        })
+                    }else{
+                        $('.years_smak').show().find("h3").text(txt);
+                        $('.years_smak').find("p").text("进入“我的账户”--“理财券”“体验金专区”查看");
+                    }
+                    $(".cover_layer").show();
+                })
+                is=1;
+            }
         })
         function ajaxfn(id, url, fn){
             $.ajax({
@@ -77,22 +80,25 @@
         }
         $(".years_paper a").on("click",function(){
             var data_id=$(this).attr("data_id");
-            ajaxfn(data_id, "/api/wlb_reward/hm_banque/#", function(data){
-                var txt=data.message;
-                if(data.ret_code == 0){
-                    $('.years_smak').show();
+            if(is == 0){
+                ajaxfn(data_id, "/api/wlb_reward/hm_banque/#", function(data){
+                    var txt=data.message;
+                    if(data.ret_code == 0){
+                        $('.years_smak').show();
 
-                }else{
-                    $('.years_smak').show().find("h3").text(txt);
-                    $('.years_smak').find("p").text("进入“我的账户”--“理财券”查看");
-                }
-                $(".cover_layer").show();
-            })
-
+                    }else{
+                        $('.years_smak').show().find("h3").text(txt);
+                        $('.years_smak').find("p").text("进入“我的账户”--“理财券”查看");
+                    }
+                    $(".cover_layer").show();
+                })
+                is=1;
+            }
         })
         $(".years_close").on("click",function(){
             $(this).parent().parent().hide();
             $(".cover_layer").hide();
+            is=0;
         })
         isdata = function(data){
             if(data == 2){
