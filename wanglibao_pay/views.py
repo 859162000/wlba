@@ -61,6 +61,8 @@ from wanglibao_rest import utils as rest_utils
 from weixin.models import WeixinUser
 from wanglibao_rest.common import DecryptParmsAPIView
 from marketing.tools import withdraw_submit_ok
+from misc.models import Misc
+from wanglibao_pay.tasks import sync_bind_card
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -78,9 +80,10 @@ class BankListView(TemplateView):
         default_bank = Bank.get_deposit_banks().filter(
             name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
+        bank_num = int(Misc.objects.get(key='pc_bank_num').value)
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:14],
+            'banks': Bank.get_deposit_banks()[:bank_num],
             'announcements': AnnouncementAccounts
         })
         return context
@@ -190,6 +193,10 @@ class PayView(TemplateView):
             result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device_type)
         else:
             result = HuifuPay().pre_pay(request)
+
+        # async card list
+        sync_bind_card.apply_async(kwargs={'user_id': user.id})
+
         return self.render_to_response(result)
 
     @method_decorator(csrf_exempt)

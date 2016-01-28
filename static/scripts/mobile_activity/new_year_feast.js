@@ -310,7 +310,7 @@ org.feast = (function (org) {
                                     },500)
                                     $('.pot-s').addClass('selectEd')
                                 }else{
-                                    org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
+                                    org.ui.alert('<p class="title-s">'+ data.message +'</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>', '', '3')
                                 }
                             }
                          })
@@ -335,9 +335,6 @@ org.feast = (function (org) {
                   });
                 }
             })
-            $('#projectList').click(function(){
-                window.location.href = '/weixin/list/';
-            })
         },
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
@@ -351,16 +348,19 @@ org.feast = (function (org) {
                         },
                         success: function (data) {
                             if(data.ret_code == 0){
-                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>';
+                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>';
                                 org.ui.alert(txt, '', '3')
                             }else{
-                                org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
+                                org.ui.alert('<p class="title-s">'+ data.message +'</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>', '', '3')
                             }
                         }
                     })
                 } else {
                     window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                 }
+            })
+            $('#projectList').on('click',function(){
+                window.location.href = '/activity/experience/account/';
             })
         }
     }
@@ -396,12 +396,13 @@ wlb.ready({
         }
 
         mixins.sendUserInfo(function (data) {
-            $('#projectList').on('click',function(){
-                mixins.jumpToManageMoney();
-            })
             if (data.ph == '') {
                 $('.pot-s,.packets-btn a').on('click',function(){
                     mixins.loginApp({refresh: 1, url: ''})
+                })
+                $('#projectList').on('click',function(){
+                    //mixins.loginApp({refresh: 1, url: ''})
+                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/account/'});
                 })
             } else {
                 connect(data)

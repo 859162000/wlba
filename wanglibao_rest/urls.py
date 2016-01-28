@@ -40,7 +40,7 @@ from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
                             UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView, AdminIdValidate,
-                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
@@ -193,10 +193,10 @@ urlpatterns = patterns(
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
     url(r'^pushtest/$', PushTestView.as_view()),
-    # url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
-    # url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
-    # url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
-    url(r'^voice/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
+    url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
+    url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
+    url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
+    url(r'^voice/send_voice_code/$', SendVoiceCodeNewAPIView.as_view()),
     url(r'^marketing/tv/$', Statistics.as_view()),
     url(r'^marketing/tv_inside/$', StatisticsInside.as_view()),
     url(r'^p2p/investrecord', InvestRecord.as_view()),
