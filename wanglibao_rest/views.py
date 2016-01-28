@@ -565,6 +565,56 @@ class SendVoiceCodeAPIView(APIView):
             if count >= 10:
                 return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
 
+                # phone_validate_code_item.code_send_count += 1
+                # phone_validate_code_item.save()
+        else:
+            now = timezone.now()
+            phone_validate_code_item = PhoneValidateCode()
+            validate_code = generate_validate_code()
+            phone_validate_code_item.validate_code = validate_code
+            phone_validate_code_item.phone = phone_number
+            phone_validate_code_item.last_send_time = now
+            phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.is_validated = False
+            phone_validate_code_item.save()
+
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
+        return Response({"ret_code": res_code, "message": res_text})
+
+
+class SendVoiceCodeNewAPIView(APIView):
+    """
+    汇讯群呼(快易通)语音短信验证码接口
+    """
+    # TODO 此接口节后需要优化去掉
+    permission_classes = ()
+
+    def post(self, request):
+        phone_number = request.DATA.get("phone", "").strip()
+        if not phone_number or not phone_number.isdigit():
+            return Response({"ret_code": 30111, "message": u"信息输入不完整"})
+
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code": 30112, "message": u"手机号输入有误"})
+
+        # 验证图片验证码
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({"ret_code": 30114, "message": message})
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        # 语音验证码次数不加1
+        if phone_validate_code_item:
+            count = phone_validate_code_item.code_send_count
+            if count >= 10:
+                return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
+
             # phone_validate_code_item.code_send_count += 1
             # phone_validate_code_item.save()
         else:
@@ -586,6 +636,7 @@ class SendVoiceCodeAPIView(APIView):
 
 
 class SendVoiceCodeTwoAPIView(APIView):
+    # TODO 此接口节后需要优化去掉
     permission_classes = ()
     throttle_classes = (UserRateThrottle,)
 
@@ -616,8 +667,11 @@ class SendVoiceCodeTwoAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
-        logger.info("voice_code2: %s" % cont)
+        # status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info("voice_code2: %s" % res_text)
         return Response({"ret_code": 0, "message": "ok"})
 
 
