@@ -274,7 +274,7 @@ wlb.ready({
                 login = false;
                 $('#nologin').unbind('click')
                 $('.receive_box').on('click', function(){
-                    mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/mobile/'});
+                    mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/mobile/'});
                 })
             } else {
                 login = true;
