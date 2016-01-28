@@ -2,6 +2,41 @@
  * Created by rsj217 on 16-1-21.
  */
 
+var video_1 = document.getElementById('really-cool-video'),
+    video_2 = document.getElementById('really-cool-video2');
+// 原生的JavaScript事件绑定函数
+  function bindEvent(ele, eventName, func){
+      if(window.addEventListener){
+          ele.addEventListener(eventName, func);
+      }
+      else{
+          ele.attachEvent('on' + eventName, func);
+      }
+  }
+
+  bindEvent(video_1,'ended',function(){
+    document.getElementsByClassName('vjs-poster')[0].style.display='block';
+    document.getElementsByClassName('vjs-big-play-button')[0].style.display='block';
+    video_1.currentTime = 0;
+  });
+
+  bindEvent(video_1,'play',function(){
+    document.getElementsByClassName('vjs-poster')[0].style.display='none';
+    document.getElementsByClassName('vjs-big-play-button')[0].style.display='none';
+  });
+
+   bindEvent(video_2,'ended',function(){
+      document.getElementsByClassName('vjs-poster')[1].style.display='block';
+      document.getElementsByClassName('vjs-big-play-button')[1].style.display='block';
+      video_1.currentTime = 0;
+    });
+
+    bindEvent(video_2,'play',function(){
+      document.getElementsByClassName('vjs-poster')[1].style.display='none';
+      document.getElementsByClassName('vjs-big-play-button')[1].style.display='none';
+    });
+
+
 require.config({
   paths: {
     'scrollify': 'lib/jquery.fullPage.min',
@@ -16,14 +51,14 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   //视屏播放
 //  $('#really-cool-video').height(283);
 //  $('#really-cool-video2').height(283);
-  var player = videojs('really-cool-video', { /* Options */ }, function() {
-    console.log('Good to go!');
+//  var player = videojs('really-cool-video', { /* Options */ }, function() {
+//    console.log('Good to go!');
+//
+//
+//  });
 
 
-  });
 
-  var whereYouAt = player.currentTime();
-  console.log(player.ended);
 
 
   $('.tv-box1').on('click',function(){
