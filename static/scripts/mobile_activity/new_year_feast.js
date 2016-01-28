@@ -355,7 +355,7 @@ org.feast = (function (org) {
                                 } else {
                                     org.ui.alert('<p class="title-s">' + data.message + '</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>', '', '3')
                                 }
-                                $('.packets-btn a').addClass('selectEd')
+                                $('.packets-btn a').removeClass('selectEd')
                             }
                         })
                     }
