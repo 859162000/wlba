@@ -31,6 +31,7 @@ import base64
 from wanglibao_pay.pay import PayOrder, PayMessage
 from wanglibao_rest.utils import split_ua
 # from wanglibao_account.cooperation import CoopRegister
+from wanglibao_pay.tasks import sync_bind_card
 
 logger = logging.getLogger(__name__)
 
@@ -650,9 +651,11 @@ class YeeShortPay:
                 # 请求绑定银行卡
                 res = self._bind_card_request(request, input_phone, card_no, request_id)
                 if res['ret_code'] != 0:
-                    if res['ret_code'] == '600326':
-                        card.is_bind_yee = True
-                        card.save()
+                    # 600302绑卡个数超限，600326此卡已绑定，此时去第三方同步卡列表
+                    if res['ret_code'] in ['600302', '600326']:
+                        # card.is_bind_yee = True
+                        # card.save()
+                        sync_bind_card.apply_async(kwargs={'user_id': user.id})
                         return {'ret_code': '20119', 'message': '银行卡已绑定，请返回使用快捷充值'}
                     else:
                         logger.error(res)
