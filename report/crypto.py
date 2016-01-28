@@ -20,9 +20,6 @@ class Rsa(object):
         #pub_key_file = os.path.join(settings.BASE_DIR, "pub_key.pem")
         pub_key_file = os.path.join(settings.CERT_DIR, "pub_key.pem")
         pub_key = RSA.load_pub_key(pub_key_file)
-
-        print
-
         return pub_key.public_encrypt(data, RSA.pkcs1_oaep_padding)
 
     @classmethod
