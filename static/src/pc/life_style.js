@@ -30,7 +30,16 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   $('.show-box h1').css({"height":$(window).height()/4});
 
   $('#fullpage').fullpage({
-    normalScrollElements :'#main-box'
+    normalScrollElements :'#main-box',
+    afterLoad : function(anchorLink,index){
+      if (index == 1){
+        $(".section").eq(1).show();
+      }else if (index ==2){
+        $(".section").eq(2).show();
+      }
+
+    }
+
   });
 
   var h_win = $(window).height();

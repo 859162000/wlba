@@ -15,7 +15,7 @@ html
       .section
         include global/g_nav
         .banner.clearfix
-      .section
+      .section(style="display:none")
         .life_nav.clearfix
           ul
             li
@@ -217,18 +217,18 @@ html
                 p 资金托管是保障投资人资金不被挪用的最重要方式之一，平台可以与第三方支付机构或银行进行合作。资金托管需要支付费用，十亿以上交易额的平台，在支付方面的费用预计能够达到百万量级。平台对待资金托管及费用承担的态度在一定程度上能说明问题。
                 p.tit-strong(style="float:left") 第五点：看平台的整体收益情况
                 p 金融行业是个风险定价的行业，高风险高收益、低风险低收益。正规的平台收益都不会太高，一般在6%-15%左右，只有刚上线的平台为了人气才会发收益稍等提高点，但一般情况下也不会超20%。遇到一些收益特别高的平台，最好还是远离吧。
-      .section.view-show
+      .section.view-show(style="display:none")
         .show-box
           h1
-          .tv-box1.video-js
-            video( id="really-cool-video", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="504", height="339", poster="/static/imgs/pc_activity/life_style/black.jpg", data-setup='{"language":"zh"}' )
+          .tv-box1
+            video(id="really-cool-video" , class="video-js vjs-default-skin vjs-big-play-centered", data-setup='{"language":"zh"}' , controls, preload="auto", width="504", height="339", poster="/static/imgs/pc_activity/life_style/black.jpg")
+              source(src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_kevin.ogg", type='video/ogg')
               source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_kevin.mp4", type='video/mp4')
-              source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_kevin.ogg", type='video/ogg')
               p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,safari,ie9以上等)！
           .tv-box2
-            video( id="really-cool-video2", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="504", height="339",poster="/static/imgs/pc_activity/life_style/black.jpg", data-setup='{"language":"zh"}' )
-              source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_luxy.mp4", type='video/mp4')
+            video( id="really-cool-video", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="504", height="339", poster="/static/imgs/pc_activity/life_style/black.jpg", data-setup='{"language":"zh"}' )
               source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_luxy.ogg", type='video/ogg')
+              source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_luxy.mp4", type='video/mp4')
               p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,safari,ie9以上等)！
           p.leader(style="margin-right:54px")
             span 网利宝CEO
