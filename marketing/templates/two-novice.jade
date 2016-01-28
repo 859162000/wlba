@@ -1,0 +1,143 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/two-novice.css?v=20446477")
+    - csrf_token
+  body(style='background: #ffd9b4')
+    include global/g_nav
+    .two-novice
+      .two-banner
+      .two-main0
+      .two-main
+        .two-main1
+          .main1-title
+            h1 第一步：注册账户&nbsp;&nbsp;
+              span 开启财富保值增值之旅
+          .main1-main
+            dl
+              dd
+                h2 30秒完成注册
+                p 方便又快捷
+              dt.nov
+              dd
+                if user.is_authenticated
+                  a(href='javascript:void(0);').two-button1.two-buttonn 立即注册
+                else
+                  a(href='/accounts/register/').two-button1 立即注册
+            dl
+              dd
+                h2 实名认证、绑定银行卡
+                p 信息安全，资金保障
+              dt.nov.nov1
+              dd
+                if user.is_authenticated
+                  a(href='javascript:void(0);').two-button1.two-buttonb 我要认证
+                else
+                  a(href='/accounts/register/').two-button1 我要认证
+            dl
+              dd
+                h2 账户充值、立即投资
+                p 畅享15%高收益
+              dt.nov.nov2
+              dd
+                a(href='/p2p/list/').two-button1 我要投资
+        .two-main1
+          .main1-title
+            h1 第二步：领取福利&nbsp;&nbsp;
+              span 立即注册享三重福利
+          .main1-main
+            dl
+              dd
+                h2
+                  span 福利一&nbsp;&nbsp;
+                  |28888体验金
+                p 我出本金你得收益，可提现！
+              dt.novi
+                p 28888￥
+                h3 体验金
+            dl
+              dd
+                h2
+                  span 福利二&nbsp;&nbsp;
+                  |300元红包
+                p 投资直减现金使用，真划算！
+              dt.novi
+                p 300￥
+                h3 直减红包
+            dl
+              dd
+                h2
+                  span 福利三&nbsp;&nbsp;
+                  |最高100元奖励
+                p 邀好友投资送红包，更能天天赚佣金！
+              dt.novi
+                p 100￥
+                h3 奖励红包
+            a(href='/activity/noviceDecember/').main2-button1 立即查看详情
+            p.beizhu 备注：注册成功后，登录“我的账户” -- 体验金专区查看体验金；登录“我的账户” -- 理财券专区查看红包
+        .two-main1
+          .main1-title
+            h1 第三步：投资理财&nbsp;&nbsp;
+              span 畅享安全高收益
+          .main1-main
+            dl
+              dd
+                h2 直接投标
+                p 最高年化16%年化收益率
+                p 1月、3月、6月等多种标期可供选择
+              dt.novic
+              dd
+                a(href='/p2p/list/').two-button1 立即投资
+            dl
+              dd
+                h2 自动投标
+                p 设置自动投标，省心又放心
+                p 回款自动复投赚收益，利上加利
+              dt.novic.novic1
+              dd
+                if user.is_authenticated
+                  a(href='/accounts/auto_tender/').two-button1 立即开启
+                else
+                  a(href='/accounts/register/').two-button1 立即开启
+
+            dl
+              dd
+                h2 抢标神器
+                p 关注微信服务号，上标提前知
+                p 投标快人一步！
+              dt.novic.novic2
+              dd
+                a(href='javascript:void(0);').two-button1.two-buttonu 立即关注
+            p.beizhu 投资流程：线上注册 -- 实名绑卡 -- 充值账户 -- 选标投资 -- 获得收益
+
+        .two-main1
+          .main1-title
+            h1 第四步：玩转掌上理财
+          .main1-main
+            .rewei
+            .rewei.rewei1
+        .two-main1
+          .main1-title
+            h1 第五步：网利宝小课堂&nbsp;&nbsp;
+              span 对比优势看得见，投资就选网利宝
+          .main1-main
+            .chart
+            .chart.chart1
+              if user.is_authenticated
+                a(href='javascript:void(0);').chart1-button1.chart1-button0 立即注册领红包
+              else
+                a(href='/accounts/register/').chart1-button1 立即注册领红包
+            .chart.chart2
+    .two-footer
+    #two-mov-ice
+      .mov-ice
+        p.mov
+        a(href='javascript:void(0);').ice-button 我知道啦
+    include global/g_footer
+    include include/tracking
+    script(src="/static/js/two-novice.js?v=120801")
