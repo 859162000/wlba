@@ -28,7 +28,7 @@ var video_1 = document.getElementById('really-cool-video'),
    bindEvent(video_2,'ended',function(){
       document.getElementsByClassName('vjs-poster')[1].style.display='block';
       document.getElementsByClassName('vjs-big-play-button')[1].style.display='block';
-      video_1.currentTime = 0;
+      video_2.currentTime = 0;
     });
 
     bindEvent(video_2,'play',function(){
