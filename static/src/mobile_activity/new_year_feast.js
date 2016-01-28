@@ -120,8 +120,8 @@ org.feast = (function (org) {
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
                 if ($('#authenticated').val() == 'True') {
-                    $('.packets-btn a').addClass('selectEd');
                     if(!$(this).hasClass('selectEd')) {
+                        $('.packets-btn a').addClass('selectEd');
                         var id = $(this).attr('data-id');
                         org.ajax({
                             url: '/api/wlb_reward/hm_banque/',
