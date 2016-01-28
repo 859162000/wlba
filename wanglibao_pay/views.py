@@ -194,9 +194,6 @@ class PayView(TemplateView):
         else:
             result = HuifuPay().pre_pay(request)
 
-        # async card list
-        sync_bind_card.apply_async(kwargs={'user_id': user.id})
-
         return self.render_to_response(result)
 
     @method_decorator(csrf_exempt)
