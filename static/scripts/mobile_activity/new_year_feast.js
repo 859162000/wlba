@@ -351,7 +351,7 @@ org.feast = (function (org) {
                         },
                         success: function (data) {
                             if(data.ret_code == 0){
-                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财卷”及“体验金专区”查看</p>';
+                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财券”及“体验金专区”查看</p>';
                                 org.ui.alert(txt, '', '3')
                             }else{
                                 org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
