@@ -79,7 +79,8 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
         $(".section").eq(2).show();
       }
 
-    }
+    },
+    navigation : true
 
   });
 
