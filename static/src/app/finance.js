@@ -177,7 +177,7 @@ org.finance = (function (org) {
             if (amount <= 100) return 1;
             if (amount > 100 && amount <= 500) return 2;
             if (amount > 500 && amount <= 5000) return 3;
-            if (amount > 500 && amount <= 5000) return 4;
+            if (amount > 5000 && amount <= 50000) return 4;
             if (amount > 50000) return 5
         },
         canvas_model3_doging: function (percent) {
