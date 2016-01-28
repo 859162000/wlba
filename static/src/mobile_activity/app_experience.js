@@ -50,15 +50,35 @@
 var login = false;
 wlb.ready({
     app: function (mixins) {
+        function connect(data) {
+            org.ajax({
+                url: '/accounts/token/login/ajax/',
+                type: 'post',
+                data: {
+                    token: data.tk,
+                    secret_key: data.secretToken,
+                    ts: data.ts
+                },
+                success: function (data) {
+                    var url = location.href;
+                    var times = url.split("?");
+                    if(times[1] != 1){
+                        url += "?1";
+                        self.location.replace(url);
+                    }
+                    initFun();
+                }
+            })
+        }
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
+                $('#nologin').unbind('click')
                 $('.receive_box').on('click', function(){
                     mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/mobile/'});
                 })
             } else {
                 login = true;
-                initFun();
             }
         })
     },
@@ -181,14 +201,6 @@ function initFun() {
             init: lib.init
         }
     })(org);
-    $.each($('script'), function(){
-        var src = $(this).attr('src');
-        if(src){
-            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
-                org[$(this).attr('data-init')].init();
-            }
-        }
-    })
 }
 ;(function(org){
     $.extend($.fn, {

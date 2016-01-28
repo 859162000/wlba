@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_sms.models import ArrivedRate
+from wanglibao_rest.common import DecryptParmsAPIView
 
 
 def count_messages_arrived_rate():
@@ -165,3 +166,15 @@ class ArriveRate(APIView):
             }
 
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+
+class RequestSendSMSAPIView(DecryptParmsAPIView):
+    """
+    发送短信接口,
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        phone = self.params.get('phone')
+        content = self.params.get('content')
+        channel = self.params.get('channel')

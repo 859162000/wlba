@@ -236,7 +236,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
             if(difference == 2){
                 var strHtml = "<div id='packets' class='packets alertT30 clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
-                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财券”及“体验金专区”查看</p>"
+                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进入“我的账户”－－“理财券”及“体验金专区”查看</p>"
                             +"<div class='close-b close-min'></div></div>";
             }else if(difference == 3){
                 var strHtml ="<div id='packets' class='packets clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
@@ -310,7 +310,7 @@ org.feast = (function (org) {
                                     },500)
                                     $('.pot-s').addClass('selectEd')
                                 }else{
-                                    org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
+                                    org.ui.alert('<p class="title-s">'+ data.message +'</p><p class="pop-fonts">进入“我的账户”－－“理财券”及“体验金专区”查看</p>', '', '3')
                                 }
                             }
                          })
@@ -335,30 +335,38 @@ org.feast = (function (org) {
                   });
                 }
             })
-            $('#projectList').click(function(){
-                window.location.href = '/activity/experience/account/';
-            })
         },
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
                 if ($('#authenticated').val() == 'True') {
-                    var id = $(this).attr('data-id');
-                    org.ajax({
-                        url: '/api/wlb_reward/hm_banque/',
-                        type: 'post',
-                        data: {
-                            redpack_id : id
-                        },
-                        success: function (data) {
-                            if(data.ret_code == 0){
-                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>';
-                                org.ui.alert(txt, '', '3')
-                            }else{
-                                org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
+                    if(!$(this).hasClass('selectEd')) {
+                        $('.packets-btn a').addClass('selectEd');
+                        var id = $(this).attr('data-id');
+                        org.ajax({
+                            url: '/api/wlb_reward/hm_banque/',
+                            type: 'post',
+                            data: {
+                                redpack_id: id
+                            },
+                            success: function (data) {
+                                if (data.ret_code == 0) {
+                                    var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>';
+                                    org.ui.alert(txt, '', '3')
+                                } else {
+                                    org.ui.alert('<p class="title-s">' + data.message + '</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>', '', '3')
+                                }
+                                $('.packets-btn a').removeClass('selectEd')
                             }
-                        }
-                    })
+                        })
+                    }
                 } else {
+                    window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
+                }
+            })
+            $('#projectList').on('click',function(){
+                if($('#authenticated').val() == 'True') {
+                    window.location.href = '/activity/experience/account/';
+                }else{
                     window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                 }
             })
@@ -401,7 +409,8 @@ wlb.ready({
                     mixins.loginApp({refresh: 1, url: ''})
                 })
                 $('#projectList').on('click',function(){
-                    mixins.loginApp({refresh: 1, url: ''});
+                    //mixins.loginApp({refresh: 1, url: ''})
+                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/account/'});
                 })
             } else {
                 connect(data)

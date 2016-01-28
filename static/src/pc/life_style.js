@@ -2,6 +2,41 @@
  * Created by rsj217 on 16-1-21.
  */
 
+var video_1 = document.getElementById('really-cool-video'),
+    video_2 = document.getElementById('really-cool-video2');
+// 原生的JavaScript事件绑定函数
+  function bindEvent(ele, eventName, func){
+      if(window.addEventListener){
+          ele.addEventListener(eventName, func);
+      }
+      else{
+          ele.attachEvent('on' + eventName, func);
+      }
+  }
+
+  bindEvent(video_1,'ended',function(){
+    document.getElementsByClassName('vjs-poster')[0].style.display='block';
+    document.getElementsByClassName('vjs-big-play-button')[0].style.display='block';
+    video_1.currentTime = 0;
+  });
+
+  bindEvent(video_1,'play',function(){
+    document.getElementsByClassName('vjs-poster')[0].style.display='none';
+    document.getElementsByClassName('vjs-big-play-button')[0].style.display='none';
+  });
+
+   bindEvent(video_2,'ended',function(){
+      document.getElementsByClassName('vjs-poster')[1].style.display='block';
+      document.getElementsByClassName('vjs-big-play-button')[1].style.display='block';
+      video_2.currentTime = 0;
+    });
+
+    bindEvent(video_2,'play',function(){
+      document.getElementsByClassName('vjs-poster')[1].style.display='none';
+      document.getElementsByClassName('vjs-big-play-button')[1].style.display='none';
+    });
+
+
 require.config({
   paths: {
     'scrollify': 'lib/jquery.fullPage.min',
@@ -18,7 +53,13 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
 //  $('#really-cool-video2').height(283);
 //  var player = videojs('really-cool-video', { /* Options */ }, function() {
 //    console.log('Good to go!');
+//
+//
 //  });
+
+
+
+
 
   $('.tv-box1').on('click',function(){
     $(this).children('.black').hide()
@@ -30,15 +71,25 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   $('.show-box h1').css({"height":$(window).height()/4});
 
   $('#fullpage').fullpage({
-    normalScrollElements :'#main-box'
+    normalScrollElements :'#main-box',
+    afterLoad : function(anchorLink,index){
+      if (index == 1){
+        $(".section").eq(1).show();
+      }else if (index ==2){
+        $(".section").eq(2).show();
+      }
+
+    },
+    navigation : true
+
   });
 
   var h_win = $(window).height();
   var Top = $('.banner').offset().top;
   var H = h_win-Top;
   $('.banner').height(H+'px');
-  $('.main-box').height(h_win-170+'px');
-  $('.main-box .lei-box').height(h_win-210+'px');
+  $('.main-box').height(h_win-130+'px');
+  $('.main-box .lei-box').height(h_win-180+'px');
   var T = $('.main-box').height()/2-67+'px';
   $('.fp-prev,.fp-next').css({'top':T});
 

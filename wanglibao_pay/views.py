@@ -62,6 +62,7 @@ from weixin.models import WeixinUser
 from wanglibao_rest.common import DecryptParmsAPIView
 from marketing.tools import withdraw_submit_ok
 from misc.models import Misc
+from wanglibao_pay.tasks import sync_bind_card
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -192,6 +193,7 @@ class PayView(TemplateView):
             result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device_type)
         else:
             result = HuifuPay().pre_pay(request)
+
         return self.render_to_response(result)
 
     @method_decorator(csrf_exempt)
