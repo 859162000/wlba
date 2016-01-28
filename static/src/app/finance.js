@@ -165,7 +165,7 @@ org.finance = (function (org) {
                 }
             }
 
-            if (count >= 10) {
+            if (count > 10) {
                 return {
                     name: name[2],
                     detail: detail[2]
