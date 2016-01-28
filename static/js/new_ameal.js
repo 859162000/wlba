@@ -60,9 +60,8 @@
                 }else{
                     $('.years_smak').show().find("h3").text(txt);
                 }
-
-
             })
+            $(".cover_layer").show();
         })
         function ajaxfn(id, url, fn){
             $.ajax({
@@ -85,10 +84,11 @@
                     $('.years_smak').show().find("h3").text(txt);
                 }
             })
-
+            $(".cover_layer").show();
         })
         $(".years_close").on("click",function(){
             $(this).parent().parent().hide();
+            $(".cover_layer").hide();
         })
         isdata = function(data){
             if(data == 2){
@@ -101,9 +101,10 @@
                 $("#boil").animate({"left" : 50+"%", "top" : -85+"px"},500);
             }
         }
-        dialog = function(){
-
-        }
+        $(".years_explain_box").hide();
+        $("#years_gui").on('click',function(){
+            $(".years_explain_box").slideToggle(500);
+        })
 
     })
 })()
