@@ -401,7 +401,7 @@ wlb.ready({
                     mixins.loginApp({refresh: 1, url: ''})
                 })
                 $('#projectList').on('click',function(){
-                    mixins.loginApp({refresh: 1, url: ''});
+                    mixins.loginApp({refresh: 1, url: '/activity/experience/account/'});
                 })
             } else {
                 connect(data)
