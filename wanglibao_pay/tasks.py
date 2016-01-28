@@ -6,8 +6,6 @@ pay model async task
 """
 
 from wanglibao.celery import app
-from wanglibao_pay.yee_pay import YeeShortPay
-from wanglibao_pay.kuai_pay import KuaiShortPay
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_pay.models import Card
 
@@ -17,6 +15,9 @@ def sync_bind_card(user_id):
     sync binded card from pay channel
     """
     # 查询易宝已经绑定卡
+    from wanglibao_pay.yee_pay import YeeShortPay
+    from wanglibao_pay.kuai_pay import KuaiShortPay
+
     user = WanglibaoUserProfile.objects.get(pk=user_id)
     res = YeeShortPay().bind_card_query(user=user)
     if res['ret_code'] not in (0, 20011):
