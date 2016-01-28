@@ -336,7 +336,7 @@ org.feast = (function (org) {
                 }
             })
             $('#projectList').click(function(){
-                window.location.href = '/weixin/list/';
+                window.location.href = '/activity/experience/account/';
             })
         },
         _receiveFun: function(){
@@ -351,7 +351,7 @@ org.feast = (function (org) {
                         },
                         success: function (data) {
                             if(data.ret_code == 0){
-                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进去“我的账户”－－“理财卷”及“体验金专区”查看</p>';
+                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>';
                                 org.ui.alert(txt, '', '3')
                             }else{
                                 org.ui.alert('<p class="error-s">'+data.message+'</p>', '', '3')
@@ -396,12 +396,12 @@ wlb.ready({
         }
 
         mixins.sendUserInfo(function (data) {
-            $('#projectList').on('click',function(){
-                mixins.jumpToManageMoney();
-            })
             if (data.ph == '') {
                 $('.pot-s,.packets-btn a').on('click',function(){
                     mixins.loginApp({refresh: 1, url: ''})
+                })
+                $('#projectList').on('click',function(){
+                    mixins.loginApp({refresh: 1, url: ''});
                 })
             } else {
                 connect(data)
