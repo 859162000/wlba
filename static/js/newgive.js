@@ -19,34 +19,34 @@
         });
 
         //banner
-        var currentBanner = 0, timer = null, speedBanner = 3000,
-            banners = $('.slide-banner'),
-            bannerCount = banners.length,
-            anchors = $('.slide-anchor');
-        switchBanner = function () {
-            $(banners[currentBanner]).fadeOut();
-            $(anchors[currentBanner]).toggleClass('active');
-            currentBanner = (currentBanner + 1) % bannerCount;
-            $(banners[currentBanner]).fadeIn();
-            $(anchors[currentBanner]).toggleClass('active');
-        };
-        timer = setInterval(switchBanner, speedBanner);
-        anchors.mouseover(function (e) {
-            return clearInterval(timer);
-        }).mouseout(function (e) {
-            return timer = setInterval(switchBanner, speedBanner);
-        });
-        anchors.click(function (e) {
-            e.preventDefault();
-            var index = $(this).index();
-            if (index !== currentBanner) {
-                $(banners[currentBanner]).fadeOut();
-                $(anchors[currentBanner]).toggleClass('active');
-                $(banners[index]).fadeIn();
-                $(anchors[index]).toggleClass('active');
-                return currentBanner = index;
-            }
-        });
+        //var currentBanner = 0, timer = null, speedBanner = 3000,
+        //    banners = $('.slide-banner'),
+        //    bannerCount = banners.length,
+        //    anchors = $('.slide-anchor');
+        //switchBanner = function () {
+        //    $(banners[currentBanner]).fadeOut();
+        //    $(anchors[currentBanner]).toggleClass('active');
+        //    currentBanner = (currentBanner + 1) % bannerCount;
+        //    $(banners[currentBanner]).fadeIn();
+        //    $(anchors[currentBanner]).toggleClass('active');
+        //};
+        //timer = setInterval(switchBanner, speedBanner);
+        //anchors.mouseover(function (e) {
+        //    return clearInterval(timer);
+        //}).mouseout(function (e) {
+        //    return timer = setInterval(switchBanner, speedBanner);
+        //});
+        //anchors.click(function (e) {
+        //    e.preventDefault();
+        //    var index = $(this).index();
+        //    if (index !== currentBanner) {
+        //        $(banners[currentBanner]).fadeOut();
+        //        $(anchors[currentBanner]).toggleClass('active');
+        //        $(banners[index]).fadeIn();
+        //        $(anchors[index]).toggleClass('active');
+        //        return currentBanner = index;
+        //    }
+        //});
 
 
         var $num = $('.gv_tzh')
