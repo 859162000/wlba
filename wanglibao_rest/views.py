@@ -573,7 +573,7 @@ class SendVoiceCodeAPIView(APIView):
                                                                phone_validate_code_item.validate_code,
                                                                phone_validate_code_item.id)
         logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
-        return Response({"ret_code": res_code, "message": res_text})
+        return Response({"ret_code": 0, "message": 'ok'})
 
 
 class SendVoiceCodeNewAPIView(APIView):
