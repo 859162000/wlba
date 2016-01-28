@@ -2,7 +2,8 @@
 doctype html
 html(style="background:#fecf4f")
     head
-        include include/app_header.jade
+        title 网利宝
+        include include/app_head
         link(href="/static/styles/mobile_activity/app.css?v=20160120", rel="stylesheet")
         body
             input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -46,7 +47,7 @@ html(style="background:#fecf4f")
                     .rule-div
                         .rule-title
                             span 红包和加息券规则
-                        p 1、红包有效期：2016年2月4日00:00-2016年2月15日23:59；
+                        p 1、红包有效期至2016年2月29日23:59；
                         p 2、所有红包为直抵红包，有使用门槛。直抵红包在投资中可直抵现金使用，详情使用方法请见我的账户-理财券红包列表查看；
                         p 3、红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
                         p 4、加息券在电脑端和手机端均可使用，一券一标永久加息。投标时选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
@@ -78,19 +79,18 @@ html(style="background:#fecf4f")
                             p.packets-icon(class='icon{{index}}')
                                 span
                 p.title-fonts.mt1 备注：活动期新老用户均可领取享用
-                p.title-fonts （每天每个红包限领一次，每天均可来领，红包限投3个月及以上标期）
+                p.title-fonts （每天五选一限领1个红包，每天均可来领，红包限投3个月及以上标期）
                 .rule-div
                     .rule-title
                         span 活动规则
                     p 1、活动时间：2016年2月4日-2016年2月15日；
-                    p 2、活动期间，新老用户均可参加活动，活动期间全民盛宴和豪门盛宴福利每位用户每天限领一次，每天均可领取；
-                    p 3、红包和加息券只限投正常期限理财标获得和使用，不可用于定存宝和债转等产品，使用详情可见我的账户--理财券列表；
-                    p 4、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
-                    p 5、网利宝对此活动享有最终解释权。
-                    p.rule_content_bt#ios-show(style='display:none') 6、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
+                    p 2、活动期间，新老用户均可参加活动，活动期间全民盛宴和豪门盛宴福利每位用户每天限领一次，每天均可领取，使用详情可见我的账户--理财券列表；
+                    p 3、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+                    p 4、网利宝对此活动享有最终解释权。
+                    p.rule_content_bt#ios-show(style='display:none') 5、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
     script(src="/static/src/mobile/lib/weixin/wx.js")
     script(src="/static/scripts/component/webview.js?v=2222")
-    script(data-init="feast",src="/static/scripts/mobile_activity/new_year_feast.js?v=8888965968")
+    script(src="/static/scripts/mobile_activity/new_year_feast.js?v=789456")
     script.
         var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,

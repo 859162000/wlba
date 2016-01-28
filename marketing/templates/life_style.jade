@@ -15,7 +15,7 @@ html
       .section
         include global/g_nav
         .banner.clearfix
-      .section
+      .section(style="display:none")
         .life_nav.clearfix
           ul
             li
@@ -149,7 +149,7 @@ html
                 p(style="float:left") 我不是传统意义上的好学生，但是我想做传统意义上的好男人，让老婆轻松，让孩子快乐。
                 p 今年我就三十岁了，已经是两个孩子的爸爸，都说我是顾家的好男人，可是上学那会，真算不上好学生。大学还没毕业就跑到上海打工，找工作的时候才知道学历的重要性，但是拗着一股劲迎难而上，工作日去工作，周末就去上海电视大学充电，很快从普通工人就变成了管理人员。
                 p 我身上的一股执拗劲儿一直没改过，直到2009年5月11号上午11点25分，大女儿出生了，当我抱着她的那一刻，突然眼泪就流了下来，从我抱她的那一刻起，我就要对她以后的生活负全责了，一种责任感代替了我身上的执拗。
-                p(style="margin-bottom:0px;float:left") 我连自己的生日都会忘记，很奇怪把女儿的生日记得那么清楚，还有一个时间记得比较清楚，就是2014年10月。20114年我准备
+                p(style="margin-bottom:0px;float:left") 我连自己的生日都会忘记，很奇怪把女儿的生日记得那么清楚，还有一个时间记得比较清楚，就是2014年10月。2014年我准备
                 .left-div(style="width:478px;float:left")
                   p 自己创业，于是来到了云南、贵州一带包项目，没想到创业比自己想得难多了，最终以失败告终，一下就没了收入来源。突然想到了10月份看到的网利宝，那时候钱基本是做银行理财，收益5%左右，乍一下看到网利宝12%以上的项目，有点不太敢相信。后来慢慢了解，发现有一个项目是自己信任的公司做担保，于是先拿了100块试试，我想有很多人都是从100开始投的吧。
                   p 虽然投的少，但是每笔回款都有短信提醒，感觉还是比较靠谱的，等本息到帐后逐渐加大了投资。由于家庭的一些情况，2015年就没怎么出去工作，唯一的收入就是投资理财的收益，其中网利宝占了很大一部分，所以我关注网利宝比一般人要关注得更多。
@@ -217,18 +217,18 @@ html
                 p 资金托管是保障投资人资金不被挪用的最重要方式之一，平台可以与第三方支付机构或银行进行合作。资金托管需要支付费用，十亿以上交易额的平台，在支付方面的费用预计能够达到百万量级。平台对待资金托管及费用承担的态度在一定程度上能说明问题。
                 p.tit-strong(style="float:left") 第五点：看平台的整体收益情况
                 p 金融行业是个风险定价的行业，高风险高收益、低风险低收益。正规的平台收益都不会太高，一般在6%-15%左右，只有刚上线的平台为了人气才会发收益稍等提高点，但一般情况下也不会超20%。遇到一些收益特别高的平台，最好还是远离吧。
-      .section.view-show
+      .section.view-show(style="display:none")
         .show-box
           h1
-          .tv-box1.video-js
-            video( id="really-cool-video", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="504", height="339", poster="/static/imgs/pc/life_style/black.png", data-setup='{"language":"zh"}' )
+          .tv-box1
+            video(id="really-cool-video" , class="video-js vjs-default-skin vjs-big-play-centered", data-setup='{"language":"zh"}' , controls, preload="auto", width="504", height="339", poster="/static/imgs/pc_activity/life_style/black.jpg")
+              source(src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_kevin.ogg", type='video/ogg')
               source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_kevin.mp4", type='video/mp4')
-              source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_kevin.ogg", type='video/ogg')
               p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,safari,ie9以上等)！
           .tv-box2
-            video( id="really-cool-video2", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="504", height="339",poster="/static/imgs/pc/life_style/black.png", data-setup='{"language":"zh"}' )
-              source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_luxy.mp4", type='video/mp4')
+            video( id="really-cool-video2", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="504", height="339", poster="/static/imgs/pc_activity/life_style/black.jpg", data-setup='{"language":"zh"}' )
               source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_luxy.ogg", type='video/ogg')
+              source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_luxy.mp4", type='video/mp4')
               p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,safari,ie9以上等)！
           p.leader(style="margin-right:54px")
             span 网利宝CEO
