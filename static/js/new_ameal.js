@@ -59,9 +59,11 @@
                     })
                 }else{
                     $('.years_smak').show().find("h3").text(txt);
+                    $('.years_smak').find("p").text("进入“我的账户”--“理财券”“体验金专区”查看");
                 }
+                $(".cover_layer").show();
             })
-            $(".cover_layer").show();
+
         })
         function ajaxfn(id, url, fn){
             $.ajax({
@@ -82,9 +84,11 @@
 
                 }else{
                     $('.years_smak').show().find("h3").text(txt);
+                    $('.years_smak').find("p").text("进入“我的账户”--“理财券”查看");
                 }
+                $(".cover_layer").show();
             })
-            $(".cover_layer").show();
+
         })
         $(".years_close").on("click",function(){
             $(this).parent().parent().hide();
