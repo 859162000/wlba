@@ -274,7 +274,7 @@ wlb.ready({
                 login = false;
                 $('#nologin').unbind('click')
                 $('.receive_box').on('click', function(){
-                    mixins.registerApp({refresh:1, url:'http://192.168.1.73:8000/activity/experience/redirect/'});
+                    mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/redirect/'});
                 })
             } else {
                 login = true;
