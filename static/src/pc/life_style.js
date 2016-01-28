@@ -16,9 +16,15 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   //视屏播放
 //  $('#really-cool-video').height(283);
 //  $('#really-cool-video2').height(283);
-//  var player = videojs('really-cool-video', { /* Options */ }, function() {
-//    console.log('Good to go!');
-//  });
+  var player = videojs('really-cool-video', { /* Options */ }, function() {
+    console.log('Good to go!');
+
+
+  });
+
+  var whereYouAt = player.currentTime();
+  console.log(player.ended);
+
 
   $('.tv-box1').on('click',function(){
     $(this).children('.black').hide()
@@ -46,8 +52,8 @@ require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   var Top = $('.banner').offset().top;
   var H = h_win-Top;
   $('.banner').height(H+'px');
-  $('.main-box').height(h_win-170+'px');
-  $('.main-box .lei-box').height(h_win-210+'px');
+  $('.main-box').height(h_win-130+'px');
+  $('.main-box .lei-box').height(h_win-180+'px');
   var T = $('.main-box').height()/2-67+'px';
   $('.fp-prev,.fp-next').css({'top':T});
 
