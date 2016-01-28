@@ -1889,6 +1889,8 @@ class QMBanquetRewardAPI(APIView):
                     return Response({"ret_code":0, 'redpack_txts':redpack_txts})
                 else:
                     return Response({"ret_code":1, "message":"今天已经领过了"})
+        except IntegrityError, e:
+            return Response({"ret_code":4, "message":"IntegrityError"})
         except Exception, e:
             logger.debug(traceback.format_exc())
             return Response({"ret_code":4, "message":"error"})
@@ -1970,7 +1972,8 @@ class HMBanquetRewardAPI(APIView):
                 gift_record.redpack_record_id_time = timezone.now()
                 gift_record.save()
                 return Response({"ret_code":0, 'message':"success"})
-
+        except IntegrityError, e:
+            return Response({"ret_code":4, "message":"IntegrityError"})
         except Exception, e:
             logger.debug(traceback.format_exc())
             return Response({"ret_code":4, "message":"error"})
