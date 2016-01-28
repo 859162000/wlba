@@ -217,7 +217,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-; org.ui = (function(){
+;org.ui = (function(){
     var lib = {
         _alert: function(txt, callback,difference){
             var alertFram = '';
@@ -269,35 +269,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 var login = false;
 wlb.ready({
     app: function (mixins) {
-        function connect(data) {
-            org.ajax({
-                url: '/accounts/token/login/ajax/',
-                type: 'post',
-                data: {
-                    token: data.tk,
-                    secret_key: data.secretToken,
-                    ts: data.ts
-                },
-                success: function (data) {
-                    var url = location.href;
-                    var times = url.split("?");
-                    if(times[1] != 1){
-                        url += "?1";
-                        self.location.replace(url);
-                    }
-                    initFun();
-                }
-            })
-        }
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
                 $('#nologin').unbind('click')
                 $('.receive_box').on('click', function(){
-                    mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/mobile/'});
+                    mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/mobile/'});
                 })
             } else {
                 login = true;
+                initFun();
             }
         })
     },
