@@ -360,7 +360,11 @@ org.feast = (function (org) {
                 }
             })
             $('#projectList').on('click',function(){
-                window.location.href = '/activity/experience/account/';
+                if($('#authenticated').val() == 'True') {
+                    window.location.href = '/activity/experience/account/';
+                }else{
+                    window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
+                }
             })
         }
     }
