@@ -90,7 +90,6 @@ def getAppSecretKey(token):
 def getDecryptedContent(token, content_encrypted, original_length):
     key = getAppSecretKey(token)
     padding = AES.block_size-original_length%16
-    print padding
     aes = AesForApp(key, padding)
     return aes.decrypt(content_encrypted)
 
