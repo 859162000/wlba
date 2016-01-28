@@ -178,9 +178,9 @@ wlb.ready({
 
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
-                $('.pot-s,.packets-btn a').on('click',function(){
-                    mixins.loginApp({refresh: 1, url: ''})
-                })
+                //$('.pot-s,.packets-btn a').on('click',function(){
+                //    mixins.loginApp({refresh: 1, url: ''})
+                //})
                 $('#projectList').on('click',function(){
                     mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/account/'});
                 })
