@@ -15,6 +15,7 @@ from wanglibao_sms import messages
 from marketing.models import IntroducedBy
 from marketing import utils
 from wanglibao_sms.tasks import send_messages
+from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
@@ -244,6 +245,8 @@ def send_income_message_sms():
     phones_list = []
     messages_list = []
     if incomes:
+        i = 0
+        data_messages = {}
         for income in incomes:
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile')\
@@ -253,10 +256,21 @@ def send_income_message_sms():
             if not name:
                 from wanglibao.templatetags.formatters import safe_phone_str
                 name = safe_phone_str(phone)
-            phones_list.append(phone)
-            messages_list.append(messages.sms_income(name,
-                                                     income.get('invite__count'),
-                                                     income.get('earning__sum')))
+
+            data_messages[i] = {
+                'user_id': phone,
+                'user_type': 'phone',
+                'params': {
+                    'name': name,
+                    'count': income.get('invite__count'),
+                    'amount': income.get('earning__sum')
+                }
+            }
+            i += 1
+            # phones_list.append(phone)
+            # messages_list.append(messages.sms_income(name,
+            #                                          income.get('invite__count'),
+            #                                          income.get('earning__sum')))
 
             # 发送站内信
             title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
@@ -268,11 +282,13 @@ def send_income_message_sms():
             })
 
         # 批量发送短信
-        send_messages.apply_async(kwargs={
-            "phones": phones_list,
-            "messages": messages_list,
-            "ext": 666
-        })
+        # 功能推送id: 3
+        PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
+        # send_messages.apply_async(kwargs={
+        #     "phones": phones_list,
+        #     "messages": messages_list,
+        #     "ext": 666
+        # })
 
 
 @app.task
@@ -286,20 +302,10 @@ def check_unavailable_3_days():
     # 查询三天后的日期
     days = 3
     check_date = timezone.now() + timezone.timedelta(days=days)
-    date_fmt = check_date.strftime('%Y-%m-%d')
     start_date = utils.local_to_utc(check_date, 'min').strftime('%Y-%m-%d %H:%M:%S')
     end_date = utils.local_to_utc(check_date, 'max').strftime('%Y-%m-%d %H:%M:%S')
 
     cursor = connection.cursor()
-    # sql = "select COUNT(c.user_id), c.user_id, p.phone " \
-    #       "from wanglibao_redpack_redpackrecord c, " \
-    #       "wanglibao_redpack_redpack r, " \
-    #       "wanglibao_redpack_redpackevent e, " \
-    #       "wanglibao_profile_wanglibaouserprofile p " \
-    #       "where c.redpack_id = r.id and r.event_id = e.id and c.user_id = p.user_id " \
-    #       "and e.unavailable_at > '{}' and e.unavailable_at <= '{}' " \
-    #       "and e.auto_extension = 0 and c.order_id is NULL " \
-    #       "group by c.user_id;".format(start_date, end_date)
 
     sql = "SELECT COUNT(a.user_id), a.user_id, b.phone FROM " \
           "(SELECT r.user_id, e.auto_extension AS is_auto, e.unavailable_at, " \
@@ -314,27 +320,21 @@ def check_unavailable_3_days():
           "OR (a.is_auto = 1 AND a.end_date > '{}' AND a.end_date <= '{}')) " \
           "GROUP BY a.user_id;".format(start_date, end_date, start_date, end_date)
 
-    print(sql)
     cursor.execute(sql)
     fetchall = cursor.fetchall()
 
-    phones_list = []
-    messages_list = []
-    for res in fetchall:
-        try:
-            phones_list.append(res[2])
-            messages_list.append(messages.red_packet_invalid_alert(res[0], days))
-        except Exception, e:
-            print str(e)
-
-    # for msg in messages_list:
-    #     print msg
-
-    send_messages.apply_async(kwargs={
-        'phones': phones_list,
-        'messages': messages_list,
-        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-    })
+    data_messages = {}
+    for idx, item in enumerate(fetchall):
+        data_messages[idx] = {
+            'user_id': item[2],
+            'user_type': 'phone',
+            'params': {
+                'count': item[0],
+                'days': days
+            }
+        }
+    # 功能推送id: 1
+    PHPSendSMS().send_sms(rule_id=1, data_messages=data_messages)
 
 
 @app.task
@@ -355,18 +355,31 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
     # 获取没有投资的用户
     users = registered_users.exclude(id__in=ids)
 
-    phones_list = []
+    data_messages = {}
+    i = 0
     for user in users:
-        try:
-            phones_list.append(user.wanglibaouserprofile.phone)
-        except Exception, e:
-            print e
-            pass
-    send_messages.apply_async(kwargs={
-        'phones': phones_list,
-        'messages': [messages.user_invest_alert()],
-        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-    })
+        data_messages[i] = {
+            'user_id': user.wanglibaouserprofile.phone,
+            'user_type': 'phone',
+            'params': {}
+        }
+        i += 1
+
+    # 功能推送id: 2
+    PHPSendSMS().send_sms(rule_id=2, data_messages=data_messages)
+
+    # phones_list = []
+    # for user in users:
+    #     try:
+    #         phones_list.append(user.wanglibaouserprofile.phone)
+    #     except Exception, e:
+    #         print e
+    #         pass
+    # send_messages.apply_async(kwargs={
+    #     'phones': phones_list,
+    #     'messages': [messages.user_invest_alert()],
+    #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+    # })
 
 
 @app.task
