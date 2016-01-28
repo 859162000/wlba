@@ -236,7 +236,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
             if(difference == 2){
                 var strHtml = "<div id='packets' class='packets alertT30 clearfix'><div class='packets-bg'><div class='packets-content'>"+ txt +"</div></div>"
-                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进去“我的账户”－－“理财券”及“体验金专区”查看</p>"
+                            +"<p class='yellow-fonts'>领取成功！</p><p class='yellow-fonts'>进入“我的账户”－－“理财券”及“体验金专区”查看</p>"
                             +"<div class='close-b close-min'></div></div>";
             }else if(difference == 3){
                 var strHtml ="<div id='packets' class='packets clearfix'><div class='alert-style'></div><div class='alert-bg'>"+ txt +"</div>"
@@ -310,7 +310,7 @@ org.feast = (function (org) {
                                     },500)
                                     $('.pot-s').addClass('selectEd')
                                 }else{
-                                    org.ui.alert('<p class="title-s">'+ data.message +'</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>', '', '3')
+                                    org.ui.alert('<p class="title-s">'+ data.message +'</p><p class="pop-fonts">进入“我的账户”－－“理财券”及“体验金专区”查看</p>', '', '3')
                                 }
                             }
                          })
