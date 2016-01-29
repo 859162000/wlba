@@ -1255,7 +1255,7 @@ class AuthorizeUser(APIView):
                     w_user = WeixinUser()
                     w_user.account_original_id = account.original_id
                     w_user.openid = openid
-                    save_user = True
+                    w_user.save()
 
                 if w_user.account_original_id != account.original_id:
                     w_user.account_original_id = account.original_id
