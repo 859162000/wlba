@@ -11,7 +11,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppAboutView, AppManagementView, AppLogoutAPIView, AppQuestionsView,
                                  AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
                                  AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppAreaView,
-                                 AppAreaApiView, AppMemorabiliaView, AppDataModuleView,
+                                 AppAreaApiView, AppMemorabiliaView, AppDataModuleView, AppActivateScoreImageAPIView,
                                  AppFinanceView)
 
 router = DefaultRouter()
@@ -25,6 +25,7 @@ urlpatterns = patterns(
     '',
     url(r'', include(router.urls)),
     url(r'^preload/$', AppActivateImageAPIView.as_view()),
+    url(r'^preload_score/$', AppActivateScoreImageAPIView.as_view()),
     url(r'^repayment/$', AppRepaymentAPIView.as_view()),
     url(r'^repayment_plan/all/$', AppRepaymentPlanAllAPIView.as_view()),
     url(r'^repayment_plan/month/$', AppRepaymentPlanMonthAPIView.as_view()),
