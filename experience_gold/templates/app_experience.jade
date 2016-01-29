@@ -23,10 +23,8 @@ html(style="background:#fc9300")
                         if user.is_authenticated
                             if experience_count == 0
                                 if p2p_record_count == 0
-                                    .aa 111
                                     img(src='/static/imgs/mobile_activity/app_experience/btn.png').no_invest
                                 else
-                                    .bb 222
                                     img(src='/static/imgs/mobile_activity/app_experience/btn.png').investeds
                             else
                                 .invested 已领取体验金{{experience_all | money_format_int}}元
