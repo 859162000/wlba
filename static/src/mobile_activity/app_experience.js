@@ -76,6 +76,7 @@ wlb.ready({
                 $('#nologin').unbind('click')
                 $('.receive_box').on('click', function(){
                     mixins.registerApp({refresh:1, url:''});
+                    connect(data)
                 })
             } else {
                 login = true;
