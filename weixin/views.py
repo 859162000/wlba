@@ -395,7 +395,7 @@ class WeixinJoinView(View):
     def getCSReply(self):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
-        if now.year==2016 and now.month==1 and (now.day>=5 and now.day<=29):
+        if now.year==2016 and now.month==2 and (now.day>=5 and now.day<=13):
             txt = u"2月5日至2月13日新年期间微信客服休息，由此给您带来的不便敬请谅解，谢谢您的支持，祝新年愉快~"
             return txt
 
