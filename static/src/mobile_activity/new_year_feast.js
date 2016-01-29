@@ -191,7 +191,7 @@ wlb.ready({
                 })
                 $('#projectList').on('click',function(){
                     //mixins.loginApp({refresh: 1, url: ''})
-                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/account/'});
+                    mixins.loginApp({refresh: 1, url: 'https://www.wanglibao.com/activity/experience/account/'});
                 })
             } else {
                 connect(data)
