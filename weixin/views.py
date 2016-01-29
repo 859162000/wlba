@@ -355,11 +355,12 @@ class WeixinJoinView(View):
             if scene_id:
                 _process_scene_record(w_user, scene_id)
 
-        if not reply and not user:
-            txt = self.getBindTxt(fromUserName)
-            reply = create_reply(txt, self.msg)
         if not reply:
-            reply = -1
+            if not user:
+                txt = self.getBindTxt(fromUserName)
+            else:
+                txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
+            reply = create_reply(txt, self.msg)
         return reply
 
     def getSubscribeArticle(self):
@@ -394,12 +395,16 @@ class WeixinJoinView(View):
     def getCSReply(self):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
+        if now.year==2016 and now.month==2 and (now.day>=5 and now.day<=13):
+            txt = u"2月5日至2月13日新年期间微信客服休息，由此给您带来的不便敬请谅解，谢谢您的支持，祝新年愉快~"
+            return txt
+
         if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
             txt = u"客官，想和网利君天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利君在线时间为\n" \
-                  u"【周一至周五10：00~17：00】"
+                  u"【周一至周五9：00~18：00】"
         else:
             txt = u"客官，网利君在线时间为\n"\
-                    + u"【周一至周五10：00~17：00】，请在工作与我们联系哦~"
+                    + u"【周一至周五9：00~18：00】，请在工作时间与我们联系哦~"
         return txt
 
     def getSignExperience_gold(self):

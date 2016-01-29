@@ -6,7 +6,7 @@ from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import logging
-from decimal import Decimal
+# from decimal import Decimal
 from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
@@ -21,11 +21,11 @@ from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
 from wanglibao_p2p.common import get_p2p_list
-from wanglibao_redis.backend import redis_backend
-from wanglibao_rest import utils
-from wanglibao_redpack import backends
-from .util import _generate_ajax_template, FWH_LOGIN_URL
-from wanglibao_pay.models import Bank
+# from wanglibao_redis.backend import redis_backend
+# from wanglibao_rest import utils
+# from wanglibao_redpack import backends
+from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
+# from wanglibao_pay.models import Bank
 from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger("weixin")
@@ -65,9 +65,10 @@ class WXLogin(TemplateView):
                     oauth = WeChatOAuth(account.app_id, account.app_secret, )
                     user_info = oauth.fetch_access_token(code)
                     self.openid = user_info.get('openid')
-                    w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
-                    if is_first:
-                        w_user.save()
+                    w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
+                    # w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
+                    # if is_first:
+                    #     w_user.save()
                 except WeChatException, e:
                     error_msg = e.message
             else:
