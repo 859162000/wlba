@@ -75,8 +75,7 @@ wlb.ready({
                 login = false;
                 $('#nologin').unbind('click')
                 $('.receive_box').on('click', function(){
-                    mixins.registerApp({refresh:1, url:''});
-                    connect(data)
+                    mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/redirect/'});
                 })
             } else {
                 login = true;
