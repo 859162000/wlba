@@ -272,7 +272,6 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                $('#nologin').unbind('click')
                 $('.receive_box').on('click', function(){
                     mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/redirect/'});
                 })
