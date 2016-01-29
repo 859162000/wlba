@@ -1916,8 +1916,7 @@ class QMBanquetTemplate(TemplateView):
                         redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                         if redpack_event:
                             redpacks.append({'redpack_id':redpack_id, "amount":redpack_event.amount, 'invest_amount':redpack_event.invest_amount, "rtype":redpack_event.rtype})
-        sorted(redpacks, lambda x,y:cmp(x['amount'],y['amount']))
-        print redpacks
+        redpacks = sorted(redpacks, lambda x,y:cmp(x['amount'],y['amount']))
         return {
             "redpacks":redpacks,
         }
