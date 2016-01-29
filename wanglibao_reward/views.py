@@ -1951,6 +1951,8 @@ class HMBanquetRewardAPI(APIView):
         if self.activity.is_stopped:
             return Response({"ret_code":2, "message":"活动已经暂停了"})
         activity_rules = ActivityRule.objects.filter(activity=self.activity, is_used=True).all()
+        if len(activity_rules) == 0:
+            return Response({"ret_code":5, "message":"没有活动规则"})
         for activity_rule in activity_rules:
             activity_redpacks = activity_rule.redpack.split(',')
             if redpack_event_id not in activity_redpacks:
