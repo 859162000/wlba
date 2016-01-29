@@ -3,7 +3,7 @@
 from django.views.generic import TemplateView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from wanglibao_activity.models import (ActivityTemplates, ActivityImages, ActivityShow,
-                                       ActivityBannerPosition)
+                                       ActivityBannerShow)
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -121,6 +121,20 @@ class TemplatesFormatTemplate(TemplateView):
 class PcActivityAreaView(TemplateView):
     template_name = 'area.jade'
 
+    def get_banner(self, banner_querys, banner_type):
+        banner_show = banner_querys.filter(banner_type=banner_type).first()
+        if not banner_show:
+            banner_show = ActivityBannerShow.objects.filter(
+                banner_type=banner_type, show_end_at__lte=timezone.now()
+            ).select_related('activity',).order_by('-show_end_at').first()
+
+            if not banner_show:
+                banner_show = ActivityBannerShow.objects.filter(
+                    banner_type=banner_type, show_start_at__gte=timezone.now()
+                ).select_related('activity').order_by('show_start_at').first()
+
+        return banner_show
+
     def get_context_data(self, **kwargs):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_pc=True,
@@ -129,20 +143,22 @@ class PcActivityAreaView(TemplateView):
                                                     ).select_related('activity')
 
         activity_list = get_sorts_for_activity_show(activity_list)
-        now =timezone.now()
-        main_banner = ActivityBannerPosition.objects.filter(main__start_at__lte=now, main__end_at__gt=now).select_related().first()
-        left_banner = ActivityBannerPosition.objects.filter(second_right__start_at__lte=now, second_right__end_at__gt=now).select_related().first()
-        right_banner = ActivityBannerPosition.objects.filter(second_right__start_at__lte=now, second_right__end_at__gt=now).select_related().first()
+        act_banner_shows = ActivityBannerShow.objects.filter(show_start_at__lte=timezone.now(),
+                                                             show_end_at__gt=timezone.now()
+                                                             ).select_related('activity_show')
+
+        main_banner = self.get_banner(act_banner_shows, u'主推')
+        left_banner = self.get_banner(act_banner_shows, u'副推左')
+        right_banner = self.get_banner(act_banner_shows, u'副推右')
+
         limit = 6
         page = 1
-
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
-        print ">>>>>>>>>>", main_banner, left_banner, right_banner
+
         return {
             'main_banner': main_banner,
             'left_banner': left_banner,
             'right_banner': right_banner,
-
             'results': activity_list[:limit],
             'all_page': all_page,
             'page': page,

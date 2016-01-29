@@ -1840,8 +1840,12 @@ class QMBanquetRewardAPI(APIView):
                 self.get_activity_by_code(code)
                 if not self.activity:
                     return Response({"ret_code":3, "message":"活动配置code=%s没有取到"%code})
+                now = timezone.now()
+                if self.activity.start_at >= now:
+                    return Response({"ret_code":3, "message":"活动还未开始"})
+                if self.activity.end_at <= now:
+                    return Response({"ret_code":3, "message":"活动已过期"})
                 if self.activity.is_stopped:
-                    logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, u'活动已经暂停了'))
                     return Response({"ret_code":2, "message":"活动已经暂停了"})
                 gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
                 if not gift_record.exists():
@@ -1851,7 +1855,7 @@ class QMBanquetRewardAPI(APIView):
                 gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
                 if not gift_record.activity_code:
                     redpack_txts = []
-                    activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
+                    activity_rules = ActivityRule.objects.filter(activity=self.activity, is_used=True).all()
                     device = split_ua(self.request)
                     device_type = device['device_type']
                     for activity_rule in activity_rules:
@@ -1912,8 +1916,7 @@ class QMBanquetTemplate(TemplateView):
                         redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                         if redpack_event:
                             redpacks.append({'redpack_id':redpack_id, "amount":redpack_event.amount, 'invest_amount':redpack_event.invest_amount, "rtype":redpack_event.rtype})
-        sorted(redpacks, lambda x,y:cmp(x['amount'],y['amount']))
-        print redpacks
+        redpacks = sorted(redpacks, lambda x,y:cmp(x['amount'],y['amount']))
         return {
             "redpacks":redpacks,
         }
@@ -1939,10 +1942,16 @@ class HMBanquetRewardAPI(APIView):
         self.get_activity_by_code(self.activity_code)
         if not self.activity:
             return Response({"ret_code":3, "message":"活动配置code=%s没有取到"%self.activity_code})
+        now = timezone.now()
+        if self.activity.start_at >= now:
+            return Response({"ret_code":3, "message":"活动还未开始"})
+        if self.activity.end_at <= now:
+            return Response({"ret_code":3, "message":"活动已过期"})
         if self.activity.is_stopped:
-            logger.debug("class:%s, msg:%s" %(self.__class__.__name__, u'活动已经暂停了'))
             return Response({"ret_code":2, "message":"活动已经暂停了"})
-        activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
+        activity_rules = ActivityRule.objects.filter(activity=self.activity, is_used=True).all()
+        if len(activity_rules) == 0:
+            return Response({"ret_code":5, "message":"没有活动规则"})
         for activity_rule in activity_rules:
             activity_redpacks = activity_rule.redpack.split(',')
             if redpack_event_id not in activity_redpacks:
