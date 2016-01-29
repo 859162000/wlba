@@ -124,13 +124,14 @@ class PcActivityAreaView(TemplateView):
     def get_banner(self, banner_querys, banner_type):
         banner_show = banner_querys.filter(banner_type=banner_type).first()
         if not banner_show:
-            banner_show = ActivityBannerShow.objects.filter(banner_type=banner_type,
-                                                            show_end_at__lte=timezone.now()
-                                                            ).order_by('-show_end_at').first()
+            banner_show = ActivityBannerShow.objects.filter(
+                banner_type=banner_type, show_end_at__lte=timezone.now()
+            ).select_related('activity',).order_by('-show_end_at').first()
+
             if not banner_show:
-                banner_show = ActivityBannerShow.objects.filter(banner_type=banner_type,
-                                                                show_start_at__gte=timezone.now()
-                                                                ).order_by('show_start_at').first()
+                banner_show = ActivityBannerShow.objects.filter(
+                    banner_type=banner_type, show_start_at__gte=timezone.now()
+                ).select_related('activity').order_by('show_start_at').first()
 
         return banner_show
 
