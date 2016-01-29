@@ -44,18 +44,18 @@ html(style='background:#f5f5f5;height:100%;overflow:hidden;')
                 span.user-name 亲爱的赞赞赞
               .model2-data-warp
                 .finance-model2-list 您是网利宝第 <i class= 'yellow zc_ranking'></i> 位注册用户
-                .finance-model-dotted
+                .finance-model-dotted(style='padding: .5rem 1rem;')
                   .dotted-item
                     .dotted-circle
                     .dotted-line.ele-line
                     .dotted-circle
-                .finance-model2-list 投资总额: <i class= 'yellow tz_amount'></i> <br>击败 <span class='tz_ranking_percent'></span>%的投资人
-                .finance-model-dotted
+                .finance-model2-list 投资总额: <i class= 'yellow tz_amount'></i>
+                .finance-model-dotted(style='padding: .5rem 1rem;')
                   .dotted-item
                     .dotted-circle
                     .dotted-line.ele-line
                     .dotted-circle
-                .finance-model2-list 投资总收益：<i class= 'yellow income_total'></i> <br>这个数字会惨遭嫉妒
+                .finance-model2-list 总收益：<i class= 'yellow income_total'></i><br>(总收益＝投资收益＋活动收益)
             img(src='/static/imgs/app/finance/earth_lion2_default.png').finance-earth
             .finance-page-chicken.ele-txt2 回顾我的致富之路
             .touch-next
@@ -65,7 +65,7 @@ html(style='background:#f5f5f5;height:100%;overflow:hidden;')
               .finance-head
                 .star-head
                 .head-title 土豪致富秘笈
-              .finance-model3-list 秘笈1:要做土豪，必先勤劳（全年投资次数／周期）
+              .finance-model3-list 秘笈1：要做土豪，必先勤劳
               .finance-model3-rotate
                 .rotate-item
                   .item-warp
@@ -82,13 +82,13 @@ html(style='background:#f5f5f5;height:100%;overflow:hidden;')
                   .dotted-circle
                   .dotted-line.ele-line
                   .dotted-circle
-              .finance-model3-list.finance-model3-space 秘笈2:不光勤劳，出手要豪（单笔投资最大额度）
+              .finance-model3-list.finance-model3-space 秘笈2：不光勤劳，出手要豪
               .finance-model3-canvas
                 .finance-canvas-list
                   .max-finance ¥<span class='tz_max_amount'></span>
                 .finance-canvas-list
                   canvas(id="canvas-model3")
-              .item-dec.finance-model3-space 出手豪气超过<span class='tz_max_ranking_percent'></span>%投资人
+              .item-dec.finance-model3-space 单笔投资最大额度，出手豪气超过<span class='tz_max_ranking_percent'></span>%投资人
             .finance-page-chicken.ele-txt2 分析我的性格色彩，紧抱自己大腿
             .touch-next
           //第四页
@@ -175,6 +175,9 @@ html(style='background:#f5f5f5;height:100%;overflow:hidden;')
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
     script(src="/static/src/app/echarts/Chart.min.js")
     script(src="/static/scripts/component/dist/webview.js?v=2222")
-    script(src='/static/scripts/app/finance.js?v=2522899221')
+    script(src='/static/scripts/app/dist/finance.js?v=25228221')
+    script.
+      var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+      document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F55fcf0f3d843f47b4785c7ec44de129c' type='text/javascript'%3E%3C/script%3E"));
 
                

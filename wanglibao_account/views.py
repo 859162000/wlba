@@ -608,7 +608,7 @@ class AccountHomeAPIView(APIView):
         # 当月免费提现次数
         fee_config = WithdrawFee().get_withdraw_fee_config()
         free_times_per_month = int(fee_config['fee']['free_times_per_month'])
-        withdraw_success_count = int(WithdrawFee().get_withdraw_success_count(user))
+        withdraw_success_count = int(WithdrawFee().get_withdraw_count(user))
         withdraw_free_count = free_times_per_month - withdraw_success_count
 
         if withdraw_free_count <= 0:

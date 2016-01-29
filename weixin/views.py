@@ -359,7 +359,7 @@ class WeixinJoinView(View):
             if not user:
                 txt = self.getBindTxt(fromUserName)
             else:
-                txt = u"您的微信当前绑定帐号为：%s"%user.wanglibaouserprofile.phone
+                txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)
         return reply
 
@@ -397,10 +397,10 @@ class WeixinJoinView(View):
         weekday = now.weekday() + 1
         if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
             txt = u"客官，想和网利君天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利君在线时间为\n" \
-                  u"【周一至周五10：00~17：00】"
+                  u"【周一至周五9：00~18：00】"
         else:
             txt = u"客官，网利君在线时间为\n"\
-                    + u"【周一至周五10：00~17：00】，请在工作与我们联系哦~"
+                    + u"【周一至周五9：00~18：00】，请在工作时间与我们联系哦~"
         return txt
 
     def getSignExperience_gold(self):

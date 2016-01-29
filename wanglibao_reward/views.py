@@ -1840,8 +1840,12 @@ class QMBanquetRewardAPI(APIView):
                 self.get_activity_by_code(code)
                 if not self.activity:
                     return Response({"ret_code":3, "message":"活动配置code=%s没有取到"%code})
+                now = timezone.now()
+                if self.activity.start_at >= now:
+                    return Response({"ret_code":3, "message":"活动还未开始"})
+                if self.activity.end_at <= now:
+                    return Response({"ret_code":3, "message":"活动已过期"})
                 if self.activity.is_stopped:
-                    logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, u'活动已经暂停了'))
                     return Response({"ret_code":2, "message":"活动已经暂停了"})
                 gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
                 if not gift_record.exists():
@@ -1851,7 +1855,7 @@ class QMBanquetRewardAPI(APIView):
                 gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
                 if not gift_record.activity_code:
                     redpack_txts = []
-                    activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
+                    activity_rules = ActivityRule.objects.filter(activity=self.activity, is_used=True).all()
                     device = split_ua(self.request)
                     device_type = device['device_type']
                     for activity_rule in activity_rules:
@@ -1867,21 +1871,21 @@ class QMBanquetRewardAPI(APIView):
                                     return Response({"ret_code":6,"message":messege})
                                 redpack_text = "None"
                                 if redpack_event.rtype == 'interest_coupon':
-                                    redpack_text = "%s%%加息券"%int(redpack_event.amount)
+                                    redpack_text = "%s%%加息券"%redpack_event.amount
                                 if redpack_event.rtype == 'percent':
-                                    redpack_text = "%s%%百分比红包"%int(redpack_event.amount)
+                                    redpack_text = "%s%%百分比红包"%redpack_event.amount
                                 if redpack_event.rtype == 'direct':
                                     redpack_text = "%s元红包"%int(redpack_event.amount)
                                 redpack_txts.append(redpack_text)
-                                redpack_record_ids += str(redpack_record_id)
+                                redpack_record_ids += (str(redpack_record_id) + ",")
                             gift_record.redpack_record_ids = redpack_record_ids
                         if activity_rule.gift_type == "experience_gold":
                             experience_record_ids = ""
                             experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
                             if not experience_record_id:
                                 return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
-                            redpack_txts.append('%s元体验金'%experience_event.amount)
-                            experience_record_ids+=str(experience_record_id)
+                            redpack_txts.append('%s元体验金'%int(experience_event.amount))
+                            experience_record_ids += (str(experience_record_id) + ",")
                             gift_record.experience_record_ids = experience_record_ids
                     gift_record.activity_code = self.activity.code
                     gift_record.activity_code_time = timezone.now()
@@ -1889,6 +1893,8 @@ class QMBanquetRewardAPI(APIView):
                     return Response({"ret_code":0, 'redpack_txts':redpack_txts})
                 else:
                     return Response({"ret_code":1, "message":"今天已经领过了"})
+        except IntegrityError, e:
+            return Response({"ret_code":4, "message":"IntegrityError"})
         except Exception, e:
             logger.debug(traceback.format_exc())
             return Response({"ret_code":4, "message":"error"})
@@ -1937,10 +1943,16 @@ class HMBanquetRewardAPI(APIView):
         self.get_activity_by_code(self.activity_code)
         if not self.activity:
             return Response({"ret_code":3, "message":"活动配置code=%s没有取到"%self.activity_code})
+        now = timezone.now()
+        if self.activity.start_at >= now:
+            return Response({"ret_code":3, "message":"活动还未开始"})
+        if self.activity.end_at <= now:
+            return Response({"ret_code":3, "message":"活动已过期"})
         if self.activity.is_stopped:
-            logger.debug("class:%s, msg:%s" %(self.__class__.__name__, u'活动已经暂停了'))
             return Response({"ret_code":2, "message":"活动已经暂停了"})
-        activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
+        activity_rules = ActivityRule.objects.filter(activity=self.activity, is_used=True).all()
+        if len(activity_rules) == 0:
+            return Response({"ret_code":5, "message":"没有活动规则"})
         for activity_rule in activity_rules:
             activity_redpacks = activity_rule.redpack.split(',')
             if redpack_event_id not in activity_redpacks:
@@ -1970,7 +1982,8 @@ class HMBanquetRewardAPI(APIView):
                 gift_record.redpack_record_id_time = timezone.now()
                 gift_record.save()
                 return Response({"ret_code":0, 'message':"success"})
-
+        except IntegrityError, e:
+            return Response({"ret_code":4, "message":"IntegrityError"})
         except Exception, e:
             logger.debug(traceback.format_exc())
             return Response({"ret_code":4, "message":"error"})
