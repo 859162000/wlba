@@ -1,14 +1,16 @@
 # coding: utf-8
 
 import time
+import datetime
 from django import forms
 from django.contrib import admin
-import datetime
 from django.utils import timezone
+from django.db.models import Q
 from import_export import resources, fields
 from import_export.admin import ExportMixin
+from django.contrib.admin import widgets
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, \
-    ActivityImages, WapActivityTemplates, ActivityShow, ActivityBannerPosition
+    ActivityImages, WapActivityTemplates, ActivityShow, ActivityBannerPosition, ActivityBannerShow
 import models as m
 
 
@@ -232,8 +234,8 @@ class ActivityShowForm(forms.ModelForm):
     pc_template = forms.CharField(label=u'PC-活动详情页模板名称*', max_length=255, required=False)
     app_detail_link = forms.CharField(label=u'APP-活动详情页链接*', max_length=255, required=False)
     app_template = forms.CharField(label=u'APP-活动详情页模板名称*', max_length=255, required=False)
-    start_at = forms.DateTimeField(label=u'活动页面展示开始时间*', required=False)
-    end_at = forms.DateTimeField(label=u'活动页面展示结束时间*', required=False)
+    start_at = forms.DateTimeField(label=u'活动页面展示开始时间*', widget=widgets.AdminSplitDateTime)
+    end_at = forms.DateTimeField(label=u'活动页面展示结束时间*', widget=widgets.AdminSplitDateTime)
 
     def clean_pc_detail_link(self):
         is_pc = self.cleaned_data.get('is_pc')
@@ -295,7 +297,7 @@ class ActivityShowForm(forms.ModelForm):
 
 class ActivityShowAdmin(admin.ModelAdmin):
     actions = None
-    search_fields = ('activity', 'channel')
+    search_fields = ('id', 'activity', 'channel')
     ordering = ('-priority', '-created_at')
     raw_id_fields = ('activity',)
     list_display = ('activity', 'activity_status', 'platform', 'priority')
@@ -308,28 +310,6 @@ class ActivityBannerPosForm(forms.ModelForm):
     second_left = forms.ModelChoiceField(queryset=queryset, label=u'副推左', required=True)
     second_right = forms.ModelChoiceField(queryset=queryset, label=u'副推右', required=True)
 
-    def is_valid_time(self, self_activity_show, banner_type):
-        if banner_type == 'main':
-            banner_dsc = u'主推'
-        elif banner_type == 'second_left':
-            banner_dsc = u'副推左'
-        else:
-            banner_dsc = u'副推右'
-
-        banners = ActivityBannerPosition.objects.all().select_related().order_by('%s__start_at' % banner_type)
-        before_end_time = None
-        for banner in banners:
-            activity_show = getattr(banner, banner_type, None)
-            if activity_show and activity_show != self_activity_show:
-                start_time = activity_show.start_at
-                end_time = activity_show.end_at
-                if before_end_time:
-                    if start_time >= before_end_time:
-                        raise forms.ValidationError(u'活动展示(%s, %s)%sBanner展示时间冲突' % (
-                            self_activity_show, activity_show, banner_dsc))
-
-                before_end_time = end_time
-
     def clean_main(self):
         main = self.cleaned_data.get('main')
         second_left = self.cleaned_data.get('second_left')
@@ -338,8 +318,6 @@ class ActivityBannerPosForm(forms.ModelForm):
         act_list = [second_left, second_right]
         if main in act_list:
             raise forms.ValidationError(u'活动不能重复')
-
-        self.is_valid_time(main, 'main')
 
         return main
 
@@ -352,8 +330,6 @@ class ActivityBannerPosForm(forms.ModelForm):
         if second_left in act_list:
             raise forms.ValidationError(u'活动不能重复')
 
-        self.is_valid_time(second_left, 'second_left')
-
         return second_left
 
     def clean_second_right(self):
@@ -364,8 +340,6 @@ class ActivityBannerPosForm(forms.ModelForm):
         act_list = [main, second_left]
         if second_right in act_list:
             raise forms.ValidationError(u'活动不能重复')
-
-        self.is_valid_time(second_right, 'second_right')
 
         return second_right
 
@@ -380,6 +354,61 @@ class ActivityBannerPosAdmin(admin.ModelAdmin):
     form = ActivityBannerPosForm
 
 
+class ActivityBannerShowForm(forms.ModelForm):
+    queryset = ActivityShow.objects.filter(is_pc=True, link_is_hide=False)
+    activity_show = forms.ModelChoiceField(queryset=queryset, label=u'活动展示')
+
+    def clean(self):
+        show_start_at = self.cleaned_data.get('show_start_at')
+        show_end_at = self.cleaned_data.get('show_end_at')
+        activity_show = self.cleaned_data.get('activity_show')
+        banner_type = self.cleaned_data.get('banner_type')
+
+        if not activity_show:
+            raise forms.ValidationError(u'活动展示不能为空')
+
+        if not show_start_at:
+            raise forms.ValidationError(u'Banner展示开始时间不能为空')
+
+        if not show_end_at:
+            raise forms.ValidationError(u'Banner展示结束时间不能为空')
+
+        if not banner_type:
+            raise forms.ValidationError(u'Banner类型不能为空')
+
+        if show_start_at <= show_end_at:
+            if activity_show.start_at <= show_start_at <= show_end_at <= activity_show.end_at:
+                act_banner_shows = ActivityBannerShow.objects.filter(Q(show_start_at__lte=show_start_at,
+                                                                       show_end_at__gte=show_start_at,
+                                                                       banner_type=banner_type) |
+                                                                     Q(show_start_at__lte=show_end_at,
+                                                                       show_end_at__gte=show_end_at,
+                                                                       banner_type=banner_type))
+                this_id = self.instance.id
+                for banner_show in act_banner_shows:
+                    if this_id and this_id == banner_show.id:
+                        continue
+                    else:
+                        raise forms.ValidationError(u"与活动banner展示(id为%s)展示时间冲突" % banner_show.id)
+            else:
+                raise forms.ValidationError(u"活动banner展示时间不在『活动展示』时间内")
+        else:
+            raise forms.ValidationError(u"banner展示开始时间不能大于banner展示结束时间")
+
+        return self.cleaned_data
+
+    class Meta:
+        forms.model = ActivityBannerShow
+
+
+class ActivityBannerShowAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ('id', 'activity_show', 'banner_type', 'show_start_at', 'show_end_at', 'created_at')
+    search_fields = ('id', 'activity_show', 'banner_type')
+    ordering = ('show_start_at',)
+    form = ActivityBannerShowForm
+
+
 admin.site.register(WapActivityTemplates, WapActivityTemplatesAdmin)
 admin.site.register(ActivityImages, ActivityImagesAdmin)
 admin.site.register(ActivityTemplates, ActivityTemplatesAdmin)
@@ -390,3 +419,4 @@ admin.site.register(ActivityRecord, ActivityRecordAdmin)
 
 admin.site.register(ActivityShow, ActivityShowAdmin)
 admin.site.register(ActivityBannerPosition, ActivityBannerPosAdmin)
+admin.site.register(ActivityBannerShow, ActivityBannerShowAdmin)

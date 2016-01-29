@@ -414,6 +414,9 @@ class ActivityShow(models.Model):
     created_at = models.DateTimeField(u'添加时间', auto_now=False, default=timezone.now, auto_now_add=True)
     link_is_hide = models.BooleanField(verbose_name=u'是否隐藏活动页面', default=False)
     priority = models.IntegerField(u'优先级', help_text=u'越大越优先', default=0, blank=False)
+    main_banner = models.ImageField(u'主推Banner', null=True, blank=True, upload_to='activity/banner')
+    left_banner = models.ImageField(u'副推左Banner', null=True, blank=True, upload_to='activity/banner')
+    right_banner = models.ImageField(u'副推右Banner', null=True, blank=True, upload_to='activity/banner')
 
     def activity_status(self):
         now = timezone.now()
@@ -488,3 +491,29 @@ class ActivityBannerPosition(models.Model):
                                                             self.second_left.activity.name,
                                                             self.second_right.activity.name,
                                                             )
+
+
+class ActivityBannerShow(models.Model):
+    """活动Banner展示排期"""
+
+    BANNER_TYPE = (
+        (u'主推', u'主推'),
+        (u'副推左', u'副推左'),
+        (u'副推右', u'副推右'),
+    )
+
+    activity_show = models.ForeignKey(ActivityShow, verbose_name=u'活动展示')
+    banner_type = models.CharField(u'Banner类型', max_length=10, choices=BANNER_TYPE)
+    show_start_at = models.DateTimeField(u'Banner展示开始时间', auto_now=False, default=timezone.now,
+                                         help_text=u'大于等于『活动展示』开始时间')
+    show_end_at = models.DateTimeField(u'Banner展示结束时间', auto_now=False, default=timezone.now,
+                                       help_text=u'小于等于『活动展示』结束时间')
+    created_at = models.DateTimeField(u'创建时间', auto_now=True)
+
+    class Meta:
+        verbose_name = u'活动Banner展示排期'
+        verbose_name_plural = u'活动Banner展示排期'
+        ordering = ['-show_start_at']
+
+    def __unicode__(self):
+        return u'%s(%s)' % (self.activity_show.activity, self.banner_type)
