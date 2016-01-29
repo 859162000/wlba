@@ -191,7 +191,7 @@ wlb.ready({
                 })
                 $('#projectList').on('click',function(){
                     //mixins.loginApp({refresh: 1, url: ''})
-                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/account/'});
+                    mixins.loginApp({refresh: 1, url: 'https://www.wanglibao.com/activity/experience/account/'});
                 })
             } else {
                 connect(data)
@@ -223,7 +223,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://staging.wanglibao.com/activity/new_year_feast/',
+            var host = 'https://www.wanglibao.com/activity/new_year_feast/',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = window.location.href,
                 shareMainTit = '新年红包宴，每天可领一次福气大礼包。',
