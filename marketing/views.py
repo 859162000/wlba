@@ -84,6 +84,7 @@ from marketing.utils import pc_data_generator
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
+from wanglibao_rest.utils import get_client_ip
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2008,10 +2009,12 @@ class CommonAward(object):
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
     template_name = 'xunlei_one.jade'
+    wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
         response_data = {}
-        if not channel_code or channel_code != 'xunlei9':
+        channel_codes = ('xunlei9', 'mxunlei')
+        if not channel_code or channel_code not in channel_codes:
             response_data = {
                 'ret_code': '20001',
                 'message': u'非法请求',
@@ -2040,6 +2043,15 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         return response_data
 
     def get_context_data(self, **kwargs):
+        params = self.request.GET
+        sign = params.get('sign', '').strip()
+        _time = params.get('time', '').strip()
+        nickname = params.get('nickname', '').strip()
+        user_id = params.get('xluserid', '').strip()
+        channel_code = params.get('promo_token', '').strip()
+        response_data = self.check_params(channel_code, sign, _time, nickname, user_id)
+
+        self.wx_code = channel_code
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
         device_list = ['android', 'iphone']
@@ -2048,14 +2060,6 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
             match = re.search(device, user_agent)
             if match and match.group():
                 self.template_name = 'app_xunlei.jade'
-
-        params = self.request.GET
-        channel_code = params.get('promo_token', '').strip()
-        sign = params.get('sign', '').strip()
-        _time = params.get('time', '').strip()
-        nickname = params.get('nickname', '').strip()
-        user_id = params.get('xluserid', '').strip()
-        response_data = self.check_params(channel_code, sign, _time, nickname, user_id)
 
         if not response_data:
             check_data = {
@@ -2080,6 +2084,7 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
 
         context.update(response_data)
         return context
+
 
 class QuickApplyerAPIView(APIView):
     permission_classes = ()
@@ -2972,7 +2977,8 @@ class ThunderBindingApi(APIView):
         # Modify by cwb@20151230
         user = self.request.user
         user_channel = get_user_channel_record(user)
-        if not user_channel or user_channel.code != 'xunlei9':
+        channel_codes = ('xunlei9', 'mxunlei')
+        if not user_channel or user_channel.code not in channel_codes:
             response_data = {
                 'ret_code': '10004',
                 'message': u'非迅雷渠道用户',
@@ -2984,7 +2990,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        if channel_code and (channel_code == 'xunlei9' and channel_user
+        if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
@@ -3014,10 +3020,11 @@ class ThunderBindingApi(APIView):
                 'message': u'非法请求',
             }
 
-        logger.info("Thunder binding user_id[%s], promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
-                    % (user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
+        logger.info("%s binding user_id[%s], promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
+                    % (user_channel.code, user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
 
 import math
 class CustomerAccount2015ApiView(APIView):
@@ -3077,6 +3084,19 @@ class CustomerAccount2015ApiView(APIView):
                     account_dict['tz_sterm_point'] = aa
                     account_dict['tz_mterm_point'] = bb
                     account_dict['tz_lterm_point'] = cc
+
+                    try:
+                        account.total_visit_count += 1
+                        if not account.first_visit_time:
+                            account.first_visit_time = timezone.now()
+                            account.first_visit_ipaddr = get_client_ip(request)
+                        else:
+                            account.last_visit_time = timezone.now()
+                            account.last_visit_ipaddr = get_client_ip(request)
+                        account.save()
+                    except Exception, ex:
+                        logger.exception("=20150127= Failed to save account2015 visited record: [%s], [%s]", user_id, ex)
+
                 error_code=0
                 error_message=u'Success'
             else:
@@ -3086,6 +3106,7 @@ class CustomerAccount2015ApiView(APIView):
                 account_dict['zc_ranking'] = zc_ranking
                 account_dict['tz_amount'] = 0
                 account_dict['income_reward'] = 0
+                account_dict['invite_income'] = 0
 
             profile = user.wanglibaouserprofile
             user_name = u'网利宝用户'

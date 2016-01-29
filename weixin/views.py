@@ -47,8 +47,10 @@ import json
 import uuid
 import urllib
 import logging
+import traceback
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
+from django.db import transaction, IntegrityError
 from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
@@ -248,12 +250,28 @@ class WeixinJoinView(View):
             reply = create_reply(articles, self.msg)
 
         if self.msg.key == 'sign_in':
-            # try:
-                if self.checkIsTodaySignIn(w_user, user):
-                    txt = u"今日已经签到，明日再来"
-                    reply = create_reply(txt, self.msg)
-                else:
-                    seg = SendExperienceGold(user)
+            reply = self.process_sign_in(w_user.openid)
+        if self.msg.key == 'my_experience_gold':
+            seg = SendExperienceGold(user)
+            amount = seg.get_amount()
+            txt = u"您的帐号：%s\n" \
+                  u"体验金金额：%s元"%(user.wanglibaouserprofile.phone, amount)
+            reply = create_reply(txt, self.msg)
+
+        return reply
+
+    def process_sign_in(self, openid):
+        reply = -1
+        try:
+            with transaction.atomic():
+                w_user = WeixinUser.objects.select_for_update().filter(openid=openid).first()
+                now = datetime.datetime.now()
+                start = datetime.datetime(now.year,now.month, now.day)
+                end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
+                war = WeiXinUserActionRecord.objects.filter(user_id=w_user.user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+                if not war:
+                    _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
+                    seg = SendExperienceGold(w_user.user)
                     experience_event = self.getSignExperience_gold()
                     if experience_event:
                         seg.send(experience_event.id)
@@ -263,20 +281,19 @@ class WeixinJoinView(View):
                               u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
                         reply = create_reply(txt, self.msg)
                     else:
-                        reply = -1
-                        logger.debug(u'用户签到没有领到体验金')
-                    _process_record(w_user, user, 'sign_in', u"用户签到")
-            # except Exception, e:
-            #     reply = -1
-            #     logger.debug(u"用户签到领体验金抛出异常")
-        if self.msg.key == 'my_experience_gold':
-            seg = SendExperienceGold(user)
-            amount = seg.get_amount()
-            txt = u"您的帐号：%s\n" \
-                  u"体验金金额：%s元"%(user.wanglibaouserprofile.phone, amount)
-            reply = create_reply(txt, self.msg)
-
+                        reply = create_reply(u'恭喜您，签到成功！', self.msg)
+                        logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
+                else:
+                    txt = u"今日已经签到，明日再来"
+                    reply = create_reply(txt, self.msg)
+        except Exception,e:
+            logger.debug(traceback.format_exc())
         return reply
+
+        # except Exception, e:
+        #     reply = -1
+        #     logger.debug(u"用户签到领体验金抛出异常")
+
 
     @checkBindDeco
     def check_service_subscribe(self, w_user=None, user=None):
@@ -338,11 +355,12 @@ class WeixinJoinView(View):
             if scene_id:
                 _process_scene_record(w_user, scene_id)
 
-        if not reply and not user:
-            txt = self.getBindTxt(fromUserName)
-            reply = create_reply(txt, self.msg)
         if not reply:
-            reply = -1
+            if not user:
+                txt = self.getBindTxt(fromUserName)
+            else:
+                txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
+            reply = create_reply(txt, self.msg)
         return reply
 
     def getSubscribeArticle(self):
@@ -377,12 +395,16 @@ class WeixinJoinView(View):
     def getCSReply(self):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
+        if now.year==2016 and now.month==2 and (now.day>=5 and now.day<=13):
+            txt = u"2月5日至2月13日新年期间微信客服休息，由此给您带来的不便敬请谅解，谢谢您的支持，祝新年愉快~"
+            return txt
+
         if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
             txt = u"客官，想和网利君天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利君在线时间为\n" \
-                  u"【周一至周五10：00~17：00】"
+                  u"【周一至周五9：00~18：00】"
         else:
             txt = u"客官，网利君在线时间为\n"\
-                    + u"【周一至周五10：00~17：00】，请在工作与我们联系哦~"
+                    + u"【周一至周五9：00~18：00】，请在工作时间与我们联系哦~"
         return txt
 
     def getSignExperience_gold(self):
@@ -395,21 +417,6 @@ class WeixinJoinView(View):
             random_int = random.randint(0, length-1)
             return experience_events[random_int]
         return None
-    def checkIsTodaySignIn(self, w_user, user):
-        now = datetime.datetime.now()
-
-        start = datetime.datetime(now.year,now.month, now.day)
-        end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
-
-        war = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
-
-        # experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
-        #                                                   created_at__lt=end, created_at__gt=start).all()
-
-        is_today_signin = False
-        if war:
-            is_today_signin = True
-        return is_today_signin
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -1241,38 +1248,41 @@ class AuthorizeUser(APIView):
             except WeChatException, e:
                 return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
             openid = res.get('openid')
-            w_user = WeixinUser.objects.filter(openid=openid).first()
-            save_user = False
+            try:
+                w_user = WeixinUser.objects.filter(openid=openid).first()
+                save_user = False
+                if not w_user:
+                    w_user = WeixinUser()
+                    w_user.account_original_id = account.original_id
+                    w_user.openid = openid
+                    w_user.save()
 
-            if not w_user:
-                w_user = WeixinUser()
-                w_user.account_original_id = account.original_id
-                w_user.openid = openid
-                save_user = True
+                if w_user.account_original_id != account.original_id:
+                    w_user.account_original_id = account.original_id
+                    save_user = True
 
-            if w_user.account_original_id != account.original_id:
-                w_user.account_original_id = account.original_id
-                save_user = True
-
-            if not w_user.auth_info:
-                auth_info = AuthorizeInfo()
-                auth_info.access_token = res.get('access_token')
-                auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
-                auth_info.refresh_token = res.get('refresh_token')
-                auth_info.save()
-                w_user.auth_info = auth_info
-                save_user = True
-            else:
-                w_user.auth_info.access_token = res.get('access_token')
-                w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
-                w_user.auth_info.refresh_token = res.get('refresh_token')
-                w_user.auth_info.save()
-            if save_user:
-                w_user.save()
+                if not w_user.auth_info:
+                    auth_info = AuthorizeInfo()
+                    auth_info.access_token = res.get('access_token')
+                    auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                    auth_info.refresh_token = res.get('refresh_token')
+                    auth_info.save()
+                    w_user.auth_info = auth_info
+                    save_user = True
+                else:
+                    w_user.auth_info.access_token = res.get('access_token')
+                    w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                    w_user.auth_info.refresh_token = res.get('refresh_token')
+                    w_user.auth_info.save()
+                if save_user:
+                    w_user.save()
+            except IntegrityError, e:
+                logger.debug("=========================并发了====")
+                logger.debug(traceback.format_exc())
 
             appendkeys = []
             for key in request.GET.keys():
-                if key == u'state' or key == u'code':
+                if key == u'state' or key == u'code' or key== u'redirect_uri':
                     continue
                 appendkeys.append(key)
 

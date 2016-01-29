@@ -39,8 +39,8 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView, AdminIdValidate,
+                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
@@ -60,7 +60,8 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView
+from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -146,6 +147,7 @@ urlpatterns = patterns(
     url(r'^bank/list_new/$', BankListNewAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
+    url(r'^has_validate/', HasValidationAPIView.as_view()),
     url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
@@ -190,10 +192,10 @@ urlpatterns = patterns(
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
     url(r'^pushtest/$', PushTestView.as_view()),
-    # url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
-    # url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
-    # url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
-    url(r'^voice/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
+    url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
+    url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
+    url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
+    url(r'^voice/send_voice_code/$', SendVoiceCodeNewAPIView.as_view()),
     url(r'^marketing/tv/$', Statistics.as_view()),
     url(r'^marketing/tv_inside/$', StatisticsInside.as_view()),
     url(r'^p2p/investrecord', InvestRecord.as_view()),
@@ -275,6 +277,8 @@ urlpatterns += patterns(
     url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
     url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
+    url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
+    url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
 )
 
 

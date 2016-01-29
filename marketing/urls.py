@@ -71,16 +71,20 @@ urlpatterns = patterns(
     url(r'^recharge_8000/$', TemplateView.as_view(template_name="recharge_8000.jade")),
     url(r'^double_eggs/$', TemplateView.as_view(template_name="double_eggs.jade")),
     url(r'^celebrity/$', TemplateView.as_view(template_name="celebrity.jade")),
-    url(r'^xunlei_setp/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='xunlei9')),
-    url(r'^xunlei_one/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='xunlei9')),
+    url(r'^xunlei_setp/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
+    url(r'^xunlei_one/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
     url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
     url(r'^damai-old/$', TemplateView.as_view(template_name="damai-old.jade")),
     url(r'^app_damai_old/$', TemplateView.as_view(template_name="app_damai_old.jade")),
     url(r'^send_reward/$', TemplateView.as_view(template_name="send_reward.jade")),
     url(r'^january_reward/$', TemplateView.as_view(template_name="january_reward.jade")),
     url(r'^damai-video/$', TemplateView.as_view(template_name="damai-video.jade")),
-    url(r'^video-test/$', TemplateView.as_view(template_name="video-test.html")),
     url(r'^new_year/$', TemplateView.as_view(template_name="new_year.jade")),
+    url(r'^life_style/$', TemplateView.as_view(template_name="life_style.jade")),
+    url(r'^two-novice/$', TemplateView.as_view(template_name="two-novice.jade")),
+    url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
+    url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
+
 
 )
 
@@ -176,6 +180,9 @@ urlpatterns += patterns(
     url(r'^app_send_reward/$', TemplateView.as_view(template_name="app_send_reward.jade")),
     url(r'^app_january_reward/$', TemplateView.as_view(template_name="app_january_reward.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
+
+    url(r'^weixin_mammon/$', TemplateView.as_view(template_name="h5_mammon.jade")),
+    url(r'^app_two_novice/$', TemplateView.as_view(template_name="app_two_novice.jade")),
 
 )
 # app with webview

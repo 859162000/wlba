@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -236,7 +236,6 @@ org.finance = (function (org) {
         model_canvac_opeartion: true,
         canvas_model4: null,
         init: function () {
-
             lib.fetch_data();
             lib.listen_handle()
         },
@@ -274,8 +273,6 @@ org.finance = (function (org) {
 
             swiper.removeSlide(rm_page);
             swiper.update(true)
-            $('.refresh').html($('.swiper-slide').length)
-
 
         },
         fetch_data: function () {
@@ -291,53 +288,69 @@ org.finance = (function (org) {
                             _self.swiper_init([6])
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) > 0){
-                            _self.swiper_init([1,2,3,6])
+                        if(parseInt(account.tz_amount) <= 0){
+                            if(parseInt(account.income_reward) > 0 || parseInt(account.invite_income) > 0){
+                                _self.swiper_init([1,2,3,6])
+                            }
+                            if(parseInt(account.income_reward) <= 0 && parseInt(account.invite_income) <= 0){
+                                _self.swiper_init([1,2,3,4,5])
+                            }
+
                         }
 
-                        if(parseInt(account.tz_amount) <= 0 && parseInt(account.income_reward) <= 0){
-                            _self.swiper_init([1,2,3,4,5])
-                        }
+                        function append_data(){
+                            //page1
+                            $('.zc_ranking').text(account.zc_ranking)
+                            $('.tz_amount').text( '￥'+ account.tz_amount)
+                            $('.tz_ranking_percent').text(account.tz_ranking_percent)
+                            $('.income_total').text('￥'+ account.income_total)
+                            //page2
+                            $('.user-name').text('亲爱的'+ account.user_name)
+                            $('.tz_times').text(account.tz_times)
+                            $('.tz_avg_times').text(account.tz_avg_time)
+                            $('.tz_max_amount').text(account.tz_max_amount)
+                            $('.tz_max_ranking_percent').text(Math.floor(account.tz_max_ranking_percent))
+                            //page3
+                            $('.tz_sterm_percent').text(account.tz_sterm_percent)
+                            $('.tz_mterm_percent').text(account.tz_mterm_percent)
+                            $('.tz_lterm_percent').text(account.tz_lterm_percent)
+                            var name = _self.set_limit_style(account.tz_sterm_point, account.tz_mterm_point, account.tz_lterm_point)
+                            $('.model4-head-name').text(name)
+                            //page4
+                            $('.invite_count').text(account.invite_count)
+                            $('.invite_income').text(account.invite_income)
 
-                        //page1
-                        $('.zc_ranking').text(account.zc_ranking)
-                        $('.tz_amount').text( '￥'+ account.tz_amount)
-                        $('.tz_ranking_percent').text(account.tz_ranking_percent)
-                        $('.income_total').text('￥'+ account.income_total)
-                        //page2
-                        $('.tz_times').text(account.tz_times)
-                        $('.tz_avg_times').text(account.tz_avg_time)
-                        $('.tz_max_amount').text(account.tz_max_amount)
-                        $('.tz_max_ranking_percent').text(Math.floor(account.tz_max_ranking_percent))
-                        //page3
-                        $('.tz_sterm_percent').text(account.tz_sterm_percent)
-                        $('.tz_mterm_percent').text(account.tz_mterm_percent)
-                        $('.tz_lterm_percent').text(account.tz_lterm_percent)
-                        var name = _self.set_limit_style(account.tz_sterm_percent, account.tz_mterm_percent, account.tz_lterm_percent)
-                        $('.model4-head-name').text(name)
-                        //page4
-                        $('.invite_count').text(account.tz_sterm_point)
-                        $('.invite_income').text(account.tz_mterm_point)
-                        var message = _self.set_invite_count_style(account.tz_lterm_point)
-                        $('.cravat-cue-detail').text(message.name)
-                        $('.cravat-alert').text(message.detail)
-                        //page5
-                        $('.income_reward').text(account.income_reward)
-                        $('.income_hb_expire').text(account.income_hb_expire)
-                        $('.income_jxq_expire').text(account.income_jxq_expire)
-                        var sheep_count = _self.set_sheep_style(account.income_reward)
-                        for (var i = 0; i < sheep_count; i++) {
-                            $('.model6-yang-icon').append("<div class='sheep-icon'></div>")
-                        }
-                        var chinese_num = ['一', '二', '三', '四', '五']
-                        $('.sheep-account').text(chinese_num[sheep_count - 1] + '只羊')
+                                var message = _self.set_invite_count_style(account.invite_count)
+                                $('.cravat-cue-detail').text(message.name)
+                                $('.cravat-alert').text(message.detail)
 
+
+                            //page5
+                            $('.income_reward').text(account.income_reward)
+                            $('.income_hb_expire').text(account.income_hb_expire)
+                            $('.income_jxq_expire').text(account.income_jxq_expire)
+                            var sheep_count = _self.set_sheep_style(account.income_reward)
+                            for (var i = 0; i < sheep_count; i++) {
+                                $('.model6-yang-icon').append("<div class='sheep-icon'></div>")
+                            }
+                            var chinese_num = ['一', '二', '三', '四', '五']
+                            $('.sheep-account').text(chinese_num[sheep_count - 1] + '只羊')
+                        }
+                        try{
+                            append_data()
+                        }catch(e){
+                            console.log('数据异常')
+                        }
                         $('.client-loding-warp').animate({
                             opacity: 0
                         }, 300, function () {
                             $(this).hide()
                         })
 
+                    }
+
+                    if(result.error_code == 404){
+                        finance_alert.show('没有发现该用户')  
                     }
                 }
 
@@ -357,7 +370,7 @@ org.finance = (function (org) {
         set_invite_count_style: function (count) {
             var
                 name = ['茕茕孑立', '门可罗雀', '门庭若市'],
-                detail = ['形容孤身一人，一个全民淘金好友都没邀请到。', '形容全民淘金所邀请好友数稀少。', '形容全民淘金邀请到的好友很多热闹得像人才市场一样。']
+                detail = ['孤身一人，一个全民淘金好友都没邀请到。', '全民淘金所邀请好友数稀少。', '全民淘金邀请到的好友很多,热闹得像人才市场一样。']
             if (count == 0) {
                 return {
                     name: name[0],
@@ -371,7 +384,7 @@ org.finance = (function (org) {
                 }
             }
 
-            if (count >= 10) {
+            if (count > 10) {
                 return {
                     name: name[2],
                     detail: detail[2]
@@ -383,7 +396,7 @@ org.finance = (function (org) {
             if (amount <= 100) return 1;
             if (amount > 100 && amount <= 500) return 2;
             if (amount > 500 && amount <= 5000) return 3;
-            if (amount > 500 && amount <= 5000) return 4;
+            if (amount > 5000 && amount <= 50000) return 4;
             if (amount > 50000) return 5
         },
         canvas_model3_doging: function (percent) {
@@ -394,10 +407,12 @@ org.finance = (function (org) {
                 canvas_r = canvas_r / 2
                 canvas_font = '17px'
             }
+
+
             function infinite() {
                 _self.canvas_model3(canvas_w / 2, canvas_w / 2, canvas_r / 2, _self.process_num, canvas_w, canvas_font);
                 t = setTimeout(infinite, 30);
-
+                first = false
                 if (_self.process_num >= percent) {
                     clearTimeout(t);
                     _self.process_num = 0;
@@ -417,8 +432,10 @@ org.finance = (function (org) {
 
                 if (_self.model_canvac_opeartion) {
                     canvas.getContext('2d').translate(0.5, 0.5)
+                    cts.globalCompositeOperation= 'source-atop';
                     canvas.width = canvas_w;
                     canvas.height = canvas_w;
+
                     _self.model_canvac_opeartion = false
                 }
             } else {
@@ -447,12 +464,13 @@ org.finance = (function (org) {
             cts.textBaseline = 'middle';
             cts.moveTo(x, y);
             cts.fillText(process + "%", x, y);
+
         },
         cavas_model4: function (sort, mid, long) {
             var doughnutData = [
                 {
                     value: sort,
-                    color: "#4877C8"
+                    color: "#f35b47"
                 },
                 {
                     value: mid,
@@ -460,7 +478,7 @@ org.finance = (function (org) {
                 },
                 {
                     value: long,
-                    color: "#F35B47"
+                    color: "#4877c8"
                 },
 
             ];
@@ -480,6 +498,24 @@ org.finance = (function (org) {
         init: lib.init
     }
 })(org);
+
+finance_alert = (function(){
+    var $alert_body  =   $('.client-login-alert');
+    var show = function(title, callback, data){
+        $alert_body.show()
+        $('.alert-head-aue').text(title)
+
+        $('.login--alert-opeartion').one('click', function(){
+            $alert_body.hide()
+            callback && callback(data)
+        })
+    }
+
+    return {
+        show: show
+    }
+})()
+
 wlb.ready({
     app: function (mixins) {
         function connect(data) {
@@ -497,16 +533,12 @@ wlb.ready({
                 }
             })
         }
-
         mixins.shareData({title: '2015年，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
-                $('.client-login-alert').show().on('click', function () {
-                    mixins.loginApp({refresh: 1, url: ''})
-                })
-                $('.login--alert-opeartion').on('click', function () {
-                    $('.client-login-alert').hide()
-                })
+                finance_alert.show('你还没有登录哦，登录获取更多资讯吧', function(mixin){
+                    mixin.loginApp({refresh: 1, url: ''})
+                },mixins)
 
             } else {
                 connect(data)
