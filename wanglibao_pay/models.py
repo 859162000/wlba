@@ -66,7 +66,9 @@ class Bank(models.Model):
 
     @classmethod
     def get_bind_channel_banks(cls):
-        banks = Bank.objects.all().exclude(channel__isnull=True).exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
+        banks = Bank.objects.all().exclude(channel__isnull=True)\
+            .exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True)\
+            .exclude(yee_bind_code__isnull=True).exclude(bank__name__in=[u'农业银行']).select_related()
         rs = []
         for bank in banks:
             obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
