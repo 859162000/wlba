@@ -1,10 +1,11 @@
 # coding: utf-8
 
 import time
+import datetime
 from django import forms
 from django.contrib import admin
-import datetime
 from django.utils import timezone
+from django.db.models import Q
 from import_export import resources, fields
 from import_export.admin import ExportMixin
 from django.contrib.admin import widgets
@@ -377,9 +378,12 @@ class ActivityBannerShowForm(forms.ModelForm):
 
         if show_start_at <= show_end_at:
             if activity_show.start_at <= show_start_at <= show_end_at <= activity_show.end_at:
-                act_banner_shows = ActivityBannerShow.objects.filter(show_start_at__gte=show_start_at,
-                                                                     show_end_at__lte=show_end_at,
-                                                                     banner_type=banner_type)
+                act_banner_shows = ActivityBannerShow.objects.filter(Q(show_start_at__lte=show_start_at,
+                                                                       show_end_at__gte=show_start_at,
+                                                                       banner_type=banner_type) |
+                                                                     Q(show_start_at__lte=show_end_at,
+                                                                       show_end_at__gte=show_end_at,
+                                                                       banner_type=banner_type))
                 this_id = self.instance.id
                 for banner_show in act_banner_shows:
                     if this_id and this_id == banner_show.id:
@@ -399,7 +403,7 @@ class ActivityBannerShowForm(forms.ModelForm):
 
 class ActivityBannerShowAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('activity_show', 'banner_type', 'show_start_at', 'show_end_at', 'created_at')
+    list_display = ('id', 'activity_show', 'banner_type', 'show_start_at', 'show_end_at', 'created_at')
     search_fields = ('id', 'activity_show', 'banner_type')
     ordering = ('show_start_at',)
     form = ActivityBannerShowForm
