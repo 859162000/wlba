@@ -1282,7 +1282,7 @@ class AuthorizeUser(APIView):
 
             appendkeys = []
             for key in request.GET.keys():
-                if key == u'state' or key == u'code':
+                if key == u'state' or key == u'code' or key== u'redirect_uri':
                     continue
                 appendkeys.append(key)
 
