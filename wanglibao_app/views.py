@@ -1017,6 +1017,23 @@ class AppFinanceView(TemplateView):
         #return super(AppFinanceView, self).get(request, *args, **kwargs)
         return HttpResponseRedirect(reverse('app_finance'))
 
+class AppPraiseAwardView(TemplateView):
+
+    """ Client 点赞 """
+    template_name = 'client_praise_reward.jade'
+
+    def get(self, request, *args, **kwargs):
+
+        device_list = ['micromessenger']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return HttpResponseRedirect(reverse('weixin_annual_bonus'))
+
+        return super(AppPraiseAwardView, self).get(request, *args, **kwargs)
+
 
 
 # class AppMemorabiliaDetailView(TemplateView):
