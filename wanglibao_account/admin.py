@@ -344,12 +344,19 @@ class UserAddressAdmin(admin.ModelAdmin):
 
 class UserThreeOrderAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ("user", "order_on", "request_no", "result_code", "created_at")
+    list_display = ("user", "order_on", "request_no", "result_code", 'msg', "answer_at", "created_at")
     search_fields = ('user__wanglibaouserprofile__phone', "request_no")
     raw_id_fields = ('user', )
 
+    def has_add_permission(self, request):
+        return False
+
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
 
 class UserSourceAdmin(admin.ModelAdmin):
     list_display = ['keyword', 'website', 'created_at']
@@ -362,7 +369,7 @@ class UserSourceAdmin(admin.ModelAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        return  False
+        return False
 
 admin.site.register(UserSource, UserSourceAdmin)
 

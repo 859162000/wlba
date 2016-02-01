@@ -70,7 +70,7 @@ class UserThreeOrder(models.Model):
     request_no = models.CharField(unique=True, max_length=30, verbose_name=u'请求流水号')
     result_code = models.CharField(max_length=30, blank=True, verbose_name=u'受理结果编码')
     msg = models.CharField(max_length=255, blank=True, verbose_name=u'受理结果消息')
-    created_at = models.DateTimeField(u'下单时间', auto_now_add=True)
+    created_at = models.DateTimeField(u'下单时间', auto_now=True)
     answer_at = models.DateTimeField(u'订单反馈时间', blank=True, null=True)
 
     class Meta:
