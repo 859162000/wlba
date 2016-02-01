@@ -350,7 +350,7 @@ org.finance = (function (org) {
                     }
 
                     if(result.error_code == 404){
-                        finance_alert.show('没有发现该用户')  
+                        finance_alert.show('没有发现该用户')
                     }
                 }
 
