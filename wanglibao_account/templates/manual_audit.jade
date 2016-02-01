@@ -11,37 +11,25 @@ block main
         .panel
             .well
                 .panel-title-bar__no-border
-                    .panel-title 身份信息-短信修改手机号
+                    .panel-title 身份信息-人工审核修改手机号
                 .form_wrap
                     .title_top 为保证您的账户安全，请输入以下信息：
                     form.form-group(enctype="multipart/form-data", content_type="multipart/form-data", action="/api/manual_modify/phone/", method="post")
                         -csrf_token
                         .box
-                            label 原手机号
-                            .box_right
-                                .text.phone_num {{phone}}
-                        .box.phone_code
-                            label 验证码
-                            .box_right
-                                <input class="input_code" type='text' placeholder="请输入验证码" autocomplete="off"/>
-                                <button type="button" class="get_code">获取验证码</button>
-                                .status
-                                    .true
-                                    .false
-                        .box
                             label 账户登录密码
                             .box_right
                                 .input_box
-                                    <input class="input_phone password" type="text" onfocus="this.type='password'" placeholder="请输入账户登录密码" autocomplete="off" >
-                                    .status.status_2
+                                    <input id='password' class="input_phone" type="text" onfocus="this.type='password'" placeholder="请输入账户登录密码" autocomplete="off" disableautocomplete>
+                                    .status.status_1
                                         .true
                                         .false 账户登录密码有误
                         .box
                             label 实名身份证号
                             .box_right
                                 .input_box
-                                    <input class="input_phone id_number" type="text" placeholder="请输入身份证号" autocomplete="off">
-                                    .status.status_3
+                                    <input id='id_number' class="input_phone" type="text" placeholder="请输入实名认证身份证号" autocomplete="off">
+                                    .status.status_2
                                         .true
                                         .false 身份证信息有误
                         if is_bind_card
@@ -49,24 +37,16 @@ block main
                                 label 银行卡号
                                 .box_right
                                     .input_box
-                                        <input class="input_phone bind_card" type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
+                                        <input id='' class="input_phone bind_card" type="text" placeholder="请输入已绑定银行卡号" autocomplete="off">
                                         .status
                                             .true
                                             .false 银行卡号码有误
-                        .box
-                            label 新手机号
-                            .box_right
-                                .input_box
-                                    <input class="input_phone new_phone" type="text" placeholder="请输入新手机号" autocomplete="off">
-                                    .status
-                                        .true
-                                        .false 新手机号码有误
                         .box
                             label
                             .box_right
                                 <input class="submit button" type="button" value="下一步"/>
                                 .error_title.error_form
-
-
+    //include global/g_footer
     script.
-        require(["/static/js/sms_vali_phone.js?v=2016011801"])
+        require(["/static/js/manual_audit.js?v=2016011801"])
+    include include/tracking

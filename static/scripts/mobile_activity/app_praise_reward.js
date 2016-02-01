@@ -411,7 +411,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				if(xhr.err_code==0){
 					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
 				}else if(xhr.err_code==205){
-					$('.friend_top span').html(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('.apply_button').show();
 				}else{
@@ -469,7 +469,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
-					$('.friend_top span').html(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').show();
 					$('.friend_top .close').hide();
 					if(h5_user_static){
@@ -483,7 +483,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				}else if(xhr.err_code==404){
 					$('.regist_button').show().css('display','block');
 					$('.new_user_text').show();
-					$('.friend_top span').html(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 
 				}else if(xhr.err_code==403){
@@ -492,10 +492,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					}else{
 						$('.login_button').show();
 					}
-					$('.friend_top span').html(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else{
-					$('.friend_top span').html(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}
 			});

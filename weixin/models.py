@@ -405,7 +405,7 @@ class WeixinUser(models.Model):
     )
 
     subscribe = models.IntegerField('是否订阅该公众号标识', default=0)
-    openid = models.CharField('用户标识', max_length=128, db_index=True)
+    openid = models.CharField('用户标识', max_length=128, unique=True)
     nickname = models.CharField('用户昵称', max_length=64, blank=True)
     sex = models.IntegerField('用户性别', choices=SEX_DATA, default=0)
     city = models.CharField('用户所在城市', max_length=128, blank=True)

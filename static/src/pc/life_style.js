@@ -163,8 +163,8 @@ point();
   function tab(ele,number){
     var sum = number;
     $(ele).css({'left':'0px'});
-    $('.next').on('click',function(){
-      $(this).removeClass('next')
+    $('.next').off().on('click',function(){
+      $(this).removeClass('next');
       sum++;
       if(sum==$(ele).children('.slide-div').length){
         sum = 0;
@@ -177,7 +177,7 @@ point();
         })
       $('.ul-point ul li').eq(sum).addClass('point-hight').siblings().removeClass('point-hight');
     });
-    $('.prev').on('click',function(){
+    $('.prev').off().on('click',function(){
       $(this).removeClass('prev');
       sum--;
       if(sum<0){

@@ -339,22 +339,26 @@ org.feast = (function (org) {
         _receiveFun: function(){
             $('.packets-btn a').click(function(){
                 if ($('#authenticated').val() == 'True') {
-                    var id = $(this).attr('data-id');
-                    org.ajax({
-                        url: '/api/wlb_reward/hm_banque/',
-                        type: 'post',
-                        data: {
-                            redpack_id : id
-                        },
-                        success: function (data) {
-                            if(data.ret_code == 0){
-                                var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>';
-                                org.ui.alert(txt, '', '3')
-                            }else{
-                                org.ui.alert('<p class="title-s">'+ data.message +'</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>', '', '3')
+                    if(!$(this).hasClass('selectEd')) {
+                        $('.packets-btn a').addClass('selectEd');
+                        var id = $(this).attr('data-id');
+                        org.ajax({
+                            url: '/api/wlb_reward/hm_banque/',
+                            type: 'post',
+                            data: {
+                                redpack_id: id
+                            },
+                            success: function (data) {
+                                if (data.ret_code == 0) {
+                                    var txt = '<p class="title-s">领取成功！</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>';
+                                    org.ui.alert(txt, '', '3')
+                                } else {
+                                    org.ui.alert('<p class="title-s">' + data.message + '</p><p class="pop-fonts">进入“我的账户”－－“理财券”查看</p>', '', '3')
+                                }
+                                $('.packets-btn a').removeClass('selectEd')
                             }
-                        }
-                    })
+                        })
+                    }
                 } else {
                     window.location.href = '/weixin/login/?next=/weixin_activity/qm_banquet/';
                 }
@@ -406,7 +410,7 @@ wlb.ready({
                 })
                 $('#projectList').on('click',function(){
                     //mixins.loginApp({refresh: 1, url: ''})
-                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/account/'});
+                    mixins.loginApp({refresh: 1, url: 'https://www.wanglibao.com/activity/experience/account/'});
                 })
             } else {
                 connect(data)
@@ -438,7 +442,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://staging.wanglibao.com/activity/new_year_feast/',
+            var host = 'https://www.wanglibao.com/activity/new_year_feast/',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = window.location.href,
                 shareMainTit = '新年红包宴，每天可领一次福气大礼包。',

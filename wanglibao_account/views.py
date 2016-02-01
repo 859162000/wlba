@@ -27,6 +27,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
+from django.db import transaction
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -69,13 +70,15 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
-from wanglibao_account.models import UserThreeOrder, ManualModifyPhoneRecord
+from wanglibao_account.models import UserThreeOrder, ManualModifyPhoneRecord,SMSModifyPhoneRecord
 import requests
 from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
+from wanglibao_sms.models import PhoneValidateCode
+from wanglibao_account.forms import verify_captcha
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -1131,7 +1134,7 @@ class AccountBankCard(TemplateView):
 
         cards = BindBank.objects.filter(user__exact=self.request.user)
         p2p_cards = Card.objects.filter(user__exact=self.request.user)
-        banks = Bank.get_bind_channel_banks()
+        banks = Bank.get_withdraw_banks()
         return {
             "cards": cards,
             'p2p_cards': p2p_cards,
@@ -2220,39 +2223,6 @@ class FirstPayResultView(TemplateView):
         return {'first_pay_succeed': first_pay_succeed}
 
 
-class ManualModifyPhoneTemplate(TemplateView):
-    template_name = 'phone_modify_manual.jade'
-
-    def get_context_data(self, **kwargs):
-        user = self.request.user
-
-        form = ManualModifyPhoneForm()
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
-        return {'form':form, 'modify_phone_record':modify_phone_record}
-
-
-
-class ManualModifyPhoneAPI(APIView):
-    # permission_classes = (IsAuthenticated, )
-    permission_classes = ()
-
-    def post(self, request):
-        user = request.user
-        form = ManualModifyPhoneForm(self.request.POST, self.request.FILES)
-        if form.is_valid():
-            id_front_image = form.cleaned_data['id_front_image']
-            id_back_image = form.cleaned_data['id_back_image']
-            id_user_image = form.cleaned_data['id_user_image']
-            new_phone = form.cleaned_data['new_phone']
-            manual_record = ManualModifyPhoneRecord()
-            manual_record.user = user
-            manual_record.id_front_image = id_front_image
-            manual_record.id_back_image = id_back_image
-            manual_record.id_user_image = id_user_image
-            manual_record.new_phone = new_phone
-            manual_record.status = u'初审中'
-            manual_record.save()
-        return Response({'ret_code': 0})
 
 
 class IdentityInformationTemplate(TemplateView):
@@ -2261,10 +2231,21 @@ class IdentityInformationTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         profile = user.wanglibaouserprofile
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        modify_phone_state = 0
+        if modify_phone_record:
+            if modify_phone_record.status == u'复审通过':
+                modify_phone_state = 1
+            if modify_phone_record.status in [u'待初审', u'初审待定', u'待复审']:
+                modify_phone_state = 2
+
         return {
             "phone": safe_phone_str(profile.phone),
             "id_is_valid": profile.id_is_valid,
-            "trade_pwd": profile.trade_pwd == ""
+            "trade_pwd": profile.trade_pwd != "",
+            "modify_phone_state": modify_phone_state,
+            'name': profile.name,
+            "id_number": profile.id_number,
         }
 
 
@@ -2272,8 +2253,9 @@ class ValidateAccountInfoTemplate(TemplateView):
     template_name = ""
 
     def get_context_data(self, **kwargs):
-        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
-        is_bind_card = cards.exists()
+        # cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
         return {
             'is_bind_card': is_bind_card
         }
@@ -2282,39 +2264,218 @@ class ValidateAccountInfoAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        form = LoginAuthenticationNoCaptchaForm(request, data=request.DATA)
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        id_number = request.DATA.get('id_number', "").strip()
+        params = request.DATA
+        data = {}
+        for k,v in params.iteritems():
+            data[k]=v
+        data['identifier']=profile.phone
+        form = LoginAuthenticationNoCaptchaForm(request, data=data)
         if form.is_valid():
-            print '----------------------'
+            if id_number != profile.id_number:
+                return Response({'message':"身份证错误"}, status=400)
+            #todo
+            # 同卡之后要对银行卡号进行验证
+            card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+            if card.exists():
+                card_no = request.DATA.get('card_no', "").strip()
+                if not card_no:
+                    return Response({'message': "绑卡用户需要提供绑定的银行卡号"}, status=400)
+                card = card.first()
+                if card.no != card_no:
+                    return Response({'message': "银行卡号输入错误"}, status=400)
             return Response({'ret_code': 0})
-        return Response(status=400)
+        message = form.errors
+        for key, value in form.errors.iteritems():
+            message = ",".join(value)
+        return Response({"message":message}, status=400)
+
+class ModifyPhoneValidateCode(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
+        new_phone_user = User.objects.filter(wanglibaouserprofile__phone=phone_number)
+        if new_phone_user.exists():
+            return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+
+        if not res:
+            return Response({'message': message, "type":"captcha"}, status=403)
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        return Response({'message': message, "type":"validation"}, status=status)
+
+class ManualModifyPhoneTemplate(TemplateView):
+    template_name = 'phone_modify_manual.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        form = ManualModifyPhoneForm()
+        # modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        return {
+                'form':form,
+                'user_name':profile.name,
+                # 'modify_phone_record':modify_phone_record
+                }
+
+
+
+class ManualModifyPhoneAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        profile = user.wanglibaouserprofile
+        if not profile.id_is_valid or not profile.id_number:
+            return Response({'message':"还没有实名认证"}, status=400)
+        form = ManualModifyPhoneForm(self.request.DATA, self.request.FILES)
+        if form.is_valid():
+            id_front_image = form.cleaned_data['id_front_image']
+            id_back_image = form.cleaned_data['id_back_image']
+            id_user_image = form.cleaned_data['id_user_image']
+            new_phone = form.cleaned_data['new_phone']
+            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"待初审", u"初审待定", u"待复审"]).first()
+            if modify_phone_record:
+                return Response({'message': u"您之前申请的人工修改手机号的请求还未处理完毕,请联系网利宝客服"}, status=400)
+            #todo
+            manual_record = ManualModifyPhoneRecord()
+            manual_record.user = user
+            manual_record.phone = profile.phone
+            manual_record.id_front_image = id_front_image
+            manual_record.id_back_image = id_back_image
+            manual_record.id_user_image = id_user_image
+            manual_record.new_phone = new_phone
+            manual_record.status = u'待初审'
+            manual_record.save()
+            return Response({'ret_code': 0})
+        else:
+            message = form.errors
+            for key, value in form.errors.iteritems():
+                message = ",".join(value)
+            return Response({"message":message}, status=400)
+
 
 class SMSModifyPhoneValidateTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         user = self.request.user
         profile = user.wanglibaouserprofile
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
         return {
             "phone": profile.phone,
+            'is_bind_card': is_bind_card,
             }
 
 class SMSModifyPhoneValidateAPI(APIView):
+    permission_classes = (IsAuthenticated, )
 
-    pass
+    def post(self, request):
+        user = request.user
+        profile = user.wanglibaouserprofile
+        validate_code = request.DATA.get('validate_code', "").strip()
+        id_number = request.DATA.get('id_number', "").strip()
+        new_phone = request.DATA.get('new_phone', "").strip()
+
+        if not profile.id_is_valid or not profile.id_number:
+            return Response({'message':"还没有实名认证"}, status=400)
+        if not validate_code or not id_number or not new_phone:
+            return Response({'message':"参数为空"}, status=400)
+        params = request.DATA
+        data = {}
+        for k,v in params.iteritems():
+            data[k]=v
+        data['identifier']=profile.phone
+        form = LoginAuthenticationNoCaptchaForm(request, data=data)
+        if form.is_valid():
+            if form.get_user()!=user:
+                return Response({'message':"用户错误"}, status=400)
+            status, message = validate_validation_code(profile.phone, validate_code)
+            if status != 200:
+                return Response({'message':message}, status=400)
+            if id_number != profile.id_number:
+                return Response({'message':"身份证错误"}, status=400)
+            new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
+            if new_phone_user:
+                return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+            #todo
+            # 同卡之后要对银行卡号进行验证
+            card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+            if card.exists():
+                card_no = request.DATA.get('card_no', "").strip()
+                if not card_no:
+                    return Response({'message': "绑卡用户需要提供绑定的银行卡号"}, status=400)
+                card = card.first()
+                if card.no != card_no:
+                    return Response({'message': "银行卡号输入错误"}, status=400)
+
+            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
+            if not sms_modify_record:
+                sms_modify_record = SMSModifyPhoneRecord()
+                sms_modify_record.user = user
+                sms_modify_record.phone = profile.phone
+                sms_modify_record.status = u'短信修改手机号提交'
+                sms_modify_record.new_phone = new_phone
+                sms_modify_record.save()
+            if sms_modify_record.new_phone != new_phone:
+                sms_modify_record.new_phone = new_phone
+                sms_modify_record.save()
+            return Response({"message":'ok'})
+
+        return Response({"message":form.errors}, status=400)
 
 class SMSModifyPhoneTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         user = self.request.user
         profile = user.wanglibaouserprofile
+        new_phone = ""
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
+        if sms_modify_record:
+            new_phone = sms_modify_record.new_phone
+
         return {
-            "new_phone": profile.phone,
+            "new_phone": new_phone,
             }
 
 class SMSModifyPhoneAPI(APIView):
-    pass
-
-
-
-
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        user = request.user
+        new_phone = request.DATA.get('new_phone', "").strip()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status = u'短信修改手机号提交').first()
+        if not sms_modify_record:
+            return Response({'message':u"还没有短信申请修改手机号"}, status=400)
+        profile = user.wanglibaouserprofile
+        validate_code = request.DATA.get('validate_code', "").strip()
+        if not validate_code:
+            return Response({'message':"验证码不能为空"}, status=400)
+        status, message = validate_validation_code(new_phone, validate_code)
+        if status != 200:
+            return Response({'message':message}, status=400)
+        new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
+        if new_phone_user:
+            return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+        card = Card.objects.filter(user=request.user, is_the_one_card=True)
+        if card.exists():
+            card_no = request.DATA.get('card_no', "").strip()
+            if not card_no or card_no != card.no:
+                return Response({'message':"银行卡号错误"}, status=400)
+        with transaction.atomic(savepoint=True):
+            old_phone = profile.phone
+            profile.phone = new_phone
+            profile.save()
+            PhoneValidateCode.objects.filter(phone=old_phone).delete()
+            sms_modify_record.status=u'短信修改手机号成功'
+            sms_modify_record.save()
+            #todo force user login again
+            return Response({'message':'ok'})
 
 
