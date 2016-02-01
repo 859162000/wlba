@@ -85,6 +85,7 @@ urlpatterns = patterns(
     url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
     url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
 
+    url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
 
 )
 
