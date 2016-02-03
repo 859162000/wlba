@@ -374,5 +374,5 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         })
     }
-	weixin_share("网利宝，是一种生活方式");//微信分享
+	weixin_share("网利宝,是一种生活方式");//微信分享
 })();
