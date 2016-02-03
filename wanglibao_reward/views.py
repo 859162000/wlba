@@ -11,7 +11,8 @@ from experience_gold.backends import SendExperienceGold
 from django.db import transaction
 from django.db import IntegrityError
 from django.db.models import Sum
-from datetime import datetime
+# from datetime import datetime
+import datetime
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 import inspect
@@ -1833,7 +1834,8 @@ class QMBanquetRewardAPI(APIView):
         logger.exception("class:%s, function:%s, reason,%s, msg:%s" %(self.__class__.__name__, self.current_function_name, reason, msg))
 
     def post(self, request):
-        now_date = timezone.now().date()
+        # now_date = timezone.now().date()
+        now_date = datetime.date.today()
         try:
             with transaction.atomic():
                 code = self.get_random_activity_code()
@@ -1964,7 +1966,8 @@ class HMBanquetRewardAPI(APIView):
         device_type = device['device_type']
         try:
             with transaction.atomic():
-                now_date = timezone.now().date()
+                # now_date = timezone.now().date()
+                now_date = datetime.date.today()
                 gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
                 if not gift_record.exists():
                     ActivityRewardRecord.objects.create(
