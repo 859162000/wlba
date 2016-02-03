@@ -1139,13 +1139,15 @@ class StatisticsInside(APIView):
         end_fmt = today_start.strftime('%Y-%m-%d %H:%M:%S')
 
         # 每日累计申请提现, Add by hb on 2016-02-03
+        today_utc = local_to_utc(today, 'now')
         start_withdraw = today_start + timedelta(hours=16)
         # 当日16点前查询以昨日16点作为起始时间
-        if today < start_withdraw :
+        if today_utc < start_withdraw :
             start_withdraw = yesterday_start + timedelta(hours=16)
-        stop_withdraw = today
-        yesterday_withdraw = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
+        stop_withdraw = today_utc
+        yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
             .filter(catalog='取款预冻结').aggregate(Sum('amount'))
+        yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
 
         # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
