@@ -114,9 +114,9 @@
                 });
             }
         });
-		var whost = window.location.href;
         wx.ready(function () {
-            var host = whost.substring(0,whost.indexOf('/activity')),
+			var winHost = window.location.href;
+            var host = winHost.substring(0,winHost.indexOf('/activity')),
                 shareImg = host + '/static/imgs/mobile/share_logo.png',
                 shareLink = host + '/activity/weixin_lifestyle/',
                 shareMainTit = shareTit,
