@@ -48,6 +48,7 @@ from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from wanglibao.templatetags.formatters import safe_phone_str
 import traceback
 logger = logging.getLogger('wanglibao_reward')
 
@@ -1149,8 +1150,10 @@ class XunleiActivityAPIView(APIView):
     def get(self, request):
         _type = request.GET.get("type", None)
         if _type == "orders":
-            records = WanglibaoActivityReward.objects.filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
-            data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': str(record.p2p_amount)} for record in records]
+            records = WanglibaoActivityReward.objects.only('user__id', 'p2p_amount', 'user__wanglibaouserprofile__phone') \
+                .select_related('user__wanglibaouserprofile') \
+                .filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
+            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(record.p2p_amount)} for record in records]
             to_json_response = {
                 'ret_code': 1005,
                 'data': data,

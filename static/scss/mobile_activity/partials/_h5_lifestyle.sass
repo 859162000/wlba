@@ -1,0 +1,252 @@
+.h5_lifestyle_html
+  height: 100%
+  width: 100%
+  overflow: hidden
+@-webkit-keyframes toBig
+  0%
+    opacity: 0.1
+    -webkit-transform: scale(0.2)
+  50%
+    opacity: 0.5
+    -webkit-transform: scale(1)
+@keyframes toBig
+  0%
+    opacity: 0.1
+    transform: scale(0.2)
+  50%
+    opacity: 0.5
+    transform: scale(1)
+
+@-webkit-keyframes rotate
+  0%
+    -webkit-transform: rotate(0)
+  100%
+    -webkit-transform: rotate(360deg)
+
+@keyframes rotate
+  0%
+    transform: rotate(0)
+  100%
+    transform: rotate(360deg)
+
+.h5_lifestyle
+  position: relative
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  @mixin middle
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+  @mixin pageArr-animate($t:0s)
+    animation: toBig 1.5s ease-in-out $t infinite
+    -webkit-animation: toBig 1.5s ease-in-out $t infinite
+  .next-box
+    //position: absolute
+    //width: 100%
+    text-align: center
+    //bottom: 1rem
+    //z-index: 9
+    display: none
+    //+pageArr-animate
+    z-index: 999
+    position: absolute
+    bottom: 0.5rem
+    height: 2rem
+    width: 0.5rem
+    left: 50%
+    margin-left: -0.25rem
+    .cicle-item
+      display: block
+      background: #000
+      opacity: 0.2
+      width: 0.4rem
+      height: 0.4rem
+      border-radius: 0.4rem
+      overflow: hidden
+      margin-top: 0.2rem
+      &:nth-child(1)
+        +pageArr-animate
+      &:nth-child(2)
+        +pageArr-animate(0.5s)
+      &:nth-child(3)
+        +pageArr-animate(1s)
+  .page-swipe
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    overflow: hidden
+  .swiper-wrapper
+    .swiper-slide
+      background: url("/static/imgs/mobile_activity/h5_lifestyle/page-bg.jpg") no-repeat
+      background-size: cover
+      padding: 0 1rem
+      position: relative
+      +middle
+      .page-main
+        border-radius: 0.5rem
+        background: #fff
+        width: 100%
+        height: 23rem
+        padding: 0.6rem 1rem 0
+        position: relative
+        .page-main-box
+          width: 100%
+          height: 100%
+          overflow: hidden
+      .page-tit
+        text-align: center
+        font-size: 0.8rem
+        color: #a62c00
+        line-height: 0.95rem
+        margin-bottom: 0.1rem
+      .page-img
+        text-align: center
+        margin-bottom: -0.5rem
+      .page-txt
+        font-size: 0.6rem
+        line-height: 0.95rem
+        color: #666
+        margin-top: 0.6rem
+      .page-btm
+        width: 3.625rem
+        height: 4.3rem
+        position: absolute
+        right: -1rem
+        bottom: -2.8rem
+        background: url("/static/imgs/mobile_activity/h5_lifestyle/btm-logo.png") no-repeat
+        background-size: contain
+      @media screen and (min-width: 700px)
+        .page-main
+          padding-top: 1rem
+          height: 25rem
+        .page-tit
+          margin-bottom: 0.6rem
+    .page1
+      padding: 0
+      background: url("/static/imgs/mobile_activity/h5_lifestyle/page1.jpg") center top no-repeat
+      background-size: cover
+      img
+        opacity: 0
+        width: 100%
+    .page6
+      background: url("/static/imgs/mobile_activity/h5_lifestyle/page6.jpg") center center no-repeat
+      background-size: cover
+      padding: 0
+      text-align: center
+      .page6-mian
+        width: 100%
+        height: 18rem
+      .page6-tab-nav
+        width: 15rem
+        margin: 2rem auto 1rem
+        border: 1px solid #f06c00
+        border-radius: 0.2rem
+        overflow: hidden
+        font-size: 0.7rem
+        text-align: center
+        height: 1.5rem
+        line-height: 1.5rem
+        .tab-nav
+          width: 50%
+          float: left
+          color: #f06c00
+          &.active
+            color: #fff
+            background: #f06c00
+      @media screen and (min-width: 700px)
+        .page6-mian
+          height: 22.5rem
+      button
+        outline: none
+        -webkit-appearance: none
+
+      .tab-cont
+        overflow: hidden
+        .cont-item
+          display: none
+          position: relative
+          width: 15rem
+          height: 11.2rem
+          margin: 0 auto
+          &.active
+            display: block
+          video
+            width: 100%
+            height: 100%
+          .video-bg
+            position: absolute
+            top: 0
+            left: 0
+            z-index: 9999
+            width: 100%
+            height: 100%
+            background-color: #000
+            background-position: center
+            background-repeat: no-repeat
+            background-size: 100% auto
+            +middle
+          .video-btn
+            +middle
+            border: 0.15rem solid #fff
+            width: 3.5rem
+            height: 3.5rem
+            border-radius: 2rem
+            &:after
+              display: inline-block
+              border: 1rem dashed transparent
+              border-left: 1rem solid #fff
+              content: ""
+              margin-left: 40%
+
+  .page-loading
+    height: 100%
+    width: 100%
+    position: absolute
+    z-index: 99
+    top: 0
+    left: 0
+    background: #bd5500
+    text-align: center
+    +middle
+    .load-img-box
+      display: inline-block
+      position: relative
+      width: 4.925rem
+      .an-img
+        position: absolute
+        top: 0.91rem
+        left: 0.91rem
+        -webkit-animation: rotate 3s linear backwards infinite
+        animation: rotate 3s linear backwards infinite
+    .load-num-box
+      width: 10rem
+      margin: 2rem auto
+      .load-line-box
+        position: relative
+        width: 100%
+        height: 0.3rem
+        background: #9f3b00
+        border-radius: 0.3rem
+        overflow: hidden
+        .load-now
+          position: absolute
+          top: 0
+          left: 0
+          height: 100%
+          width: 100%
+          background: #fff
+      .load-txt
+        font-size: 0.5rem
+        color: #6e3100
+        margin-bottom: 0.2rem
+
+
+
+
+
+
+

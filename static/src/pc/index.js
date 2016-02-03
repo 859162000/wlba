@@ -196,7 +196,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
     }
 
     ~function show_newyear() {
-        if ($(window).height() > 700) {
+        if ($(window).height() > 750) {
             $('.g-new-year-bottom-warp').show()
         }
     }()

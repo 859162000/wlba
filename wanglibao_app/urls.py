@@ -12,7 +12,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
                                  AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppAreaView,
                                  AppAreaApiView, AppMemorabiliaView, AppDataModuleView, AppActivateScoreImageAPIView,
-                                 AppFinanceView)
+                                 AppFinanceView, AppPraiseAwardView)
 
 router = DefaultRouter()
 
@@ -54,5 +54,6 @@ urlpatterns = patterns(
     url(r'^data_cube/$', AppDataModuleView.as_view()),#数据魔方
     url(r'^finance/$', AppFinanceView.as_view()),
     url(r'^share-finance/$', TemplateView.as_view(template_name="client_share_finance.jade"), name='app_finance'),
+    url(r'^praise-award/$', AppPraiseAwardView.as_view()),
 )
 
