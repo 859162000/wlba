@@ -20,4 +20,5 @@ urlpatterns = patterns(
     url(r'^rock/$', TemplateView.as_view(template_name="client_announcement_rock.jade")),
     url(r'^trading-A/$', TemplateView.as_view(template_name="client_announcement_trading_A.jade")),
     url(r'^trading-B/$', TemplateView.as_view(template_name="client_announcement_trading_B.jade")),
+    url(r'^abc-pay/$', TemplateView.as_view(template_name="client_announcement_abc_pay.jade")),
 )
