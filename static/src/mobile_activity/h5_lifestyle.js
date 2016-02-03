@@ -111,7 +111,7 @@
             var winHost = window.location.href;
             var host = winHost.substring(0,winHost.indexOf('/activity')),
 			//var host = 'https://staging.wanglibao.com',
-                shareImg = host + '/static/imgs/mobile/share_logo.png',
+                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = host + '/activity/weixin_lifestyle/',
                 shareMainTit = shareTit,
                 shareBody = '2015，你的收益如何？让他们来跟你分享下，投资创造美好生活的心得吧~';
