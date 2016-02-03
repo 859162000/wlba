@@ -289,29 +289,22 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		videoFun._pause(contSib.find("video"));
 	});
 
-	function perFun(){
-		var imgs = document.getElementsByTagName("img");
-		var len = 0;
-
+	var t = window.setTimeout(preLoad, 100);
+	var step = 0;
+    function preLoad() {
 		var percent = $("#load-txt"),
 			imgAn = $("div.load-now");
-		for(var i=0; i<imgs.length; i++){
-		  (function(i){
-
-			imgs[i].onload = function(){
-			    len ++;
-				var per = parseInt(len*100/imgs.length);
-				percent.text(per+"%");
-				imgAn.css("width", per+"%");
-				if(per > 80){
-					$("#page-loading").hide();
-					$("#next-box,#page-swipe").show();
-				}
-			}
-		  })(i);
+		percent.text(step + "%");
+		imgAn.animate({ width: step + "%" }, 10);
+        step += 1;
+        if (step <= 100) {
+            t = window.setTimeout(preLoad, 10);
+        } else {
+			clearTimeout(t);
+			$("#page-loading").hide();
+			$("#next-box,#page-swipe").show();
 		}
-	}
-	perFun();
+    }
 
 	function weixin_share(shareTit,fn){
         //alert(shareTit);
@@ -334,8 +327,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         });
         wx.ready(function () {
-			var winHost = window.location.href;
+            var winHost = window.location.href;
             var host = winHost.substring(0,winHost.indexOf('/activity')),
+			//var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/share_logo.png',
                 shareLink = host + '/activity/weixin_lifestyle/',
                 shareMainTit = shareTit,
