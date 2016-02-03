@@ -185,6 +185,8 @@ urlpatterns += patterns(
     url(r'^weixin_mammon/$', TemplateView.as_view(template_name="h5_mammon.jade")),
     url(r'^app_two_novice/$', TemplateView.as_view(template_name="app_two_novice.jade")),
 
+    url(r'^weixin_lifestyle/$', TemplateView.as_view(template_name="h5_lifestyle.jade")),
+
 )
 # app with webview
 urlpatterns += patterns(
