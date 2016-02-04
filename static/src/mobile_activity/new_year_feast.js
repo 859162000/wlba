@@ -212,7 +212,7 @@ var weChatShare = (function(org){
             dataType : 'json',
             success : function(data) {
                 //请求成功，通过config注入配置信息,
-                wx.config({
+                wx.config({ 
                     debug: false,
                     appId: data.appId,
                     timestamp: data.timestamp,
@@ -223,7 +223,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com/activity/new_year_feast/',
+            var host = 'https://www.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = window.location.href,
                 shareMainTit = '新年红包宴，每天领一次，最高拿8000！',
