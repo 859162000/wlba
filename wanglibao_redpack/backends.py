@@ -752,3 +752,88 @@ def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at
 
 def get_app_version():
     misc = Misc.objects.filter(key='android_update').first()
+
+
+# Add by hmm on 2016-2-4
+#为二月红包宴年前专用接口，节后会调整
+def give_activity_redpack_for_hby(user, event, device_type, just_one_packet=False, check_issue_time=False):
+    """
+
+    :param user:
+    :param event: 支持RedPackEevent对象或是一个event的名字
+    :param device_type:
+    :param just_one_packet: 置为True，对于某个红包活动用户只能获得一个红包，不能获得多个
+    :param check_issue_time：检查发放时间，超期不发放
+    :return:
+    """
+    device_type = _decide_device(device_type)
+    # 后台设置必须保证红包的event不重名
+    if not isinstance(event, RedPackEvent):
+        try:
+            event = RedPackEvent.objects.get(name=event)
+        except:
+            return False, u"活动名称错误", 0
+    #检查红包发放时间
+    now = timezone.now()
+    if now < event.give_start_at or now > event.give_end_at:
+        return False, u'活动已过期', 0
+    redpack = RedPack.objects.filter(event=event, status="unused").first()
+    if not redpack:
+        return False, u"没有此优惠券", 0
+    if redpack.token != "":
+        redpack.status = "used"
+        redpack.save()
+    if just_one_packet and RedPackRecord.objects.filter(redpack=redpack, user=user).exists():
+        return False, u"限领一个红包", 0
+    record = RedPackRecord()
+    record.user = user
+    record.redpack = redpack
+    record.change_platform = device_type
+    record.save()
+
+    # start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+    #                                           record.created_at, event.available_at, event.unavailable_at)
+    # _send_message_for_hby(user, event, end_time)
+
+    return True, "", record
+
+
+#为二月红包宴年前专用接口，节后会调整
+def _send_message_for_hby(user, event, end_time):
+    fmt_str = "%Y年%m月%d日"
+    if end_time:
+        unavailable_at = end_time
+    else:
+        unavailable_at = event.unavailable_at
+    give_time = timezone.localtime(unavailable_at).strftime(fmt_str)
+    mtype = 'activity'
+    rtype = u'元红包'
+    coupon_amount = event.amount
+    if event.rtype == 'interest_coupon':
+        rtype = u'%加息券'
+    if event.rtype == 'percent':
+        coupon_amount = event.highest_amount
+
+    # 发送短信,功能推送id: 4
+    # 模板中的参数变量必须以 name=value 的形式传入
+    # phone = user.wanglibaouserprofile.phone
+    # PHPSendSMS().send_sms_one(4, phone, 'phone', amount=coupon_amount, rtype=rtype)
+
+    # send_messages.apply_async(kwargs={
+    #     'phones': [user.wanglibaouserprofile.phone],
+    #     'messages': [messages.red_packet_get_alert(coupon_amount, rtype)],
+    #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+    # })
+    if event.rtype == 'percent':
+        title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
+    elif event.rtype == 'interest_coupon':
+        title, content = messages.msg_give_coupon(event.name, event.amount, give_time)
+        mtype = 'coupon'
+    else:
+        title, content = messages.msg_redpack_give(event.amount, event.name, give_time)
+    inside_message.send_one.apply_async(kwargs={
+        "user_id": user.id,
+        "title": title,
+        "content": content,
+        "mtype": mtype
+    })
