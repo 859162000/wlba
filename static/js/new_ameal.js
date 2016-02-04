@@ -64,7 +64,7 @@
                         $('.years_smak').find("p").text("进入“我的账户”--“理财券”“体验金专区”查看");
                     }
                     $(".cover_layer").show();
-                })
+                });
                 is=1;
             }
         })
@@ -75,6 +75,11 @@
                 data: {redpack_id : id},
                 success: function(data){
                     fn(data)
+                },
+                error: function(xml){
+                    if(xml.status === 403){
+                        window.location.href="/accounts/login/?next=/weixin_activity/new_ameal/";
+                    }
                 }
             })
         }
@@ -99,7 +104,7 @@
                         smak.show();
                     }
                     $(".cover_layer").show();
-                })
+                });
                 is=1;
             }
         })
