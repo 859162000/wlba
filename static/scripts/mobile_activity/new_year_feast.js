@@ -431,7 +431,7 @@ var weChatShare = (function(org){
             dataType : 'json',
             success : function(data) {
                 //请求成功，通过config注入配置信息,
-                wx.config({
+                wx.config({ 
                     debug: false,
                     appId: data.appId,
                     timestamp: data.timestamp,
@@ -442,7 +442,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com/activity/new_year_feast/',
+            var host = 'https://www.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = window.location.href,
                 shareMainTit = '新年红包宴，每天可领一次福气大礼包。',
@@ -456,7 +456,7 @@ var weChatShare = (function(org){
             });
             //分享给微信朋友圈
             org.onMenuShareTimeline({
-                title: '新年红包宴，每天可领一次福气大礼包。',
+                title: '新年红包宴，每天领一次，最高拿22000！',
                 link : shareLink,
                 imgUrl: shareImg
             })
