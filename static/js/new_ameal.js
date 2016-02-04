@@ -81,8 +81,8 @@
         $(".years_paper a").on("click",function(){
             var data_id=$(this).attr("data_id");
             var smak = $('.years_smak'),
-                smakH = $('.years_smak').find("h3"),
-                smakP = $('.years_smak').find("p");
+                smakH = smak.find("h3"),
+                smakP = smak.find("p");
             if(is == 0){
                 ajaxfn(data_id, "/api/wlb_reward/hm_banque/#", function(data){
                     var txt=data.message;
