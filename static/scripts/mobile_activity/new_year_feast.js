@@ -402,7 +402,7 @@ wlb.ready({
                 }
             })
         }
-
+        mixins.shareData({title: '新年红包宴，每天领一次，最高拿22000！', content: '每天一次开锅领奖：红包、加息券、体验金百发百中。'});
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 $('.pot-s,.packets-btn a').on('click',function(){
