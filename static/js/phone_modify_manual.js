@@ -253,8 +253,7 @@
             file_3 = document.getElementById("id_user_image").value;
             code_num = $('.input_code').val();
 
-            if(file_1&&phone_true&&code_num){
-            //if(file_1&&file_2&&file_3&&phone_true&&code_num){
+            if(file_1&&file_2&&file_3&&phone_true&&code_num){
                 var form =$("#form");
                 var formData = new FormData($( "#form" )[0]);
                 //alert(formData);
