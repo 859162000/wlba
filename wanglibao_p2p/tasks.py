@@ -215,7 +215,7 @@ def p2p_auto_ready_for_settle():
 
 
 @app.task
-def bajinshe_product_push_to_coop():
+def bajinshe_product_push():
     push_url = settings.BAJINSHE_PRODUCT_PULL_URL
     coop_id = settings.BAJINSHE_COOP_ID
     coop_key = settings.BAJINSHE_COOP_KEY

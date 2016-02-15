@@ -65,7 +65,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
-from wanglibao_account.utils import Crypto
+from wanglibao_account.utils import Crypto, get_bajinshe_access_token
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
@@ -1670,7 +1670,10 @@ class BaJinSheRegister(CoopRegister):
                 order.save()
 
     def register_call_back(self, user):
-        Binding.objects.filter()
+        pass
+        # order_id = '%s_0001' % timezone.now().strftime("%Y%m%d%H%M%S")
+        # access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
+        # Binding.objects.filter()
 
     def purchase_call_back(self, user, order_id):
         self.bajinshe_call_back(user, order_id)
