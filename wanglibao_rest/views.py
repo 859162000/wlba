@@ -46,7 +46,7 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua, get_client_ip, has_binding_for_bid
+from wanglibao_rest.utils import split_ua, get_client_ip, has_binding_for_bid, get_coop_binding_for_phone
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
@@ -1596,14 +1596,11 @@ class AccessUserExistsApi(APIView):
             channel = get_channel_record(channel_code)
             if channel:
                 phone = request.session.get('phone')
-                binding = has_binding_for_bid(channel_code, phone)
+                binding = get_coop_binding_for_phone(channel_code, phone)
                 user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
                 if binding and user:
-                    crypto = Crypto()
-                    data_buf = crypto.encrypt_mode_cbc(str(user.id), settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
-                    user_id = crypto.encode_bytes(data_buf)
                     response_data = {
-                        'user_id': user_id,
+                        'user_id': binding.bid,
                         'ret_code': 10000,
                         'message': u'该号已注册'
                     }

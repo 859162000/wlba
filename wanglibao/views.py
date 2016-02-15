@@ -312,7 +312,7 @@ def landpage_view(request):
                 # 判断用户是否为登录状态
                 if not request.user.is_authenticated():
                     # 判断手机号是否已经注册
-                    phone = request.session.get('channel_user', None)
+                    phone = request.session.get('phone', None)
                     if phone:
                         phone_has_register = has_register_for_phone(phone)
                     else:

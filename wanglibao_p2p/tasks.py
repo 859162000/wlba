@@ -216,7 +216,7 @@ def p2p_auto_ready_for_settle():
 
 @app.task
 def bajinshe_product_push():
-    push_url = settings.BAJINSHE_PRODUCT_PULL_URL
+    push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
     coop_id = settings.BAJINSHE_COOP_ID
     coop_key = settings.BAJINSHE_COOP_KEY
     order_id = '%s_0000' % timezone.now().strftime("%Y%m%d%H%M%S")

@@ -1587,7 +1587,7 @@ class BaJinSheRegister(CoopRegister):
         self.c_code = 'bajinshe'
         self.channel_product_id_key = 'product_id'
         self.external_channel_client_id_key = 'appid'
-        self.external_channel_user_key = 'usn'
+        self.external_channel_phone_key = 'usn'
         self.internal_channel_phone_key = 'phone'
         self.external_channel_user_id_key = 'p_user_id'
         self.external_channel_order_id_key = 'orderNum'
@@ -1603,6 +1603,7 @@ class BaJinSheRegister(CoopRegister):
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
+        channel_phone = self.request.REQUEST.get(self.external_channel_phone_key, None)
         channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
         p_id = self.request.REQUEST.get(self.channel_product_id_key, None)
         client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
@@ -1614,7 +1615,9 @@ class BaJinSheRegister(CoopRegister):
 
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
-            self.request.session[self.internal_channel_phone_key] = channel_user
+
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
 
         if p_id:
             self.request.session[self.channel_product_id_key] = p_id
@@ -1643,6 +1646,11 @@ class BaJinSheRegister(CoopRegister):
         :return:
         """
         channel_user = self.channel_user
+        if not channel_user:
+            crypto = Crypto()
+            data_buf = crypto.encrypt_mode_cbc(str(user.id), settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
+            channel_user = crypto.encode_bytes(data_buf)
+
         channel_name = self.channel_name
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         if channel_name and channel_user and len(channel_user) <= bid_len:
@@ -1670,10 +1678,18 @@ class BaJinSheRegister(CoopRegister):
                 order.save()
 
     def register_call_back(self, user):
-        pass
-        # order_id = '%s_0001' % timezone.now().strftime("%Y%m%d%H%M%S")
-        # access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
-        # Binding.objects.filter()
+        push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
+        coop_id = settings.BAJINSHE_COOP_ID
+        coop_key = settings.BAJINSHE_COOP_KEY
+        order_id = '%s_0001' % timezone.now().strftime("%Y%m%d%H%M%S")
+        access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
+        bid = get_tid_for_coop(user.id)
+        phone = get_phone_for_coop(user.id)
+        if access_token and bid:
+            tran = {
+                'bingdingUid': bid,
+                'usn': phone,
+            }
 
     def purchase_call_back(self, user, order_id):
         self.bajinshe_call_back(user, order_id)

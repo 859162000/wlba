@@ -134,5 +134,9 @@ def has_binding_for_bid(channel_code, bid):
     return Binding.objects.filter(btype=channel_code, bid=bid).exists()
 
 
+def get_coop_binding_for_phone(channel_code, phone):
+    return Binding.objects.filter(btype=channel_code, user__wanglibaouserprofile__phone=phone).first()
+
+
 def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
