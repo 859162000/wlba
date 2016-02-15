@@ -1117,7 +1117,7 @@ class AccountBankCard(TemplateView):
 
         cards = BindBank.objects.filter(user__exact=self.request.user)
         p2p_cards = Card.objects.filter(user__exact=self.request.user)
-        banks = Bank.get_withdraw_banks()
+        banks = Bank.get_bind_channel_banks()
         return {
             "cards": cards,
             'p2p_cards': p2p_cards,

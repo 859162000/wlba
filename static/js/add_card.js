@@ -141,7 +141,7 @@
           },
           type: 'post'
         }).done(function(xhr) {
-          if (xhr.ret_code === 0) {
+          if (xhr.ret_code === 0 || xhr.ret_code === 2200) {
             location.reload();
           } else {
             tool.modalAlert({
@@ -258,44 +258,10 @@
     });
 
     /*绑定银行卡 */
-    $('.binding-card').click(function() {
-      var card, par, str;
-      $('#bindingOldCard').modal();
-      $('#bindingOldCard').find('.ok-btn').attr({
-        'data-card': $(this).attr('data-card')
-      });
-      $('#bindingOldCard').find('.close-modal').hide();
-      $('.modal').css({
-        'width': '560px'
-      });
-      par = $(this).parent();
-      card = par.find('.bank-card--info-value').text();
-      str = par.find('.bank-card--bank-name').find('label').text() + '尾号' + card.substr(card.length - 4);
-      return $('.bankInfo').html(str);
-    });
 
     /*确认绑定 */
-    $('.ok-btn').click(function() {
-      return $.ajax({
-        url: '/api/pay/the_one_card/',
-        data: {
-          card_id: $(this).attr('data-card')
-        },
-        type: 'put'
-      }).done(function() {
-        return location.reload();
-      }).fail(function(xhr) {
-        return tool.modalAlert({
-          title: '温馨提示',
-          msg: xhr.message
-        });
-      });
-    });
 
     /*取消绑定 */
-    $('.no-btn').click(function() {
-      return $.modal.close();
-    });
     $('.change-bank').click(function() {
       $('#confirmInfo').hide();
       return $('#chooseBank,.bankTitle span').show();
@@ -337,21 +303,21 @@
       } else {
         if ($('#id-is-valid').val() === 'False') {
           $('#id-validate').modal();
+          $.ajax({
+            url: "/api/profile/",
+            type: "GET",
+            data: {}
+          }).success(function(data) {
+            if (data.is_mainland_user === false) {
+              $('#goPersonalInfo').attr({
+                'data-type': 'special'
+              });
+              return $('#goPersonalInfo').text('绑定银行卡');
+            }
+          });
           return;
         }
       }
-      $.ajax({
-        url: "/api/profile/",
-        type: "GET",
-        data: {}
-      }).success(function(data) {
-        if (data.is_mainland_user === false) {
-          $('#goPersonalInfo').attr({
-            'data-type': 'special'
-          });
-          return $('#goPersonalInfo').text('绑定银行卡');
-        }
-      });
       e.preventDefault();
       $('.banks-list,.bankManage').hide();
       return $('#chooseBank,.bankTitle').show();

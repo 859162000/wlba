@@ -90,43 +90,8 @@
         }
       }
     });
-<<<<<<< HEAD
     $('.ispan4-omega').click(function() {
       $('.code-img-error').html('');
-=======
-    if ($('#id-is-valid').attr('data-type') === 'qiye') {
-      if ($('#id-is-valid').val() === 'False') {
-        $.ajax({
-          url: '/qiye/profile/exists/',
-          data: {},
-          type: 'GET'
-        }).done(function(data) {
-          if (data.ret_code === 10000) {
-            return $.ajax({
-              url: '/qiye/profile/get/',
-              data: {},
-              type: 'GET'
-            }).done(function(data) {
-              if (data.data.status !== '审核通过') {
-                return $('.verifyHref').attr('href', '/qiye/profile/edit/');
-              }
-            });
-          }
-        }).fail(function(data) {
-          return $('.verifyHref').attr('href', '/qiye/info/');
-        });
-        $('#id-validate').modal();
-        return;
-      }
-    } else {
-      if ($('#id-is-valid').val() === 'False') {
-        $('#id-validate').modal();
-        return;
-      }
-    }
-    $('#button-get-code-btn').click(function() {
-      var url;
->>>>>>> qiye_investment
       $('#img-code-div2').modal();
       $('#img-code-div2').find('#id_captcha_1').val('');
       return _refreshCode();
@@ -437,13 +402,41 @@
         }
       }
     });
-    return $.ajax({
+    $.ajax({
       url: "/api/home/",
       type: "GET",
       data: {}
     }).success(function(data) {
       return $('.red-text').text(data.p2p_margin);
     });
+    if ($('#id-is-valid').attr('data-type') === 'qiye') {
+      if ($('#id-is-valid').val() === 'False') {
+        $.ajax({
+          url: '/qiye/profile/exists/',
+          data: {},
+          type: 'GET'
+        }).done(function(data) {
+          if (data.ret_code === 10000) {
+            return $.ajax({
+              url: '/qiye/profile/get/',
+              data: {},
+              type: 'GET'
+            }).done(function(data) {
+              if (data.data.status !== '审核通过') {
+                return $('.verifyHref').attr('href', '/qiye/profile/edit/');
+              }
+            });
+          }
+        }).fail(function(data) {
+          return $('.verifyHref').attr('href', '/qiye/info/');
+        });
+        $('#id-validate').modal();
+      }
+    } else {
+      if ($('#id-is-valid').val() === 'False') {
+        $('#id-validate').modal();
+      }
+    }
   });
 
 }).call(this);

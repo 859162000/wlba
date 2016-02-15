@@ -46,6 +46,7 @@
             data: {},
             type: 'GET',
             success: function (data) {
+                $('.cardsEd').show()
                 var strHtml = '<div class="w100 clearfix">'
                 strHtml+='<div class="bank-card">'
                      +'<div class="bank-card--title-bar row">';
@@ -60,17 +61,17 @@
                      +'<dt class="bank-card--info-title">账号</dt>'
                      +'<dd class="bank-card--info-value">'+ data.no.substring(0,3)+'**** ****' +data.no.substr(data.no.length-4)+'</dd>'
                      +'</dl></div></div></div>';
-                $('#add-card-button').before(strHtml)
-                $('#add-card-button').hide()
+                $('#bank-List').append(strHtml)
             },
             error : function(){
-                $('#add-card-button').show()
+                $('.noCards').show();
                 $.ajax({
                     url: '/api/pay/cnp/list_new/',
                     data: {},
                     type: 'POST',
                     success: function (data) {
-                        if(data.cards.length > 0){
+                        var strHtml = '';
+                        if(data.ret_code == 0){
                             var strHtml = ''
                             $.each(data.cards,function(i,o){
                               strHtml+='<div class="bank-card">'
@@ -87,8 +88,10 @@
                                      +'<dd class="bank-card--info-value">'+ o.storable_no.substring(0,3)+'**** ****' +o.storable_no.substr(o.storable_no.length-4)+'</dd>'
                                      +'</dl></div><div data-card="'+ o.card_id +'" class="binding-card">绑定该卡</div></div>';
                             })
-                            $('#add-card-button').before(strHtml)
                         }
+                        strHtml+='<div id="add-card-button" class="add-bank-card">'
+                               +'<div class="add-icon-large"></div><p class="add-card-text">添加一张银行卡</p></div>';
+                        $('#bank-List').append(strHtml)
                     }
                 });
             }
@@ -132,6 +135,53 @@
         /*取消绑定 */
         $('#bindingOldCard').delegate('.no-btn','click',function() {
           return $.modal.close();
+        });
+
+
+        $('#bank-List').delegate('#add-card-button','click',function(e) {
+          if ($('#id-is-valid').attr('data-type') === 'qiye') {
+            if ($('#id-is-valid').val() === 'False') {
+              $.ajax({
+                url: '/qiye/profile/exists/',
+                data: {},
+                type: 'GET'
+              }).done(function(data) {
+                if (data.ret_code === 10000) {
+                  $.ajax({
+                    url: '/qiye/profile/get/',
+                    data: {},
+                    type: 'GET'
+                  }).done(function(data) {
+                    if (data.data.status !== '审核通过') {
+                      $('.verifyHref').attr('href', '/qiye/profile/edit/');
+                    }
+                  });
+                }
+              }).fail(function(data) {
+                $('.verifyHref').attr('href', '/qiye/info/');
+              });
+              $('#id-validate').modal();
+            }
+          } else {
+            if ($('#id-is-valid').val() === 'False') {
+              $('#id-validate').modal();
+              $.ajax({
+                url: "/api/profile/",
+                type: "GET",
+                data: {}
+              }).success(function(data) {
+                if (data.is_mainland_user === false) {
+                  $('#goPersonalInfo').attr({
+                    'data-type': 'special'
+                  });
+                  $('#goPersonalInfo').text('绑定银行卡');
+                }
+              });
+            }
+          }
+          e.preventDefault();
+          $('.banks-list,.bankManage').hide();
+          $('#chooseBank,.bankTitle').show();
         });
     })
 })()

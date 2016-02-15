@@ -114,7 +114,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         type: 'post'
       }
       .done (xhr)->
-        if xhr.ret_code == 0
+        if xhr.ret_code == 0 || xhr.ret_code == 2200
           location.reload()
         else
          tool.modalAlert({title: '温馨提示', msg: xhr.message})
@@ -207,32 +207,32 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
   )
 
   ###绑定银行卡###
-  $('.binding-card').click ->
-    $('#bindingOldCard').modal()
-    $('#bindingOldCard').find('.ok-btn').attr('data-card':$(this).attr('data-card'))
-    $('#bindingOldCard').find('.close-modal').hide()
-    $('.modal').css('width':'560px')
-    par = $(this).parent()
-    card = par.find('.bank-card--info-value').text()
-    str = par.find('.bank-card--bank-name').find('label').text()+'尾号'+card.substr(card.length-4)
-    $('.bankInfo').html(str)
+#  $('.binding-card').click ->
+#    $('#bindingOldCard').modal()
+#    $('#bindingOldCard').find('.ok-btn').attr('data-card':$(this).attr('data-card'))
+#    $('#bindingOldCard').find('.close-modal').hide()
+#    $('.modal').css('width':'560px')
+#    par = $(this).parent()
+#    card = par.find('.bank-card--info-value').text()
+#    str = par.find('.bank-card--bank-name').find('label').text()+'尾号'+card.substr(card.length-4)
+#    $('.bankInfo').html(str)
 
   ###确认绑定###
-  $('.ok-btn').click ->
-    $.ajax {
-      url: '/api/pay/the_one_card/'
-      data: {
-        card_id : $(this).attr('data-card')
-      }
-      type: 'put'
-    }
-    .done ()->
-      location.reload()
-    .fail (xhr)->
-      tool.modalAlert({title: '温馨提示', msg: xhr.message})
+#  $('.ok-btn').click ->
+#    $.ajax {
+#      url: '/api/pay/the_one_card/'
+#      data: {
+#        card_id : $(this).attr('data-card')
+#      }
+#      type: 'put'
+#    }
+#    .done ()->
+#      location.reload()
+#    .fail (xhr)->
+#      tool.modalAlert({title: '温馨提示', msg: xhr.message})
   ###取消绑定###
-  $('.no-btn').click ->
-    $.modal.close()
+#  $('.no-btn').click ->
+#    $.modal.close()
 
 
   $('.change-bank').click ->

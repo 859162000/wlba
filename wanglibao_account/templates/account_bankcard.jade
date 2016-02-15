@@ -13,18 +13,16 @@ block sidebar
 block main
   .panel-padding.clearfix
     .bank-card-manage.bankManage 银行卡管理
+        span.cardsEd(style="display:none") 您已成功绑定银行卡，今后可通过该卡进行提现。
     .bank-card-manage.bankTitle(style='display:none') 绑定银行卡
         span 绑定的银行卡持卡人，需同身份认证的个人信息保持一致
     .banks-list
         - csrf_token
-        .manage-pop 为了您的资金安全，网利宝实行了新的
-            a 银行卡管理制度
+        .manage-pop.noCards(style="display:none") 为了您的资金安全，网利宝实行了新的
+            a(href='/announcement/detail/479/',target='_blank') 银行卡管理制度
             | ，请您通过网页版再次对APP已绑定银行卡进行认证。
-        .manage-pop 已经在APP绑定银行卡的用户，仍可通过APP进行充值、提现等操作。
+        .manage-pop.noCards(style="display:none") 已经在APP绑定银行卡的用户，仍可通过APP进行充值、提现等操作。
         .row.padding-l-r-m#bank-List
-          .add-bank-card#add-card-button(style='display:none')
-                .add-icon-large
-                p.add-card-text 添加一张银行卡
           //if p2p_cards
           //  each card in p2p_cards
           //    .bank-card
@@ -49,12 +47,15 @@ block main
           //      .add-icon-large
           //      p.add-card-text 添加一张银行卡
         .kindly-reminder
-            p
-                b 温馨提示
-            p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
-            p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
-            p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
-            p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+            .kindly-reminder-m(style='width:525px')
+                p
+                    b 温馨提示
+                p 1. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+                p 2. 绑卡成功后，将自动为您开通快捷支付功能，方便您通过APP进行充值提现。
+                p 3. 绑卡成功后，您的提现资金将统一打到该银行卡。
+                p 4. 如需取消绑卡或者更换银行卡，请提交资料至邮箱：jiesuan@wanglibank.com，详情见
+                    a(href='https://www.wanglibao.com/announcement/detail/359/',target='_blank',style='padding-left:0') 公告
+                    | 。
 
       include include/add_card
   #bindingOldCard.bindingOldCard(style='display:none')
@@ -70,4 +71,4 @@ block main
         a(href='javascript:void(0)').ok-btn 确定绑卡
         a(href='javascript:void(0)').no-btn 绑定其它卡片
     script.
-        require(['/static/js/add_card.js?v=1223333','/static/js/bank_list.js'])
+        require(['/static/js/add_card.js?v=2016011501','/static/js/bank_list.js?v=2016011801'])
