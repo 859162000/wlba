@@ -2340,9 +2340,6 @@ class ManualModifyPhoneAPI(APIView):
             id_front_image = form.cleaned_data['id_front_image']
             id_back_image = form.cleaned_data['id_back_image']
             id_user_image = form.cleaned_data['id_user_image']
-            id_front_image.name = "%s_%s"%(user.id, 0)
-            id_back_image.name = "%s_%s"%(user.id, 1)
-            id_user_image.name = "%s_%s"%(user.id, 2)
             new_phone = form.cleaned_data['new_phone']
             modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"待初审", u"初审待定", u"待复审"]).first()
             if modify_phone_record:
@@ -2351,12 +2348,17 @@ class ManualModifyPhoneAPI(APIView):
             manual_record = ManualModifyPhoneRecord()
             manual_record.user = user
             manual_record.phone = profile.phone
-            manual_record.id_front_image = id_front_image
-            manual_record.id_back_image = id_back_image
-            manual_record.id_user_image = id_user_image
             manual_record.new_phone = new_phone
             manual_record.status = u'待初审'
             manual_record.save()
+            id_front_image.name = "%s_%s_%s"%(user.id, manual_record.id, 0)
+            id_back_image.name = "%s_%s_%s"%(user.id, manual_record.id, 1)
+            id_user_image.name = "%s_%s_%s"%(user.id, manual_record.id, 2)
+            manual_record.id_front_image = id_front_image
+            manual_record.id_back_image = id_back_image
+            manual_record.id_user_image = id_user_image
+            manual_record.save()
+
             return Response({'ret_code': 0})
         else:
             message = form.errors
