@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
 from marketing.models import Channels, ChannelsNew
+from file_storage.storages import AliOSSStorageForCover
 
 
 class IdVerification(models.Model):
@@ -219,7 +220,9 @@ class UserPhoneBook(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, default=timezone.now())
     is_used = models.BooleanField(default=True, verbose_name=u"是否使用", help_text=u'默认使用')
 
+
 class ManualModifyPhoneRecord(models.Model):
+
     STATUS_CHOICES = (
         (u"待初审",   u"待初审"),
         (u"初审待定", u"初审待定"),
@@ -231,9 +234,9 @@ class ManualModifyPhoneRecord(models.Model):
     # 待初审　初审待定　初审驳回　待复审　复审通过 复审驳回
     user = models.ForeignKey(User)
     phone = models.CharField(max_length=64, blank=True, help_text=u'手机号码')
-    id_front_image = models.ImageField(upload_to='id_card', blank=True, verbose_name=u'身份证正面照片', help_text=u'身份证正面照片')
-    id_back_image = models.ImageField(upload_to='id_card', blank=True, verbose_name=u'身份证反面照片', help_text=u'身份证反面照片')
-    id_user_image = models.ImageField(upload_to='id_card', blank=True, verbose_name=u'手持身份证照片', help_text=u'手持身份证照片')
+    id_front_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'身份证正面照片', help_text=u'身份证正面照片')
+    id_back_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'身份证反面照片', help_text=u'身份证反面照片')
+    id_user_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'手持身份证照片', help_text=u'手持身份证照片')
     new_phone = models.CharField(max_length=64, blank=True, help_text=u'新的手机号码')
     status = models.CharField(max_length=16, default=u'初审中', db_index=True,
                               choices=STATUS_CHOICES,
