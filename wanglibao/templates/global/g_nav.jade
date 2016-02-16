@@ -7,14 +7,18 @@
     .g-samll-start
       .samll-nav-hotline 客服热线 ： 400-858-8066
 
-      .samll-nav-wechat.samll-nav-animate 关注有惊喜
+      .samll-nav-wechat.samll-nav-animate
+        span 关注有惊喜
+        span.icon-weixin-version2
         .samll-wechat-hover
           .wechat-hover-body
             .wechat-hover-san
             img(src='/static/imgs/pc/nav/wechat_server.jpg')
             .wechat-hover-dec 关注网利宝微信
 
-      .samll-nav-app.samll-nav-animate 网利宝APP
+      .samll-nav-app.samll-nav-animate
+        span 网利宝APP
+        span.icon-app
         .samll-wechat-hover
           .wechat-hover-body
             .wechat-hover-san
@@ -30,20 +34,26 @@
         a(href='/accounts/home/').samll-nav-user.checkLoginStatus {{user | display_name}}
         a(href='/accounts/logout?next=/').samll-nav-logout 退出
       else
-        a(href='/accounts/login/').samll-nav-user 登录
+        a(href='/accounts/login/').samll-nav-user.samll-user-red 登录
         a(href='/accounts/register/').samll-nav-logout 免费注册
 
+
+
+
 .g-nav-warp
-  .g-nav
+  .g-nav.g-year-layout
     a(href="/").g-logo-box
-      img(src="/static/imgs/pc/logo/logo_80.jpg?v=2", alt='网利宝', class='logo_l')
-      img(src="/static/imgs/pc/logo/logo_60.jpg?v=2", alt='网利宝', class='logo_s')
+      img(src="/static/imgs/pc/logo/new_year_80.png?v=2", alt='网利宝', class='logo_l')
+      img(src="/static/imgs/pc/logo/new_year_60.png?v=2", alt='网利宝', class='logo_s')
     .g-user-warp
       .g-user
         if activeItem == "我的账户"
           myacount = 'highlight'
         a(href="/accounts/home", class='{{myacount}}')#checkUserType.user-nav
-          i.icon.iconfont.icon-user
+          if user.is_authenticated
+            i.user-icon-img-active
+          else
+            i.user-icon-img
           span.user-text 我的账户
           i.icon.iconfont.icon-down
         ul.g-nav-user-nav#minNavs
@@ -59,18 +69,60 @@
     .g-nav-box
       mixin nav-item(name, link, news)
         if activeItem == name
-            a.highlight(href=link)= name
+            a(href=link)
+              .link-name=name
+              .reel-item
+                span.reel-left.reel
+                span.reel-body
+                span.reel-right.reel
               if news
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
         else
-            a(href=link)= name
+            a(href=link)
+              .link-name=name
+              .reel-item
+                span.reel-left.reel
+                span.reel-body
+                span.reel-right.reel
               if news
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
 
       +nav-item('首页', '/')
       +nav-item('理财专区', '/p2p/list/')
       +nav-item('贷款专区', '/finance/')
-      +nav-item('活动专区', '/activity/area/', 'new')
+      +nav-item('活动专区', '/activity/area/')
       +nav-item('安全保障', '/security')
+    if index
+      .leo-layout.leo-layout-left
+        .leo-ears
+        .leo-face
+        .leo-before
+        .leo-light.light-left
+        .leo-light.light-right
+        .couplet-warp
+          .couplet.couplet-left.couplet-count
 
+      .leo-layout.leo-layout-right
+        .leo-ears
+        .leo-face
+        .leo-before
+        .leo-light.light-left
+        .leo-light.light-right
+        .couplet-warp
+          .couplet.couplet-right
+      img(src='/static/imgs/pc/newyear/bottom_left.png').leo-imgs
+      img(src='/static/imgs/pc/newyear/bottom_right.png').leo-imgs
+      img(src='/static/imgs/pc/newyear/couplet_left.png').leo-imgs
+      img(src='/static/imgs/pc/newyear/couplet_right.png').leo-imgs
+      img(src='/static/imgs/pc/newyear/leo_ears.png').leo-imgs
+      img(src='/static/imgs/pc/newyear/leo_face.png').leo-imgs
+      img(src='/static/imgs/pc/newyear/leo_light.png').leo-imgs
+
+  .g-nav-multicolour-line
+
+
+if index
+  .g-new-year-bottom-warp
+    img(src='/static/imgs/pc/newyear/bottom_left.png').new-year-bottom-left
+    img(src='/static/imgs/pc/newyear/bottom_right.png').new-year-bottom-right
 

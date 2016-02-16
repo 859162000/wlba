@@ -57,6 +57,7 @@ from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
+from wanglibao_margin.models import MarginRecord
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
@@ -1000,7 +1001,6 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
-
 class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
@@ -1138,6 +1138,17 @@ class StatisticsInside(APIView):
         start_fmt = yesterday_start.strftime('%Y-%m-%d %H:%M:%S')
         end_fmt = today_start.strftime('%Y-%m-%d %H:%M:%S')
 
+        # 每日累计申请提现, Add by hb on 2016-02-03
+        today_utc = local_to_utc(today, 'now')
+        start_withdraw = today_start + timedelta(hours=16)
+        # 当日16点前查询以昨日16点作为起始时间
+        if today_utc < start_withdraw :
+            start_withdraw = yesterday_start + timedelta(hours=16)
+        stop_withdraw = today_utc
+        yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
+            .filter(catalog='取款预冻结').aggregate(Sum('amount'))
+        yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
+
         # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
@@ -1185,7 +1196,8 @@ class StatisticsInside(APIView):
             'today_repayment_total': today_repayment_total,  # 今日还款额
             'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
-            'yesterday_new_amount': yesterday_new_amount  # 昨日新用户投资金额
+            'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
+            'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
         }
 
         data.update(get_public_statistics())

@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -328,8 +328,8 @@ var weChatShare = (function(org){
             var host = 'https://www.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = $('input[name=url]').val(),
-                shareMainTit = '送你580元现金豪礼，就是这么任性！专享16%超高收益',
-                shareBody = '新人立领580元现金红包，专享16%超高收益，史无前例！100元起投立即去看看～戳这里>>';
+                shareMainTit = '送你300元现金豪礼，就是这么任性！',
+                shareBody = '新人立领300元现金红包，专享16%超高收益，史无前例！100元起投立即去看看～戳这里>>';
             //分享给微信好友
             org.onMenuShareAppMessage({
                 title: shareMainTit,
