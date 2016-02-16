@@ -928,6 +928,8 @@ class YeeShortPay:
                 card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
                 if card:
                     yee_card_no_list.append(card.no)
-            if yee_card_no_list:
-                Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
-                Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+            # support yee_card_no_list = []
+            Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+            Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+            Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
+                                is_the_one_card=True).update(is_the_one_card=False)

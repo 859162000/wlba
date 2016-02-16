@@ -983,6 +983,8 @@ class KuaiShortPay:
             result.update({"ret_code": 4, "message":"不能使用信用卡"})
         elif res_code == "51":
             result.update({"ret_code": 51, "message":"余额不足"})
+        elif res_code == 't3':
+            result.update({'ret_code': 7, 'message': message})
         else:
             result.update({"ret_code": 5, "message":message})
         return result
@@ -1053,11 +1055,14 @@ class KuaiShortPay:
     @method_decorator(transaction.atomic)
     def _handle_third_pay_error(self, error, user_id, payinfo_id, order_id):
         logger.exception(error)
+        user = User.objects.get(id=user_id)
+        # t3错误，一个银行不能绑定多张卡或者未绑定
+        if error.code == 201183:
+            self.sync_bind_card(user)
         pay_info = PayInfo.objects.select_for_update().get(id=payinfo_id)
 
         if pay_info.status == PayInfo.PROCESSING:
             order = Order.objects.get(id=order_id)
-            user = User.objects.get(id=user_id)
 
             if isinstance(error, ThirdPayError):
                 error_code = error.code
@@ -1187,6 +1192,8 @@ class KuaiShortPay:
                 elif result['ret_code'] >0:
                     if result['ret_code'] == 2:
                         raise ThirdPayError(self.ERR_CODE_WAITING, result['message'])
+                    elif result['ret_code'] == 7:
+                        raise ThirdPayError(201183, result['message'])
                     else:
                         raise ThirdPayError(201181, result['message'])
                 # device = split_ua(request)
@@ -1429,3 +1436,19 @@ class KuaiShortPay:
         #         logger.error(e)
 
         return card
+
+    def sync_bind_card(self, user):
+        # 查询块钱已经绑定卡
+        res = self.query_bind_new(user.id)
+        if res['ret_code'] != 0: return res
+        if 'cards' in res:
+            kuai_card_no_list = []
+            for car in res['cards']:
+                card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
+                if card:
+                    kuai_card_no_list.append(card.no)
+            # suppoort kuai_card_no_list = []
+            Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
+            Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
+            Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
+                                is_the_one_card=True).update(is_the_one_card=False)
