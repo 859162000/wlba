@@ -78,7 +78,10 @@ class PHPSendSMS(SMSBackEnd):
         response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers)
 
         status_code = response.status_code
-        res_text = json.loads(response.text)
+        try:
+            res_text = json.loads(response.text)
+        except:
+            res_text = response.text
 
         # 写入日志
         logger.info(">>>> json data: {}".format(post_data_json))
@@ -101,7 +104,7 @@ class PHPSendSMS(SMSBackEnd):
                 'user_id': user_id,
                 'user_type': user_type,
                 'params': {
-                    key: kwargs[key] for key in kwargs.keys()
+                    key: str(kwargs[key]) for key in kwargs.keys()
                 }
             }
         }

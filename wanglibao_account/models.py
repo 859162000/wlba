@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
 from marketing.models import Channels, ChannelsNew
+from file_storage.storages import AliOSSStorageForCover
 
 
 class IdVerification(models.Model):
@@ -219,29 +220,52 @@ class UserPhoneBook(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, default=timezone.now())
     is_used = models.BooleanField(default=True, verbose_name=u"是否使用", help_text=u'默认使用')
 
+
 class ManualModifyPhoneRecord(models.Model):
+
     STATUS_CHOICES = (
-        (u"短信修改提交", u"短信修改提交"),
-        (u"短信修改成功", u"短信修改成功"),
-        (u"初审中",   u"初审中"),
+        (u"待初审",   u"待初审"),
         (u"初审待定", u"初审待定"),
         (u"初审驳回", u"初审驳回"),
-        (u"初审通过", u"初审通过"),
-        (u"复审中",   u"复审中"),
+        (u"待复审",   u"待复审"),
         (u"复审通过", u"复审通过"),
         (u"复审驳回", u"复审驳回"),
     )
-    # 初审中　初审待定　初审驳回　初审通过　复审中 复审通过 复审驳回
+    # 待初审　初审待定　初审驳回　待复审　复审通过 复审驳回
     user = models.ForeignKey(User)
-    id_front_image = models.ImageField(upload_to='id_front', blank=True, verbose_name=u'身份证正面照片', help_text=u'身份证正面照片')
-    id_back_image = models.ImageField(upload_to='id_back', blank=True, verbose_name=u'身份证反面照片', help_text=u'身份证反面照片')
-    id_user_image = models.ImageField(upload_to='id_user', blank=True, verbose_name=u'手持身份证照片', help_text=u'手持身份证照片')
+    phone = models.CharField(max_length=64, blank=True, help_text=u'手机号码')
+    id_front_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'身份证正面照片', help_text=u'身份证正面照片')
+    id_back_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'身份证反面照片', help_text=u'身份证反面照片')
+    id_user_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'手持身份证照片', help_text=u'手持身份证照片')
     new_phone = models.CharField(max_length=64, blank=True, help_text=u'新的手机号码')
     status = models.CharField(max_length=16, default=u'初审中', db_index=True,
                               choices=STATUS_CHOICES,
                               verbose_name=u'申请状态')
+    remarks = models.CharField(max_length=64, blank=True, help_text=u'客服在审核过程中的备注')
     created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
     update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
+    class Meta:
+        verbose_name_plural = u'人工修改手机号'
+        ordering = ('-created_at',)
+
+class SMSModifyPhoneRecord(models.Model):
+    STATUS_CHOICES = (
+        (u"短信修改手机号提交", u"短信修改手机号提交"),
+        (u"短信修改手机号成功", u"短信修改手机号成功"),
+    )
+    user = models.ForeignKey(User)
+    phone = models.CharField(max_length=64, blank=True, help_text=u'手机号码')
+    new_phone = models.CharField(max_length=64, blank=True, help_text=u'新的手机号码')
+    status = models.CharField(max_length=16, default=u'短信修改手机号提交', db_index=True,
+                              choices=STATUS_CHOICES,
+                              verbose_name=u'短信修改状态')
+
+    created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
+    update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
+    class Meta:
+        verbose_name_plural = u'短信修改手机号'
+        ordering = ('-created_at',)
+
 
 #发给所有人
 def send_public_message(sender, instance, **kwargs):

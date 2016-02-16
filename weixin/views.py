@@ -50,7 +50,7 @@ import logging
 import traceback
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
@@ -395,6 +395,10 @@ class WeixinJoinView(View):
     def getCSReply(self):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
+        if now.year==2016 and now.month==2 and (now.day>=5 and now.day<=13):
+            txt = u"2月5日至2月13日新年期间微信客服休息，由此给您带来的不便敬请谅解，谢谢您的支持，祝新年愉快~"
+            return txt
+
         if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
             txt = u"客官，想和网利君天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利君在线时间为\n" \
                   u"【周一至周五9：00~18：00】"
@@ -1244,38 +1248,41 @@ class AuthorizeUser(APIView):
             except WeChatException, e:
                 return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
             openid = res.get('openid')
-            w_user = WeixinUser.objects.filter(openid=openid).first()
-            save_user = False
+            try:
+                w_user = WeixinUser.objects.filter(openid=openid).first()
+                save_user = False
+                if not w_user:
+                    w_user = WeixinUser()
+                    w_user.account_original_id = account.original_id
+                    w_user.openid = openid
+                    w_user.save()
 
-            if not w_user:
-                w_user = WeixinUser()
-                w_user.account_original_id = account.original_id
-                w_user.openid = openid
-                save_user = True
+                if w_user.account_original_id != account.original_id:
+                    w_user.account_original_id = account.original_id
+                    save_user = True
 
-            if w_user.account_original_id != account.original_id:
-                w_user.account_original_id = account.original_id
-                save_user = True
-
-            if not w_user.auth_info:
-                auth_info = AuthorizeInfo()
-                auth_info.access_token = res.get('access_token')
-                auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
-                auth_info.refresh_token = res.get('refresh_token')
-                auth_info.save()
-                w_user.auth_info = auth_info
-                save_user = True
-            else:
-                w_user.auth_info.access_token = res.get('access_token')
-                w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
-                w_user.auth_info.refresh_token = res.get('refresh_token')
-                w_user.auth_info.save()
-            if save_user:
-                w_user.save()
+                if not w_user.auth_info:
+                    auth_info = AuthorizeInfo()
+                    auth_info.access_token = res.get('access_token')
+                    auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                    auth_info.refresh_token = res.get('refresh_token')
+                    auth_info.save()
+                    w_user.auth_info = auth_info
+                    save_user = True
+                else:
+                    w_user.auth_info.access_token = res.get('access_token')
+                    w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                    w_user.auth_info.refresh_token = res.get('refresh_token')
+                    w_user.auth_info.save()
+                if save_user:
+                    w_user.save()
+            except IntegrityError, e:
+                logger.debug("=========================并发了====")
+                logger.debug(traceback.format_exc())
 
             appendkeys = []
             for key in request.GET.keys():
-                if key == u'state' or key == u'code':
+                if key == u'state' or key == u'code' or key== u'redirect_uri':
                     continue
                 appendkeys.append(key)
 

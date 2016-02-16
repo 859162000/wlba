@@ -3,7 +3,6 @@
   margin-top: 15px
   display: inline-block
   width: 100%
-
   .info_box
     height: 50px
     padding-left: 80px
@@ -27,7 +26,7 @@
       float: left
       height: 50px
       display: block
-      margin: 2px 0 0 14px
+      margin: 2px 0 0 26px
       dt
         height: 20px
         .text
@@ -77,17 +76,23 @@
       background: #e4371f
       color: #fff
       border-color: #e4371f
+    .button_is_click
+      background: #e4371f
+      color: #fff
+      border-color: #e4371f
+    .button_is_click:hover
+      opacity: 0.8
     .button_change
       margin: 7px 10px 0 0
   .is_open
-    margin-bottom: 25px
+    margin-bottom: 57px
   .phone_change_wrap
     width: 352px
     margin: 0 auto
-    display: block
     clear: both
     height: 150px
     position: relative
+    display: none
     .line
       position: absolute
       left: 50%
@@ -99,6 +104,7 @@
       width: 116px
       float: left
       display: block
+      cursor: pointer
       .img
         width: 48px
         height: 44px
@@ -115,6 +121,9 @@
           line-height: 18px
           color: #999
           font-size: 12px
+    .wrap_box:hover
+      dt
+        color: #e4371f
     .sms_wrap
       .img
         background: url("/static/images/account_safe/ico.png") no-repeat left -204px
@@ -122,3 +131,136 @@
       float: right
       .img
         background: url("/static/images/account_safe/ico.png") no-repeat left -248px
+.phone_modify_main_wrap .clear
+  clear: both
+.phone_modify_main_wrap
+  .p1
+    .text
+      float: left
+      font-size: 16px
+      color: #333
+      line-height: 20px
+      width: 90px
+    .ico
+      width: 16px
+      height: 16px
+      float: left
+      display: block
+      position: relative
+      top: 2px
+      left: 0px
+      margin-right: 3px
+    .is_set_ico
+      background: url("/static/images/account_safe/ico.png") no-repeat -58px top
+    .no_set_ico
+      background: url("/static/images/account_safe/ico.png") no-repeat -58px -17px
+    span
+      float: left
+      font-size: 16px
+      line-height: 20px
+      height: auto
+      width: auto
+    .is_set_text
+      color: #32a557
+    .no_set_text
+      color: #fd9000
+.phone_modify_main_wrap
+  .p2
+    padding-top: 5px
+.phone_modify_main_wrap
+  .panel
+    a
+      border: 1px #e0e0e0 solid
+      background: #f5f5f5
+      color: #e4371f
+
+    a:hover
+      background: #e4371f
+      color: #fff
+      border-color: #e4371f
+.pwd-management .pwd-div2 .btns .bg
+  border: 1px #e0e0e0 solid
+  background: #f5f5f5
+  color: #e4371f
+.pwd-management .pwd-div2 .btns .bg:hover
+  background: #e4371f
+  color: #fff
+  border-color: #e4371f
+.phone_modify_main_wrap_1
+  padding-bottom: 55px
+.phone_modify_main_wrap
+  .panel-title
+    .text
+      line-height: 20px
+      font-size: 13px
+      color: #fd9827
+      margin-left: 26px
+      background: url("/static/images/account_safe/ico.png") no-repeat -58px -16px
+      padding-left: 19px
+      position: relative
+      top: -2.5px
+      left: 0
+      height: 20px
+      display: inline-block
+    .true
+      padding: 0 10px
+      background: #fd9827
+      border-radius: 10px
+      font-size: 13px
+      text-align: center
+      line-height: 20px
+      height: 20px
+      color: #fff
+      position: relative
+      top: -2.5px
+      margin-left: 20px
+      display: inline-block
+  .pwd-management
+    padding: 0px 80px 55px
+  .well
+    padding-bottom: 40px
+  #id_valid
+    margin-bottom: 15px
+  .panel-annotation
+    margin: 0 80px 10px 163px
+  .space-vertical-l
+    margin: 0 80px 0 163px
+    padding-bottom: 0
+  .phone_change_wrap
+    a
+      background: none
+      border: none
+    a:hover
+      background: none
+      border: none
+.phone_modify_popup
+  position: fixed
+  left: 0
+  top: 0
+  z-index: 999
+  width: 100%
+  height: 100%
+  display: none
+  .phone_modify_popup_text
+    position: absolute
+    width: 188px
+    height: 64px
+    text-align: center
+    line-height: 64px
+    left: 50%
+    top: 50%
+    margin: -32px 0 0 -94px
+    background: #fff
+    color: #b72a0a
+    font-size: 16px
+    border-radius: 10px
+    z-index: 3
+  .phone_modify_bg
+    width: 100%
+    height: 100%
+    background: #000
+    opacity: 0.5
+    position: absolute
+    left: 0
+    top: 0
+    z-index: 2

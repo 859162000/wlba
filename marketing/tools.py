@@ -245,8 +245,8 @@ def send_income_message_sms():
     phones_list = []
     messages_list = []
     if incomes:
-        i = 0
-        data_messages = {}
+        # i = 0
+        # data_messages = {}
         for income in incomes:
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile')\
@@ -257,20 +257,20 @@ def send_income_message_sms():
                 from wanglibao.templatetags.formatters import safe_phone_str
                 name = safe_phone_str(phone)
 
-            data_messages[i] = {
-                'user_id': phone,
-                'user_type': 'phone',
-                'params': {
-                    'name': name,
-                    'count': income.get('invite__count'),
-                    'amount': income.get('earning__sum')
-                }
-            }
-            i += 1
-            # phones_list.append(phone)
-            # messages_list.append(messages.sms_income(name,
-            #                                          income.get('invite__count'),
-            #                                          income.get('earning__sum')))
+            # data_messages[i] = {
+            #     'user_id': phone,
+            #     'user_type': 'phone',
+            #     'params': {
+            #         'name': name,
+            #         'count': int(income.get('invite__count')),
+            #         'amount': float(income.get('earning__sum'))
+            #     }
+            # }
+            # i += 1
+            phones_list.append(phone)
+            messages_list.append(messages.sms_income(name,
+                                                     income.get('invite__count'),
+                                                     income.get('earning__sum')))
 
             # 发送站内信
             title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
@@ -283,12 +283,11 @@ def send_income_message_sms():
 
         # 批量发送短信
         # 功能推送id: 3
-        PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
-        # send_messages.apply_async(kwargs={
-        #     "phones": phones_list,
-        #     "messages": messages_list,
-        #     "ext": 666
-        # })
+        # PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list,
+        })
 
 
 @app.task

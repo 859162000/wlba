@@ -64,7 +64,7 @@
                         $('.years_smak').find("p").text("进入“我的账户”--“理财券”“体验金专区”查看");
                     }
                     $(".cover_layer").show();
-                })
+                });
                 is=1;
             }
         })
@@ -75,23 +75,36 @@
                 data: {redpack_id : id},
                 success: function(data){
                     fn(data)
+                },
+                error: function(xml){
+                    if(xml.status === 403){
+                        window.location.href="/accounts/login/?next=/weixin_activity/new_ameal/";
+                    }
                 }
             })
         }
         $(".years_paper a").on("click",function(){
             var data_id=$(this).attr("data_id");
+            var smak = $('.years_smak'),
+                smakH = smak.find("h3"),
+                smakP = smak.find("p");
             if(is == 0){
                 ajaxfn(data_id, "/api/wlb_reward/hm_banque/#", function(data){
                     var txt=data.message;
                     if(data.ret_code == 0){
-                        $('.years_smak').show();
-
+                        //$('.years_smak').show();
+                        smakH.text("领取成功!");
+                        smakP.text('进入“我的账户”--“理财券”查看');
+                        smak.show();
                     }else{
-                        $('.years_smak').show().find("h3").text(txt);
-                        $('.years_smak').find("p").text("进入“我的账户”--“理财券”查看");
+                        //$('.years_smak').show().find("h3").text(txt);
+                        //$('.years_smak').find("p").text("进入“我的账户”--“理财券”查看");
+                        smakH.text(txt);
+                        smakP.text("进入“我的账户”--“理财券”查看");
+                        smak.show();
                     }
                     $(".cover_layer").show();
-                })
+                });
                 is=1;
             }
         })
