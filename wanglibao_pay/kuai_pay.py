@@ -1450,4 +1450,5 @@ class KuaiShortPay:
             # suppoort kuai_card_no_list = []
             Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
             Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
-
+            Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
+                                is_the_one_card=True).update(is_the_one_card=False)
