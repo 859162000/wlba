@@ -1751,4 +1751,8 @@ class CoopDataDispatchApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        pass
+        data = request.POST
+        channel_code = data.get('channel_code')
+        sign = data.get('sign')
+        act = data.get('act')
+        
