@@ -24,18 +24,87 @@ function getQueryString(name) {
 }
 
 var token = getQueryString('promo_token'),
-    xid = getQueryString('xluserid')
+    xid = getQueryString('xluserid'),
+    referfrom = getQueryString('referfrom')
 org.ajax({
     url: '/api/has_binding/' + token + '/' + xid + '/',
     type: 'GET',
     success: function (data) {
-        if (data.ret_code == 10001) {
+        if (data.ret_code == 10000) {
+            org.ajax({
+                url: '/api/has_binding/xunlei9/' + xid + '/',
+                type: 'GET',
+                success: function (data1) {
+                    if (data1.ret_code == 10001) {
+                        $('.xunmeng3').show();
+                        $('.maimai-form').hide();
+                    }
+                }
+            })
+        }else{
             $('.xunmeng3').show();
             $('.maimai-form').hide();
         }
     }
+});
+org.ajax({
+    url: '/api/coop_pv/' + token + '/?source=pv_wanglibao&ext=' + xid + '&ext2=' + referfrom,
+    type: "GET"
+});
+
+//微信分享
+var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
+org.ajax({
+    type: 'GET',
+    url: '/weixin/api/jsapi_config/',
+    dataType: 'json',
+    success: function (data) {
+        //请求成功，通过config注入配置信息,
+        wx.config({
+            debug: false,
+            appId: data.appId,
+            timestamp: data.timestamp,
+            nonceStr: data.nonceStr,
+            signature: data.signature,
+            jsApiList: jsApiList
+        });
+    }
+});
+
+var tokenq = getQueryString('promo_token'),
+    xidq = getQueryString('xluserid'),
+    timerq = getQueryString('time'),
+    sigq = getQueryString('sign'),
+    nameq = getQueryString('nickname'),
+    referq = getQueryString('referfrom');
+wx.ready(function () {
+
+    var host = 'https://www.wanglibao.com',
+        shareImg = host + '/static/imgs/mobile/share_logo.png',
+        shareLink = host + '/activity/app_xunlei/?promo_token=' + tokenq + '&xluserid=' + xidq + '&time=' + timerq + '&sign=' + sigq + '&nickname=' + nameq + '&referfrom=' + referq,
+        shareMainTit = '送你28888元体验金+1年迅雷会员',
+        shareBody = '注册即送28888元体验金，首次充值送7天迅雷白金会员，首次投资不低于1000元送1年迅雷白金会员。'
+    //分享给微信好友
+    org.onMenuShareAppMessage({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    });
+    //分享给微信朋友圈
+    org.onMenuShareTimeline({
+        title: shareMainTit,
+        link: shareLink,
+        imgUrl: shareImg
+    })
+    //分享给QQ
+    org.onMenuShareQQ({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    })
 })
-;
 org.xunlei = (function (org) {
 
     var lib = {
@@ -159,7 +228,8 @@ org.xunlei = (function (org) {
                     xid = getQueryString('xluserid'),
                     timer = getQueryString('time'),
                     sig = getQueryString('sign'),
-                    name = getQueryString('nickname');
+                    namer = getQueryString('nickname'),
+                    name = decodeURIComponent(namer);
 
                 var get_ticket_ajax = {};
                 get_ticket_ajax = {
@@ -184,7 +254,7 @@ org.xunlei = (function (org) {
                     }
                 }
                 ops = {
-                    url: '/api/register/?promo_token=xunlei9',
+                    url: '/api/register/',
                     type: 'POST',
                     data: {
                         'identifier': _self.$phone.val(),

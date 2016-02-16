@@ -166,7 +166,7 @@ block main
         .space-vertical-m
 
   else
-    .account-home-panel__no-padding
+    .account-home-panel__no-padding(style="padding-bottom:20px")
       .account-home-panel--title-bar__product
         ul.title-bar--tabs
           li.title-bar--tab
@@ -196,32 +196,86 @@ block main
                       p.align-center
                           span.big_number {{experience_account.unpaid_interest | money_format}}
                       p.align-center.desc 待收收益（元）
-              p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动以余额形式发放至投资人的理财专区账户。
-              table.table.tableNew
-                  thead
-                      tr
-                          th 投标时间
-                          th 产品名称
-                          th 投资金额
-                          th 年化收益
-                          th 项目期限
-                          th 已收益／预期收益
-                  tbody
-                    if experience_amortization
-                      for amo in experience_amortization
-                        tr
-                          td {{amo.created_time}}
-                          td {{amo.product.name}}
-                          td {{amo.principal}}
-                          td {{amo.product.expected_earning_rate}}%
-                          td {{amo.product.period}}
-                          if amo.settled
-                            td {{amo.interest | money_format}}/{{amo.interest | money_format}}（（元）
-                          else
-                            td 0.00/{{amo.interest | money_format}}（元）
-                    else
-                        tr
-                            td 暂无记录
+              p.tyjMark 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除，
+                a(href="javascript:void(0)")#showMark 体验金领取及使用说明。
+              if experience_account.experience_amount != 0
+                  .project_div.clearfix
+                    h5 {{experience_account.product.name}}
+                    ul.project_detail.clearfix
+                        li.li_one
+                          label {{experience_account.experience_amount}}元
+                          span 融资金额
+                        li.li_two
+                            label {{experience_account.product.expected_earning_rate}}%
+                            span 年化收益
+                        li.li_three
+                            label {{experience_account.product.period}}天
+                            span 投资期限
+                        li.li_four
+                            if experience_account.experience_amount > 0
+                                a(href='javascript:void(0)').investBtn 立即投资
+                            else
+                                a.invest_ed 立即投资
+              if experience_amortization
+                  .look_more_detail
+                    .more_btn
+                        label 查看历史投资项目
+                        span
+                  table.table.tableNew(style="display:none")
+                      thead
+                          tr
+                              th 投标时间
+                              th 产品名称
+                              th 投资金额
+                              th 年化收益
+                              th 项目期限
+                              th 已收益／预期收益
+                      tbody
+                        if experience_amortization
+                          for amo in experience_amortization
+                            tr
+                              td {{amo.created_time}}
+                              td {{amo.product.name}}
+                              td {{amo.principal}}
+                              td {{amo.product.expected_earning_rate}}%
+                              td {{amo.product.period}}天
+                              if amo.settled
+                                td {{amo.interest | money_format}}/{{amo.interest | money_format}}（（元）
+                              else
+                                td 0.00/{{amo.interest | money_format}}（元）
+                        else
+                            tr
+                                td 暂无记录
+    .explain_box(style="display:none")
+        .explain_box_img
+            .explain_content_box
+                p.title_ex 体验金领取及使用说明
+                ul
+                    li.clearfix
+                        span
+                        .explain_content
+                            p.name 如何领取？
+                            p 1、新用户通过注册（老用户通过邀请等活动奖励）获得体验金后，体验金自动放入相应账户并发送站内信通知。
+                    li.clearfix
+                        span
+                        .explain_content
+                            p.name 如何使用？
+                            p 1、体验金只能在相关活动页投资体验标，投资时不能使用其它理财券。体验金有效期自发放日起15天内有效。
+                            p 2、体验金需要用户手动投资，投资时系统将自动按体验金总额一次性投资完毕。例如，用户A注册获得10000元体验金，未使用，之后该用户通过参与活动获得5000元体验金，此时用户选择投资体验标时（两笔体验金均在有效期内），系统默认将15000元体验金全部投资。
+                    li.clearfix
+                        span
+                        .explain_content
+                            p.name 体验金是否可提现？
+                            p 1、体验金投资项目，17点前投资当日计息，17点后投资次日计息，项目到期日17点回款。还款本金系统自动收回，利息收益自动以余额形式发放至投资人的理财专区账户。例如，新手28888元体验金，计息日为1天（含节假日），今天16：50分投资，项目立即计息，今天17：00体验金投资收益会发放到您个人账户。
+                            p 2、体验金利息收益与正常账户余额一样，可用来投资和提现。
+                            p.mt40 部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
+    #success(style='display:none')
+        .successBox
+            p
+                span
+            p.succeesFonts 恭喜您投资成功！
+            p 到期后体验金自动收回
+            p 收益自动发放
 
 block script
   script.

@@ -5,6 +5,7 @@ __author__ = 'zhanghe'
 
 import logging
 import json
+import base64
 
 from datetime import datetime, timedelta
 from marketing.models import IntroducedBy
@@ -38,7 +39,8 @@ from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
 from wanglibao_sms import messages as sms_messages
 from wanglibao_sms.utils import send_validation_code
-from wanglibao_sms.tasks import send_messages
+# from wanglibao_sms.tasks import send_messages
+from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
@@ -50,15 +52,69 @@ from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
+import re
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
+class AppActivateScoreImageAPIView(APIView):
+    """
+    app端查询启动评分活动图片
+    """
+    permission_classes = ()
+    SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
+    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
+
+    def post(self, request):
+        size = request.DATA.get('size', '').strip()
+
+        device = split_ua(request)
+        device_type = device['device_type']
+
+        if not device_type or not size:
+            return Response({'ret_code': 20001, 'message': u'信息输入不完整'})
+
+        if device_type != 'ios' or int(size) not in (x for x in range(1, 9)):
+            return Response({'ret_code': 20002, 'message': u'参数不合法'})
+
+        if int(size) in (x for x in range(5, 9)):
+            size = str(int(size) - 4)
+            device_type = 'act_score_iso'
+
+        size = self.SIZE_MAP[size]
+
+        activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
+        if activate:
+            if size == 'img_one':
+                img_url = activate.img_one
+            elif size == 'img_two':
+                img_url = activate.img_two
+            elif size == 'img_three':
+                img_url = activate.img_three
+            elif size == 'img_four':
+                img_url = activate.img_four
+            else:
+                img_url = ''
+
+            if img_url:
+                img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
+                return Response({'ret_code': 0,
+                                 'message': 'ok',
+                                 'image': img_url,
+                                 })
+
+        return Response({'ret_code': 20003, 'message': 'fail'})
+
+
+
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
-    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android'}
+    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
 
     def post(self, request):
         size = request.DATA.get('size', '').strip()
@@ -93,10 +149,17 @@ class AppActivateImageAPIView(APIView):
                 img_url = ''
             jump_state = activate.jump_state
             link_dest = activate.link_dest
-
             if img_url:
-                img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                return Response({'ret_code': 0, 'message': 'ok', 'image': img_url, 'jump_state': jump_state, 'link_dest':link_dest})
+                invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
+                if activate.user_invest_limit=='-1' or (activate.user_invest_limit=='0' and not invest_flag) or (activate.user_invest_limit=='1' and invest_flag):
+                    img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
+                    return Response({'ret_code': 0,
+                                     'message': 'ok',
+                                     'image': img_url,
+                                     'jump_state': jump_state,
+                                     'link_dest':link_dest,
+                                     'link_dest_url':activate.link_dest_h5_url,
+                                     })
 
         return Response({'ret_code': 20003, 'message': 'fail'})
 
@@ -542,7 +605,9 @@ class SendValidationCodeView(APIView):
         if not res:
             return Response({"ret_code": 40044, "message": message})
 
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         if status != 200:
             return Response({"ret_code": 30044, "message": message})
 
@@ -702,7 +767,10 @@ class AppPhoneBookAlertApiView(APIView):
             # 投资提醒
             if int(flag) == 1:
                 if not (user_book.alert_at and user_book.alert_at > local_to_utc(datetime.now(), 'min')):
-                    self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
+                    # self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
+                    # 邀请投资提醒短信
+                    # 模板中的参数变量必须以 name=value 的形式传入
+                    PHPSendSMS().send_sms_one(5, phone, 'phone',  name=send_name)
                     user_book.alert_at = timezone.now()
                     user_book.is_used = True
                     user_book.save()
@@ -716,7 +784,10 @@ class AppPhoneBookAlertApiView(APIView):
                     user_book.save()
 
                 if not user_book.is_register and not (user_book.invite_at and user_book.invite_at > local_to_utc(datetime.now(), 'min')):
-                    self._send_sms(phone, sms_messages.sms_alert_invite(name=send_name, phone=profile.phone))
+                    # 邀请注册提醒短信
+                    # 模板中的参数变量必须以 name=value 的形式传入
+                    aws = base64.b64encode(profile.phone)[0:-1]
+                    PHPSendSMS().send_sms_one(6, phone, 'phone', name=send_name, aws=aws)
                     user_book.invite_at = timezone.now()
                     user_book.save()
 
@@ -725,16 +796,10 @@ class AppPhoneBookAlertApiView(APIView):
             logger.error(e.message)
             return Response({'ret_code': 20003, 'message': u'内部程序错误'})
 
-    def _send_sms(self, phone, sms):
-        send_messages.apply_async(kwargs={
-            'phones': [phone],
-            'messages': [sms],
-            'ext': 666  # 营销类短信发送必须增加ext参数,值为666
-        })
-
 
 class AppInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
+
     def post(self, request, **kwargs):
         dic = account_backends.broker_invite_list(request.user)
         users = dic['users']
@@ -934,6 +999,42 @@ class AppDataModuleView(TemplateView):
 
     """ 数据魔方 """
     template_name = 'client_data_cube.jade'
+
+class AppFinanceView(TemplateView):
+
+    """ 投资记 """
+    template_name = 'client_animate_finance.jade'
+
+    def get(self, request, *args, **kwargs):
+
+        device_list = ['wlbapp']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return super(AppFinanceView, self).get(request, *args, **kwargs)
+        #return super(AppFinanceView, self).get(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse('app_finance'))
+
+class AppPraiseAwardView(TemplateView):
+
+    """ Client 点赞 """
+    template_name = 'client_praise_reward.jade'
+
+    def get(self, request, *args, **kwargs):
+
+        device_list = ['micromessenger']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return HttpResponseRedirect(reverse('weixin_annual_bonus'))
+
+        return super(AppPraiseAwardView, self).get(request, *args, **kwargs)
+
+
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'

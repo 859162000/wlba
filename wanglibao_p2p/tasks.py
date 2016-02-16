@@ -22,6 +22,7 @@ from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
 
+logger = get_task_logger(__name__)
 
 @app.task
 def p2p_watchdog():
@@ -35,9 +36,13 @@ def delete_old_product_amortization(pa_list):
 
 @app.task
 def process_paid_product(product_id):
-    time.sleep(2)
-    p2p = P2PProduct.objects.select_related('user').get(pk=product_id)
-    P2POperator.preprocess_for_settle(p2p)
+    try:
+        time.sleep(2)
+        p2p = P2PProduct.objects.select_related('user').get(pk=product_id)
+        P2POperator.preprocess_for_settle(p2p)
+    except:
+        print('p2p process_for_settle error: ' + str(p2p))
+        logger.error('p2p process_for_settle error: ' + str(p2p))
 
 @app.task
 def full_send_message(product_name):

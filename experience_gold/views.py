@@ -19,7 +19,7 @@ class ExperienceGoldView(TemplateView):
             template_name = "experience_gold.jade"
         elif template == 'mobile':
             template_name = 'app_experience.jade'
-        elif template == 'account':
+        elif template == 'account' or template == 'nologin':
             template_name = 'experience_account.jade'
         elif template == 'redirect':
             template_name = 'experience_redirect.jade'
@@ -67,7 +67,8 @@ class ExperienceGoldView(TemplateView):
                 experience_all = experience_record_all.get('event__amount__sum')
 
             # 体验标还款计划
-            experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
+            experience_amortization = ExperienceAmortization.objects.filter(user=user)\
+                .select_related('product').order_by('-created_time')
             if experience_amortization:
                 paid_interest = reduce(lambda x, y: x + y,
                                        [e.interest for e in experience_amortization if e.settled is True], 0)

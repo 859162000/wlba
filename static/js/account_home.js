@@ -12,6 +12,32 @@
 
   require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
     var DataViewModel, isXunleiBindSuccess, viewModel;
+    $('.more_btn').click(function() {
+      return $('.tableNew').slideToggle();
+    });
+    $('#showMark').click(function() {
+      $('.explain_box').modal();
+      $('.modal').removeClass('modal');
+      return $('.explain_box').css({
+        'margin-left': '-435px'
+      });
+    });
+    $('.investBtn').click(function() {
+      return $.ajax({
+        url: '/api/experience/buy/',
+        type: "POST",
+        data: {}
+      }).done(function(data) {
+        $('#success').modal();
+        $('#success').find('.close-modal').hide();
+        return setInterval(function() {
+          $.modal.close();
+          return location.reload();
+        }, 2000);
+      }).fail(function(data) {
+        return console.log(1111);
+      });
+    });
     $.ajax({
       url: "/qiye/profile/get/",
       type: "GET",

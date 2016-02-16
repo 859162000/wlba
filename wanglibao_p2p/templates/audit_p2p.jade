@@ -87,7 +87,7 @@ html
         .panel-title-bar
           .panel-title 动作
         .well
-          form(method="POST", action="{{request.url}}").pull-left
+          .pull-left(data-url='{{request.url}}')
             -csrf_token
             button.button-audit(type="submit", style="width:220px; height:40px; font-size:16px;") 审核通过
 

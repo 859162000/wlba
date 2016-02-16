@@ -3,14 +3,25 @@
 from django.views.generic import TemplateView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from wanglibao_activity.models import (ActivityTemplates, ActivityImages, ActivityShow,
-                                       ActivityBannerPosition)
+                                       ActivityBannerShow)
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from weixin.util import _generate_ajax_template
 from .utils import get_queryset_paginator, get_sorts_for_activity_show
 from django.db.models import Q
+from wanglibao_account import message as inside_message
+from experience_gold.backends import SendExperienceGold
+from wanglibao_redpack import backends as redpack_backends
+import json
 
+class WeixinGGLTemplate(TemplateView):
+    template_name = ''
+    def get_context_data(self, **kwargs):
+        order_id = self.request.GET.get('order_id')
+        return {
+           'order_id': order_id
+        }
 
 class TemplatesFormatTemplate(TemplateView):
     def get_context_data(self, **kwargs):
@@ -110,6 +121,20 @@ class TemplatesFormatTemplate(TemplateView):
 class PcActivityAreaView(TemplateView):
     template_name = 'area.jade'
 
+    def get_banner(self, banner_querys, banner_type):
+        banner_show = banner_querys.filter(banner_type=banner_type).first()
+        if not banner_show:
+            banner_show = ActivityBannerShow.objects.filter(
+                banner_type=banner_type, show_end_at__lte=timezone.now()
+            ).select_related('activity',).order_by('-show_end_at').first()
+
+            if not banner_show:
+                banner_show = ActivityBannerShow.objects.filter(
+                    banner_type=banner_type, show_start_at__gte=timezone.now()
+                ).select_related('activity').order_by('show_start_at').first()
+
+        return banner_show
+
     def get_context_data(self, **kwargs):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_pc=True,
@@ -118,16 +143,22 @@ class PcActivityAreaView(TemplateView):
                                                     ).select_related('activity')
 
         activity_list = get_sorts_for_activity_show(activity_list)
+        act_banner_shows = ActivityBannerShow.objects.filter(show_start_at__lte=timezone.now(),
+                                                             show_end_at__gt=timezone.now()
+                                                             ).select_related('activity_show')
 
-        banner = ActivityBannerPosition.objects.all().select_related().first()
+        main_banner = self.get_banner(act_banner_shows, u'主推')
+        left_banner = self.get_banner(act_banner_shows, u'副推左')
+        right_banner = self.get_banner(act_banner_shows, u'副推右')
 
         limit = 6
         page = 1
-
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
-            'banner': banner,
+            'main_banner': main_banner,
+            'left_banner': left_banner,
+            'right_banner': right_banner,
             'results': activity_list[:limit],
             'all_page': all_page,
             'page': page,
@@ -175,6 +206,62 @@ class ActivityAreaApi(APIView):
             'list_count': data_count
         })
 
+
+class AutoDistributeRewardAPIView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        user = request.user
+        if not user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登陆，请先登陆',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        activity = request.POST.get('activity', None)
+        from wanglibao_reward.models import WanglibaoActivityReward
+
+        rewards = WanglibaoActivityReward.objects.filter(acitivity=activity, is_used=False)
+        if not rewards:
+            to_json_response = {
+                'ret_code': 1001,
+                'message': u'用户的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        reward = rewards.first()
+        if reward.reward:
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": reward.reward.type,
+                "content": reward.reward.content,
+                "mtype": "activity"
+            })
+            reward.reward.is_used = True
+            reward.reward.save()
+
+
+        if reward.experience_glod:
+            SendExperienceGold(request.user).send(reward.experience_glod.id)
+
+        if reward.redpack_event:
+            redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
+
+        reward.has_sent = True
+
+        to_json_response = {
+            'ret_code': 0,
+            'message': u'发送奖品',
+            'reward': reward.reward.content if reward.reward else None,
+            'redpack': reward.redpack_event.amount if reward.redpack_event else None,
+            'exp_glod': reward.experience_glod.amount if reward.experience_glod else None,
+            'left': rewards.count()-1,
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 # class ActivityDetailView(TemplateView):
 #     def get_context_data(self, platform, id, **kwargs):

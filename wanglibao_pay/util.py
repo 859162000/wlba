@@ -33,7 +33,8 @@ def fmt_two_amount(value):
     :param value: value 为一个字符串
     :return:
     """
-    #以防传入float或是其他导致错误
+    # 以防传入float或是其他导致错误
+
     value = str(value)
     amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
     return amount

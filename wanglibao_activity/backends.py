@@ -8,26 +8,89 @@ from decimal import Decimal
 from django.utils import timezone
 from django.db.models import Q, Sum
 from django.db import transaction
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.template import Template, Context
 from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
-from wanglibao_redpack import backends as redpack_backends
+# from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
 from wanglibao_p2p.models import P2PRecord, P2PEquity, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_sms.tasks import send_messages
+# from wanglibao_sms.tasks import send_messages
 from wanglibao_sms import messages as sms_messages
 from wanglibao_rest.utils import decide_device
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from weixin.models import WeixinUser
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 from weixin.tasks import sentTemplate
-
+from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger(__name__)
+
+
+def get_reward_index(activity, probabilities):
+    indexs = [int(1/probability) for probability in sorted(probabilities)] #为了保证在相同的条件下，概率小的先中，排序是必须的
+
+    logger.debug(u'抽奖概率依次为：%s' % probabilities)
+    rewards = WanglibaoActivityReward.objects.filter(activity=activity.code).count()
+
+    reward_index = len(probabilities)-1
+    for _index, value in enumerate(indexs):
+        if rewards % value == 0:
+            reward_index = _index
+            break
+
+    return reward_index
+
+
+def handle_lottery_distribute(user, activity, trigger_node, order_id, amount):
+    activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True, trigger_node=trigger_node).all()
+    probabilities = []
+    for rule in activity_rules:
+        probabilities.append(rule.probability)
+
+
+    for chance in xrange(activity.chances):
+        _index = get_reward_index(activity, probabilities)
+
+        try:
+            redpack = None
+            experience_gold = None
+            reward = None
+            redpack_id = int(activity_rules[_index].redpack)
+            redpack = RedPackEvent.objects.filter(id=redpack_id).first()
+            experience_gold = ExperienceEvent.objects.filter(id=redpack_id).first()
+
+            reward = Reward.objects.filter(id=int(activity_rules[_index].reward)).first()
+        except Exception, reason:
+            print ">>>>>>>>>>>>>>>>>", reason
+
+        if chance < activity.rewards:
+            WanglibaoActivityReward.objects.create(
+                user=user,
+                order_id=order_id,
+                redpack=redpack,
+                experience=experience_gold,
+                reward=reward,
+                activity=activity.code,
+                p2p_amount=amount,
+                left_times=1,
+                join_times=1,
+                has_sent=False)
+        else:
+            WanglibaoActivityReward.objects.create(
+                user=user,
+                order_id=order_id,
+                redpack=None,
+                experience=None,
+                reward=None,
+                activity=activity.code,
+                p2p_amount=amount,
+                left_times=1,
+                join_times=1,
+                has_sent=False)
 
 
 def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False, is_first_bind=False):
@@ -42,6 +105,10 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
+
+            if False and activity.is_lottery:
+                handle_lottery_distribute(activity, trigger_node)
+
             if activity.is_all_channel is False and trigger_node not in ('p2p_audit', 'repaid'):
                 if activity.channel != "":
                     channel_list = activity.channel.split(",")
@@ -58,6 +125,8 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
             else:
                 activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node,
                                                              is_used=True).order_by('-id')
+
+            #activity_rules = activity_rules.exclude(activity__is_lottery=True)  等需要开放优化功能的时候，放开 add by yihen
 
             if activity_rules:
                 for rule in activity_rules:
@@ -809,7 +878,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD)
+            sms = Template(sms_template)
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
@@ -837,12 +906,17 @@ def _send_message_template(user, title, content):
     })
 
 
-def _send_sms_template(phones, content):
-    send_messages.apply_async(kwargs={
-        "phones": [phones, ],
-        "messages": [content, ],
-        "ext": 666
-    })
+def _send_sms_template(phone, content):
+    # 发送短信,功能推送id: 7
+    # 直接发送短信内容
+    from wanglibao_sms.send_php import PHPSendSMS
+    PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content)
+
+    # send_messages.apply_async(kwargs={
+    #     "phones": [phone, ],
+    #     "messages": [content, ],
+    #     "ext": 666
+    # })
 
 
 def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):

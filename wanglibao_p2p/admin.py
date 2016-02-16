@@ -418,7 +418,7 @@ class AmortizationRecordAdmin(admin.ModelAdmin):
     actions = None
     list_display = (
         'catalog', 'order_id', 'amortization', 'user', 'term',
-        'principal', 'interest', 'penal_interest', 'coupon_interest', 'description')
+        'principal', 'interest', 'penal_interest', 'coupon_interest', 'created_time', 'description')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('amortization', 'user')
 

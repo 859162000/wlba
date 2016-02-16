@@ -190,7 +190,7 @@ class ProductionIDVerifyV2BackEnd(object):
 
         record.save()
 
-        return record, None
+        return record, message
 
 
 def parse_id_verify_response_v2(text):
@@ -260,6 +260,22 @@ class MyHttpsAdapter(HTTPAdapter):
                                        maxsize=maxsize,
                                        block=block,
                                        ssl_version=ssl.PROTOCOL_TLSv1)
+
+
+def check_birth_date_for_id(id_number):
+    """根据身份证判断出生日期是否合法"""
+
+    id_number = str(id_number)
+    if len(id_number) == 15:
+        birth_date = '19' + id_number[6:12]
+    else:
+        birth_date = id_number[6:14]
+
+    _month = birth_date[4:6]
+    _day = birth_date[6:]
+    if 0 < int(_month) <= 12 and 0 < int(_day) <= 31:
+        return True
+    return False
 
 
 def check_age_for_id(id_number):
@@ -383,6 +399,10 @@ def get_verify_result(id_number, name):
     # check_result, _error = check_id_card(id_number)
     # if not check_result:
     #     return verify_result, id_photo, _error
+
+    # 身份证出生日期合法性校验
+    if not check_birth_date_for_id(id_number):
+        return verify_result, id_photo, u'身份证出生日期不合法'
 
     # 根据身份证号出生日期判断用户是否大于或等于18周岁
     if not check_age_for_id(id_number):

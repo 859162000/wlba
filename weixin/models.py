@@ -173,13 +173,19 @@ class WeiXinChannel(models.Model):
 
 
 class QrCode(models.Model):
-    ACCOUNTS = (
+    if settings.ENV == settings.ENV_PRODUCTION:
+        ACCOUNTS = (
         ('gh_f758af6347b6', '网利宝服务号'),
         ('gh_77c09ff2f3a3', '网利宝订阅号'),
-        ('gh_32e9dc3fab8e', '王小青测试号'),
-        ('gh_3b82a2651647', '霍梅梅测试号'),
-        ('gh_9e8ff84237cd', '曹玉娇测试号'),
-    )
+        )
+    else:
+        ACCOUNTS = (
+            ('gh_9e8ff84237cd', '曹玉娇测试号'),
+            ('gh_32e9dc3fab8e', '王小青测试号'),
+            ('gh_3b82a2651647', '霍梅梅测试号'),
+            ('gh_d3d05c71a967', 'staging测试号'),
+        )
+
     account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True, choices=ACCOUNTS)
     ticket = models.CharField('ticket', max_length=512, null=False)
     expire_at = models.DateTimeField('ticket过期时间', auto_now_add=True, blank=True, null=True)
@@ -399,7 +405,7 @@ class WeixinUser(models.Model):
     )
 
     subscribe = models.IntegerField('是否订阅该公众号标识', default=0)
-    openid = models.CharField('用户标识', max_length=128, db_index=True)
+    openid = models.CharField('用户标识', max_length=128, unique=True)
     nickname = models.CharField('用户昵称', max_length=64, blank=True)
     sex = models.IntegerField('用户性别', choices=SEX_DATA, default=0)
     city = models.CharField('用户所在城市', max_length=128, blank=True)

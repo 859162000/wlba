@@ -258,7 +258,7 @@ def require_trade_pwd(view_func):
             else:
                 return HttpResponse(json.dumps(check_result), content_type="application/json")
         except ValueError:
-            logger.error('trade request POST %s header %s'%(request.POST, request.META))
+            logger.exception('trade request POST %s header %s'%(request.POST, request.META))
             return HttpResponse(json.dumps({'ret_code': 40002, 'message': '交易密码错误'}), content_type="application/json")
     
     return _wrapped_view

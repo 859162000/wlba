@@ -12,7 +12,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
-                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView)
+                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI,
+                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -38,8 +39,8 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView, AdminIdValidate,
+                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
@@ -59,7 +60,9 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView
+from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI)
+from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
 
@@ -144,6 +147,7 @@ urlpatterns = patterns(
     url(r'^bank/list_new/$', BankListNewAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
+    url(r'^has_validate/', HasValidationAPIView.as_view()),
     url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
@@ -191,6 +195,7 @@ urlpatterns = patterns(
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
+    url(r'^voice/send_voice_code/$', SendVoiceCodeNewAPIView.as_view()),
     url(r'^marketing/tv/$', Statistics.as_view()),
     url(r'^marketing/tv_inside/$', StatisticsInside.as_view()),
     url(r'^p2p/investrecord', InvestRecord.as_view()),
@@ -228,6 +233,12 @@ urlpatterns = patterns(
     url(r'^inner/send_sms/$', InnerSysSendSMS.as_view()),
     url(r'^inner/validate_id/$', InnerSysValidateID.as_view()),
     url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
+    url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
+    url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
+    url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
+    url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
+    url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
+
 )
 
 urlpatterns += patterns('',
@@ -265,6 +276,9 @@ urlpatterns += patterns(
     url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
+    url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
+    url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
+    url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
 )
 
 
@@ -303,4 +317,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
+)
+
+#
+urlpatterns += patterns(
+    '',
+    url(r'^account2015/$', CustomerAccount2015ApiView.as_view()),
 )

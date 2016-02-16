@@ -20,15 +20,21 @@ document.addEventListener('touchmove', function(e) {//禁止左右滑动
     }
 });
 //高度
-var bHeight = (48*window.screen.width)/320;//48dp = *px
-var wHeight = $(window).height();
-//alert($(document).height() +","+ screen.availHeight +","+window.screen.height+",screen.width:"+window.screen.width);
-if(!wHeight){
-    $("body").height(window.screen.height-bHeight);
-}else{
-    $("body").height(wHeight);
+function setHeight(dom){
+    var wHeight = $(window).height();
+    var screenH = (window.screen.height*320)/window.screen.width;
+    //alert((window.screen.height*320)/window.screen.width+"html,"+ screen.availHeight +","+window.screen.height+",screen.width:"+window.screen.width+"bHeight:"+bHeight);
+    if(wHeight < screenH){
+        dom.height(screenH);
+    }else{
+        dom.height(wHeight);
+    }
+    //alert(wHeight +","+ (window.screen.height*320)/window.screen.width);
 }
-
+window.onload = function(){
+    //var bHeight = (48*window.screen.width)/320;//48dp = *px
+    setHeight($("body"));
+}
 
 // 路径配置
 require.config({
@@ -217,6 +223,9 @@ function setMap(){//设置地图
 }
 
 function allFun(){
+    setHeight($("body"));
+    //setHeight($("#page-swipe"));
+
     setMap();//地图
     $(".data-totalTime").text(dataVal.plat_total[0].date);//截止日期
 
@@ -300,6 +309,8 @@ function allFun(){
           }
       }
     });
+
+    setHeight($("#page-swipe .swiper-slide"));
 
     //线上月交易额
     $("div.page4 .page-tab-cont").on("click","div.bar-item",function(){
@@ -420,6 +431,8 @@ function allFun(){
     setTimeout(function(){
       $("div.page-loading").hide();//加载ok
       $("#next-box").show();
+
+
     },500);
 
 }

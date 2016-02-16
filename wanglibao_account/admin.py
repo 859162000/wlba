@@ -17,6 +17,10 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.views import AdminIdVerificationView, AdminSendMessageView
 from wanglibao.templatetags.formatters import safe_phone_str, safe_name
 from django.forms.models import BaseInlineFormSet
+from wanglibao_account.models import UserSource
+from wanglibao.settings import ENV, ENV_PRODUCTION
+from .backends import get_verify_result
+from .utils import Xunlei9AdminCallback
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_pay.models import PayInfo
 from .utils import xunleivip_generate_sign
@@ -153,14 +157,13 @@ class IdVerificationAdmin(admin.ModelAdmin):
             obj.update_verify = False
 
             # 只有生产环境可以实现更新操作
-            # if ENV == ENV_PRODUCTION:
-            verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
-            obj.description = message
-            if verify_result:
-                obj.is_valid = True
-                if _id_photo:
-                    obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
-
+            if ENV == ENV_PRODUCTION:
+                verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
+                obj.description = message
+                if verify_result:
+                    obj.is_valid = True
+                    if _id_photo:
+                        obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
         obj.save()
 
 

@@ -1,0 +1,115 @@
+extends account_home_base
+
+- load formatters
+- load mathfilters
+- load widget_tweaks
+
+block head
+    - with '账户安全' as title
+    include include/head
+    - endwith
+block sidebar
+    - with '账户安全' as activeItem
+    include include/user_center_sidebar
+    - endwith
+block main
+    .phone_modify_main_wrap.phone_modify_main_wrap_1
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 身份信息
+                        if modify_phone_state = 2
+                            .text 人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
+                        if modify_phone_state = 1
+                            .true 手机号修改成功
+                .info_box.margin_top_box.is_open
+                    .img.img_1
+                    dl
+                        dt
+                            .text 手机号
+                            .ico.is_set_ico
+                            span.is_set_text 已绑定
+                        dd {{phone}}
+                    if modify_phone_state != 2
+                        .button.phone_change_button 修改
+                if id_is_valid
+                    .phone_change_wrap
+                        .line
+                        a.wrap_box.sms_wrap(href='/accounts/sms_modify/vali_acc_info/')
+                            .img
+                            dl
+                                dt 短信认证
+                                dd 原手机可收取短信
+                        a.wrap_box.people_wrap(href='/accounts/manual_modify/vali_acc_info/')
+                            .img
+                            dl
+                                dt 人工审核
+                                dd 原手机无法收取短信
+                .info_box#id_valid
+                    .img.img_2
+                    if id_is_valid
+                        dl
+                            dt
+                                .text 实名认证
+                                .ico.is_set_ico
+                                span.is_set_text 已认证
+                            dd {{user.wanglibaouserprofile.name | safe_name}} {{user.wanglibaouserprofile.id_number | safe_id}}
+                    else
+                        dl.id_no_valid
+                            dt
+                                .text 实名认证
+                                .ico.no_set_ico
+                                span.no_set_text 待认证
+                            dd 您尚未进行实名认证！
+                        a.button(href='/accounts/id_verify/') 实名认证
+    .phone_modify_main_wrap.phone_modify_main_wrap_2
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 密码管理
+                .pwd-management.margin_top_box
+                    input(type="hidden")#bankIsNoBind
+                    - csrf_token
+                    .pwd-div.clearfix
+                        span.span1
+                        .info-fonts
+                            .p1
+                                .text 登录密码
+                                .ico.is_set_ico
+                                span.is_set_text 已设置
+                                .clear
+                            .p2 账户登录使用，定期修改可提升账户安全性
+                        a(href='/accounts/update/') 修改
+                    .pwd-div.pwd-div2.clearfix
+                        span.span2
+                        .info-fonts
+                            .p1
+                                .text 交易密码
+                                .ico.no_set_ico
+                                span.no_set_text 未设置
+                                .clear
+                            p.p2 6位数字，投资、提现时使用，保证账户资金安全
+                        .btns
+                            p.old(style='display:none')
+                                a(href='javascript:void(0)')#getBackTradingPwd 找回
+                                a(href='/accounts/trading') 修改
+                            p.new(style='display:none')
+                                a(href='javascript:void(0)')#setPWDA.bg 设置
+            #goBindingBackWin.goBindingBackWin(style='display:none')
+                p.title 温馨提示
+                p 请先绑卡，再设置交易密码
+                p
+                    a(href='javascript:void(0)').no#temporaryNot 暂不绑卡
+                    a(href='/accounts/bankcard/').yes 去绑卡
+            #id-validate(style='display: none')
+                  input#id-is-valid(type='hidden', value='')
+                  .padding-xl.align-center
+                      p 为保证您的资金安全，请先进行实名认证
+                      .space-vertical-l
+                      a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
+    .phone_modify_popup
+        .phone_modify_popup_text 请先完成实名认证
+        .phone_modify_bg
+    script.
+        require(["/static/js/account_safe.js?v=20160012501"])
+

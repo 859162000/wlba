@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -243,7 +243,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     wx.ready(function(){
 
-        var host = 'https://www.wanglibao.com',
+        var host = 'https://staging.wanglibao.com/',
             shareName = '万圣夜出门的结果就是......',
             shareImg = host + '/static/imgs/mobile_activity/app_halloween/weixin.jpg',
             shareLink = host + '/activity/app_halloween/',

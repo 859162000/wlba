@@ -3,15 +3,6 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from utils import detect_identifier_type
 
-import time
-from hashlib import md5
-from rest_framework.authtoken.models import Token
-from marketing.models import LoginAccessToken
-from django.conf import settings
-
-def timestamp():
-    return long(time.time())
-
 User = get_user_model()
 
 
@@ -68,6 +59,14 @@ class EmailPhoneUsernameAuthBackend(object):
         except User.DoesNotExist:
             return None
 
+import time
+from hashlib import md5
+from rest_framework.authtoken.models import Token
+from marketing.models import LoginAccessToken
+from django.conf import settings
+
+def timestamp():
+    return long(time.time())
 
 class TokenSecretSignAuthBackend(object):
     def authenticate(self, **kwargs):

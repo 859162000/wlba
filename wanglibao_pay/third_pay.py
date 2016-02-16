@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 import sys
+from wanglibao_account.cooperation import CoopRegister
 from django.http.response import Http404
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
@@ -275,7 +276,7 @@ def withdraw(request):
         pay_info.margin_record = margin_record
 
         pay_info.save()
-        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone, "bank_name":bank.name}
+        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone, "bank_name":bank.name, "order_id": order.id}
     except Exception, e:
         pay_info.error_message = str(e)
         pay_info.status = PayInfo.FAIL
@@ -317,8 +318,9 @@ def card_bind_list(request):
                 Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
 
         card_list = []
-        cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行']).filter(Q(user=user),
-                    Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
+        cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行'])\
+            .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True))\
+            .select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
             bank_list = [card.bank.gate_id for card in cards]

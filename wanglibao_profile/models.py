@@ -11,7 +11,7 @@ USER_TYPE = (
     ('0', u'正常用户'),
     ('1', u'渠道用户'),
     ('2', u'经纪人'),
-    ('3', u'企业用户'),
+    ('3', u'企业用户')
 )
 
 
@@ -74,3 +74,64 @@ def create_profile(sender, **kw):
 
 # post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
 post_save.connect(create_profile, sender=User, dispatch_uid="users-profile-creation-signal")
+
+import decimal
+from datetime import date, datetime
+class Account2015(models.Model):
+    user_id = models.IntegerField(primary_key=True)
+    zc_ranking = models.IntegerField(u'注册排名', default=0, null=False)
+    tz_times = models.IntegerField(u'投资次数', default=0, null=False)
+    tz_amount = models.DecimalField(u'投资总金额', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_ranking_percent = models.DecimalField(u'投资排名百分比', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_max_amount = models.DecimalField(u'最大单笔投资额', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_max_ranking_percent = models.DecimalField(u'最大单笔投资排名百分比', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_sterm_amount = models.DecimalField(u'短期项目投资比例', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_mterm_amount = models.DecimalField(u'中期项目投资比例', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_lterm_amount = models.DecimalField(u'长期项目投资比例', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_total = models.DecimalField(u'总收益', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_reward = models.DecimalField(u'羊毛数', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_hb_expire = models.DecimalField(u'过期红包金额', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_jxq_expire = models.DecimalField(u'过期加息券额度', default=0.00, null=False, max_digits=20, decimal_places=2)
+    invite_count = models.IntegerField(u'邀请好友数', default=0, null=False)
+    invite_income = models.DecimalField(u'邀请好友总佣金', default=0.00, null=False, max_digits=20, decimal_places=2)
+
+    first_visit_time = models.DateTimeField(u'首次访问时间', null=True)
+    first_visit_ipaddr = models.CharField(u'首次访问来源IP地址', null=True, max_length=20)
+    last_visit_time = models.DateTimeField(u'最近访问时间', null=True)
+    last_visit_ipaddr = models.CharField(u'最近访问来源IP地址', null=True, max_length=20)
+    total_visit_count = models.IntegerField(u'总计访问次数', default=0, null=False, db_index=True)
+
+    def toJSON_filter(self, jsondump=False, include=None, exclude=None):
+        fields = []
+        for field in self._meta.fields:
+            inflag = False
+            if include:
+                if field.name in include:
+                   inflag = True
+            else:
+                inflag = True
+
+            if exclude:
+                if field.name in exclude:
+                    inflag = False
+
+            if inflag:
+                fields.append(field.name)
+
+        d = {}
+        for attr in fields:
+            value = getattr(self, attr)
+            if isinstance(value, datetime):
+                d[attr] = value.strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(value, date):
+                d[attr] = value.strftime('%Y-%m-%d')
+            elif isinstance(value, decimal.Decimal):
+                d[attr] = str(value)
+            else:
+                d[attr] = getattr(self, attr)
+
+        if jsondump:
+            import json
+            return json.dumps(d)
+        else:
+            return d

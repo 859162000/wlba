@@ -366,7 +366,10 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amortization.coupon_interest = term[4]
                 amortization.term = index + 1
                 amortization.user = equity.user
-                amortization.product_amortization = product_amortizations[index]
+                try:
+                    amortization.product_amortization = product_amortizations[index]
+                except IndexError:
+                    logger.error('generate amortization for product %s failed' % self.product)
 
                 if len(term) == 7:
                     amortization.term_date = term[6]

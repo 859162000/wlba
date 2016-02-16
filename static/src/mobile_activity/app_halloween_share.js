@@ -24,7 +24,7 @@
 
     wx.ready(function(){
 
-        var host = 'https://www.wanglibao.com',
+        var host = 'https://staging.wanglibao.com/',
             shareName = '万圣夜出门的结果就是......',
             shareImg = host + '/static/imgs/mobile_activity/app_halloween/weixin.jpg',
             shareLink = host + '/activity/app_halloween/',

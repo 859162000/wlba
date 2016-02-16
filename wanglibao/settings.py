@@ -136,6 +136,7 @@ INSTALLED_APPS = (
     'wanglibao_lottery',
     'daterange_filter',
     'experience_gold',
+    'wanglibao_qiye',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -181,7 +182,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        # 'HOST': '192.168.1.242',
+        #'HOST': '192.168.1.242',
     }
 
 import sys
@@ -420,6 +421,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/experience_gold.log',
             'formatter': 'verbose'
         },
+        'wanglibao_sms': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_sms.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -428,7 +435,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_sms': {
-            'handlers': ['file'],
+            'handlers': ['wanglibao_sms', 'console'],
             'level': 'DEBUG',
         },
         'shumi': {
@@ -807,8 +814,8 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_API_URL = "https://app.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
-    CALLBACK_HOST = 'https://feature1.wanglibao.com'
-    STATIC_FILE_HOST = 'https://feature1.wanglibao.com'
+    CALLBACK_HOST = 'https://staging.wanglibao.com'
+    STATIC_FILE_HOST = 'https://staging.wanglibao.com'
     # MER_ID = '510743'
     # CUSTOM_ID = '000010124821'
     # huifu id 改为和生产相同
@@ -882,6 +889,11 @@ KUAI_PAY_TR3_SIGNATURE = ''
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
+
+# 汇讯群呼语音验证码(快易通)
+VOICE_HX_URL = 'http://i.huixun35.com/sdk/SMS'
+VOICE_HX_UID = '52361'
+VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
 
 # Modify by hb on 2015-11-25 for new id-verify-channel
 #ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
@@ -1140,6 +1152,7 @@ XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
 
 # 脉脉
 WLB_FOR_MAIMAI1_KEY = '2004'

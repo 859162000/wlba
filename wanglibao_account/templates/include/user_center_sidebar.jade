@@ -56,7 +56,7 @@ if user.wanglibaouserprofile.utype == '3'
         .box
             .box-title 会员信息
             ul.sidebar
-                +sidebar-item('密码管理', '/accounts/setting/', '_self', '0', 'icon10')
+                +sidebar-item('账户安全', '/accounts/security/', '_self', '0', 'icon9')
                 +sidebar-item('站内信', '/accounts/message/', '_self', '0', 'icon11', 'msg')
                 +sidebar-item('资料修改', '/qiye/profile/edit/', '_self', '0', 'icon13', 'last')
     .finishing(style="display:none")
@@ -85,12 +85,10 @@ else
         .box-title 活动奖励
         ul.sidebar
             +sidebar-item('理财券', '/accounts/coupon/unused/', '_self', '0', 'icon6')
-            +sidebar-item('全民淘金', '/accounts/invite/', '_self', '0', 'icon7')
-            +sidebar-item('激活迅雷会员', 'http://act.vip.xunlei.com/vip/2014/xlhyk/', '_blank', '0', 'icon8', 'last')
+            +sidebar-item('全民淘金', '/accounts/invite/', '_self', '0', 'icon7', 'last')
     .box
         .box-title 会员信息
         ul.sidebar
-            +sidebar-item('实名认证', '/accounts/id_verify/', '_self', '0', 'icon9')
-            +sidebar-item('密码管理', '/accounts/setting/', '_self', '0', 'icon10')
+            +sidebar-item('账户安全', '/accounts/security/', '_self', '0', 'icon9')
             +sidebar-item('站内信', '/accounts/message/', '_self', '0', 'icon11', 'msg')
             +sidebar-item('收货地址', '/accounts/address/', '_self', '0', 'icon12', 'last')

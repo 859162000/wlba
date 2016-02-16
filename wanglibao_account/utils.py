@@ -15,6 +15,11 @@ from django.template.loader import render_to_string, get_template
 from django.utils import timezone
 from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd, ProductionIDVerifyV2BackEnd
+from marketing.utils import get_user_channel_record
+from wanglibao_pay.models import PayInfo
+from wanglibao_p2p.models import P2PRecord
+from wanglibao import settings
+from wanglibao.settings import ENV, ENV_PRODUCTION
 import logging
 import hashlib
 import pytz
@@ -135,7 +140,6 @@ def verify_id(name, id_number):
 def generate_contract(equity, template_name=None, equities=None):
     """
     Generate the contract file for the equity.
-
     :param equity: Equity param, which links the product and user
     :return: The string representation of the contract
     """
@@ -160,7 +164,6 @@ def generate_contract(equity, template_name=None, equities=None):
 def generate_contract_preview(productAmortizations, product, template_name=None):
     """
     Generate the contract file for the equity.
-
     :param equity: Equity param, which links the product and user
     :return: The string representation of the contract
     """
@@ -337,7 +340,6 @@ def str_to_utc(time_str):
 
 def str_to_float(time_str):
     """
-
     :param time_str:
     :return:
     """
@@ -572,3 +574,193 @@ def str_to_dict(s):
         result[urllib.unquote_plus(key)] = urllib.unquote_plus(value)
 
     return result
+
+
+class Xunlei9AdminCallback(object):
+    """迅雷9管理后台回调"""
+
+    def xunlei_call_back(self, user, tid, data, url, order_id):
+        order_id = '%s_%s' % (order_id, data['act'])
+        data['uid'] = tid
+        data['orderid'] = order_id
+        data['type'] = 'baijin'
+        sign = xunleivip_generate_sign(data, settings.XUNLEIVIP_KEY)
+        params = dict({'sign': sign}, **data)
+
+        # 创建渠道订单记录
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder.objects.get_or_create(user=user, order_on=channel_recode, request_no=order_id)[0]
+        order.save()
+
+        # 异步回调
+        from .tasks import xunleivip_callback
+        xunleivip_callback.apply_async(
+            kwargs={'url': url, 'params': params,
+                    'channel': channel_recode.code, 'order_id': order_id})
+
+    def recharge_call_back(self, obj, order_prefix=''):
+        penny = Decimal(0.01).quantize(Decimal('.01'))
+        pay_info = PayInfo.objects.filter(user=obj.user, type='D', amount__gt=penny,
+                                          status=PayInfo.SUCCESS).order_by('create_time').first()
+
+        # 判断用户是否绑定和首次充值
+        if pay_info and int(pay_info.amount) >= 100:
+            data = {
+                'sendtype': '1',
+                'num1': 7,
+                'act': 5171
+            }
+
+            order_prefix = order_prefix or pay_info.order_id
+            self.xunlei_call_back(obj.user, obj.bid, data,
+                                  settings.XUNLEIVIP_CALL_BACK_URL,
+                                  order_prefix)
+
+    def purchase_call_back(self, obj, order_prefix=''):
+        p2p_record = P2PRecord.objects.filter(user=obj.user, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and int(p2p_record.amount) >= 1000:
+            data = {
+                'sendtype': '0',
+                'num1': 12,
+                'act': 5170
+            }
+
+            order_prefix = order_prefix or p2p_record.order_id
+            self.xunlei_call_back(obj.user, obj.bid, data,
+                                  settings.XUNLEIVIP_CALL_BACK_URL,
+                                  order_prefix)
+
+    def process_callback(self, obj, order_list):
+        if order_list.exists():
+            if order_list.count() == 1:
+                order_prefix, order_suffix = order_list.first().request_no.split('_')
+                if order_list.first().result_code:
+                    if int(order_suffix) == 5170:
+                        self.recharge_call_back(obj)
+                    elif int(order_suffix) == 5171:
+                        self.purchase_call_back(obj)
+                else:
+                    if int(order_suffix) == 5170:
+                        self.recharge_call_back(obj)
+                        self.purchase_call_back(obj, order_prefix)
+                    elif int(order_suffix) == 5171:
+                        self.recharge_call_back(obj, order_prefix)
+                        self.purchase_call_back(obj)
+            else:
+                for order in order_list:
+                    if order.result_code == '':
+                        order_prefix, order_suffix = order.request_no.split('_')
+                        if int(order_suffix) == 5170:
+                            self.purchase_call_back(obj, order_prefix)
+                        elif int(order_suffix) == 5171:
+                            self.recharge_call_back(obj, order_prefix)
+        else:
+            self.recharge_call_back(obj)
+            self.purchase_call_back(obj)
+
+
+class ZGDXAdminCallback(object):
+    """迅雷9管理后台回调"""
+
+    def __init__(self):
+        self.c_code = 'zgdx'
+        self.call_back_url = settings.ZGDX_CALL_BACK_URL
+        self.partner_no = settings.ZGDX_PARTNER_NO
+        self.service_code = settings.ZGDX_SERVICE_CODE
+        self.contract_id = settings.ZGDX_CONTRACT_ID
+        self.activity_id = settings.ZGDX_ACTIVITY_ID
+        self.coop_key = settings.ZGDX_KEY
+        self.iv = settings.ZGDX_IV
+
+    def zgdx_call_back(self, user, plat_offer_id, order_id=None):
+        logger.info("ZGDX-Enter zgdx_call_back for zgdx: user[%s], order_id[%s], plat_offer_id[%s]" % (user.id,
+                                                                                                       order_id,
+                                                                                                       plat_offer_id))
+        if datetime.datetime.now().day >= 28:
+            effect_type = '1'
+        else:
+            effect_type = '0'
+
+        request_no_prefix = order_id or str(user.id) + timezone.now().strftime("%Y%m%d%H%M%S")
+        request_no = request_no_prefix + '_' + plat_offer_id
+        phone = user.wanglibaouserprofile.phone
+        code = {
+            'request_no': request_no,
+            'phone_id': phone,
+            'service_code': self.service_code,
+            'contract_id': self.contract_id,
+            'activity_id': self.activity_id,
+            'order_type': '1',
+            'plat_offer_id': plat_offer_id,
+            'effect_type': effect_type,
+        }
+        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
+        params = {
+            'code': encodeBytes(encrypt_str),
+            'partner_no': self.partner_no,
+        }
+
+        # 创建渠道订单记录
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder.objects.get_or_create(user=user, order_on=channel_recode, request_no=request_no)[0]
+        order.save()
+
+        # 异步回调
+        from .tasks import zgdx_callback
+        zgdx_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
+    def binding_card_call_back(self, obj, order_prefix=''):
+        logger.info("ZGDX-Enter recharge_call_back for zgdx: user[%s], order_prefix[%s]" % (obj.user.id, order_prefix))
+        self.zgdx_call_back(obj.user, '104369', order_prefix)
+        if obj.extra != '1':
+            obj.extra = '1'
+            obj.save()
+
+    def purchase_call_back(self, obj, order_prefix=''):
+        logger.info("ZGDX-Enter purchase_call_back for zgdx: user[%s], order_prefix[%s]" % obj.user.id, order_prefix)
+
+        p2p_record = P2PRecord.objects.filter(user_id=obj.user.id, catalog=u'申购').order_by('create_time').first()
+        if p2p_record:
+            order_prefix = order_prefix or p2p_record.order_id
+            p2p_amount = int(p2p_record.amount)
+            if p2p_amount >= 1000:
+                if 1000 <= p2p_amount < 2000:
+                    plat_offer_id = '104371'
+                else:
+                    plat_offer_id = '104372'
+                self.zgdx_call_back(obj.user, plat_offer_id, order_prefix)
+
+    def process_callback(self, obj, order_list):
+        if ENV != ENV_PRODUCTION:
+            pass
+            # return
+        if order_list.exists():
+            if order_list.count() == 1:
+                order_prefix, order_suffix = order_list.first().request_no.split('_')
+                if order_list.first().result_code:
+                    if order_suffix == '104369':
+                        self.purchase_call_back(obj)
+                    elif order_suffix in ['104371', '104372']:
+                        self.binding_card_call_back(obj)
+                else:
+                    if order_suffix == '104369':
+                        self.purchase_call_back(obj)
+                        self.binding_card_call_back(obj, order_prefix)
+                    elif order_suffix in ['104371', '104372']:
+                        self.binding_card_call_back(obj)
+                        self.purchase_call_back(obj, order_prefix)
+            else:
+                for order in order_list:
+                    if order.result_code == '':
+                        order_prefix, order_suffix = order.request_no.split('_')
+                        if order_suffix == '104369':
+                            self.binding_card_call_back(obj, order_prefix)
+                        elif order_suffix in ['104371', '104372']:
+                            self.purchase_call_back(obj, order_prefix)
+        else:
+            self.binding_card_call_back(obj)
+            self.purchase_call_back(obj)
+
