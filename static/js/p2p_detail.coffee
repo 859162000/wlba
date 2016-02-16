@@ -79,9 +79,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
     $('.payment').html(html).show()
 
-  $.validator.addMethod 'dividableBy100', (value, element) ->
-    return value % 100 == 0 && !/\./ig.test(value)
-  , '请输入100的整数倍'
+#  $.validator.addMethod 'dividableBy100', (value, element) ->
+#    return value % 100 == 0 && !/\./ig.test(value)
+#  , '请输入100的整数倍'
 
   $.validator.addMethod 'integer', (value, element) ->
     notInteger = /\.\d*[^0]+\d*$/ig.test(value)

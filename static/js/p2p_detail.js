@@ -99,9 +99,6 @@
       }
       return $('.payment').html(html).show();
     };
-    $.validator.addMethod('dividableBy100', function(value, element) {
-      return value % 100 === 0 && !/\./ig.test(value);
-    }, '请输入100的整数倍');
     $.validator.addMethod('integer', function(value, element) {
       var notInteger;
       notInteger = /\.\d*[^0]+\d*$/ig.test(value);
