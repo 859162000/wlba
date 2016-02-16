@@ -20,6 +20,7 @@ urlpatterns = patterns(
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
     url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
+    url(r'^regist/second/$', login_required(views.WeixinRegisterBindCard.as_view(), login_url='/weixin/login/'), name='weixin_regist_bind_card'),
     url(r'^regist/three/$', TemplateView.as_view(template_name="weixin_registProcess_three.jade")),
 
 

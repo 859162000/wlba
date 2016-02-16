@@ -483,6 +483,15 @@ class WeixinRegister(TemplateView):
         }
 
 
+class WeixinRegisterBindCard(TemplateView):
+    template_name = 'weixin_registProcess_second.jade'
+
+    def get_context_data(self, **kwargs):
+
+        return {
+            'recharge': True
+        }
+
 class JumpPageTemplate(TemplateView):
     template_name = 'sub_times.jade'
 
