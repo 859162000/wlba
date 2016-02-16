@@ -103,7 +103,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
         buttonText : '登记证',
         chunked:true,
         // 分片大小
-        chunkSize:512 * 1024,
+        chunkSize:2048 * 1024,
         //最大上传的文件数量, 总文件大小,单个文件大小(单位字节);
         fileNumLimit:1,
         fileSizeLimit:500000 * 1024,
