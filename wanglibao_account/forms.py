@@ -60,7 +60,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'mlgb error': u'注册成功',
         'verify_invalid': u'请输入验证码',
         'verify_error': u'短信验证码错误',
-        'manual_modify_exists': u'该手机号为人工修改手机号申请修改的手机号',
+        'manual_modify_exists': u'要注册手机号不能为人工修改手机号正在申请修改的手机号',
     }
 
     class Meta:
