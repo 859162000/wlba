@@ -12,6 +12,28 @@ require.config
     "ddslick": ['jquery']
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal, validate)->
+
+  $.validator.addMethod 'dividableBy100', (value, element) ->
+    return value % 100 == 0 && !/\./ig.test(value)
+  , '请输入100的整数倍'
+
+  $.validator.addMethod 'integer', (value, element) ->
+    notInteger = /\.\d*[^0]+\d*$/ig.test(value)
+    return !($.isNumeric(value) && notInteger)
+  , '请输入整数'
+
+  $.validator.addMethod 'positiveNumber', (value, element) ->
+    return Number(value) > 0
+  , '请输入有效金额'
+
+  $.validator.addMethod 'threshold', (value, element) ->
+    for obj in ddData
+      if obj.value == $('.dd-selected-value').val()*1
+        selectedData = obj
+        break
+    return if selectedData then $('#id_amount').val() - selectedData.invest_amount >= 0 else true
+  , '投资金额未达到理财券门槛'
+
   isFirst = true
 
   getFormatedNumber = (num) ->
@@ -78,27 +100,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount)
       html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
     $('.payment').html(html).show()
-
-#  $.validator.addMethod 'dividableBy100', (value, element) ->
-#    return value % 100 == 0 && !/\./ig.test(value)
-#  , '请输入100的整数倍'
-
-  $.validator.addMethod 'integer', (value, element) ->
-    notInteger = /\.\d*[^0]+\d*$/ig.test(value)
-    return !($.isNumeric(value) && notInteger)
-  , '请输入整数'
-
-  $.validator.addMethod 'positiveNumber', (value, element) ->
-    return Number(value) > 0
-  , '请输入有效金额'
-
-  $.validator.addMethod 'threshold', (value, element) ->
-    for obj in ddData
-      if obj.value == $('.dd-selected-value').val()*1
-        selectedData = obj
-        break
-    return if selectedData then $('#id_amount').val() - selectedData.invest_amount >= 0 else true
-  , '投资金额未达到理财券门槛'
 
   if $('#id_amount').attr('p2p-type') == '票据'
     opt =
