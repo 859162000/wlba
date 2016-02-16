@@ -1741,3 +1741,14 @@ class OauthUserRegisterApi(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class CoopDataDispatchApi(APIView):
+    """
+    渠道中心平台数据调度接口
+    """
+
+    permission_classes = ()
+
+    def post(self, request):
+        pass
