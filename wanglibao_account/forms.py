@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import F
 
 from utils import detect_identifier_type, verify_id
-from wanglibao_account.models import VerifyCounter, IdVerification
+from wanglibao_account.models import VerifyCounter, IdVerification, ManualModifyPhoneRecord
 from wanglibao_sms.utils import validate_validation_code
 from marketing.models import InviteCode, PromotionToken, Channels
 from wanglibao_account.utils import mlgb_md5
@@ -60,6 +60,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'mlgb error': u'注册成功',
         'verify_invalid': u'请输入验证码',
         'verify_error': u'短信验证码错误',
+        'manual_modify_exists': u'该手机号为人工修改手机号申请修改的手机号',
     }
 
     class Meta:
@@ -118,6 +119,12 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             )
 
         if len(users) == 0:
+            manual_modify_exists = ManualModifyPhoneRecord.objects.filter(new_phone=identifier, status__in=[u"待初审", u"初审待定", u"待复审"]).exists()
+            if manual_modify_exists:
+                raise forms.ValidationError(
+                        self.error_messages['manual_modify_exists'],
+                        code='manual_modify_exists',
+                )
             return identifier.strip()
         raise forms.ValidationError(
             self.error_messages['duplicate_username'],
