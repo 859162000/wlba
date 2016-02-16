@@ -376,6 +376,18 @@ class ActivityBannerShowForm(forms.ModelForm):
         if not banner_type:
             raise forms.ValidationError(u'Banner类型不能为空')
 
+        if banner_type == u'主推':
+            if not activity_show.main_banner:
+                raise forms.ValidationError(u"所选『活动展示』未添加%sbanner" % banner_type)
+
+        if banner_type == u'副推左':
+            if not activity_show.left_banner:
+                raise forms.ValidationError(u"所选『活动展示』未添加%sbanner" % banner_type)
+
+        if banner_type == u'副推右':
+            if not activity_show.right_banner:
+                raise forms.ValidationError(u"所选『活动展示』未添加%sbanner" % banner_type)
+
         if show_start_at <= show_end_at:
             if activity_show.start_at <= show_start_at <= show_end_at <= activity_show.end_at:
                 act_banner_shows = ActivityBannerShow.objects.filter(Q(show_start_at__lte=show_start_at,
@@ -383,6 +395,9 @@ class ActivityBannerShowForm(forms.ModelForm):
                                                                        banner_type=banner_type) |
                                                                      Q(show_start_at__lte=show_end_at,
                                                                        show_end_at__gte=show_end_at,
+                                                                       banner_type=banner_type) |
+                                                                     Q(show_start_at__gte=show_start_at,
+                                                                       show_end_at__lte=show_end_at,
                                                                        banner_type=banner_type))
                 this_id = self.instance.id
                 for banner_show in act_banner_shows:
