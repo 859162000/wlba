@@ -11,7 +11,7 @@ require.config
     "jquery.validate": ['jquery']
     "ddslick": ['jquery']
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal, validate)->
   isFirst = true
 
   getFormatedNumber = (num) ->
@@ -79,20 +79,20 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
     $('.payment').html(html).show()
 
-  $.validator.addMethod 'dividableBy100', (value, element)->
+  $.validator.addMethod 'dividableBy100', (value, element) ->
     return value % 100 == 0 && !/\./ig.test(value)
   , '请输入100的整数倍'
 
-  $.validator.addMethod 'integer', (value, element)->
+  $.validator.addMethod 'integer', (value, element) ->
     notInteger = /\.\d*[^0]+\d*$/ig.test(value)
     return !($.isNumeric(value) && notInteger)
   , '请输入整数'
 
-  $.validator.addMethod 'positiveNumber', (value, element)->
+  $.validator.addMethod 'positiveNumber', (value, element) ->
     return Number(value) > 0
   , '请输入有效金额'
 
-  $.validator.addMethod 'threshold', (value, element)->
+  $.validator.addMethod 'threshold', (value, element) ->
     for obj in ddData
       if obj.value == $('.dd-selected-value').val()*1
         selectedData = obj
