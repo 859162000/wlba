@@ -1287,4 +1287,17 @@ class UnbindCardTemplateView(TemplateView):
 
 
 
-
+class PayinfoView(APIView):
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        user = request.user
+        pay_info = PayInfo.objects.filter(user=request.user).first()
+        messages = {}
+        if pay_info.status == "失败":
+            messages['recharge'] = False
+        elif pay_info.status == "成功":
+            messages['recharge'] = True
+        else:
+            pass
+        
+        return Response(json.dumps(messages))
