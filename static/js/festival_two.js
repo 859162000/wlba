@@ -637,6 +637,7 @@ $(function(){
                 shareLink = host + '/activity/festival_two/',
                 shareMainTit = shareTit,
                 shareBody = '闹元宵，吃大餐，抽红包财源滚滚来';
+            alert(shareImg);
             //分享给微信好友
             wx.onMenuShareAppMessage({
                 title: shareMainTit,
