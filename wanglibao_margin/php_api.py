@@ -13,11 +13,13 @@ from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
-    calc_php_commission
+    calc_php_commission, php_redpacks
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
 
+from wanglibao_rest import utils
+from wanglibao_redpack import backends
 
 class GetUserInfo(APIView):
     """
@@ -629,3 +631,37 @@ class AssignmentBuyFail(APIView):
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class GetRedPacks(APIView):
+    """
+    http请求方式: get
+    http://xxxxxx.com/php/redpacks/list/
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        red_pack_info = dict()
+        period = int(self.request.REQUEST.get('period'))
+        uid = int(self.request.REQUEST.get('userId'))
+
+        if self.request.user.pk and int(self.request.user.pk) == int(uid):
+
+            device = utils.split_ua(self.request)
+
+            result = php_redpacks(request.user, device['device_type'], period=period)
+            redpacks = result['packages'].get('available', [])
+
+            red_pack_info.update(
+                status=1,
+                redpacks=redpacks
+            )
+        else:
+            red_pack_info.update(
+                status=0,
+                msg=u'authentic error!'
+            )
+
+        return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))

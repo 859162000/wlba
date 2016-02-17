@@ -8,7 +8,7 @@ import requests
 import simplejson
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.utils import timezone
 from user_agents import parse
 
@@ -19,8 +19,8 @@ from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper, check_amount
 from wanglibao_margin.models import Margin, MarginRecord, MonthProduct, PhpRefundRecord
 from wanglibao_p2p.models import P2PEquity
-from wanglibao_redpack.models import PhpIncome
-# from weixin.util import getAccountInfo
+from wanglibao_redpack.backends import _decide_device, get_start_end_time, REDPACK_RULE, stamp
+from wanglibao_redpack.models import PhpIncome, RedPackRecord
 
 
 def set_cookie(response, key, value, hours_expire=1, domain=settings.SESSION_COOKIE_DOMAIN):
@@ -444,3 +444,107 @@ def get_unread_msgs(user_id):
         ret.update(status=0, msg=str(e))
 
     return ret
+
+
+def php_redpacks(user, device_type, period=0, status='available', app_version=''):
+    """
+    获得月利宝产品对应可用的红包加息券
+    月利宝的期限都是月以上的. 传来标需要的周期是几个月, period 整数, 代表最小数量
+
+    :param user:
+    :param device_type:
+    :param period:
+    :param status:
+    :param app_version:
+    :return:
+    """
+
+    if not user.is_authenticated():
+        packages = {"available": []}
+        return {"ret_code": 0, "packages": packages}
+
+    device_type = _decide_device(device_type)
+
+    # 如果使用了加息券, 散标不能重复使用. 但是月利宝可以重复使用
+    if status == "available":
+        packages = {"available": []}
+        # 红包
+        # 包括大于这个周期的红包和等于这个周期的红包. 如 period=3, period_type='month' 和 period=3, period_type='month_gte'
+        # 还有天数大于这个周期月的也可以使用
+        records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
+            .filter(redpack__event__p2p_types__isnull=True)\
+            .filter(Q(Q(redpack__event__period__gte=period) &
+                      (Q(redpack__event__period_type='month') | Q(redpack__event__period_type='month_gte'))) |
+                    Q(Q(redpack__event__period__gte=period*30) &
+                      (Q(redpack__event__period_type='day') | Q(redpack__event__period_type='day_gte'))) |
+                    # 不限制时间的优惠券
+                    Q(Q(redpack__event__period=0)))\
+            .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+        for record in records:
+            redpack = record.redpack
+            if redpack.status == "invalid":
+                continue
+            event = record.redpack.event
+            p2p_types_id = 0
+            p2p_types_name = ''
+
+            start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                      record.created_at, event.available_at, event.unavailable_at)
+
+            obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
+                    "id": record.id, "invest_amount": event.invest_amount,
+                    "unavailable_at": stamp(end_time), "event_id": event.id,
+                    "period": event.period, "period_type": event.period_type,
+                    "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
+                    "highest_amount": event.highest_amount, "order_by": 2}
+            if start_time < timezone.now() < end_time:
+                if event.apply_platform == "all" or event.apply_platform == device_type or \
+                        (device_type in ('ios', 'android') and event.apply_platform == 'app'):
+                    if obj['method'] == REDPACK_RULE['percent']:
+                        obj['amount'] = obj['amount']/100.0
+                    packages['available'].append(obj)
+
+        # 加息券
+        # 检测app版本号，小于2.5.2版本不返回加息券列表
+        is_show = True
+        if device_type == 'ios' or device_type == 'android':
+            if app_version < "2.5.3":
+                is_show = False
+        if is_show:
+            # 显示加息券, 月利宝可以多次使用加息券
+            coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
+                .filter(redpack__event__p2p_types__isnull=True)\
+                .filter(Q(Q(redpack__event__period__gte=period) &
+                          (Q(redpack__event__period_type='month') | Q(redpack__event__period_type='month_gte'))) |
+                        Q(Q(redpack__event__period__gte=period*30) &
+                          (Q(redpack__event__period_type='day') | Q(redpack__event__period_type='day_gte'))) |
+                        Q(Q(redpack__event__period=0)))\
+                .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+            for coupon in coupons:
+                if coupon.order_id:
+                    continue
+                redpack = coupon.redpack
+                if redpack.status == 'invalid':
+                    continue
+                event = coupon.redpack.event
+
+                start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                          coupon.created_at, event.available_at, event.unavailable_at)
+
+                obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
+                       "id": coupon.id, "invest_amount": event.invest_amount,
+                       "unavailable_at": stamp(end_time), "event_id": event.id,
+                       "period": event.period, "period_type": event.period_type,
+                       "highest_amount": event.highest_amount, "order_by": 1}
+
+                if start_time < timezone.now() < end_time:
+                    if event.apply_platform == "all" or event.apply_platform == device_type or \
+                            (device_type in ('ios', 'android') and event.apply_platform == 'app'):
+                        if obj['method'] == REDPACK_RULE['interest_coupon']:
+                            obj['amount'] = obj['amount'] / 100.0
+                        packages['available'].append(obj)
+
+        # packages['available'].sort(key=lambda x: x['unavailable_at'])
+        packages['available'].sort(key=lambda x: x['order_by'], reverse=True)
+
+    return {"ret_code": 0, "packages": packages}
