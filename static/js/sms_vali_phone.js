@@ -94,75 +94,125 @@
             });
         });
 
-        $('.button').click(function(){
-            $('.error_form').hide();
-            var validate_code_val = $('.input_code').val();
-            var password_val = $('.password').val();
-            var id_number_val = $('.id_number').val();
-            var new_phone_val = $('.new_phone').val();
-            var id_true,pass_true,post_data,card_no;
+        $('.button').click(function() {
+			$('.error_form').hide();
+			var validate_code_val = $('.input_code').val();
+			var password_val = $('.password').val();
+			var id_number_val = $('.id_number').val();
+			var new_phone_val = $('.new_phone').val();
+			var validate_code_true, id_true, pass_true, new_phone_num, post_data, card_no, card_no_true;
 
-            if(id_number_val.length=='15'||id_number_val.length=='18'){
-                $('.status_3').hide();
-                id_true = true;
-            }else{
-                $('.status_3 .false').show().text('身份证位数错误').prev().hide();
-                $('.status_3').show();
-                id_true = false;
-            }
+			if (validate_code_val.length == '6') {
+				$('.status_1').hide();
+				validate_code_true = true;
+			} else {
+				$('.status_1 .false').show().text('验证码错误').prev().hide();
+				$('.status_1').show();
+				validate_code_true = false;
+			}
 
-            if(password_val.length<6){
-                $('.status_2 .false').show().text('密码位数错误').prev().hide();
-                $('.status_2').show();
-                pass_true = false;
-            }else{
-                $('.status_2').hide();
-                pass_true = true;
-            }
+			if (id_number_val.length == '15' || id_number_val.length == '18') {
+				$('.status_3').hide();
+				id_true = true;
+			} else {
+				$('.status_3 .false').show().text('身份证信息有误').prev().hide();
+				$('.status_3').show();
+				id_true = false;
+			}
 
-            if(pass_true&&id_true){
+			if (password_val.length < 6) {
+				$('.status_2 .false').show().text('账户登录密码有误').prev().hide();
+				$('.status_2').show();
+				pass_true = false;
+			} else {
+				$('.status_2').hide();
+				pass_true = true;
+			}
+
+			if ($('input.bind_card').length > 0) {
+				if ($('input.bind_card').val().length >= 10 && $('input.bind_card').val().length <= 20) {
+					$('.status_4 .false').show().text('银行卡号码有误').prev().hide();
+					$('.status_4').show();
+					card_no_true = false;
+				} else {
+					$('.status_4').hide();
+					card_no_true = true;
+				}
+			}
+
+			if (new_phone_val.length != 11) {
+				$('.status_5 .false').show().text('新手机号码有误').prev().hide();
+				$('.status_5').show();
+				new_phone_num = false;
+			} else {
+				$('.status_5').hide();
+				new_phone_num = true;
+			}
+
+			if (pass_true && id_true && new_phone_num && validate_code_val) {
 
 
-                if($('input.bind_card').length>0){
-                //当用户有同卡进出时
-                    card_no = $('.bind_card').val();
-                    post_data = {
-                        'validate_code':validate_code_val,
-                        'password':password_val,
-                        'id_number':id_number_val,
-                        'new_phone':new_phone_val,
-                        'card_no':card_no
-                    };
-                }else {
-                    post_data = {
-                        'validate_code': validate_code_val,
-                        'password': password_val,
-                        'id_number': id_number_val,
-                        'new_phone': new_phone_val
-                    }
-                }
+				if ($('input.bind_card').length > 0) {
+					//当用户有同卡进出时
+					if (card_no_true) {
+						card_no = $('.bind_card').val();
+						post_data = {
+							'validate_code': validate_code_val,
+							'password': password_val,
+							'id_number': id_number_val,
+							'new_phone': new_phone_val,
+							'card_no': card_no
+						};
+						$.ajax({
+							url: '/api/sms_modify/vali_acc_info/',
+							type: 'POST',
+							data: post_data,
+							success: function (xhr) {
 
-                $.ajax({
-                    url: '/api/sms_modify/vali_acc_info/' ,
-                    type: 'POST',
-                    data: post_data,
-                    success: function (xhr) {
+								$('.error_form').hide();
+								$('.status .false').hide();
+								$('.status .true').show();
+								$('.status').show();
+								window.location.href = '/accounts/sms_modify/phone/';
 
-                        $('.error_form').hide();
-                        $('.status .false').hide();
-                        $('.status .true').show();
-                        $('.status').show();
-                        window.location.href = '/accounts/sms_modify/phone/';
+							},
+							error: function (xhr) {
+								result = JSON.parse(xhr.responseText);
+								$('.error_form').text(result.message).show();
+							}
 
-                    },
-                    error: function (xhr) {
-                        result = JSON.parse(xhr.responseText);
-                        $('.error_form').text(result.message).show();
-                    }
+						});
+					} else {
+						post_data = {
+							'validate_code': validate_code_val,
+							'password': password_val,
+							'id_number': id_number_val,
+							'new_phone': new_phone_val
+						}
+						$.ajax({
+							url: '/api/sms_modify/vali_acc_info/',
+							type: 'POST',
+							data: post_data,
+							success: function (xhr) {
 
-                });
-            }
-        })
+								$('.error_form').hide();
+								$('.status .false').hide();
+								$('.status .true').show();
+								$('.status').show();
+								window.location.href = '/accounts/sms_modify/phone/';
+
+							},
+							error: function (xhr) {
+								result = JSON.parse(xhr.responseText);
+								$('.error_form').text(result.message).show();
+							}
+						});
+					}
+
+
+				}
+			}
+		})
 
     })
 

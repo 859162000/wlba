@@ -32,6 +32,8 @@ block main
                         dd {{phone}}
                     if modify_phone_state != 2
                         .button.phone_change_button 修改
+                    else
+                        .button.phone_changing 申请修改中
                 if id_is_valid
                     .phone_change_wrap
                         .line
@@ -111,5 +113,5 @@ block main
         .phone_modify_popup_text 请先完成实名认证
         .phone_modify_bg
     script.
-        require(["/static/js/account_safe.js?v=20160012501"])
+        require(["/static/js/account_safe.js?v=20160012501","/static/js/account_setting.js"])
 
