@@ -11,7 +11,7 @@ from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_mess
 
 def sendWechatPhoneRewardByRegister(user, device_type="all"):
     phone = user.wanglibaouserprofile.phone
-    phoneRewardRecords = WechatPhoneRewardRecord.objects.select_for_update().filter(status=False, phone=phone).all()
+    phoneRewardRecords = WechatPhoneRewardRecord.objects.filter(status=False, phone=phone).all()
     for phoneRewardRecord in phoneRewardRecords:
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
         for key, value in enumerate(rewards):
@@ -26,8 +26,7 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
             if key == 'experience':
                 for experience in value:
                     SendExperienceGold(user).send(pk=experience.id)
-        phoneRewardRecord.status = True
-        phoneRewardRecord.save()
+
         redpack_ids = phoneRewardRecord.redpack_event_ids.split(',')
         for redpack_id in redpack_ids:
             redpack_event = RedPackEvent.objects.filter(id=int(redpack_id)).first()
@@ -36,6 +35,8 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
                 start_time, end_time = get_start_end_time(redpack_event.auto_extension, redpack_event.auto_extension_days,
                                                           record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
                 _send_message_for_hby(user, redpack_event, end_time)
+        phoneRewardRecord.status = True
+        phoneRewardRecord.save()
 
 def sendWechatPhoneReward(openid, user, device_type):
     now_date = datetime.date.today()
