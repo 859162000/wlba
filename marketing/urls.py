@@ -187,7 +187,7 @@ urlpatterns += patterns(
 
     url(r'^weixin_lifestyle/$', TemplateView.as_view(template_name="h5_lifestyle.jade")),
 
-    url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
+    #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
 
 )
 # app with webview
