@@ -2238,7 +2238,7 @@ class LanternBanquetTemplate(TemplateView):
         redpack_id_str = str(redpack_id)
         if redpack_id == -1:
             return Response(res)
-
+        openid = self.request.session.get('lantern_openid')
         now_date = datetime.date.today()
         phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
         try:
@@ -2258,7 +2258,7 @@ class LanternBanquetTemplate(TemplateView):
         except IntegrityError, e:
             pass
 
-        openid = self.request.session.get('lantern_openid')
+
         now_date = datetime.date.today()
         phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
         try:
@@ -2277,24 +2277,27 @@ class LanternBanquetTemplate(TemplateView):
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
         redpacks = rewards.get('redpack')
         experiences = rewards.get('experience')
-        reward_txt_list = []
+        rewards = {'redpack':[], 'coupon':[], 'experience':[]}
         for redpack_dict in redpacks:
             redpack_event = redpack_dict.get('redpack_event')
             redpack_text = "None"
             if redpack_event.rtype == 'interest_coupon':
-                redpack_text = "%s%%加息券"%redpack_event.amount
+                rewards.get('coupon').append({'amount':int(redpack_event.amount), 'invest_amount':convert_to_10k(redpack_event.invest_amount)})
+                # redpack_text = "%s%%加息券"%redpack_event.amount
             if redpack_event.rtype == 'percent':
-                redpack_text = "%s%%百分比红包"%redpack_event.amount
+                # redpack_text = "%s%%百分比红包"%redpack_event.amount
+                rewards.get('redpack').append({'amount':redpack_event.amount, 'invest_amount':convert_to_10k(redpack_event.invest_amount)})
             if redpack_event.rtype == 'direct':
-                redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
-            reward_txt_list.append(redpack_text)
+                # redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
+                rewards.get('redpack').append({'amount':int(redpack_event.amount), 'invest_amount':convert_to_10k(redpack_event.invest_amount)})
+
         for experience_dict in experiences:
             experience_event = experience_dict.get('experience_event')
-            reward_txt_list.append('%s元体验金'%int(experience_event.amount))
+            rewards.get('experience').append({"amount":int(experience_event.amount)})
 
         event = RedPackEvent.objects.filter(id=redpack_id).first()
 
-        return context.update({"reward_txt_list":reward_txt_list, "redpack":{'amount':event.amount, 'invest_amount':event.invest_amount}})
+        return context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
 
 
     def dispatch(self, request, *args, **kwargs):
