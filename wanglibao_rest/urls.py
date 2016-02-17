@@ -61,7 +61,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_QMReward, Lantern_HMReward, Lantern_FetchRewardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -279,8 +279,10 @@ urlpatterns += patterns(
     url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
     url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
     url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
+    url(r'^lantern/qm_reward/$', Lantern_QMReward.as_view()),  # 全民盛宴
+    url(r'^lantern/hm_reward/$', Lantern_HMReward.as_view()),  # 豪门盛宴
+    url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
 )
-
 
 # app端改版新接口
 urlpatterns += patterns(
