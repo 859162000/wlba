@@ -10,7 +10,7 @@ require.config
     "jquery.validate": ['jquery']
     "ddslick": ['jquery']
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal, validate)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal, validate, ddslick)->
 
   $.validator.addMethod 'dividableBy100', (value, element) ->
     return value % 100 == 0 && !/\./ig.test(value)
