@@ -491,15 +491,20 @@ class WeixinRegisterBindCard(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        #user = self.request.user
-        pay_info = PayInfo.objects.filter(user=self.request.user).first()
+        user = self.request.user
+
+        pay_info = PayInfo.objects.filter(user=user).first()
+
         recharge = None
-        if pay_info.status == "失败":
-            recharge = False
-        elif pay_info.status == "成功":
+        try:
+            if pay_info.status == "失败":
+                recharge = False
+            elif pay_info.status == "成功":
+                recharge = True
+            else:
+                pass
+        except AttributeError:
             recharge = True
-        else:
-            pass
 
         return {
             'recharge': recharge
