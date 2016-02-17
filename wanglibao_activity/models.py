@@ -80,6 +80,9 @@ class Activity(models.Model):
     product_ids = models.CharField(u'指定产品ID', max_length=200, blank=True, default='',
                                    help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
+    is_lottery = models.BooleanField(u'是否为抽奖活动', default=False, editable=False)
+    chances = models.IntegerField(u'抽奖次数', default=0, blank=True, null=True, editable=False)
+    rewards = models.IntegerField(u'获奖次数', default=0, blank=True, null=True, editable=False)
     channel = models.CharField(u'渠道名称', max_length=800, blank=True,
                                help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao-other，多个渠道用英文逗号间隔')
     is_all_channel = models.BooleanField(u'所有渠道', default=False, help_text=u'如果勾选“所有渠道”，则系统不再限定渠道')
@@ -111,6 +114,8 @@ class Activity(models.Model):
             raise ValidationError(u'选择指定产品时，需要填写产品的ID，多个ID之间用英文逗号间隔')
         if self.is_stopped:
             self.stopped_at = timezone.now()
+        if self.chances < self.rewards:
+            raise ValidationError(u'获奖次数不能大于抽奖次数')
 
     def activity_status(self):
         now = timezone.now()
@@ -152,6 +157,7 @@ class ActivityRule(models.Model):
     redpack = models.CharField(u'对应活动ID', max_length=200, blank=True,
                                help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，否则会导致无法发放<br/>\
                                如需要多个ID则用英文逗号隔开,如:1,2,3')
+    probability = models.FloatField(u'获奖概率', default=0, blank=True, null=True, editable=False)
     reward = models.CharField(u'奖品类型名称', max_length=200, blank=True,
                               help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
     income = models.FloatField(u'金额或比率', default=0, blank=True,
@@ -408,6 +414,9 @@ class ActivityShow(models.Model):
     created_at = models.DateTimeField(u'添加时间', auto_now=False, default=timezone.now, auto_now_add=True)
     link_is_hide = models.BooleanField(verbose_name=u'是否隐藏活动页面', default=False)
     priority = models.IntegerField(u'优先级', help_text=u'越大越优先', default=0, blank=False)
+    main_banner = models.ImageField(u'主推Banner', null=True, blank=True, upload_to='activity/banner')
+    left_banner = models.ImageField(u'副推左Banner', null=True, blank=True, upload_to='activity/banner')
+    right_banner = models.ImageField(u'副推右Banner', null=True, blank=True, upload_to='activity/banner')
 
     def activity_status(self):
         now = timezone.now()
@@ -482,3 +491,29 @@ class ActivityBannerPosition(models.Model):
                                                             self.second_left.activity.name,
                                                             self.second_right.activity.name,
                                                             )
+
+
+class ActivityBannerShow(models.Model):
+    """活动Banner展示排期"""
+
+    BANNER_TYPE = (
+        (u'主推', u'主推'),
+        (u'副推左', u'副推左'),
+        (u'副推右', u'副推右'),
+    )
+
+    activity_show = models.ForeignKey(ActivityShow, verbose_name=u'活动展示')
+    banner_type = models.CharField(u'Banner类型', max_length=10, choices=BANNER_TYPE)
+    show_start_at = models.DateTimeField(u'Banner展示开始时间', auto_now=False, default=timezone.now,
+                                         help_text=u'大于等于『活动展示』开始时间')
+    show_end_at = models.DateTimeField(u'Banner展示结束时间', auto_now=False, default=timezone.now,
+                                       help_text=u'小于等于『活动展示』结束时间')
+    created_at = models.DateTimeField(u'创建时间', auto_now=True)
+
+    class Meta:
+        verbose_name = u'活动Banner展示排期'
+        verbose_name_plural = u'活动Banner展示排期'
+        ordering = ['-show_start_at']
+
+    def __unicode__(self):
+        return u'%s(%s)' % (self.activity_show.activity, self.banner_type)

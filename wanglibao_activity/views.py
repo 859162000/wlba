@@ -3,13 +3,17 @@
 from django.views.generic import TemplateView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from wanglibao_activity.models import (ActivityTemplates, ActivityImages, ActivityShow,
-                                       ActivityBannerPosition)
+                                       ActivityBannerShow, ActivityBannerPosition)
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from weixin.util import _generate_ajax_template
 from .utils import get_queryset_paginator, get_sorts_for_activity_show
 from django.db.models import Q
+from wanglibao_account import message as inside_message
+from experience_gold.backends import SendExperienceGold
+from wanglibao_redpack import backends as redpack_backends
+import json
 
 class WeixinGGLTemplate(TemplateView):
     template_name = ''
@@ -117,6 +121,20 @@ class TemplatesFormatTemplate(TemplateView):
 class PcActivityAreaView(TemplateView):
     template_name = 'area.jade'
 
+    def get_banner(self, banner_querys, banner_type):
+        banner_show = banner_querys.filter(banner_type=banner_type).first()
+        if not banner_show:
+            banner_show = ActivityBannerShow.objects.filter(
+                banner_type=banner_type, show_end_at__lte=timezone.now()
+            ).select_related('activity',).order_by('-show_end_at').first()
+
+            if not banner_show:
+                banner_show = ActivityBannerShow.objects.filter(
+                    banner_type=banner_type, show_start_at__gte=timezone.now()
+                ).select_related('activity').order_by('show_start_at').first()
+
+        return banner_show
+
     def get_context_data(self, **kwargs):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_pc=True,
@@ -125,16 +143,37 @@ class PcActivityAreaView(TemplateView):
                                                     ).select_related('activity')
 
         activity_list = get_sorts_for_activity_show(activity_list)
+        act_banner_shows = ActivityBannerShow.objects.filter(show_start_at__lte=timezone.now(),
+                                                             show_end_at__gt=timezone.now()
+                                                             ).select_related('activity_show')
 
-        banner = ActivityBannerPosition.objects.all().select_related().first()
+        main_banner = self.get_banner(act_banner_shows, u'主推')
+        left_banner = self.get_banner(act_banner_shows, u'副推左')
+        right_banner = self.get_banner(act_banner_shows, u'副推右')
+
+        if not main_banner:
+            main_banner = ActivityBannerPosition.objects.all().select_related().first()
+            main_banner.activity_show = main_banner.main
+            main_banner.activity_show.main_banner = main_banner.main_banner
+
+        if not left_banner:
+            left_banner = ActivityBannerPosition.objects.all().select_related().first()
+            left_banner.activity_show = left_banner.second_left
+            left_banner.activity_show.left_banner = left_banner.left_banner
+
+        if not right_banner:
+            right_banner = ActivityBannerPosition.objects.all().select_related().first()
+            right_banner.activity_show = right_banner.second_right
+            right_banner.activity_show.right_banner = right_banner.right_banner
 
         limit = 6
         page = 1
-
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
-            'banner': banner,
+            'main_banner': main_banner,
+            'left_banner': left_banner,
+            'right_banner': right_banner,
             'results': activity_list[:limit],
             'all_page': all_page,
             'page': page,

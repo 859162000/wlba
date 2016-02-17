@@ -14,21 +14,20 @@ html(style='background:#f5f5f5;')
     - endwith
     .i-mod-warp
       .i-area-banner
-        if banner.main_banner
-          a(href='{{banner.main.pc_detail_link}}', style='background:url(/media/{{banner.main_banner}}) no-repeat center')
+        if main_banner.activity_show.main_banner
+          a(href='{{main_banner.activity_show.pc_detail_link}}', style='background:url(/media/{{main_banner.activity_show.main_banner}}) no-repeat center')
     .i-mod-warp.mg-t-l
       .i-mod.clearfix
         .area-main-push.fl.mg-r-sm
-          if banner.left_banner
-            a(href='{{banner.second_left.pc_detail_link}}', style='background:url(/media/{{banner.left_banner}}) no-repeat center')
+          if left_banner.activity_show.left_banner
+            a(href='{{left_banner.activity_show.pc_detail_link}}', style='background:url(/media/{{left_banner.activity_show.left_banner}}) no-repeat center')
           else
-            a(href='javascript:void(0)', style='background:url(/media/{{banner.left_banner}}) no-repeat center')
+            a(href='javascript:void(0)', style='background:url(/media/{{left_banner.activity_show.left_banner}}) no-repeat center')
         .area-main-push.fl
-          if banner.right_banner
-            if banner.second_right.pc_detail_link
-              a(href='{{banner.second_right.pc_detail_link}}', style='background:url(/media/{{banner.right_banner}}) no-repeat center')
-            else
-              a(href='javascript:void(0)', style='background:url(/media/{{banner.right_banner}}) no-repeat center')
+          if right_banner.activity_show.right_banner
+            a(href='{{right_banner.activity_show.pc_detail_link}}', style='background:url(/media/{{right_banner.activity_show.right_banner}}) no-repeat center')
+          else
+            a(href='javascript:void(0)', style='background:url(/media/{{right_banner.activity_show.right_banner}}) no-repeat center')
     .i-mod-warp.i-mod-line.mg-t-m.mg-b-xll
 
     .i-mod-warp.mg-b-xll
