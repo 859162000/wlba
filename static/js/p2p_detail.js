@@ -2,7 +2,6 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
       tools: 'lib/modal.tools',
       "jquery.validate": 'lib/jquery.validate.min',
