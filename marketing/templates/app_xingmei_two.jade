@@ -10,8 +10,38 @@ html(style="background:#9a477d")
         img(src='/static/imgs/mobile_activity/app_xm/banner.jpg')
       .xingmei-main
         .one
+          .prize
+            span.prize-one
+            p 注册成为网利宝用户
+              br
+              |送
+              span 5元
+              |星美观影抵扣券
+          .prize
+            span.prize-two
+            p 新用户单笔首次投资500元及以上
+              br
+              |送
+              span 2张
+              |2D/3D通用兑换券
+          .prize
+            span.prize-three
+            p 新用户单笔首次投资500元及以上
+              br
+              |送
+              span 2张
+              |2D/3D通用兑换券
+          .xm-error 对不起,您不符合领取规则
+          //恭喜您,您已获得奖励,请到个人用户查看
+          if user.is_authenticated
+            .reg-btn.no-reg
+              a 立即投资
+          else
+            .reg-btn
+              a(href="/weixin/regist/") 立即投资
         h1(style="margin-top:1rem") 兑换码使用流程
-        .xm-liucheng
+      .xm-liucheng
+      .xingmei-main
         h1(style="margin-top:1rem") 投资流程
         .ele-liucheng
         h1 活动规则
@@ -21,6 +51,7 @@ html(style="background:#9a477d")
           li 新用户注册为网利宝会员将获得5元抵用券1张，限量1000张；
           li 新用户单笔首次投资500元及以上送2张2D/3D通用影券，新用户老用户优惠不叠加且只有一次获取机会；
           li 网利宝老用户单笔投资1000元及以上送1张2D/3D通用影券，新用户老用户优惠不叠加且只有一次获取机会；
+          li 以上电影票共600张，送完为止；
           li 手机号为网利宝唯一帐号，星美用户均可参与活动；
           li 观影票统一以网利宝站内信形式发送给用户，敬请查看；
           li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证一经核实将取消获奖资格；
@@ -36,14 +67,34 @@ html(style="background:#9a477d")
             img(src="/static/imgs/mobile_activity/extension/extension_xiu3.png")
             p 第三方<br/><em>100%</em>本息保障
 
+        script(src="/static/src/mobile/lib/zepto/zepto.js")
         script.
-            var inputDom = document.getElementById('submit-put'),
-                urlDom = document.getElementById('submit-url') ;
-              urlDom.addEventListener('touchend', function () {
-                if (inputDom.value === '') {
-                  return alert('请输入手机号!');
+            (function(){
+
+              $('.no-reg').on('click',function(){
+                $('.xm-error').show()
+
+              })
+              console.log()
+              $.ajax({
+                type: 'POST',
+                url: '/projects',
+                data: { name: 'Zepto.js' },
+                dataType: 'json',
+                timeout: 300,
+                context: $('body'),
+                success: function(data){
+                  // Supposing this JSON payload was received:
+                  //   {"project": {"id": 42, "html": "<div>..." }}
+                  // append the HTML to context object.
+                  this.append(data.project.html)
+                },
+                error: function(xhr, type){
+                  //alert('Ajax error!')
                 }
-                window.location.href = '/weixin/regist/?phone='+inputDom.value;
-              });
+              })
+            })();
+
+
 
           
