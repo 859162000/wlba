@@ -14,6 +14,6 @@ urlpatterns = patterns(
 
     url(r'^qm_banquet/$', views.QMBanquetTemplate.as_view(), name='qm_banquet'),
     url(r'^new_ameal/$', views.QMBanquetTemplate.as_view(template_name="new_ameal.jade")),
-    url(r'^lantern_banquet/$', views.LanternBanquetTemplate.as_view(template_name="new_ameal.jade")),
+    url(r'^lantern_banquet/$', views.LanternBanquetTemplate.as_view(template_name="festival_two.html")),
 
 )
