@@ -30,7 +30,7 @@ from constant import MessageTemplate
 from constant import (ACCOUNT_INFO_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
                       PRODUCT_ONLINE_TEMPLATE_ID)
 from weixin.util import getAccountInfo
-from wanglibao_pay.models import Bank
+from wanglibao_pay.models import Bank, PayInfo
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.replies import TransferCustomerServiceReply
 from wechatpy.utils import check_signature
@@ -67,6 +67,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from weixin.tasks import detect_product_biding, sentTemplate
 from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
 from weixin.util import FWH_UNBIND_URL, filter_emoji
+from rest_framework.permissions import IsAuthenticated
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -486,10 +487,22 @@ class WeixinRegister(TemplateView):
 class WeixinRegisterBindCard(TemplateView):
     template_name = 'weixin_registProcess_second.jade'
 
+    permission_classes = (IsAuthenticated, )
+
     def get_context_data(self, **kwargs):
 
+        #user = self.request.user
+        pay_info = PayInfo.objects.filter(user=self.request.user).first()
+        recharge = None
+        if pay_info.status == "失败":
+            recharge = False
+        elif pay_info.status == "成功":
+            recharge = True
+        else:
+            pass
+
         return {
-            'recharge': True
+            'recharge': recharge
         }
 
 class JumpPageTemplate(TemplateView):
