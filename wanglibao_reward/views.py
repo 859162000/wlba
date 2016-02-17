@@ -2282,7 +2282,7 @@ class LanternBanquetTemplate(TemplateView):
             redpack_event = redpack_dict.get('redpack_event')
             redpack_text = "None"
             if redpack_event.rtype == 'interest_coupon':
-                rewards.get('coupon').append({'amount':int(redpack_event.amount)})
+                rewards.get('coupon').append({'amount':redpack_event.amount})
                 # redpack_text = "%s%%加息券"%redpack_event.amount
             if redpack_event.rtype == 'percent':
                 # redpack_text = "%s%%百分比红包"%redpack_event.amount
