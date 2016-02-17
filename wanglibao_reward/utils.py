@@ -37,13 +37,12 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
                                                           record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
                 _send_message_for_hby(user, redpack_event, end_time)
 
-def sendWechatPhoneReward(user, device_type):
-    phone = user.wanglibaouserprofile.phone
+def sendWechatPhoneReward(openid, user, device_type):
     now_date = datetime.date.today()
     events = []
     records = []
-    phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(status=False, phone=phone, create_date=now_date).first()
     with transaction.atomic():
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(status=False, openid=openid, create_date=now_date).first()
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
         for key, value in enumerate(rewards):
             if key == 'redpack':
