@@ -27,7 +27,7 @@ from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao import settings
-from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder, ActivityRewardRecord
+from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder, ActivityRewardRecord, WechatPhoneRewardRecord
 from wanglibao_redpack.models import RedPackEvent
 from experience_gold.models import ExperienceEvent
 from wanglibao_activity.models import Activity, ActivityRule
@@ -49,6 +49,10 @@ import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward
+from weixin.models import WeixinAccounts
+from wechatpy.oauth import WeChatOAuth
+from wechatpy.exceptions import  WeChatException
 import traceback
 logger = logging.getLogger('wanglibao_reward')
 
@@ -2193,3 +2197,181 @@ class HMBanquetRewardAPI(APIView):
             logger.debug("===============二月红包宴发站内信异常=================")
             logger.debug(traceback.format_exc())
         return Response({"ret_code":0, 'message':"success"})
+
+
+
+
+
+class LanternBanquetTemplate(TemplateView):
+    """
+    元宵节
+    """
+    template_name = 'new_year_feast.jade'
+
+    def dispatch(self, request, *args, **kwargs):
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        try:
+            if code and state:
+                account = WeixinAccounts.getByOriginalId(state)
+                request.session['account_key'] = account.account_key
+                oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                res = oauth.fetch_access_token(code)
+                openid = res.get('openid')
+                request.session['lantern_openid'] = openid
+            else:
+                return Response({'ret_code':-1, "message":"code, state error"})
+        except WeChatException,e:
+                return Response({'ret_code':e.errcode, 'message':e.errmsg})
+
+class Lantern_QMReward(APIView):
+    permission_classes = ()
+    activity_codes = ['qmsy_redpack', 'qmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
+
+    def get_random_activity_code(self):
+        return self.activity_codes[random.randint(0, 1)]
+
+
+    def post(self, request):
+        openid = request.session.get('lantern_openid')
+        if not openid:
+            return Response({"ret_code":-1, "message":"openid为空"})
+        code = self.get_random_activity_code()
+        activity = Activity.objects.filter(code=code).first()
+        if not activity:
+            return Response({"ret_code":-1, "message":"没有相应活动"})
+
+        now = timezone.now()
+        if activity.start_at >= now:
+            return Response({"ret_code":3, "message":"活动还未开始"})
+        if activity.end_at <= now:
+            return Response({"ret_code":3, "message":"活动已过期"})
+        if activity.is_stopped:
+            return Response({"ret_code":2, "message":"活动已经暂停了"})
+
+
+        now_date = datetime.date.today()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
+        try:
+            if not phoneRewardRecord:
+                WechatPhoneRewardRecord.objects.create(
+                        openid = openid
+                    )
+            phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+
+            if phoneRewardRecord.activity_code and phoneRewardRecord.activity_code != code:
+                phoneRewardRecord.activity_code = code
+                phoneRewardRecord.save()
+            if not phoneRewardRecord.activity_code:
+                phoneRewardRecord.activity_code = code
+                phoneRewardRecord.save()
+        except:
+            pass
+        rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
+        return Response({"ret_code":0, "rewards":rewards})
+
+
+class Lantern_HMReward(APIView):
+    permission_classes = ()
+    activity_code = 'hmsy_redpack'
+
+    def get_random_redpack_id(self):
+        activity = Activity.objects.filter(code=self.activity_code).first()
+        if not activity:
+            return -1, {"ret_code":-1, "message":"没有相应活动"}
+        activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True).all()
+        if len(activity_rules) == 0:
+            return -1, {"ret_code":5, "message":"没有活动规则"}
+        all_redpacks = []
+        for activity_rule in activity_rules:
+            activity_redpacks = activity_rule.redpack.split(',')
+            all_redpacks.extend(activity_redpacks)
+        if len(all_redpacks)==0:
+            return -1, {"ret_code":-1, "message":"没有相应红包"}
+        return all_redpacks[random.randint(0, len(all_redpacks)-1)], {}
+
+    def post(self, request):
+        openid = request.session.get('lantern_openid')
+        if not openid:
+            return Response({"ret_code":-1, "message":"openid为空"})
+
+        activity = Activity.objects.filter(code=self.activity_code).first()
+        if not activity:
+            return Response({"ret_code":-1, "message":"没有相应活动"})
+
+        now = timezone.now()
+        if activity.start_at >= now:
+            return Response({"ret_code":3, "message":"活动还未开始"})
+        if activity.end_at <= now:
+            return Response({"ret_code":3, "message":"活动已过期"})
+        if activity.is_stopped:
+            return Response({"ret_code":2, "message":"活动已经暂停了"})
+
+        redpack_id, res = self.get_random_redpack_id()
+        if redpack_id == -1:
+            return Response(res)
+
+        now_date = datetime.date.today()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
+        try:
+            if not phoneRewardRecord:
+                WechatPhoneRewardRecord.objects.create(
+                        openid = openid
+                    )
+            phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+            redpack_id_str = str(redpack_id)
+            if phoneRewardRecord.redpack_event_ids and phoneRewardRecord.redpack_event_ids != redpack_id_str:
+                phoneRewardRecord.redpack_event_ids = redpack_id_str
+                phoneRewardRecord.save()
+            if not phoneRewardRecord.redpack_event_ids:
+                phoneRewardRecord.redpack_event_ids = redpack_id_str
+                phoneRewardRecord.save()
+        except:
+            pass
+        event = RedPackEvent.objects.filter(id=redpack_id).first()
+        return Response({"ret_code":0, "redpack":event})
+
+
+class Lantern_FetchRewardAPI(APIView):
+    """
+    元宵节--领取api
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        openid = request.session.get('lantern_openid')
+        if not openid:
+            return Response({"ret_code":-1, "message":"openid为空"})
+        now_date = datetime.date.today()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+        if not phoneRewardRecord:
+            return Response({"ret_code":-1, "message":"openid为空"})
+        activity = Activity.objects.filter(code=phoneRewardRecord.activity_code).first()
+        if not activity:
+            return Response({"ret_code":-1, "message":"没有相应活动"})
+
+        now = timezone.now()
+        if activity.start_at >= now:
+            return Response({"ret_code":3, "message":"活动还未开始"})
+        if activity.end_at <= now:
+            return Response({"ret_code":3, "message":"活动已过期"})
+        if activity.is_stopped:
+            return Response({"ret_code":2, "message":"活动已经暂停了"})
+
+        phone = request.DATA.get('phone')
+        if not phone:
+            return Response({"ret_code":-1, "message":"phone为空"})
+
+        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        if userprofile:
+            device = split_ua(self.request)
+            device_type = device['device_type']
+            res = sendWechatPhoneReward(userprofile.user, device_type)
+            if res['ret_code']==0:
+                phoneRewardRecord.phone = phone
+                phoneRewardRecord.save()
+            return Response(res)
+        phoneRewardRecord.phone = phone
+        phoneRewardRecord.save()
+        return Response({"ret_code":0, "message":"success"})
+
