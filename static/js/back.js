@@ -134,7 +134,7 @@
           title: '温馨提示',
           msg: xhr.message,
           callback_ok:function(){
-              window.location.href='/accounts/setting/';
+              window.location.href='/accounts/safe/';
           }
         });
       });
