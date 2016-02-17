@@ -15,7 +15,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal, validate) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
     var $target_more, acount_product, buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, purchaseFun, showPayInfo, showPayTip, toThousands, validator;
     isFirst = true;
     getFormatedNumber = function(num) {
