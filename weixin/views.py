@@ -494,12 +494,15 @@ class WeixinRegisterBindCard(TemplateView):
         #user = self.request.user
         pay_info = PayInfo.objects.filter(user=self.request.user).first()
         recharge = None
-        if pay_info.status == "失败":
-            recharge = False
-        elif pay_info.status == "成功":
+        if pay_info == None:
             recharge = True
         else:
-            pass
+            if pay_info.status == "失败":
+                recharge = False
+            elif pay_info.status == "成功":
+                recharge = True
+            else:
+                pass
 
         return {
             'recharge': recharge
