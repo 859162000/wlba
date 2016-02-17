@@ -15,34 +15,8 @@
     }
   });
 
-  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal, validate) {
+  require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
     var $target_more, acount_product, buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, purchaseFun, showPayInfo, showPayTip, toThousands, validator;
-    $.validator.addMethod('dividableBy100', function(value, element) {
-      return value % 100 === 0 && !/\./ig.test(value);
-    }, '请输入100的整数倍');
-    $.validator.addMethod('integer', function(value, element) {
-      var notInteger;
-      notInteger = /\.\d*[^0]+\d*$/ig.test(value);
-      return !($.isNumeric(value) && notInteger);
-    }, '请输入整数');
-    $.validator.addMethod('positiveNumber', function(value, element) {
-      return Number(value) > 0;
-    }, '请输入有效金额');
-    $.validator.addMethod('threshold', function(value, element) {
-      var obj, selectedData, _i, _len;
-      for (_i = 0, _len = ddData.length; _i < _len; _i++) {
-        obj = ddData[_i];
-        if (obj.value === $('.dd-selected-value').val() * 1) {
-          selectedData = obj;
-          break;
-        }
-      }
-      if (selectedData) {
-        return $('#id_amount').val() - selectedData.invest_amount >= 0;
-      } else {
-        return true;
-      }
-    }, '投资金额未达到理财券门槛');
     isFirst = true;
     getFormatedNumber = function(num) {
       return Math.round(num * 100) / 100;
@@ -125,6 +99,32 @@
       }
       return $('.payment').html(html).show();
     };
+    $.validator.addMethod('dividableBy100', function(value, element) {
+      return value % 100 === 0 && !/\./ig.test(value);
+    }, '请输入100的整数倍');
+    $.validator.addMethod('integer', function(value, element) {
+      var notInteger;
+      notInteger = /\.\d*[^0]+\d*$/ig.test(value);
+      return !($.isNumeric(value) && notInteger);
+    }, '请输入整数');
+    $.validator.addMethod('positiveNumber', function(value, element) {
+      return Number(value) > 0;
+    }, '请输入有效金额');
+    $.validator.addMethod('threshold', function(value, element) {
+      var obj, selectedData, _i, _len;
+      for (_i = 0, _len = ddData.length; _i < _len; _i++) {
+        obj = ddData[_i];
+        if (obj.value === $('.dd-selected-value').val() * 1) {
+          selectedData = obj;
+          break;
+        }
+      }
+      if (selectedData) {
+        return $('#id_amount').val() - selectedData.invest_amount >= 0;
+      } else {
+        return true;
+      }
+    }, '投资金额未达到理财券门槛');
     if ($('#id_amount').attr('p2p-type') === '票据') {
       opt = {
         required: true,
