@@ -1,0 +1,49 @@
+- load formatters
+doctype html
+html(style="background:#9a477d")
+  head
+    title 网利宝
+    include include/app_head
+  body
+    .xingmei-warp
+      .extension-banner
+        img(src='/static/imgs/mobile_activity/app_xm/banner.jpg')
+      .xingmei-main
+        .one
+        h1(style="margin-top:1rem") 兑换码使用流程
+        .xm-liucheng
+        h1(style="margin-top:1rem") 投资流程
+        .ele-liucheng
+        h1 活动规则
+        .extension-rules
+        .step-title
+        ol.rules-ol#rules-ol(style="color:#989493;padding:0 0.5rem 2rem 1.075rem")
+          li 新用户注册为网利宝会员将获得5元抵用券1张，限量1000张；
+          li 新用户单笔首次投资500元及以上送2张2D/3D通用影券，新用户老用户优惠不叠加且只有一次获取机会；
+          li 网利宝老用户单笔投资1000元及以上送1张2D/3D通用影券，新用户老用户优惠不叠加且只有一次获取机会；
+          li 手机号为网利宝唯一帐号，星美用户均可参与活动；
+          li 观影票统一以网利宝站内信形式发送给用户，敬请查看；
+          li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证一经核实将取消获奖资格；
+          li 本活动在法律允许范围内归网利科技所有。
+        .extension-footer#extension-footer(style="padding-bottom:1.2rem;margin:0")
+          .footer-item
+            img(src="/static/imgs/mobile_activity/extension/extension_xiu1.png")
+            p <em>IDG资本</em>百亿市值<br/><em>A股上市公司</em>入股
+          .footer-item
+            img(src="/static/imgs/mobile_activity/extension/extension_xiu2.png")
+            p 账户资金安全<br/>由<em>阳光保险</em>承保
+          .footer-item
+            img(src="/static/imgs/mobile_activity/extension/extension_xiu3.png")
+            p 第三方<br/><em>100%</em>本息保障
+
+        script.
+            var inputDom = document.getElementById('submit-put'),
+                urlDom = document.getElementById('submit-url') ;
+              urlDom.addEventListener('touchend', function () {
+                if (inputDom.value === '') {
+                  return alert('请输入手机号!');
+                }
+                window.location.href = '/weixin/regist/?phone='+inputDom.value;
+              });
+
+          

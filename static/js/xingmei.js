@@ -13,10 +13,18 @@
   require(['jquery','activityRegister'], function($,re) {
     //注册
     re.activityRegister.activityRegisterInit({
-        registerTitle :'注册送10元电影券',    //注册框标语
+        registerTitle :'注册送5元电影券',    //注册框标语
         isNOShow : '1',
-        buttonFont: '注册领电影券'
+        buttonFont: '注册领电影券',
+        hasCallBack: true,
+        callBack: function(){
+          window.location.href='/';
+        }
     });
+    if($('#ganjiwang-model')){
+      $('#ganjiwang-model,#ganjiwang-welcome').hide()
+    }
+    $('.xun-p a').attr('href','/accounts/login/?next=/activity/xingmei_two/');
     $('.reg-btn').click(function(){
         $('body,html').animate({scrollTop: 0}, 600);
         $('#small-zc').hide();
@@ -25,12 +33,21 @@
     //提醒注册
     $('.reg').on('click',function(){
       $('#small-zc').show();
-      $('#xl-aug-success').show()
+      $('#xl-aug-success').show();
+      $('#xl-aug-fail').hide();
     })
     //关闭模态框
-    $('.first-xl-off2').on('click',function(){
+    $('.first-xl-off2,.fail-btn').on('click',function(){
       $('#small-zc').hide();
-      $('#xl-aug-success').hide()
+      $('#xl-aug-success').hide();
+      $('#xl-aug-fail').hide();
+    })
+    //提示
+    $('.btn-fail').on('click',function(){
+      $('#small-zc').show();
+      $('#xl-aug-success').hide();
+      $('#xl-aug-fail').show()
+
     })
     //模态口
     var body_h=$('body').height();

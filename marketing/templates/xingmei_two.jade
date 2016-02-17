@@ -1,0 +1,161 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/xingmei_two.css")
+  body(style="background:#9a477d")
+    include include/activityTopNew
+    //baidu
+    .xingmei-content
+      .xl-backtop(style="z-index:99")
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+        .erweima
+      .xm-prize
+        .prize
+          b.xm-com.xm-icon1
+          p 注册成为网利宝用户
+            br
+            |送
+            span 5元
+            |星美观影抵扣券
+        .prize
+          b.xm-com.xm-icon2
+          p 新用户单笔首次投资500元及以上
+            br
+            |送
+            span 2张
+            |2D/3D通用兑换券
+        .prize(style="margin-right:0px")
+          b.xm-com.xm-icon3
+          p 网利宝老用户单笔投资1000元及以上
+            br
+            |送
+            span 1张
+            |2D/3D通用兑换券
+        if user.is_authenticated
+          .xm-btn.btn-fail 立即投资
+        else
+          .xm-btn.reg 立即投资
+      .xl-box1
+        h2.xl-jiang
+          .xl-center.seven-center
+            | 兑换码使用流程
+        .prize-liucheng
+          .prize-tit 选座下单
+            br
+            span Choose a place an order
+          .prize-tit(style="left:457px;top:35px") 输入电影
+            br
+            |兑换码支付
+            br
+            span(style="top:-5px") Enter film exchange code payment
+          .prize-tit(style="left:824px;top:35px") 影城
+            br
+            |取票观影
+            br
+            span(style="top:-5px") Studios collect the tickets viewing
+      .xl-box1
+        h2.xl-jiang
+          .xl-center.seven-center
+            | 投资流程
+        .content-process
+          .content-pptv(style="background:#9a477d;max-width:1101px")
+            .process-text(style="height:32px;padding:0")
+            .process-list
+              .circle-free.circle-float
+                .close
+                .last
+                .next
+                img(src="/static/images/pptv/free.jpg")
+              .triangle-start
+                .start-cont
+              .circle
+                .circle-body.free
+                .circle-txt 注册网利宝账号
+                .circle-txt2
+              .triangle-center(style="width:0px")
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.recharge
+                .circle-txt 充值资金到账户
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.tender
+                .circle-txt 选择投资标
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.collec
+                .circle-txt 获得收益和奖励
+              .triangle-end(style="width:120px")
+                .end-cont
+      .xl-box1(style="margin-top:0")
+        span.tu2.xingmei-com.six
+        h2.xl-jiang
+          .xl-center.seven-center
+            | 活动规则
+        ol
+          li 新用户注册为网利宝会员将获得5元抵用券1张，限量1000张；
+          li 新用户单笔首次投资500元及以上送2张2D/3D通用影券，新用户老用户优惠不叠加且只有一次获取机会；
+          li 网利宝老用户单笔投资1000元及以上送1张2D/3D通用影券，新用户老用户优惠不叠加且只有一次获取机会；
+          li 手机号为网利宝唯一帐号，星美用户均可参与活动；
+          li 观影票统一以网利宝站内信形式发送给用户，敬请查看；
+          li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证一经核实将取消获奖资格；
+          li 本活动在法律允许范围内归网利科技所有。
+      .xl-box1(style="height:259px")
+        .san-new(style="background:#9a477d")
+          .san-new-content.container(style="padding:10px 0 0")
+            .row.gold-dl-row
+              .san-span
+                dl
+                  dt.com.com-trust(style="background: url('/static/imgs/pc_activity/ganjiwang/safe1.png') no-repeat center")
+                  dd.pp-zi
+                    p
+                      b IDG资本
+                      br
+                      | 百亿市值
+                      b A股上市公司
+                      | 入股
+              .san-span
+                dl
+                  dt.com.com-security(style="background: url('/static/imgs/pc_activity/ganjiwang/safe2.png') no-repeat center")
+                  dd.pp-zi
+                    p 账户资金安全
+                      br
+                      | 由
+                      b 阳光保险
+                      | 承保
+              .san-span
+                dl
+                  dt.com.com-authority(style="background: url('/static/imgs/pc_activity/three.png') no-repeat center")
+                  dd.pp-zi
+                    p 第三方
+                      br
+                      b 100%
+                      | 本息保障
+  include global/g_footer
+  #small-zc
+  #xl-aug-success
+    span.first-xl-off2 ×
+    p
+      span.xingmei-com.seven
+      |请您先注册
+    .reg-btn 注册
+  #xl-aug-fail
+    span.first-xl-off2 ×
+    p
+      | 对不起,您不符合领取规则
+    .fail-btn 确定
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/xingmei.js'])
