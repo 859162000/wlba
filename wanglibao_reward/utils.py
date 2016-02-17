@@ -100,5 +100,5 @@ def getRewardsByActivity(code):
             experience = ExperienceEvent.objects.filter(invalid=False, pk=activity_rule.redpack, available_at__lt=now, unavailable_at__gt=now).first()
             if experience:
                 rewards.get('experience').append({'experience_event':experience})
-
+    return rewards
 
