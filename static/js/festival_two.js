@@ -631,9 +631,10 @@ $(function(){
         });
         wx.ready(function () {
             var winHost = window.location.href;
-            var host = winHost.substring(0,winHost.indexOf('/activity')),
+            var host = winHost.substring(0,winHost.indexOf('/activity'));
+            host = host ? host : "https://staging.wanglibao.com/";
 			//var host = 'https://staging.wanglibao.com',
-                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+            var shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = host + '/activity/festival_two/',
                 shareMainTit = shareTit,
                 shareBody = '闹元宵，吃大餐，抽红包财源滚滚来';
