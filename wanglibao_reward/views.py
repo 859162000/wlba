@@ -2282,39 +2282,42 @@ class LanternBanquetTemplate(TemplateView):
             redpack_event = redpack_dict.get('redpack_event')
             redpack_text = "None"
             if redpack_event.rtype == 'interest_coupon':
-                rewards.get('coupon').append({'amount':int(redpack_event.amount), 'invest_amount':convert_to_10k(redpack_event.invest_amount)})
+                rewards.get('coupon').append({'amount':int(redpack_event.amount)})
                 # redpack_text = "%s%%加息券"%redpack_event.amount
             if redpack_event.rtype == 'percent':
                 # redpack_text = "%s%%百分比红包"%redpack_event.amount
-                rewards.get('redpack').append({'amount':redpack_event.amount, 'invest_amount':convert_to_10k(redpack_event.invest_amount)})
+                rewards.get('redpack').append({'amount':redpack_event.amount, 'invest_amount':convert_to_10k(redpack_event.invest_amount)[:-1]})
             if redpack_event.rtype == 'direct':
                 # redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
-                rewards.get('redpack').append({'amount':int(redpack_event.amount), 'invest_amount':convert_to_10k(redpack_event.invest_amount)})
+                rewards.get('redpack').append({'amount':int(redpack_event.amount), 'invest_amount':convert_to_10k(redpack_event.invest_amount)[:-1]})
 
         for experience_dict in experiences:
             experience_event = experience_dict.get('experience_event')
             rewards.get('experience').append({"amount":int(experience_event.amount)})
 
         event = RedPackEvent.objects.filter(id=redpack_id).first()
-
-        return context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
+        context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
+        print context
+        return context
 
 
     def dispatch(self, request, *args, **kwargs):
-        code = request.GET.get('code')
-        state = request.GET.get('state')
-        try:
-            if code and state:
-                account = WeixinAccounts.getByOriginalId(state)
-                request.session['account_key'] = account.account_key
-                oauth = WeChatOAuth(account.app_id, account.app_secret, )
-                res = oauth.fetch_access_token(code)
-                openid = res.get('openid')
-                request.session['lantern_openid'] = openid
-            else:
-                return Response({'ret_code':-1, "message":"code, state error"})
-        except WeChatException,e:
-                return Response({'ret_code':e.errcode, 'message':e.errmsg})
+        openid = request.GET.get('openid')
+        request.session['lantern_openid'] = openid
+        # code = request.GET.get('code')
+        # state = request.GET.get('state')
+        # try:
+        #     if code and state:
+        #         account = WeixinAccounts.getByOriginalId(state)
+        #         request.session['account_key'] = account.account_key
+        #         oauth = WeChatOAuth(account.app_id, account.app_secret, )
+        #         res = oauth.fetch_access_token(code)
+        #         openid = res.get('openid')
+        #         request.session['lantern_openid'] = openid
+        #     else:
+        #         return Response({'ret_code':-1, "message":"code, state error"})
+        # except WeChatException,e:
+        #         return Response({'ret_code':e.errcode, 'message':e.errmsg})
         return super(LanternBanquetTemplate, self).dispatch(request, *args, **kwargs)
 
 class Lantern_QMReward(APIView):
