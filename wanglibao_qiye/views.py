@@ -55,26 +55,33 @@ class EnterpriseProfileUploadApi(APIView):
                     file_suffix = file_name.split('.')[-1] or 'png'
                     filename = 'enterprise/images/%s_%s.%s' % (user.id, field_name, file_suffix)
                     file_content = request.FILES[field_name]
+                    picture_max_size = 2097152
+                    if file_content.size <= picture_max_size:
+                        try:
+                            AliOSSStorageForCover().save(filename, file_content)
+                        except Exception, e:
+                            logger.info('aliyun save faild with user[%s], fieldname[%s]' % (user.id, filename))
+                            logger.info(e)
 
-                    try:
-                        AliOSSStorageForCover().save(filename, file_content)
-                    except Exception, e:
-                        logger.info('aliyun save faild with user[%s], fieldname[%s]' % (user.id, filename))
-                        logger.info(e)
+                            response_data = {
+                                'filename': None,
+                                'message': u'上传失败',
+                                'ret_code': 40001,
+                            }
+                        else:
+                            response_data = {
+                                'filename': filename + '?' + str(time.time()),
+                                'message': 'success',
+                                'ret_code': 10000,
+                            }
 
-                        response_data = {
-                            'filename': None,
-                            'message': u'上传失败',
-                            'ret_code': 40001,
-                        }
+                            return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
                     else:
                         response_data = {
-                            'filename': filename + '?' + str(time.time()),
-                            'message': 'success',
-                            'ret_code': 10000,
+                            'filename': None,
+                            'message': u'上传失败,图片大小不能超过2M',
+                            'ret_code': 40002,
                         }
-
-                        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
                 response_data = {
                     'filename': None,

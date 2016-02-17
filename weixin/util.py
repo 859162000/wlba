@@ -44,8 +44,8 @@ def get_fwh_login_url(next=None):
             return FWH_LOGIN_URL
 
 
-if not FWH_LOGIN_URL:
-    get_fwh_login_url()
+#if not FWH_LOGIN_URL:
+#    get_fwh_login_url()
 
 
 def redirectToJumpPage(message, next=None):
