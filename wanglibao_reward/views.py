@@ -2393,5 +2393,5 @@ class Lantern_FetchRewardAPI(APIView):
             return Response(res)
         phoneRewardRecord.phone = phone
         phoneRewardRecord.save()
-        return Response({"ret_code":0, "message":"success"})
+        return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
 
