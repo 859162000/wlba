@@ -2302,22 +2302,20 @@ class LanternBanquetTemplate(TemplateView):
 
 
     def dispatch(self, request, *args, **kwargs):
-        openid = request.GET.get('openid')
-        request.session['lantern_openid'] = openid
-        # code = request.GET.get('code')
-        # state = request.GET.get('state')
-        # try:
-        #     if code and state:
-        #         account = WeixinAccounts.getByOriginalId(state)
-        #         request.session['account_key'] = account.account_key
-        #         oauth = WeChatOAuth(account.app_id, account.app_secret, )
-        #         res = oauth.fetch_access_token(code)
-        #         openid = res.get('openid')
-        #         request.session['lantern_openid'] = openid
-        #     else:
-        #         return Response({'ret_code':-1, "message":"code, state error"})
-        # except WeChatException,e:
-        #         return Response({'ret_code':e.errcode, 'message':e.errmsg})
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        try:
+            if code and state:
+                account = WeixinAccounts.getByOriginalId(state)
+                request.session['account_key'] = account.account_key
+                oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                res = oauth.fetch_access_token(code)
+                openid = res.get('openid')
+                request.session['lantern_openid'] = openid
+            else:
+                return Response({'ret_code':-1, "message":"code, state error"})
+        except WeChatException,e:
+                return Response({'ret_code':e.errcode, 'message':e.errmsg})
         return super(LanternBanquetTemplate, self).dispatch(request, *args, **kwargs)
 
 class Lantern_QMReward(APIView):
