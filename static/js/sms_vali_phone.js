@@ -121,11 +121,11 @@
             }
 
             if(new_phone_val.length!=11){
-                $('.status_2 .false').show().text('新手机号码有误').prev().hide();
-                $('.status_2').show();
+                $('.status_4 .false').show().text('新手机号码有误').prev().hide();
+                $('.status_4').show();
                 new_phone_num = false;
             }else{
-                $('.status_2').hide();
+                $('.status_4').hide();
                 new_phone_num = true;
             }
 
