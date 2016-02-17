@@ -97,13 +97,10 @@
 
     //请求接口,判断用户领奖的状态
     $.ajax({
-      type: 'GET',
+      type: 'POST',
       url: '/api/activity/reward/?activity=xm2',
       success: function(data){
-        console.log(data)
-      },
-      error: function(xhr, type){
-        //alert('Ajax error!')
+        console.log(data.message)
       }
     })
 
