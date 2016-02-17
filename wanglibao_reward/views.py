@@ -2223,6 +2223,7 @@ class LanternBanquetTemplate(TemplateView):
                 return Response({'ret_code':-1, "message":"code, state error"})
         except WeChatException,e:
                 return Response({'ret_code':e.errcode, 'message':e.errmsg})
+        return super(LanternBanquetTemplate, self).dispatch(request, *args, **kwargs)
 
 class Lantern_QMReward(APIView):
     permission_classes = ()
