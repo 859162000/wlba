@@ -2257,18 +2257,33 @@ class Lantern_QMReward(APIView):
                 WechatPhoneRewardRecord.objects.create(
                         openid = openid
                     )
-            phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+            with transaction.atomic():
+                phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
 
-            if phoneRewardRecord.activity_code and phoneRewardRecord.activity_code != code:
-                phoneRewardRecord.activity_code = code
-                phoneRewardRecord.save()
-            if not phoneRewardRecord.activity_code:
-                phoneRewardRecord.activity_code = code
-                phoneRewardRecord.save()
-        except:
+                if phoneRewardRecord.activity_code and phoneRewardRecord.activity_code != code:
+                    phoneRewardRecord.activity_code = code
+                    phoneRewardRecord.save()
+                if not phoneRewardRecord.activity_code:
+                    phoneRewardRecord.activity_code = code
+                    phoneRewardRecord.save()
+        except IntegrityError, e:
             pass
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
-        return Response({"ret_code":0, "rewards":rewards})
+        redpacks = rewards.get('redpack')
+        experiences = rewards.get('experience')
+        reward_txt_list = []
+        for redpack_event in redpacks:
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                redpack_text = "%s%%百分比红包"%redpack_event.amount
+            if redpack_event.rtype == 'direct':
+                redpack_text = "%s元红包"%int(redpack_event.amount)
+            reward_txt_list.append(redpack_text)
+        for experience_event in experiences:
+            reward_txt_list.append('%s元体验金'%int(experience_event.amount))
+        return Response({"ret_code":0, "rewards":reward_txt_list})
 
 
 class Lantern_HMReward(APIView):
@@ -2318,18 +2333,20 @@ class Lantern_HMReward(APIView):
                 WechatPhoneRewardRecord.objects.create(
                         openid = openid
                     )
-            phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
-            redpack_id_str = str(redpack_id)
-            if phoneRewardRecord.redpack_event_ids and phoneRewardRecord.redpack_event_ids != redpack_id_str:
-                phoneRewardRecord.redpack_event_ids = redpack_id_str
-                phoneRewardRecord.save()
-            if not phoneRewardRecord.redpack_event_ids:
-                phoneRewardRecord.redpack_event_ids = redpack_id_str
-                phoneRewardRecord.save()
-        except:
+            with transaction.atomic():
+                phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+                redpack_id_str = str(redpack_id)
+                if phoneRewardRecord.redpack_event_ids and phoneRewardRecord.redpack_event_ids != redpack_id_str:
+                    phoneRewardRecord.redpack_event_ids = redpack_id_str
+                    phoneRewardRecord.save()
+                if not phoneRewardRecord.redpack_event_ids:
+                    phoneRewardRecord.redpack_event_ids = redpack_id_str
+                    phoneRewardRecord.save()
+        except IntegrityError, e:
             pass
         event = RedPackEvent.objects.filter(id=redpack_id).first()
-        return Response({"ret_code":0, "redpack":event})
+
+        return Response({"ret_code":0, "redpack":{'amount':event.amount, 'invest_amount':event.invest_amount}})
 
 
 class Lantern_FetchRewardAPI(APIView):
