@@ -100,19 +100,19 @@
             var password_val = $('.password').val();
             var id_number_val = $('.id_number').val();
             var new_phone_val = $('.new_phone').val();
-            var id_true,pass_true,post_data,card_no;
+            var id_true,pass_true,new_phone_num,post_data,card_no;
 
             if(id_number_val.length=='15'||id_number_val.length=='18'){
                 $('.status_3').hide();
                 id_true = true;
             }else{
-                $('.status_3 .false').show().text('身份证位数错误').prev().hide();
+                $('.status_3 .false').show().text('身份证信息有误').prev().hide();
                 $('.status_3').show();
                 id_true = false;
             }
 
             if(password_val.length<6){
-                $('.status_2 .false').show().text('密码位数错误').prev().hide();
+                $('.status_2 .false').show().text('账户登录密码有误').prev().hide();
                 $('.status_2').show();
                 pass_true = false;
             }else{
@@ -120,7 +120,16 @@
                 pass_true = true;
             }
 
-            if(pass_true&&id_true){
+            if(new_phone_val.length!=11){
+                $('.status_2 .false').show().text('新手机号码有误').prev().hide();
+                $('.status_2').show();
+                new_phone_num = false;
+            }else{
+                $('.status_2').hide();
+                new_phone_num = true;
+            }
+
+            if(pass_true&&id_true&&new_phone_num){
 
 
                 if($('input.bind_card').length>0){
