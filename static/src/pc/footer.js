@@ -21,7 +21,12 @@ require(['jquery'], function( $ ) {
                 })
             }
         }).fail(function(data){
-           window.location.href = '/qiye/info/'
+            var result = JSON.parse(data.responseText)
+            if(result.ret_code != 20001){
+                window.location.href = '/qiye/info/'
+            }else{
+                window.location.href = '/accounts/home/'    
+            }
         })
     }
     $('#investment,#checkUserType').on('click',function(){

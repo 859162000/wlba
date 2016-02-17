@@ -1293,11 +1293,14 @@ class PayinfoView(APIView):
         user = request.user
         pay_info = PayInfo.objects.filter(user=request.user).first()
         messages = {}
-        if pay_info.status == "失败":
-            messages['recharge'] = False
-        elif pay_info.status == "成功":
+        if pay_info == None:
             messages['recharge'] = True
         else:
-            pass
+            if pay_info.status == "失败":
+                messages['recharge'] = False
+            elif pay_info.status == "成功":
+                messages['recharge'] = True
+            else:
+                pass
         
         return Response(json.dumps(messages))
