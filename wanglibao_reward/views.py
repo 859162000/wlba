@@ -2273,7 +2273,8 @@ class Lantern_QMReward(APIView):
         redpacks = rewards.get('redpack')
         experiences = rewards.get('experience')
         reward_txt_list = []
-        for redpack_event in redpacks:
+        for redpack_dict in redpacks:
+            redpack_event = redpack_dict.get('redpack_event')
             redpack_text = "None"
             if redpack_event.rtype == 'interest_coupon':
                 redpack_text = "%s%%加息券"%redpack_event.amount
@@ -2282,7 +2283,8 @@ class Lantern_QMReward(APIView):
             if redpack_event.rtype == 'direct':
                 redpack_text = "%s元红包"%int(redpack_event.amount)
             reward_txt_list.append(redpack_text)
-        for experience_event in experiences:
+        for experience_dict in experiences:
+            experience_event = experience_dict.get('experience_event')
             reward_txt_list.append('%s元体验金'%int(experience_event.amount))
         return Response({"ret_code":0, "rewards":reward_txt_list})
 
@@ -2360,10 +2362,13 @@ class Lantern_FetchRewardAPI(APIView):
         openid = request.session.get('lantern_openid')
         if not openid:
             return Response({"ret_code":-1, "message":"openid为空"})
+        phone = request.DATA.get('phone')
+        if not phone:
+            return Response({"ret_code":-1, "message":"phone为空"})
         now_date = datetime.date.today()
-        phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, phone=phone, create_date=now_date).first()
         if not phoneRewardRecord:
-            return Response({"ret_code":-1, "message":"openid为空"})
+            return Response({"ret_code":-1, "message":"记录为空"})
         activity = Activity.objects.filter(code=phoneRewardRecord.activity_code).first()
         if not activity:
             return Response({"ret_code":-1, "message":"没有相应活动"})
@@ -2375,10 +2380,6 @@ class Lantern_FetchRewardAPI(APIView):
             return Response({"ret_code":3, "message":"活动已过期"})
         if activity.is_stopped:
             return Response({"ret_code":2, "message":"活动已经暂停了"})
-
-        phone = request.DATA.get('phone')
-        if not phone:
-            return Response({"ret_code":-1, "message":"phone为空"})
 
         userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
         if userprofile:
