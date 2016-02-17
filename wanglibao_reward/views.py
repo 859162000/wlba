@@ -53,6 +53,7 @@ from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import  WeChatException
+from wanglibao.templatetags.formatters import convert_to_10k
 import traceback
 logger = logging.getLogger('wanglibao_reward')
 
@@ -2281,7 +2282,7 @@ class Lantern_QMReward(APIView):
             if redpack_event.rtype == 'percent':
                 redpack_text = "%s%%百分比红包"%redpack_event.amount
             if redpack_event.rtype == 'direct':
-                redpack_text = "%s元红包"%int(redpack_event.amount)
+                redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
             reward_txt_list.append(redpack_text)
         for experience_dict in experiences:
             experience_event = experience_dict.get('experience_event')
