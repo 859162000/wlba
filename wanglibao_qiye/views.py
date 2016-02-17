@@ -7,10 +7,12 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.views.generic import TemplateView
 from django.http import HttpResponse
+from django.contrib.auth.hashers import make_password
 from file_storage.storages import AliOSSStorageForCover
 from wanglibao_pay.models import Bank
 from .models import EnterpriseUserProfile
 from .forms import EnterpriseUserProfileForm
+from wanglibao_profile.backends import _trade_pwd_lock_clear
 
 logger = logging.getLogger(__name__)
 
@@ -164,7 +166,8 @@ class EnterpriseProfileCreateApi(APIView):
                     e_profile.bank = form.cleaned_data['bank']
                     e_profile.save()
 
-                    user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_pwd']
+                    user.wanglibaouserprofile.trade_pwd = make_password(form.cleaned_data['trade_pwd'])
+                    _trade_pwd_lock_clear(user.wanglibaouserprofile)
                     user.wanglibaouserprofile.save()
 
                     response_data = {
@@ -205,7 +208,6 @@ class EnterpriseProfileEditView(TemplateView):
             try:
                 e_profile = EnterpriseUserProfile.objects.get(user=user)
                 e_profile.banks = get_have_company_channel_banks()
-                e_profile.trade_pwd = user.wanglibaouserprofile.trade_pwd
                 response_data = {
                     'data': e_profile,
                     'message': 'success',
@@ -286,12 +288,6 @@ class EnterpriseProfileUpdateApi(APIView):
                             change_list.append(u'[公司地址]')
                             profile_has_changed = True
 
-                        if user.wanglibaouserprofile.trade_pwd != form_data['trade_pwd']:
-                            user.wanglibaouserprofile.trade_pwd = form_data['trade_pwd']
-                            user.wanglibaouserprofile.save()
-                            change_list.append(u'[交易密码]')
-                            profile_has_changed = True
-
                         if e_profile.status == u'审核失败' and not user.wanglibaouserprofile.id_valid_time:
                             if e_profile.bank_card_no != form_data['company_account']:
                                 e_profile.bank_card_no = form_data['company_account']
@@ -323,7 +319,6 @@ class EnterpriseProfileUpdateApi(APIView):
                                 change_list.append(u'[所属银行]')
                                 profile_has_changed = True
 
-                        # FixMe,交易码变更是否需要重新审核
                         if profile_has_changed:
                             e_profile.description = u'待审核字段:' + u'、'.join(change_list)
                             e_profile.status = u'待审核'
