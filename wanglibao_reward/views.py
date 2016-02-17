@@ -2367,7 +2367,7 @@ class Lantern_FetchRewardAPI(APIView):
         if not phone:
             return Response({"ret_code":-1, "message":"phone为空"})
         now_date = datetime.date.today()
-        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, phone=phone, create_date=now_date).first()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
         if not phoneRewardRecord:
             return Response({"ret_code":-1, "message":"记录为空"})
         activity = Activity.objects.filter(code=phoneRewardRecord.activity_code).first()
