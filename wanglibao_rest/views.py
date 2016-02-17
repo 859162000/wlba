@@ -1743,6 +1743,18 @@ class OauthUserRegisterApi(APIView):
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
+class CoopDataSyncApi(APIView):
+    """
+    渠道中心平台数据同步接口
+    """
+
+    permission_classes = ()
+
+    def post(self, request):
+        data = request.POST
+        _from = ''
+
+
 class CoopDataDispatchApi(APIView):
     """
     渠道中心平台数据调度接口
@@ -1752,7 +1764,14 @@ class CoopDataDispatchApi(APIView):
 
     def post(self, request):
         data = request.POST
-        channel_code = data.get('channel_code')
+        channel = data.get('channel')
         sign = data.get('sign')
         act = data.get('act')
-        
+
+        if channel and sign and act:
+            pass
+        else:
+            response_data = {
+                'ret_code': 50001,
+                'message': u'非法请求',
+            }
