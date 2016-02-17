@@ -1066,6 +1066,68 @@ class ZGDXRegister(CoopRegister):
                 self.zgdx_call_back(user, plat_offer_id, order_id)
 
 
+class XingMeiRegister(CoopRegister):
+    def __init__(self, request):
+        super(XingMeiRegister, self).__init__(request)
+        self.c_code = 'xm2'
+        self.invite_code = 'xm2'
+
+    def purchase_call_back(self, user, order_id):
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    xm2 = activity['rock_finance']
+                    first_p2p_amount = xm2['first_p2p_amount']
+                    tickets = xm2["ticket_amount"]
+                    start_time = xm2["start_time"]
+                    end_time = xm2["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        if p2p_record and p2p_record.order_id == int(order_id):
+
+            # 1: 如果票数到600，直接跳出
+            counts = ActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+            if counts >= tickets:
+                logger.debug(u'票已经发完了, %s' % (counts))
+                return
+
+            # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
+            now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+            if now < start_time or now > end_time:
+                logger.debug(u"start_time:%s, end_time:%s, now:%s" % (start_time, end_time, now))
+                return
+
+            # 4: 如果投资额度不够，直接跳出
+            if p2p_record.amount < first_p2p_amount:
+                logger.debug(u"p2p_record.amount:%s, p2p_amount:%s" % (p2p_record.amount, first_p2p_amount))
+                return
+
+            try:
+                activity_reward = ActivityReward.objects.create(
+                        activity='xm2',
+                        order_id=order_id,
+                        user=user,
+                        p2p_amount=p2p_record.amount,
+                        reward=None,
+                        has_sent=False, #当用户领奖后,变成True, reward填上相应的奖品
+                        left_times=1,
+                        join_times=1,
+                )
+            except Exception, reason:
+                logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
+                raise Exception(u"生成获奖记录异常")
+
 class RockFinanceRegister(CoopRegister):
     def __init__(self, request):
         super(RockFinanceRegister, self).__init__(request)
@@ -1543,7 +1605,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister, XunleiMobileRegister, ]
+                          YZCJRegister, RockFinanceRegister, XunleiMobileRegister, XingMeiRegister]
 
 #######################第三方用户查询#####################
 
