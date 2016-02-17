@@ -100,7 +100,16 @@
             var password_val = $('.password').val();
             var id_number_val = $('.id_number').val();
             var new_phone_val = $('.new_phone').val();
-            var id_true,pass_true,new_phone_num,post_data,card_no;
+            var validate_code_true,id_true,pass_true,new_phone_num,post_data,card_no;
+
+            if(validate_code_val.length=='6'){
+                $('.status_1').hide();
+                validate_code_true = true;
+            }else{
+                $('.status_1 .false').show().text('验证码错误').prev().hide();
+                $('.status_1').show();
+                validate_code_true = false;
+            }
 
             if(id_number_val.length=='15'||id_number_val.length=='18'){
                 $('.status_3').hide();
@@ -129,7 +138,7 @@
                 new_phone_num = true;
             }
 
-            if(pass_true&&id_true&&new_phone_num){
+            if(pass_true&&id_true&&new_phone_num&&validate_code_val){
 
 
                 if($('input.bind_card').length>0){
