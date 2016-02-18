@@ -74,7 +74,8 @@ block main
                 .aa.trade_pwd_is_set(style='display:none')
                     .span5
                       input.withdraw-input(type='text',onfocus="this.type='password'", name='trade_pwd', placeholder='请输入交易密码')
-                    a(href='javascript:void(0)',tag='1').forget-pwd 忘记交易密码？
+                    if user.wanglibaouserprofile.utype != '3'
+                        a(href='javascript:void(0)',tag='1').forget-pwd 忘记交易密码？
                 .bb.trade_pwd_is_set_no(style='display:none')
                     .bank-counts(style='display:none')
                         a(href='javascript:void(0)',tag='2').forget-pwd 设置交易密码
