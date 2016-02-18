@@ -80,7 +80,8 @@ class BankListView(TemplateView):
         default_bank = Bank.get_deposit_banks().filter(
             name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
-        bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        #bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        bank_num = 20
         context.update({
             'default_bank': default_bank,
             'banks': Bank.get_deposit_banks()[:bank_num],
@@ -1287,20 +1288,19 @@ class UnbindCardTemplateView(TemplateView):
 
 
 
-class PayinfoView(APIView):
+class CheckRechargePayinfoView(APIView):
+    '''检查用户是否成功充值过'''
     permission_classes = (IsAuthenticated, )
     def post(self, request):
         user = request.user
-        pay_info = PayInfo.objects.filter(user=request.user).first()
+        pay_info = PayInfo.objects.filter(user=request.user)
         messages = {}
         if pay_info == None:
             messages['recharge'] = True
         else:
-            if pay_info.status == "失败":
-                messages['recharge'] = False
-            elif pay_info.status == "成功":
+            if pay_info.filter(status="成功"):
                 messages['recharge'] = True
             else:
-                pass
+                messages['recharge'] = False
         
         return Response(json.dumps(messages))

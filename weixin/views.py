@@ -499,12 +499,10 @@ class WeixinRegisterBindCard(TemplateView):
         if pay_info == None:
             recharge = True
         else:
-            if pay_info.status == "失败":
-                recharge = False
-            elif pay_info.status == "成功":
+            if pay_info.filter(status="成功"):
                 recharge = True
             else:
-                pass
+                recharge = False
 
         return {
             'recharge': recharge
