@@ -98,7 +98,8 @@
     //请求接口,判断用户领奖的状态
     $.ajax({
       type: 'POST',
-      url: '/api/activity/reward/?activity=xm2',
+      data: {activity:'xm2'},
+      url: '/api/activity/reward/',
       success: function(data){
         console.log(data.message)
       }
