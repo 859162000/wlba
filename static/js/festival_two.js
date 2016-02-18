@@ -139,14 +139,16 @@ var myApp ={
         },1000);
     },
     handelResult01: function(obj){
-        var dom = $("#go_next");
+         var dom = $("#go_next");
         if(obj.ret_code == 0){
             if(!obj.is_wanglibao){
                 dom.attr("href","/weixin/regist/");
             }else{
                 dom.attr("href","/weixin/login/");
             }
-            myApp.mySwiper.slideNext(true,1000);
+            setTimeout(function(){
+                myApp.mySwiper.slideNext(true,1000);
+            },1000);
         }else{
             alert(obj.message);
         }
@@ -335,17 +337,55 @@ $(function(){
     }
 
     //菜盘旋转
-    var foodTimer = null;
-    foodTimer = setInterval(startDisk,4500);
+    var fps = 0.2;
+    var pause = false;
+    var now;
+    var then = Date.now();
+    var interval = 1000/fps;
+    var delta;
+    window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+
+    function tick() {
+        if(pause){
+            return;
+        }
+        if(window.requestAnimationFrame)
+        {
+            requestAnimationFrame(tick);
+            now = Date.now();
+            delta = now - then;
+            if (delta > interval) {
+                then = now - (delta % interval);
+                startDisk();
+            }
+        }
+        else
+        {
+            setTimeout(tick, interval);
+            startDisk();
+        }
+    }
+    tick();
+
+
+
+    //var foodTimer = null;
+    //foodTimer = setInterval(startDisk,4500);
+
+    //var footTimer = requestAnimationFrame(startDisk);
+    //startDisk();
+
 
     //我的菜
     $('#panel-page01 .myFoodBtn01').on('touchend', function(){
         if(foodIsMoving){
-            //console.log('movig');
+            console.log('movig');
             return false;
         }else{
-            //console.log('stop');
-            window.clearInterval(foodTimer);
+            console.log('stop');
+            //window.clearInterval(foodTimer);
+            pause = true ;
+
             $(this).hide();
 
             $('#panel-page01 .justItBtn').show();
@@ -370,41 +410,17 @@ $(function(){
         $('#panel-page01 .shines .shine').eq(f).hide();
         $('#panel-page01 .shines').hide();
 
-        startDisk();
-        foodTimer = setInterval(startDisk,4500);
+        //startDisk();
+        //foodTimer = setInterval(startDisk,4500);
+        pause = false ;
+        tick();
     });
 
     //就是它
-    //var justIt = true;
     $('#panel-page01 .justItBtn').on('touchend', function(){
-        //if(justIt){
-            //justIt = false;
-            var str = $("#redPacket1-val").val(),
-                dom = $('#redPacket01'),
-                html = '';
-            //$.ajax({
-            //    type: "POST",
-            //    url: "/api/lantern/qm_reward/",
-            //    dataType: "json",
-            //    success: function(data){
-            //        justIt = true;
-            //        console.log(data);
-            //        for(var i=0; i<data.rewards.length; i++){
-            //            if(i != data.rewards.length-1){
-            //                str += data.rewards[i]+"<br />";
-            //            }else{
-            //                str += data.rewards[i];
-            //            }
-            //
-            //        }
-            //        dom.find("#redPacket-cont").html(str);
-            //        dom.show();
-            //    },
-            //    error: function(){
-            //        justIt = true;
-            //        alert("服务器出错了，请稍后重试");
-            //    }
-            //});
+        var str = $("#redPacket1-val").val(),
+            dom = $('#redPacket01'),
+            html = '';
         str = eval('(' + str + ')');
         var redpack = str.redpack,
             coupon = str.coupon,
@@ -423,52 +439,8 @@ $(function(){
                 html += experence[m].amount+"元体验金<br />";
             }
         }
-        //console.log(html);
-            dom.find("#redPacket-cont").html(html);
-            dom.show();
-        //}
-        //var f = parseInt($('#panel-page01 .foods .pos-one').attr('data-f')) - 1;
-        //var whichRed = -1;
-        //switch (f){
-        //    case 0:
-        //        //0 鸭子 红包1
-        //        whichRed = 0;
-        //        break;
-        //    case 1:
-        //        whichRed = 1;
-        //        break
-        //    case 2:
-        //        //2 玉米 红包1
-        //        whichRed = 0;
-        //        break
-        //    case 3:
-        //        whichRed = 1;
-        //        break
-        //    case 4:
-        //        //4 鸡 红包1
-        //        whichRed = 0;
-        //        break
-        //    case 5:
-        //        whichRed = 1;
-        //        break
-        //    default:
-        //        whichRed = 0;
-        //}
-        //switch (whichRed){
-        //    case 0:
-        //        $('#redPacket01').show();
-        //        $('#redPacket02').hide();
-        //        break;
-        //    case 1:
-        //        $('#redPacket01').hide();
-        //        $('#redPacket02').show();
-        //        break
-        //    default:
-        //        $('#redPacket01').show();
-        //        $('#redPacket02').hide();
-        //}
-
-        //myApp.foodOne = f;
+        dom.find("#redPacket-cont").html(html);
+        dom.show();
     });
 
     //红包收下 继续点菜
@@ -479,38 +451,16 @@ $(function(){
     //panel-page02
 
     //点击菜盘弹窗
-    //var foodClick = true;
     $('#panel-page02 .foods .food').on('touchend', function(){
-        //if(foodClick){
-            //foodClick = false;
-            var f = $(this).index();
-            var page2 = $('#panel-page02');
-            var str = $("#redPacket2-val").val(),
-                html = '';
+        var f = $(this).index();
+        var page2 = $('#panel-page02');
+        var str = $("#redPacket2-val").val(),
+            html = '';
         str = eval('(' + str + ')');
-            //$.ajax({
-            //    type: "POST",
-            //    url: "/api/lantern/hm_reward/",
-            //    dataType: "json",
-            //    success: function(data){
-            //        foodClick = true;
-            //        console.log(data);
-            //        page2.find('.results .result').eq(f).show().find("div.content").html('<p class="big-tit">拿到'+ data.redpack['amount'] +'元红包啦！</p><p>单笔投资满'+ parseInt(data.redpack['invest_amount'])/10000 +'万可用</p>');
-            //        page2.find('.layer03').show();
-            //    },
-            //    error: function(e){
-            //        foodClick = true;
-            //        alert('服务器连接超时，请查看您的网络！');
-            //    }
-            //});
         //console.log(str);
         html = '<p class="big-tit">拿到'+ str['amount'] +'元红包啦！</p><p>单笔投资满'+ parseInt(str['invest_amount'])/10000 +'万可用</p>';
-            page2.find('.results .result').eq(f).show().find("div.content").html(html);
-            page2.find('.layer03').show();
-            //myApp.foodTwo = f;
-        //}
-        //console.log($(this).index());
-
+        page2.find('.results .result').eq(f).show().find("div.content").html(html);
+        page2.find('.layer03').show();
     });
 
     //手机输入框切换颜色
@@ -533,7 +483,7 @@ $(function(){
         }
     });
 
-    //领取 AJAX 手机验证 领取
+    //领取 AJAX 手机验证
     $('#panel-page02 .receiveBtn').on('click', function(){
 
         if(myApp.ajaxSwitch01){
@@ -550,6 +500,7 @@ $(function(){
                     alert('请输入正确的手机号码哦!');
                     return false;
                 }
+
                 myApp.ajaxSwitch01 = false;
                 myApp.ajaxSwitch011 = false;
                 $.ajax({
@@ -566,10 +517,10 @@ $(function(){
                     error: function(e){
                         myApp.ajaxSwitch01 = true;
                         myApp.ajaxSwitch011 = true;
+                        alert(e);
                         alert('服务器连接超时，请查看您的网络！');
                     }
                 });
-                //myApp.handelResult01({err: 0},"register");//register or 空
             }else{
                 alert('您已经提交过信息了哦！');
             }
@@ -608,6 +559,7 @@ $(function(){
     //$('#share').on('click', function(){
     //    $(this).hide();
     //});
+
     function weixin_share(shareTit,fn){
         //alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
