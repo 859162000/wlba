@@ -1079,7 +1079,7 @@ class XingMeiRegister(CoopRegister):
             activity = json.loads(activity_config.value)
             if type(activity) == dict:
                 try:
-                    xm2 = activity['rock_finance']
+                    xm2 = activity['xm2']
                     first_p2p_amount = xm2['first_p2p_amount']
                     tickets = xm2["ticket_amount"]
                     start_time = xm2["start_time"]

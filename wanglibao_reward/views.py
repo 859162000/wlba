@@ -53,6 +53,8 @@ from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import  WeChatException
+from wanglibao.templatetags.formatters import convert_to_10k
+from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 logger = logging.getLogger('wanglibao_reward')
 
@@ -2207,6 +2209,107 @@ class LanternBanquetTemplate(TemplateView):
     元宵节
     """
     template_name = 'new_year_feast.jade'
+    activity_codes = ['qmsy_redpack', 'qmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
+    activity_code = 'hmsy_redpack'
+    def get_random_activity_code(self):
+        return self.activity_codes[random.randint(0, 1)]
+
+
+    def get_random_redpack_id(self):
+        activity = Activity.objects.filter(code=self.activity_code).first()
+        if not activity:
+            return -1, {"ret_code":-1, "message":"没有相应活动"}
+        activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True).all()
+        if len(activity_rules) == 0:
+            return -1, {"ret_code":5, "message":"没有活动规则"}
+        all_redpacks = []
+        for activity_rule in activity_rules:
+            activity_redpacks = activity_rule.redpack.split(',')
+            all_redpacks.extend(activity_redpacks)
+        if len(all_redpacks)==0:
+            return -1, {"ret_code":-1, "message":"没有相应红包"}
+        return all_redpacks[random.randint(0, len(all_redpacks)-1)], {}
+
+
+    def get_context_data(self, **kwargs):
+        context = super(LanternBanquetTemplate, self).get_context_data(**kwargs)
+        code = self.get_random_activity_code()
+        redpack_id, res = self.get_random_redpack_id()
+        redpack_id_str = str(redpack_id)
+        if redpack_id == -1:
+            return Response(res)
+        openid = self.request.session.get('lantern_openid')
+        now_date = datetime.date.today()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
+        try:
+            if not phoneRewardRecord:
+                WechatPhoneRewardRecord.objects.create(
+                        openid = openid
+                    )
+            with transaction.atomic():
+                phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+                redpack_id_str = str(redpack_id)
+                if phoneRewardRecord.redpack_event_ids and phoneRewardRecord.redpack_event_ids != redpack_id_str:
+                    phoneRewardRecord.redpack_event_ids = redpack_id_str
+                    phoneRewardRecord.save()
+                if not phoneRewardRecord.redpack_event_ids:
+                    phoneRewardRecord.redpack_event_ids = redpack_id_str
+                    phoneRewardRecord.save()
+        except IntegrityError, e:
+            pass
+
+
+        now_date = datetime.date.today()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
+        try:
+            if not phoneRewardRecord:
+                WechatPhoneRewardRecord.objects.create(
+                        openid = openid
+                    )
+            if not phoneRewardRecord.phone:
+                with transaction.atomic():
+                    phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+                    phoneRewardRecord.activity_code = code
+                    phoneRewardRecord.redpack_event_ids = redpack_id_str
+                    phoneRewardRecord.save()
+        except IntegrityError, e:
+            pass
+        rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
+        redpacks = rewards.get('redpack')
+        experiences = rewards.get('experience')
+        rewards = {'redpack':[], 'coupon':[], 'experience':[]}
+        for redpack_dict in redpacks:
+            redpack_event = redpack_dict.get('redpack_event')
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                rewards.get('coupon').append({'amount':redpack_event.amount})
+                # redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                # redpack_text = "%s%%百分比红包"%redpack_event.amount
+                rewards.get('redpack').append({'amount':redpack_event.amount, 'invest_amount':convert_to_10k(redpack_event.invest_amount)[:-1]})
+            if redpack_event.rtype == 'direct':
+                # redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
+                rewards.get('redpack').append({'amount':int(redpack_event.amount), 'invest_amount':convert_to_10k(redpack_event.invest_amount)[:-1]})
+
+        for experience_dict in experiences:
+            experience_event = experience_dict.get('experience_event')
+            rewards.get('experience').append({"amount":int(experience_event.amount)})
+
+        event = RedPackEvent.objects.filter(id=redpack_id).first()
+        context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
+        BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
+        share_url = ""
+        m = Misc.objects.filter(key='weixin_qrcode_info').first()
+        if m and m.value:
+            info = json.loads(m.value)
+            if isinstance(info, dict) and info.get("fwh"):
+                original_id = info.get("fwh")
+                account = WeixinAccounts.getByOriginalId(original_id)
+                share_url = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=CALLBACK_HOST+"/weixin_activity/lantern_banquet/", state=original_id)
+        # print context
+        context['share_url']=share_url
+        return context
+
 
     def dispatch(self, request, *args, **kwargs):
         code = request.GET.get('code')
@@ -2223,6 +2326,7 @@ class LanternBanquetTemplate(TemplateView):
                 return Response({'ret_code':-1, "message":"code, state error"})
         except WeChatException,e:
                 return Response({'ret_code':e.errcode, 'message':e.errmsg})
+        return super(LanternBanquetTemplate, self).dispatch(request, *args, **kwargs)
 
 class Lantern_QMReward(APIView):
     permission_classes = ()
@@ -2272,16 +2376,18 @@ class Lantern_QMReward(APIView):
         redpacks = rewards.get('redpack')
         experiences = rewards.get('experience')
         reward_txt_list = []
-        for redpack_event in redpacks:
+        for redpack_dict in redpacks:
+            redpack_event = redpack_dict.get('redpack_event')
             redpack_text = "None"
             if redpack_event.rtype == 'interest_coupon':
                 redpack_text = "%s%%加息券"%redpack_event.amount
             if redpack_event.rtype == 'percent':
                 redpack_text = "%s%%百分比红包"%redpack_event.amount
             if redpack_event.rtype == 'direct':
-                redpack_text = "%s元红包"%int(redpack_event.amount)
+                redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
             reward_txt_list.append(redpack_text)
-        for experience_event in experiences:
+        for experience_dict in experiences:
+            experience_event = experience_dict.get('experience_event')
             reward_txt_list.append('%s元体验金'%int(experience_event.amount))
         return Response({"ret_code":0, "rewards":reward_txt_list})
 
@@ -2359,10 +2465,18 @@ class Lantern_FetchRewardAPI(APIView):
         openid = request.session.get('lantern_openid')
         if not openid:
             return Response({"ret_code":-1, "message":"openid为空"})
+        phone = request.DATA.get('phone')
+        if not phone:
+            return Response({"ret_code":-1, "message":"phone为空"})
         now_date = datetime.date.today()
-        phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
         if not phoneRewardRecord:
-            return Response({"ret_code":-1, "message":"openid为空"})
+            return Response({"ret_code":-1, "message":"记录为空"})
+        if phoneRewardRecord.phone:
+            return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
+
+        if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone).exists():
+            return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
         activity = Activity.objects.filter(code=phoneRewardRecord.activity_code).first()
         if not activity:
             return Response({"ret_code":-1, "message":"没有相应活动"})
@@ -2375,20 +2489,18 @@ class Lantern_FetchRewardAPI(APIView):
         if activity.is_stopped:
             return Response({"ret_code":2, "message":"活动已经暂停了"})
 
-        phone = request.DATA.get('phone')
-        if not phone:
-            return Response({"ret_code":-1, "message":"phone为空"})
-
         userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
         if userprofile:
             device = split_ua(self.request)
             device_type = device['device_type']
-            res = sendWechatPhoneReward(userprofile.user, device_type)
+            res = sendWechatPhoneReward(openid, userprofile.user, device_type)
             if res['ret_code']==0:
+                res['is_wanglibao']=True
                 phoneRewardRecord.phone = phone
                 phoneRewardRecord.save()
             return Response(res)
         phoneRewardRecord.phone = phone
         phoneRewardRecord.save()
-        return Response({"ret_code":0, "message":"success"})
+        # send_sms_msg_one.
+        return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
 

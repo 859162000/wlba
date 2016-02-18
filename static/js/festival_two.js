@@ -138,17 +138,17 @@ var myApp ={
             });
         },1000);
     },
-    handelResult01: function(obj,reg){
+    handelResult01: function(obj){
         var dom = $("#go_next");
-        if(obj.err == '0'){
-            if(reg == "register"){
+        if(obj.ret_code == 0){
+            if(!obj.is_wanglibao){
                 dom.attr("href","/weixin/regist/");
             }else{
                 dom.attr("href","/weixin/login/");
             }
             myApp.mySwiper.slideNext(true,1000);
         }else{
-            alert('提交信息验证失败，请查看信息是否填写正确！');
+            alert(obj.message);
         }
     }
 };
@@ -341,10 +341,10 @@ $(function(){
     //我的菜
     $('#panel-page01 .myFoodBtn01').on('touchend', function(){
         if(foodIsMoving){
-            console.log('movig');
+            //console.log('movig');
             return false;
         }else{
-            console.log('stop');
+            //console.log('stop');
             window.clearInterval(foodTimer);
             $(this).hide();
 
@@ -375,24 +375,58 @@ $(function(){
     });
 
     //就是它
-    var justIt = true;
+    //var justIt = true;
     $('#panel-page01 .justItBtn').on('touchend', function(){
-        if(justIt){
-            justIt = false;
-            $.ajax({
-                type: "POST",
-                url: "",
-                dataType: "json",
-                success: function(data){
-                    justIt = true;
-
-                },
-                error: function(){
-                    justIt = true;
-                    alert("服务器出错了，请稍后重试");
-                }
-            });
+        //if(justIt){
+            //justIt = false;
+            var str = $("#redPacket1-val").val(),
+                dom = $('#redPacket01'),
+                html = '';
+            //$.ajax({
+            //    type: "POST",
+            //    url: "/api/lantern/qm_reward/",
+            //    dataType: "json",
+            //    success: function(data){
+            //        justIt = true;
+            //        console.log(data);
+            //        for(var i=0; i<data.rewards.length; i++){
+            //            if(i != data.rewards.length-1){
+            //                str += data.rewards[i]+"<br />";
+            //            }else{
+            //                str += data.rewards[i];
+            //            }
+            //
+            //        }
+            //        dom.find("#redPacket-cont").html(str);
+            //        dom.show();
+            //    },
+            //    error: function(){
+            //        justIt = true;
+            //        alert("服务器出错了，请稍后重试");
+            //    }
+            //});
+        str = eval('(' + str + ')');
+        var redpack = str.redpack,
+            coupon = str.coupon,
+            experence = str.experience;
+        //console.log(coupon,coupon.length);
+        for(var i=0; i<redpack.length; i++){
+            html += redpack[i].amount+"元红包（单笔投资满"+ redpack[i].invest_amount +"万可用）<br />";
         }
+        for(var j=0; j<coupon.length; j++){
+            html += coupon[j].amount+"%加息券<br />";
+        }
+        for(var m=0; m<experence.length; m++){
+            if(m == (experence.length-1)){
+                html += experence[m].amount+"元体验金";
+            }else{
+                html += experence[m].amount+"元体验金<br />";
+            }
+        }
+        //console.log(html);
+            dom.find("#redPacket-cont").html(html);
+            dom.show();
+        //}
         //var f = parseInt($('#panel-page01 .foods .pos-one').attr('data-f')) - 1;
         //var whichRed = -1;
         //switch (f){
@@ -445,30 +479,36 @@ $(function(){
     //panel-page02
 
     //点击菜盘弹窗
-    var foodClick = true;
+    //var foodClick = true;
     $('#panel-page02 .foods .food').on('touchend', function(){
-        if(foodClick){
-            foodClick = false;
+        //if(foodClick){
+            //foodClick = false;
             var f = $(this).index();
             var page2 = $('#panel-page02');
-            $.ajax({
-                type: "POST",
-                url: "",
-                dataType: "json",
-                success: function(data){
-                    foodClick = true;
-                    page2.find('.results .result').eq(f).show().find("div.content").html('<p class="big-tit">拿到22000元红包啦！</p><p>单笔投资满120万可用；2.2%折扣</p>');
-                    page2.find('.layer03').show();
-                },
-                error: function(e){
-                    foodClick = true;
-                    alert('服务器连接超时，请查看您的网络！');
-                }
-            });
-            //page2.find('.results .result').eq(f).show().find("div.content").html('<p class="big-tit">拿到22000元红包啦！</p><p>单笔投资满120万可用；2.2%折扣</p>');
-            //page2.find('.layer03').show();
+            var str = $("#redPacket2-val").val(),
+                html = '';
+        str = eval('(' + str + ')');
+            //$.ajax({
+            //    type: "POST",
+            //    url: "/api/lantern/hm_reward/",
+            //    dataType: "json",
+            //    success: function(data){
+            //        foodClick = true;
+            //        console.log(data);
+            //        page2.find('.results .result').eq(f).show().find("div.content").html('<p class="big-tit">拿到'+ data.redpack['amount'] +'元红包啦！</p><p>单笔投资满'+ parseInt(data.redpack['invest_amount'])/10000 +'万可用</p>');
+            //        page2.find('.layer03').show();
+            //    },
+            //    error: function(e){
+            //        foodClick = true;
+            //        alert('服务器连接超时，请查看您的网络！');
+            //    }
+            //});
+        //console.log(str);
+        html = '<p class="big-tit">拿到'+ str['amount'] +'元红包啦！</p><p>单笔投资满'+ parseInt(str['invest_amount'])/10000 +'万可用</p>';
+            page2.find('.results .result').eq(f).show().find("div.content").html(html);
+            page2.find('.layer03').show();
             //myApp.foodTwo = f;
-        }
+        //}
         //console.log($(this).index());
 
     });
@@ -499,16 +539,14 @@ $(function(){
         if(myApp.ajaxSwitch01){
             if(myApp.ajaxSwitch011){
                 var data = {
-                    'phoneNumber' : $('#phoneNumber').val(),
-                    'foodOne' : myApp.foodOne,
-                    'foodTwo' : myApp.foodTwo
+                    'phone' : $('#phoneNumber').val(),
                 };
 
-                if(data.phoneNumber == '' || data.phoneNumber == '输入手机号 领取两个红包'){
+                if(data.phone == '' || data.phone == '输入手机号 领取两个红包'){
                     alert('请输入您的手机号码哦！');
                     return false;
                 }
-                if(utils.checkMobile(data.phoneNumber) == false){
+                if(utils.checkMobile(data.phone) == false){
                     alert('请输入正确的手机号码哦!');
                     return false;
                 }
@@ -517,12 +555,14 @@ $(function(){
                 myApp.ajaxSwitch011 = false;
                 $.ajax({
                     type: "POST",
-                    url: "api/save.php",
+                    url: "/api/lantern/fetch_reward/",
                     data: data,
                     dataType: "json",
                     success: function(data){
                         myApp.ajaxSwitch01 = true;
-                        myApp.handelResult01({err: 0},"register");//register or 空
+                        myApp.ajaxSwitch011 = true;
+                        //console.log(data);
+                        myApp.handelResult01(data);
                     },
                     error: function(e){
                         myApp.ajaxSwitch01 = true;
@@ -591,12 +631,13 @@ $(function(){
         });
         wx.ready(function () {
             var winHost = window.location.href;
-            var host = winHost.substring(0,winHost.indexOf('/activity')),
+            var host = $("#shareUrl").val();
 			//var host = 'https://staging.wanglibao.com',
-                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+            var shareImg = host + 'https://www.wanglibao.com/static/imgs/mobile/weChat_logo.png',
                 shareLink = host + '/activity/festival_two/',
                 shareMainTit = shareTit,
                 shareBody = '闹元宵，吃大餐，抽红包财源滚滚来';
+
             //分享给微信好友
             wx.onMenuShareAppMessage({
                 title: shareMainTit,
