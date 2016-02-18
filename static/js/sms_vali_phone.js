@@ -182,6 +182,7 @@
 							}
 
 						});
+					}
 					} else {
 						post_data = {
 							'validate_code': validate_code_val,
@@ -211,7 +212,7 @@
 
 
 				}
-			}
+
 		})
 
     })
