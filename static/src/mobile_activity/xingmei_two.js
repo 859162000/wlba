@@ -27,3 +27,9 @@
     })
   })
 })();
+
+wlb.ready({
+    app: function (mixins) {
+        mixins.shareData({'title':'你观影，我买单','content':'去星美看电影，来网利宝免费领票'});
+    }
+})
