@@ -1269,3 +1269,8 @@ if ENV == ENV_PRODUCTION:
 # Oauth2 加密密钥
 OAUTH2_CRYPTO_KEY = 'd2xiOTkK'
 OAUTH2_CRYPTO_IV = 'a2xiMjAxNgo'
+
+
+# 渠道数据中心平台--数据同步密钥
+BASE_SYNC_KEY = ''
+YLB_SYNC_KEY = ''
