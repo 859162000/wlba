@@ -942,6 +942,12 @@ class XingMeiRewardDistributer(RewardDistributer):
             logger.debug(u"投资额:%s, 发奖门槛:%s" % (self.amount, p2p_amount))
             return
 
+        #5: 如果已经给用户发过领奖机会,不要重复发
+        _reward = WanglibaoActivityReward.objects.filter(user=self.user, activity='xm2').first()
+        if _reward:
+            logger.debug('发奖机会已经给用户下发了,不可重复下发, user:%s' % self.user)
+            return
+
         try:
             activity_reward = WanglibaoActivityReward.objects.create(
                     activity='xm2',
