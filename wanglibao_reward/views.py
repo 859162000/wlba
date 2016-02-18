@@ -2328,133 +2328,6 @@ class LanternBanquetTemplate(TemplateView):
                 return Response({'ret_code':e.errcode, 'message':e.errmsg})
         return super(LanternBanquetTemplate, self).dispatch(request, *args, **kwargs)
 
-class Lantern_QMReward(APIView):
-    permission_classes = ()
-    activity_codes = ['qmsy_redpack', 'qmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
-
-    def get_random_activity_code(self):
-        return self.activity_codes[random.randint(0, 1)]
-
-
-    def post(self, request):
-        openid = request.session.get('lantern_openid')
-        if not openid:
-            return Response({"ret_code":-1, "message":"openid为空"})
-        code = self.get_random_activity_code()
-        activity = Activity.objects.filter(code=code).first()
-        if not activity:
-            return Response({"ret_code":-1, "message":"没有相应活动"})
-
-        now = timezone.now()
-        if activity.start_at >= now:
-            return Response({"ret_code":3, "message":"活动还未开始"})
-        if activity.end_at <= now:
-            return Response({"ret_code":3, "message":"活动已过期"})
-        if activity.is_stopped:
-            return Response({"ret_code":2, "message":"活动已经暂停了"})
-
-
-        now_date = datetime.date.today()
-        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
-        try:
-            if not phoneRewardRecord:
-                WechatPhoneRewardRecord.objects.create(
-                        openid = openid
-                    )
-            with transaction.atomic():
-                phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
-
-                if phoneRewardRecord.activity_code and phoneRewardRecord.activity_code != code:
-                    phoneRewardRecord.activity_code = code
-                    phoneRewardRecord.save()
-                if not phoneRewardRecord.activity_code:
-                    phoneRewardRecord.activity_code = code
-                    phoneRewardRecord.save()
-        except IntegrityError, e:
-            pass
-        rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
-        redpacks = rewards.get('redpack')
-        experiences = rewards.get('experience')
-        reward_txt_list = []
-        for redpack_dict in redpacks:
-            redpack_event = redpack_dict.get('redpack_event')
-            redpack_text = "None"
-            if redpack_event.rtype == 'interest_coupon':
-                redpack_text = "%s%%加息券"%redpack_event.amount
-            if redpack_event.rtype == 'percent':
-                redpack_text = "%s%%百分比红包"%redpack_event.amount
-            if redpack_event.rtype == 'direct':
-                redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
-            reward_txt_list.append(redpack_text)
-        for experience_dict in experiences:
-            experience_event = experience_dict.get('experience_event')
-            reward_txt_list.append('%s元体验金'%int(experience_event.amount))
-        return Response({"ret_code":0, "rewards":reward_txt_list})
-
-
-class Lantern_HMReward(APIView):
-    permission_classes = ()
-    activity_code = 'hmsy_redpack'
-
-    def get_random_redpack_id(self):
-        activity = Activity.objects.filter(code=self.activity_code).first()
-        if not activity:
-            return -1, {"ret_code":-1, "message":"没有相应活动"}
-        activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True).all()
-        if len(activity_rules) == 0:
-            return -1, {"ret_code":5, "message":"没有活动规则"}
-        all_redpacks = []
-        for activity_rule in activity_rules:
-            activity_redpacks = activity_rule.redpack.split(',')
-            all_redpacks.extend(activity_redpacks)
-        if len(all_redpacks)==0:
-            return -1, {"ret_code":-1, "message":"没有相应红包"}
-        return all_redpacks[random.randint(0, len(all_redpacks)-1)], {}
-
-    def post(self, request):
-        openid = request.session.get('lantern_openid')
-        if not openid:
-            return Response({"ret_code":-1, "message":"openid为空"})
-
-        activity = Activity.objects.filter(code=self.activity_code).first()
-        if not activity:
-            return Response({"ret_code":-1, "message":"没有相应活动"})
-
-        now = timezone.now()
-        if activity.start_at >= now:
-            return Response({"ret_code":3, "message":"活动还未开始"})
-        if activity.end_at <= now:
-            return Response({"ret_code":3, "message":"活动已过期"})
-        if activity.is_stopped:
-            return Response({"ret_code":2, "message":"活动已经暂停了"})
-
-        redpack_id, res = self.get_random_redpack_id()
-        if redpack_id == -1:
-            return Response(res)
-
-        now_date = datetime.date.today()
-        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
-        try:
-            if not phoneRewardRecord:
-                WechatPhoneRewardRecord.objects.create(
-                        openid = openid
-                    )
-            with transaction.atomic():
-                phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
-                redpack_id_str = str(redpack_id)
-                if phoneRewardRecord.redpack_event_ids and phoneRewardRecord.redpack_event_ids != redpack_id_str:
-                    phoneRewardRecord.redpack_event_ids = redpack_id_str
-                    phoneRewardRecord.save()
-                if not phoneRewardRecord.redpack_event_ids:
-                    phoneRewardRecord.redpack_event_ids = redpack_id_str
-                    phoneRewardRecord.save()
-        except IntegrityError, e:
-            pass
-        event = RedPackEvent.objects.filter(id=redpack_id).first()
-
-        return Response({"ret_code":0, "redpack":{'amount':event.amount, 'invest_amount':event.invest_amount}})
-
-
 class Lantern_FetchRewardAPI(APIView):
     """
     元宵节--领取api
@@ -2501,6 +2374,11 @@ class Lantern_FetchRewardAPI(APIView):
             return Response(res)
         phoneRewardRecord.phone = phone
         phoneRewardRecord.save()
-        # send_sms_msg_one.
+        send_sms_msg_one.apply_async(kwargs={
+        "rule_id":7,
+        "phone":phone,
+        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。关注网利宝服务号，每日签到抽大奖。 退订回TD",
+        "user_type":"phone"
+        })
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
 
