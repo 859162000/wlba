@@ -2433,8 +2433,10 @@ class SMSModifyPhoneValidateAPI(APIView):
                 sms_modify_record.new_phone = new_phone
                 sms_modify_record.save()
             return Response({"message":'ok'})
-
-        return Response({"message":form.errors}, status=400)
+        message = form.errors
+        for key, value in form.errors.iteritems():
+            message = ",".join(value)
+        return Response({"message":message}, status=400)
 
 class SMSModifyPhoneTemplate(TemplateView):
 
