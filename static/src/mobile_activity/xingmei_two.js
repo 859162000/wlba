@@ -28,8 +28,30 @@
   })
 })();
 
-wlb.ready({
-    app: function (mixins) {
-        mixins.shareData({'title':'你观影，我买单','content':'去星美看电影，来网利宝免费领票'});
-    }
+wx.ready(function () {
+    var host = 'https://www.wanglibao.com',
+        shareImg = host + '/static/imgs/mobile/share_logo.png',
+        shareLink = host + '/activity/app_xingmei_two/?promo_token=xm2',
+        shareMainTit = '你观影，我买单',
+        shareBody = '去星美看电影，来网利宝免费领票';
+    //分享给微信好友
+    org.onMenuShareAppMessage({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    });
+    //分享给微信朋友圈
+    org.onMenuShareTimeline({
+        title: shareMainTit,
+        link: shareLink,
+        imgUrl: shareImg
+    })
+    //分享给QQ
+    org.onMenuShareQQ({
+        title: shareMainTit,
+        desc: shareBody,
+        link: shareLink,
+        imgUrl: shareImg
+    })
 })
