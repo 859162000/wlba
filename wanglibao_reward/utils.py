@@ -14,7 +14,7 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
     phoneRewardRecords = WechatPhoneRewardRecord.objects.filter(status=False, phone=phone).all()
     for phoneRewardRecord in phoneRewardRecords:
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
-        for key, value in enumerate(rewards):
+        for key, value in rewards.iteritems():
             if key == 'redpack':
                 for redpack_event_info in value:
                     redpack_event = redpack_event_info['redpack_event']
@@ -26,7 +26,7 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
                         _send_message_for_hby(user, redpack_event, end_time)
             if key == 'experience':
                 for experience_info in value:
-                    experience = experience_info['experience']
+                    experience = experience_info['experience_event']
                     SendExperienceGold(user).send(pk=experience.id)
 
         redpack_ids = phoneRewardRecord.redpack_event_ids.split(',')
@@ -47,7 +47,7 @@ def sendWechatPhoneReward(openid, user, device_type):
     with transaction.atomic():
         phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(status=False, openid=openid, create_date=now_date).first()
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
-        for key, value in enumerate(rewards):
+        for key, value in rewards.iteritems():
             if key == 'redpack':
                 for redpack_event_info in value:
                     redpack_event = redpack_event_info['redpack_event']
@@ -58,7 +58,7 @@ def sendWechatPhoneReward(openid, user, device_type):
                     records.append(record)
             if key == 'experience':
                 for experience_info in value:
-                    experience = experience_info['experience']
+                    experience = experience_info['experience_event']
                     experience_record_id, experience_event = SendExperienceGold(user).send(pk=experience.id)
                     if not experience_record_id:
                         return {"ret_code":-1, "message":"体验金无法发放"}
