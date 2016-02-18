@@ -18,7 +18,8 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
     YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
-    AssignmentBuyFail, GetUnreadMgsNum, YueLiBaoBuyStatus, AssignmentBuyStatus, GetUserUnreadMgsNum, GetRedPacks
+    AssignmentBuyFail, GetUnreadMgsNum, YueLiBaoBuyStatus, AssignmentBuyStatus, GetUserUnreadMgsNum, GetRedPacks, \
+    SendRedPacks
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -211,6 +212,7 @@ urlpatterns += patterns(
     url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_buy_assignment'),
     url(r'^php/assignment/status/$', AssignmentBuyStatus.as_view(), name='php_buy_assignment_status'),
     url(r'^php/assignment/fail/$', AssignmentBuyFail.as_view(), name='php_buy_assignment_fail'),
+    url(r'^php/redpacks/send/$', SendRedPacks.as_view(), name='send_redpacks_by_push'),
 
     # url(r'^php/logout/$', logout_with_cookie, name='php_logout_cookie'),
 )

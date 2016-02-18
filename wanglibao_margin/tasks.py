@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 import requests
 import simplejson
+from django.contrib.auth.models import User
 from django.db import transaction
 
+from order.utils import OrderHelper
 from wanglibao import settings
 from wanglibao.celery import app
 
 from wanglibao_margin.models import MonthProduct, AssignmentOfClaims
-from wanglibao_margin.php_utils import PhpMarginKeeper
+from wanglibao_margin.php_utils import PhpMarginKeeper, php_redpack_consume
+from wanglibao_redpack.models import RedPackRecord
 
 
 def save_to_sqs(url, data):
@@ -18,7 +21,7 @@ def save_to_sqs(url, data):
 
 
 @app.task
-def buy_month_product(token=None):
+def buy_month_product(token=None, red_packet_id=None, amount=None, user=None, device_type=None):
     """
     对这个购买的月利宝记录进行扣款冻结操作.
     :param token: month_product's unique token.
@@ -38,14 +41,34 @@ def buy_month_product(token=None):
     else:
         # 状态成功, 对买家扣款, 加入冻结资金
         try:
-            buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
-            buyer_keeper.freeze(product.amount, description='')
-            product.trade_status = 'PAID'
-            product.save()
-            ret.update(status=1,
-                       token=product.token,
-                       msg='success')
+            with transaction.atomic(savepoint=True):
+                buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
+                buyer_keeper.freeze(product.amount, description='')
+                product.trade_status = 'PAID'
+                product.save()
+                ret.update(status=1,
+                           token=product.token,
+                           msg='success')
+
+                # 如果使用红包的话, 增加红包使用记录
+                if red_packet_id and int(red_packet_id) > 0:
+                    redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
+                    user = User.objects.filter(pk=user).first()
+                    redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
+                                                               product_id=product.product_id, status=u'新建').id
+                    result = php_redpack_consume(red_packet_id, amount, user, product.id, device_type, product.product_id)
+                    if result['ret_code'] != 0:
+                        raise Exception, result['message']
+                    if result['rtype'] != 'interest_coupon':
+                        red_record = buyer_keeper.redpack_deposit(result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
+                                                                  order_id=redpack_order_id, savepoint=False)
+
         except Exception, e:
+            f = open('.stdout.txt', 'a+')
+            print >> f, 'buy month product failed with error:'
+            print >> f, 'e = {}'.format(e)
+            print >>f, 'redpack id = {}'.format(red_packet_id)
+            f.close()
             product.trade_status = 'FAILED'
             product.save()
             ret.update(status=0,

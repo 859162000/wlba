@@ -13,13 +13,14 @@ from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
-    calc_php_commission, php_redpacks
+    calc_php_commission, php_redpacks, send_redpacks
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_redpack.backends import restore
 
 from wanglibao_rest import utils
-from wanglibao_redpack import backends
+
 
 class GetUserInfo(APIView):
     """
@@ -210,7 +211,6 @@ class CheckTradePassword(APIView):
     def post(self, request):
         user_id = self.request.POST.get('userId')
         trade_password = self.request.POST.get('pwd')
-
         try:
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
@@ -239,6 +239,8 @@ class YueLiBaoBuy(APIView):
         amount_source = request.POST.get('sourceAmount')
         red_packet = request.POST.get('redPacketAmount')
         red_packet_type = request.POST.get('isRedPacket')
+        # 使用的红包id
+        red_packet_id = request.POST.get('RedPacketId') or 0
 
         try:
             user = User.objects.get(pk=user_id)
@@ -252,8 +254,9 @@ class YueLiBaoBuy(APIView):
                 red_packet=red_packet,
                 red_packet_type=red_packet_type,
             )
-
-            buy_month_product.apply_async(kwargs={'token': token})
+            device = utils.split_ua(self.request)
+            buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
+                                                  'amount': amount, 'user': user_id, 'device_type': device['device_type']})
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
         except Exception, e:
@@ -300,6 +303,9 @@ class YueLiBaoBuyFail(APIView):
                     # 状态置为已退款, 这个记录丢弃
                     product.cancel_status = True
                     product.save()
+
+                    # 增加回退红包接口
+                    restore(product.order_id, product_id, product.amount, user)
 
             ret.update(status=1,
                        msg='success')
@@ -647,11 +653,12 @@ class GetRedPacks(APIView):
         period = int(self.request.REQUEST.get('period'))
         uid = int(self.request.REQUEST.get('userId'))
 
-        if self.request.user.pk and int(self.request.user.pk) == int(uid):
-
+        # if self.request.user.pk and int(self.request.user.pk) == int(uid):
+        # 去掉登录验证, 方便PHP
+        if 1:
             device = utils.split_ua(self.request)
 
-            result = php_redpacks(request.user, device['device_type'], period=period)
+            result = php_redpacks(User.objects.get(pk=uid), device['device_type'], period=period)
             redpacks = result['packages'].get('available', [])
 
             red_pack_info.update(
@@ -665,3 +672,26 @@ class GetRedPacks(APIView):
             )
 
         return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))
+
+
+class SendRedPacks(APIView):
+    """
+    http请求方式: post
+    http://xxxxxx.com/php/redpacks/send/
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    def post(self, request):
+
+        redpack_id = int(self.request.REQUEST.get('redpack_id'))
+        user_ids = self.request.REQUEST.get('userIds').split(',')
+
+        if 1:
+            ret = send_redpacks(redpack_id, user_ids)
+
+        else:
+            ret = {'status': 0,
+                   'msg': 'authentic error!'}
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

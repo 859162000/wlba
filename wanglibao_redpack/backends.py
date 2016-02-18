@@ -254,12 +254,19 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 obj['amount'] = obj['amount']/100.0
 
             if x.order_id:
-                pr = P2PRecord.objects.filter(order_id=x.order_id).first()
-                obj.update({"product":pr.product.name, "apply_at":stamp(x.apply_at),
-                            "apply_platform":x.apply_platform})
-                packages['used'].append(obj)
-                packages['used'].sort(key=lambda x: x['unavailable_at'])
-                packages['used'].sort(key=lambda x: x['order_by'])
+                try:
+                    # 增加对月利宝使用过的红包处理
+                    pr = P2PRecord.objects.filter(order_id=x.order_id).first()
+                    obj.update({"product":pr.product.name, "apply_at":stamp(x.apply_at),
+                                "apply_platform":x.apply_platform})
+                    packages['used'].append(obj)
+                    packages['used'].sort(key=lambda x: x['unavailable_at'])
+                    packages['used'].sort(key=lambda x: x['order_by'])
+                except Exception, e:
+                    f = open('.stdout.yuelibao.redpacks.txt', 'a+')
+                    print >> f, '{}, order_id = {}'.format(e, x.order_id)
+                    f.close()
+                    continue
             else:
                 if x.redpack.status == "invalid":
                     packages['invalid'].append(obj)

@@ -19,8 +19,9 @@ from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper, check_amount
 from wanglibao_margin.models import Margin, MarginRecord, MonthProduct, PhpRefundRecord
 from wanglibao_p2p.models import P2PEquity
-from wanglibao_redpack.backends import _decide_device, get_start_end_time, REDPACK_RULE, stamp
-from wanglibao_redpack.models import PhpIncome, RedPackRecord
+from wanglibao_pay.util import fmt_two_amount
+from wanglibao_redpack.backends import _decide_device, get_start_end_time, REDPACK_RULE, stamp, _calc_deduct
+from wanglibao_redpack.models import PhpIncome, RedPackRecord, RedPackEvent, RedPack
 
 
 def set_cookie(response, key, value, hours_expire=1, domain=settings.SESSION_COOKIE_DOMAIN):
@@ -247,7 +248,7 @@ class PhpMarginKeeper(MarginKeeper):
                     self.tracer(u'债转罚息入账', penal_interest, margin.margin, u'债转罚息入账', refund_id)
                 if platform_interest > 0:
                     margin.margin += platform_interest
-                    self.tracer(u'债转平台加息入账', penal_interest, margin.margin, u'债转平台加息入账', refund_id)
+                    self.tracer(u'债转平台加息入账', platform_interest, margin.margin, u'债转平台加息入账', refund_id)
                 if coupon_interest > 0:
                     margin.margin += coupon_interest
                     description = u"债转加息存入{}元".format(coupon_interest)
@@ -548,3 +549,104 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
         packages['available'].sort(key=lambda x: x['order_by'], reverse=True)
 
     return {"ret_code": 0, "packages": packages}
+
+
+def php_redpack_consume(redpack, amount, user, order_id, device_type, product_id):
+    """
+
+    :param redpack:
+    :param amount:  投资的金额
+    :param user:
+    :param order_id:
+    :param device_type:
+    :param product_id:
+    :return:
+    """
+    amount = fmt_two_amount(amount)
+    record = RedPackRecord.objects.filter(user=user, id=redpack).first()
+    redpack = record.redpack
+    event = redpack.event
+    device_type = _decide_device(device_type)
+
+    start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                              record.created_at, event.available_at, event.unavailable_at)
+    if not record:
+        return {"ret_code": 30171, "message": u"优惠券不存在"}
+    if record.order_id or record.product_id:
+        return {"ret_code": 30172, "message": u"优惠券已使用"}
+    if redpack.status == "invalid":
+        return {"ret_code": 30173, "message": u"优惠券已作废"}
+    if not start_time < timezone.now() < end_time:
+        return {"ret_code": 30174, "message": u"优惠券不可使用"}
+    if amount < event.invest_amount:
+        return {"ret_code": 30175, "message": u"投资金额不满足优惠券规则%s" % event.invest_amount}
+    if event.apply_platform != "all" and (event.apply_platform != device_type or (event.give_platform == 'app' and device_type not in ('ios', 'android'))):
+        return {"ret_code": 30176, "message": u"此优惠券只能在%s平台使用" % event.apply_platform}
+
+    rtype = event.rtype
+    rule_value = event.amount
+    if event.rtype != 'interest_coupon':
+        deduct = _calc_deduct(amount, rtype, rule_value, event)
+    else:
+        deduct = 0
+
+    record.is_month_product = True
+    record.order_id = order_id
+    record.product_id = product_id
+    record.apply_platform = device_type
+    record.apply_amount = deduct
+    record.apply_at = timezone.now()
+    record.save()
+
+    return {"ret_code": 0, "message": u"ok", "deduct": deduct, "rtype": event.rtype}
+
+
+def php_redpack_restore(order_id, product_id, amount, user):
+    if type(amount) != decimal.Decimal:
+        amount = fmt_two_amount(amount)
+    record = RedPackRecord.objects.filter(is_month_product=True, user=user,
+                                          order_id=order_id, product_id=product_id).first()
+    if not record:
+        return {"ret_code": -1, "message": "redpack not exists"}
+    record.apply_platform = ""
+    record.apply_at = None
+    record.is_month_product = False
+    record.order_id = None
+    record.product_id = None
+    record.save()
+
+    event = record.redpack.event
+    rtype = event.rtype
+    rule_value = event.amount
+    # deduct = event.amount
+    deduct = _calc_deduct(amount, rtype, rule_value, event)
+    from wanglibao_redpack.backends import logger
+    if rtype == "interest_coupon":
+        logger.info(u"%s--%s 退回加息券 %s" % (event.name, record.id, timezone.now()))
+        return {"ret_code": 1, "deduct": deduct}
+    else:
+        logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
+        return {"ret_code": 0, "deduct": deduct}
+
+
+def send_redpacks(event_id, user_ids):
+    """
+    发送此红包给对应的用户
+    :param event_id:        红包活动id
+    :param user_ids:           用户list
+    :return:
+    """
+    event = RedPackEvent.objects.filter(pk=event_id).first()
+    red_pack = RedPack.objects.filter(event=event).first()
+
+    users = User.objects.filter(id__in=user_ids)
+    args_list = []
+
+    for user in users:
+        args_list.append(RedPackRecord(redpack=red_pack, user=user))
+
+    try:
+        RedPackRecord.objects.bulk_create(args_list)
+        return {'status': 1, 'msg': 'success!'}
+    except Exception, e:
+        return {'status': 0, 'msg': 'send redpacks error: {}'.format(str(e))}

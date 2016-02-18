@@ -109,6 +109,7 @@ class RedPackRecord(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
     apply_amount = models.FloatField(null=True, default=0.0, verbose_name=u'使用金额')
+    is_month_product = models.BooleanField(default=False, verbose_name=u"是否是月利宝产品")
     order_id = models.IntegerField(verbose_name=u'关联订单', null=True, db_index=True)
     product_id = models.IntegerField(verbose_name=u'关联产品', null=True, db_index=True)
 

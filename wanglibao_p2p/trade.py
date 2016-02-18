@@ -90,8 +90,8 @@ class P2PTrader(object):
                 if result['rtype'] != 'interest_coupon':
                     red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'],
                                                                     order_id=redpack_order_id, savepoint=False)
-                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
-                                        amount=amount, deduct=result['deduct'], redpack=redpack)
+                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功',
+                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False, platform=platform)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
