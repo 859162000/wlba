@@ -14,7 +14,7 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
     phoneRewardRecords = WechatPhoneRewardRecord.objects.filter(status=False, phone=phone).all()
     for phoneRewardRecord in phoneRewardRecords:
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
-        for key, value in enumerate(rewards):
+        for key, value in rewards.iteritems():
             if key == 'redpack':
                 for redpack_event_info in value:
                     redpack_event = redpack_event_info['redpack_event']
@@ -47,7 +47,7 @@ def sendWechatPhoneReward(openid, user, device_type):
     with transaction.atomic():
         phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(status=False, openid=openid, create_date=now_date).first()
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
-        for key, value in enumerate(rewards):
+        for key, value in rewards.iteritems():
             if key == 'redpack':
                 for redpack_event_info in value:
                     redpack_event = redpack_event_info['redpack_event']
