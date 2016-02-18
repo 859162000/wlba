@@ -1295,12 +1295,9 @@ class CheckRechargePayinfoView(APIView):
         user = request.user
         pay_info = PayInfo.objects.filter(user=request.user)
         messages = {}
-        if pay_info == None:
+        if pay_info.filter(status="成功"):
             messages['recharge'] = True
         else:
-            if pay_info.filter(status="成功"):
-                messages['recharge'] = True
-            else:
-                messages['recharge'] = False
+            messages['recharge'] = False
         
         return Response(json.dumps(messages))
