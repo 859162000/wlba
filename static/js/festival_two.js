@@ -539,7 +539,7 @@ $(function(){
         if(myApp.ajaxSwitch01){
             if(myApp.ajaxSwitch011){
                 var data = {
-                    'phone' : $('#phoneNumber').val(),
+                    'phone' : $('#phoneNumber').val()
                 };
 
                 if(data.phone == '' || data.phone == '输入手机号 领取两个红包'){
@@ -550,7 +550,6 @@ $(function(){
                     alert('请输入正确的手机号码哦!');
                     return false;
                 }
-
                 myApp.ajaxSwitch01 = false;
                 myApp.ajaxSwitch011 = false;
                 $.ajax({

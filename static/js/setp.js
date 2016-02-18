@@ -17,6 +17,9 @@
         isNOShow : '1',
         buttonFont: '立即注册'
     });
+    if($('#ganjiwang-model')){
+      $('#denglu-user').hide();
+    }
     //回到顶部开始
     //固定回到顶部,
      function backtop(box){
