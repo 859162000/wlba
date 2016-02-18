@@ -459,7 +459,7 @@ $(function(){
     //手机输入框切换颜色
     $('#panel-page02 #phoneNumber').on({
         'focus':function(){
-            if($(this).val()=='输入手机号 领取两个红包'){
+            if($(this).val()=='输入手机号 领取所有红包'){
                 $(this).val('');
                 $(this).css({
                     'color': '#fc8910'
@@ -471,7 +471,7 @@ $(function(){
                 $(this).css({
                     'color': '#cccccc'
                 });
-                $(this).val('输入手机号 领取两个红包');
+                $(this).val('输入手机号 领取所有红包');
             }
         }
     });
@@ -485,7 +485,7 @@ $(function(){
                     'phone' : $('#phoneNumber').val()
                 };
 
-                if(data.phone == '' || data.phone == '输入手机号 领取两个红包'){
+                if(data.phone == '' || data.phone == '输入手机号 领取所有红包'){
                     alert('请输入您的手机号码哦！');
                     return false;
                 }
