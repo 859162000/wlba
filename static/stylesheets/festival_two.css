@@ -1433,15 +1433,12 @@ input[type=number]::-webkit-outer-spin-button {
   top: 24.00793651%;
 }
 #redPacket01 .detail {
-  margin-left: -41%;
-  width: 82%;
+  margin-left: -37.03125%;
+  width: 74.0625%;
   position: absolute;
   left: 50%;
   bottom: 23.80952381%;
-  color: #fff;
-  text-align: center;
 }
-
 #redPacket01 .orderBtn {
   margin-left: -30.390625%;
   width: 60.78125%;
@@ -1553,7 +1550,41 @@ input[type=number]::-webkit-outer-spin-button {
   top: 0.99206349%;
 }
 
+#panel-page02 .layer03 .results .result .content {
+  background: url("/static/imgs/mobile_activity/festival_two/redPacket-bg.png") left center no-repeat;
+  background-size: contain;
+  margin-left: -46.71875%;
+  width: 93.4375%;
+  position: absolute;
+  left: 50%;
+  bottom: 27.97619048%;
+  font-size: 14px;
+  padding-left: 25%;
+  color: #fff;
+  line-height: 30px;
+}
+#panel-page02 .layer03 .results .result .content .big-tit{
+  font-size: 20px;
+}
+#panel-page02 .layer03 .results .result .content {
+  background: url("/static/imgs/mobile_activity/festival_two/redPacket-bg.png") left center no-repeat;
+  background-size: contain;
+  margin-left: -46.71875%;
+  width: 93.4375%;
+  position: absolute;
+  left: 50%;
+  bottom: 27.97619048%;
+  font-size: 14px;
+  padding-left: 25%;
+  color: #fff;
+  line-height: 30px;
+}
+#panel-page02 .layer03 .results .result .content .big-tit{
+  font-size: 20px;
+}
 #redPacket01 .detail #redPacket-cont{
+  color: #fff;
+  text-align: center;
   font-size: 14px;
   line-height: 26px;
 }
