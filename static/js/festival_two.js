@@ -157,13 +157,6 @@ var myApp ={
 
 $(function(){
 
-    //$('#iframe01').get(0).contentWindow.SVGDIMISOK = function(){
-    //    console.log(this);  //this -> HTMLwindow
-    //    console.log($('#iframe01').get(0).contentDocument); // SVGdocument
-    //    console.log($('#iframe01').get(0).contentWindow); // SVGwindow
-    //}
-
-
     //console.log(myApp.pages);
 
     //init html font-size for remLayout
@@ -379,10 +372,10 @@ $(function(){
     //我的菜
     $('#panel-page01 .myFoodBtn01').on('touchend', function(){
         if(foodIsMoving){
-            console.log('movig');
+            //console.log('movig');
             return false;
         }else{
-            console.log('stop');
+            //console.log('stop');
             //window.clearInterval(foodTimer);
             pause = true ;
 
@@ -517,7 +510,7 @@ $(function(){
                     error: function(e){
                         myApp.ajaxSwitch01 = true;
                         myApp.ajaxSwitch011 = true;
-                        alert($.parseJSON(e));
+                        //alert($.parseJSON(e));
                         alert('服务器连接超时，请查看您的网络！');
                     }
                 });
