@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="utf-8" />
+    <title>明年赚不赚 就看元宵宴</title>
+    <meta name="viewport" content="width=device-width , initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+<!--    <meta name="viewport" content="width=640, user-scalable=no">-->
+    <meta name="language" content="zh_cn" />
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="MobileOptimized" content="320" />
+    <meta http-equiv="cleartype" content="on" />
+<!--    <meta name="format-detection" content="email=no" />-->
+    <meta name="format-detection" content="telephone=no,email=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-touch-fullscreen" content="no" />
+    <!--<link rel="shortcut icon" type="image/x-icon" href="/static/imgs/mobile_activity/festival_two/favicon.ico"/>-->
+    <link href="/static/stylesheets/lib/swiper3.1.0.min.css" rel="stylesheet" type="text/css" />
+    <link href="/static/stylesheets/festival_two.css?t=20160216" rel="stylesheet" type="text/css" />
+
+<!--    <script type="text/javascript">-->
+<!--        var startTime = new Date().getTime();-->
+<!--    </script>-->
+</head>
+<body>
+<!-- <input type="hidden" value='{"redpack":[{"amount":20,"height_invest":10},{"amount":50,"height_invest":80}],"coupon":[{"amount":"1%"},{"amount":"1.5%"}],"experence":[{"amount":"888"}]}' id="redPacket1-val" /> -->
+<input type="hidden" value='{{ rewards }}' id="redPacket1-val" />
+<input type="hidden" value='{{ redpack }}' id="redPacket2-val" />
+<input type="hidden" value='{{ share_url }}' id="shareUrl" />
+<!--phoneNumber:15555555555-->
+<!--foodOne:3-->
+<!--foodTwo:1-->
+
+<!--foodOne 0->img_015-->
+<!--        1->img_016-->
+<!--        2->img_017-->
+<!--        3->img_018-->
+<!--        4->img_019-->
+<!--        5->img_020-->
+<!---->
+<!--foodTwo 0->img_039-->
+<!--        1->img_040-->
+<!--        2->img_041-->
+<!--        3->img_042-->
+<!--        4->img_043-->
+
+<!--loading-->
+<div id="loading">
+    <div class="table">
+        <img src="/static/imgs/mobile_activity/festival_two/img_001.png" alt=""/>
+        <ul class="peoples">
+            <li class="people people-one">
+                <img src="/static/imgs/mobile_activity/festival_two/img_002.png" alt=""/>
+            </li>
+            <li class="people people-two">
+                <img src="/static/imgs/mobile_activity/festival_two/img_003.png" alt=""/>
+            </li>
+            <li class="people people-three">
+                <img src="/static/imgs/mobile_activity/festival_two/img_004.png" alt=""/>
+            </li>
+            <li class="people people-four">
+                <img src="/static/imgs/mobile_activity/festival_two/img_005.png" alt=""/>
+            </li>
+            <li class="people people-five">
+                <img src="/static/imgs/mobile_activity/festival_two/img_006.png" alt=""/>
+            </li>
+            <li class="people people-six">
+                <img src="/static/imgs/mobile_activity/festival_two/img_007.png" alt=""/>
+            </li>
+        </ul>
+
+    </div>
+</div>
+
+
+<!--bg_music-->
+<div style="display:none;">
+    <audio id="audio_bg" src="/static/musics/festival_two.mp3" preload="auto" autoplay="autoplay" loop="loop"></audio>
+</div>
+
+<!--bg_music_img-->
+<div id="bg_music_img">
+    <a href="javascript:void(0)">
+        <img class="on" src="/static/imgs/mobile_activity/festival_two/musicBgOn.png" alt="" />
+        <img class="off" src="/static/imgs/mobile_activity/festival_two/musicBgOff.png" alt="" />
+    </a>
+</div>
+
+<!--logo-->
+<!--<div id="logo">-->
+<!--    <a href="javascript:void(0)"><img src="/static/imgs/mobile_activity/festival_two/logo.png" alt="logo"/></a>-->
+<!--</div>-->
+
+<!--arrow-->
+<!--<div id="arrow">-->
+<!--    <a href="javascript:void(0)"><img src="/static/imgs/mobile_activity/festival_two/arrow.png" alt="" /></a>-->
+<!--</div>-->
+
+<!--share-->
+<!--<div id="share">-->
+<!--    <div class="share_i"><img src="/static/imgs/mobile_activity/festival_two/share.png" alt="" /></div>-->
+<!--</div>-->
+
+<!--main pages -->
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+
+        <!--panel-page01-->
+        <div class="swiper-slide" id="panel-page01">
+            <div class="layer layer01">
+                <div class="lantern lantern-l">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_009.png" alt=""/>
+                </div>
+                <div class="lantern lantern-r">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_009.png" alt=""/>
+                </div>
+            </div>
+            <div class="layer layer02">
+                <div class="table">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_010.png" alt=""/>
+
+                    <ul class="foods">
+                        <li class="food food-one pos-one" data-p="1" data-f="1"><img src="/static/imgs/mobile_activity/festival_two/img_015.png" alt=""/></li>
+                        <li class="food food-two pos-two" data-p="2" data-f="2"><img src="/static/imgs/mobile_activity/festival_two/img_016.png" alt=""/></li>
+                        <li class="food food-three pos-three" data-p="3" data-f="3"><img src="/static/imgs/mobile_activity/festival_two/img_017.png" alt=""/></li>
+                        <li class="food food-four pos-four" data-p="4" data-f="4"><img src="/static/imgs/mobile_activity/festival_two/img_018.png" alt=""/></li>
+                        <li class="food food-five pos-five" data-p="5" data-f="5"><img src="/static/imgs/mobile_activity/festival_two/img_019.png" alt=""/></li>
+                        <li class="food food-six pos-six" data-p="6" data-f="6"><img src="/static/imgs/mobile_activity/festival_two/img_020.png" alt=""/></li>
+                    </ul>
+
+                    <ul class="shines">
+                        <li class="shine shine-one"><img src="/static/imgs/mobile_activity/festival_two/img_021.png" alt=""/></li>
+                        <li class="shine shine-two"><img src="/static/imgs/mobile_activity/festival_two/img_022.png" alt=""/></li>
+                        <li class="shine shine-three"><img src="/static/imgs/mobile_activity/festival_two/img_023.png" alt=""/></li>
+                        <li class="shine shine-four"><img src="/static/imgs/mobile_activity/festival_two/img_024.png" alt=""/></li>
+                        <li class="shine shine-five"><img src="/static/imgs/mobile_activity/festival_two/img_025.png" alt=""/></li>
+                        <li class="shine shine-six"><img src="/static/imgs/mobile_activity/festival_two/img_026.png" alt=""/></li>
+                    </ul>
+
+                    <div class="guideText">
+                        <img src="/static/imgs/mobile_activity/festival_two/img_011.png" alt=""/>
+                    </div>
+                </div>
+            </div>
+            <div class="layer layer03">
+                <div class="myFoodBtn01"><img src="/static/imgs/mobile_activity/festival_two/img_012.png" alt=""/></div>
+                <div class="myFoodBtn02"><img src="/static/imgs/mobile_activity/festival_two/img_012_1.png" alt=""/></div>
+                <div class="justItBtn"><img src="/static/imgs/mobile_activity/festival_two/img_013.png" alt=""/></div>
+                <div class="reelectBtn"><img src="/static/imgs/mobile_activity/festival_two/img_013_1.png" alt=""/></div>
+                <div class="prompt"><img src="/static/imgs/mobile_activity/festival_two/img_014.png" alt=""/></div>
+            </div>
+            <div id="redPacket01" class="redPacket">
+                <div class="title"><img src="/static/imgs/mobile_activity/festival_two/img_027_1.png" alt=""/></div>
+                <div class="title_img"><img src="/static/imgs/mobile_activity/festival_two/img_027_2.png" alt=""/></div>
+                <div class="detail">
+                    <div id="redPacket-cont">100元红包（单笔投资2万元可用）<br />300元红包（单笔投资6完可用）<br />1.2%加息券<br />2%加息券<br />888元体验金</div>
+                    <!--<div class="remarks">
+                        <!-- 备注：红包为0.5%折扣红包，限3月标以上使用。折合加息2%递减。加息券不限标期、无门槛。
+                        <img src="/static/imgs/mobile_activity/festival_two/remarks.png" alt=""/>
+                    </div>-->
+                </div>
+                <div class="orderBtn"><img src="/static/imgs/mobile_activity/festival_two/img_029.png" alt=""/></div>
+            </div>
+            <div id="redPacket02" class="redPacket">
+                <div class="title"><img src="/static/imgs/mobile_activity/festival_two/img_027_1.png" alt=""/></div>
+                <div class="title_img"><img src="/static/imgs/mobile_activity/festival_two/img_027_2.png" alt=""/></div>
+                <div class="detail"><img src="/static/imgs/mobile_activity/festival_two/img_031.png" alt=""/></div>
+                <div class="orderBtn"><img src="/static/imgs/mobile_activity/festival_two/img_029.png" alt=""/></div>
+            </div>
+        </div>
+
+        <!--panel-page02-->
+        <div class="swiper-slide" id="panel-page02">
+            <div class="layer layer01">
+                <div class="lantern lantern-l">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_033.png" alt=""/>
+                </div>
+                <div class="lantern lantern-m">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_034.png" alt=""/>
+                </div>
+                <div class="lantern lantern-r">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_035.png" alt=""/>
+                </div>
+            </div>
+            <div class="layer layer02">
+                <div class="table">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_036.png" alt=""/>
+                    <ul class="foods">
+                        <li class="food food-one"><img src="/static/imgs/mobile_activity/festival_two/img_039.png" alt=""/></li>
+                        <li class="food food-two"><img src="/static/imgs/mobile_activity/festival_two/img_040.png" alt=""/></li>
+                        <li class="food food-three"><img src="/static/imgs/mobile_activity/festival_two/img_041.png" alt=""/></li>
+                        <li class="food food-four"><img src="/static/imgs/mobile_activity/festival_two/img_042.png" alt=""/></li>
+                        <li class="food food-five"><img src="/static/imgs/mobile_activity/festival_two/img_043.png" alt=""/></li>
+                    </ul>
+                    <div class="guideText">
+                        <img src="/static/imgs/mobile_activity/festival_two/img_037.png" alt=""/>
+                    </div>
+                </div>
+                <div class="prompt">
+                    <img src="/static/imgs/mobile_activity/festival_two/img_038.png" alt=""/>
+                </div>
+            </div>
+            <div class="layer layer03">
+                <ul class="results">
+                    <li class="result result-one">
+                        <div class="titleImg"><img src="/static/imgs/mobile_activity/festival_two/img_044_1.png" alt=""/></div>
+                        <div class="title"><img src="/static/imgs/mobile_activity/festival_two/img_045_1.png" alt=""/></div>
+                        <div class="content"><img src="/static/imgs/mobile_activity/festival_two/img_046_1.png" alt=""/></div>
+                    </li>
+                    <li class="result result-two">
+                        <div class="titleImg"><img src="/static/imgs/mobile_activity/festival_two/img_044_2.png" alt=""/></div>
+                        <div class="title"><img src="/static/imgs/mobile_activity/festival_two/img_045_2.png" alt=""/></div>
+                        <div class="content"><img src="/static/imgs/mobile_activity/festival_two/img_046_2.png" alt=""/></div>
+                    </li>
+                    <li class="result result-three">
+                        <div class="titleImg"><img src="/static/imgs/mobile_activity/festival_two/img_044_3.png" alt=""/></div>
+                        <div class="title"><img src="/static/imgs/mobile_activity/festival_two/img_045_3.png" alt=""/></div>
+                        <div class="content"><img src="/static/imgs/mobile_activity/festival_two/img_046_3.png" alt=""/></div>
+                    </li>
+                    <li class="result result-four">
+                        <div class="titleImg"><img src="/static/imgs/mobile_activity/festival_two/img_044_4.png" alt=""/></div>
+                        <div class="title"><img src="/static/imgs/mobile_activity/festival_two/img_045_4.png" alt=""/></div>
+                        <div class="content"><img src="/static/imgs/mobile_activity/festival_two/img_046_4.png" alt=""/></div>
+                    </li>
+                    <li class="result result-five">
+                        <div class="titleImg"><img src="/static/imgs/mobile_activity/festival_two/img_044_5.png" alt=""/></div>
+                        <div class="title"><img src="/static/imgs/mobile_activity/festival_two/img_045_5.png" alt=""/></div>
+                        <div class="content"><img src="/static/imgs/mobile_activity/festival_two/img_046_5.png" alt=""/></div>
+                    </li>
+                </ul>
+                <div class="mutualLayer">
+                    <div class="phoneNumber">
+                        <div class="img_png"></div>
+<!--                        <img src="/static/imgs/mobile_activity/festival_two/img_048_1.png" alt="">-->
+                        <div class="textWrap">
+                            <input type="text" id="phoneNumber" name="phoneNumber" maxlength="11" value="输入手机号 领取两个红包"/>
+                        </div>
+                    </div>
+                    <div class="receiveBtn"><a href="javascript:void(0)" target="_blank"><img src="/static/imgs/mobile_activity/festival_two/img_047.png" alt=""/></a></div>
+                </div>
+            </div>
+        </div>
+
+        <!--panel-page03-->
+        <div class="swiper-slide" id="panel-page03">
+            <div class="layer layer01"></div>
+            <div class="layer layer02">
+                <div class="share"><img src="/static/imgs/mobile_activity/festival_two/img_051.png" alt=""/></div>
+                <div class="title"><a href="javascript:;" id="go_next"><img src="/static/imgs/mobile_activity/festival_two/img_052.png" alt=""/></a></div>
+                <div class="year"><img src="/static/imgs/mobile_activity/festival_two/a.png" alt=""/></div>
+<!--                <div class="Greeting "><img src="/static/imgs/mobile_activity/festival_two/img_054.png" alt=""/></div>-->
+                <div class="erweima"><img src="/static/imgs/mobile_activity/festival_two/b.png" alt=""/></div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<!--JS依赖库-->
+<script type="text/javascript" src="/static/src/mobile/lib/weixin/wx.js"></script>
+<script type="text/javascript" src="/static/js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/lib/swiper3.1.0.jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/lib/velocity.min.js"></script>
+<script type="text/javascript" src="/static/js/lib/velocity.ui.min.js"></script>
+<!--<script type="text/javascript" src="/static/js/lib/jquery.imgpreload.min.js"></script>-->
+<!--app程序入口-->
+<!--<script src="/static/js/resource.js?></script>-->
+<script src="/static/js/festival_two.js?t=2016021626"></script>
+</body>
+</html>

@@ -29,7 +29,8 @@ block main
                 p.p2 6位数字，投资、提现时使用，保证账户资金安全
             .btns
                 p.old(style='display:none')
-                    a(href='javascript:void(0)')#getBackTradingPwd 找回
+                    if user.wanglibaouserprofile.utype != '3'
+                        a(href='javascript:void(0)')#getBackTradingPwd 找回
                     a(href='/accounts/trading') 修改
                 p.new(style='display:none')
                     a(href='javascript:void(0)')#setPWDA.bg 设置
