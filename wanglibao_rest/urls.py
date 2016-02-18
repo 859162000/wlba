@@ -33,7 +33,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
                             BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
                             BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
-                            BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView, PayinfoView)
+                            BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView, CheckRechargePayinfoView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
@@ -61,7 +61,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_QMReward, Lantern_HMReward, Lantern_FetchRewardAPI)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -176,7 +176,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/delete/$', BindPayDelView.as_view()),
     url(r'^pay/cnp/dynnum/$', BindPayDynNumView.as_view()),
     url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
-    url(r'^pay/check_recharge/$', PayinfoView.as_view()),
+    url(r'^pay/check_recharge/$', CheckRechargePayinfoView.as_view()),
 
     # 切换支付渠道重新
     url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
@@ -280,8 +280,6 @@ urlpatterns += patterns(
     url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
     url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
     url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
-    url(r'^lantern/qm_reward/$', Lantern_QMReward.as_view()),  # 全民盛宴
-    url(r'^lantern/hm_reward/$', Lantern_HMReward.as_view()),  # 豪门盛宴
     url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
 )
 

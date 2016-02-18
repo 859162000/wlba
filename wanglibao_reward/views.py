@@ -2252,26 +2252,7 @@ class LanternBanquetTemplate(TemplateView):
                 WechatPhoneRewardRecord.objects.create(
                         openid = openid
                     )
-            with transaction.atomic():
-                phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
-                redpack_id_str = str(redpack_id)
-                if phoneRewardRecord.redpack_event_ids and phoneRewardRecord.redpack_event_ids != redpack_id_str:
-                    phoneRewardRecord.redpack_event_ids = redpack_id_str
-                    phoneRewardRecord.save()
-                if not phoneRewardRecord.redpack_event_ids:
-                    phoneRewardRecord.redpack_event_ids = redpack_id_str
-                    phoneRewardRecord.save()
-        except IntegrityError, e:
-            pass
-
-
-        now_date = datetime.date.today()
-        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
-        try:
-            if not phoneRewardRecord:
-                WechatPhoneRewardRecord.objects.create(
-                        openid = openid
-                    )
+            phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
             if not phoneRewardRecord.phone:
                 with transaction.atomic():
                     phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
@@ -2318,6 +2299,7 @@ class LanternBanquetTemplate(TemplateView):
 
 
     def dispatch(self, request, *args, **kwargs):
+        # request.session['lantern_openid'] = request.GET.get('openid')
         code = request.GET.get('code')
         state = request.GET.get('state')
         try:
@@ -2347,15 +2329,25 @@ class Lantern_FetchRewardAPI(APIView):
         phone = request.DATA.get('phone')
         if not phone:
             return Response({"ret_code":-1, "message":"phone为空"})
+        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
         now_date = datetime.date.today()
         phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
         if not phoneRewardRecord:
             return Response({"ret_code":-1, "message":"记录为空"})
         if phoneRewardRecord.phone:
-            return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
+            if WanglibaoUserProfile.objects.filter(phone=phoneRewardRecord.phone).exists():
+                if phoneRewardRecord.status:
+                    return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
+            else:
+                return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
 
-        if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone).exists():
-            return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
+        if userprofile:
+            if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone, status=True).exists():
+                return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
+        else:
+            if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone).exists():
+                return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
+
         activity = Activity.objects.filter(code=phoneRewardRecord.activity_code).first()
         if not activity:
             return Response({"ret_code":-1, "message":"没有相应活动"})
@@ -2368,15 +2360,15 @@ class Lantern_FetchRewardAPI(APIView):
         if activity.is_stopped:
             return Response({"ret_code":2, "message":"活动已经暂停了"})
 
-        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
+
         if userprofile:
             device = split_ua(self.request)
             device_type = device['device_type']
+            phoneRewardRecord.phone = phone
+            phoneRewardRecord.save()
             res = sendWechatPhoneReward(openid, userprofile.user, device_type)
             if res['ret_code']==0:
                 res['is_wanglibao']=True
-                phoneRewardRecord.phone = phone
-                phoneRewardRecord.save()
             return Response(res)
         phoneRewardRecord.phone = phone
         phoneRewardRecord.save()

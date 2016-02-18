@@ -13,10 +13,18 @@
   require(['jquery','activityRegister'], function($,re) {
     //注册
     re.activityRegister.activityRegisterInit({
-        registerTitle :'注册送10元电影券',    //注册框标语
+        registerTitle :'注册送5元电影券',    //注册框标语
         isNOShow : '1',
-        buttonFont: '注册领电影券'
+        buttonFont: '注册领电影券',
+        hasCallBack: true,
+        callBack: function(){
+          window.location.href='/';
+        }
     });
+    if($('#ganjiwang-model')){
+      $('#ganjiwang-model,#ganjiwang-welcome').hide()
+    }
+    $('.xun-p a').attr('href','/accounts/login/?next=/activity/xingmei_two/?promo_token=xm2');
     $('.reg-btn').click(function(){
         $('body,html').animate({scrollTop: 0}, 600);
         $('#small-zc').hide();
@@ -25,13 +33,17 @@
     //提醒注册
     $('.reg').on('click',function(){
       $('#small-zc').show();
-      $('#xl-aug-success').show()
+      $('#xl-aug-success').show();
+      $('#xl-aug-fail').hide();
     })
     //关闭模态框
-    $('.first-xl-off2').on('click',function(){
+    $('.first-xl-off2,.fail-btn').on('click',function(){
       $('#small-zc').hide();
-      $('#xl-aug-success').hide()
+      $('#xl-aug-success').hide();
+      $('#xl-aug-fail').hide();
     })
+    //提示
+
     //模态口
     var body_h=$('body').height();
     $('#small-zc').height(body_h);
@@ -76,6 +88,32 @@
       $('body,html').animate({scrollTop: 0}, 600);
       return false
     })
+
+
+    //请求接口,判断用户领奖的状态
+    $('.xm-btn').on('click',function(){
+      $.ajax({
+        type: 'POST',
+        data: {activity:'xm2'},
+        url: '/api/activity/reward/',
+        success: function(data){
+          if($('.xm-btn').hasClass('btn-fail')){
+            $('#small-zc').show();
+            $('#xl-aug-success').hide();
+            $('#xl-aug-fail').children('p').text(data.message)
+            $('#xl-aug-fail').show()
+          }
+        }
+      })
+
+
+    })
+
+
+
+
+
+
 
   });
 
