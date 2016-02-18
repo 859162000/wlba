@@ -550,7 +550,6 @@ $(function(){
                     alert('请输入正确的手机号码哦!');
                     return false;
                 }
-                alert(myApp.mySwiper.height);
                 myApp.ajaxSwitch01 = false;
                 myApp.ajaxSwitch011 = false;
                 $.ajax({
