@@ -26,7 +26,7 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
                         _send_message_for_hby(user, redpack_event, end_time)
             if key == 'experience':
                 for experience_info in value:
-                    experience = experience_info['experience']
+                    experience = experience_info['experience_event']
                     SendExperienceGold(user).send(pk=experience.id)
 
         redpack_ids = phoneRewardRecord.redpack_event_ids.split(',')
@@ -58,7 +58,7 @@ def sendWechatPhoneReward(openid, user, device_type):
                     records.append(record)
             if key == 'experience':
                 for experience_info in value:
-                    experience = experience_info['experience']
+                    experience = experience_info['experience_event']
                     experience_record_id, experience_event = SendExperienceGold(user).send(pk=experience.id)
                     if not experience_record_id:
                         return {"ret_code":-1, "message":"体验金无法发放"}

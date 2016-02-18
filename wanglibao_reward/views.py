@@ -2246,6 +2246,7 @@ class LanternBanquetTemplate(TemplateView):
                 WechatPhoneRewardRecord.objects.create(
                         openid = openid
                     )
+            phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
             if not phoneRewardRecord.phone:
                 with transaction.atomic():
                     phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
@@ -2357,11 +2358,11 @@ class Lantern_FetchRewardAPI(APIView):
         if userprofile:
             device = split_ua(self.request)
             device_type = device['device_type']
+            phoneRewardRecord.phone = phone
+            phoneRewardRecord.save()
             res = sendWechatPhoneReward(openid, userprofile.user, device_type)
             if res['ret_code']==0:
                 res['is_wanglibao']=True
-                phoneRewardRecord.phone = phone
-                phoneRewardRecord.save()
             return Response(res)
         phoneRewardRecord.phone = phone
         phoneRewardRecord.save()
