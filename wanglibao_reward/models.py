@@ -232,6 +232,9 @@ class WechatPhoneRewardRecord(models.Model):
     redpack_event_ids = models.CharField(u'优惠券IDs', max_length=64, null=True)
     status = models.BooleanField(default=False, verbose_name=u'优惠券是否已经领取', help_text=u'默认是没有领取')
     create_time = models.DateTimeField(u'记录创建时间', auto_now_add=True)
+    redpack_record_ids = models.CharField(u'领取优惠券流水ｉｄ', max_length=64, null=True)
+    experience_record_ids = models.CharField(u'领取体验金流水ｉｄ', max_length=64, null=True)
+
     class Meta:
         unique_together = (("openid", "phone", "create_date"),)  # 联合唯一索引
 

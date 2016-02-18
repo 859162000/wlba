@@ -18,6 +18,8 @@ class Migration(SchemaMigration):
             ('redpack_event_ids', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
             ('status', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('redpack_record_ids', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
+            ('experience_record_ids', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
         ))
         db.send_create_signal(u'wanglibao_reward', ['WechatPhoneRewardRecord'])
 
@@ -245,10 +247,12 @@ class Migration(SchemaMigration):
             'activity_code': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'create_date': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'experience_record_ids': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'openid': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
             'redpack_event_ids': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
+            'redpack_record_ids': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'status': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         u'wanglibao_reward.weixinannualbonus': {

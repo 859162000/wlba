@@ -13,6 +13,8 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
     phone = user.wanglibaouserprofile.phone
     phoneRewardRecords = WechatPhoneRewardRecord.objects.filter(status=False, phone=phone).all()
     for phoneRewardRecord in phoneRewardRecords:
+        redpack_record_ids = ""
+        experience_record_ids = ""
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
         for key, value in rewards.iteritems():
             if key == 'redpack':
@@ -20,30 +22,44 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
                     redpack_event = redpack_event_info['redpack_event']
                     status, messege, record = give_activity_redpack_for_hby(user, redpack_event, device_type)
                     if status:
-
+                        if not redpack_record_ids:
+                            redpack_record_ids += str(record.id)
+                        else:
+                            redpack_record_ids += (","+str(record.id))
                         start_time, end_time = get_start_end_time(redpack_event.auto_extension, redpack_event.auto_extension_days,
                                                                   record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
                         _send_message_for_hby(user, redpack_event, end_time)
             if key == 'experience':
                 for experience_info in value:
                     experience = experience_info['experience_event']
-                    SendExperienceGold(user).send(pk=experience.id)
-
+                    experience_record_id, experience_event = SendExperienceGold(user).send(pk=experience.id)
+                    if not experience_record_ids:
+                        experience_record_ids += str(experience_record_id)
+                    else:
+                        experience_record_ids += (","+str(experience_record_id))
         redpack_ids = phoneRewardRecord.redpack_event_ids.split(',')
         for redpack_id in redpack_ids:
             redpack_event = RedPackEvent.objects.filter(id=int(redpack_id)).first()
             status, messege, record = give_activity_redpack_for_hby(user, redpack_event, device_type)
+            if not redpack_record_ids:
+                redpack_record_ids += str(record.id)
+            else:
+                redpack_record_ids += (","+str(record.id))
             if status:
                 start_time, end_time = get_start_end_time(redpack_event.auto_extension, redpack_event.auto_extension_days,
                                                           record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
                 _send_message_for_hby(user, redpack_event, end_time)
         phoneRewardRecord.status = True
+        phoneRewardRecord.redpack_record_ids = redpack_record_ids
+        phoneRewardRecord.experience_record_ids = experience_record_ids
         phoneRewardRecord.save()
 
 def sendWechatPhoneReward(openid, user, device_type):
     now_date = datetime.date.today()
     events = []
     records = []
+    redpack_record_ids = ""
+    experience_record_ids = ""
     with transaction.atomic():
         phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(status=False, openid=openid, create_date=now_date).first()
         rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
@@ -54,6 +70,10 @@ def sendWechatPhoneReward(openid, user, device_type):
                     status, messege, record = give_activity_redpack_for_hby(user, redpack_event, device_type)
                     if not status:
                         return {"ret_code":-1, "message":messege}
+                    if not redpack_record_ids:
+                        redpack_record_ids += str(record.id)
+                    else:
+                        redpack_record_ids += (","+str(record.id))
                     events.append(redpack_event)
                     records.append(record)
             if key == 'experience':
@@ -62,6 +82,10 @@ def sendWechatPhoneReward(openid, user, device_type):
                     experience_record_id, experience_event = SendExperienceGold(user).send(pk=experience.id)
                     if not experience_record_id:
                         return {"ret_code":-1, "message":"体验金无法发放"}
+                    if not experience_record_ids:
+                        experience_record_ids += str(experience_record_id)
+                    else:
+                        experience_record_ids += (","+str(experience_record_id))
 
         redpack_ids = phoneRewardRecord.redpack_event_ids.split(',')
         for redpack_id in redpack_ids:
@@ -69,9 +93,15 @@ def sendWechatPhoneReward(openid, user, device_type):
             status, messege, record = give_activity_redpack_for_hby(user, redpack_event, device_type)
             if not status:
                 return {"ret_code":-1, "message":messege}
+            if not redpack_record_ids:
+                redpack_record_ids += str(record.id)
+            else:
+                redpack_record_ids += (","+str(record.id))
             events.append(redpack_event)
             records.append(record)
         phoneRewardRecord.status = True
+        phoneRewardRecord.redpack_record_ids = redpack_record_ids
+        phoneRewardRecord.experience_record_ids = experience_record_ids
         phoneRewardRecord.save()
     try:
         for idx, event in enumerate(events):
