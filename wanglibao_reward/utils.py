@@ -50,7 +50,7 @@ def sendWechatPhoneRewardByRegister(user, device_type="all"):
                                                           record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
                 _send_message_for_hby(user, redpack_event, end_time)
         phoneRewardRecord.status = True
-        phoneRewardRecord.redpack_event_ids = redpack_record_ids
+        phoneRewardRecord.redpack_record_ids = redpack_record_ids
         phoneRewardRecord.experience_record_ids = experience_record_ids
         phoneRewardRecord.save()
 
@@ -100,7 +100,7 @@ def sendWechatPhoneReward(openid, user, device_type):
             events.append(redpack_event)
             records.append(record)
         phoneRewardRecord.status = True
-        phoneRewardRecord.redpack_event_ids = redpack_record_ids
+        phoneRewardRecord.redpack_record_ids = redpack_record_ids
         phoneRewardRecord.experience_record_ids = experience_record_ids
         phoneRewardRecord.save()
     try:
