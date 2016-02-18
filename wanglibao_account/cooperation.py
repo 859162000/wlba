@@ -1114,16 +1114,17 @@ class XingMeiRegister(CoopRegister):
                 return
 
             try:
-                activity_reward = ActivityReward.objects.create(
-                        activity='xm2',
-                        order_id=order_id,
-                        user=user,
-                        p2p_amount=p2p_record.amount,
-                        reward=None,
-                        has_sent=False, #当用户领奖后,变成True, reward填上相应的奖品
-                        left_times=1,
-                        join_times=1,
-                )
+                for _index in xrange(2):
+                    activity_reward = ActivityReward.objects.create(
+                            activity='xm2',
+                            order_id=order_id,
+                            user=user,
+                            p2p_amount=p2p_record.amount,
+                            reward=None,
+                            has_sent=False, #当用户领奖后,变成True, reward填上相应的奖品
+                            left_times=1,
+                            join_times=1,)
+
             except Exception, reason:
                 logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
                 raise Exception(u"生成获奖记录异常")
