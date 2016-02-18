@@ -24,7 +24,7 @@
     if($('#ganjiwang-model')){
       $('#ganjiwang-model,#ganjiwang-welcome').hide()
     }
-    $('.xun-p a').attr('href','/accounts/login/?next=/activity/xingmei_two/');
+    $('.xun-p a').attr('href','/accounts/login/?next=/activity/xingmei_two/?promo_token=xm2');
     $('.reg-btn').click(function(){
         $('body,html').animate({scrollTop: 0}, 600);
         $('#small-zc').hide();
@@ -43,12 +43,7 @@
       $('#xl-aug-fail').hide();
     })
     //提示
-    $('.btn-fail').on('click',function(){
-      $('#small-zc').show();
-      $('#xl-aug-success').hide();
-      $('#xl-aug-fail').show()
 
-    })
     //模态口
     var body_h=$('body').height();
     $('#small-zc').height(body_h);
@@ -96,14 +91,25 @@
 
 
     //请求接口,判断用户领奖的状态
-    $.ajax({
-      type: 'POST',
-      data: {activity:'xm2'},
-      url: '/api/activity/reward/',
-      success: function(data){
-        console.log(data.message)
-      }
+    $('.xm-btn').on('click',function(){
+      $.ajax({
+        type: 'POST',
+        data: {activity:'xm2'},
+        url: '/api/activity/reward/',
+        success: function(data){
+          if($('.xm-btn').hasClass('btn-fail')){
+            $('#small-zc').show();
+            $('#xl-aug-success').hide();
+            $('#xl-aug-fail').children('p').text(data.message)
+            $('#xl-aug-fail').show()
+          }
+        }
+      })
+
+
     })
+
+
 
 
 

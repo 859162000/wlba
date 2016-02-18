@@ -38,7 +38,7 @@ html(style="background:#9a477d")
               a 立即投资
           else
             .reg-btn
-              a(href="/weixin/regist/") 立即投资
+              a(href="/weixin/regist/?next=/activity/app_xingmei_two/?promo_token=xm2") 立即投资
         h1(style="margin-top:1rem") 兑换码使用流程
       .xm-liucheng
       .xingmei-main
@@ -67,33 +67,8 @@ html(style="background:#9a477d")
             img(src="/static/imgs/mobile_activity/extension/extension_xiu3.png")
             p 第三方<br/><em>100%</em>本息保障
 
-        script(src="/static/src/mobile/lib/zepto/zepto.js")
-        script.
-            (function(){
+    script(src="/static/scripts/mobile_activity/xingmei_two.js")
 
-              $('.no-reg').on('click',function(){
-                $('.xm-error').show()
-
-              })
-              console.log()
-              $.ajax({
-                type: 'POST',
-                url: '/projects',
-                data: { name: 'Zepto.js' },
-                dataType: 'json',
-                timeout: 300,
-                context: $('body'),
-                success: function(data){
-                  // Supposing this JSON payload was received:
-                  //   {"project": {"id": 42, "html": "<div>..." }}
-                  // append the HTML to context object.
-                  this.append(data.project.html)
-                },
-                error: function(xhr, type){
-                  //alert('Ajax error!')
-                }
-              })
-            })();
 
 
 
