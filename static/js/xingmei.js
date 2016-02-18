@@ -97,18 +97,23 @@
         data: {activity:'xm2'},
         url: '/api/activity/reward/',
         success: function(data){
-          if($('.xm-btn').hasClass('btn-fail')){
-            if(data.ret_code==1003){
-              $('#xl-aug-fail').children('p').text('对不起,您不符合领取规则')
-            }else if(data.ret_code==0){
-              $('#xl-aug-fail').children('p').text('恭喜您,您已获得奖励,请到个人用户查看')
-            }else{
-              $('#xl-aug-fail').children('p').text(data.message)
-            }
-            $('#small-zc').show();
+          if(data.ret_code==1000){
+            $('#xl-aug-success').show();
+            $('#xl-aug-fail').hide()
+          }else if(data.ret_code==1003){
+            $('#xl-aug-fail').children('p').text('对不起,您不符合领取规则');
+            $('#xl-aug-success').hide();
+            $('#xl-aug-fail').show()
+          }else if(data.ret_code==0){
+            $('#xl-aug-fail').children('p').text('恭喜您,您已获得奖励,请到个人用户查看')
+            $('#xl-aug-success').hide();
+            $('#xl-aug-fail').show()
+          }else{
+            $('#xl-aug-fail').children('p').text(data.message)
             $('#xl-aug-success').hide();
             $('#xl-aug-fail').show()
           }
+          $('#small-zc').show();
         }
       })
 
