@@ -221,22 +221,22 @@
                 time_intervalId = setInterval(timerFunction, 1000);
                 time_intervalId;
 
-                //$.ajax({
-                //    url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
-                //    type: 'POST',
-                //    success: function (xhr) {
-                //        $('.error_form').hide();
-                //    },
-                //    error: function (xhr) {
-                //        result = JSON.parse(xhr.responseText);
-                //        $('.error_form').text(result.message).show();
-				//
-                //        clearInterval(time_intervalId);
-                //        time_count = 0;
-                //        $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
-				//
-                //    }
-                //});
+                $.ajax({
+                    url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
+                    type: 'POST',
+                    success: function (xhr) {
+                        $('.error_form').hide();
+                    },
+                    error: function (xhr) {
+                        result = JSON.parse(xhr.responseText);
+                        $('.error_form').text(result.message).show();
+
+                        clearInterval(time_intervalId);
+                        time_count = 0;
+                        $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+
+                    }
+                });
             }else{
                 $('.status_code .false').text('请先输入正确的手机号');
                 $('.status_code').show().children('.true').hide();
