@@ -576,7 +576,7 @@ $(function(){
             var winHost = window.location.href;
             var host = $("#shareUrl").val();
 			//var host = 'https://staging.wanglibao.com',
-            var shareImg = host + 'https://www.wanglibao.com/static/imgs/mobile/weChat_logo.png',
+            var shareImg = 'https://www.wanglibao.com/static/imgs/mobile/weChat_logo.png',
                 shareLink = host + '/activity/festival_two/',
                 shareMainTit = shareTit,
                 shareBody = '闹元宵，吃大餐，抽红包财源滚滚来';
