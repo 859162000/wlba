@@ -236,6 +236,6 @@ class WechatPhoneRewardRecord(models.Model):
     experience_record_ids = models.CharField(u'领取体验金流水ｉｄ', max_length=64, null=True)
 
     class Meta:
-        unique_together = (("openid", "create_date"), ("phone", "create_date"))  # 联合唯一索引
+        unique_together = (("openid", "phone", "create_date"),)  # 联合唯一索引
 
 
