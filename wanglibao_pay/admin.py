@@ -5,8 +5,6 @@ from django.utils import timezone
 from wanglibao_pay.models import Bank, PayInfo, Card, WithdrawCard, WithdrawCardRecord, WhiteListCard, BlackListCard
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
     AdminTransaction, CardConfigTemplateView
-# , 'channel', 'type'
-UnbindCardTemplateView
 
 class PayInfoStatusFilter(admin.SimpleListFilter):
     title = u'状态'
@@ -179,8 +177,6 @@ admin.site.register_view('pay/withdraw/rollback', view=WithdrawRollback.as_view(
 
 admin.site.register_view('pay/transaction', view=AdminTransaction.as_view(),name=u'交易记录详情')
 
-admin.site.register_view('pay/card/config/',
-        view=CardConfigTemplateView.as_view(), name=u'用户卡管理',
-                         urlname='card_config')
+admin.site.register_view('pay/card/config/', view=CardConfigTemplateView.as_view(), name=u'用户卡管理', urlname='card_config')
 
 

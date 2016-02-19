@@ -1335,10 +1335,7 @@ class CardConfigTemplateView(TemplateView):
 
         wangli_cards = Card.objects.filter(user=user).all()
         kuai_cards = third_pay.KuaiShortPay().query_bind_new(user.id)['cards']
-        logger.info('kuai_cards1'+str(kuai_cards))
-        kuai_cards.append('6225880548')
         kuai_cards = self._get_wangli_cards(kuai_cards, wangli_cards)
-        logger.info('kuai_cards2'+str(kuai_cards))
         yee_cards = third_pay.YeeShortPay().bind_card_query(user) 
         yee_cards = [c['card_top'] + c['card_last'] for c in yee_cards['data']['cardlist']]
         yee_cards = self._get_wangli_cards(yee_cards, wangli_cards)
