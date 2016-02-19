@@ -241,7 +241,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       }
     })
   })
-  var host = 'https://www.wanglibao.com',
+  var host = 'https://staging.wanglibao.com',
         shareImg = host + '/static/imgs/mobile/share_logo.png',
         shareLink = host + '/activity/app_xingmei_two/?promo_token=xm2',
         shareMainTit = '你观影，我买单',
