@@ -1054,10 +1054,13 @@ class KuaiShortPay:
         elif result['ret_code']:
             return {"ret_code": 20103, "message": result['message']}
 
-        card.is_bind_kuai = False
-        if not card.is_bind_yee:
-            card.is_the_one_card = False
-        card.save()
+        cards = [c for c in Card.objects.filter(user_id=user_id).all() if
+                 (c.no[:6] + c.no[-4:]) == card_short_no]
+        for card in cards:
+            card.is_bind_kuai = False
+            if not card.is_bind_yee:
+                card.is_the_one_card = False
+            card.save()
 
         return {"ret_code": 0, "message": "ok"}
 
