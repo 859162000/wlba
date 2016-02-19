@@ -325,3 +325,9 @@ urlpatterns += patterns(
     '',
     url(r'^account2015/$', CustomerAccount2015ApiView.as_view()),
 )
+
+# 短信发送相关
+urlpatterns += patterns(
+    '',
+    url(r'^sms/', include('wanglibao_sms.urls')),
+)

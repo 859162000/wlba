@@ -104,7 +104,11 @@
             $('#xl-aug-fail').children('p').text('对不起,您不符合领取规则');
             $('#xl-aug-success').hide();
             $('#xl-aug-fail').show()
-          }else if(data.ret_code==0){
+          }else if(data.ret_code==1005){
+            $('#xl-aug-fail').children('p').text('您的奖励已发放')
+            $('#xl-aug-success').hide();
+            $('#xl-aug-fail').show()
+        }else if(data.ret_code==0){
             $('#xl-aug-fail').children('p').text('恭喜您,您已获得奖励,请到个人账户查看')
             $('#xl-aug-success').hide();
             $('#xl-aug-fail').show()
