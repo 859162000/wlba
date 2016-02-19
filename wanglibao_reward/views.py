@@ -2215,8 +2215,8 @@ class LanternBanquetTemplate(TemplateView):
     元宵节
     """
     template_name = 'new_year_feast.jade'
-    activity_codes = ['yx_qmsy_redpack', 'yx_qmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
-    activity_code = 'yx_hmsy_redpack'
+    activity_codes = ['yxqmsy_redpack', 'yxqmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
+    activity_code = 'yxhmsy_redpack'
     def get_random_activity_code(self):
         return self.activity_codes[random.randint(0, 1)]
 
