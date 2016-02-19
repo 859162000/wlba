@@ -2287,9 +2287,12 @@ class ValidateAccountInfoAPI(APIView):
                 if card.no != card_no:
                     return Response({'message': "银行卡号输入错误"}, status=400)
             return Response({'ret_code': 0})
-        message = form.errors
+        message = ""
         for key, value in form.errors.iteritems():
-            message = ",".join(value)
+            for msg in value:
+                if msg == u"用户名或者密码不正确":
+                    msg = u"密码不正确"
+                message+=msg
         return Response({"message":message}, status=400)
 
 class ModifyPhoneValidateCode(APIView):
@@ -2433,9 +2436,12 @@ class SMSModifyPhoneValidateAPI(APIView):
                 sms_modify_record.new_phone = new_phone
                 sms_modify_record.save()
             return Response({"message":'ok'})
-        message = form.errors
+        message = ""
         for key, value in form.errors.iteritems():
-            message = ",".join(value)
+            for msg in value:
+                if msg == u"用户名或者密码不正确":
+                    msg = u"密码不正确"
+                message+=msg
         return Response({"message":message}, status=400)
 
 class SMSModifyPhoneTemplate(TemplateView):

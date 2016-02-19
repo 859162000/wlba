@@ -1301,9 +1301,11 @@ class WeixinRedpackRegister(CoopRegister):
         super(WeixinRedpackRegister, self).__init__(request)
         self.c_code = 'wrp'
         self.invite_code = 'wrp'
-        self.order_id = request.POST.get("order_id", None)
+        # Move to register_call_back() by hb on 2016-02-19
+        #self.order_id = request.POST.get("order_id", None)
 
     def register_call_back(self, user):
+        self.order_id = self.request.POST.get("order_id", None)
         phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         try:

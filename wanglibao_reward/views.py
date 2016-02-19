@@ -2230,8 +2230,8 @@ class LanternBanquetTemplate(TemplateView):
     元宵节
     """
     template_name = 'new_year_feast.jade'
-    activity_codes = ['qmsy_redpack', 'qmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
-    activity_code = 'hmsy_redpack'
+    activity_codes = ['yxqmsy_redpack', 'yxqmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
+    activity_code = 'yxhmsy_redpack'
     def get_random_activity_code(self):
         return self.activity_codes[random.randint(0, 1)]
 
@@ -2308,8 +2308,11 @@ class LanternBanquetTemplate(TemplateView):
                 original_id = info.get("fwh")
                 account = WeixinAccounts.getByOriginalId(original_id)
                 share_url = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=CALLBACK_HOST+"/weixin_activity/lantern_banquet/", state=original_id)
-        # print context
+
         context['share_url']=share_url
+        csrftoken =  self.request.COOKIES.get('csrftoken', "")
+        context['csrftoken']=csrftoken
+        # print context
         return context
 
 
@@ -2392,7 +2395,7 @@ class Lantern_FetchRewardAPI(APIView):
         send_sms_msg_one.apply_async(kwargs={
         "rule_id":7,
         "phone":phone,
-        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。关注网利宝服务号，每日签到抽大奖。 退订回TD",
+        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。",
         "user_type":"phone"
         })
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
