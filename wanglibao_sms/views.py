@@ -12,7 +12,9 @@ from rest_framework.views import APIView
 
 from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_sms.models import ArrivedRate
+from wanglibao_sms.models import ArrivedRate, MessageTemplate
+from wanglibao_sms import messages as sms_messages
+from wanglibao_sms.tasks import send_messages
 from wanglibao_rest.common import DecryptParmsAPIView
 
 
@@ -168,13 +170,29 @@ class ArriveRate(APIView):
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
-class RequestSendSMSAPIView(DecryptParmsAPIView):
+class SendSMSNoticeAPIView(DecryptParmsAPIView):
     """
-    发送短信接口,
+    发送短信接口, template_id: 1=>success; 2=>fail
     """
     permission_classes = ()
 
     def post(self, request):
         phone = self.params.get('phone')
-        content = self.params.get('content')
-        channel = self.params.get('channel')
+        sms_func_name = self.params.get('sms_func_name')
+        if not sms_func_name:
+            return
+
+        sms_template = MessageTemplate.objects.filter(message_for=sms_func_name).first()
+        if sms_template:
+            sms_content = sms_template.content
+        else:
+            if sms_func_name == 'changed_mobile_success':
+                sms_content = sms_messages.changed_mobile_success()
+            else:
+                sms_content = sms_messages.changed_mobile_fail()
+
+        # 发送短信
+        send_messages.apply_async(kwargs={
+            "phones": [phone, ],
+            "messages": [sms_content, ],
+        })
