@@ -2300,7 +2300,7 @@ class LanternBanquetTemplate(TemplateView):
             experience_event = experience_dict.get('experience_event')
             rewards.get('experience').append({"amount":int(experience_event.amount)})
 
-        event = RedPackEvent.objects.filter(id=redpack_id).first()
+        event = RedPackEvent.objects.filter(id=int(phoneRewardRecord.redpack_event_ids)).first()
         context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
         BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
         share_url = ""
