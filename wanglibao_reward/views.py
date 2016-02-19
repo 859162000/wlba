@@ -2401,5 +2401,6 @@ class Lantern_FetchRewardAPI(APIView):
         "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。",
         "user_type":"phone"
         })
+        request.session['lantern_openid'] = None
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
 
