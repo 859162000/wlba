@@ -1118,21 +1118,11 @@ class XingMeiDistribute(ActivityRewardDistribute):
         if now < start_time or now > end_time:
             json_to_response = {
                 'ret_code': 1001,
-                'message': u'活动还没有开始'
+                'message': u'不在活动时间内,不可领票'
             }
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
             return
-
-        #3 奖品已经发放完毕
-        counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
-        if counts >= tickets:
-            json_to_response = {
-                'ret_code': 1002,
-                'message': u'奖品已经发完了'
-            }
-
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         #4 用户没有抽奖机会
         activity_rewards = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, reward=None)
@@ -1140,6 +1130,16 @@ class XingMeiDistribute(ActivityRewardDistribute):
             json_to_response = {
                 'ret_code': 1003,
                 'message': u'用户没有抽奖机会'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        #3 奖品已经发放完毕
+        counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+        if counts >= tickets:
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'奖品已经发完了'
             }
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
