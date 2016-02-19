@@ -279,10 +279,12 @@
                     error: function (xhr) {
                         result = JSON.parse(xhr.responseText);
                         $('.error_form').text(result.message).show();
+                        $('.input_code').val('');
                     }
                 });
             }else{
                 $('.error_form').text('请将表单填写完整').show();
+
             }
 
 

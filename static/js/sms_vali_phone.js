@@ -181,6 +181,7 @@
 							error: function (xhr) {
 								result = JSON.parse(xhr.responseText);
 								$('.error_form').text(result.message).show();
+								$('.input_code').val('');
 							}
 
 						});
@@ -208,6 +209,7 @@
 							error: function (xhr) {
 								result = JSON.parse(xhr.responseText);
 								$('.error_form').text(result.message).show();
+								$('.input_code').val('');
 							}
 						});
 					}
