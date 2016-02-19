@@ -1344,7 +1344,6 @@ class CardConfigTemplateView(TemplateView):
         res = {'user_id': profile.user_id, 'phone': phone, 'name': profile.name, 'wangli_cards': wangli_cards,
                 'kuai_cards': kuai_cards, 'yee_cards': yee_cards, 'banks_info':
                 banks_info}
-        logger.info('card_config' + str(res))
         return res
 
 

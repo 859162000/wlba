@@ -79,7 +79,6 @@ from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha
-
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
 
@@ -2362,6 +2361,10 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.id_user_image = id_user_image
             manual_record.save()
 
+            send_messages.apply_async(kwargs={
+                "phones": [new_phone, ],
+                "messages": ["尊敬的网利宝用户，您已申请人工审核修改手机号，申请结果将在1-2个工作日内通过短信发送到本手机，请留意", ],
+            })
             return Response({'ret_code': 0})
         else:
             message = form.errors
@@ -2424,7 +2427,7 @@ class SMSModifyPhoneValidateAPI(APIView):
                 if card.no != card_no:
                     return Response({'message': "银行卡号输入错误"}, status=400)
 
-            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
+            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
             if not sms_modify_record:
                 sms_modify_record = SMSModifyPhoneRecord()
                 sms_modify_record.user = user
@@ -2450,7 +2453,7 @@ class SMSModifyPhoneTemplate(TemplateView):
         user = self.request.user
         profile = user.wanglibaouserprofile
         new_phone = ""
-        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
         if sms_modify_record:
             new_phone = sms_modify_record.new_phone
 
@@ -2463,7 +2466,7 @@ class SMSModifyPhoneAPI(APIView):
     def post(self, request):
         user = request.user
         new_phone = request.DATA.get('new_phone', "").strip()
-        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status = u'短信修改手机号提交').first()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status=u'短信修改手机号提交').first()
         if not sms_modify_record:
             return Response({'message':u"还没有短信申请修改手机号"}, status=400)
         profile = user.wanglibaouserprofile
@@ -2476,11 +2479,6 @@ class SMSModifyPhoneAPI(APIView):
         new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
         if new_phone_user:
             return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
-        card = Card.objects.filter(user=request.user, is_the_one_card=True)
-        if card.exists():
-            card_no = request.DATA.get('card_no', "").strip()
-            if not card_no or card_no != card.no:
-                return Response({'message':"银行卡号错误"}, status=400)
         with transaction.atomic(savepoint=True):
             old_phone = profile.phone
             profile.phone = new_phone
@@ -2489,6 +2487,10 @@ class SMSModifyPhoneAPI(APIView):
             sms_modify_record.status=u'短信修改手机号成功'
             sms_modify_record.save()
             #todo force user login again
+            send_messages.apply_async(kwargs={
+                "phones": [new_phone, ],
+                "messages": ["尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。", ],
+            })
             return Response({'message':'ok'})
 
 

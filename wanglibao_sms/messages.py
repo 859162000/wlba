@@ -508,6 +508,41 @@ def sms_alert_unbanding_xunlei(reward_dsct, url):
               u"<a href='{}'>领取奖励>></a><br/>"
     return content.format(reward_dsct, url)
 
+
+@suffix
+def changed_mobile_success():
+    """
+    修改手机号成功短信
+    """
+    if get_stitch():
+        try:
+            redis = redis_backend()
+            obj = redis._get('changed_mobile_success')
+            content = cPickle.loads(obj)['content']
+            return content
+        except Exception:
+            return u"尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。"
+    else:
+        return u"尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。"
+
+
+@suffix
+def changed_mobile_fail():
+    """
+    修改手机号失败短信
+    """
+    if get_stitch():
+        try:
+            redis = redis_backend()
+            obj = redis._get('changed_mobile_fail')
+            content = cPickle.loads(obj)['content']
+            return content
+        except Exception:
+            return u"尊敬的网利宝用户，由于所上传的资料不符要求，您的修改手机号申请未通过，请按照要求上传资料文件或联系客服，感谢您的支持。"
+    else:
+        return u"尊敬的网利宝用户，由于所上传的资料不符要求，您的修改手机号申请未通过，请按照要求上传资料文件或联系客服，感谢您的支持。"
+
+
 if __name__ == "__main__":
     print sms_alert_invest('test')
     print sms_alert_invite('test', '15038038823')
