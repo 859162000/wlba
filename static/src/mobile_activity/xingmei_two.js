@@ -3,10 +3,6 @@
  */
 
 (function(){
-  //$('.no-reg').on('click',function(){
-  //  $('.xm-error').show()
-  //
-  //})
   $('.reg-btn').on('click',function(){
     org.ajax({
       type: 'POST',
@@ -18,7 +14,7 @@
         }else if(data.ret_code==1003){
           $('.xm-error').text('对不起,您不符合领取规则')
         }else if(data.ret_code==0){
-          $('.xm-error').text('恭喜您,您已获得奖励,请到个人用户查看')
+          $('.xm-error').text('恭喜您,您已获得奖励,请到个人账户查看')
         }else{
           $('.xm-error').text(data.message)
         }
@@ -26,10 +22,7 @@
       }
     })
   })
-})();
-
-wx.ready(function () {
-    var host = 'https://www.wanglibao.com',
+  var host = 'https://www.wanglibao.com',
         shareImg = host + '/static/imgs/mobile/share_logo.png',
         shareLink = host + '/activity/app_xingmei_two/?promo_token=xm2',
         shareMainTit = '你观影，我买单',
@@ -54,4 +47,8 @@ wx.ready(function () {
         link: shareLink,
         imgUrl: shareImg
     })
-})
+
+
+
+})();
+
