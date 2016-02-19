@@ -2476,11 +2476,6 @@ class SMSModifyPhoneAPI(APIView):
         new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
         if new_phone_user:
             return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
-        card = Card.objects.filter(user=request.user, is_the_one_card=True)
-        if card.exists():
-            card_no = request.DATA.get('card_no', "").strip()
-            if not card_no or card_no != card.no:
-                return Response({'message':"银行卡号错误"}, status=400)
         with transaction.atomic(savepoint=True):
             old_phone = profile.phone
             profile.phone = new_phone
