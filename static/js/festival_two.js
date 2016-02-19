@@ -477,8 +477,7 @@ $(function(){
     });
 
     //领取 AJAX 手机验证
-    $('#panel-page02 .receiveBtn').on('click', function(){
-
+    $('#panel-page02 .receiveBtn').on('touchend', function(){
         if(myApp.ajaxSwitch01){
             if(myApp.ajaxSwitch011){
                 var data = {
@@ -575,10 +574,10 @@ $(function(){
         });
         wx.ready(function () {
             var winHost = window.location.href;
-            var host = $("#shareUrl").val();
+            var host = $.trim($("#shareUrl").val());
 			//var host = 'https://staging.wanglibao.com',
-            var shareImg = host + 'https://www.wanglibao.com/static/imgs/mobile/weChat_logo.png',
-                shareLink = host + '/activity/festival_two/',
+            var shareImg = 'https://www.wanglibao.com/static/imgs/mobile/weChat_logo.png',
+                shareLink = host,
                 shareMainTit = shareTit,
                 shareBody = '闹元宵，吃大餐，抽红包财源滚滚来';
 

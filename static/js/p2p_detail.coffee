@@ -187,29 +187,44 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
       tip = '您的投资金额为:' + $('input[name=amount]').val() + '元'
       tool.modalAlert({title: '温馨提示', msg: tip, callback_ok: ()->
-        $.ajax {
-          url: '/qiye/profile/exists/'
-          data: {
-          }
-          type: 'GET'
-        }
-        .done (data)->
-          if data.ret_code == 10000
-            $.ajax {
-              url: '/qiye/profile/get/'
-              data: {
-              }
-              type: 'GET'
+        if $('#id-is-valid').attr('data-type') == 'qiye'
+          $.ajax {
+            url: '/qiye/profile/exists/'
+            data: {
             }
-            .done (data)->
-              if data.data.status != '审核通过'
-                window.location.href = '/qiye/profile/edit/'
-              else
-                purchaseFun()
-        .fail (data)->
-          result = JSON.parse(data.responseText)
-          if(result.ret_code != 20001)
-            window.location.href = '/qiye/info/'
+            type: 'GET'
+          }
+          .done (data)->
+            if data.ret_code == 10000
+              $.ajax {
+                url: '/qiye/profile/get/'
+                data: {
+                }
+                type: 'GET'
+              }
+              .done (data)->
+                if data.data.status != '审核通过'
+                  tool.modalAlert({
+                    title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
+                      window.location.href = '/qiye/profile/edit/'
+                  })
+                else
+                  purchaseFun()
+          .fail (data)->
+            result = JSON.parse(data.responseText)
+            if(result.ret_code != 20001)
+              tool.modalAlert({
+                title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
+                  window.location.href = '/qiye/info/'
+              })
+            else
+              purchaseFun()
+        else
+          if $('#id-is-valid').val() == 'False'
+            tool.modalAlert({
+              title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
+                window.location.href = '/accounts/id_verify/'
+            })
           else
             purchaseFun()
       })

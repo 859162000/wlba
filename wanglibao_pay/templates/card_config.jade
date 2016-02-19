@@ -11,7 +11,7 @@ head
                 $(unbind_button).closest('tr').children('td.card_num').text();
             var kuai_code_td =
                 $(unbind_button).closest('tr').children('td.kuai_code');
-            if (kuai_code_td.has('select')){
+            if (kuai_code_td.has('select').length > 0){
                 var kuai_code = kuai_code_td.children('select').val()
             }else {
                 var kuai_code = kuai_code_td.text()
