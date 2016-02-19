@@ -1103,6 +1103,16 @@ class XingMeiDistribute(ActivityRewardDistribute):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
+        #5 用户已经领取过奖品了
+        activity_reward = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, has_sent=True).first()
+        if activity_reward:
+            json_to_response = {
+                'ret_code': 1005,
+                'message': u'您的奖励已经发放'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
         #2 活动时间不合法
         now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
         if now < start_time or now > end_time:
@@ -1134,15 +1144,6 @@ class XingMeiDistribute(ActivityRewardDistribute):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        #5 用户已经领取过奖品了
-        activity_reward = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, has_sent=True).first()
-        if activity_reward:
-            json_to_response = {
-                'ret_code': 1005,
-                'message': u'您的奖励已经发放'
-            }
-
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         #6 给用户发奖品,注意并发控制, 注意url直接请求接口
         with transaction.atomic():
