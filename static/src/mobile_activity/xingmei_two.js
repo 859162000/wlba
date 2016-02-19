@@ -12,7 +12,7 @@
       success: function(data){
         console.log(data.ret_code)
         if(data.ret_code==1000){
-          window.location.href='/weixin/regist/?next=/activity/app_xingmei_two/&mobile=/weixin/list/'
+          window.location.href='/weixin/regist/?next=/activity/app_xingmei_two/&mobile=/weixin/list/?promo_token=xm2'
         }else if(data.ret_code==1003){
           $('.xm-error').text('对不起,您不符合领取规则')
           $('.xm-error').show()
