@@ -477,8 +477,7 @@ $(function(){
     });
 
     //领取 AJAX 手机验证
-    $('#panel-page02 .receiveBtn').on('click', function(){
-
+    $('#panel-page02 .receiveBtn').on('touchend', function(){
         if(myApp.ajaxSwitch01){
             if(myApp.ajaxSwitch011){
                 var data = {
