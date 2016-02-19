@@ -198,12 +198,13 @@
         });
 
         var time_count = 60;
+		var time_intervalId;
         var timerFunction = function () {
-            if (time_count >= 1) {
+            if (time_count > 1) {
                 time_count--;
                 return $('.get_code').text(time_count + '秒后可重发');
             } else {
-                clearInterval(timerFunction);
+                clearInterval(time_intervalId);
                 $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
                 //return $(document.body).trigger('from:captcha');
             }
@@ -217,8 +218,8 @@
 
                 $('.get_code').attr('disabled', 'disabled').addClass('wait');
                 time_count = 60;
-                timerFunction();
-                setInterval(timerFunction, 1000);
+                time_intervalId = setInterval(timerFunction, 1000);
+                time_intervalId;
 
                 $.ajax({
                     url: '/api/manual_modify/phone_validation_code/'+phone.val()+'/',
@@ -230,7 +231,7 @@
                         result = JSON.parse(xhr.responseText);
                         $('.error_form').text(result.message).show();
 
-                        clearInterval(timerFunction);
+                        clearInterval(time_intervalId);
                         time_count = 0;
                         $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
 

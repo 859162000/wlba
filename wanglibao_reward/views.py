@@ -2293,8 +2293,11 @@ class LanternBanquetTemplate(TemplateView):
                 original_id = info.get("fwh")
                 account = WeixinAccounts.getByOriginalId(original_id)
                 share_url = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=CALLBACK_HOST+"/weixin_activity/lantern_banquet/", state=original_id)
-        # print context
+
         context['share_url']=share_url
+        csrftoken =  self.request.COOKIES.get('csrftoken', "")
+        context['csrftoken']=csrftoken
+        # print context
         return context
 
 
