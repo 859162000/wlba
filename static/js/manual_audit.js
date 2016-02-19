@@ -61,19 +61,31 @@
                 $('.status_2').hide();
                 id_true = true;
             }else{
-                $('.status_2 .false').show().text('身份证位数错误').prev().hide();
+                $('.status_2 .false').show().text('身份证信息有误').prev().hide();
                 $('.status_2').show();
                 id_true = false;
             }
 
             if(password_val.length<6){
-                $('.status_1 .false').show().text('密码位数错误').prev().hide();
+                $('.status_1 .false').show().text('账户登录密码有误').prev().hide();
                 $('.status_1').show();
                 pass_true = false;
             }else{
                 $('.status_1').hide();
                 pass_true = true;
             }
+
+            var card_no_true;
+            if ($('input.bind_card').length > 0) {
+				if ($('input.bind_card').val().length >= 10 && $('input.bind_card').val().length <= 20) {
+					$('.status_3 .false').show().text('银行卡号码有误').prev().hide();
+					$('.status_3').show();
+					card_no_true = false;
+				} else {
+					$('.status_3').hide();
+					card_no_true = true;
+				}
+			}
 
             var card_no;
             var post_data;
@@ -85,28 +97,40 @@
                     'password':password_val,
                     'card_no':card_no
                 };
+                if(pass_true&&id_true&&card_no_true){
+                    $.ajax({
+                        url: '/api/manual_modify/vali_acc_info/' ,
+                        type: 'POST',
+                        data: post_data,
+                        success: function (xhr) {
+                            window.location.href = '/accounts/manual_modify/phone/';
+                        },
+                        error: function (xhr) {
+                            result = JSON.parse(xhr.responseText);
+                            $('.error_form').text(result.message).show();
+                        }
+                    });
+                }
             }else {
                 post_data = {
                     'id_number':id_number_val,
                     'password':password_val
                 }
+                if(pass_true&&id_true){
+                    $.ajax({
+                        url: '/api/manual_modify/vali_acc_info/' ,
+                        type: 'POST',
+                        data: post_data,
+                        success: function (xhr) {
+                            window.location.href = '/accounts/manual_modify/phone/';
+                        },
+                        error: function (xhr) {
+                            result = JSON.parse(xhr.responseText);
+                            $('.error_form').text(result.message).show();
+                        }
+                    });
+                }
             }
-
-            if(pass_true&&id_true){
-                $.ajax({
-                    url: '/api/manual_modify/vali_acc_info/' ,
-                    type: 'POST',
-                    data: post_data,
-                    success: function (xhr) {
-                        window.location.href = '/accounts/manual_modify/phone/';
-                    },
-                    error: function (xhr) {
-                        result = JSON.parse(xhr.responseText);
-                        $('.error_form').text(result.message).show();
-                    }
-                });
-            }
-
         })
 
     })
