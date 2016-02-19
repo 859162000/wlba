@@ -2352,7 +2352,7 @@ class Lantern_FetchRewardAPI(APIView):
         phone = request.DATA.get('phone')
         if not phone:
             return Response({"ret_code":-1, "message":"phone为空"})
-        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
+
         now_date = datetime.date.today()
         phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
         if not phoneRewardRecord:
@@ -2363,7 +2363,7 @@ class Lantern_FetchRewardAPI(APIView):
                     return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
             else:
                 return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
-
+        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
         if userprofile:
             if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone, status=True).exists():
                 return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
