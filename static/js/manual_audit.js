@@ -78,12 +78,12 @@
             var card_no_true;
             if ($('input.bind_card').length > 0) {
 				if ($('input.bind_card').val().length >= 10 && $('input.bind_card').val().length <= 20) {
-					$('.status_3 .false').show().text('银行卡号码有误').prev().hide();
-					$('.status_3').show();
-					card_no_true = false;
-				} else {
 					$('.status_3').hide();
 					card_no_true = true;
+				} else {
+                    $('.status_3 .false').show().text('银行卡号码有误').prev().hide();
+					$('.status_3').show();
+					card_no_true = false;
 				}
 			}
 
