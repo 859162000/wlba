@@ -2427,7 +2427,7 @@ class SMSModifyPhoneValidateAPI(APIView):
                 if card.no != card_no:
                     return Response({'message': "银行卡号输入错误"}, status=400)
 
-            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
+            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
             if not sms_modify_record:
                 sms_modify_record = SMSModifyPhoneRecord()
                 sms_modify_record.user = user
@@ -2453,7 +2453,7 @@ class SMSModifyPhoneTemplate(TemplateView):
         user = self.request.user
         profile = user.wanglibaouserprofile
         new_phone = ""
-        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status = u'短信修改手机号提交').first()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
         if sms_modify_record:
             new_phone = sms_modify_record.new_phone
 
@@ -2466,7 +2466,7 @@ class SMSModifyPhoneAPI(APIView):
     def post(self, request):
         user = request.user
         new_phone = request.DATA.get('new_phone', "").strip()
-        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status = u'短信修改手机号提交').first()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status=u'短信修改手机号提交').first()
         if not sms_modify_record:
             return Response({'message':u"还没有短信申请修改手机号"}, status=400)
         profile = user.wanglibaouserprofile
@@ -2487,6 +2487,10 @@ class SMSModifyPhoneAPI(APIView):
             sms_modify_record.status=u'短信修改手机号成功'
             sms_modify_record.save()
             #todo force user login again
+            send_messages.apply_async(kwargs={
+                "phones": [new_phone, ],
+                "messages": ["尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。", ],
+            })
             return Response({'message':'ok'})
 
 
