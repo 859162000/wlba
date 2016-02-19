@@ -2380,7 +2380,7 @@ class Lantern_FetchRewardAPI(APIView):
         send_sms_msg_one.apply_async(kwargs={
         "rule_id":7,
         "phone":phone,
-        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。关注网利宝服务号，每日签到抽大奖。 退订回TD",
+        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。",
         "user_type":"phone"
         })
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
