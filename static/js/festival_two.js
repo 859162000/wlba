@@ -509,7 +509,7 @@ $(function(){
                     error: function(e){
                         myApp.ajaxSwitch01 = true;
                         myApp.ajaxSwitch011 = true;
-                        alert($.parseJSON(e));
+                        //alert($.parseJSON(e));
                         alert('服务器连接超时，请查看您的网络！');
                     }
                 });
