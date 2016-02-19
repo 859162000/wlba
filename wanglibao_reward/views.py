@@ -1105,8 +1105,8 @@ class XingMeiDistribute(ActivityRewardDistribute):
 
         #5 用户已经领取过奖品了
         activity_reward = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user)
-        has_sent = activity_reward.exclude(has_sent=True)
-        no_sent = activity_reward.exclude(has_sent=False)
+        has_sent = activity_reward.filter(has_sent=True)
+        no_sent = activity_reward.filter(has_sent=False)
         if has_sent.exists() and not no_sent.exists():
             json_to_response = {
                 'ret_code': 1005,
