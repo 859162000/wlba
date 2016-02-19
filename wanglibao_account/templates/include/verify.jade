@@ -1,8 +1,8 @@
 #id-validate(style='display: none')
   if user.wanglibaouserprofile.utype == '3'
-    input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}',data-type='qiye')
+    input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}',data-type='qiye')
   else
-    input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}')
+    input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
   .padding-xl.align-center
     p 为保证您的资金安全，请先进行实名认证
     .space-vertical-l
