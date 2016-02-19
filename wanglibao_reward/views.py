@@ -11,6 +11,7 @@ from experience_gold.backends import SendExperienceGold
 from django.db import transaction
 from django.db import IntegrityError
 from django.db.models import Sum
+from wanglibao_sms.tasks import send_messages
 # from datetime import datetime
 import datetime
 from wanglibao_account import message as inside_message
@@ -1133,7 +1134,17 @@ class XingMeiDistribute(ActivityRewardDistribute):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        #5 给用户发奖品,注意并发控制, 注意url直接请求接口
+        #5 用户已经领取过奖品了
+        activity_reward = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, has_sent=True).first()
+        if activity_reward:
+            json_to_response = {
+                'ret_code': 1005,
+                'message': u'您的奖励已经发放'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        #6 给用户发奖品,注意并发控制, 注意url直接请求接口
         with transaction.atomic():
             ticket_reward = Reward.objects.select_for_update().filter(type=u'星美电影券', is_used=False).first()
             if not ticket_reward:
@@ -1149,6 +1160,10 @@ class XingMeiDistribute(ActivityRewardDistribute):
                     "title": ticket_reward.type,
                     "content": u"恭喜您获得星美影院兑换券: %s" % ticket_reward.content,
                     "mtype": "activity"
+                })
+                send_messages.apply_async(kwargs={
+                    "phones": [request.user.wanglibaouserprofile.phone, ],
+                    "messages": [u'恭喜您获得星美影院兑换券: %s【网利科技】' % ticket_reward.content,]
                 })
                 activity_reward.reward = ticket_reward
                 activity_reward.has_sent = True

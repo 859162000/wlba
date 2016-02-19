@@ -1124,7 +1124,7 @@ class XingMeiRegister(CoopRegister):
                             has_sent=False, #当用户领奖后,变成True, reward填上相应的奖品
                             left_times=1,
                             join_times=1,)
-
+                    logger.debug(u'用户 %s 首投 %s, 获得%s张星美影券' % (user, p2p_record.amount, _index+1))
             except Exception, reason:
                 logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
                 raise Exception(u"生成获奖记录异常")
