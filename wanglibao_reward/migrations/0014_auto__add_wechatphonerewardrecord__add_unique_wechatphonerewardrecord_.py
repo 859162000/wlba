@@ -23,13 +23,19 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'wanglibao_reward', ['WechatPhoneRewardRecord'])
 
-        # Adding unique constraint on 'WechatPhoneRewardRecord', fields ['openid', 'phone', 'create_date']
-        db.create_unique(u'wanglibao_reward_wechatphonerewardrecord', ['openid', 'phone', 'create_date'])
+        # Adding unique constraint on 'WechatPhoneRewardRecord', fields ['openid', 'create_date']
+        db.create_unique(u'wanglibao_reward_wechatphonerewardrecord', ['openid', 'create_date'])
+
+        # Adding unique constraint on 'WechatPhoneRewardRecord', fields ['phone', 'create_date']
+        db.create_unique(u'wanglibao_reward_wechatphonerewardrecord', ['phone', 'create_date'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'WechatPhoneRewardRecord', fields ['openid', 'phone', 'create_date']
-        db.delete_unique(u'wanglibao_reward_wechatphonerewardrecord', ['openid', 'phone', 'create_date'])
+        # Removing unique constraint on 'WechatPhoneRewardRecord', fields ['phone', 'create_date']
+        db.delete_unique(u'wanglibao_reward_wechatphonerewardrecord', ['phone', 'create_date'])
+
+        # Removing unique constraint on 'WechatPhoneRewardRecord', fields ['openid', 'create_date']
+        db.delete_unique(u'wanglibao_reward_wechatphonerewardrecord', ['openid', 'create_date'])
 
         # Deleting model 'WechatPhoneRewardRecord'
         db.delete_table(u'wanglibao_reward_wechatphonerewardrecord')
@@ -243,7 +249,7 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
         },
         u'wanglibao_reward.wechatphonerewardrecord': {
-            'Meta': {'unique_together': "(('openid', 'phone', 'create_date'),)", 'object_name': 'WechatPhoneRewardRecord'},
+            'Meta': {'unique_together': "(('openid', 'create_date'), ('phone', 'create_date'))", 'object_name': 'WechatPhoneRewardRecord'},
             'activity_code': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
             'create_date': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),

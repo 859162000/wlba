@@ -2385,14 +2385,17 @@ class Lantern_FetchRewardAPI(APIView):
 
 
         if userprofile:
-            device = split_ua(self.request)
-            device_type = device['device_type']
-            phoneRewardRecord.phone = phone
-            phoneRewardRecord.save()
-            res = sendWechatPhoneReward(openid, userprofile.user, device_type)
-            if res['ret_code']==0:
-                res['is_wanglibao']=True
-            return Response(res)
+            try:
+                device = split_ua(self.request)
+                device_type = device['device_type']
+                phoneRewardRecord.phone = phone
+                phoneRewardRecord.save()
+                res = sendWechatPhoneReward(openid, userprofile.user, device_type)
+                if res['ret_code']==0:
+                    res['is_wanglibao']=True
+                return Response(res)
+            except IntegrityError, e:
+                return Response({"ret_code":-1, "message":"系统忙，请重试"})
         phoneRewardRecord.phone = phone
         phoneRewardRecord.save()
         send_sms_msg_one.apply_async(kwargs={
