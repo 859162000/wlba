@@ -4,7 +4,8 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
 from wanglibao_pay.views import BankListView, PayCallback, WithdrawCompleteView, WithdrawCallback, PayView, WithdrawView, \
-    PayCompleteView, WithdrawTransactions, WithdrawRedirectView, YeeProxyPayCompleteView, BankListForRegisterView
+    PayCompleteView, WithdrawTransactions, WithdrawRedirectView,\
+    YeeProxyPayCompleteView, BankListForRegisterView, CardConfigTemplateView
 
 urlpatterns = patterns('',
     # tmplate view
@@ -22,5 +23,5 @@ urlpatterns = patterns('',
     url(r'^withdraw/audit/$', login_required(WithdrawTransactions.as_view(), login_url='/accounts/login/'), name='withdraw-transactions'),
     url(r'^withdraw/rollback/$', login_required(WithdrawTransactions.as_view(), login_url='/accounts/login/'), name='withdraw-rollback'),
 
-    #
+    url(r'cards/config/$', CardConfigTemplateView.as_view()), 
 )
