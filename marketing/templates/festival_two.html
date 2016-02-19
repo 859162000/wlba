@@ -23,6 +23,7 @@
 <!--    </script>-->
 </head>
 <body>
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrftoken }}">
 <!-- <input type="hidden" value='{"redpack":[{"amount":20,"height_invest":10},{"amount":50,"height_invest":80}],"coupon":[{"amount":"1%"},{"amount":"1.5%"}],"experence":[{"amount":"888"}]}' id="redPacket1-val" /> -->
 <input type="hidden" value='{{ rewards }}' id="redPacket1-val" />
 <input type="hidden" value='{{ redpack }}' id="redPacket2-val" />
