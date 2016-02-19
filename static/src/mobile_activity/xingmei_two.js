@@ -16,6 +16,9 @@
         }else if(data.ret_code==1003){
           $('.xm-error').text('对不起,您不符合领取规则')
           $('.xm-error').show()
+        }else if(data.ret_code==1005){
+          $('.xm-error').text('您的奖励已发放')
+          $('.xm-error').show()
         }else if(data.ret_code==0){
           $('.xm-error').text('恭喜您,您已获得奖励,请到个人账户查看')
           $('.xm-error').show()
