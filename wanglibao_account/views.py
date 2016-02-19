@@ -79,7 +79,6 @@ from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha
-
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
 
@@ -2362,6 +2361,10 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.id_user_image = id_user_image
             manual_record.save()
 
+            send_messages.apply_async(kwargs={
+                "phones": [new_phone, ],
+                "messages": ["尊敬的网利宝用户，您已申请人工审核修改手机号，申请结果将在1-2个工作日内通过短信发送到本手机，请留意", ],
+            })
             return Response({'ret_code': 0})
         else:
             message = form.errors
