@@ -14,7 +14,6 @@ from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_sms.models import ArrivedRate, MessageTemplate
 from wanglibao_sms import messages as sms_messages
-from wanglibao_sms.tasks import send_messages
 from wanglibao_rest.common import DecryptParmsAPIView
 
 
@@ -192,6 +191,7 @@ class SendSMSNoticeAPIView(DecryptParmsAPIView):
                 sms_content = sms_messages.changed_mobile_fail()
 
         # 发送短信
+        from .tasks import send_messages
         send_messages.apply_async(kwargs={
             "phones": [phone, ],
             "messages": [sms_content, ],
