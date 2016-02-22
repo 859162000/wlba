@@ -1124,7 +1124,7 @@ class XingMeiRegister(CoopRegister):
                             has_sent=False, #当用户领奖后,变成True, reward填上相应的奖品
                             left_times=1,
                             join_times=1,)
-
+                    logger.debug(u'用户 %s 首投 %s, 获得%s张星美影券' % (user, p2p_record.amount, _index+1))
             except Exception, reason:
                 logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
                 raise Exception(u"生成获奖记录异常")
@@ -1301,9 +1301,11 @@ class WeixinRedpackRegister(CoopRegister):
         super(WeixinRedpackRegister, self).__init__(request)
         self.c_code = 'wrp'
         self.invite_code = 'wrp'
-        self.order_id = request.POST.get("order_id", None)
+        # Move to register_call_back() by hb on 2016-02-19
+        #self.order_id = request.POST.get("order_id", None)
 
     def register_call_back(self, user):
+        self.order_id = self.request.POST.get("order_id", None)
         phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         try:

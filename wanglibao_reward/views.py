@@ -11,6 +11,7 @@ from experience_gold.backends import SendExperienceGold
 from django.db import transaction
 from django.db import IntegrityError
 from django.db.models import Sum
+from wanglibao_sms.tasks import send_messages
 # from datetime import datetime
 import datetime
 from wanglibao_account import message as inside_message
@@ -1102,16 +1103,36 @@ class XingMeiDistribute(ActivityRewardDistribute):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
+        #5 用户已经领取过奖品了
+        has_sent = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, has_sent=True)
+        if has_sent.exists():
+            json_to_response = {
+                'ret_code': 1005,
+                'message': u'您的奖励已经发放'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
         #2 活动时间不合法
         now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
         if now < start_time or now > end_time:
             json_to_response = {
                 'ret_code': 1001,
-                'message': u'活动还没有开始'
+                'message': u'不在活动时间内,不可领票'
             }
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
             return
+
+        #4 用户没有抽奖机会
+        activity_rewards = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, reward=None)
+        if not activity_rewards.first():
+            json_to_response = {
+                'ret_code': 1003,
+                'message': u'用户没有抽奖机会'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         #3 奖品已经发放完毕
         counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
@@ -1123,47 +1144,44 @@ class XingMeiDistribute(ActivityRewardDistribute):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        #4 用户没有抽奖机会
-        activity_reward = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, reward=None).first()
-        if not activity_reward:
-            json_to_response = {
-                'ret_code': 1003,
-                'message': u'用户没有抽奖机会'
-            }
 
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        #6 给用户发奖品,注意并发控制, 注意url直接请求接口
+        for activity_reward in activity_rewards.all():  #要兼容新用户两张电影票的情况
+            with transaction.atomic():
+                ticket_reward = Reward.objects.select_for_update().filter(type=u'星美电影券', is_used=False).first()
+                if not ticket_reward:
+                    json_to_response = {
+                        'ret_code': 1004,
+                        'message': u'奖品已经发完了(库里不足%s张)' % (tickets)
+                    }
 
-        #5 给用户发奖品,注意并发控制, 注意url直接请求接口
-        with transaction.atomic():
-            ticket_reward = Reward.objects.select_for_update().filter(type=u'星美电影券', is_used=False).first()
-            if not ticket_reward:
-                json_to_response = {
-                    'ret_code': 1004,
-                    'message': u'奖品已经发完了(库里不足%s张)' % (tickets)
-                }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": request.user.id,
+                        "title": ticket_reward.type,
+                        "content": u"恭喜您获得星美影院兑换券: %s" % ticket_reward.content,
+                        "mtype": "activity"
+                    })
+                    send_messages.apply_async(kwargs={
+                        "phones": [request.user.wanglibaouserprofile.phone, ],
+                        "messages": [u'恭喜您获得星美影院兑换券: %s【网利科技】' % ticket_reward.content,]
+                    })
+                    activity_reward.reward = ticket_reward
+                    activity_reward.has_sent = True
+                    activity_reward.left_time = 0
+                    activity_reward.join_time = 0
+                    activity_reward.update_time = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+                    activity_reward.save()
 
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-            else:
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": request.user.id,
-                    "title": ticket_reward.type,
-                    "content": u"恭喜您获得星美影院兑换券: %s" % ticket_reward.content,
-                    "mtype": "activity"
-                })
-                activity_reward.reward = ticket_reward
-                activity_reward.has_sent = True
-                activity_reward.left_time = 0
-                activity_reward.join_time = 0
-                activity_reward.update_time = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
-                activity_reward.save()
+                    ticket_reward.is_used = True
+                    ticket_reward.save()
 
-                ticket_reward.is_used = True
-                ticket_reward.save()
-                json_to_response = {
-                    'ret_code': 0,
-                    'message': u'电影票成功发放'
-                }
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        json_to_response = {
+            'ret_code': 0,
+            'message': u'电影票成功发放'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 
 class ThanksGivingDistribute(ActivityRewardDistribute):
@@ -2215,8 +2233,8 @@ class LanternBanquetTemplate(TemplateView):
     元宵节
     """
     template_name = 'new_year_feast.jade'
-    activity_codes = ['qmsy_redpack', 'qmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
-    activity_code = 'hmsy_redpack'
+    activity_codes = ['yxqmsy_redpack', 'yxqmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
+    activity_code = 'yxhmsy_redpack'
     def get_random_activity_code(self):
         return self.activity_codes[random.randint(0, 1)]
 
@@ -2282,7 +2300,7 @@ class LanternBanquetTemplate(TemplateView):
             experience_event = experience_dict.get('experience_event')
             rewards.get('experience').append({"amount":int(experience_event.amount)})
 
-        event = RedPackEvent.objects.filter(id=redpack_id).first()
+        event = RedPackEvent.objects.filter(id=int(phoneRewardRecord.redpack_event_ids)).first()
         context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
         BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
         share_url = ""
@@ -2293,8 +2311,11 @@ class LanternBanquetTemplate(TemplateView):
                 original_id = info.get("fwh")
                 account = WeixinAccounts.getByOriginalId(original_id)
                 share_url = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=CALLBACK_HOST+"/weixin_activity/lantern_banquet/", state=original_id)
-        # print context
+
         context['share_url']=share_url
+        csrftoken =  self.request.COOKIES.get('csrftoken', "")
+        context['csrftoken']=csrftoken
+        # print context
         return context
 
 
@@ -2331,7 +2352,7 @@ class Lantern_FetchRewardAPI(APIView):
         phone = request.DATA.get('phone')
         if not phone:
             return Response({"ret_code":-1, "message":"phone为空"})
-        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
+
         now_date = datetime.date.today()
         phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
         if not phoneRewardRecord:
@@ -2342,7 +2363,7 @@ class Lantern_FetchRewardAPI(APIView):
                     return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
             else:
                 return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
-
+        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
         if userprofile:
             if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone, status=True).exists():
                 return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
@@ -2364,20 +2385,23 @@ class Lantern_FetchRewardAPI(APIView):
 
 
         if userprofile:
-            device = split_ua(self.request)
-            device_type = device['device_type']
-            phoneRewardRecord.phone = phone
-            phoneRewardRecord.save()
-            res = sendWechatPhoneReward(openid, userprofile.user, device_type)
-            if res['ret_code']==0:
-                res['is_wanglibao']=True
-            return Response(res)
+            try:
+                device = split_ua(self.request)
+                device_type = device['device_type']
+                phoneRewardRecord.phone = phone
+                phoneRewardRecord.save()
+                res = sendWechatPhoneReward(openid, userprofile.user, device_type)
+                if res['ret_code']==0:
+                    res['is_wanglibao']=True
+                return Response(res)
+            except IntegrityError, e:
+                return Response({"ret_code":-1, "message":"系统忙，请重试"})
         phoneRewardRecord.phone = phone
         phoneRewardRecord.save()
         send_sms_msg_one.apply_async(kwargs={
         "rule_id":7,
         "phone":phone,
-        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。关注网利宝服务号，每日签到抽大奖。 退订回TD",
+        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。",
         "user_type":"phone"
         })
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})

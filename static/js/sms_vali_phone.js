@@ -53,14 +53,15 @@
         /*输入手机号，验证码*/
 
         var time_count = 60;
+		var time_intervalId;
         var timerFunction = function () {
-            if (time_count >= 1) {
+            if (time_count > 1) {
                 time_count--;
                 return $('.get_code').text(time_count + '秒后可重发');
             } else {
-                clearInterval(timerFunction);
+                clearInterval(time_intervalId);
                 $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
-                //return $(document.body).trigger('from:captcha');
+
             }
         };
         var result;
@@ -70,8 +71,8 @@
 
             $('.get_code').attr('disabled', 'disabled').addClass('wait');
             time_count = 60;
-            timerFunction();
-            setInterval(timerFunction, 1000);
+			time_intervalId = setInterval(timerFunction, 1000);
+			time_intervalId;
 
             $.ajax({
                 url: '/api/phone_validation_code/' + phone + '/',
@@ -87,9 +88,10 @@
                     $('.phone_code .status .false').text(result.message).show();
                     $('.phone_code .status').show();
 
-                    clearInterval(timerFunction);
-                    time_count = 0;
-                    $('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+                    clearInterval(time_intervalId);
+					time_count = 0;
+                	$('.get_code').text('重新获取').removeAttr('disabled').removeClass('wait');
+
                 }
             });
         });
@@ -131,12 +133,12 @@
 
 			if ($('input.bind_card').length > 0) {
 				if ($('input.bind_card').val().length >= 10 && $('input.bind_card').val().length <= 20) {
+					$('.status_4').hide();
+					card_no_true = true;
+				} else {
 					$('.status_4 .false').show().text('银行卡号码有误').prev().hide();
 					$('.status_4').show();
 					card_no_true = false;
-				} else {
-					$('.status_4').hide();
-					card_no_true = true;
 				}
 			}
 
@@ -179,6 +181,7 @@
 							error: function (xhr) {
 								result = JSON.parse(xhr.responseText);
 								$('.error_form').text(result.message).show();
+								$('.input_code').val('');
 							}
 
 						});
@@ -206,6 +209,7 @@
 							error: function (xhr) {
 								result = JSON.parse(xhr.responseText);
 								$('.error_form').text(result.message).show();
+								$('.input_code').val('');
 							}
 						});
 					}
