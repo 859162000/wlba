@@ -90,7 +90,7 @@ class Card(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
-    add_at = models.DateTimeField(auto_now=True)
+    add_at = models.DateTimeField(auto_now_add=True)
     is_bind_huifu = models.BooleanField(verbose_name=u"是否绑定汇付快捷", default=False)
     is_bind_kuai = models.BooleanField(verbose_name=u"是否绑定快钱快捷", default=False)
     is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
