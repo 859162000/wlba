@@ -196,3 +196,4 @@ class SendSMSNoticeAPIView(DecryptParmsAPIView):
             "phones": [phone, ],
             "messages": [sms_content, ],
         })
+        return HttpResponse(renderers.JSONRenderer().render({"message":'ok'}, 'application/json'))
