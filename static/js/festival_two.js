@@ -360,8 +360,9 @@ $(function(){
 
     //iphone6s 音乐不自动播放
     $('body').on('touchstart',function(){
-        alert(1);
-        myApp.audioPlay();
+        if(!$("#bg_music_img").hasClass("active") && !document.getElementById("audio_bg").paused){
+           myApp.audioPlay();
+        }
     });
 
     //main pages
