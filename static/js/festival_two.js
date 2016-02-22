@@ -324,6 +324,7 @@ var myApp ={
 };
 
 $(function(){
+    myApp.audioPlay();
 
     //console.log(myApp.pages);
 
