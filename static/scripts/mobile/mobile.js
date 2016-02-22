@@ -1981,11 +1981,7 @@ org.processSecond = (function (org) {
                             if(check.firstRecharge){
                                 $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
                             }else{
-                                var next_url = org.getQueryStringByName('next');
-                                var callback_url = next_url == '' ? '/weixin/regist/three/' : next_url;
-                                return org.ui.alert('绑卡成功！',function(){
-                                    window.location.href= callback_url;
-                                });
+                                return org.ui.alert('绑卡成功！');
                             }
 
                         }
