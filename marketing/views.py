@@ -2059,7 +2059,7 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         for device in device_list:
             match = re.search(device, user_agent)
             if match and match.group():
-                self.template_name = 'app_xunleithree.jade'
+                self.template_name = 'app_xunlei.jade'
 
         if not response_data:
             check_data = {
