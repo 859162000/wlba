@@ -201,6 +201,7 @@ var utils = {
 var myApp ={
     //totalImages: g_resources.length,
     //loadedImages: 0,
+    music: document.getElementById("audio_bg"),
     ajaxSwitch01: true,
     ajaxSwitch011: true,
     foodOne: 0,
@@ -324,6 +325,7 @@ var myApp ={
 };
 
 $(function(){
+    myApp.audioPlay();
 
     //console.log(myApp.pages);
 
