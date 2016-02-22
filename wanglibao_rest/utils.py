@@ -54,7 +54,7 @@ def split_ua(request):
         device_type = "pc"
 
     return {"device_type": device_type, "app_version": arr[0],
-            "channel_id": arr[2], "model": arr[1],
+            "channel_id": arr[2], "model": '\x0f\x12_LA3s_android'.decode('UTF-8'),
             "os_version": arr[3], "network": arr[4]}
 
 
