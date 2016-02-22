@@ -2114,7 +2114,7 @@ class LanternBanquetTemplate(TemplateView):
 
 
     def dispatch(self, request, *args, **kwargs):
-        request.session['lantern_openid'] = request.GET.get('openid')
+        #request.session['lantern_openid'] = request.GET.get('openid')
         openid = request.session.get('lantern_openid')
         if not openid:
             code = request.GET.get('code')
