@@ -87,6 +87,7 @@ urlpatterns = patterns(
     url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
+    url(r'^xunlei_three/$', TemplateView.as_view(template_name="xunlei_three.jade")),
 
 )
 
