@@ -1,3 +1,167 @@
+var org = (function () {
+    document.body.addEventListener('touchstart', function () {
+    }); //ios 触发active渲染
+    var lib = {
+        scriptName: 'mobile.js',
+        _ajax: function (options) {
+            $.ajax({
+                url: options.url,
+                type: options.type,
+                data: options.data,
+                dataType: options.dataType,
+                async: options.async,
+                beforeSend: function (xhr, settings) {
+                    options.beforeSend && options.beforeSend(xhr);
+                    //django配置post请求
+                    if (!lib._csrfSafeMethod(settings.type) && lib._sameOrigin(settings.url)) {
+                        xhr.setRequestHeader('X-CSRFToken', lib._getCookie('csrftoken'));
+                    }
+                },
+                success: function (data) {
+                    options.success && options.success(data);
+                },
+                error: function (xhr) {
+                    options.error && options.error(xhr);
+                },
+                complete: function () {
+                    options.complete && options.complete();
+                }
+            });
+        },
+        _calculate: function (dom, callback) {
+            var calculate = function (amount, rate, period, pay_method) {
+                var divisor, rate_pow, result, term_amount;
+                if (/等额本息/ig.test(pay_method)) {
+                    rate_pow = Math.pow(1 + rate, period);
+                    divisor = rate_pow - 1;
+                    term_amount = amount * (rate * rate_pow) / divisor;
+                    result = term_amount * period - amount;
+                } else if (/日计息/ig.test(pay_method)) {
+                    result = amount * rate * period / 360;
+                } else {
+                    result = amount * rate * period / 12;
+                }
+                return Math.floor(result * 100) / 100;
+            };
+
+            dom.on('input', function () {
+                _inputCallback();
+            });
+
+            function _inputCallback() {
+                var earning, earning_element, earning_elements, fee_earning;
+                var target = $('input[data-role=p2p-calculator]'),
+                    existing = parseFloat(target.attr('data-existing')),
+                    period = target.attr('data-period'),
+                    rate = target.attr('data-rate') / 100,
+                    pay_method = target.attr('data-paymethod');
+                activity_rate = target.attr('activity-rate') / 100;
+                activity_jiaxi = target.attr('activity-jiaxi') / 100;
+                amount = parseFloat(target.val()) || 0;
+
+                if (amount > target.attr('data-max')) {
+                    amount = target.attr('data-max');
+                    target.val(amount);
+                }
+                activity_rate += activity_jiaxi;
+                amount = parseFloat(existing) + parseFloat(amount);
+                earning = calculate(amount, rate, period, pay_method);
+                fee_earning = calculate(amount, activity_rate, period, pay_method);
+
+                if (earning < 0) {
+                    earning = 0;
+                }
+                earning_elements = (target.attr('data-target')).split(',');
+
+                for (var i = 0; i < earning_elements.length; i++) {
+                    earning_element = earning_elements[i];
+                    if (earning) {
+                        fee_earning = fee_earning ? fee_earning : 0;
+                        earning += fee_earning;
+                        $(earning_element).text(earning.toFixed(2));
+                    } else {
+                        $(earning_element).text("0.00");
+                    }
+                }
+                callback && callback();
+            }
+        },
+        _getQueryStringByName: function (name) {
+            var result = location.search.match(new RegExp('[\?\&]' + name + '=([^\&]+)', 'i'));
+            if (result == null || result.length < 1) {
+                return '';
+            }
+            return result[1];
+        },
+        _getCookie: function (name) {
+            var cookie, cookieValue, cookies, i;
+            cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                cookies = document.cookie.split(';');
+                i = 0;
+                while (i < cookies.length) {
+                    cookie = $.trim(cookies[i]);
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                    i++;
+                }
+            }
+            return cookieValue;
+        },
+        _csrfSafeMethod: function (method) {
+            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+        },
+        _sameOrigin: function (url) {
+            var host, origin, protocol, sr_origin;
+            host = document.location.host;
+            protocol = document.location.protocol;
+            sr_origin = '//' + host;
+            origin = protocol + sr_origin;
+            return (url === origin || url.slice(0, origin.length + 1) === origin + '/') || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url));
+        },
+        _setShareData: function (ops, suFn, canFn) {
+            var setData = {};
+            if (typeof ops == 'object') {
+                for (var p in ops) {
+                    setData[p] = ops[p];
+                }
+            }
+            typeof suFn == 'function' && suFn != 'undefined' ? setData.success = suFn : '';
+            typeof canFn == 'function' && canFn != 'undefined' ? setData.cancel = canFn : '';
+            return setData
+        },
+        /*
+         * 分享到微信朋友
+         */
+        _onMenuShareAppMessage: function (ops, suFn, canFn) {
+            wx.onMenuShareAppMessage(lib._setShareData(ops, suFn, canFn));
+        },
+        /*
+         * 分享到微信朋友圈
+         */
+        _onMenuShareTimeline: function (ops, suFn, canFn) {
+            wx.onMenuShareTimeline(lib._setShareData(ops, suFn, canFn));
+        },
+        _onMenuShareQQ: function () {
+            wx.onMenuShareQQ(lib._setShareData(ops, suFn, canFn));
+        }
+    }
+    return {
+        scriptName: lib.scriptName,
+        ajax: lib._ajax,
+        calculate: lib._calculate,
+        getQueryStringByName: lib._getQueryStringByName,
+        getCookie: lib._getCookie,
+        csrfSafeMethod: lib._csrfSafeMethod,
+        sameOrigin: lib._sameOrigin,
+        onMenuShareAppMessage: lib._onMenuShareAppMessage,
+        onMenuShareTimeline: lib._onMenuShareTimeline,
+        onMenuShareQQ: lib._onMenuShareQQ,
+    }
+})();
+
 var utils = {
     getQueryString: function(name){
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -147,9 +311,13 @@ var myApp ={
                 dom.attr("href","/weixin/login/");
             }
             setTimeout(function(){
+                myApp.ajaxSwitch01 = true;
+                myApp.ajaxSwitch011 = true;
                 myApp.mySwiper.slideNext(true,1000);
             },1000);
         }else{
+            myApp.ajaxSwitch01 = true;
+            myApp.ajaxSwitch011 = true;
             alert(obj.message);
         }
     }
@@ -480,43 +648,36 @@ $(function(){
     $('#panel-page02 .receiveBtn').on('touchend', function(){
         //alert(myApp.ajaxSwitch01);
         if(myApp.ajaxSwitch01){
-            if(myApp.ajaxSwitch011){
-                var data = {
-                    'phone' : $('#phoneNumber').val()
-                };
+            var data = {
+                'phone' : $('#phoneNumber').val()
+            };
 
-                if(data.phone == '' || data.phone == '输入手机号 领取所有红包'){
-                    alert('请输入您的手机号码哦！');
-                    return false;
-                }
-                if(utils.checkMobile(data.phone) == false){
-                    alert('请输入正确的手机号码哦!');
-                    return false;
-                }
-
-                myApp.ajaxSwitch01 = false;
-                myApp.ajaxSwitch011 = false;
-                $.ajax({
-                    type: "POST",
-                    url: "/api/lantern/fetch_reward/",
-                    data: data,
-                    dataType: "json",
-                    success: function(data){
-                        myApp.ajaxSwitch01 = true;
-                        myApp.ajaxSwitch011 = true;
-                        //console.log(data);
-                        myApp.handelResult01(data);
-                    },
-                    error: function(e){
-                        myApp.ajaxSwitch01 = true;
-                        myApp.ajaxSwitch011 = true;
-                        alert($.parseJSON(e));
-                        alert('服务器连接超时，请查看您的网络！');
-                    }
-                });
-            }else{
-                alert('您已经提交过信息了哦！');
+            if(data.phone == '' || data.phone == '输入手机号 领取所有红包'){
+                alert('请输入您的手机号码哦！');
+                return false;
             }
+            if(utils.checkMobile(data.phone) == false){
+                alert('请输入正确的手机号码哦!');
+                return false;
+            }
+            myApp.ajaxSwitch01 = false;
+            myApp.ajaxSwitch011 = false;
+            org.ajax({
+                type: "POST",
+                url: "/api/lantern/fetch_reward/",
+                data: data,
+                dataType: "json",
+                success: function(data){
+                    //console.log(data);
+                    myApp.handelResult01(data);
+                },
+                error: function(e){
+                    myApp.ajaxSwitch01 = true;
+                    myApp.ajaxSwitch011 = true;
+                    //alert($.parseJSON(e));
+                    alert('服务器连接超时，请查看您的网络！');
+                }
+            });
         }else{
             alert('正在提交信息哦！');
         }
