@@ -928,7 +928,7 @@ class XingMeiRewardDistributer(RewardDistributer):
 
         # 1: 如果票数到600，直接跳出
         counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
-        if counts >= tickets:
+        if counts > tickets:
             logger.debug(u'票已经发完了, %s' % (counts))
             return
 
@@ -1136,7 +1136,7 @@ class XingMeiDistribute(ActivityRewardDistribute):
 
         #3 奖品已经发放完毕
         counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
-        if counts >= tickets:
+        if counts > tickets:
             json_to_response = {
                 'ret_code': 1002,
                 'message': u'奖品已经发完了'
