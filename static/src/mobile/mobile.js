@@ -1197,7 +1197,7 @@ org.recharge = (function (org) {
             _self.$load.hide();
             _self.$recharge_body.show();
             _self.data = data;
-
+            _self.$amount.attr('placeholder', '该银行单笔限额' + data.bank.bank_limit.second_one/10000+'万元')
             _self.$card_no.val(card);
             _self.$bank_name.text(data.bank.name);
             lib._rechargeThe_one_card();
