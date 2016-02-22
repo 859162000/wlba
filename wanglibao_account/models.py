@@ -114,7 +114,11 @@ message_type = (
     #("audited", "满标已审核"),
     ("public", u"发给所有"),
     ("invite", u"邀请奖励"),
-    ("coupon", u"加息奖励")
+    ("coupon", u"加息奖励"),
+    # 增加PHP站内信类型
+    ("apply_success", u"债权转让申请成功"),
+    ("transfer_success", u"债权转让成功"),
+    ("transfer_accomplish", u"债权转让完成"),
 )
 def timestamp():
     return long(time.time())
