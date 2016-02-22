@@ -201,6 +201,7 @@ var utils = {
 var myApp ={
     //totalImages: g_resources.length,
     //loadedImages: 0,
+    music: document.getElementById("audio_bg"),
     ajaxSwitch01: true,
     ajaxSwitch011: true,
     foodOne: 0,
@@ -325,6 +326,7 @@ var myApp ={
 
 $(function(){
 
+
     //console.log(myApp.pages);
 
     //init html font-size for remLayout
@@ -356,6 +358,13 @@ $(function(){
         return false;
     });
 
+    //iphone6s 音乐不自动播放
+    $('body').on('touchstart',function(){
+        alert(document.getElementById("audio_bg").paused);
+        if(!$("#bg_music_img").hasClass("active") && document.getElementById("audio_bg").paused){
+           myApp.audioPlay();
+        }
+    });
 
     //main pages
     myApp.mySwiper = new Swiper('.swiper-container', {
