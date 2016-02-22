@@ -366,7 +366,6 @@ $(function(){
     });
     if(typeof (WeixinJSBridge) != 'undefined') {
         WeixinJSBridge.invoke('closeWindow', {}, function (res) {
-            alert(res.err_msg);
             if (res.err_msg === "ok") {
                 myApp.audioPause();
             }
