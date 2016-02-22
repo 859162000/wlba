@@ -325,7 +325,7 @@ var myApp ={
 };
 
 $(function(){
-    myApp.audioPlay();
+
 
     //console.log(myApp.pages);
 
@@ -358,6 +358,11 @@ $(function(){
         return false;
     });
 
+    //iphone6s 音乐不自动播放
+    $('body').on('touchstart',function(){
+        alert(1);
+        myApp.audioPlay();
+    });
 
     //main pages
     myApp.mySwiper = new Swiper('.swiper-container', {
