@@ -85,6 +85,15 @@ class Bank(models.Model):
             rs.append(obj)
         return rs
 
+    @property
+    def bank_limit(self):
+        if self.channel == 'kuaipay' and self.kuai_limit:
+            return util.handle_kuai_bank_limit(self.kuai_limit)
+        elif self.channel == 'huifu' and self.huifu_bind_limit:
+            return util.handle_kuai_bank_limit(self.huifu_bind_limit)
+        elif self.channel == 'yeepay' and self.yee_bind_limit:
+            return util.handle_kuai_bank_limit(self.yee_bind_limit)
+
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号', db_index=True)
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
