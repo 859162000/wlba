@@ -2096,6 +2096,7 @@ class LanternBanquetTemplate(TemplateView):
         event = RedPackEvent.objects.filter(id=int(phoneRewardRecord.redpack_event_ids)).first()
         context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
         BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
+        token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
         share_url = ""
         m = Misc.objects.filter(key='weixin_qrcode_info').first()
         if m and m.value:
@@ -2103,8 +2104,8 @@ class LanternBanquetTemplate(TemplateView):
             if isinstance(info, dict) and info.get("fwh"):
                 original_id = info.get("fwh")
                 account = WeixinAccounts.getByOriginalId(original_id)
-                share_url = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=CALLBACK_HOST+"/weixin_activity/lantern_banquet/", state=original_id)
-
+                share_url = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=CALLBACK_HOST+"/weixin_activity/lantern_banquet/?promo_token=%s"%token, state=original_id)
+        # print share_url
         context['share_url']=share_url
         csrftoken =  self.request.COOKIES.get('csrftoken', "")
         context['csrftoken']=csrftoken
