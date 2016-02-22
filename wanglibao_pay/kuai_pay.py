@@ -657,6 +657,7 @@ class KuaiShortPay:
         self.QUERY_URL = settings.KUAI_PAY_URL + "/cnp/pci_query"
         self.DEL_URL = settings.KUAI_PAY_URL + "/cnp/pci_del"
         self.DYNNUM_URL = settings.KUAI_PAY_URL + "/cnp/getDynNum"
+        self.QUERY_TRANSACTION_URL = settings.KUAI_PAY_URL + '/cnp/query_txn'
 
         self.PAY_BACK_RETURN_URL = settings.KUAI_PAY_BACK_RETURN_URL
         self.PAY_TR3_SIGNATURE = settings.KUAI_PAY_TR3_SIGNATURE
@@ -1415,6 +1416,15 @@ class KuaiShortPay:
         self._request_dict = dict(user_id=user_id, order_id=order_id, amount=amount)
         return self._sp_pay_tr4_xml(ref_number)
         # return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
+
+    def query_trx_result(self, pay_id):
+        """
+        去第三方查询交易结果
+        快钱使用order_id查询，易宝使用payinfo的id查询
+        """
+        trx_data  = self._sp_query_xml(pay_id)
+        trx_result_resp = self._request(trx_data, self.QUERY_TRANSACTION_URL)
+        return trx_result_resp
 
     def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
