@@ -1,8 +1,6 @@
 
 var path = require('path');
 var webpack = require('webpack');
-var HtmlwebpackPlugin = require("html-webpack-plugin");
-
 
 var ROOT_PATH = path.resolve(__dirname);
 var JS_PATH = path.resolve(ROOT_PATH, "src/mobile");
