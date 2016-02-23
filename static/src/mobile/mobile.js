@@ -1861,6 +1861,9 @@ org.processSecond = (function (org) {
 
                         }
                     },
+                    error: function(data){
+                        return org.ui.alert(data.detail);
+                    },
                     complete: function () {
                         if(check.firstRecharge){
                             _self.$submit.removeAttr('disabled').text('绑卡并充值');
