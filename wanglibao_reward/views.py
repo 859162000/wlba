@@ -1148,7 +1148,7 @@ class XingMeiDistribute(ActivityRewardDistribute):
         #6 给用户发奖品,注意并发控制, 注意url直接请求接口
         for activity_reward in activity_rewards.all():  #要兼容新用户两张电影票的情况
             counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
-            if counts > tickets:
+            if counts >= tickets:
                 json_to_response = {
                     'ret_code': 1003,
                     'message': u'奖品已经发完了'
