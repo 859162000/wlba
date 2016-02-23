@@ -40,9 +40,15 @@ def split_ua(request):
 
         model = user_agent.device.model if user_agent.device.model else ''
         os_version = user_agent.os.version_string if user_agent.os.version_string else ''
-        return {"device_type": "pc", "app_version": "wlb_h5",
-                "channel_id": "", "model": model,
-                "os_version": os_version, "network": ""}
+        device = {"device_type": "pc", "app_version": "wlb_h5",
+                  "channel_id": "", "model": model,
+                  "os_version": os_version, "network": ""}
+
+        # 对所有客户端信息做编码统一处理
+        for k, v in device.iteritems():
+            device[k] = v.decode('utf-8', 'ignore')
+
+        return device
 
     # APP客户端user_agent解析
     dt = arr[1].lower()
@@ -53,9 +59,15 @@ def split_ua(request):
     else:
         device_type = "pc"
 
-    return {"device_type": device_type, "app_version": arr[0],
-            "channel_id": arr[2], "model": arr[1],
-            "os_version": arr[3], "network": arr[4]}
+    device = {"device_type": device_type, "app_version": arr[0],
+              "channel_id": arr[2], "model": arr[1],
+              "os_version": arr[3], "network": arr[4]}
+
+    # 对所有客户端信息做编码统一处理
+    for k, v in device.iteritems():
+        device[k] = v.decode('utf-8', 'ignore')
+
+    return device
 
 
 def get_client_ip(request):

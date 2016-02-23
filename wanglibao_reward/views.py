@@ -928,9 +928,9 @@ class XingMeiRewardDistributer(RewardDistributer):
 
         # 1: 如果票数到600，直接跳出
         counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
-        if counts >= tickets:
+        if counts > tickets:
             logger.debug(u'票已经发完了, %s' % (counts))
-            return
+            #return
 
         # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
         now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
@@ -1128,8 +1128,8 @@ class XingMeiDistribute(ActivityRewardDistribute):
         activity_rewards = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, reward=None)
         if not activity_rewards.first():
             json_to_response = {
-                'ret_code': 1003,
-                'message': u'用户没有抽奖机会'
+                'ret_code': 1002,
+                'message': u'不符合领奖规则'
             }
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
@@ -1138,7 +1138,7 @@ class XingMeiDistribute(ActivityRewardDistribute):
         counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
         if counts >= tickets:
             json_to_response = {
-                'ret_code': 1002,
+                'ret_code': 1003,
                 'message': u'奖品已经发完了'
             }
 
@@ -1147,6 +1147,15 @@ class XingMeiDistribute(ActivityRewardDistribute):
 
         #6 给用户发奖品,注意并发控制, 注意url直接请求接口
         for activity_reward in activity_rewards.all():  #要兼容新用户两张电影票的情况
+            counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+            if counts >= tickets:
+                json_to_response = {
+                    'ret_code': 1003,
+                    'message': u'奖品已经发完了'
+                }
+
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
             with transaction.atomic():
                 ticket_reward = Reward.objects.select_for_update().filter(type=u'星美电影券', is_used=False).first()
                 if not ticket_reward:

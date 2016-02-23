@@ -1004,7 +1004,17 @@ class WeixinRecharge(TemplateView):
 
         banks = Bank.get_kuai_deposit_banks()
         next = self.request.GET.get('rechargeNext', '')
+        user = self.request.user
+
+        pay_info = PayInfo.objects.filter(user=user)
+
+        recharge = None
+        if pay_info.filter(status="成功"):
+            recharge = True
+        else:
+            recharge = False
         return {
+            'recharge': recharge,
             'banks': banks,
             'next' : next,
         }
@@ -1189,7 +1199,18 @@ class WeixinAccountBankCard(TemplateView):
                     is_one = True
         except:
             result = ''
+
+        user = self.request.user
+
+        pay_info = PayInfo.objects.filter(user=user)
+
+        recharge = None
+        if pay_info.filter(status="成功"):
+            recharge = True
+        else:
+            recharge = False
         return {
+            'recharge': recharge,
             'p2p_cards': p2p_cards,
             'is_one': is_one
         }

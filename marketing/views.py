@@ -2008,7 +2008,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_one.jade'
+    template_name = 'xunlei_three.jade'
     wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):

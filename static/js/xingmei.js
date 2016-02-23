@@ -101,7 +101,7 @@
             $('#xl-aug-success').show();
             $('#xl-aug-fail').hide()
           }else if(data.ret_code==1003){
-            $('#xl-aug-fail').children('p').text('对不起,您不符合领取规则');
+            $('#xl-aug-fail').children('p').text('来晚了,电影券已经抢光了');
             $('#xl-aug-success').hide();
             $('#xl-aug-fail').show()
           }else if(data.ret_code==1005){
