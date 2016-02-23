@@ -1098,9 +1098,9 @@ class XingMeiRegister(CoopRegister):
 
             # 1: 如果票数到600，直接跳出
             counts = ActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
-            if counts >= tickets:
+            if counts > tickets:
                 logger.debug(u'票已经发完了, %s' % (counts))
-                return
+                #return
 
             # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
             now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())

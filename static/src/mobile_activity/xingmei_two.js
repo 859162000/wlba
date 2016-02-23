@@ -3,6 +3,7 @@
  */
 
 
+
 (function(){
   $('.reg-btn').on('click',function(){
     org.ajax({
@@ -14,7 +15,7 @@
         if(data.ret_code==1000){
           window.location.href='/weixin/regist/?next=/activity/app_xingmei_two/&mobile=/weixin/list/?promo_token=xm2'
         }else if(data.ret_code==1003){
-          $('.xm-error').text('对不起,您不符合领取规则')
+          $('.xm-error').text('来晚了,电影券已经抢光了')
           $('.xm-error').show()
         }else if(data.ret_code==1005){
           $('.xm-error').text('您的奖励已发放')
