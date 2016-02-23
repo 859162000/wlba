@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
                             AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
-                            AccountFundAssetAPI,
+                            AccountFundAssetAPI, LoginCounterVerifyAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
                             AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
@@ -124,6 +124,7 @@ urlpatterns = patterns(
 
     url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
 
+    url(r'^login_verify/$', LoginCounterVerifyAPI.as_view()),
     url(r'^user_login/$', UserHasLoginAPI.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
