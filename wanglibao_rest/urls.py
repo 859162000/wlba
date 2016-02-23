@@ -12,7 +12,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
-                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView)
+                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI,
+                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -60,7 +61,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -233,6 +234,12 @@ urlpatterns = patterns(
     url(r'^inner/send_sms/$', InnerSysSendSMS.as_view()),
     url(r'^inner/validate_id/$', InnerSysValidateID.as_view()),
     url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
+    url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
+    url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
+    url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
+    url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
+    url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
+
 )
 
 urlpatterns += patterns('',
@@ -273,8 +280,8 @@ urlpatterns += patterns(
 #    url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
     url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
     url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
+    url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
 )
-
 
 # app端改版新接口
 urlpatterns += patterns(
@@ -323,4 +330,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
+)
+
+# 短信发送相关
+urlpatterns += patterns(
+    '',
+    url(r'^sms/', include('wanglibao_sms.urls')),
 )
