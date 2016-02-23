@@ -1856,7 +1856,12 @@ org.processSecond = (function (org) {
                             if(check.firstRecharge){
                                 $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
                             }else{
-                                return org.ui.alert('绑卡成功！');
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+
+                                return org.ui.alert('绑卡成功！',function(){
+                                    windows.location.href = next
+                                });
                             }
 
                         }
