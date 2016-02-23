@@ -1860,7 +1860,7 @@ org.processSecond = (function (org) {
                                     next = next_url == '' ? '/weixin/list/' : next_url;
 
                                 return org.ui.alert('绑卡成功！',function(){
-                                    windows.location.href = next
+                                    window.location.href = next
                                 });
                             }
 
