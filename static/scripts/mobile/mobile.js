@@ -1986,7 +1986,8 @@ org.processSecond = (function (org) {
 
                         }
                     },
-                    error: function(data){
+                    error: function(result){
+                        var data = JSON.parse(result.responseText);
                         return org.ui.alert(data.detail);
                     },
                     complete: function () {
