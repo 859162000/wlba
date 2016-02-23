@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import F
 
 from utils import detect_identifier_type, verify_id
-from wanglibao_account.models import VerifyCounter, IdVerification
+from wanglibao_account.models import VerifyCounter, IdVerification, ManualModifyPhoneRecord
 from wanglibao_sms.utils import validate_validation_code
 from marketing.models import InviteCode, PromotionToken, Channels
 from wanglibao_account.utils import mlgb_md5
@@ -60,6 +60,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'mlgb error': u'注册成功',
         'verify_invalid': u'请输入验证码',
         'verify_error': u'短信验证码错误',
+        'manual_modify_exists': u'要注册手机号不能为人工修改手机号正在申请修改的手机号',
     }
 
     class Meta:
@@ -118,6 +119,12 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             )
 
         if len(users) == 0:
+            manual_modify_exists = ManualModifyPhoneRecord.objects.filter(new_phone=identifier, status__in=[u"待初审", u"初审待定", u"待复审"]).exists()
+            if manual_modify_exists:
+                raise forms.ValidationError(
+                        self.error_messages['manual_modify_exists'],
+                        code='manual_modify_exists',
+                )
             return identifier.strip()
         raise forms.ValidationError(
             self.error_messages['duplicate_username'],
@@ -430,4 +437,34 @@ class TokenSecretSignAuthenticationForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+
+class ManualModifyPhoneForm(forms.Form):
+    error_messages ={
+        'validate must not be null': '1',
+    }
+
+    id_front_image = forms.ImageField(label='身份证正面照片')
+    id_back_image = forms.ImageField(label='身份证反面照片')
+    id_user_image = forms.ImageField(label='手持身份证照片')
+    new_phone = forms.CharField(max_length=64, label='新的手机号码')
+    validate_code = forms.CharField(label="Validate code for phone", required=False)
+    def clean_validate_code(self):
+        if 'new_phone' in self.cleaned_data:
+            new_phone = self.cleaned_data["new_phone"]
+            validate_code = self.cleaned_data.get('validate_code', '')
+            if validate_code:
+                status, message = validate_validation_code(new_phone, validate_code)
+                if status != 200:
+                    raise forms.ValidationError(
+                        # Modify by hb on 2015-12-02
+                        #self.error_messages['validate code not match'],
+                        message,
+                        code='validate_code_error',
+                    )
+            else:
+                raise forms.ValidationError(
+                        self.error_messages['validate must not be null'],
+                        code='validate_code_error',
+                    )
+        return self.cleaned_data
 
