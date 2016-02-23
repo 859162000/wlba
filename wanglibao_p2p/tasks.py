@@ -196,10 +196,10 @@ def p2p_auto_ready_for_settle():
     now = timezone.now()
     for amort in product_amorts:
         time_offset = datetime.timedelta(minutes=random.randint(1, 30))
-        settle_time = now + time_offset
+        term_date = now + time_offset
         # amort.update(ready_for_settle=True, settlement_time=settle_time, is_auto_ready_for_settle=True)
         amort.ready_for_settle = True
-        amort.settlement_time = settle_time
+        amort.term_date = term_date
         amort.is_auto_ready_for_settle = True
         amort.save()
 
