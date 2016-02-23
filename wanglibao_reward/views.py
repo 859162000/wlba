@@ -930,7 +930,7 @@ class XingMeiRewardDistributer(RewardDistributer):
         counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
         if counts > tickets:
             logger.debug(u'票已经发完了, %s' % (counts))
-            return
+            #return
 
         # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
         now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
@@ -1128,8 +1128,8 @@ class XingMeiDistribute(ActivityRewardDistribute):
         activity_rewards = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, reward=None)
         if not activity_rewards.first():
             json_to_response = {
-                'ret_code': 1003,
-                'message': u'用户没有抽奖机会'
+                'ret_code': 1002,
+                'message': u'不符合领奖规则'
             }
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
@@ -1138,7 +1138,7 @@ class XingMeiDistribute(ActivityRewardDistribute):
         counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
         if counts > tickets:
             json_to_response = {
-                'ret_code': 1002,
+                'ret_code': 1003,
                 'message': u'奖品已经发完了'
             }
 
