@@ -1,0 +1,81 @@
+- load formatters
+doctype html
+html(style="background: #f6f6f6")
+  head
+    title 网利宝
+    include include/app_head
+    link(href="/static/styles/mobile_activity/app_xunleizhuce.css?v=2022251455", rel="stylesheet")
+    - csrf_token
+  body
+    .xunmeng2
+      .xunmeng2-top
+        p 迅雷会员&网利宝
+      .xunmeng2-moidle
+        p 您已成功注册网利宝
+        p 并且与迅雷帐号绑定成功
+      .xunmeng2-moidle2
+        if ret_code == '10000'
+          p 迅雷帐号：{{nickname}}
+        p 网利宝帐号：
+          span.va
+      .xunmeng2-bottom
+        a(href='/weixin/list/').xunleiwangli 前往网利宝
+        p 迅雷会员奖励将直接发送到此迅雷帐号上
+
+    .banner
+      img(src='/static/imgs/mobile_activity/app_xunleithree/h5banner.jpg')
+    .main
+      .xunmeng3
+        .xunmeng3-moidle
+          p 该迅雷帐号（{{nickname}}）已绑定网利
+          p 宝帐号，请直接登录网利宝帐号，
+          p 继续领取会员
+        .xunmeng3-bottom
+          a(href='/weixin/login/').xunleiwangli1 登录网利宝帐号
+          a(href='javascript:void(0);').xunlei1
+           span 切换迅雷帐号
+      .maimai-form
+        input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
+        .maimai-check-body
+          .maimai-form-margin
+          .phone-check
+            input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+            input(type='hidden', name='codeimg_key',value='')
+            img(src='').check-img
+          .maimai-form-margin
+          .phone-check
+            input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+            button(type="button").check-submit 短信验证码
+        .maimai-form-sign 请输入正确的手机号
+        .maimai-form-margin.maimai-sign-margin
+        if ret_code == '10000'
+          p.xunleibangding 注册后将与您的迅雷帐号：{{nickname}}绑定
+        else
+          p.xunleibangding
+        input(type='button',name='submit' ,value="马上注册领取红包",disabled=true).maimai-form-btn2.maimai-form-btn1
+        //p.xunleipeople
+          |已有网利宝帐号？
+          a(href='/weixin/login/') 请登录
+
+    //宣传文案
+    section.regist-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4.title1=title
+            p.bodyTxt5=bodyTxt1
+            p.bodyTxt5=bodyTxt2
+
+
+        +li('trust', '信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资')
+        +li('safe', '安全', '第三方资金托管', '阳光保险承保资金安全')
+        +li('authority', '权威', '华尔街精英金融团队', 'IT数据风控系统')
+        +li('profit', '高收益', '30余倍银行活期收益', '100元起投')
+    .erwei
+      img(src='/static/imgs/mobile_activity/app_xunlei/xunerwei.jpg')
+      p 立即关注网利宝微信服务号
+      p 抢标投标不用愁，快来扫一扫！
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(data-init='xunlei', src="/static/scripts/mobile_activity/app_xunlei.js?v=201622230")
+    include include/tracking
