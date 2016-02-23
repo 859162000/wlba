@@ -52,7 +52,8 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, LoginCounter,\
+    UserThreeOrder, ManualModifyPhoneRecord, SMSModifyPhoneRecord
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -70,8 +71,7 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
-from wanglibao_account.models import UserThreeOrder, ManualModifyPhoneRecord,SMSModifyPhoneRecord
-import requests
+# import requests
 from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 from wanglibao_pay.fee import WithdrawFee
@@ -2509,5 +2509,42 @@ class SMSModifyPhoneAPI(APIView):
                 "messages": ["尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。", ],
             })
             return Response({'message':'ok'})
+
+
+class LoginCounterVerifyAPI(APIView):
+    """登录次数验证"""
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+
+        from django.db.models import F
+
+        now = timezone.now()
+        today_start = local_to_utc(now, 'min')
+        today_end = local_to_utc(now, 'max')
+        user = request.user
+        password = request.DATA.get('password').strip()
+
+        if user.check_password(password):
+            return Response({'ret_code': 0, 'message': 'ok'})
+        else:
+            # 密码错误，请重新输入
+            # 错误大于6次, 密码错误频繁，为账户安全建议重置
+            verify_counter, created = LoginCounter.objects.get_or_create(user=user)
+
+            if verify_counter.count > 6 and today_start < now < today_end:
+                msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+            else:
+                msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
+
+            if today_start < now < today_end:
+                verify_counter.count = F('count') + 1
+            else:
+                verify_counter.count = 1
+            verify_counter.save()
+
+            return Response(msg)
+
 
 
