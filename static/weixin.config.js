@@ -7,7 +7,7 @@ var HtmlwebpackPlugin = require("html-webpack-plugin");
 var ROOT_PATH = path.resolve(__dirname);
 var JS_PATH = path.resolve(ROOT_PATH, "src/mobile");
 
-var BUILD_PATH = path.resolve(ROOT_PATH, "script/mobile/dev");
+var BUILD_PATH = path.resolve(ROOT_PATH, "scripts/mobile/dev");
 
 
 if(process.env.NODE_ENV == 'pro'){
@@ -17,11 +17,11 @@ if(process.env.NODE_ENV == 'pro'){
 module.exports = {
     entry: {
         list: path.resolve(JS_PATH, 'list'),
-        vendor: [path.resolve(JS_PATH, 'lib/zepto')]
+        vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto')]
     },
     output: {
-        path: path.join(__dirname, outpath),
-        publicPath: BUILD_PATH + '/',
+        path: BUILD_PATH,
+        publicPath: '/',
         filename: '[name].js'
     },
     module: {
@@ -31,9 +31,9 @@ module.exports = {
         ]
     },
     resolve: {
-        modulesDirectories: ['./src/mobile_fuelcard'],
+        modulesDirectories: ['./src/mobile'],
         alias: {
-            zepto: 'lib/zepto.js'
+            zepto: 'lib/zepto/zepto.js'
         },
         extensions: ['', '.js']
     },
@@ -42,6 +42,6 @@ module.exports = {
         new webpack.optimize.CommonsChunkPlugin({   //第三方库生成的文件
             name: ['vendor'],
            filename: "vendor.zepto.js"
-        }),
+        })
     ]
 };
