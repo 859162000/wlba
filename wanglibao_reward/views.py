@@ -1161,7 +1161,7 @@ class XingMeiDistribute(ActivityRewardDistribute):
                 if not ticket_reward:
                     json_to_response = {
                         'ret_code': 1004,
-                        'message': u'奖品已经发完了(库里不足%s张)' % (tickets)
+                        'message': u'奖品已经发完了'
                     }
 
                     return HttpResponse(json.dumps(json_to_response), content_type='application/json')
