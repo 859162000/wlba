@@ -179,12 +179,9 @@ class RechargeTemplate(TemplateView):
         else:
             recharge = False
         margin = self.request.user.margin.margin
-        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
-        # print cards
         return {
             'recharge': recharge,
             'banks': banks,
-            'cards':cards,
             'next' : next,
             'margin': margin if margin else 0.0,
         }
