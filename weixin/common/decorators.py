@@ -50,9 +50,9 @@ def is_check_id_verify(is_check):
                 if not wanglibaoprofile.id_is_valid:
                     return HttpResponseRedirect("/weixin/sub_regist_first/")
 
-                cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
-                if not cards.exists():
-                    return HttpResponseRedirect("/weixin/sub_regist_second/")
+                # cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
+                # if not cards.exists():
+                #     return HttpResponseRedirect("/weixin/sub_regist_second/")
             res = f(self, request, *args, **kwargs)
             return res
         return check
