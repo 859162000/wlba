@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
+from django.db.models import Q
 from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import is_check_id_verify
 from weixin.models import WeixinAccounts, WeixinUser
@@ -25,7 +26,7 @@ from wanglibao_redis.backend import redis_backend
 from wanglibao_rest import utils
 from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
-from wanglibao_pay.models import Bank
+from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger("weixin")
@@ -168,8 +169,20 @@ class AccountTemplate(TemplateView):
 
 class RechargeTemplate(TemplateView):
     def get_context_data(self, **kwargs):
+        banks = Bank.get_kuai_deposit_banks()
+        next = self.request.GET.get('rechargeNext', '')
+        user = self.request.user
+        pay_info = PayInfo.objects.filter(user=user)
+
+        if pay_info.filter(status="成功"):
+            recharge = True
+        else:
+            recharge = False
         margin = self.request.user.margin.margin
         return {
+            'recharge': recharge,
+            'banks': banks,
+            'next' : next,
             'margin': margin if margin else 0.0,
         }
 
