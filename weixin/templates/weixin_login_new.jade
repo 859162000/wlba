@@ -12,23 +12,20 @@ html(style="background: #f5f5f5")
       .login-logo-bg
       .login-logo-icon
           img(src="/static/imgs/mobile/logo.png", alt="")
+
     section.form-box
-      from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
-        - csrf_token
-        input(name="openid", type="hidden", value="{{ context.openid }}")
-        input(name="captcha_0", type="hidden", value="")
-        .form-list
-          .form-icon.user-phone.identifier-icon
-          .form-input
-            input(type="tel", name="identifier", placeholder="请输入手机号",data-target2='identifier-icon', data-icon='user-phone', data-target="identifier-edit", data-empty='', data-val='input-clear')
-            .form-edit-icon.identifier-edit
-        .form-list
-          .form-icon.user-password.password-icon
-          .form-input
-            input(type="password", name="password", placeholder="请输入密码",data-target2='password-icon', data-icon='user-password')
-            .form-edit-icon.password-handle.hide-password
-        section.login-submit
-          button(type="submit", disabled=true) 登录网利宝
+      .form-list
+        .form-icon.user-phone.identifier-icon
+        .form-input
+          input(type="tel", name="identifier", placeholder="请输入手机号",data-target2='identifier-icon', data-icon='user-phone', data-target="identifier-edit", data-empty='', data-val='input-clear')
+          .form-edit-icon.identifier-edit
+      .form-list
+        .form-icon.user-password.password-icon
+        .form-input
+          input(type="password", name="password", placeholder="请输入密码",data-target2='password-icon', data-icon='user-password')
+          .form-edit-icon.password-handle.hide-password
+      section.login-submit
+        button(type="submit", disabled=true) 登录网利宝
     section.login-for-regist
       if next == ''
         a(href="/weixin/regist/") 免费注册
@@ -36,5 +33,8 @@ html(style="background: #f5f5f5")
         a(href="/weixin/regist/?next={{next}}") 免费注册
     section.bank-safe
       span 账户资金安全由阳光保险承保
+    include include/ui_model/mobile_errorsign
     include include/tracking
-  script(data-init='login', src="/static/scripts/mobile/dist/mobile.js?v=20151106")
+    script(src='/static/scripts/mobile/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile/dev/login.js')
+    //script(data-init='login', src="/static/scripts/mobile/dist/mobile.js?v=20151106")
