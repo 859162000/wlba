@@ -128,48 +128,62 @@
         //效果
         var click = false;
         $('#vertical').find('a').click(function () {
-             if (click) {
-                    return false;
-                } else {
-                    click = true;
-                }
+            if (click) {
+                return false;
+            } else {
+                click = true;
+            }
+            var self = $(this),
+                img = self.find('.imgg');
             $.ajax({
                 url: "/api/activity/reward/",
                 type: "POST",
-                data:{ activity:'xunlei'},
+                data: {activity: 'xunlei'},
                 async: false
             }).done(function (data) {
                 console.log(data)
+                //console.log(data['ret_code'])
+                if (data['ret_code'] == 0) {
+                    img.animate({'width': 0}, 500, function () {
+                        $(this).hide().next().show();
+                        $(this).next().animate({'width': '261px'}, 300, function () {
+                            $('#vertical').find('a').removeClass('xun');
+                            setTimeout(function () {
+                                self.find('.info').animate({'width': 0}, 300, function () {
+                                    $(this).hide();
+                                    img.show();
+                                    img.animate({'width': '261px'}, 300, function () {
+                                        click = false;
+                                    });
+                                });
 
-            });
-            var self = $(this),
-                img = self.find('.imgg');
-            img.animate({'width': 0}, 500, function () {
-                $(this).hide().next().show();
-                $(this).next().animate({'width': '261px'}, 300, function () {
-                    $('#vertical').find('a').removeClass('xun');
-                    setTimeout(function () {
-                        self.find('.info').animate({'width': 0}, 300, function () {
-                            $(this).hide();
-                            img.show();
-                            img.animate({'width': '261px'}, 300,function(){
-                                 click = false;
-                            });
+                            }, 3000);
+
                         });
 
-                    }, 3000);
+                    });
+                } else if (data['ret_code'] == 1000 || data['ret_code'] == 1002) {
+                    click = true;
+                }
 
-                });
 
             });
 
+
         })
+        chances();
+        function chances() {
+            $.ajax({
+                url: "/api/activity/reward/?activity=xunlei&action=chances",
+                type: "GET",
+                async: false
+            }).done(function (data) {
+                console.log(data);
+                // $('.chance').text(' ' + data['lefts'] + ' ');
 
-        //function chances() {
+            });
 
-
-        //}
-
+        }
 
 
         //登入框穿参数
