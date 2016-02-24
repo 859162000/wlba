@@ -8,8 +8,9 @@ html
     - endwith
     link(rel="stylesheet",href="/static/styles/pc_activity/xunlei_three.css")
   body(style="background:#ffdc79")
+    - csrf_token
     include include/activityTopNewxunlei0
-    //.ten-gif
+    .ten-gif
       .gif
         .ten-yun
         .money
@@ -51,6 +52,19 @@ html
             |你有&nbsp;
             span 3
             |&nbsp;次翻牌机会
+          #vertical.brand
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
         .three-maindraw1
           .maindraw-title1
             h1 新用户专享福利
@@ -60,21 +74,30 @@ html
                 dd 注册送
                 dt.drawtitle1
             dd.ddraw
-              a(href='javascript:void(0);') 立即注册
+              if user.is_authenticated
+                a(href='javascript:void(0);').buttonxunlei 立即注册
+              else
+                a(href='javascript:void(0);').buttonxunlei1 立即注册
           dl
             dt
               dl
                 dd 首充送
                 dt.drawtitle1.drawtitle11
             dd.ddraw
-              a(href='javascript:void(0);') 立即充值
+              if user.is_authenticated
+                a(href='/accounts/home/').buttonxunlei2 立即充值
+              else
+                a(href='javascript:void(0);').buttonxunlei3 立即充值
           dl
             dt
               dl
                 dd 首投送
                 dt.drawtitle1.drawtitle12
             dd.ddraw
-              a(href='javascript:void(0);') 立即投资
+              if user.is_authenticated
+                a(href='/p2p/list/').buttonxunlei4 立即投资
+              else
+                a(href='javascript:void(0);').buttonxunlei5 立即投资
 
         .three-maindraw2
           .maindraw-title2

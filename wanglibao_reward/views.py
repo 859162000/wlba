@@ -1050,7 +1050,7 @@ class DistributeRewardAPIView(APIView):
                 break
 
         if run:
-            if self.actoin == 'chances':
+            if self.action == 'chances':
                 return processor().get_chances(request)
         else:
             json_to_response = {
@@ -1097,13 +1097,20 @@ class XunleiDistribute(ActivityRewardDistribute):
         self.channels = ('xunlei9', 'mxunlei')
 
     def get_chances(self, request):
-        counts = WanglibaoActivityReward.objects.fiter(activity=self.token, user=request.user, has_sent=0).count()
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        counts = WanglibaoActivityReward.objects.filter(activity=self.token, user=request.user, has_sent=0).count()
         json_to_response = {
             'ret_code': 0,
             'count': counts,
             'message': u'获得用户的翻拍机会'
         }
-        return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
     def judge_valid_user(self, request, channels):
         if not request.user.is_authenticated():
@@ -1126,7 +1133,7 @@ class XunleiDistribute(ActivityRewardDistribute):
 
     def generate(self, request):
         #  判断有没有生成抽奖记录
-        counts = WanglibaoActivityReward.objects.filter(user=request.user, activity=self.token).counts()
+        counts = WanglibaoActivityReward.objects.filter(user=request.user, activity=self.token).count()
         if counts > 0:
             return
         experience_rate = {
@@ -1142,7 +1149,7 @@ class XunleiDistribute(ActivityRewardDistribute):
         }
         p2p_record = P2PRecord.objects.filter(user=request.user).first()
         if not p2p_record:  # 新用户
-            no_reward = time.localtime() % 3  # 保证未抽中的次数是随机的
+            no_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
             for unused in xrange(3):
                 if no_reward == unused:
                     WanglibaoActivityReward.objects.create(
@@ -1170,7 +1177,7 @@ class XunleiDistribute(ActivityRewardDistribute):
                             has_sent=0,)
 
         else:  # 老用户
-            when_reward = time.localtime() % 3  # 保证未抽中的次数是随机的
+            when_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
             for unused in xrange(3):
                 if when_reward == unused:
                     counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(redpack_event=None).count()
@@ -1179,12 +1186,12 @@ class XunleiDistribute(ActivityRewardDistribute):
                             continue
 
                         with transaction.atomic():
-                            experience = RedPackEvent.objects.filter(name=value[0]).first()
+                            redpack = RedPackEvent.objects.filter(name=value[0]).first()
                             WanglibaoActivityReward.objects.create(
                                     user=request.user,
                                     reward=None,
-                                    redpack_event=None,
-                                    experience=experience,
+                                    redpack_event=redpack,
+                                    experience=None,
                                     activity=self.token,
                                     has_sent=0,)
                 else:
@@ -1198,14 +1205,14 @@ class XunleiDistribute(ActivityRewardDistribute):
 
 
     def distribute(self, request):
-        status, response_msg = self.judge_valid_user()
+        status, response_msg = self.judge_valid_user(request, None)
         if False == status:
             return response_msg
 
         self.generate(request)
 
         with transaction.atomic():
-            reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, has_sent=0).first()
+            reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, has_sent=0, activity=self.token).first()
             if not reward:
                 json_to_response = {
                     'ret_code': 1002,
