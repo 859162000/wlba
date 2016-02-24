@@ -28,6 +28,10 @@ from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from shumi_backend.exception import FetchException, AccessException
+from shumi_backend.fetch import UserInfoFetcher
+from wanglibao_buy.models import BindBank
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 logger = logging.getLogger("weixin")
 
@@ -278,3 +282,27 @@ class FWHIdValidate(TemplateView):
 
 
 
+class FWHBankCard(TemplateView):
+    template_name = 'account_bankcard.jade'
+
+    def get_context_data(self, **kwargs):
+        message = ''
+        try:
+            fetcher = UserInfoFetcher(self.request.user)
+            fetcher.fetch_bind_banks()
+        except FetchException:
+            message = u'获取数据失败，请稍后重试'
+        except AccessException:
+            pass
+
+        cards = BindBank.objects.filter(user__exact=self.request.user)
+        p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        banks = Bank.get_withdraw_banks()
+        return {
+            "cards": cards,
+            'p2p_cards': p2p_cards,
+            'banks': banks,
+            'user_profile': self.request.user.wanglibaouserprofile,
+            "message": message,
+            'announcements': AnnouncementAccounts
+        }
