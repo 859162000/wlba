@@ -14,13 +14,17 @@ html(style='background: #ffdc79')
     .xunleidraw
       .xunltitle
         p 幸运大翻牌
-      p.fanzhuan
-        |请
-        if user.is_authenticated
-          a(href='javascript:void(0);').signxun 立即登陆
-        else
+      if user.is_authenticated
+        p.fanzhuan
+          |你有&nbsp;
           a(href='javascript:void(0);').signxun 3
-        |，获取翻牌机会
+          |&nbsp;次翻牌机会
+      else
+        p.fanzhuan
+          |请
+          a(href='javascript:void(0);').signxun.signxun1 立即登陆
+          |，获取翻牌机会
+
     .xunleifanpai
       #vertical.brand
         a(href="javascript:void(0)").xun
@@ -41,21 +45,21 @@ html(style='background: #ffdc79')
       h1 注册送
       img(src='/static/imgs/mobile_activity/app_xunleithree/app_mainxun.png')
       if user.is_authenticated
-        a(href='/weixin/login/?next=/activity/app_xunleithree/?promo_token=xunlei9').xunleibutton 立即注册
+        a(href='/weixin/login/?next=/activity/app_xunleithree/?promo_token=xunlei9').xunleibutton.xunleibutton0 立即注册
       else
-        a(href='javascript:void(0);').xunleibutton 立即注册12
+        a(href='javascript:void(0);').xunleibutton.xunleibutton1 立即注册12
       h1 首充送
       img(src='/static/imgs/mobile_activity/app_xunleithree/app_mainxun1.png')
       if user.is_authenticated
         a(href='/weixin/list/').xunleibutton 立即充值
       else
-        a(href='javascript:void(0);').xunleibutton 立即充值
+        a(href='javascript:void(0);').xunleibutton.xunleibutton2 立即充值
       h1 首投送
       img(src='/static/imgs/mobile_activity/app_xunleithree/app_mainxun2.png')
       if user.is_authenticated
         a(href='/weixin/list/').xunleibutton 立即投资
       else
-        a(href='javascript:void(0);').xunleibutton 立即投资
+        a(href='javascript:void(0);').xunleibutton.xunleibutton3 立即投资
       .xunltitle
         p 活动规则
     .huodongxunlei
@@ -71,5 +75,5 @@ html(style='background: #ffdc79')
         li 9、 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次且仅限散标使用，不可叠加使用，使用后无论是 否有余额均失效；
         li 10、 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
         li 11、 本活动最终解释权在法律允许范围内归网利宝所有。
-    script(src="/static/src/mobile/lib/weixin/wx.js")
-    script(src="/static/scripts/mobile_activity/app_xunleithree.js?v=13944552")
+    //script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(src="/static/scripts/mobile_activity/app_xunleithree.js?v=333333")

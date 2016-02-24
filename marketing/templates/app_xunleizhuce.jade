@@ -4,7 +4,7 @@ html(style="background: #f6f6f6")
   head
     title 网利宝
     include include/app_head
-    link(href="/static/styles/mobile_activity/app_xunleizhuce.css?v=2022251455", rel="stylesheet")
+    link(href="/static/styles/mobile_activity/app_xunlei.css?v=2022251455", rel="stylesheet")
     - csrf_token
   body
     .xunmeng2
@@ -21,7 +21,6 @@ html(style="background: #f6f6f6")
       .xunmeng2-bottom
         a(href='/weixin/list/').xunleiwangli 前往网利宝
         p 迅雷会员奖励将直接发送到此迅雷帐号上
-
     .banner
       img(src='/static/imgs/mobile_activity/app_xunleithree/h5banner.jpg')
     .main
@@ -33,7 +32,7 @@ html(style="background: #f6f6f6")
         .xunmeng3-bottom
           a(href='/weixin/login/').xunleiwangli1 登录网利宝帐号
           a(href='javascript:void(0);').xunlei1
-           span 切换迅雷帐号
+            span 切换迅雷帐号
       .maimai-form
         input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
         .maimai-check-body
@@ -54,9 +53,8 @@ html(style="background: #f6f6f6")
           p.xunleibangding
         input(type='button',name='submit' ,value="马上注册领取红包",disabled=true).maimai-form-btn2.maimai-form-btn1
         p.xunleipeople
-          |已有网利宝帐号？
+          | 已有网利宝帐号？
           a(href='/weixin/login/') 请登录
-
     //宣传文案
     section.regist-propagate
       ul
@@ -66,8 +64,6 @@ html(style="background: #f6f6f6")
             h4.title1=title
             p.bodyTxt5=bodyTxt1
             p.bodyTxt5=bodyTxt2
-
-
         +li('trust', '信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资')
         +li('safe', '安全', '第三方资金托管', '阳光保险承保资金安全')
         +li('authority', '权威', '华尔街精英金融团队', 'IT数据风控系统')
@@ -76,6 +72,5 @@ html(style="background: #f6f6f6")
       img(src='/static/imgs/mobile_activity/app_xunlei/xunerwei.jpg')
       p 立即关注网利宝微信服务号
       p 抢标投标不用愁，快来扫一扫！
-    script(src="/static/src/mobile/lib/weixin/wx.js")
-    script(src="/static/scripts/mobile_activity/app_xunleithree.js?v=13944552")
+    script(data-init='xunlei', src="/static/scripts/mobile_activity/app_xunleizhuce.js?v=201622230")
     include include/tracking

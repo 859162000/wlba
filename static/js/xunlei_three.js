@@ -133,17 +133,26 @@
                 } else {
                     click = true;
                 }
+            $.ajax({
+                url: "/api/activity/reward/",
+                type: "POST",
+                data:{ activity:'xunlei'},
+                async: false
+            }).done(function (data) {
+                console.log(data)
+
+            });
             var self = $(this),
                 img = self.find('.imgg');
             img.animate({'width': 0}, 500, function () {
                 $(this).hide().next().show();
-                $(this).next().animate({'width': '261px'}, 500, function () {
+                $(this).next().animate({'width': '261px'}, 300, function () {
                     $('#vertical').find('a').removeClass('xun');
                     setTimeout(function () {
-                        self.find('.info').animate({'width': 0}, 500, function () {
+                        self.find('.info').animate({'width': 0}, 300, function () {
                             $(this).hide();
                             img.show();
-                            img.animate({'width': '261px'}, 800,function(){
+                            img.animate({'width': '261px'}, 300,function(){
                                  click = false;
                             });
                         });
@@ -155,6 +164,11 @@
             });
 
         })
+
+        //function chances() {
+
+
+        //}
 
 
 
