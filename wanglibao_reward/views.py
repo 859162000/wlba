@@ -1052,6 +1052,8 @@ class DistributeRewardAPIView(APIView):
         if run:
             if self.action == 'chances':
                 return processor().get_chances(request)
+            if self.action == 'generate':
+                return processor().generate_rewards(request)
         else:
             json_to_response = {
                 'ret_code': 3000,
@@ -1130,6 +1132,14 @@ class XunleiDistribute(ActivityRewardDistribute):
                 return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         return True, None
+
+    def generate_rewards(self, request):
+        status, response_msg = self.judge_valid_user(request, None)
+        if False==status:
+            return response_msg
+        else:
+            self.generate(request)
+            return self.get_chances(request)
 
     def generate(self, request):
         #  判断有没有生成抽奖记录
