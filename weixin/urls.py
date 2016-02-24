@@ -80,7 +80,7 @@ urlpatterns = patterns(
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
 
     url(r'^sub_regist_first/$', login_required(TemplateView.as_view(template_name="service_registProcess_first.jade"), login_url="/weixin/sub_login_redirect/")),
-    url(r'^sub_regist_second/$', login_required(TemplateView.as_view(template_name="service_registProcess_second.jade"), login_url="/weixin/sub_login_redirect/")),
+    url(r'^sub_regist_second/$', login_required(views.WeixinRegisterBindCard.as_view(template_name="service_registProcess_second.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_regist_three/$', login_required(TemplateView.as_view(template_name="service_registProcess_three.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_account/$', login_required(main_views.AccountTemplate.as_view(template_name="service_account.jade"), login_url="/weixin/sub_login_redirect/"), name='sub_account'),
 
