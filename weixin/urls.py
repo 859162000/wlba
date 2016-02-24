@@ -92,7 +92,7 @@ urlpatterns = patterns(
 
     url(r'^sub_reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(template_name="service_reward.jade"), login_url="/weixin/sub_login_redirect/")),
     #银行卡管理
-    url(r'^sub_bankcards/$', login_required(main_views.FWHBankCard.as_view(template_name="service_bankcard.jade"), login_url="/weixin/sub_login_redirect/")),
+    url(r'^sub_bankcards/$', login_required(views.WeixinAccountBankCard.as_view(template_name="service_bankcard.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_pwd_back/$', TemplateView.as_view(template_name="service_tradepwd_back.jade")),
     #微站 api
     url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),

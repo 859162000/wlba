@@ -279,30 +279,3 @@ class FWHIdValidate(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         return super(FWHIdValidate, self).dispatch(request, *args, **kwargs)
-
-
-
-class FWHBankCard(TemplateView):
-    template_name = 'account_bankcard.jade'
-
-    def get_context_data(self, **kwargs):
-        message = ''
-        try:
-            fetcher = UserInfoFetcher(self.request.user)
-            fetcher.fetch_bind_banks()
-        except FetchException:
-            message = u'获取数据失败，请稍后重试'
-        except AccessException:
-            pass
-
-        cards = BindBank.objects.filter(user__exact=self.request.user)
-        p2p_cards = Card.objects.filter(user__exact=self.request.user)
-        banks = Bank.get_withdraw_banks()
-        return {
-            "cards": cards,
-            'p2p_cards': p2p_cards,
-            'banks': banks,
-            'user_profile': self.request.user.wanglibaouserprofile,
-            "message": message,
-            'announcements': AnnouncementAccounts
-        }
