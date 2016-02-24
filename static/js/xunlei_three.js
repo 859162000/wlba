@@ -118,12 +118,12 @@
             return false
         })
         //回到banner注册
-        //$('.receive1').click(function () {
-        //
-        //    $('body,html').animate({scrollTop: 0}, 600);
-        //    return false
-        //
-        //})
+        $('.buttonxunlei1,.buttonxunlei3,.buttonxunlei5,.buttonxunlei').click(function () {
+
+            $('body,html').animate({scrollTop: 0}, 600);
+            return false
+
+        })
         //路径$("#index_01").attr("src","images/index_01_1.jpg");
         //效果
         var click = false;
