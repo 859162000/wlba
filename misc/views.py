@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import json
-
+from django.utils import timezone
 from django.db.models import Q
 from misc.models import Misc, timestamp
 from wanglibao_p2p.models import P2PProduct
@@ -76,36 +76,47 @@ class MiscRecommendProduction(object):
         """
         ids = self.get_recommend_products()
         if ids:
-            for id in ids:
-                recommend = P2PProduct.objects.filter(hide=False, status=u'正在招标', id=id)
+            for pid in ids:
+                recommend = P2PProduct.objects.filter(hide=False,
+                                                      publish_time__lte=timezone.now(),
+                                                      status=u'正在招标',
+                                                      id=pid)
                 if recommend:
-                    return id
+                    return pid
         # 自定义查询标
-        productions = P2PProduct.objects.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))
+        productions = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), status=u'正在招标') \
+            .exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))
         if productions:
             id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
             id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
             return id_rate[0]['id']
 
         else:
-            product = P2PProduct.objects.filter(hide=False, status=u'满标待打款').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-soldout_time').first()
+            product = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), status=u'满标待打款') \
+                .exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-soldout_time').first()
             return product.id
 
     def get_recommend_product_except_new(self, ids=None):
         """ 主推标不包含新手标 """
         ids = self.get_recommend_products()
         if ids:
-            for id in ids:
-                recommend = P2PProduct.objects.filter(hide=False, status=u'正在招标', id=id).exclude(category=u'新手标')
+            for pid in ids:
+                recommend = P2PProduct.objects.filter(hide=False,
+                                                      publish_time__lte=timezone.now(),
+                                                      status=u'正在招标',
+                                                      id=pid).exclude(category=u'新手标')
                 if recommend:
-                    return id
+                    return pid
         # 自定义查询标
-        productions = P2PProduct.objects.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标') | Q(category=u'新手标'))
+        productions = P2PProduct.objects.filter(hide=False, status=u'正在招标') \
+            .exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标') | Q(category=u'新手标'))
         if productions:
             id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
             id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
             return id_rate[0]['id']
 
         else:
-            product = P2PProduct.objects.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标') | Q(category=u'新手标')).order_by('-priority', '-publish_time').first()
+            product = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now()) \
+                .exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标') | Q(category=u'新手标')) \
+                .order_by('-priority', '-publish_time').first()
             return product.id

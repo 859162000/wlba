@@ -113,9 +113,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
 
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           x.created_at, event.available_at, event.unavailable_at)
+                end_time_day = end_time.strftime('%Y-%m-%d')
 
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                        "id": x.id, "invest_amount": event.invest_amount,
+                        "id": x.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
                         "period": event.period, "period_type": event.period_type,
                         "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
@@ -128,7 +129,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         packages['available'].append(obj)
             # 排序
             packages['available'].sort(key=lambda x: x['highest_amount'], reverse=True)
-            packages['available'].sort(key=lambda x: x['unavailable_at'])
+            packages['available'].sort(key=lambda x: x['end_time_day'])
             packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # 加息券
@@ -188,9 +189,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
 
                     start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                               coupon.created_at, event.available_at, event.unavailable_at)
+                    end_time_day = end_time.strftime('%Y-%m-%d')
 
                     obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                           "id": coupon.id, "invest_amount": event.invest_amount,
+                           "id": coupon.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                            "unavailable_at": stamp(end_time), "event_id": event.id,
                            "period": event.period, "period_type": event.period_type,
                            "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
@@ -203,7 +205,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
                 # 排序
-                packages['available'].sort(key=lambda x: x['unavailable_at'])
+                packages['available'].sort(key=lambda x: x['end_time_day'])
                 packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # packages['available'].sort(key=lambda x: x['unavailable_at'])
