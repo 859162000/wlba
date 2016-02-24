@@ -1,0 +1,110 @@
+
+@mixin clearfix()
+  &:before,
+  &:after
+    content: ""
+    display: table
+  &:after
+    clear: both
+
+//按钮统一
+
+@mixin submit($height: 2.5rem, $color: #fff, $background: #DB493F)
+  display: block
+  -webkit-appearance: none
+  width: 100%
+  height: $height
+  line-height: $height
+  text-align: center
+  color: $color
+  background: $background
+  border-radius: .2rem
+  font-size: rem(32)
+  border: 0
+  &:active
+    box-shadow: 0px 10px 200px rgba(0,0,0,0.2) inset
+  &:disabled
+    background: rgba(219, 73, 63, 0.498039)
+
+//输入框样式
+
+.wx-input-double
+  display: -webkit-box
+
+.wx-input-public
+  display: -webkit-box
+  -webkit-box-flex: 1
+  -webkit-box-align: center
+  font-size: rem(30)
+  padding:  0 1rem 0 .5rem
+  background: #fff
+  border-radius: .2rem
+
+  .wx-input-name
+    color: #666
+
+  input.wx-input-main, select
+    -webkit-appearance: none
+    -webkit-box-flex: 1
+    display: block
+    width: 100%
+    border: 0
+    padding: 0.7rem 0.2rem 0.7rem 0.9rem
+    &::-webkit-input-placeholder
+      color: #ccc
+  select
+    background: url('/static/imgs/mobile_fuelcard/input_icon/arrow_down.png') no-repeat right center
+    background-size: rem(42)
+    color: #ccc
+  .wx-clear-input
+    display: none
+    width: 1rem
+    height: 1rem
+    background: url("/static/imgs/mobile_fuelcard/account/clear.png") no-repeat center
+    background-size: 100%
+
+  .wx-show-password, .wx-hide-password
+    width: 1rem
+    height: 1rem
+    background: url("/static/imgs/mobile/login/eyes_hide.png") no-repeat center
+    background-size: 100%
+  .wx-hide-password
+    background: url("/static/imgs/mobile/login/eyes_show.png") no-repeat center
+    background-size: 100%
+.wx-validation
+  color: #fff
+  margin-left: 0.5rem
+  button
+    display: block
+    -webkit-appearance: none
+    width: 7rem
+    background: #50b143
+    color: #fff
+    text-align: center
+    padding: 0.7rem 0
+    border-radius: 0.2rem
+    border: 0
+    font-size: rem(30)
+    &:disabled
+      background: #ccc
+  img
+    display: block
+    width: 7rem
+    height: 2.25rem
+    border-radius: 0.2rem
+    background: #ccc
+
+
+//平安保险
+
+.wx-safe-green
+  text-align: center
+  span
+    display: inline-block
+    background: url("/static/imgs/mobile/login/bank_safe.png") no-repeat left
+    font-size: 0.6rem
+    color: #50b143
+    background-size: .9rem
+    line-height: 1.5rem
+    padding-left: 1.2rem
+
