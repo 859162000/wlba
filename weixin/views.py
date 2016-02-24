@@ -888,7 +888,8 @@ class P2PDetailView(TemplateView):
         redpacks = []
         user = self.request.user
         id_is_valid = False
-        card_is_bind = False
+        is_one = False
+
         if user.is_authenticated():
             user_margin = user.margin.margin
             equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
@@ -899,8 +900,14 @@ class P2PDetailView(TemplateView):
             result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
             redpacks = result['packages'].get('available', [])
             id_is_valid = user.wanglibaouserprofile.id_is_valid,
-            cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
-            card_is_bind = cards.exists()
+            try:
+                p2p_cards = card_bind_list(self.request)['cards']
+                for card in p2p_cards:
+                    if card['is_the_one_card']:
+                        is_one = True
+            except:
+                pass
+
         orderable_amount = min(p2p['limit_amount_per_user'] - current_equity, p2p['remain'])
         total_buy_user = P2PEquity.objects.filter(product=p2p['id']).count()
 
@@ -922,7 +929,7 @@ class P2PDetailView(TemplateView):
             'next': next,
             'amount_profit': amount_profit,
             'id_is_valid':id_is_valid,
-            'card_is_bind':card_is_bind
+            'is_one':is_one
         })
 
         return context
