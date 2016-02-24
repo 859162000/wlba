@@ -69,7 +69,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             # 红包
             records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
                 .exclude(redpack__event__rtype='interest_coupon')\
-                .order_by('-redpack__event__amount', 'redpack__event__unavailable_at')
+                .order_by('-redpack__event__amount')
             for x in records:
                 if x.order_id:
                     continue
@@ -126,6 +126,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         if obj['method'] == REDPACK_RULE['percent']:
                             obj['amount'] = obj['amount']/100.0
                         packages['available'].append(obj)
+            # 排序
+            packages['available'].sort(key=lambda x: x['highest_amount'], reverse=True)
+            packages['available'].sort(key=lambda x: x['unavailable_at'])
+            packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # 加息券
         # 检测app版本号，小于2.5.2版本不返回加息券列表
@@ -138,7 +142,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             if records_count_p2p == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
                     .filter(redpack__event__rtype='interest_coupon')\
-                    .order_by('-redpack__event__amount', 'redpack__event__unavailable_at')
+                    .order_by('-redpack__event__amount')
                 for coupon in coupons:
                     if coupon.order_id:
                         continue
@@ -198,6 +202,9 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                             if obj['method'] == REDPACK_RULE['interest_coupon']:
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
+                # 排序
+                packages['available'].sort(key=lambda x: x['unavailable_at'])
+                packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # packages['available'].sort(key=lambda x: x['unavailable_at'])
         packages['available'].sort(key=lambda x: x['order_by'], reverse=True)
