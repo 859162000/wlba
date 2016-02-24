@@ -68,7 +68,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         if records_count == 0:
             # 红包
             records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+                .exclude(redpack__event__rtype='interest_coupon')\
+                .order_by('-redpack__event__amount', 'redpack__event__unavailable_at')
             for x in records:
                 if x.order_id:
                     continue
@@ -136,7 +137,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             records_count_p2p = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
             if records_count_p2p == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                    .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+                    .filter(redpack__event__rtype='interest_coupon')\
+                    .order_by('-redpack__event__amount', 'redpack__event__unavailable_at')
                 for coupon in coupons:
                     if coupon.order_id:
                         continue
