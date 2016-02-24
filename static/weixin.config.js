@@ -32,12 +32,14 @@ module.exports = {
         loaders: [
             { test: /\.js$/, exclude: /(node_modules)/, loader: 'babel', query: { presets: ['es2015'] }},
             { test: /zepto(\.min)?\.js$/, loader: "exports?Zepto; delete window.$; delete window.Zepto;" },
+            { test: /wx(\.min)?\.js$/, loader: "exports?wx" },
         ]
     },
     resolve: {
         modulesDirectories: ['./src/mobile'],
         alias: {
-            zepto: 'lib/zepto/zepto.js'
+            zepto: 'lib/zepto/zepto.js',
+            wx: 'lib/weixin/wx.js'
         },
         extensions: ['', '.js']
     },
