@@ -165,6 +165,19 @@
                 } else if (data['ret_code'] == 1000 || data['ret_code'] == 1002) {
                     click = true;
                 }
+                if(data['experience'] == 3588){
+                    $(".info").attr("src","/static/imgs/pc_activity/xunlei_three/xunlei-threepai3588.png");
+                }else if(data['experience'] == 1588){
+                    $(".info").attr("src","/static/imgs/pc_activity/xunlei_three/xunlei-threepai1588.png");
+                }else if(data['experience'] == 1888){
+                    $(".info").attr("src","/static/imgs/pc_activity/xunlei_three/xunlei-threepai1888.png");
+                }else if(data['experience'] == 2588){
+                    $(".info").attr("src","/static/imgs/pc_activity/xunlei_three/xunlei-threepai2588.png");
+                }else if(data['experience'] == 5888){
+                    $(".info").attr("src","/static/imgs/pc_activity/xunlei_three/xunlei-threepai5888.png");
+                }else if(data['experience'] == null){
+                    $(".info").attr("src","/static/imgs/pc_activity/xunlei_three/xunlei-threepai3.png");
+                }
 
 
             });
@@ -174,7 +187,7 @@
         chances();
         function chances() {
             $.ajax({
-                url: "/api/activity/reward/?activity=xunlei&action=chances",
+                url: "/api/activity/reward/?activity=xunlei&action=generate",
                 type: "GET",
                 async: false
             }).done(function (data) {
