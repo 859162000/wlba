@@ -21,6 +21,7 @@ from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, Jrji
     JrjiaUsStatusView
 from wanglibao_account.views import FirstPayResultView
 from wanglibao_lottery.views import LotteryListTemplateView
+# from wanglibao_account.decorators import login_required
 
 urlpatterns = patterns(
     '',
@@ -138,7 +139,7 @@ urlpatterns = patterns(
 
     url(r'^security/$', login_required(IdentityInformationTemplate.as_view(template_name='account_safe.jade'), login_url='/accounts/login/')),
     url(r'^manual_modify/vali_acc_info/$', login_required(ValidateAccountInfoTemplate.as_view(template_name="manual_audit.jade"), login_url='/accounts/login/')),
-    url(r'^manual_modify/phone/$', ManualModifyPhoneTemplate.as_view()),
+    url(r'^manual_modify/phone/$', login_required(ManualModifyPhoneTemplate.as_view(), login_url='/accounts/login/')),
     url(r'^sms_modify/vali_acc_info/$', login_required(SMSModifyPhoneValidateTemplate.as_view(template_name="sms_vali_phone.jade"), login_url='/accounts/login/')),
     url(r'^sms_modify/phone/$', login_required(SMSModifyPhoneTemplate.as_view(template_name="sms_modify_phone.jade"), login_url='/accounts/login/'))
 )
