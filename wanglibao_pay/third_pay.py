@@ -318,8 +318,7 @@ def card_bind_list(request):
        #         Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
 
         card_list = []
-        cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行'])\
-            .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True))\
+        cards = Card.objects .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True))\
             .select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
