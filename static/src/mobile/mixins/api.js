@@ -3,7 +3,7 @@
  * @param options
  */
 
-export const ajax = function (options) {
+export const ajax = (options) => {
     $.ajax({
         url: options.url,
         type: options.type,
@@ -36,7 +36,7 @@ export const ajax = function (options) {
  */
 
 
-export const getCookie = function (name) {
+export const getCookie = (name) => {
     let cookie, cookies, i, cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         cookies = document.cookie.split(';');
@@ -58,7 +58,7 @@ const _csrfSafeMethod = (method) => {
     return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method)
 };
 
-const _sameOrigin = function (url) {
+const _sameOrigin = (url) => {
     let host, origin, protocol, sr_origin;
     host = document.location.host;
     protocol = document.location.protocol;

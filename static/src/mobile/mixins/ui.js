@@ -23,7 +23,7 @@ window.alert = function(text, callback){
  * @param callback  回调函数
  * @param callbackData 回调函数的数据
  */
-window.confirm = function(title, certainName = '确定', callback = null, callbackData = null){
+window.confirm = (title, certainName = '确定', callback = null, callbackData = null) => {
     const $confirm = $('.confirm-warp')
     if($confirm.length <= 0 ) return
     $confirm.show();
@@ -43,8 +43,8 @@ window.confirm = function(title, certainName = '确定', callback = null, callba
 }
 
 
-export const signModel = function (sign) {
-    $('.error-sign').html(sign).removeClass('moveDown').addClass('moveDown').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+export const signModel = (text) => {
+    $('.error-sign').html(text).removeClass('moveDown').addClass('moveDown').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
         $(this).removeClass('moveDown');
     });
 }
