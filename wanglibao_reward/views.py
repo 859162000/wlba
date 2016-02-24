@@ -858,6 +858,7 @@ class RewardDistributer(object):
         self.kwargs = kwargs
         self.Processor = {
             ThanksGivenRewardDistributer: ('all',),
+            XingMeiRewardDistributer: ('all',),
         }
 
     @property
@@ -876,6 +877,92 @@ class RewardDistributer(object):
     def processor_for_distribute(self):
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
+
+class XingMeiRewardDistributer(RewardDistributer):
+    def __init__(self, request, kwargs):
+        super(XingMeiRewardDistributer, self).__init__(request, kwargs)
+        self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
+        self.user = kwargs['user']
+        self.token = 'xm2'
+
+    @property
+    def is_valid(self):
+        """
+           用来标示次活动是否继续启用, 配合MISC使用, 如果不使用，
+           只要将self.token对应的值从misc.activities中去掉即可
+        """
+        key = 'activities'
+        activities = Misc.objects.filter(key=key).first()
+        if activities:
+            activities = json.loads(activities.value)
+            if type(activities) == dict:
+                activities = activities.get('valid_activity', '')
+        logger.debug("activitys:%s, token:%s" % (activities, self.token))
+        return True if activities.find(self.token)>=0 else False
+
+
+    def distribute(self):
+        if not self.is_valid:
+            return
+
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    xm2 = activity['xm2']
+                    p2p_amount = xm2['p2p_amount']
+                    tickets = xm2["ticket_amount"]
+                    start_time = xm2["start_time"]
+                    end_time = xm2["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+
+        # 1: 如果票数到600，直接跳出
+        counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+        if counts > tickets:
+            logger.debug(u'票已经发完了, %s' % (counts))
+            #return
+
+        # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            logger.debug(u"start_time:%s, end_time:%s, now:%s" % (start_time, end_time, now))
+            return
+
+        # 4: 如果投资额度不够，直接跳出
+        if self.amount < p2p_amount:
+            logger.debug(u"投资额:%s, 发奖门槛:%s" % (self.amount, p2p_amount))
+            return
+
+        #5: 如果已经给用户发过领奖机会,不要重复发
+        _reward = WanglibaoActivityReward.objects.filter(user=self.user, activity='xm2').first()
+        if _reward:
+            logger.debug('发奖机会已经给用户下发了,不可重复下发, user:%s' % self.user)
+            return
+
+        try:
+            activity_reward = WanglibaoActivityReward.objects.create(
+                    activity='xm2',
+                    order_id=self.order_id,
+                    user=self.user,
+                    p2p_amount=self.amount,
+                    reward=None,
+                    has_sent=False, #当用户领奖后,变成True, reward填上相应的奖品
+                    left_times=1,
+                    join_times=1,
+            )
+        except Exception, reason:
+            logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
+            raise Exception(u"生成获奖记录异常")
 
 
 class ThanksGivenRewardDistributer(RewardDistributer):
@@ -951,7 +1038,7 @@ class DistributeRewardAPIView(APIView):
 
     def __init__(self):
         super(DistributeRewardAPIView, self).__init__()
-        self.processors = [ThanksGivingDistribute, ]
+        self.processors = [ThanksGivingDistribute, XingMeiDistribute]
 
     def post(self, request):
         self.activity = request.DATA.get('activity', '')
@@ -981,6 +1068,129 @@ class ActivityRewardDistribute(object):
         """抽奖接口，必须被实现
         """
         raise NotImplementedError(u"抽象类中的方法，子类中需要被实现")
+
+
+class XingMeiDistribute(ActivityRewardDistribute):
+    def __init__(self):
+        super(XingMeiDistribute, self).__init__()
+        self.token = 'xm2'
+
+    def distribute(self, request):
+        #1 用户没有登录
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    xm2 = activity['xm2']
+                    tickets = xm2["ticket_amount"]
+                    start_time = xm2["start_time"]
+                    end_time = xm2["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        #5 用户已经领取过奖品了
+        has_sent = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, has_sent=True)
+        if has_sent.exists():
+            json_to_response = {
+                'ret_code': 1005,
+                'message': u'您的奖励已经发放'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        #2 活动时间不合法
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'不在活动时间内,不可领票'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            return
+
+        #4 用户没有抽奖机会
+        activity_rewards = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, reward=None)
+        if not activity_rewards.first():
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'不符合领奖规则'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        #3 奖品已经发放完毕
+        counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+        if counts >= tickets:
+            json_to_response = {
+                'ret_code': 1003,
+                'message': u'来晚了,奖品已经抢光了'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+
+        #6 给用户发奖品,注意并发控制, 注意url直接请求接口
+        for activity_reward in activity_rewards.all():  #要兼容新用户两张电影票的情况
+            counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+            if counts >= tickets:
+                json_to_response = {
+                    'ret_code': 1004,
+                    'message': u'奖品已经发完了'
+                }
+
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+            with transaction.atomic():
+                ticket_reward = Reward.objects.select_for_update().filter(type=u'星美电影券', is_used=False).first()
+                if not ticket_reward:
+                    json_to_response = {
+                        'ret_code': 1004,
+                        'message': u'奖品已经发完了'
+                    }
+
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": request.user.id,
+                        "title": ticket_reward.type,
+                        "content": u"恭喜您获得星美影院兑换券: %s" % ticket_reward.content,
+                        "mtype": "activity"
+                    })
+                    send_messages.apply_async(kwargs={
+                        "phones": [request.user.wanglibaouserprofile.phone, ],
+                        "messages": [u'恭喜您获得星美影院兑换券: %s【网利科技】' % ticket_reward.content,]
+                    })
+                    activity_reward.reward = ticket_reward
+                    activity_reward.has_sent = True
+                    activity_reward.left_time = 0
+                    activity_reward.join_time = 0
+                    activity_reward.update_time = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+                    activity_reward.save()
+
+                    ticket_reward.is_used = True
+                    ticket_reward.save()
+
+        json_to_response = {
+            'ret_code': 0,
+            'message': u'电影票成功发放'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 
 class ThanksGivingDistribute(ActivityRewardDistribute):
@@ -1333,19 +1543,21 @@ class WeixinActivityAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
-        activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
-        activity_record = activitys.filter(left_times__gt=0)
+        with transaction.atomic():
+            _order = Order.objects.select_for_update().filter(pk=order_id).first()
+            _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name, order_id)
+            activitys = _activitys if _activitys else self.generate_reward_activity(request.user, order_id)
+            activity_record = activitys.filter(left_times__gt=0)
 
-        if activity_record.filter(left_times__gt=0).count() == 0:
-            json_to_response = {
-                'code': 1002,
-                'messge': u'用户的抽奖机会已经用完了',
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        else:
-            with transaction.atomic():
-                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
+            if activity_record.filter(left_times__gt=0).count() == 0:
+                json_to_response = {
+                    'code': 1002,
+                    'messge': u'用户的抽奖机会已经用完了',
+                }
+                _order.save()
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            else:
+                record = WanglibaoActivityReward.objects.filter(pk=activity_record.first().id, order_id=order_id, has_sent=False).first()
                 sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, order_id=order_id, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
                 if record.redpack_event:
                     json_to_response = {
@@ -1366,7 +1578,11 @@ class WeixinActivityAPIView(APIView):
                 record.left_times = 0
                 record.has_sent = True
                 record.save()
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                _order.save()
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+
+
 
 class WeixinAnnualBonusView(TemplateView):
     openid = ''
@@ -2114,7 +2330,7 @@ class LanternBanquetTemplate(TemplateView):
 
 
     def dispatch(self, request, *args, **kwargs):
-        #request.session['lantern_openid'] = request.GET.get('openid')
+        # request.session['lantern_openid'] = request.GET.get('openid')
         openid = request.session.get('lantern_openid')
         if not openid:
             code = request.GET.get('code')

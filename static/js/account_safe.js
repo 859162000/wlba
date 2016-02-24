@@ -157,11 +157,11 @@
           if (data.trade_pwd_is_set) {
             //return $('.old').show();
             $('.old').show();
-            $('.phone_modify_main_wrap_2 .pwd-div2 .ico').addClass('is_set_ico').next().text('已设置');
+            $('.phone_modify_main_wrap_2 .pwd-div2 .ico').addClass('is_set_ico').next().text('已设置').addClass('is_set_text');
           } else {
             //return $('.new').show();
             $('.new').show();
-            $('.phone_modify_main_wrap_2 .pwd-div2 .ico').addClass('no_set_ico').next().text('未设置');
+            $('.phone_modify_main_wrap_2 .pwd-div2 .ico').addClass('no_set_ico').next().text('未设置').addClass('no_set_text');
           }
         });
         $.ajax({
