@@ -24,6 +24,7 @@ module.exports = {
         calculator: path.resolve(JS_PATH, 'calculator'),
         bankOneCard: path.resolve(JS_PATH, 'bankOneCard'),
         process_authentication: path.resolve(JS_PATH, 'process_authentication'),
+        process_addbank: path.resolve(JS_PATH, 'process_addbank'),
 
         vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto')]
     },

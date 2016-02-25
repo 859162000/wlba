@@ -13,6 +13,7 @@ import { ajax } from './mixins/api'
      * 倒计时
      */
     const countDown =  $('#countDown');
+
     const countDown_func  = (target) => {
         const endTimeList = target.attr('data-left').replace(/-/g, '/');
         const TimeTo = function (dd) {

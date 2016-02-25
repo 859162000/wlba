@@ -18,11 +18,13 @@
   &:disabled
     background: rgba(219, 73, 63, 0.498039)
 
+
 .public-submit
   +submit(rem(110), #fff, #DB493F)
 
 //输入框样式
-
+.wx-input-space
+  margin-bottom: .6rem
 .wx-input-double
   display: -webkit-box
 
@@ -34,7 +36,7 @@
   padding:  0 1rem 0 .5rem
   background: #fff
   border-radius: .2rem
-
+  border: 1px solid #e5e5e5
   .wx-input-name
     color: #666
 
@@ -45,12 +47,13 @@
     width: 100%
     border: 0
     padding: 0.8rem 0.2rem 0.8rem 0.9rem
+    color: #666
     &::-webkit-input-placeholder
       color: #ccc
   select
     background: url('/static/imgs/mobile/input_icon/arrow_down.png') no-repeat right center
     background-size: rem(42)
-    color: #ccc
+    color: #666
   .wx-clear-input
     display: none
     width: 1rem
@@ -76,7 +79,7 @@
     background: #50b143
     color: #fff
     text-align: center
-    padding: 0.7rem 0
+    padding: 0.775rem 0
     border-radius: 0.2rem
     border: 0
     font-size: rem(30)
@@ -174,10 +177,12 @@
   .bank
     +regist-icons(37, 36, 'bank')
 
-
+  .money
+    +regist-icons(37, 31, 'money')
   .card
-    +regist-icons(36, 30, 'card')
-
+    +regist-icons(37, 29, 'card')
+  .code
+    +regist-icons(37, 36, 'code')
 
 .active
   .phone
@@ -200,9 +205,12 @@
 
   .bank
     +regist-icons(37, 36, 'bank_active')
-
+  .money
+    +regist-icons(37, 31, 'money_active')
   .card
     +regist-icons(36, 30, 'card_active')
+  .code
+    +regist-icons(37, 36, 'code_active')
 
 
 

@@ -19,6 +19,7 @@ webpackJsonp([2],[
 	     * 倒计时
 	     */
 	    var countDown = $('#countDown');
+
 	    var countDown_func = function countDown_func(target) {
 	        var endTimeList = target.attr('data-left').replace(/-/g, '/');
 	        var TimeTo = function TimeTo(dd) {
