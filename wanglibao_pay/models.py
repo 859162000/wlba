@@ -72,11 +72,11 @@ class Bank(models.Model):
         rs = []
         for bank in banks:
             obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
-            if bank.channel == 'kuaipay' and bank.kuai_limit:
+            if bank.channel == 'kuaipay' and bank.kuai_limit and bank.kuai_code:
                 obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
-            elif bank.channel == 'huifu' and bank.huifu_bind_limit:
+            elif bank.channel == 'huifu' and bank.huifu_bind_limit and bank.huifu_bind_code:
                 obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
-            elif bank.channel == 'yeepay' and bank.yee_bind_limit:
+            elif bank.channel == 'yeepay' and bank.yee_bind_limit and bank.yee_bind_code:
                 obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
             else:
                 # 只返回已经有渠道的银行
