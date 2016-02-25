@@ -75,8 +75,8 @@ def margin_records(request):
     for record in records:
         obj = {
             "id": record.id,
-            "catalog": MARGIN_CATALOG_MAPPING.get(record.catalog),
-            "catalog_sign": MARGIN_CATALOG_SIGN_MAPPING.get(record.catalog),
+            "catalog": MARGIN_CATALOG_MAPPING.get(record.catalog, record.catalog),
+            "catalog_sign": MARGIN_CATALOG_SIGN_MAPPING.get(record.catalog, record.catalog),
             "create_time": util.fmt_dt_normal(util.local_datetime(record.create_time)),
             "amount": float(record.amount),
             "margin_current": float(record.margin_current),
