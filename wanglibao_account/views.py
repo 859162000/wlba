@@ -2530,4 +2530,15 @@ class LoginCounterVerifyAPI(APIView):
             return Response(msg)
 
 
+class MarginRecordsAPIView(APIView):
+    """
+    用户资金账户记录
+    """
+    permission_classes = (IsAuthenticated, )
+
+    @staticmethod
+    def post(request):
+        from wanglibao_margin.margin_record import margin_records
+        res = margin_records(request)
+        return Response(res)
 
