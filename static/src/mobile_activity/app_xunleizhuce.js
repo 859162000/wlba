@@ -1,19 +1,3 @@
-var boy = $(document.body).height();
-$('.xunmeng,.xunmeng2').css({'height': boy});
-$('.xinlei-rule').click(function () {
-    $('.xunmeng').show();
-});
-$('.xunjiang-zong span').click(function () {
-    $('.xunmeng').hide();
-});
-$('.xunlei1 span').click(function () {
-    if (getQueryString('referfrom')) {
-        var refer = getQueryString('referfrom');
-        window.location.href = "http://act.vip.xunlei.com/vip/finance/waplogin/login.html?coop=wanglibao&referfrom=" + refer
-    }
-
-});
-
 function getQueryString(name) {
     var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
     var r = window.location.search.substr(1).match(reg);
@@ -22,6 +6,25 @@ function getQueryString(name) {
     }
     return null;
 }
+
+$('.xunleiwangli1').click(function () {
+    if (getQueryString('referfrom')) {
+        var refer = getQueryString('referfrom');
+        window.location.href = "http://act.vip.xunlei.com/vip/finance/waplogin/login.html?coop=wanglibao&referfrom=" + refer
+    }
+
+});
+var tokenq = getQueryString('promo_token'),
+    xidq = getQueryString('xluserid'),
+    timerq = getQueryString('time'),
+    sigq = getQueryString('sign'),
+    nameq = getQueryString('nickname'),
+    referq = getQueryString('referfrom');
+$('.xunlei1').click(function () {
+    window.location.href = '/weixin/login/?promo_token=' + tokenq + '&xluserid=' + xidq + '&time=' + timerq + '&sign=' + sigq + '&nickname=' + nameq + '&referfrom=' + referq + '&next=/activity/app_xunleithree/'
+})
+
+
 
 var token = getQueryString('promo_token'),
     xid = getQueryString('xluserid'),
@@ -190,7 +193,7 @@ org.xunlei = (function (org) {
                             //
                             //$('.va').html(va.substring(0, 3) + "******" + va.substring(9, 11));
                             //$('.xunmeng2').show();
-                            window.location.href = '/activity/app_xunleithree/?promo_token=' + token + '&xluserid=' + xid + '&time=' + timer + '&sign=' + sig + '&nickname=' + namer + '&referfrom=' + referq
+                            window.location.href = '/weixin/list/'
                         } else {
                             //$('.get_ticket_wrap1').show();
                         }
