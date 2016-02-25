@@ -1134,7 +1134,7 @@ class XunleiDistribute(ActivityRewardDistribute):
         return True, None
 
     def generate_rewards(self, request):
-        status, response_msg = self.judge_valid_user(request, None)
+        status, response_msg = self.judge_valid_user(request, self.channels)
         if False==status:
             return response_msg
         else:
@@ -1215,7 +1215,7 @@ class XunleiDistribute(ActivityRewardDistribute):
 
 
     def distribute(self, request):
-        status, response_msg = self.judge_valid_user(request, None)
+        status, response_msg = self.judge_valid_user(request, self.channels)
         if False == status:
             return response_msg
 
