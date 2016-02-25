@@ -35,7 +35,6 @@ export const ajax = (options) => {
  *
  */
 
-
 export const getCookie = (name) => {
     let cookie, cookies, i, cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -53,6 +52,18 @@ export const getCookie = (name) => {
     return cookieValue;
 };
 
+/**
+ * 获取url参数值
+ */
+export const getQueryStringByName = (name) => {
+    const result = location.search.match(new RegExp('[\?\&]' + name + '=([^\&]+)', 'i'));
+    if (result == null || result.length < 1) {
+        return '';
+    }
+    return result[1];
+}
+
+
 
 const _csrfSafeMethod = (method) => {
     return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method)
@@ -66,6 +77,69 @@ const _sameOrigin = (url) => {
     origin = protocol + sr_origin;
     return (url === origin || url.slice(0, origin.length + 1) === origin + '/') || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url));
 };
+
+/**
+ * 计算器
+ */
+export const calculate = (dom, callback) => {
+
+    const _calculate = function (amount, rate, period, pay_method) {
+        var divisor, rate_pow, result, term_amount;
+        if (/等额本息/ig.test(pay_method)) {
+            rate_pow = Math.pow(1 + rate, period);
+            divisor = rate_pow - 1;
+            term_amount = amount * (rate * rate_pow) / divisor;
+            result = term_amount * period - amount;
+        } else if (/日计息/ig.test(pay_method)) {
+            result = amount * rate * period / 360;
+        } else {
+            result = amount * rate * period / 12;
+        }
+        return Math.floor(result * 100) / 100;
+    };
+
+    dom.on('input', function () {
+        _inputCallback();
+    });
+
+    function _inputCallback() {
+        let earning, earning_element, earning_elements, fee_earning, activity_rate, activity_jiaxi, amount;
+        let target = $('input[data-role=p2p-calculator]'),
+            existing = parseFloat(target.attr('data-existing')),
+            period = target.attr('data-period'),
+            rate = target.attr('data-rate') / 100,
+            pay_method = target.attr('data-paymethod');
+        activity_rate = target.attr('activity-rate') / 100;
+        activity_jiaxi = target.attr('activity-jiaxi') / 100;
+        amount = parseFloat(target.val()) || 0;
+
+        if (amount > target.attr('data-max')) {
+            amount = target.attr('data-max');
+            target.val(amount);
+        }
+        activity_rate += activity_jiaxi;
+        amount = parseFloat(existing) + parseFloat(amount);
+        earning = _calculate(amount, rate, period, pay_method);
+        fee_earning = _calculate(amount, activity_rate, period, pay_method);
+
+        if (earning < 0) {
+            earning = 0;
+        }
+        earning_elements = (target.attr('data-target')).split(',');
+
+        for (let i = 0; i < earning_elements.length; i++) {
+            earning_element = earning_elements[i];
+            if (earning) {
+                fee_earning = fee_earning ? fee_earning : 0;
+                earning += fee_earning;
+                $(earning_element).text(earning.toFixed(2));
+            } else {
+                $(earning_element).text("0.00");
+            }
+        }
+        callback && callback();
+    }
+}
 
 
 

@@ -1,0 +1,45 @@
+-load formatters
+doctype html
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 赚钱哪里好 就在网利宝
+      a(href="javascript:history.go(-1)")
+        span 返回
+        
+        
+    .wx-login-logos
+      .wx-head-red-space
+      .wx-head-logo
+        img(src="/static/imgs/mobile/logo.png")
+
+    .wx-login-warp
+      .wx-input-public.wx-login-input-space
+        .wx-input-icon
+          .phone
+        input(type='tel', name='identifier', placeholder= '请输入手机号', data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-clear-input
+
+      .wx-input-public.wx-login-input-space
+        .wx-input-icon
+          .password
+        input(type='password', name='password', placeholder= '请设置密码',data-icon='wx-input-icon',  autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-hide-password.wx-password-operation
+
+      button(type="submit", disabled=true).wx-login-submit 登录网利宝
+
+      .wx-for-regist-warp
+        if next == ''
+          a(href='/weixin/regist/').wx-for-regist 免费注册
+        else
+          a(href="/weixin/regist/?next={{next}}").wx-for-regist 免费注册
+      .bank-safe
+        span 账户资金安全由平安银行承保    
+
+    include include/ui_model/mobile_errorsign
+    include include/tracking
+    script(src='/static/scripts/mobile/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile/dev/login.js')
+    //script(data-init='login', src="/static/scripts/mobile/dist/mobile.js?v=20151106")

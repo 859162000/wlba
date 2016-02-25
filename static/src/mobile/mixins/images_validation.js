@@ -9,7 +9,7 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
 
     //获取图像验证码
     function validation() {
-        var url = '/captcha/refresh/?v=' + new Date().getTime();
+        let url = '/captcha/refresh/?v=' + new Date().getTime();
         $.get(url, function (result) {
             $captcha.attr('src', result['image_url']);
             $captcha_0.val(result['key']);
@@ -107,13 +107,13 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
                 return fetchValidation(phone, captcha_0, captcha_1)
             })
             .then((message)=> {
-                signView(message)
+                signModel(message)
                 console.log('短信发送成功');
                 let count = 60;
                 return timerFunction(count)
             })
             .catch((message)=> {
-                signView(message)
+                signModel(message)
             })
     }
 

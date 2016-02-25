@@ -6,9 +6,9 @@
  */
 window.alert = function(text, callback){
 
-    const $alert =$('.fuel-alert'), $button =$('.fuel-submit');
+    const $alert =$('.wx-alert'), $button =$('.wx-submit');
 
-    $alert.css('display','-webkit-box').find('.fuel-text').text(text)
+    $alert.css('display','-webkit-box').find('.wx-text').text(text)
 
     $button.on('click', () => {
         $alert.hide();
@@ -32,7 +32,7 @@ window.confirm = (title, certainName = '确定', callback = null, callbackData =
 
     $confirm.find('.confirm-cancel').on('click', () => {
         $confirm.hide();
-    })
+    });
 
     $confirm.find('.confirm-certain').on('click', () => {
         $confirm.hide();

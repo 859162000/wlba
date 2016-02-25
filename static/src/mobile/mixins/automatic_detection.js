@@ -23,12 +23,12 @@ export class Automatic {
     }
 
     isEmptyArray(array) {
-        if (array.length === 0) return true;
+        if(array.length === 0) return true;
         return false
     }
 
     isEmptyString(str) {
-        if (str == '') return true;
+        if(str == '') return true;
         return false
     }
 
@@ -94,22 +94,22 @@ export class Automatic {
         state ? this.submit.removeAttr('disabled') : this.submit.attr('disabled', 'true');
     }
 
-    operation() {
-        $('.fuel-clear-input').on('click', function () {
+    operationClear() {
+        $('.wx-clear-input').on('click', function () {
             $(this).siblings('input').val('').trigger('input');
         })
     }
 
     operationPassword() {
-        $('.fuel-password-operation').on('click', function () {
+        $('.wx-password-operation').on('click', function () {
             const type = $(this).siblings('input').attr('type');
             if(type == 'text'){
                 $(this).siblings().attr('type', 'password');
-                $(this).addClass('fuel-hide-password').removeClass('fuel-show-password');
+                $(this).addClass('wx-hide-password').removeClass('wx-show-password');
             }
             if(type == 'password'){
                 $(this).siblings().attr('type', 'text');
-                $(this).addClass('fuel-show-password').removeClass('fuel-hide-password');
+                $(this).addClass('wx-show-password').removeClass('wx-hide-password');
             }
         })
     }

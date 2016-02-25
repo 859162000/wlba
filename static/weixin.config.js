@@ -1,26 +1,30 @@
 
 var path = require('path');
 var webpack = require('webpack');
- var fs = require('fs');
 
 var ROOT_PATH = path.resolve(__dirname);
 var JS_PATH = path.resolve(ROOT_PATH, "src/mobile");
-
 var BUILD_PATH = path.resolve(ROOT_PATH, "scripts/mobile/dev");
-
 
 if(process.env.NODE_ENV == 'pro'){
     BUILD_PATH = 'scripts/mobile/pro';
 }
 
-var fs = require('fs');
-fs.readdir(JS_PATH, function(err, files){
-    console.log(files)
-})
+//var fs = require('fs');
+//fs.readdir(JS_PATH, function(err, files){
+//    console.log(files)
+//})
 
 module.exports = {
     entry: {
+        login: path.resolve(JS_PATH, 'login'),
+        regist: path.resolve(JS_PATH, 'regist'),
         list: path.resolve(JS_PATH, 'list'),
+        detail: path.resolve(JS_PATH, 'detail'),
+        calculator: path.resolve(JS_PATH, 'calculator'),
+        bankOneCard: path.resolve(JS_PATH, 'bankOneCard'),
+        process_authentication: path.resolve(JS_PATH, 'process_authentication'),
+
         vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto')]
     },
     output: {
