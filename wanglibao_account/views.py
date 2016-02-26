@@ -52,7 +52,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, LoginCounter,\
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, \
     UserThreeOrder, ManualModifyPhoneRecord, SMSModifyPhoneRecord
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
