@@ -1,6 +1,130 @@
+@keyframes myfirst
+  0%
+    top: -142px
+    width: 0px
+    margin-left: 40%
+  25%
+    top: 50%
+    width: 1000px
+    margin-left: 10%
+  50%
+    top: 75px
+    width: 776px
+    margin-left: 0%
+  55%
+    top: 156px
+  60%
+    top: 75px
+  70%
+    top: 156px
+  85%
+    top: 75px
+  95%
+    top: 106px
+  100%
+    top: 96px
+@-webkit-keyframes myfirst
+  0%
+    top: -142px
+    width: 0px
+    margin-left: 40%
+  25%
+    top: 50%
+    width: 1000px
+    margin-left: 10%
+  50%
+    top: 75px
+    width: 776px
+    margin-left: 0%
+  55%
+    top: 156px
+  60%
+    top: 75px
+  70%
+    top: 156px
+  85%
+    top: 75px
+  95%
+    top: 106px
+  100%
+    top: 96px
+@-moz-keyframes myfirst
+  0%
+    top: -142px
+    width: 0px
+    margin-left: 40%
+  25%
+    top: 50%
+    width: 1000px
+    margin-left: 10%
+  50%
+    top: 75px
+    width: 776px
+    margin-left: 0%
+  55%
+    top: 156px
+  60%
+    top: 75px
+  70%
+    top: 156px
+  85%
+    top: 75px
+  95%
+    top: 106px
+  100%
+    top: 96px
+@-o-keyframes myfirst
+  0%
+    top: -142px
+    width: 0px
+    margin-left: 40%
+  25%
+    top: 50%
+    width: 1000px
+    margin-left: 10%
+  50%
+    top: 75px
+    width: 776px
+    margin-left: 0%
+  55%
+    top: 156px
+  60%
+    top: 75px
+  70%
+    top: 156px
+  85%
+    top: 75px
+  95%
+    top: 106px
+  100%
+    top: 96px
 body .wrap
   background: url("/static/imgs/pc_activity/xunlei_three/xunlei-threebanner.jpg") center no-repeat
   height: 689px
+.ten-gif
+  width: 100%
+  height: 689px
+  margin: 0 auto
+  position: absolute
+  top: 115px
+  .gif
+    width: 1100px
+    height: 689px
+    margin: 0 auto
+    position: relative
+    overflow: hidden
+    .ten-yun
+      width: 776px
+      height: 143px
+      background: url("/static/imgs/pc_activity/xunlei_three/xunlei-threebanner-zi.png") no-repeat
+      background-size: 100% 100%
+      position: absolute
+      top: 96px
+      z-index: 15
+      animation: myfirst 5s linear
+      -moz-animation: myfirst 5s linear
+      -webkit-animation: myfirst 5s linear
+      -o-animation: myfirst 5s linear
 .biaoyu
   color: #ff5252
   font-size: 24px
@@ -92,7 +216,7 @@ body .wrap
     .three-maindraw
       width: 100%
       height: 586px
-      border: 1px solid #f0651f
+      //border: 1px solid #f0651f
       position: relative
       .maindraw-title
         width: 403px
@@ -114,6 +238,28 @@ body .wrap
         span
           color: #f24642
           text-decoration: underline
+      .brand
+        a
+          display: block
+          float: left
+          margin: -41px 20px 20px 20px
+          width: 227px
+          height: 363px
+          text-align: center
+          position: relative
+          .imgg
+            width: 260px
+            height: 363px
+          .info
+            display: none
+            img
+              width: 260px
+              height: 363px
+      #vertical
+        .info
+          width: 0
+          height: 363px
+          margin: 0 auto
     .three-maindraw1
       width: 100%
       height: 478px
@@ -193,3 +339,36 @@ body .wrap
           font-size: 16px
           line-height: 26px
           color: #d98d0e
+.dengruhou
+  .xunshang
+    text-align: center
+    color: #f00
+    text-align: center
+    font-size: 18px
+  .xunleierwei
+    width: 168px
+    margin:  10px 0 0 74px
+    .xunleiten
+      font-size: 14px
+      line-height: 24px
+    .erweimaxunlei11
+      width: 141px
+      height: 141px
+      margin-left: 13px
+      img
+        width: 141px
+    .xunleitenma
+      text-align: center
+      font-size: 14px
+      line-height: 24px
+      color: #3ea7eb
+  .prompt
+    width: 240px
+    margin-left: 38px
+    .prompt-xunlei
+      color: #ff5252
+      font-size: 14px
+      text-align: center
+      margin-top: -14px
+    .prompt-xunleiw
+      margin-bottom: 10px

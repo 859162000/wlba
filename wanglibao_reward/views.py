@@ -1038,7 +1038,29 @@ class DistributeRewardAPIView(APIView):
 
     def __init__(self):
         super(DistributeRewardAPIView, self).__init__()
-        self.processors = [ThanksGivingDistribute, XingMeiDistribute]
+        self.processors = [ThanksGivingDistribute, XingMeiDistribute, XunleiDistribute]
+
+    def get(self, request):
+        self.action = request.GET.get('action', '')
+        self.activity = request.GET.get('activity', '')
+        run = None
+        for processor in self.processors:
+            if processor().token == self.activity:
+                run = True
+                break
+
+        if run:
+            if self.action == 'chances':
+                return processor().get_chances(request)
+            if self.action == 'generate':
+                return processor().generate_rewards(request)
+        else:
+            json_to_response = {
+                'ret_code': 3000,
+                'message': u'接口还没有实现，请联系相应后端同学'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type="application/json")
 
     def post(self, request):
         self.activity = request.DATA.get('activity', '')
@@ -1068,6 +1090,155 @@ class ActivityRewardDistribute(object):
         """抽奖接口，必须被实现
         """
         raise NotImplementedError(u"抽象类中的方法，子类中需要被实现")
+
+
+class XunleiDistribute(ActivityRewardDistribute):
+    def __init__(self):
+        super(XunleiDistribute, self).__init__()
+        self.token = 'xunlei'
+        self.channels = ('xunlei9', 'mxunlei')
+
+    def get_chances(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        counts = WanglibaoActivityReward.objects.filter(activity=self.token, user=request.user, has_sent=0).count()
+        json_to_response = {
+            'ret_code': 0,
+            'count': counts,
+            'message': u'获得用户的翻拍机会'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+    def judge_valid_user(self, request, channels):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if channels:  # channel为空,表示不需要判断用户渠道号
+            Introducedby = IntroducedBy.objects.filter(user_id=request.user.id).first()
+            if not (Introducedby and Introducedby.channel and Introducedby.channel.name in channels):
+                json_to_response = {
+                    'ret_code': 1001,
+                    'message': u'用户不是来自合法的渠道'
+                }
+                return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        return True, None
+
+    def generate_rewards(self, request):
+        status, response_msg = self.judge_valid_user(request, self.channels)
+        if False==status:
+            return response_msg
+        else:
+            self.generate(request)
+            return self.get_chances(request)
+
+    def generate(self, request):
+        #  判断有没有生成抽奖记录
+        counts = WanglibaoActivityReward.objects.filter(user=request.user, activity=self.token).count()
+        if counts > 0:
+            return
+        experience_rate = {
+            1588: ('xunlei_experience_1588', 0, 4, 9),
+            1888: ('xunlei_experience_1888', 3, 8),
+            2588: ('xunlei_experience_2588', 2, 7),
+            3588: ('xunlei_experience_3588', 1, 6),
+            5888: ('xunlei_experience_5888', 5, ),
+        }
+        event_rate = {
+            1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
+            1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+        }
+        p2p_record = P2PRecord.objects.filter(user=request.user).first()
+        if not p2p_record:  # 新用户
+            no_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
+            for unused in xrange(3):
+                if no_reward == unused:
+                    WanglibaoActivityReward.objects.create(
+                            user=request.user,
+                            reward=None,
+                            redpack_event=None,
+                            experience=None,
+                            activity=self.token,
+                            has_sent=0,)
+                    continue
+
+                counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(experience=None).count()
+                for key, value in experience_rate.items():
+                    if counts+1 not in value:
+                        continue
+
+                    with transaction.atomic():
+                        experience = ExperienceEvent.objects.filter(name=value[0]).first()
+                        WanglibaoActivityReward.objects.create(
+                            user=request.user,
+                            reward=None,
+                            redpack_event=None,
+                            experience=experience,
+                            activity=self.token,
+                            has_sent=0,)
+
+        else:  # 老用户
+            when_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
+            for unused in xrange(3):
+                if when_reward == unused:
+                    counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(redpack_event=None).count()
+                    for key, value in event_rate.items():
+                        if counts+1 not in value:
+                            continue
+
+                        with transaction.atomic():
+                            redpack = RedPackEvent.objects.filter(name=value[0]).first()
+                            WanglibaoActivityReward.objects.create(
+                                    user=request.user,
+                                    reward=None,
+                                    redpack_event=redpack,
+                                    experience=None,
+                                    activity=self.token,
+                                    has_sent=0,)
+                else:
+                    WanglibaoActivityReward.objects.create(
+                            user=request.user,
+                            reward=None,
+                            redpack_event=None,
+                            experience=None,
+                            activity=self.token,
+                            has_sent=0,)
+
+
+    def distribute(self, request):
+        status, response_msg = self.judge_valid_user(request, self.channels)
+        if False == status:
+            return response_msg
+
+        self.generate(request)
+
+        with transaction.atomic():
+            reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, has_sent=0, activity=self.token).first()
+            if not reward:
+                json_to_response = {
+                    'ret_code': 1002,
+                    'message': u'3次抽奖机会已经用完了'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            else:
+                reward.has_sent = 1
+                reward.save()
+                json_to_response = {
+                    'ret_code': 0,
+                    'redpack': reward.redpack_event.amount if reward.redpack_event else None,
+                    'experience': reward.experience.amount if reward.experience else None,
+                    'message': u'获得加息券或者体验金'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 
 class XingMeiDistribute(ActivityRewardDistribute):

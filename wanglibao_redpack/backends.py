@@ -69,7 +69,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             # 红包
             records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
                 .exclude(redpack__event__rtype='interest_coupon')\
-                .order_by('-redpack__event__amount', 'redpack__event__unavailable_at')
+                .order_by('-redpack__event__amount')
             for x in records:
                 if x.order_id:
                     continue
@@ -113,9 +113,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
 
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           x.created_at, event.available_at, event.unavailable_at)
+                end_time_day = end_time.strftime('%Y-%m-%d')
 
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                        "id": x.id, "invest_amount": event.invest_amount,
+                        "id": x.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
                         "period": event.period, "period_type": event.period_type,
                         "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
@@ -126,6 +127,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         if obj['method'] == REDPACK_RULE['percent']:
                             obj['amount'] = obj['amount']/100.0
                         packages['available'].append(obj)
+            # 排序
+            packages['available'].sort(key=lambda x: x['highest_amount'], reverse=True)
+            packages['available'].sort(key=lambda x: x['end_time_day'])
+            packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # 加息券
         # 检测app版本号，小于2.5.2版本不返回加息券列表
@@ -138,7 +143,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             if records_count_p2p == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
                     .filter(redpack__event__rtype='interest_coupon')\
-                    .order_by('-redpack__event__amount', 'redpack__event__unavailable_at')
+                    .order_by('-redpack__event__amount')
                 for coupon in coupons:
                     if coupon.order_id:
                         continue
@@ -184,9 +189,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
 
                     start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                               coupon.created_at, event.available_at, event.unavailable_at)
+                    end_time_day = end_time.strftime('%Y-%m-%d')
 
                     obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                           "id": coupon.id, "invest_amount": event.invest_amount,
+                           "id": coupon.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                            "unavailable_at": stamp(end_time), "event_id": event.id,
                            "period": event.period, "period_type": event.period_type,
                            "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
@@ -198,6 +204,9 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                             if obj['method'] == REDPACK_RULE['interest_coupon']:
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
+                # 排序
+                packages['available'].sort(key=lambda x: x['end_time_day'])
+                packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # packages['available'].sort(key=lambda x: x['unavailable_at'])
         packages['available'].sort(key=lambda x: x['order_by'], reverse=True)

@@ -1868,7 +1868,13 @@ org.processSecond = (function (org) {
                     },
                     error: function(result){
                         var data = JSON.parse(result.responseText);
-                        return org.ui.alert(data.detail);
+                        return org.ui.alert(data.detail, function(){
+                            if(data.detail == '不能重复绑卡'){
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+                                window.location.href = next
+                            }
+                        });
                     },
                     complete: function () {
                         if(check.firstRecharge){
