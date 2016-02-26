@@ -1230,6 +1230,10 @@ class XunleiDistribute(ActivityRewardDistribute):
                 }
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
             else:
+                if reward.redpack_event:
+                    redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
+                if reward.experience:
+                    SendExperienceGold(request.user).send(reward.experience.id)
                 reward.has_sent = 1
                 reward.save()
                 json_to_response = {
