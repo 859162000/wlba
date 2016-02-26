@@ -294,6 +294,9 @@ webpackJsonp([6],[
 	                    if (target.attr('type') == 'checkbox' && target.prop('checked')) {
 	                        return true;
 	                    }
+	                    if (dom.target.length == 0) {
+	                        return true;
+	                    }
 	                    return false;
 	                }
 	            });

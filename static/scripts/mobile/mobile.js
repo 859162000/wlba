@@ -1744,7 +1744,7 @@ org.processSecond = (function (org) {
             if(localStorage.getItem('bank')){
                 var content = JSON.parse(localStorage.getItem('bank'));
                 lib.$bank.append(appendBanks(content));
-                lib._limit_style(content)
+                return lib._limit_style(content)
             }
             org.ajax({
                 type: 'POST',
@@ -1754,6 +1754,7 @@ org.processSecond = (function (org) {
                         lib.$bank.append(appendBanks(results.banks));
                         var content = JSON.stringify(results.banks);
                         window.localStorage.setItem('bank', content);
+
                     } else {
 
                         return org.ui.alert(results.message);

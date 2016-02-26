@@ -14,7 +14,7 @@ webpackJsonp([7],[
 
 	var _from_validation = __webpack_require__(5);
 
-	var _images_validation = __webpack_require__(6);
+	var _images_validation = __webpack_require__(7);
 
 	(function () {
 
@@ -342,6 +342,9 @@ webpackJsonp([7],[
 	                    if (target.attr('type') == 'checkbox' && target.prop('checked')) {
 	                        return true;
 	                    }
+	                    if (dom.target.length == 0) {
+	                        return true;
+	                    }
 	                    return false;
 	                }
 	            });
@@ -488,7 +491,8 @@ webpackJsonp([7],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 6 */
+/* 6 */,
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
