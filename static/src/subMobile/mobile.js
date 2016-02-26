@@ -49,7 +49,7 @@ var org = (function () {
             });
 
             function _inputCallback() {
-                var earning, earning_element, earning_elements, fee_earning;
+                var earning, earning_element, earning_elements, fee_earning, jiaxi_type;
                 var target = $('input[data-role=p2p-calculator]'),
                     existing = parseFloat(target.attr('data-existing')),
                     period = target.attr('data-period'),
@@ -72,15 +72,20 @@ var org = (function () {
                     earning = 0;
                 }
                 earning_elements = (target.attr('data-target')).split(',');
-
+                jiaxi_type = target.attr('jiaxi-type');
                 for (var i = 0; i < earning_elements.length; i++) {
                     earning_element = earning_elements[i];
                     if (earning) {
-                        fee_earning = fee_earning ? fee_earning : 0;
-                        earning += fee_earning;
-                        $(earning_element).text(earning.toFixed(2));
+                        fee_earning = fee_earning ? fee_earning : 0.00;
+                        if(jiaxi_type === "+"){
+                            $(earning_element).html(earning+'+<span class="blue">'+fee_earning+'</span>').data("val",(earning + fee_earning));
+                        }else{
+                            earning += fee_earning;
+                            $(earning_element).text(earning.toFixed(2)).data("val",(earning + fee_earning));
+                        }
                     } else {
-                        $(earning_element).text("0.00");
+                        //$(earning_element).text("0.00");
+                        $(earning_element).html('0+<span class="blue">0.00</span>').data("val",0);
                     }
                 }
                 callback && callback();
@@ -2082,7 +2087,7 @@ org.trade_back = (function (org) {
         this.callback = ops.done;
         this.$input = ops.target;
         this.$body =  $('.tran-warp');
-        this.$blue = $('span.blue');
+        this.$blue = this.$body('span.blue');
         this.$digt =  $('.six-digt-password');
         this.$close = $('.tran-close');
         this.blue_width = null;
