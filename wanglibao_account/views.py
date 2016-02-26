@@ -2525,6 +2525,7 @@ class LoginCounterVerifyAPI(APIView):
         else:
             if user.check_password(password):
                 user_profile.login_failed_count = 0
+                user_profile.login_failed_time = now
                 user_profile.save()
                 return Response({'ret_code': 0, 'message': 'ok'})
             else:
@@ -2532,8 +2533,11 @@ class LoginCounterVerifyAPI(APIView):
 
                 if today_start < now <= today_end:
                     user_profile.login_failed_count = F('count') + 1
+                    user_profile.login_failed_time = now
                 else:
                     user_profile.login_failed_count = 1
+                    user_profile.login_failed_time = now
+
                 user_profile.save()
 
         return Response(msg)
