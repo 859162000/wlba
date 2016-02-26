@@ -245,56 +245,6 @@ org.ajax({
     type: "GET"
 });
 
-//微信分享
-//var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
-//org.ajax({
-//    type: 'GET',
-//    url: '/weixin/api/jsapi_config/',
-//    dataType: 'json',
-//    success: function (data) {
-//        //请求成功，通过config注入配置信息,
-//        wx.config({
-//            debug: false,
-//            appId: data.appId,
-//            timestamp: data.timestamp,
-//            nonceStr: data.nonceStr,
-//            signature: data.signature,
-//            jsApiList: jsApiList
-//        });
-//    }
-//});
-
-
-//wx.ready(function () {
-//
-//    var host = 'https://www.wanglibao.com',
-//        shareImg = host + '/static/imgs/mobile/share_logo.png',
-//        shareLink = host + '/activity/app_xunlei/?promo_token=' + tokenq + '&xluserid=' + xidq + '&time=' + timerq + '&sign=' + sigq + '&nickname=' + nameq + '&referfrom=' + referq,
-//        shareMainTit = '送你28888元体验金，体验金专享1天10%年化收益',
-//        shareBody = '注册即送28888元体验金，首次充值不低于100元即可获7天迅雷会员及50元直抵红包，首次投资即可获得100元直抵红包,单笔首次投资不低于1000元附加获赠1年迅雷会员。'
-//    //分享给微信好友
-//    org.onMenuShareAppMessage({
-//        title: shareMainTit,
-//        desc: shareBody,
-//        link: shareLink,
-//        imgUrl: shareImg
-//    });
-//    //分享给微信朋友圈
-//    org.onMenuShareTimeline({
-//        title: shareMainTit,
-//        link: shareLink,
-//        imgUrl: shareImg
-//    })
-//    //分享给QQ
-//    org.onMenuShareQQ({
-//        title: shareMainTit,
-//        desc: shareBody,
-//        link: shareLink,
-//        imgUrl: shareImg
-//    })
-//})
-
-
 //效果
 var click = false;
 $('#vertical').find('a').click(function () {
@@ -311,7 +261,7 @@ $('#vertical').find('a').click(function () {
         data: {activity: 'xunlei'},
         async: false,
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             chances();
             if (data['ret_code'] == 0) {
                 img.animate({'width': 0}, 500, function () {
