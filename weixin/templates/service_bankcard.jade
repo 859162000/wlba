@@ -15,6 +15,16 @@ html
                   p.bank-name {{card.bank_name}}
                   p.bank-num {{card.storable_no | bank_card}}
                 .set-bank-true 已绑定
+              //script.
+              //  var i = 5;
+              //  var setFun = setInterval(function(){
+              //    if(i === 0){
+              //      clearInterval(setFun);
+              //      window.location.href = '/weixin/sub_recharge/';
+              //    }else{
+              //      i--;
+              //    }
+              //  },1000);
           else
             .bank-list
               .bank-warp
@@ -33,6 +43,10 @@ html
             a(href="/weixin/sub_regist_second/")
               span.btn-icon +
               span.btn-click 添加银行卡
+      else
+        .no-authentication-sign
+          a(href="/weixin/sub_list/").authentication-sign-btn#to-invest(style="display:none") 继续投资
+          a(href="/weixin/sub_recharge/").authentication-sign-btn 去充值
     else
       .no-authentication-sign 绑定银行卡要先通过实名认证哦
           a(href="/weixin/sub_regist_first/").authentication-sign-btn 去实名认证
