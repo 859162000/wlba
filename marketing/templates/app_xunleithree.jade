@@ -17,7 +17,7 @@ html(style='background: #ffdc79')
       if user.is_authenticated
         p.fanzhuan
           |你有&nbsp;
-          a(href='javascript:void(0);').signxun 3
+          a(href='javascript:void(0);').signxun 0
           |&nbsp;次翻牌机会
       else
         p.fanzhuan
@@ -45,9 +45,9 @@ html(style='background: #ffdc79')
       h1 注册送
       img(src='/static/imgs/mobile_activity/app_xunleithree/app_mainxun.png')
       if user.is_authenticated
-        a(href='/weixin/login/?next=/activity/app_xunleithree/?promo_token=xunlei9').xunleibutton.xunleibutton0 立即注册
+        a(href='javascript:void(0);').xunleibutton.xunleibutton0 立即注册
       else
-        a(href='javascript:void(0);').xunleibutton.xunleibutton1 立即注册12
+        a(href='javascript:void(0);').xunleibutton.xunleibutton1 立即注册
       h1 首充送
       img(src='/static/imgs/mobile_activity/app_xunleithree/app_mainxun1.png')
       if user.is_authenticated
