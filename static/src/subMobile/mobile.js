@@ -255,8 +255,8 @@ org.ui = (function () {
                                 target: $self.attr('data-target2'),
                                 addName: $self.attr('data-icon'),
                                 reMove: ($self.attr('data-icon') + "-active")
-                            },
-                        ])
+                            }
+                        ],$self);
                         $submit.attr('disabled', true);
                     } else {
                         inputForClass([
@@ -270,7 +270,7 @@ org.ui = (function () {
                                 addName: ($self.attr('data-icon') + "-active"),
                                 reMove: $self.attr('data-icon')
                             }
-                        ])
+                        ],$self);
                     }
                     var disabledBg = 'rgba(219,73,63,.5)', activeBg = 'rgba(219,73,63,1)';
                     if (options.submitStyle) {
@@ -279,12 +279,12 @@ org.ui = (function () {
                     }
                     canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled',true)
                 })
-            })
+            });
 
             //用户名一键清空
             $('.identifier-edit').on('click', function (e) {
                 $(this).siblings().val('').trigger('input');
-            })
+            });
             //密码隐藏显示
             $('.password-handle').on('click', function () {
                 if ($(this).hasClass('hide-password')) {
@@ -294,20 +294,26 @@ org.ui = (function () {
                     $(this).addClass('hide-password').removeClass('show-password');
                     $(this).siblings().attr('type', 'password');
                 }
-            })
+            });
 
-            var inputForClass = function (ops) {
-                if (!typeof(ops) === 'object') return;
-                $.each(ops, function (i) {
-                    $('.' + ops[i].target).addClass(ops[i].addName).removeClass(ops[i].reMove);
-                })
+            var inputForClass = function (ops, t) {
+                if(!typeof(ops) === 'object') return ;
+                var targetDom;
+                $.each(ops, function(i){
+                    if(t && t.siblings('.'+ops[i].target).length > 0){
+                        targetDom = t.siblings('.'+ops[i].target);
+                    }else{
+                        targetDom = $('.'+ops[i].target);
+                    }
+                    targetDom.addClass(ops[i].addName).removeClass(ops[i].reMove);
+                });
             }
             var returnCheckArr = function () {
                 var returnArr = [];
                 for (var i = 0; i < arguments.length; i++) {
                     for (var arr in arguments[i]) {
                         if (arguments[i][arr]['required'])
-                            returnArr.push(arguments[i][arr]['target'])
+                            returnArr.push(arguments[i][arr]['target']);
                     }
                 }
                 return returnArr
@@ -337,7 +343,6 @@ org.ui = (function () {
         confirm: lib._confirm
     }
 })();
-
 
 org.login = (function (org) {
     var lib = {
@@ -372,9 +377,9 @@ org.login = (function (org) {
             $submit.on('click', function () {
                 var data = {
                     'identifier': $.trim($form.find('input[name=identifier]').val()),
-                    'password': $.trim($form.find('input[name=password]').val()),
-                    'openid': $.trim($form.find('input[name=openid]').val())
-                }
+                    'password': $.trim($form.find('input[name=password]').val())
+                    //'openid': $.trim($form.find('input[name=openid]').val())
+                };
                 org.ajax({
                     'type': 'post',
                     'url': $form.attr('action'),
@@ -383,17 +388,15 @@ org.login = (function (org) {
                         $submit.attr('disabled', true).text('登录中..');
                     },
                     success: function (res) {
-                        var next = org.getQueryStringByName('next');
-                        if (next) {
-                            window.location.href = decodeURIComponent(decodeURIComponent(next));
-                            ;
-                        } else {
-                            window.location.href = '/weixin/account/';
+                        if(res.re_code != 0){
+                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                        }else{
+                            window.location.href = "/weixin/jump_page/?message=您已登录并绑定成功";
                         }
                     },
                     error: function (res) {
                         if (res['status'] == 403) {
-                            org.ui.showSign('请勿重复提交')
+                            org.ui.showSign('请勿重复提交');
                             return false;
                         }
                         var data = JSON.parse(res.responseText);
@@ -403,7 +406,7 @@ org.login = (function (org) {
                         lib._captcha_refresh()
                     },
                     complete: function () {
-                        $submit.removeAttr('disabled').text('登录网利宝');
+                        $submit.removeAttr('disabled').text('登录并关联网利宝账号');
                     }
                 });
                 return false;
@@ -456,14 +459,14 @@ org.regist = (function (org) {
                 setTimeout(function () {
                     $protocolDiv.css('top', '0%');
                 }, 0)
-            })
+            });
             //关闭协议
             $cancelXiyi.on('click', function () {
                 $protocolDiv.css('top', '100%');
                 setTimeout(function () {
                     $protocolDiv.css('display', 'none');
                 }, 200)
-            })
+            });
         },
         _captcha_refresh: function () {
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
@@ -571,9 +574,9 @@ org.regist = (function (org) {
                     if (!check[checkTarget](value)) {
                         return isSubmit = false
                     }
-                })
+                });
 
-                if (!isSubmit) return false
+                if (!isSubmit) return false;
                 var tid = org.getQueryStringByName('tid');
                 var token = $invitation.val() === '' ? $('input[name=token]').val() : $invitation.val();
                 org.ajax({
@@ -594,12 +597,13 @@ org.regist = (function (org) {
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/first/' : org.getQueryStringByName('next');
+                           var next = '/weixin/sub_regist_first/?phone='+$identifier.val();
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
+                            //console.log(next);
                             window.location.href = next;
                         } else if (data.ret_code > 0) {
-                            org.ui.showSign(data.message)
+                            org.ui.showSign(data.message);
                             $submit.text('立即注册 ｜ 领取奖励');
                         }
                     },
@@ -617,7 +621,7 @@ org.regist = (function (org) {
                 });
             })
         }
-    }
+    };
     return {
         init: lib.init
     }
@@ -643,14 +647,7 @@ org.list = (function (org) {
                 autoplay = 0;
                 loop = false;
             }
-            var myswiper = new Swiper('.swiper-container', {
-                pagination: '.swiper-pagination',
-                loop: loop,
-                lazyLoading: true,
-                autoplay: autoplay,
-                autoplayDisableOnInteraction: true,
 
-            });
         },
         _scrollListen: function () {
             $('.load-body').on('click', function () {
@@ -663,7 +660,7 @@ org.list = (function (org) {
                 url: '/api/p2ps/wx/',
                 data: {page: lib.page, 'pagesize': lib.pageSize},
                 beforeSend: function () {
-                    lib.canGetPage = false
+                    lib.canGetPage = false;
                     $('.load-text').html('加载中...');
                 },
                 success: function (data) {
@@ -867,6 +864,21 @@ org.buy = (function (org) {
             lib._checkRedpack();
             lib._calculate();
             lib._buy();
+            lib._amountInp();
+            lib._closePage();
+        },
+        _amountInp: function(){ //金额输入
+            lib.amountInout.on("input",function(){
+                var self = $(this),
+                    val = self.val();
+                if(val != ""){
+                    $(".snap-up").removeAttr("disabled").css("opacity",1);
+                }else{
+                    $(".snap-up").attr("disabled",true).css("opacity",0.5);
+                }
+                lib._setRedpack();
+                //lib.showAmount.text(val);
+            });
         },
         _checkRedpack: function () {
             var productID = $(".invest-one").attr('data-protuctid');
@@ -901,25 +913,29 @@ org.buy = (function (org) {
          */
         _setRedpack: function () {
             var redPack = lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex),//选择的select项
-                redPackVal = parseFloat(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'))
-            inputAmount = parseInt(lib.amountInout.val()), //输入框金额
+                redPackVal = parseFloat(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount')),
+                inputAmount = parseInt(lib.amountInout.val()), //输入框金额
                 redPackAmount = redPack.attr("data-amount"), //红包金额
                 redPackMethod = redPack.attr("data-method"), //红包类型
                 redPackInvestamount = parseInt(redPack.attr("data-investamount")),//红包门槛
                 redPackHighest_amount = parseInt(redPack.attr("data-highest_amount")),//红包最高抵扣（百分比红包才有）
                 repPackDikou = 0,
-                senderAmount = 0; //实际支付金额;
+                senderAmount = inputAmount; //实际支付金额;
+
             lib.redPackAmountNew = 0;
+            inputAmount = isNaN(inputAmount) ? "0.00" : inputAmount;
             if (redPackVal) { //如果选择了红包
                 if (!inputAmount) {
                     $(".redpack-investamount").hide();//未达到红包使用门槛
-                    lib.$redpackSign.hide();//红包直抵提示
+                    //lib.$redpackSign.hide();//红包直抵提示
+                    lib.showAmount.text(inputAmount);//实际支付
                     return
                 }
 
                 if (inputAmount < redPackInvestamount) {
                     lib.$redpackSign.hide();//红包直抵提示
                     lib.$redpackForAmount.hide();//请输入投资金额
+                    //lib.showAmount.text(senderAmount);//实际支付金额
                     return $(".redpack-investamount").show();//未达到红包使用门槛
                 } else {
                     lib.amountInout.attr('activity-jiaxi', 0);
@@ -941,7 +957,6 @@ org.buy = (function (org) {
                     lib.redPackAmountNew = repPackDikou;
                     if (redPackMethod != '~') {
                         lib.showredPackAmount.text(repPackDikou);//红包抵扣金额
-                        lib.showAmount.text(senderAmount);//实际支付金额
                         lib.$redpackSign.show();//红包直抵提示
                     }
                     $(".redpack-investamount").hide();//未达到红包使用门槛
@@ -949,12 +964,18 @@ org.buy = (function (org) {
             } else {
                 lib.$redpackSign.hide();//红包直抵提示
             }
+            senderAmount = isNaN(senderAmount) ? "0.00" : senderAmount;
+            lib.showAmount.text(senderAmount);//实际支付金额
             lib.$redpackForAmount.hide();//请输入投资金额
 
         },
         _buy: function () {
             var $buyButton = $('button[name=submit]'),
                 $redpack = $("#gifts-package");
+            var noBank = $("#page-onRegister");
+            if(noBank.length > 0 && noBank.is("hidden")){
+
+            }
             //红包select事件
             $redpack.on("change", function () {
                 if ($(this).val() != '') {
@@ -968,7 +989,7 @@ org.buy = (function (org) {
             });
 
             $buyButton.on('click', function () {
-                var $buySufficient = $('.buy-sufficient'),
+                var $buySufficient = $('#page-onMoney'),
                     balance = parseFloat($("#balance").attr("data-value")),
                     amount = $('.amount').val() * 1,
                     productID = $(".invest-one").attr('data-protuctid');
@@ -987,8 +1008,7 @@ org.buy = (function (org) {
                     amount: amount,
                     product: productID,
                     redpack: redpackValue
-
-                }
+                };
                 org.ui.confirm("购买金额为" + amount, '确认投资', lib._trade_pwd_seach, post_data);
 
             })
@@ -1004,7 +1024,6 @@ org.buy = (function (org) {
 
         },
         _trade_pws_operation: function(state, post_data){
-
             if(state){
                 entry_ui()
             }else{
@@ -1017,14 +1036,14 @@ org.buy = (function (org) {
                     sign: '投资金额<br>￥'+ post_data.amount,
                     target: $('input[name=password1]'),
                     done : function(pwd){
-                        entry_operation.show_loading()
-                        post_data.trade_pwd = pwd
-                        lib._buy_operation(entry_operation,post_data)
+                        entry_operation.show_loading();
+                        post_data.trade_pwd = pwd;
+                        lib._buy_operation(entry_operation,post_data);
 
                     }
-                })
-                entry_operation.init()
-                entry_operation.show()
+                });
+                entry_operation.init();
+                entry_operation.show();
             }
 
             var password_1 = null, password_2 = null ;
@@ -1036,13 +1055,13 @@ org.buy = (function (org) {
                     target: $('input[name=password1]'),
                     done : function(pwd){
                         password_1 = pwd;
-                        operation_1.clear()
+                        operation_1.clear();
                         operation_1.hide();
                         operation_2();
                     }
-                })
-                operation_1.init()
-                operation_1.show()
+                });
+                operation_1.init();
+                operation_1.show();
 
                 function operation_2(){
                     var operation_2 = new Deal({
@@ -1053,23 +1072,23 @@ org.buy = (function (org) {
                             password_2 = pwd;
 
                             if(password_2 != password_1){
-                                operation_2.clear()
-                                operation_2.hide()
+                                operation_2.clear();
+                                operation_2.hide();
                                 return Deal_ui.show_alert('error', function(){
                                     set_ui()
                                 })
                             }
-                            operation_2.show_loading()
-                            lib._trade_pws_set(operation_2, password_2)
+                            operation_2.show_loading();
+                            lib._trade_pws_set(operation_2, password_2,post_data);
                         }
-                    })
-                    operation_2.init()
-                    operation_2.show()
+                    });
+                    operation_2.init();
+                    operation_2.show();
                 }
             }
 
         },
-        _trade_pws_set: function(entry_operation, new_trade_pwd){
+        _trade_pws_set: function(entry_operation, new_trade_pwd,post_data){
             org.ajax({
                 url: '/api/trade_pwd/',
                 type: 'post',
@@ -1078,13 +1097,15 @@ org.buy = (function (org) {
                     new_trade_pwd: new_trade_pwd
                 },
                 success: function(result){
-                    entry_operation.hide_loading()
-                    entry_operation.clear()
+                    entry_operation.hide_loading();
+                    entry_operation.clear();
                     entry_operation.hide();
                     if(result.ret_code == 0){
-                        Deal_ui.show_alert('success', function(){
-                            window.location = window.location.href;
-                        }, '交易密码设置成功，请牢记！')
+                        //Deal_ui.show_alert('success', function(){
+                        //    window.location = window.location.href;
+                        //}, '交易密码设置成功，请牢记！');
+                        post_data.trade_pwd = new_trade_pwd;
+                        lib._buy_operation(entry_operation,post_data);
                     }
 
                     if(result.ret_code > 0 ){
@@ -1104,26 +1125,26 @@ org.buy = (function (org) {
                     $buyButton.attr('disabled',true).text("抢购中...");
                 },
                 success: function(result){
-                    entry_operation.hide_loading()
-                    entry_operation.clear()
+                    entry_operation.hide_loading();
+                    entry_operation.clear();
                     entry_operation.hide();
                     if(result.ret_code == 0){
                         $('.balance-sign').text(balance - result.data + lib.redPackAmountNew + '元');
-                        $(".sign-main").css("display","-webkit-box");
-                        return
+                        $("#page-ok").css("display","-webkit-box");
+                        return;
                     }
 
                     if(result.ret_code == 30047){
                         Deal_ui.show_entry(result.retry_count, function(){
                             entry_operation.show();
-                        })
-                        return
+                        });
+                        return;
                     }
                     if(result.ret_code == 30048){
                         Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
-                            window.location = '/weixin/sub_pwd_back/?next=/weixin/view/buy/'+post_data.product+ '/';
-                        })
-                        return
+                            window.location = '/weixin/sub_pwd_back/?next=/weixin/sub_detail/detail/'+post_data.product+ '/';
+                        });
+                        return;
                     }
                     if(result.error_number > 0){
                         return org.ui.alert(result.message);
@@ -1136,6 +1157,11 @@ org.buy = (function (org) {
                     $buyButton.removeAttr('disabled').text("立即投资");
                 }
             })
+        },
+        _closePage: function(){
+            $(".back-fwh").on("click",function(){
+                closePage();
+            });
         }
     }
     return {
@@ -1215,7 +1241,7 @@ org.recharge = (function (org) {
             _self.$load.hide();
             _self.$recharge_body.show();
             _self.data = data;
-            _self.$amount.attr('placeholder', '该银行单笔限额' + data.bank.bank_limit.second_one/10000+'万元')
+            _self.$amount.attr('placeholder', '该银行单笔限额' + data.bank.bank_limit.second_one/10000+'万元');
             _self.$card_no.val(card);
             _self.$bank_name.text(data.bank.name);
             lib._rechargeThe_one_card();
@@ -1262,14 +1288,14 @@ org.recharge = (function (org) {
                         phone: '',
                         card_no: sort_card,
                         amount: amount,
-                        gate_id: gate_id,
+                        gate_id: gate_id
                     },
                     beforeSend: function () {
                         _self.$recharge.attr('disabled', true).text("充值中..");
                     },
                     success: function (entry_operation, result) {
-                        entry_operation.hide_loading()
-                        entry_operation.clear()
+                        entry_operation.hide_loading();
+                        entry_operation.clear();
                         entry_operation.hide();
                         if(result.ret_code == 0){
                             return $('#page-ok').css('display', '-webkit-box').find("#total-money").text(result.margin);
@@ -1301,15 +1327,14 @@ org.recharge = (function (org) {
                     }
 
                 }
-                org.ui.confirm("充值金额为" + amount, '确认充值', lib._trade_pwd_seach, data)
+                org.ui.confirm("充值金额为" + amount, '确认充值', lib._trade_pwd_seach, data);
 
             });
         },
         //继续充值
         _close_alt: function(self){
             self.on('click',function(){
-                $("input.count-input").val('');
-                self.parents(".page-alt").hide();
+                window.location.reload();
             });
         },
         _trade_pwd_seach: function(post_data){
@@ -1323,7 +1348,6 @@ org.recharge = (function (org) {
 
         },
         _trade_pws_operation: function(state, post_data){
-
             if(state){
                 entry_ui()
             }else{
@@ -1337,13 +1361,13 @@ org.recharge = (function (org) {
                     target: $('input[name=password1]'),
                     done : function(pwd){
                         entry_operation.show_loading();
-                        post_data.data.trade_pwd = pwd
+                        post_data.data.trade_pwd = pwd;
                         lib._rechargeSingleStep(entry_operation,post_data)
 
                     }
                 })
-                entry_operation.init()
-                entry_operation.show()
+                entry_operation.init();
+                entry_operation.show();
             }
 
             var password_1 = null, password_2 = null ;
@@ -1355,13 +1379,13 @@ org.recharge = (function (org) {
                     target: $('input[name=password1]'),
                     done : function(pwd){
                         password_1 = pwd;
-                        operation_1.clear()
+                        operation_1.clear();
                         operation_1.hide();
                         operation_2();
                     }
-                })
-                operation_1.init()
-                operation_1.show()
+                });
+                operation_1.init();
+                operation_1.show();
 
                 function operation_2(){
                     var operation_2 = new Deal({
@@ -1372,23 +1396,23 @@ org.recharge = (function (org) {
                             password_2 = pwd;
 
                             if(password_2 != password_1){
-                                operation_2.clear()
-                                operation_2.hide()
+                                operation_2.clear();
+                                operation_2.hide();
                                 return Deal_ui.show_alert('error', function(){
-                                    set_ui()
+                                    set_ui();
                                 })
                             }
-                            operation_2.show_loading()
-                            lib._trade_pws_set(operation_2, password_2)
+                            operation_2.show_loading();
+                            lib._trade_pws_set(operation_2, password_2, post_data);
                         }
-                    })
-                    operation_2.init()
-                    operation_2.show()
+                    });
+                    operation_2.init();
+                    operation_2.show();
                 }
             }
 
         },
-        _trade_pws_set: function(entry_operation, new_trade_pwd){
+        _trade_pws_set: function(entry_operation, new_trade_pwd, post_data){
             org.ajax({
                 url: '/api/trade_pwd/',
                 type: 'post',
@@ -1397,13 +1421,15 @@ org.recharge = (function (org) {
                     new_trade_pwd: new_trade_pwd
                 },
                 success: function(result){
-                    entry_operation.hide_loading()
-                    entry_operation.clear()
+                    entry_operation.hide_loading();
+                    entry_operation.clear();
                     entry_operation.hide();
                     if(result.ret_code == 0){
-                        Deal_ui.show_alert('success', function(){
-                            window.location = window.location.href;
-                        },'交易密码设置成功，请牢记！')
+                        //Deal_ui.show_alert('success', function(){
+                        //    window.location = window.location.href;
+                        //},'交易密码设置成功，请牢记！')
+                        post_data.data.trade_pwd = new_trade_pwd;
+                        lib._rechargeSingleStep(entry_operation,post_data);
                     }
 
                     if(result.ret_code > 0 ){
@@ -1468,7 +1494,7 @@ org.authentication = (function (org) {
                         }
                     }
                     data[formName[i]] = $(this).val();
-                })
+                });
                 isFor && lib._forAuthentication(data)
             });
         },
@@ -1507,7 +1533,7 @@ org.authentication = (function (org) {
 org.bankOneCard = (function(){
     var lib = {
         init : function(){
-            lib.listen()
+            lib.listen();
         },
         listen: function(){
             var $set_bank = $('.set-bank'),
@@ -1516,27 +1542,34 @@ org.bankOneCard = (function(){
                 $bank_confirm =  $('.bank-confirm'),
                 $name = $('.name'),
                 $no = $('.no');
-
+            var toInvest = $('#to-invest');
+            (function(){
+                var next = org.getQueryStringByName('next');
+                if(toInvest.length > 0 && next != ''){
+                    toInvest.attr("href", next).show();
+                }
+            })();
             $set_bank.on('click', function(){
                 var
                     id = $(this).attr('data-id'),
                     no = $(this).attr('data-no'),
                     name = $(this).attr('data-name');
 
-                $set_bank_sig.show()
-                $name.text(name)
-                $no.text(no.slice(-4))
+                $set_bank_sig.show();
+                $name.text(name);
+                $no.text(no.slice(-4));
                 $bank_confirm.attr('data-id', id)
-            })
+            });
 
             $bank_cancel.on('click', function(){
-                $set_bank_sig.hide()
-            })
+                $set_bank_sig.hide();
+            });
 
             $bank_confirm.on('click', function(){
-                var id = $(this).attr('data-id')
-                lib.putBank(id)
-            })
+                var id = $(this).attr('data-id');
+                lib.putBank(id);
+            });
+
         },
         putBank: function(id){
             var $set_bank_sig  = $('.set-bank-sign');
@@ -1555,7 +1588,7 @@ org.bankOneCard = (function(){
                         return org.ui.alert('绑定成功', function(){
                             var url  = window.location.href;
                             window.location.href = url;
-                        })
+                        });
                     }
                 },
                 error: function (xhr) {
@@ -1573,7 +1606,7 @@ org.bankOneCard = (function(){
     return {
         init: lib.init
     }
-})()
+})();
 
 org.processFirst = (function (org) {
     var lib = {
@@ -1581,8 +1614,8 @@ org.processFirst = (function (org) {
         $name: $('input[name=name]'),
         $idcard: $('input[name=idcard]'),
         init: function () {
-            lib._form_logic()
-            lib._postData()
+            lib._form_logic();
+            lib._postData();
         },
         _form_logic: function () {
             var _self = this;
@@ -1614,15 +1647,15 @@ org.processFirst = (function (org) {
 
             checklist.each(function (i) {
                 if ($(this).val() == '') {
-                    org.ui.showSign($(this).attr('placeholder'))
+                    org.ui.showSign($(this).attr('placeholder'));
                     return check = false;
                 } else {
                     if (i === 1 && !reg.test($(this).val())) {
-                        org.ui.showSign('请输入正确的身份证号')
+                        org.ui.showSign('请输入正确的身份证号');
                         return check = false;
                     }
                 }
-            })
+            });
 
             return check
         },
@@ -1635,22 +1668,23 @@ org.processFirst = (function (org) {
                     lib.$submit.attr('disabled', true).text("认证中，请等待...");
                 },
                 success: function (data) {
-                    if (!data.validate == 'true') return org.ui.alert('认证失败，请重试');
-                    org.ui.alert("实名认证成功!", function () {
-                        return window.location.href = '/weixin/regist/second/';
-                    });
+                    if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
+                    //org.ui.alert("实名认证成功!",function(){
+                    //    window.location.href = '/weixin/sub_regist_second/';
+                    //});
+                    //org.ui.alert("实名认证成功!",{url:'/weixin/sub_regist_second/'});
+                    $('.sign-main').css('display','-webkit-box');
                 },
                 error: function (xhr) {
                     result = JSON.parse(xhr.responseText);
-
                     if(result.error_number == 8){
-                        org.ui.alert(result.message,function(){
-                           window.location.href = '/weixin/list/';
-                        });
+                        //org.ui.alert(result.message,function(){
+                        //   window.location.href = '/weixin/sub_list/';
+                        //});
+                        $('.sign-main-error').css('display','-webkit-box').find(".sign-tit").html(result.message);
                     }else{
                         return org.ui.alert(result.message);
                     }
-
 
                 },
                 complete: function () {
@@ -1799,8 +1833,8 @@ org.processSecond = (function (org) {
                         return $validationBtn.text(count + '秒后可重发');
                     } else {
                         clearInterval(intervalId);
-                        $validationBtn.text('重新获取').removeAttr('disabled').css('background', '#50b143')
-                        return
+                        $validationBtn.text('重新获取').removeAttr('disabled').css('background', '#50b143');
+                        return;
                     }
                 };
                 var money = function(){
@@ -1809,7 +1843,7 @@ org.processSecond = (function (org) {
                     }else{
                         return _self.$money.val()
                     }
-                }
+                };
                 org.ajax({
                     type: 'POST',
                     url: '/api/pay/deposit_new/',
@@ -1817,13 +1851,12 @@ org.processSecond = (function (org) {
                         card_no: _self.$bankcard.val(),
                         gate_id: _self.$bank.val(),
                         phone: _self.$bankphone.val(),
-                        amount: money(),
-
+                        amount: money()
                     },
                     success: function (data) {
                         if (data.ret_code > 0) {
                             clearInterval(intervalId);
-                            $validationBtn.text('重新获取').removeAttr('disabled').css('background', '#50b143')
+                            $validationBtn.text('重新获取').removeAttr('disabled').css('background', '#50b143');
                             return org.ui.alert(data.message);
                         } else {
                             $("input[name='order_id']").val(data.order_id);
@@ -1844,11 +1877,11 @@ org.processSecond = (function (org) {
             var _self = this;
 
             _self.$submit.on('click', function () {
-                var check_recharge = $(this).attr('data-recharge')
+                var check_recharge = $(this).attr('data-recharge');
                 if(check_recharge == 'true'){
                     org.ui.confirm("充值金额为" + _self.$money.val(), '确认充值', recharge, {firstRecharge: true});
                 }else{
-                    recharge({firstRecharge: false})
+                    recharge({firstRecharge: false});
                 }
 
             });
@@ -1913,7 +1946,7 @@ org.trade_back = (function (org) {
         $bankcard : $('input[name=bankcard]'),
         $cardname : $('input[name=cardname]'),
         init: function () {
-            lib.the_one_card()
+            lib.the_one_card();
             lib.listen_input();
         },
         /**
@@ -1928,10 +1961,10 @@ org.trade_back = (function (org) {
                     //同卡进出
                     var CARDNAME = data.bank.name;
                     var CARDNO = data.no.slice(-4);
-                    $('.bank-name').html(CARDNAME)
-                    $('.bank-card').html(CARDNO)
-                    lib.$bankcard.attr('placeholder', "**"+ CARDNO +"（请输入完整卡号）")
-                    $('.trade-warp').show()
+                    $('.bank-name').html(CARDNAME);
+                    $('.bank-card').html(CARDNO);
+                    lib.$bankcard.attr('placeholder', "**"+ CARDNO +"（请输入完整卡号）");
+                    $('.trade-warp').show();
                 },
                 error: function (data) {
                     //没有同卡进出
@@ -1949,7 +1982,7 @@ org.trade_back = (function (org) {
                 inputList: [
                     {target: _self.$id_number, required: true},
                     {target: _self.$bankcard, required: true},
-                    {target: _self.$cardname, required: true},
+                    {target: _self.$cardname, required: true}
                 ]
             });
 
@@ -1968,13 +2001,13 @@ org.trade_back = (function (org) {
                     target: $('input[name=password1]'),
                     done : function(pwd){
                         password_1 = pwd;
-                        operation_1.clear()
+                        operation_1.clear();
                         operation_1.hide();
                         operation_2();
                     }
                 })
-                operation_1.init()
-                operation_1.show()
+                operation_1.init();
+                operation_1.show();
 
                 function operation_2(){
                     var operation_2 = new Deal({
@@ -1985,18 +2018,18 @@ org.trade_back = (function (org) {
                             password_2 = pwd;
 
                             if(password_2 != password_1){
-                                operation_2.clear()
-                                operation_2.hide()
+                                operation_2.clear();
+                                operation_2.hide();
                                 return Deal_ui.show_alert('error', function(){
                                     set_ui()
                                 })
                             }
-                            operation_2.show_loading()
+                            operation_2.show_loading();
                             lib._trade_pws_set(operation_2, password_2)
                         }
-                    })
-                    operation_2.init()
-                    operation_2.show()
+                    });
+                    operation_2.init();
+                    operation_2.show();
                 }
             }
 
@@ -2017,7 +2050,7 @@ org.trade_back = (function (org) {
                     citizen_id: citizen_id
                 },
                 success: function(result){
-                    var next = org.getQueryStringByName('next') == '' ? '/weixin/list/' : org.getQueryStringByName('next');
+                    var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_list/' : org.getQueryStringByName('next');
                     if(result.ret_code == 0){
                         Deal_ui.show_alert('success', function(){
                             window.location = next;
@@ -2029,10 +2062,10 @@ org.trade_back = (function (org) {
                     }
                 },
                 complete: function(){
-                    operation.hide_loading()
-                    operation.clear()
+                    operation.hide_loading();
+                    operation.clear();
 
-                    operation.hide()
+                    operation.hide();
                 }
             })
         },
@@ -2049,13 +2082,12 @@ org.trade_back = (function (org) {
         this.callback = ops.done;
         this.$input = ops.target;
         this.$body =  $('.tran-warp');
-        this.$blue = $('.blue');
+        this.$blue = $('span.blue');
         this.$digt =  $('.six-digt-password');
         this.$close = $('.tran-close');
         this.blue_width = null;
         this.password = null;
         this.reCreate();
-        console.log(this.$blue.length,"d1");
     }
     Deal.prototype.init = function(){
         var _self = this;
@@ -2088,35 +2120,40 @@ org.trade_back = (function (org) {
         this.$close.off('click');
         $(document).off('click');
         this.$digt.off('click').find('i').removeClass('active');
-        $('.six-digt-password i ').find('.circle').hide()
+        $('.six-digt-password i ').find('.circle').hide();
     }
     Deal.prototype.clear = function(){
         this.$input.val('');
         this.$digt.find('i').removeClass('active');
-        $('.six-digt-password i ').find('.circle').hide()
+        $('.six-digt-password i ').find('.circle').hide();
     }
     Deal.prototype.decide = function(type){
         var value_num = this.$input.val().length;
 
         for(var i = 0; i< value_num; i++){
-            $('.six-digt-password i ').eq(i).find('.circle').show()
+            $('.six-digt-password i ').eq(i).find('.circle').show();
         }
         this.password = this.$input.val();
         this.show_blue();
-        this.move(value_num, type)
+        this.move(value_num, type);
     }
     Deal.prototype.move = function(index, type){
 
         var move_space = this.blue_width * index;
-
-        if(index == 6)  move_space = this.blue_width * 5 ;
-
+        if(index == 5){
+            this.$blue.width(this.$digt.width()-move_space);
+        }else{
+            this.$blue.width(this.blue_width);
+        }
+        if(index == 6){
+            move_space = this.blue_width * 5 ;
+        }
         this.$blue.animate({
             'translate3d': move_space + "px, 0 , 0"
         },0);
 
         if(index == 6){
-            this.$digt.find('i').removeClass('active')
+            this.$digt.find('i').removeClass('active');
             if(type == 'input'){
                 this.hide_blue();
                 this.$input.blur();
@@ -2153,29 +2190,29 @@ org.trade_back = (function (org) {
 
     Deal_ui = {
         show_alert: function(state, callback, state_message){
-            $('.tran-alert-error').show().find('.'+state).show().siblings().hide()
-            if(state_message)  $('.tran-alert-error').show().find('.'+state).find('p').html(state_message)
+            $('.tran-alert-error').show().find('.'+state).show().siblings().hide();
+            if(state_message)  $('.tran-alert-error').show().find('.'+state).find('p').html(state_message);
             $('.tran-alert-error').find('.alert-bottom').one('click', function(){
-                $('.tran-alert-error').hide()
+                $('.tran-alert-error').hide();
                 callback && callback();
             })
             return
         },
         show_entry: function(count, callback){
-            $('.tran-alert-entry').show().find('.count_pwd').html(count)
+            $('.tran-alert-entry').show().find('.count_pwd').html(count);
             $('.tran-alert-entry').find('.alert-bottom').one('click', function(){
-                $('.tran-alert-entry').hide()
+                $('.tran-alert-entry').hide();
                 callback && callback();
-            })
+            });
             return
         },
         show_lock: function(left,right,dec, callback){
-            $('.tran-alert-lock').show()
+            $('.tran-alert-lock').show();
             $('.lock-close').html(left).one('click', function(){
                 $('.tran-alert-lock').hide()
 
             });
-            $('.tran-alert-lock').find('.tran-dec-entry').html(dec)
+            $('.tran-alert-lock').find('.tran-dec-entry').html(dec);
             $('.lock-back').html(right).one('click', function(){
                 callback && callback();
             })
@@ -2456,8 +2493,8 @@ org.received_detail = (function(){
             var slide = [],
                 $item = $('.received-list');
             slide.push(org.received_ui.detail(data));
-            $item.append(slide.join(''))
-            $('.received-loding').hide()
+            $item.append(slide.join(''));
+            $('.received-loding').hide();
         },
         fetch: function(product_id){
             var _self = this;
@@ -2475,7 +2512,7 @@ org.received_detail = (function(){
     return {
         init : lib.init
     }
-})()
+})();
 
 //关闭页面，返回微信
 function closePage(){
