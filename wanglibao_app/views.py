@@ -854,6 +854,14 @@ class AppLogoutAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, **kwargs):
+        # 用户端退出时,将错误登录次数清零
+        from wanglibao_profile.models import WanglibaoUserProfile
+
+        user_profile = WanglibaoUserProfile.objects.get(user=request.user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
+
         auth.logout(request)
         return Response({'ret_code': 0, 'message': 'success'})
 
