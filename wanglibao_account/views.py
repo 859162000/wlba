@@ -2495,13 +2495,20 @@ class SMSModifyPhoneAPI(APIView):
 
 
 class LoginCounterVerifyAPI(APIView):
-    """登录次数验证"""
+    """
+    登录次数验证,下面4个情况当天错误次数清零处理
+    1、重置登录密码
+    2、退出登录
+    3、当天6次机会内验证正确
+    4、第二天清零
+    """
 
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
 
         from django.db.models import F
+        from wanglibao_profile.models import WanglibaoUserProfile
 
         now = timezone.now()
         today_start = local_to_utc(now, 'min')
@@ -2511,21 +2518,23 @@ class LoginCounterVerifyAPI(APIView):
 
         # 密码错误，请重新输入
         # 错误大于6次, 密码错误频繁，为账户安全建议重置
-        verify_counter, created = LoginCounter.objects.get_or_create(user=user)
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
 
-        if verify_counter.count > 6 and today_start < now <= today_end:
+        if user_profile.login_failed_count > 6 and today_start < now <= today_end:
             msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
         else:
             if user.check_password(password):
+                user_profile.login_failed_count = 0
+                user_profile.save()
                 return Response({'ret_code': 0, 'message': 'ok'})
             else:
                 msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
 
                 if today_start < now <= today_end:
-                    verify_counter.count = F('count') + 1
+                    user_profile.login_failed_count = F('count') + 1
                 else:
-                    verify_counter.count = 1
-                verify_counter.save()
+                    user_profile.login_failed_count = 1
+                user_profile.save()
 
         return Response(msg)
 
