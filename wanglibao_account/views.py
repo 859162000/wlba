@@ -52,7 +52,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, LoginCounter,\
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, \
     UserThreeOrder, ManualModifyPhoneRecord, SMSModifyPhoneRecord
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
@@ -2495,13 +2495,20 @@ class SMSModifyPhoneAPI(APIView):
 
 
 class LoginCounterVerifyAPI(APIView):
-    """登录次数验证"""
+    """
+    登录次数验证,下面4个情况当天错误次数清零处理
+    1、重置登录密码
+    2、退出登录
+    3、当天6次机会内验证正确
+    4、第二天清零
+    """
 
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
 
         from django.db.models import F
+        from wanglibao_profile.models import WanglibaoUserProfile
 
         now = timezone.now()
         today_start = local_to_utc(now, 'min')
@@ -2509,25 +2516,27 @@ class LoginCounterVerifyAPI(APIView):
         user = request.user
         password = request.DATA.get('password').strip()
 
-        if user.check_password(password):
-            return Response({'ret_code': 0, 'message': 'ok'})
-        else:
-            # 密码错误，请重新输入
-            # 错误大于6次, 密码错误频繁，为账户安全建议重置
-            verify_counter, created = LoginCounter.objects.get_or_create(user=user)
+        # 密码错误，请重新输入
+        # 错误大于6次, 密码错误频繁，为账户安全建议重置
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
 
-            if verify_counter.count > 6 and today_start < now < today_end:
-                msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+        if user_profile.login_failed_count > 6 and today_start < now <= today_end:
+            msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+        else:
+            if user.check_password(password):
+                user_profile.login_failed_count = 0
+                user_profile.save()
+                return Response({'ret_code': 0, 'message': 'ok'})
             else:
                 msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
 
-            if today_start < now < today_end:
-                verify_counter.count = F('count') + 1
-            else:
-                verify_counter.count = 1
-            verify_counter.save()
+                if today_start < now <= today_end:
+                    user_profile.login_failed_count = F('count') + 1
+                else:
+                    user_profile.login_failed_count = 1
+                user_profile.save()
 
-            return Response(msg)
+        return Response(msg)
 
 
 class MarginRecordsAPIView(APIView):

@@ -280,21 +280,6 @@ class SMSModifyPhoneRecord(models.Model):
         ordering = ('-created_at',)
 
 
-class LoginCounter(models.Model):
-    """
-    记录用户登录失败的次数,每天6次
-    """
-    user = models.OneToOneField(User)
-    count = models.IntegerField(u"登录失败次数", default=0)
-    update_at = models.DateTimeField(u'更新时间', auto_now=True)
-
-    class Meta:
-        verbose_name_plural = u'登录失败次数'
-
-    def __unicode__(self):
-        return u'%s: %d' % (self.user.wanglibaouserprofile.phone, self.count)
-
-
 # 发给所有人
 def send_public_message(sender, instance, **kwargs):
     if instance.mtype == "public":
