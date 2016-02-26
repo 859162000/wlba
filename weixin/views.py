@@ -889,7 +889,7 @@ class P2PDetailView(TemplateView):
         user = self.request.user
         id_is_valid = False
         is_one = False
-
+        is_bind = False
         if user.is_authenticated():
             user_margin = user.margin.margin
             equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
@@ -903,6 +903,7 @@ class P2PDetailView(TemplateView):
             try:
                 p2p_cards = card_bind_list(self.request)['cards']
                 for card in p2p_cards:
+                    is_bind = True
                     if card['is_the_one_card']:
                         is_one = True
             except:
@@ -929,7 +930,8 @@ class P2PDetailView(TemplateView):
             'next': next,
             'amount_profit': amount_profit,
             'id_is_valid':id_is_valid,
-            'is_one':is_one
+            'is_one':is_one,
+            'is_bind':is_bind
         })
 
         return context
