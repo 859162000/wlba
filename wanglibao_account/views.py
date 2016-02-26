@@ -2509,25 +2509,36 @@ class LoginCounterVerifyAPI(APIView):
         user = request.user
         password = request.DATA.get('password').strip()
 
-        if user.check_password(password):
-            return Response({'ret_code': 0, 'message': 'ok'})
-        else:
-            # 密码错误，请重新输入
-            # 错误大于6次, 密码错误频繁，为账户安全建议重置
-            verify_counter, created = LoginCounter.objects.get_or_create(user=user)
+        # 密码错误，请重新输入
+        # 错误大于6次, 密码错误频繁，为账户安全建议重置
+        verify_counter, created = LoginCounter.objects.get_or_create(user=user)
 
-            if verify_counter.count > 6 and today_start < now < today_end:
-                msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+        if verify_counter.count > 6 and today_start < now <= today_end:
+            msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+        else:
+            if user.check_password(password):
+                return Response({'ret_code': 0, 'message': 'ok'})
             else:
                 msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
 
-            if today_start < now < today_end:
-                verify_counter.count = F('count') + 1
-            else:
-                verify_counter.count = 1
-            verify_counter.save()
+                if today_start < now <= today_end:
+                    verify_counter.count = F('count') + 1
+                else:
+                    verify_counter.count = 1
+                verify_counter.save()
 
-            return Response(msg)
+        return Response(msg)
 
 
+class MarginRecordsAPIView(APIView):
+    """
+    用户资金账户记录
+    """
+    permission_classes = (IsAuthenticated, )
+
+    @staticmethod
+    def post(request):
+        from wanglibao_margin.margin_record import margin_records
+        res = margin_records(request)
+        return Response(res)
 
