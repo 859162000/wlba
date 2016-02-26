@@ -28,6 +28,10 @@ from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from shumi_backend.exception import FetchException, AccessException
+from shumi_backend.fetch import UserInfoFetcher
+from wanglibao_buy.models import BindBank
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 logger = logging.getLogger("weixin")
 
@@ -275,6 +279,3 @@ class FWHIdValidate(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         return super(FWHIdValidate, self).dispatch(request, *args, **kwargs)
-
-
-
