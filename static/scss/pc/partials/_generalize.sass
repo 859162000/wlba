@@ -1,0 +1,276 @@
+
+.i-generalize-public
+  height: 710px
+  
+  
+.i-generalize-banner
+  @extend .i-generalize-public
+  background: url("/static/imgs/pc/generalize/banner_main.jpg?v=2") no-repeat center #1c1c1c
+
+
+@for $i from 1 through 6
+  #i-generalize-model-#{$i}
+    @extend .i-generalize-public
+    background: url("/static/imgs/pc/generalize/banner_mod_#{$i}.jpg") no-repeat center
+
+.i-generalize-layout
+  position: relative
+  height: 100%
+
+.generalize-phone-public
+  position: absolute
+  bottom: 0px
+  left: 30px
+  width: 267px
+  height: 488px
+  .hover
+    position: absolute
+    opacity: 0
+  @for $i from 1 through 4
+    .hover_#{$i}
+      background: url("/static/imgs/pc/generalize/hover_banner_#{$i}.png") no-repeat center
+  .hover_1
+    top: 192px
+    width: 330px
+    height: 208px
+    left: 50%
+    margin-left: -165px
+  .hover_2
+    top: 120px
+    left: 100px
+    width: 331px
+    height: 322px
+  .hover_3
+    top: 94px
+    width: 343px
+    height: 51px
+    left: 50%
+    margin-left: -171.5px
+  .hover_4
+    top: 155px
+    right: 65px
+    width: 357px
+    height: 323px
+
+@for $i from 1 through 5
+  .generalize-phone_#{$i}
+    background: url("/static/imgs/pc/generalize/iphone_banner_#{$i}.png") no-repeat center
+
+
+.generalize-dec
+  position: absolute
+  right: 42px
+  bottom: 110px
+
+  .generalize-explain
+    color: #fff
+
+  .generalize-explain-title-pub
+    font-size: 28px
+    span
+      display: inline-block
+      vertical-align: middle
+      zoom: 1
+    @for $i from 1 through 5
+      .generalize-explain-icon-#{$i}
+        display: inline-block
+        width: 57px
+        height: 57px
+        background: url("/static/imgs/pc/generalize/icon_banner_#{$i}.png") no-repeat center
+        margin-right: 30px
+  .generalize-explain-title-2
+    color: #bb5800
+
+  .generalize-explain-content-pub
+    font-size: 20px
+    line-height: 35px
+    margin: 10px 0 20px 0
+  .generalize-explain-content-2
+    color: #bb5800
+
+  .generalize-download
+    width: 370px
+    background: #fff
+    padding: 5px
+
+    .generalize-download-layout
+      border: 1px solid #ececec
+      border-radius: 5px
+      padding: 10px
+      +clearfix()
+    .download-layout-erweima
+      float: left
+      width: 159px
+      height: 158px
+      background: url('/static/imgs/pc/generalize/download_erweima.png') no-repeat center
+    .download-layout-other
+      float: left
+      color: #666
+      font-size: 22px
+      margin-left: 25px
+    .download-btn
+      border: 1px solid #ececec
+      background: url("/static/imgs/pc/generalize/download_icon.png") no-repeat left center
+      background-position-x: 15px
+      border-radius: 30px
+      padding: 0 14px 0 60px
+    .download-dec
+      padding: 25px 0 0 22px
+.generalize-dec-fixed
+  position: fixed
+  right: 132px
+.animated
+  -webkit-animation-duration: .5s
+  animation-duration: .5s
+  -webkit-animation-iteration-count: 1
+  animation-iteration-count: 1
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+
+.zoomIn
+  -webkit-animation-name: zoomIn
+  animation-name: zoomIn
+
+.fadeIn
+  -webkit-animation-name: fadeIn
+  animation-name: fadeIn
+
+.flipInX 
+  -webkit-backface-visibility: visible !important
+  backface-visibility: visible !important
+  -webkit-animation-name: flipInX
+  animation-name: flipInX
+
+.slideInRight 
+  -webkit-animation-name: slideInRight   
+  animation-name: slideInRight   
+
+.active
+  .hover
+    opacity: 1
+  .hover_1
+    @extend .zoomIn
+    @extend .animated
+  .hover_2
+    @extend .fadeIn
+    @extend .animated
+    -webkit-animation-duration: .8s
+    animation-duration: .8s
+  .hover_3
+    @extend .flipInX
+    @extend .animated
+    -webkit-animation-duration: .9s
+    animation-duration: .9s
+  .hover_4
+    @extend .flipInX
+    @extend .slideInRight
+    -webkit-animation-duration: .9s
+    animation-duration: .9s
+
+@-webkit-keyframes zoomIn
+  from
+    opacity: 0
+    -webkit-transform: scale3d(.3, .3, .3)
+    transform: scale3d(.3, .3, .3)
+  50%
+    opacity: 1
+
+@keyframes zoomIn
+  from
+    opacity: 0
+    -webkit-transform: scale3d(.3, .3, .3)
+    transform: scale3d(.3, .3, .3)
+  50%
+    opacity: 1
+
+@-webkit-keyframes fadeIn
+  from
+    opacity: 0
+  to
+    opacity: 1
+
+@keyframes fadeIn
+  from
+    opacity: 0
+
+  to
+    opacity: 1
+@-webkit-keyframes flipInX 
+  from 
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, 90deg)
+    -webkit-animation-timing-function: ease-in
+    animation-timing-function: ease-in
+    opacity: 0
+
+  40%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg)   
+    transform: perspective(400px) rotate3d(1, 0, 0, -20deg)   
+    -webkit-animation-timing-function: ease-in   
+    animation-timing-function: ease-in   
+
+  60%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg)   
+    transform: perspective(400px) rotate3d(1, 0, 0, 10deg)   
+    opacity: 1   
+
+  80%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg)   
+    transform: perspective(400px) rotate3d(1, 0, 0, -5deg)   
+
+  to
+    -webkit-transform: perspective(400px)   
+    transform: perspective(400px)   
+
+@keyframes flipInX
+  from
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg)   
+    transform: perspective(400px) rotate3d(1, 0, 0, 90deg)   
+    -webkit-animation-timing-function: ease-in   
+    animation-timing-function: ease-in   
+    opacity: 0   
+
+  40%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg)   
+    transform: perspective(400px) rotate3d(1, 0, 0, -20deg)   
+    -webkit-animation-timing-function: ease-in   
+    animation-timing-function: ease-in   
+
+  60%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg)   
+    transform: perspective(400px) rotate3d(1, 0, 0, 10deg)   
+    opacity: 1   
+
+  80%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg)   
+    transform: perspective(400px) rotate3d(1, 0, 0, -5deg)   
+
+  to
+    -webkit-transform: perspective(400px)   
+    transform: perspective(400px)
+
+@-webkit-keyframes slideInRight
+  from
+    opacity: 0
+    -webkit-transform: translate3d(80%, 0, 0)
+    transform: translate3d(80%, 0, 0)
+    visibility: visible   
+
+  to
+    opacity: 1
+    -webkit-transform: translate3d(0, 0, 0)   
+    transform: translate3d(0, 0, 0)   
+
+@keyframes slideInRight
+  from
+    opacity: 0
+    -webkit-transform: translate3d(80%, 0, 0)
+    transform: translate3d(80%, 0, 0)
+    visibility: visible   
+
+  to
+    opacity: 1
+    -webkit-transform: translate3d(0, 0, 0)   
+    transform: translate3d(0, 0, 0)   

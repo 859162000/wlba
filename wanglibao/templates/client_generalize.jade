@@ -1,0 +1,60 @@
+doctype html
+html
+  head
+    - with '安全p2p网贷_p2p理财的风险_投资理财资金安全_网利宝' as title
+    include global/g_head
+    - endwith
+    meta(name="keywords", content="安全p2p网贷, p2p理财的风险 ,投资理财资金安全,网利宝")
+    meta(name="description", content="网利宝在p2p理财的风险，投资理财资金安全问题上做出业内独创“产融结合”的业务模式。为投资用户提供高收益、安全透明、期限灵活的理财产品，为了降低p2p理财的风险和投资理财资金安全问题，网利宝的业务模式执行360度全方位风险控制，强调把风险控制在贷前、打造风险闭环，确保理财产品安全可靠，为投资者财富增值保驾护航。")
+  body
+    - with 'app推广' as activeItem
+    include global/g_nav
+    - endwith
+    .i-mod-warp.i-generalize-banner
+      .i-mod-center.i-generalize-layout
+
+    mixin items(model, phone, hover, have_download)
+      .i-mod-warp(id=model).model-animate
+        .i-mod-center.i-generalize-layout
+          .generalize-phone-public(class=phone)
+            div(class=hover)
+          if have_download
+            .generalize-dec
+              .generalize-explain
+                .generalize-explain-title-1.generalize-explain-title-pub
+                  span.generalize-explain-icon-1
+                  span 精品推荐
+                .generalize-explain-title-2.generalize-explain-title-pub(style='display:none')
+                  span.generalize-explain-icon-2
+                  span 专享福利
+                .generalize-explain-title-3.generalize-explain-title-pub(style='display:none')
+                  span.generalize-explain-icon-3
+                  span 一键筛选
+                .generalize-explain-title-4.generalize-explain-title-pub(style='display:none')
+                  span.generalize-explain-icon-4
+                  span 实时查询
+                .generalize-explain-title-5.generalize-explain-title-pub(style='display:none')
+                  span.generalize-explain-icon-5
+                  span 发现惊喜
+                .generalize-explain-content-1.generalize-explain-content-pub 根据新老用户，推荐不同产品<br>适合自己的才是最好的！
+                .generalize-explain-content-2.generalize-explain-content-pub(style='display:none') 不定期福利，坐享更高收益<br>专属自己的才是最好的！
+                .generalize-explain-content-3.generalize-explain-content-pub(style='display:none') 三种维度，投资更方便<br>满足自己的才是最好的！
+                .generalize-explain-content-4.generalize-explain-content-pub(style='display:none') 随时查看资产，投资更放心<br>自己放心的才是最好的！
+                .generalize-explain-content-5.generalize-explain-content-pub(style='display:none') 更多好玩有趣的内容等你发现<br>愉悦自己的才是最好的！
+
+
+              .generalize-download
+                .generalize-download-layout
+                  .download-layout-erweima
+                  .download-layout-other
+                    .download-btn 扫一扫
+                    .download-dec 马上下载<br>网利宝APP
+    +items('i-generalize-model-1', 'generalize-phone_1', 'hover hover_1',  'download')
+    +items('i-generalize-model-2', 'generalize-phone_2', 'hover hover_2')
+    +items('i-generalize-model-3', 'generalize-phone_3', 'hover hover_3')
+    +items('i-generalize-model-4', 'generalize-phone_4', 'hover hover_4')
+    +items('i-generalize-model-5', 'generalize-phone_5', 'hover hover_5')
+
+    include global/g_footer
+    script.
+      require(["/static/src/pc/generalize.js?v=20160223"])
