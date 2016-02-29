@@ -2511,7 +2511,7 @@ class SMSModifyPhoneAPI(APIView):
             return Response({'message':'ok'})
 
 
-class LoginCounterVerifyAPI(APIView):
+class LoginCounterVerifyAPI(DecryptParmsAPIView):
     """
     登录次数验证,下面4个情况当天错误次数清零处理
     1、重置登录密码
@@ -2531,7 +2531,7 @@ class LoginCounterVerifyAPI(APIView):
         today_start = local_to_utc(now, 'min')
         today_end = local_to_utc(now, 'max')
         user = request.user
-        password = request.DATA.get('password').strip()
+        password = self.params.get('password').strip()
 
         # 密码错误，请重新输入
         # 错误大于6次, 密码错误频繁，为账户安全建议重置
