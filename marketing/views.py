@@ -1,5 +1,6 @@
 # encoding:utf-8
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
+from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 import base64
 import hashlib
@@ -2441,6 +2442,7 @@ class RewardDistributeAPIView(APIView):
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
         #self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.amounts = (0.5, 1, 1.5, 1.8, 2, 188, 588, 888, 1888)
         self.rates = (20, 15, 10, 4, 3, 25, 12, 6, 5)
         self.action_name = u'weixin_distribute_redpack'
 
@@ -2491,11 +2493,15 @@ class RewardDistributeAPIView(APIView):
         try:
             redpacks = list(rules.redpack.split(","))
             logger.debug(u"后台配置的红包id是：{0}".format(redpacks))
-            QSet = RedPackEvent.objects.filter(id__in=redpacks)
+            QSet = ExperienceEvent.objects.filter(id__in=redpacks)
+            QSet += RedPackEvent.objects.filter(id__in=redpacks)
         except Exception, reason:
             logger.debug(u"获得配置红包报异常, reason:%s" % (reason,))
             raise
         for item in QSet:
+            if item.amount not in self.amounts:
+                QSet.remove(item)
+                continue
             self.redpacks[item.amount] = item
 
         self.redpack_amount = sorted(self.redpacks.keys(), reverse=True)
