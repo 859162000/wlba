@@ -1138,6 +1138,9 @@ class KuaiShortPay:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user, bank=bank).first()
+            pay_record = PayInfo.objects.filter(card_no=card_no, user=user, bank=bank)
+            if pay_record.filter(error_message='银行与银行卡不匹配'):
+                return {"ret_code":201153, "message":"银行卡与银行不匹配"}
             #card = Card.objects.filter(no=card_no, user=user).first()
             #pay_record = PayInfo.objects.filter(card_no=card_no, user=user, bank=bank, status='成功').count()
             #if bank and card and bank != card.bank and pay_record==0:
@@ -1264,6 +1267,9 @@ class KuaiShortPay:
             logger.critical(res.content)
             if res.status_code != 200 or "errorCode" in res.content:
                 if "B.MGW.0120" in res.content:
+                    pay_info.error_message = '银行与银行卡不匹配'
+                    pay_info.error_code = '201221'
+                    pay_info.save()
                     raise ThirdPayError(201221, "银行与银行卡不匹配")
                 raise ThirdPayError(20122, "服务器异常")
             result = self.handle_pay_result(res.content)
