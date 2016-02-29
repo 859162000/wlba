@@ -2493,12 +2493,13 @@ class RewardDistributeAPIView(APIView):
         try:
             redpacks = list(rules.redpack.split(","))
             logger.debug(u"后台配置的红包id是：{0}".format(redpacks))
-            QSet = ExperienceEvent.objects.filter(id__in=redpacks)
-            QSet += RedPackEvent.objects.filter(id__in=redpacks)
+            QSet_Exp = set(ExperienceEvent.objects.filter(id__in=redpacks).all())
+            QSet_RPE = set(RedPackEvent.objects.filter(id__in=redpacks).all())
+            QSet = QSet_Exp | QSet_RPE
         except Exception, reason:
             logger.debug(u"获得配置红包报异常, reason:%s" % (reason,))
             raise
-        for item in QSet:
+        for item in list(QSet):
             if item.amount not in self.amounts:
                 QSet.remove(item)
                 continue
