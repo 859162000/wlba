@@ -2507,7 +2507,7 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
 
     def post(self, request):
 
-        from django.db.models import F
+        # from django.db.models import F
         from wanglibao_profile.models import WanglibaoUserProfile
 
         now = timezone.now()
@@ -2519,8 +2519,9 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
         # 密码错误，请重新输入
         # 错误大于6次, 密码错误频繁，为账户安全建议重置
         user_profile = WanglibaoUserProfile.objects.get(user=user)
+        failed_count = user_profile.login_failed_count
 
-        if user_profile.login_failed_count > 6 and today_start < now <= today_end:
+        if failed_count > 6 and today_start < now <= today_end:
             msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
         else:
             if user.check_password(password):
@@ -2532,7 +2533,7 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
                 msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
 
                 if today_start < now <= today_end:
-                    user_profile.login_failed_count = F('count') + 1
+                    user_profile.login_failed_count = failed_count + 1
                     user_profile.login_failed_time = now
                 else:
                     user_profile.login_failed_count = 1
