@@ -631,7 +631,11 @@ class YeeShortPay:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:],
                                        is_bind_yee=True).first()
         else:
-            card = Card.objects.filter(no=card_no, user=user).first()
+            #card = Card.objects.filter(no=card_no, user=user).first()
+            card = Card.objects.filter(no=card_no, user=user, bank=bank).first()
+            pay_record = PayInfo.objects.filter(card_no=card_no, user=user, bank=bank)
+            if pay_record.filter(error_message__icontains='不匹配'):
+                return {"ret_code":200118, "message":"银行卡与银行不匹配"}
 
         if not card:
             card = self.add_card_unbind(user, card_no, bank, request)
@@ -639,8 +643,8 @@ class YeeShortPay:
         if not card and not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
 
-        if bank and card and bank != card.bank:
-            return {"ret_code": 200118, "message": "银行卡与银行不匹配"}
+        #if bank and card and bank != card.bank:
+            #return {"ret_code": 200118, "message": "银行卡与银行不匹配"}
 
         # 商户生成的唯一绑卡请求号，最长50位
         request_id = '{phone}{time}'.format(phone=profile.phone, time=timezone.now().strftime("%Y%m%d%H%M%S"))

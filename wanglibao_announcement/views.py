@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from wanglibao_announcement.models import Announcement
 from django.utils import timezone
+import re
 
 
 class AnnouncementHomeView(TemplateView):
@@ -39,6 +40,13 @@ class AnnouncementDetailView(TemplateView):
 
     def get_context_data(self, id, **kwargs):
         context = super(AnnouncementDetailView, self).get_context_data(**kwargs)
+
+        device_list = ['android', 'iphone']
+        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                self.template_name = 'client_announcement_detail.jade'
 
         try:
             announce = Announcement.objects.get(pk=id, status=1, device='pc')

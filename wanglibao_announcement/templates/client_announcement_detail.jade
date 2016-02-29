@@ -1,0 +1,19 @@
+-load formatters
+doctype html
+html
+    head
+        title 阳光保险对资金账户承保
+        meta(charset="utf-8")
+        meta(name="format-detection" content="telephone=no,email=no")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        meta( name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
+        link(href="/static/styles/app/webview.css?v=20160201", rel="stylesheet")
+    body
+        .announce-warp
+            .announce-title {{announce.title}}
+            .announce-content
+                | {{announce.content|safe}}
+
+                p.content-bootm-right 北京网利科技有限公司
+                p.content-bootm-right {{announce.createtime | date:'Y-m-d'}}
