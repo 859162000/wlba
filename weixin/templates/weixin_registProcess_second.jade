@@ -4,7 +4,7 @@ html(style='background:#f5f5f5;')
     include include/weixin_head.jade
   body
     header
-      hgroup 银行卡绑定{{recharge}}
+      hgroup 银行卡绑定
     - with '2' as processnum
     include include/weixin_registProcess
     - endwith
@@ -65,6 +65,6 @@ html(style='background:#f5f5f5;')
           em.balance-sign
         a(href="/weixin/regist/three/") 下一步
     section.back-index-warp
-      a(href='/weixin/list/').back-index 暂不认证，返回首页
+      a(href='/weixin/list/').back-index 暂不绑定，返回首页
 
-    script(data-init='processSecond', src="/static/scripts/mobile/mobile.js?v=20152072")
+    script(data-init='processSecond', src="/static/scripts/mobile/mobile.js?v=20160223121")

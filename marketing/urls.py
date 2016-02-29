@@ -87,7 +87,7 @@ urlpatterns = patterns(
     url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
-    url(r'^xunlei_three/$', TemplateView.as_view(template_name="xunlei_three.jade")),
+    url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
 
 )
 
@@ -190,6 +190,8 @@ urlpatterns += patterns(
 
     url(r'^weixin_lifestyle/$', TemplateView.as_view(template_name="h5_lifestyle.jade")),
     url(r'^app_xunleithree/$', TemplateView.as_view(template_name="app_xunleithree.jade")),
+    url(r'^app_xunleizhuce/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunleizhuce.jade")),
+    # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
 

@@ -1,5 +1,6 @@
 # encoding:utf-8
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
+from experience_gold.backends import SendExperienceGold
 import base64
 import hashlib
 import os
@@ -2059,7 +2060,7 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         for device in device_list:
             match = re.search(device, user_agent)
             if match and match.group():
-                self.template_name = 'app_xunleithree.jade'
+                self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
@@ -2439,7 +2440,8 @@ class RewardDistributeAPIView(APIView):
         self.activity = None
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
-        self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        #self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.rates = (20, 15, 10, 4, 3, 25, 12, 6, 5)
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
@@ -2504,7 +2506,7 @@ class RewardDistributeAPIView(APIView):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        rate = 50
+        rate = 25
 
         for item in self.rates:
             if sent_count%(100/item)==0:
@@ -2547,17 +2549,31 @@ class RewardDistributeAPIView(APIView):
         else:
             logger.debug("join_log.amount的值为:{0}, redpack_event的值为:{1}, redpacks的值为:{2}".format(join_log.amount, redpack_event, self.redpacks))
 
-        try:
-            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-        except Exception, reason:
-            logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
-            join_log.save()
-            raise
-        else:
-            logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
-            join_log.join_times -= 1
-            join_log.save()
-            return join_log
+        if redpack_event.amount < 10:
+            try:
+                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+            except Exception, reason:
+                logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+                join_log.save()
+                raise
+            else:
+                logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
+                join_log.join_times -= 1
+                join_log.save()
+                return join_log
+
+        if redpack_event.amount >= 10:
+            try:
+                SendExperienceGold(user).send(redpack_event.id)
+            except Exception, reason:
+                logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+                join_log.save()
+                raise
+            else:
+                logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
+                join_log.join_times -= 1
+                join_log.save()
+                return join_log
 
     @method_decorator(transaction.atomic)
     def ignore_post_action(self, user):

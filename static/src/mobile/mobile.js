@@ -1197,7 +1197,7 @@ org.recharge = (function (org) {
             _self.$load.hide();
             _self.$recharge_body.show();
             _self.data = data;
-
+            _self.$amount.attr('placeholder', '该银行单笔限额' + data.bank.bank_limit.second_one/10000+'万元')
             _self.$card_no.val(card);
             _self.$bank_name.text(data.bank.name);
             lib._rechargeThe_one_card();
@@ -1856,10 +1856,25 @@ org.processSecond = (function (org) {
                             if(check.firstRecharge){
                                 $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
                             }else{
-                                return org.ui.alert('绑卡成功！');
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+
+                                return org.ui.alert('绑卡成功！',function(){
+                                    window.location.href = next
+                                });
                             }
 
                         }
+                    },
+                    error: function(result){
+                        var data = JSON.parse(result.responseText);
+                        return org.ui.alert(data.detail, function(){
+                            if(data.detail == '不能重复绑卡'){
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+                                window.location.href = next
+                            }
+                        });
                     },
                     complete: function () {
                         if(check.firstRecharge){

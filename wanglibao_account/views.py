@@ -52,7 +52,8 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, \
+    UserThreeOrder, ManualModifyPhoneRecord, SMSModifyPhoneRecord
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -70,8 +71,7 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
-from wanglibao_account.models import UserThreeOrder, ManualModifyPhoneRecord,SMSModifyPhoneRecord
-import requests
+# import requests
 from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 from wanglibao_pay.fee import WithdrawFee
@@ -2493,4 +2493,66 @@ class SMSModifyPhoneAPI(APIView):
             })
             return Response({'message':'ok'})
 
+
+class LoginCounterVerifyAPI(DecryptParmsAPIView):
+    """
+    登录次数验证,下面4个情况当天错误次数清零处理
+    1、重置登录密码
+    2、退出登录
+    3、当天6次机会内验证正确
+    4、第二天清零
+    """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+
+        # from django.db.models import F
+        from wanglibao_profile.models import WanglibaoUserProfile
+
+        now = timezone.now()
+        today_start = local_to_utc(now, 'min')
+        today_end = local_to_utc(now, 'max')
+        user = request.user
+        password = self.params.get('password').strip()
+
+        # 密码错误，请重新输入
+        # 错误大于6次, 密码错误频繁，为账户安全建议重置
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        failed_count = user_profile.login_failed_count
+
+        if failed_count > 6 and today_start < now <= today_end:
+            msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+        else:
+            if user.check_password(password):
+                user_profile.login_failed_count = 0
+                user_profile.login_failed_time = now
+                user_profile.save()
+                return Response({'ret_code': 0, 'message': 'ok'})
+            else:
+                msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
+
+                if today_start < now <= today_end:
+                    user_profile.login_failed_count = failed_count + 1
+                    user_profile.login_failed_time = now
+                else:
+                    user_profile.login_failed_count = 1
+                    user_profile.login_failed_time = now
+
+                user_profile.save()
+
+        return Response(msg)
+
+
+class MarginRecordsAPIView(APIView):
+    """
+    用户资金账户记录
+    """
+    permission_classes = (IsAuthenticated, )
+
+    @staticmethod
+    def post(request):
+        from wanglibao_margin.margin_record import margin_records
+        res = margin_records(request)
+        return Response(res)
 

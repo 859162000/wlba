@@ -8,6 +8,7 @@ class Announcement(models.Model):
     DEVICES = (
         ('pc', u'PC端'),
         ('mobile', u'手机端'),
+        ('pc&app', u'PC+APP')
     )
     TYPES = (
         ('homepage', u'首页'),
