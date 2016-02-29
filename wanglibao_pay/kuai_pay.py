@@ -1064,11 +1064,10 @@ class KuaiShortPay:
 
         return {"ret_code": 0, "message": "ok"}
 
-    def delete_bind_new(self, request, card, bank):
+    def delete_bind_new(self, user, card, bank):
         storable_no = card.no if len(card.no) == 10 else card.no[:6] + card.no[-4:]
 
-        return self.unbind_card(storable_no, card.bank.kuai_code,
-                request.user.id)
+        return self.unbind_card(storable_no, card.bank.kuai_code, user.id)
 
     @method_decorator(transaction.atomic)
     def _handle_third_pay_error(self, error, user_id, payinfo_id, order_id):
