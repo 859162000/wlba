@@ -13,13 +13,15 @@ html
     .i-mod-warp.i-generalize-banner
       .i-mod-center.i-generalize-layout
 
-    mixin items(model, phone, hover, have_download)
+    mixin items(model, phone, hover, have_mask, have_download, have_download2)
       .i-mod-warp(id=model).model-animate
         .i-mod-center.i-generalize-layout
           .generalize-phone-public(class=phone)
             div(class=hover)
+            if have_mask
+              .generalize-mask
           if have_download
-            .generalize-dec
+            .generalize-dec.generalize-dec-pub
               .generalize-explain
                 .generalize-explain-title-1.generalize-explain-title-pub
                   span.generalize-explain-icon-1
@@ -41,7 +43,20 @@ html
                 .generalize-explain-content-3.generalize-explain-content-pub(style='display:none') 三种维度，投资更方便<br>满足自己的才是最好的！
                 .generalize-explain-content-4.generalize-explain-content-pub(style='display:none') 随时查看资产，投资更放心<br>自己放心的才是最好的！
                 .generalize-explain-content-5.generalize-explain-content-pub(style='display:none') 更多好玩有趣的内容等你发现<br>愉悦自己的才是最好的！
+              .generalize-download
+                .generalize-download-layout
+                  .download-layout-erweima
+                  .download-layout-other
+                    .download-btn 扫一扫
+                    .download-dec 马上下载<br>网利宝APP
 
+          if have_download2
+            .generalize-dec.generalize-dec-other
+              .generalize-explain
+                .generalize-explain-title-5.generalize-explain-title-pub
+                  span.generalize-explain-icon-5
+                  span 发现惊喜
+                .generalize-explain-content-5.generalize-explain-content-pub 更多好玩有趣的内容等你发现<br>愉悦自己的才是最好的！
 
               .generalize-download
                 .generalize-download-layout
@@ -49,11 +64,11 @@ html
                   .download-layout-other
                     .download-btn 扫一扫
                     .download-dec 马上下载<br>网利宝APP
-    +items('i-generalize-model-1', 'generalize-phone_1', 'hover hover_1',  'download')
+    +items('i-generalize-model-1', 'generalize-phone_1', 'hover hover_1', 'have_mask', 'have_download')
     +items('i-generalize-model-2', 'generalize-phone_2', 'hover hover_2')
-    +items('i-generalize-model-3', 'generalize-phone_3', 'hover hover_3')
+    +items('i-generalize-model-3', 'generalize-phone_3', 'hover hover_3', 'have_mask')
     +items('i-generalize-model-4', 'generalize-phone_4', 'hover hover_4')
-    +items('i-generalize-model-5', 'generalize-phone_5', 'hover hover_5')
+    +items('i-generalize-model-5', 'generalize-phone_5', 'hover hover_5', '', '', 'havae')
 
     include global/g_footer
     script.

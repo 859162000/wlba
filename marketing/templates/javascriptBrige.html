@@ -68,8 +68,11 @@
 
              wlb.ready({
                  app: function(mixins){
+
                      $('webView').style.display = 'block';
-                        alert(111)
+
+                     mixins.firstLoadWebView({name: 'activity_test'})
+
                      $('login').onclick=function(){
                          mixins.loginApp({refresh:1})
                      }

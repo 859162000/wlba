@@ -20,7 +20,7 @@
 .generalize-phone-public
   position: absolute
   bottom: 0px
-  left: 30px
+  left: 130px
   width: 267px
   height: 488px
   .hover
@@ -56,7 +56,20 @@
   .generalize-phone_#{$i}
     background: url("/static/imgs/pc/generalize/iphone_banner_#{$i}.png") no-repeat center
 
-
+.generalize-mask
+  position: absolute
+  top: 66px
+  left: 18px
+  width: 230px
+  height: 411px
+  background: rgba(0,0,0,.5)
+  z-index: 1
+  opacity: 0
+  -webkit-transition: opacity 1s
+  transition: opacity 1s
+.active
+  .generalize-mask
+    opacity: 1
 .generalize-dec
   position: absolute
   right: 42px
@@ -71,7 +84,7 @@
       display: inline-block
       vertical-align: middle
       zoom: 1
-    @for $i from 1 through 5
+    @for $i from 1 through 6
       .generalize-explain-icon-#{$i}
         display: inline-block
         width: 57px
@@ -89,7 +102,7 @@
     color: #bb5800
 
   .generalize-download
-    width: 370px
+    width: 360px
     background: #fff
     padding: 5px
 
@@ -107,7 +120,8 @@
       float: left
       color: #666
       font-size: 22px
-      margin-left: 25px
+      margin-left: 15px
+      margin-top: 15px
     .download-btn
       border: 1px solid #ececec
       background: url("/static/imgs/pc/generalize/download_icon.png") no-repeat left center
@@ -150,6 +164,7 @@
 .active
   .hover
     opacity: 1
+    z-index: 2
   .hover_1
     @extend .zoomIn
     @extend .animated
