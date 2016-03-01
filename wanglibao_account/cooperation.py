@@ -296,17 +296,21 @@ class CoopRegister(object):
 
     def save_to_oauthuser(self, user):
         client_id = self.channel_client_id
+        logger.info("user[%s] enter save_to_oauthuser with client_id[%s]" % (user.id, client_id))
         if client_id:
             try:
-                client = Client.objects.get(client_id=client_id)
-                oauth_user = OauthUser()
-                oauth_user.user = user
-                oauth_user.client = client
-                oauth_user.save()
-            except Client.DoesNotExist:
-                logger.info("user[%s] save to oauthuser failed with invalid client_id [%s]" % (user.id, client_id))
+                channel_data_dispatch_url = ''
+                data = {
+                    'user_id': user.id,
+                    'client_id': client_id,
+                    'sign': '',
+                    'time': '',
+                }
+                res = requests.post(url=channel_data_dispatch_url, data=data)
             except Exception, e:
-                logger.info("user[%s] client[%s] save to oauthuser failed with error: %s" % (user.id, client_id, e))
+                logger.info("user[%s] save to oauthuser failed with error: %s" % (user.id, e))
+            else:
+                logger.info("user[%s] save to oauthuser response result: %s" % (user.id, res.text))
 
     def register_call_back(self, user):
         """
@@ -1678,18 +1682,35 @@ class BaJinSheRegister(CoopRegister):
                 order.save()
 
     def register_call_back(self, user):
-        push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
-        coop_id = settings.BAJINSHE_COOP_ID
-        coop_key = settings.BAJINSHE_COOP_KEY
-        order_id = '%s_0001' % timezone.now().strftime("%Y%m%d%H%M%S")
-        access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
-        bid = get_tid_for_coop(user.id)
-        phone = get_phone_for_coop(user.id)
-        if access_token and bid:
-            tran = {
-                'bingdingUid': bid,
-                'usn': phone,
-            }
+        client_id = self.channel_client_id
+        logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
+        if client_id:
+            try:
+                channel_data_dispatch_url = ''
+                data = {
+                    'user_id': user.id,
+                    'client_id': client_id,
+                    'sign': '',
+                    'time': '',
+                }
+                res = requests.post(url=channel_data_dispatch_url, data=data)
+            except Exception, e:
+                logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
+            else:
+                logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
+
+        # push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
+        # coop_id = settings.BAJINSHE_COOP_ID
+        # coop_key = settings.BAJINSHE_COOP_KEY
+        # order_id = '%s_0001' % timezone.now().strftime("%Y%m%d%H%M%S")
+        # access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
+        # bid = get_tid_for_coop(user.id)
+        # phone = get_phone_for_coop(user.id)
+        # if access_token and bid:
+        #     tran = {
+        #         'bingdingUid': bid,
+        #         'usn': phone,
+        #     }
 
     def purchase_call_back(self, user, order_id):
         self.bajinshe_call_back(user, order_id)
