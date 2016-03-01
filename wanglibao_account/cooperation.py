@@ -1667,6 +1667,10 @@ class BaJinSheRegister(CoopRegister):
                 binding.save()
                 # logger.debug('save user %s to binding'%user)
 
+    def generate_sign(self, channel, _time, key):
+        sign = hashlib.md5(channel + key + _time).hexdigest()
+        return sign
+
     def bajinshe_call_back(self, user, order_id):
         channel_order_id = self.channel_order_id
         oauth2_client_id = self.oauth2_client_id
@@ -1687,11 +1691,16 @@ class BaJinSheRegister(CoopRegister):
         if client_id:
             try:
                 channel_data_dispatch_url = ''
+                channel = 'base'
+                time = ''
+                key = ''
                 data = {
                     'user_id': user.id,
                     'client_id': client_id,
-                    'sign': '',
-                    'time': '',
+                    'sign': self.generate_sign(channel, time, key),
+                    'time': time,
+                    'act': 'register',
+                    'channel': channel,
                 }
                 res = requests.post(url=channel_data_dispatch_url, data=data)
             except Exception, e:
