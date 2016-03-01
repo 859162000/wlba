@@ -20,7 +20,7 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
         $('.generalize-explain-title-'+ ele_id).fadeIn().siblings('.generalize-explain-title-pub').hide()
         $('.generalize-explain-content-'+ ele_id).fadeIn().siblings('.generalize-explain-content-pub').hide()
     }, {
-      offset: -60
+      offset: -90
     })
 
 
