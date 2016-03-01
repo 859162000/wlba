@@ -3,11 +3,13 @@
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
-from django.core.paginator import Paginator
-from django.core.paginator import PageNotAnInteger
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from wanglibao_announcement.models import Announcement
 from django.utils import timezone
 import re
+import json
 
 
 class AnnouncementHomeView(TemplateView):
@@ -80,3 +82,52 @@ class AnnouncementPreviewView(TemplateView):
         })
 
         return context
+
+
+class AnnouncementHomeApi(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        req_data = request.GET
+        device_type = req_data.get('device_type')
+        page = int(req_data.get('page', 1))
+        page_size = int(req_data.get('page_size', 10))
+
+        announcements = Announcement.objects.filter(Q(status=1, hideinlist=False,) & (Q(device=device_type) | Q(device='pc&app'))
+                                                    ).order_by('-createtime').values('id', 'title',
+                                                                                     'content', 'createtime')
+        if announcements:
+            announcements_list = []
+            announcements_list.extend(announcements)
+
+            paginator = Paginator(announcements_list, page_size)
+            try:
+                announcements_list = paginator.page(page)
+            except PageNotAnInteger:
+                announcements_list = paginator.page(1)
+            except EmptyPage:
+                announcements_list = []
+            except Exception:
+                announcements_list = paginator.page(paginator.num_pages)
+
+            count = paginator.num_pages
+        else:
+            announcements_list = []
+            count = 0
+
+        announcements_list = [announce for announce in announcements_list]
+        return Response({'ret_code': 0, 'data': announcements_list, 'page': page, 'num': page_size, 'count': count})
+
+
+class AnnouncementHasNewestApi(APIView):
+    permission_classes = ()
+
+    def get(self, request, id):
+        req_data = request.GET
+        device_type = req_data.get('device_type')
+        announcements = Announcement.objects.filter(Q(pk__gt=id, status=1, hideinlist=False, device=device_type) |
+                                                    Q(pk__gt=id, status=1, hideinlist=False, device='pc&app'))
+
+        result = 1 if announcements.exists() else 0
+
+        return Response({'ret_code': 0, 'result': result})
