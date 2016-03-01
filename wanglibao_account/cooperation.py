@@ -1688,6 +1688,7 @@ class BaJinSheRegister(CoopRegister):
     def register_call_back(self, user):
         client_id = self.channel_client_id
         logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
+        # FixMe, 是否需要异步同步数据到渠道中心，如果异步，数据在队列中延迟，而用户执行了其他操作的时候，渠道中心将无法找到用户匹配数据
         if client_id:
             try:
                 channel_data_dispatch_url = ''
@@ -1701,6 +1702,8 @@ class BaJinSheRegister(CoopRegister):
                     'time': time,
                     'act': 'register',
                     'channel': channel,
+                    'phone': '',
+                    'btype': self.channel_code,
                 }
                 res = requests.post(url=channel_data_dispatch_url, data=data)
             except Exception, e:
