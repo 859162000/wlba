@@ -1710,7 +1710,7 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         order_id = request.POST.get('order_id')
-        if not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
+        if order_id and not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
             json_to_response = {
                 'code': 1001,
                 'message': u'Order和User不匹配'
