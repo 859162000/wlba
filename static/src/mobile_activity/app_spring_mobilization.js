@@ -83,7 +83,7 @@
 		})
 	})
 
-    var time_count = 3;
+        var time_count = 3;
         /*倒数秒数*/
         var time_intervalId;
         /*定义倒计时的名字*/
