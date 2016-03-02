@@ -49,8 +49,7 @@ def sendYesterdayTopRankAward():
         users = User.objects.filter(id__in=uids).all()
         now_date = datetime.date.today()
         for index, rank in enumerate(top_ranks):
-            award_key = str(index)
-            redpack_event_id = rank_awards[award_key]
+            redpack_event_id = rank_awards[index]
             redpack_event = RedPackEvent.objects.filter(id=int(redpack_event_id)).first()
             if not redpack_event:
                 logger.error('排名奖励，第%s名的奖励配置的id为%s的红包不存在,导致该排名的用户%s没有得到'%(index+1, redpack_event_id, rank['user']))

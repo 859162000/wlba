@@ -56,10 +56,65 @@
             }
         })
 
-        $('.card_box').click(function(){
-            $(this).find('.card_box_main').addClass('card_box_open');
-        })
+        var time_count = 3;
+        /*倒数秒数*/
+        var time_intervalId;
+        /*定义倒计时的名字*/
 
+        var timerFunction = function () {
+        /*定义倒计时内容*/
+            if (time_count > 1) {
+                time_count--;
+                return $('.popup_box').show();
+            } else {
+                clearInterval(time_intervalId);
+                /*清除倒计时*/
+                $('.popup_box').hide();
+                /*解锁按钮，可以点击*/
+            }
+        };
+
+        /*翻牌*/
+        $('.card_box').click(function(){
+            if(h5_user_static){
+                $(this).find('.card_box_main').addClass('card_box_open');
+                $('.popup_box').show();
+
+
+                time_count = 3;
+                time_intervalId = setInterval(timerFunction, 1000);
+                time_intervalId;
+
+
+            }else{
+                window.location.href = '/accounts/login/?next=/weixin_activity/march_reward/'
+            }
+
+        });
+        /*翻牌结束*/
+
+
+        /*翻牌抽奖*/
+        $.ajax({
+            url: '/api/march_reward/fetch/',
+            type: 'post',
+            success: function (data1) {
+
+            },error: function(data1){
+
+            }
+        })
+        /*翻牌抽奖结束*/
+
+        /*立即投资*/
+        $('.button').click(function(){
+            if(h5_user_static){
+                window.location.href = '/p2p/list/'
+            }else{
+                window.location.href = '/accounts/login/?next=/p2p/list/'
+            }
+        })
+        /*立即投资结束*/
 
     })
 

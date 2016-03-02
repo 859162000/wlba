@@ -4,7 +4,7 @@ html(style="background: #91ce00")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2016022601", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2016030101", rel="stylesheet")
         - csrf_token
     body
         .body_wrap.clear
@@ -103,10 +103,46 @@ html(style="background: #91ce00")
             .ranking_wrap
                 .ranking_main
                     .ranking_main_1
-                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__1.png')
-                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__2.png')
-                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__3.png')
-                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__4.png')
+                        .ranking_box.ranking_box_1
+                            .coupon
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                .coupon_text 2%加息券
+                            .coupon_box
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img1.png')
+                                .coupon_box_text 2%加息券
+                            .ranking_no
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img1.png')
+                                .ranking_no_text 第1名
+                        .ranking_box.ranking_box_2
+                            .coupon
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                .coupon_text 1.6%加息券
+                            .coupon_box
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img2.png')
+                                .coupon_box_text 1.6%加息券
+                            .ranking_no
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img2.png')
+                                .ranking_no_text 第2~3名
+                        .ranking_box.ranking_box_3
+                            .coupon
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                .coupon_text 1.2%加息券
+                            .coupon_box
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img3.png')
+                                .coupon_box_text 1.2%加息券
+                            .ranking_no
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img3.png')
+                                .ranking_no_text 第4~6名
+                        .ranking_box.ranking_box_4
+                            .coupon
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                .coupon_text 1%加息券
+                            .coupon_box
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img4.png')
+                                .coupon_box_text 1%加息券
+                            .ranking_no
+                                img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img4.png')
+                                .ranking_no_text 第7~10名
                     .ranking_main_2
                         .list_wrap
                             .list_main
@@ -118,66 +154,37 @@ html(style="background: #91ce00")
                                             th.two 投资金额
                                             th.three 获得福利
                                     tbody
-                                        tr.first
-                                            td.one
-                                                span.ico
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr.second
-                                            td.one
-                                                span.ico
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr.third
-                                            td.one
-                                                span.ico
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.num 4
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.num 5
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.num 6
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.num 7
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.num 8
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.num 9
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.num 10
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
+                                        ranks = enumerate(top_ranks)
+                                        for idx, rank in ranks
+                                            idx = int(idx + 1)
+                                            if idx == 1
+                                                tr.first
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
+                                            if idx == 2
+                                                tr.second
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
+                                            if idx == 3
+                                                tr.third
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
+                                            if idx > 3
+                                                tr
+                                                    td.one
+                                                        span.ico {{idx}}
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
                                 .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名
             .button.button_3
                 img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
@@ -198,13 +205,20 @@ html(style="background: #91ce00")
                 dl
                     dt 5、
                     dd 活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                dl(style="display:none")#ios-show
+                    dt 6.
+                    dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+                  p.small 网利宝对此活动享有最终解释权。
+            .popup_box
+                .main
+                    .text 您还没有测试机会，赶紧去投资吧
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2016022601")
-        //script.
-        //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
-        //        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
-        //        ios = ipad || iphone;
-        //    if (ios) {
-        //        document.getElementById('ios-show').style.display = 'block';
-        //    }
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2016030201")
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
