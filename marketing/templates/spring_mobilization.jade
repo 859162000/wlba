@@ -114,66 +114,37 @@ html
                                             th.two 投资金额
                                             th.three 获得福利
                                     tbody
-                                        tr.first
-                                            td.one
-                                                span.ico
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr.second
-                                            td.one
-                                                span.ico
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr.third
-                                            td.one
-                                                span.ico
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.ico 4
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.ico 5
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.ico 6
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.ico 7
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.ico 8
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.ico 9
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
-                                        tr
-                                            td.one
-                                                span.ico 10
-                                                span.phone 139 XXXX 2453
-                                            td.two 25,000 元
-                                            td.three 2%加息券
+                                        ranks = enumerate(top_ranks)
+                                        for idx, rank in ranks
+                                            idx = int(idx + 1)
+                                            if idx == 1
+                                                tr.first
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
+                                            if idx == 2
+                                                tr.second
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
+                                            if idx == 3
+                                                tr.third
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
+                                            if idx > 3
+                                                tr
+                                                    td.one
+                                                        span.ico {{idx}}
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}} 加息劵
                                 .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名
                         .button.button_3 立即投资
                         .grass.grass_6

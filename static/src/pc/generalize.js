@@ -51,19 +51,19 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
             return $('.model-animate').removeClass('active');
         }else if(690 <= scroll && scroll < 1037){
             MODEL_INDEX = 1
-            console.log(1, scroll)
+            //console.log(1, scroll)
         }else if(1400 <= scroll && scroll < 1744){
             MODEL_INDEX = 2
-            console.log(2, scroll)
+            //console.log(2, scroll)
         }else if(2100 <= scroll && scroll < 2455){
             MODEL_INDEX = 3
-            console.log(3, scroll)
+            //console.log(3, scroll)
         }else if(2807 <= scroll && scroll < 3167){
             MODEL_INDEX = 4
-            console.log(4, scroll)
+            //console.log(4, scroll)
         }else if(3526 <= scroll && scroll < 3800){
             MODEL_INDEX = 5
-            console.log(5, scroll)
+            //console.log(5, scroll)
         }
         //alert(MODEL_INDEX)
         $('.generalize-explain-title-'+ MODEL_INDEX).show().siblings('.generalize-explain-title-pub').hide();

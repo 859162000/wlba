@@ -9,7 +9,7 @@ var org = (function () {
                 type: options.type,
                 data: options.data,
                 dataType: options.dataType,
-                async: options.async,
+                async: options.async || true,
                 beforeSend: function (xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
