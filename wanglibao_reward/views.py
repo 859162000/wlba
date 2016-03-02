@@ -2591,7 +2591,7 @@ class Lantern_FetchRewardAPI(APIView):
         "user_type":"phone"
         })
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
-
+from decimal import Decimal
 class MarchAwardTemplate(TemplateView):
     """
     三月活动
@@ -2613,7 +2613,12 @@ class MarchAwardTemplate(TemplateView):
         else:
             ranks = []
             chances = 0
-        
+        ranks = [{'phone': u'12281719233', 'amount__sum': Decimal('88977701.00'), 'user': 71660L}, {'phone': u'13700000001', 'amount__sum': Decimal('15000300.00'), 'user': 100L}, {'phone': u'18910505634', 'amount__sum': Decimal('14740651.00'), 'user': 38L}, {'phone': u'12312311190', 'amount__sum': Decimal('13995800.00'), 'user': 71326L}, {'phone': u'12400000042', 'amount__sum': Decimal('10000000.00'), 'user': 206L}, {'phone': u'tester', 'amount__sum': Decimal('9916821.00'), 'user': 22L}, {'phone': u'12400000199', 'amount__sum': Decimal('8000000.00'), 'user': 390L}, {'phone': u'12400000024', 'amount__sum': Decimal('4997100.00'), 'user': 197L}, {'phone': u'12400001161', 'amount__sum': Decimal('4501100.00'), 'user': 543L}, {'phone': u'12312312341', 'amount__sum': Decimal('4152300.00'), 'user': 439L}]
+        for rank in ranks:
+            rank['amount__sum'] = float(rank['amount__sum'])
+            rank['coupon'] = 1.6
+        print ranks
+
         return {
            "chances": chances,
            "top_ranks":ranks
