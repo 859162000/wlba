@@ -97,25 +97,26 @@ class AnnouncementHomeApi(APIView):
                                                     ).order_by('-createtime').values('id', 'title',
                                                                                      'content', 'createtime')
         if announcements:
-            announcements_list = []
-            announcements_list.extend(announcements)
-
-            paginator = Paginator(announcements_list, page_size)
+            paginator = Paginator(announcements, page_size)
             try:
-                announcements_list = paginator.page(page)
+                announcements = paginator.page(page)
             except PageNotAnInteger:
-                announcements_list = paginator.page(1)
+                announcements = paginator.page(1)
             except EmptyPage:
-                announcements_list = []
+                announcements = []
             except Exception:
-                announcements_list = paginator.page(paginator.num_pages)
+                announcements = paginator.page(paginator.num_pages)
 
             count = paginator.num_pages
         else:
-            announcements_list = []
+            announcements = []
             count = 0
 
-        announcements_list = [announce for announce in announcements_list]
+        announcements_list = []
+        for announce in announcements:
+            announce["createtime"] = timezone.localtime(announce["createtime"]).strftime('%Y-%m-%d')
+            announcements_list.append(announce)
+
         return Response({'ret_code': 0, 'data': announcements_list, 'page': page, 'num': page_size, 'count': count})
 
 
