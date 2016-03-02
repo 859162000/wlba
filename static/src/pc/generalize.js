@@ -49,19 +49,19 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
         //alert(scroll)
         if(scroll < 690){
             return $('.model-animate').removeClass('active');
-        }else if(690 < scroll && scroll < 1400){
+        }else if(690 <= scroll && scroll < 1037){
             MODEL_INDEX = 1
             //console.log(1, scroll)
-        }else if(1400 < scroll && scroll < 2100){
+        }else if(1400 <= scroll && scroll < 1744){
             MODEL_INDEX = 2
             //console.log(2, scroll)
-        }else if(2100 < scroll && scroll < 2807){
+        }else if(2100 <= scroll && scroll < 2455){
             MODEL_INDEX = 3
             //console.log(3, scroll)
-        }else if(2807 < scroll && scroll < 3526){
+        }else if(2807 <= scroll && scroll < 3167){
             MODEL_INDEX = 4
-           // console.log(4, scroll)
-        }else if(3526 < scroll && scroll < 3800){
+            //console.log(4, scroll)
+        }else if(3526 <= scroll && scroll < 3800){
             MODEL_INDEX = 5
             //console.log(5, scroll)
         }
