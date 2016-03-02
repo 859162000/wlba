@@ -73,20 +73,10 @@ import uuid
 import urllib
 from .utils import xunleivip_generate_sign
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
-from wanglibao_oauth2.models import OauthUser, Client
 import json
-from wanglibao_oauth2.tools import get_current_utc_timestamp
+from wanglibao_rest.utils import get_current_utc_timestamp
 
 logger = logging.getLogger('wanglibao_cooperation')
-
-
-def get_client(channel_code):
-    try:
-        client = Client.objects.get(channel__code=channel_code)
-    except Client.DoesNotExist:
-        client = None
-
-    return client
 
 
 def get_uid_for_coop(user_id):
@@ -1763,44 +1753,45 @@ class RenRenLiRegister(CoopRegister):
             # logger.debug('save user %s to binding'%user)
 
     def purchase_call_back(self, user, order_id):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
-            p2p_record = P2PRecord.objects.filter(user_id=user.id,
-                                                  order_id=order_id,
-                                                  catalog=u'申购').select_related('product').first()
-
-            channel_code = binding.btype
-            client = get_client(channel_code)
-            if not client:
-                logger.info("%s purchase call back failed with wrong not found client" % channel_code)
-                return
-
-            if p2p_record:
-                user_profile = WanglibaoUserProfile.objects.filter(user_id=user.id).first()
-                phone = user_profile.phone if user_profile else ''
-                data = {
-                    'User_name': phone,
-                    'Order_no': order_id,
-                    'Pro_name': p2p_record.product.name,
-                    'Pro_id': p2p_record.product.id,
-                    'Invest_money': float(p2p_record.amount),
-                    'Rate': p2p_record.product.expected_earning_rate,
-                    'Invest_start_date': int(time.mktime(p2p_record.create_time.timetuple())),
-                    'Invest_end_date': int(time.mktime(p2p_record.product.end_time.timetuple())),
-                    # 'Back_money': '',
-                    # 'Back_last_date': '',
-                    'Cust_key': binding.bid,
-                }
-
-                params = {
-                    'Data': json.dumps([data]),
-                    'Cust_id': client.client_id,
-                    'Sign_type': 'MD5',
-                    'Sign': hashlib.md5(self.coop_id+self.coop_key+client.client_id+client.client_secret).hexdigest(),
-                }
-
-                common_callback_for_post.apply_async(
-                    kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+        pass
+        # binding = Binding.objects.filter(user_id=user.id).first()
+        # if binding:
+        #     p2p_record = P2PRecord.objects.filter(user_id=user.id,
+        #                                           order_id=order_id,
+        #                                           catalog=u'申购').select_related('product').first()
+        #
+        #     channel_code = binding.btype
+        #     client = get_client(channel_code)
+        #     if not client:
+        #         logger.info("%s purchase call back failed with wrong not found client" % channel_code)
+        #         return
+        #
+        #     if p2p_record:
+        #         user_profile = WanglibaoUserProfile.objects.filter(user_id=user.id).first()
+        #         phone = user_profile.phone if user_profile else ''
+        #         data = {
+        #             'User_name': phone,
+        #             'Order_no': order_id,
+        #             'Pro_name': p2p_record.product.name,
+        #             'Pro_id': p2p_record.product.id,
+        #             'Invest_money': float(p2p_record.amount),
+        #             'Rate': p2p_record.product.expected_earning_rate,
+        #             'Invest_start_date': int(time.mktime(p2p_record.create_time.timetuple())),
+        #             'Invest_end_date': int(time.mktime(p2p_record.product.end_time.timetuple())),
+        #             # 'Back_money': '',
+        #             # 'Back_last_date': '',
+        #             'Cust_key': binding.bid,
+        #         }
+        #
+        #         params = {
+        #             'Data': json.dumps([data]),
+        #             'Cust_id': client.client_id,
+        #             'Sign_type': 'MD5',
+        #             'Sign': hashlib.md5(self.coop_id+self.coop_key+client.client_id+client.client_secret).hexdigest(),
+        #         }
+        #
+        #         common_callback_for_post.apply_async(
+        #             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
 # 注册第三方通道
