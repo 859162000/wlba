@@ -29,9 +29,14 @@ html
     if user.wanglibaouserprofile.id_is_valid
       if not is_one
         .bank-add-btn
-          a(href="/weixin/regist/second/")
-            span.btn-icon +
-            span.btn-click 添加银行卡
+          if recharge
+            a(href="/weixin/regist/second/?next=/weixin/account/bankcard/")
+              span.btn-icon +
+              span.btn-click 添加银行卡
+          else
+            a(href="/weixin/regist/second/")
+              span.btn-icon +
+              span.btn-click 添加银行卡
     else
       .no-authentication-sign 绑定银行卡要先通过实名认证哦
           a(href="/weixin/regist/first/").authentication-sign-btn 去实名认证
@@ -52,4 +57,4 @@ html
           .sign-operation
             .bank-cancel 取消
             button(type='submit').bank-confirm 立即绑定
-    script(data-init='bankOneCard', src="/static/scripts/mobile/mobile.js?v=201512072")
+    script(data-init='bankOneCard', src="/static/scripts/mobile/dist/mobile.js?v=20160302")

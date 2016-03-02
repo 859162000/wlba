@@ -33,7 +33,7 @@ html
           .value-input-main
             .value-input-body
               .value-input-name 充值金额
-              input(placeholder="请输入100的整数金额", type="tel", id="phone", name="amount").recharge-input
+              input(placeholder="该银行单笔限额5万元", type="tel", id="phone", name="amount").recharge-input
               input(type="hidden", name="maxamount", value="200000")
 
           .value-submit
@@ -57,7 +57,10 @@ html
           p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
           p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
           p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
-        a(href="/weixin/regist/second/").authentication-sign-btn 立即去绑卡
+        if recharge
+          a(href="/weixin/regist/second/?next=/weixin/recharge/").authentication-sign-btn 立即去绑卡
+        else
+          a(href="/weixin/regist/second/").authentication-sign-btn 立即去绑卡
 
     else
       .no-authentication-sign 为保证您的资金安全，请先进行实名认证
@@ -73,6 +76,6 @@ html
     section.recharge-bank
     include include/tran_password
     include include/confirm
-    script(data-init="recharge", src="/static/scripts/mobile/mobile.js?v=20151120")
+    script(data-init="recharge", src="/static/scripts/mobile/dist/mobile.js?v=20160302")
 
 

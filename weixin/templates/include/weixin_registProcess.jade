@@ -8,8 +8,9 @@
   if processnum == '1'
     img(src='/static/imgs/mobile/process/first.png')
     .regist-process-dec 完成实名认证，即可获得20元红包
-  if processnum == '2'
-    img(src='/static/imgs/mobile/process/second.png')
-    .regist-process-dec 首次充值成功，即可获得100元红包
+  if not recharge
+    if processnum == '2'
+      img(src='/static/imgs/mobile/process/second.png')
+      .regist-process-dec 首次充值成功，即可获得100元红包
   if processnum == '3'
     img(src='/static/imgs/mobile/process/three.png')

@@ -9,7 +9,7 @@ var org = (function () {
                 type: options.type,
                 data: options.data,
                 dataType: options.dataType,
-                async: options.async,
+                async: options.async || true,
                 beforeSend: function (xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -1197,7 +1197,7 @@ org.recharge = (function (org) {
             _self.$load.hide();
             _self.$recharge_body.show();
             _self.data = data;
-
+            _self.$amount.attr('placeholder', '该银行单笔限额' + data.bank.bank_limit.second_one/10000+'万元')
             _self.$card_no.val(card);
             _self.$bank_name.text(data.bank.name);
             lib._rechargeThe_one_card();
@@ -1780,6 +1780,13 @@ org.processSecond = (function (org) {
                         return
                     }
                 };
+                var money = function(){
+                    if(_self.$money.length == 0){
+                        return 0.01
+                    }else{
+                        return _self.$money.val()
+                    }
+                }
                 org.ajax({
                     type: 'POST',
                     url: '/api/pay/deposit_new/',
@@ -1787,7 +1794,7 @@ org.processSecond = (function (org) {
                         card_no: _self.$bankcard.val(),
                         gate_id: _self.$bank.val(),
                         phone: _self.$bankphone.val(),
-                        amount: _self.$money.val(),
+                        amount: money(),
 
                     },
                     success: function (data) {
@@ -1814,11 +1821,16 @@ org.processSecond = (function (org) {
             var _self = this;
 
             _self.$submit.on('click', function () {
-                org.ui.confirm("充值金额为" + _self.$money.val(), '确认充值', recharge);
+                var check_recharge = $(this).attr('data-recharge')
+                if(check_recharge == 'true'){
+                    org.ui.confirm("充值金额为" + _self.$money.val(), '确认充值', recharge, {firstRecharge: true});
+                }else{
+                    recharge({firstRecharge: false})
+                }
 
             });
 
-            function recharge() {
+            function recharge(check) {
                 org.ajax({
                     type: 'POST',
                     url: '/api/pay/cnp/dynnum_new/',
@@ -1830,17 +1842,47 @@ org.processSecond = (function (org) {
                         set_the_one_card: true
                     },
                     beforeSend: function () {
-                        _self.$submit.attr('disabled', 'disabled').text('充值中...');
+                        if(check.firstRecharge){
+                            _self.$submit.attr('disabled', 'disabled').text('充值中...');
+                        }else{
+                            _self.$submit.attr('disabled', 'disabled').text('绑卡中...');
+                        }
+
                     },
                     success: function (data) {
                         if (data.ret_code > 0) {
                             return org.ui.alert(data.message);
                         } else {
-                            $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
+                            if(check.firstRecharge){
+                                $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
+                            }else{
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+
+                                return org.ui.alert('绑卡成功！',function(){
+                                    window.location.href = next
+                                });
+                            }
+
                         }
                     },
+                    error: function(result){
+                        var data = JSON.parse(result.responseText);
+                        return org.ui.alert(data.detail, function(){
+                            if(data.detail == '不能重复绑卡'){
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+                                window.location.href = next
+                            }
+                        });
+                    },
                     complete: function () {
-                        _self.$submit.removeAttr('disabled').text('绑卡并充值');
+                        if(check.firstRecharge){
+                            _self.$submit.removeAttr('disabled').text('绑卡并充值');
+                        }else{
+                            _self.$submit.removeAttr('disabled').text('立即绑卡');
+                        }
+
                     }
                 })
             }
