@@ -11,7 +11,9 @@ from experience_gold.backends import SendExperienceGold
 from django.db import transaction
 from django.db import IntegrityError
 from django.db.models import Sum
-from datetime import datetime
+from wanglibao_sms.tasks import send_messages
+# from datetime import datetime
+import datetime
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 import inspect
@@ -26,7 +28,7 @@ from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao import settings
-from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder, ActivityRewardRecord
+from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder, ActivityRewardRecord, WechatPhoneRewardRecord, P2pOrderRewardRecord
 from wanglibao_redpack.models import RedPackEvent
 from experience_gold.models import ExperienceEvent
 from wanglibao_activity.models import Activity, ActivityRule
@@ -47,7 +49,15 @@ from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, getTodayTop10Ranks
+from weixin.models import WeixinAccounts
+from wechatpy.oauth import WeChatOAuth
+from wechatpy.exceptions import  WeChatException
+from wanglibao.templatetags.formatters import convert_to_10k
+from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
+from wanglibao_redis.backend import redis_backend
 logger = logging.getLogger('wanglibao_reward')
 
 class WeixinShareDetailView(TemplateView):
@@ -849,6 +859,7 @@ class RewardDistributer(object):
         self.kwargs = kwargs
         self.Processor = {
             ThanksGivenRewardDistributer: ('all',),
+            XingMeiRewardDistributer: ('all',),
         }
 
     @property
@@ -867,6 +878,92 @@ class RewardDistributer(object):
     def processor_for_distribute(self):
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
+
+class XingMeiRewardDistributer(RewardDistributer):
+    def __init__(self, request, kwargs):
+        super(XingMeiRewardDistributer, self).__init__(request, kwargs)
+        self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
+        self.user = kwargs['user']
+        self.token = 'xm2'
+
+    @property
+    def is_valid(self):
+        """
+           用来标示次活动是否继续启用, 配合MISC使用, 如果不使用，
+           只要将self.token对应的值从misc.activities中去掉即可
+        """
+        key = 'activities'
+        activities = Misc.objects.filter(key=key).first()
+        if activities:
+            activities = json.loads(activities.value)
+            if type(activities) == dict:
+                activities = activities.get('valid_activity', '')
+        logger.debug("activitys:%s, token:%s" % (activities, self.token))
+        return True if activities.find(self.token)>=0 else False
+
+
+    def distribute(self):
+        if not self.is_valid:
+            return
+
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    xm2 = activity['xm2']
+                    p2p_amount = xm2['p2p_amount']
+                    tickets = xm2["ticket_amount"]
+                    start_time = xm2["start_time"]
+                    end_time = xm2["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+
+        # 1: 如果票数到600，直接跳出
+        counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+        if counts > tickets:
+            logger.debug(u'票已经发完了, %s' % (counts))
+            #return
+
+        # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            logger.debug(u"start_time:%s, end_time:%s, now:%s" % (start_time, end_time, now))
+            return
+
+        # 4: 如果投资额度不够，直接跳出
+        if self.amount < p2p_amount:
+            logger.debug(u"投资额:%s, 发奖门槛:%s" % (self.amount, p2p_amount))
+            return
+
+        #5: 如果已经给用户发过领奖机会,不要重复发
+        _reward = WanglibaoActivityReward.objects.filter(user=self.user, activity='xm2').first()
+        if _reward:
+            logger.debug('发奖机会已经给用户下发了,不可重复下发, user:%s' % self.user)
+            return
+
+        try:
+            activity_reward = WanglibaoActivityReward.objects.create(
+                    activity='xm2',
+                    order_id=self.order_id,
+                    user=self.user,
+                    p2p_amount=self.amount,
+                    reward=None,
+                    has_sent=False, #当用户领奖后,变成True, reward填上相应的奖品
+                    left_times=1,
+                    join_times=1,
+            )
+        except Exception, reason:
+            logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
+            raise Exception(u"生成获奖记录异常")
 
 
 class ThanksGivenRewardDistributer(RewardDistributer):
@@ -942,7 +1039,29 @@ class DistributeRewardAPIView(APIView):
 
     def __init__(self):
         super(DistributeRewardAPIView, self).__init__()
-        self.processors = [ThanksGivingDistribute, ]
+        self.processors = [ThanksGivingDistribute, XingMeiDistribute, XunleiDistribute]
+
+    def get(self, request):
+        self.action = request.GET.get('action', '')
+        self.activity = request.GET.get('activity', '')
+        run = None
+        for processor in self.processors:
+            if processor().token == self.activity:
+                run = True
+                break
+
+        if run:
+            if self.action == 'chances':
+                return processor().get_chances(request)
+            if self.action == 'generate':
+                return processor().generate_rewards(request)
+        else:
+            json_to_response = {
+                'ret_code': 3000,
+                'message': u'接口还没有实现，请联系相应后端同学'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type="application/json")
 
     def post(self, request):
         self.activity = request.DATA.get('activity', '')
@@ -972,6 +1091,282 @@ class ActivityRewardDistribute(object):
         """抽奖接口，必须被实现
         """
         raise NotImplementedError(u"抽象类中的方法，子类中需要被实现")
+
+
+class XunleiDistribute(ActivityRewardDistribute):
+    def __init__(self):
+        super(XunleiDistribute, self).__init__()
+        self.token = 'xunlei'
+        self.channels = ('xunlei9', 'mxunlei')
+
+    def get_chances(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        counts = WanglibaoActivityReward.objects.filter(activity=self.token, user=request.user, has_sent=0).count()
+        json_to_response = {
+            'ret_code': 0,
+            'count': counts,
+            'message': u'获得用户的翻拍机会'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+    def judge_valid_user(self, request, channels):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if channels:  # channel为空,表示不需要判断用户渠道号
+            Introducedby = IntroducedBy.objects.filter(user_id=request.user.id).first()
+            if not (Introducedby and Introducedby.channel and Introducedby.channel.name in channels):
+                json_to_response = {
+                    'ret_code': 1001,
+                    'message': u'用户不是来自合法的渠道'
+                }
+                return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        return True, None
+
+    def generate_rewards(self, request):
+        status, response_msg = self.judge_valid_user(request, self.channels)
+        if False==status:
+            return response_msg
+        else:
+            self.generate(request)
+            return self.get_chances(request)
+
+    def generate(self, request):
+        #  判断有没有生成抽奖记录
+        counts = WanglibaoActivityReward.objects.filter(user=request.user, activity=self.token).count()
+        if counts > 0:
+            return
+        experience_rate = {
+            1588: ('xunlei_experience_1588', 0, 4, 9),
+            1888: ('xunlei_experience_1888', 3, 8),
+            2588: ('xunlei_experience_2588', 2, 7),
+            3588: ('xunlei_experience_3588', 1, 6),
+            5888: ('xunlei_experience_5888', 5, ),
+        }
+        event_rate = {
+            1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
+            1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+        }
+        p2p_record = P2PRecord.objects.filter(user=request.user).first()
+        if not p2p_record:  # 新用户
+            no_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
+            for unused in xrange(3):
+                if no_reward == unused:
+                    WanglibaoActivityReward.objects.create(
+                            user=request.user,
+                            reward=None,
+                            redpack_event=None,
+                            experience=None,
+                            activity=self.token,
+                            has_sent=0,)
+                    continue
+
+                counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(experience=None).count()
+                for key, value in experience_rate.items():
+                    if counts+1 not in value:
+                        continue
+
+                    with transaction.atomic():
+                        experience = ExperienceEvent.objects.filter(name=value[0]).first()
+                        WanglibaoActivityReward.objects.create(
+                            user=request.user,
+                            reward=None,
+                            redpack_event=None,
+                            experience=experience,
+                            activity=self.token,
+                            has_sent=0,)
+
+        else:  # 老用户
+            when_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
+            for unused in xrange(3):
+                if when_reward == unused:
+                    counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(redpack_event=None).count()
+                    for key, value in event_rate.items():
+                        if counts+1 not in value:
+                            continue
+
+                        with transaction.atomic():
+                            redpack = RedPackEvent.objects.filter(name=value[0]).first()
+                            WanglibaoActivityReward.objects.create(
+                                    user=request.user,
+                                    reward=None,
+                                    redpack_event=redpack,
+                                    experience=None,
+                                    activity=self.token,
+                                    has_sent=0,)
+                else:
+                    WanglibaoActivityReward.objects.create(
+                            user=request.user,
+                            reward=None,
+                            redpack_event=None,
+                            experience=None,
+                            activity=self.token,
+                            has_sent=0,)
+
+
+    def distribute(self, request):
+        status, response_msg = self.judge_valid_user(request, self.channels)
+        if False == status:
+            return response_msg
+
+        self.generate(request)
+
+        with transaction.atomic():
+            reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, has_sent=0, activity=self.token).first()
+            if not reward:
+                json_to_response = {
+                    'ret_code': 1002,
+                    'message': u'3次抽奖机会已经用完了'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            else:
+                if reward.redpack_event:
+                    redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
+                if reward.experience:
+                    SendExperienceGold(request.user).send(reward.experience.id)
+                reward.has_sent = 1
+                reward.save()
+                json_to_response = {
+                    'ret_code': 0,
+                    'redpack': reward.redpack_event.amount if reward.redpack_event else None,
+                    'experience': reward.experience.amount if reward.experience else None,
+                    'message': u'获得加息券或者体验金'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+
+class XingMeiDistribute(ActivityRewardDistribute):
+    def __init__(self):
+        super(XingMeiDistribute, self).__init__()
+        self.token = 'xm2'
+
+    def distribute(self, request):
+        #1 用户没有登录
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    xm2 = activity['xm2']
+                    tickets = xm2["ticket_amount"]
+                    start_time = xm2["start_time"]
+                    end_time = xm2["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        #5 用户已经领取过奖品了
+        has_sent = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, has_sent=True)
+        if has_sent.exists():
+            json_to_response = {
+                'ret_code': 1005,
+                'message': u'您的奖励已经发放'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        #2 活动时间不合法
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'不在活动时间内,不可领票'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            return
+
+        #4 用户没有抽奖机会
+        activity_rewards = WanglibaoActivityReward.objects.filter(activity='xm2', user=request.user, reward=None)
+        if not activity_rewards.first():
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'不符合领奖规则'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        #3 奖品已经发放完毕
+        counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+        if counts >= tickets:
+            json_to_response = {
+                'ret_code': 1003,
+                'message': u'来晚了,奖品已经抢光了'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+
+        #6 给用户发奖品,注意并发控制, 注意url直接请求接口
+        for activity_reward in activity_rewards.all():  #要兼容新用户两张电影票的情况
+            counts = WanglibaoActivityReward.objects.filter(activity='xm2').exclude(reward=None).count()
+            if counts >= tickets:
+                json_to_response = {
+                    'ret_code': 1004,
+                    'message': u'奖品已经发完了'
+                }
+
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+            with transaction.atomic():
+                ticket_reward = Reward.objects.select_for_update().filter(type=u'星美电影券', is_used=False).first()
+                if not ticket_reward:
+                    json_to_response = {
+                        'ret_code': 1004,
+                        'message': u'奖品已经发完了'
+                    }
+
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": request.user.id,
+                        "title": ticket_reward.type,
+                        "content": u"恭喜您获得星美影院兑换券: %s" % ticket_reward.content,
+                        "mtype": "activity"
+                    })
+                    send_messages.apply_async(kwargs={
+                        "phones": [request.user.wanglibaouserprofile.phone, ],
+                        "messages": [u'恭喜您获得星美影院兑换券: %s【网利科技】' % ticket_reward.content,]
+                    })
+                    activity_reward.reward = ticket_reward
+                    activity_reward.has_sent = True
+                    activity_reward.left_time = 0
+                    activity_reward.join_time = 0
+                    activity_reward.update_time = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+                    activity_reward.save()
+
+                    ticket_reward.is_used = True
+                    ticket_reward.save()
+
+        json_to_response = {
+            'ret_code': 0,
+            'message': u'电影票成功发放'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 
 class ThanksGivingDistribute(ActivityRewardDistribute):
@@ -1148,8 +1543,10 @@ class XunleiActivityAPIView(APIView):
     def get(self, request):
         _type = request.GET.get("type", None)
         if _type == "orders":
-            records = WanglibaoActivityReward.objects.filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
-            data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': str(record.p2p_amount)} for record in records]
+            records = WanglibaoActivityReward.objects.only('user__id', 'p2p_amount', 'user__wanglibaouserprofile__phone') \
+                .select_related('user__wanglibaouserprofile') \
+                .filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
+            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(record.p2p_amount)} for record in records]
             to_json_response = {
                 'ret_code': 1005,
                 'data': data,
@@ -1314,7 +1711,7 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         order_id = request.POST.get('order_id')
-        if not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
+        if order_id and not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
             json_to_response = {
                 'code': 1001,
                 'message': u'Order和User不匹配'
@@ -1833,66 +2230,88 @@ class QMBanquetRewardAPI(APIView):
         logger.exception("class:%s, function:%s, reason,%s, msg:%s" %(self.__class__.__name__, self.current_function_name, reason, msg))
 
     def post(self, request):
-        now_date = timezone.now().date()
+        # now_date = timezone.now().date()
+        now_date = datetime.date.today()
+        events = []
+        records = []
+        redpack_txts = []
         try:
-            with transaction.atomic():
-                code = self.get_random_activity_code()
-                self.get_activity_by_code(code)
-                if not self.activity:
-                    return Response({"ret_code":3, "message":"活动配置code=%s没有取到"%code})
-                if self.activity.is_stopped:
-                    logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, u'活动已经暂停了'))
-                    return Response({"ret_code":2, "message":"活动已经暂停了"})
-                gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
-                if not gift_record.exists():
-                    ActivityRewardRecord.objects.create(
-                        user = self.request.user,
-                    )
-                gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
-                if not gift_record.activity_code:
-                    redpack_txts = []
-                    activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
-                    device = split_ua(self.request)
-                    device_type = device['device_type']
-                    for activity_rule in activity_rules:
-                        if activity_rule.gift_type == "redpack":
-                            redpack_record_ids = ""
-                            redpack_ids = activity_rule.redpack.split(',')
-                            for redpack_id in redpack_ids:
-                                redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
-                                if not redpack_event:
-                                    return Response({"ret_code":5,"message":'QMBanquetRewardAPI post redpack_event not exist'})
-                                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, redpack_event, device_type)
-                                if not status:
-                                    return Response({"ret_code":6,"message":messege})
-                                redpack_text = "None"
-                                if redpack_event.rtype == 'interest_coupon':
-                                    redpack_text = "%s%%加息券"%int(redpack_event.amount)
-                                if redpack_event.rtype == 'percent':
-                                    redpack_text = "%s%%百分比红包"%int(redpack_event.amount)
-                                if redpack_event.rtype == 'direct':
-                                    redpack_text = "%s元红包"%int(redpack_event.amount)
-                                redpack_txts.append(redpack_text)
-                                redpack_record_ids += str(redpack_record_id)
-                            gift_record.redpack_record_ids = redpack_record_ids
-                        if activity_rule.gift_type == "experience_gold":
-                            experience_record_ids = ""
-                            experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
-                            if not experience_record_id:
-                                return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
-                            redpack_txts.append('%s元体验金'%experience_event.amount)
-                            experience_record_ids+=str(experience_record_id)
-                            gift_record.experience_record_ids = experience_record_ids
-                    gift_record.activity_code = self.activity.code
-                    gift_record.activity_code_time = timezone.now()
-                    gift_record.save()
-                    return Response({"ret_code":0, 'redpack_txts':redpack_txts})
-                else:
-                    return Response({"ret_code":1, "message":"今天已经领过了"})
-        except Exception, e:
-            logger.debug(traceback.format_exc())
-            return Response({"ret_code":4, "message":"error"})
+            code = self.get_random_activity_code()
+            self.get_activity_by_code(code)
+            if not self.activity:
+                return Response({"ret_code":3, "message":"活动配置code=%s没有取到"%code})
+            now = timezone.now()
+            if self.activity.start_at >= now:
+                return Response({"ret_code":3, "message":"活动还未开始"})
+            if self.activity.end_at <= now:
+                return Response({"ret_code":3, "message":"活动已过期"})
+            if self.activity.is_stopped:
+                return Response({"ret_code":2, "message":"活动已经暂停了"})
+            gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
+            if not gift_record.exists():
+                ActivityRewardRecord.objects.create(
+                    user = self.request.user,
+                )
 
+            with transaction.atomic():
+                gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
+                if gift_record.activity_code:
+                    return Response({"ret_code":1, "message":"今天已经领过了"})
+
+                activity_rules = ActivityRule.objects.filter(activity=self.activity, is_used=True).all()
+                device = split_ua(self.request)
+                device_type = device['device_type']
+
+                for activity_rule in activity_rules:
+                    if activity_rule.gift_type == "redpack":
+                        redpack_record_ids = ""
+                        redpack_ids = activity_rule.redpack.split(',')
+                        for redpack_id in redpack_ids:
+                            redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                            if not redpack_event:
+                                return Response({"ret_code":5,"message":'QMBanquetRewardAPI post redpack_event not exist'})
+                            status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, redpack_event, device_type)
+                            if not status:
+                                return Response({"ret_code":6,"message":messege})
+                            redpack_text = "None"
+                            if redpack_event.rtype == 'interest_coupon':
+                                redpack_text = "%s%%加息券"%redpack_event.amount
+                            if redpack_event.rtype == 'percent':
+                                redpack_text = "%s%%百分比红包"%redpack_event.amount
+                            if redpack_event.rtype == 'direct':
+                                redpack_text = "%s元红包"%int(redpack_event.amount)
+                            redpack_txts.append(redpack_text)
+                            redpack_record_ids += (str(record.id) + ",")
+                            events.append(redpack_event)
+                            records.append(record)
+                        gift_record.redpack_record_ids = redpack_record_ids
+                    if activity_rule.gift_type == "experience_gold":
+                        experience_record_ids = ""
+                        experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+                        if not experience_record_id:
+                            return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
+                        redpack_txts.append('%s元体验金'%int(experience_event.amount))
+                        experience_record_ids += (str(experience_record_id) + ",")
+                        gift_record.experience_record_ids = experience_record_ids
+                gift_record.activity_code = self.activity.code
+                gift_record.activity_code_time = timezone.now()
+                gift_record.save()
+        except IntegrityError, e:
+            return Response({"ret_code":4, "message":"系统忙，请重试"})
+        except Exception, e:
+            logger.debug("===============二月红包宴异常=================")
+            logger.debug(traceback.format_exc())
+            return Response({"ret_code":4, "message":"系统忙，请重试"})
+        try:
+            for idx, event in enumerate(events):
+                record = records[idx]
+                start_time, end_time = redpack_backends.get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                          record.created_at, event.available_at, event.unavailable_at)
+                redpack_backends._send_message_for_hby(request.user, event, end_time)
+        except Exception, e:
+            logger.debug("===============二月红包宴发站内信异常=================")
+            logger.debug(traceback.format_exc())
+        return Response({"ret_code":0, 'redpack_txts':redpack_txts})
 
 
 class QMBanquetTemplate(TemplateView):
@@ -1910,8 +2329,7 @@ class QMBanquetTemplate(TemplateView):
                         redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                         if redpack_event:
                             redpacks.append({'redpack_id':redpack_id, "amount":redpack_event.amount, 'invest_amount':redpack_event.invest_amount, "rtype":redpack_event.rtype})
-        sorted(redpacks, lambda x,y:cmp(x['amount'],y['amount']))
-        print redpacks
+        redpacks = sorted(redpacks, lambda x,y:cmp(x['amount'],y['amount']))
         return {
             "redpacks":redpacks,
         }
@@ -1937,10 +2355,16 @@ class HMBanquetRewardAPI(APIView):
         self.get_activity_by_code(self.activity_code)
         if not self.activity:
             return Response({"ret_code":3, "message":"活动配置code=%s没有取到"%self.activity_code})
+        now = timezone.now()
+        if self.activity.start_at >= now:
+            return Response({"ret_code":3, "message":"活动还未开始"})
+        if self.activity.end_at <= now:
+            return Response({"ret_code":3, "message":"活动已过期"})
         if self.activity.is_stopped:
-            logger.debug("class:%s, msg:%s" %(self.__class__.__name__, u'活动已经暂停了'))
             return Response({"ret_code":2, "message":"活动已经暂停了"})
-        activity_rules = ActivityRule.objects.filter(activity=self.activity).all()
+        activity_rules = ActivityRule.objects.filter(activity=self.activity, is_used=True).all()
+        if len(activity_rules) == 0:
+            return Response({"ret_code":5, "message":"没有活动规则"})
         for activity_rule in activity_rules:
             activity_redpacks = activity_rule.redpack.split(',')
             if redpack_event_id not in activity_redpacks:
@@ -1952,25 +2376,314 @@ class HMBanquetRewardAPI(APIView):
         device = split_ua(self.request)
         device_type = device['device_type']
         try:
+            # now_date = timezone.now().date()
+            now_date = datetime.date.today()
+            gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
+            if not gift_record.exists():
+                ActivityRewardRecord.objects.create(
+                    user = self.request.user,
+                )
             with transaction.atomic():
-                now_date = timezone.now().date()
-                gift_record = ActivityRewardRecord.objects.filter(create_date=now_date, user=self.request.user)
-                if not gift_record.exists():
-                    ActivityRewardRecord.objects.create(
-                        user = self.request.user,
-                    )
                 gift_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=self.request.user).first()
                 if gift_record.redpack_record_id:
                     return Response({"ret_code":1, "message":"今天已经领过了"})
 
-                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(request.user, event, device_type)
+                status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, event, device_type)
                 if not status:
                     return Response({"ret_code":4, 'message':messege})
-                gift_record.redpack_record_id = redpack_record_id
+                gift_record.redpack_record_id = record.id
                 gift_record.redpack_record_id_time = timezone.now()
                 gift_record.save()
-                return Response({"ret_code":0, 'message':"success"})
-
+        except IntegrityError, e:
+            return Response({"ret_code":4, "message":"系统忙，请重试"})
         except Exception, e:
+            logger.debug("===============二月红包宴异常=================")
             logger.debug(traceback.format_exc())
-            return Response({"ret_code":4, "message":"error"})
+            return Response({"ret_code":4, "message":"系统忙，请重试"})
+        try:
+            start_time, end_time = redpack_backends.get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                          record.created_at, event.available_at, event.unavailable_at)
+            redpack_backends._send_message_for_hby(request.user, event, end_time)
+        except Exception, e:
+            logger.debug("===============二月红包宴发站内信异常=================")
+            logger.debug(traceback.format_exc())
+        return Response({"ret_code":0, 'message':"success"})
+
+
+
+
+
+class LanternBanquetTemplate(TemplateView):
+    """
+    元宵节
+    """
+    template_name = 'new_year_feast.jade'
+    activity_codes = ['yxqmsy_redpack', 'yxqmsy_redpack1'] #['lantern_redpack', 'lantern_redpack1']
+    activity_code = 'yxhmsy_redpack'
+    def get_random_activity_code(self):
+        return self.activity_codes[random.randint(0, 1)]
+
+
+    def get_random_redpack_id(self):
+        activity = Activity.objects.filter(code=self.activity_code).first()
+        if not activity:
+            return -1, {"ret_code":-1, "message":"没有相应活动"}
+        activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True).all()
+        if len(activity_rules) == 0:
+            return -1, {"ret_code":5, "message":"没有活动规则"}
+        all_redpacks = []
+        for activity_rule in activity_rules:
+            activity_redpacks = activity_rule.redpack.split(',')
+            all_redpacks.extend(activity_redpacks)
+        if len(all_redpacks)==0:
+            return -1, {"ret_code":-1, "message":"没有相应红包"}
+        return all_redpacks[random.randint(0, len(all_redpacks)-1)], {}
+
+
+    def get_context_data(self, **kwargs):
+        context = super(LanternBanquetTemplate, self).get_context_data(**kwargs)
+        code = self.get_random_activity_code()
+        redpack_id, res = self.get_random_redpack_id()
+        redpack_id_str = str(redpack_id)
+        if redpack_id == -1:
+            return Response(res)
+        openid = self.request.session.get('lantern_openid')
+        now_date = datetime.date.today()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
+        try:
+            if not phoneRewardRecord:
+                WechatPhoneRewardRecord.objects.create(
+                        openid = openid
+                    )
+            phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
+            if not phoneRewardRecord.phone:
+                with transaction.atomic():
+                    phoneRewardRecord = WechatPhoneRewardRecord.objects.select_for_update().filter(openid=openid, create_date=now_date).first()
+                    phoneRewardRecord.activity_code = code
+                    phoneRewardRecord.redpack_event_ids = redpack_id_str
+                    phoneRewardRecord.save()
+        except IntegrityError, e:
+            pass
+        rewards = getRewardsByActivity(phoneRewardRecord.activity_code)
+        redpacks = rewards.get('redpack')
+        experiences = rewards.get('experience')
+        rewards = {'redpack':[], 'coupon':[], 'experience':[]}
+        for redpack_dict in redpacks:
+            redpack_event = redpack_dict.get('redpack_event')
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                rewards.get('coupon').append({'amount':redpack_event.amount})
+                # redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                # redpack_text = "%s%%百分比红包"%redpack_event.amount
+                rewards.get('redpack').append({'amount':redpack_event.amount, 'invest_amount':convert_to_10k(redpack_event.invest_amount)[:-1]})
+            if redpack_event.rtype == 'direct':
+                # redpack_text = "%s元红包(单笔投资满%s万可用)"%(int(redpack_event.amount), convert_to_10k(redpack_event.invest_amount))
+                rewards.get('redpack').append({'amount':int(redpack_event.amount), 'invest_amount':convert_to_10k(redpack_event.invest_amount)[:-1]})
+
+        for experience_dict in experiences:
+            experience_event = experience_dict.get('experience_event')
+            rewards.get('experience').append({"amount":int(experience_event.amount)})
+
+        event = RedPackEvent.objects.filter(id=int(phoneRewardRecord.redpack_event_ids)).first()
+        context.update({"rewards":json.dumps(rewards), "redpack":json.dumps({'amount':event.amount, 'invest_amount':event.invest_amount})})
+        BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
+        token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+        share_url = ""
+        m = Misc.objects.filter(key='weixin_qrcode_info').first()
+        if m and m.value:
+            info = json.loads(m.value)
+            if isinstance(info, dict) and info.get("fwh"):
+                original_id = info.get("fwh")
+                account = WeixinAccounts.getByOriginalId(original_id)
+                share_url = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=CALLBACK_HOST+"/weixin_activity/lantern_banquet/?promo_token=%s"%token, state=original_id)
+        # print share_url
+        context['share_url']=share_url
+        csrftoken =  self.request.COOKIES.get('csrftoken', "")
+        context['csrftoken']=csrftoken
+        # print context
+        return context
+
+
+    def dispatch(self, request, *args, **kwargs):
+        # request.session['lantern_openid'] = request.GET.get('openid')
+        openid = request.session.get('lantern_openid')
+        if not openid:
+            code = request.GET.get('code')
+            state = request.GET.get('state')
+            try:
+                if code and state:
+                    account = WeixinAccounts.getByOriginalId(state)
+                    request.session['account_key'] = account.account_key
+                    oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                    res = oauth.fetch_access_token(code)
+                    openid = res.get('openid')
+                    request.session['lantern_openid'] = openid
+                else:
+                    return Response({'ret_code':-1, "message":"code, state error"})
+            except WeChatException,e:
+                    return Response({'ret_code':e.errcode, 'message':e.errmsg})
+        return super(LanternBanquetTemplate, self).dispatch(request, *args, **kwargs)
+
+class Lantern_FetchRewardAPI(APIView):
+    """
+    元宵节--领取api
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        openid = request.session.get('lantern_openid')
+        if not openid:
+            return Response({"ret_code":-1, "message":"openid为空"})
+        phone = request.DATA.get('phone')
+        if not phone:
+            return Response({"ret_code":-1, "message":"phone为空"})
+
+        now_date = datetime.date.today()
+        phoneRewardRecord = WechatPhoneRewardRecord.objects.filter(openid=openid, create_date=now_date).first()
+        if not phoneRewardRecord:
+            return Response({"ret_code":-1, "message":"记录为空"})
+        if phoneRewardRecord.phone:
+            if WanglibaoUserProfile.objects.filter(phone=phoneRewardRecord.phone).exists():
+                if phoneRewardRecord.status:
+                    return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
+            else:
+                return Response({"ret_code":-1, "message":"该微信号今天已经领取过了"})
+        userprofile = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        if userprofile:
+            if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone, status=True).exists():
+                return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
+        else:
+            if WechatPhoneRewardRecord.objects.filter(create_date=now_date, phone=phone).exists():
+                return Response({"ret_code":-1, "message":"该手机号今天已经领取过了"})
+
+        activity = Activity.objects.filter(code=phoneRewardRecord.activity_code).first()
+        if not activity:
+            return Response({"ret_code":-1, "message":"没有相应活动"})
+
+        now = timezone.now()
+        if activity.start_at >= now:
+            return Response({"ret_code":3, "message":"活动还未开始"})
+        if activity.end_at <= now:
+            return Response({"ret_code":3, "message":"活动已过期"})
+        if activity.is_stopped:
+            return Response({"ret_code":2, "message":"活动已经暂停了"})
+
+
+        if userprofile:
+            try:
+                device = split_ua(self.request)
+                device_type = device['device_type']
+                phoneRewardRecord.phone = phone
+                phoneRewardRecord.save()
+                res = sendWechatPhoneReward(openid, userprofile.user, device_type)
+                if res['ret_code']==0:
+                    res['is_wanglibao']=True
+                return Response(res)
+            except IntegrityError, e:
+                return Response({"ret_code":-1, "message":"系统忙，请重试"})
+        phoneRewardRecord.phone = phone
+        phoneRewardRecord.save()
+        send_sms_msg_one.apply_async(kwargs={
+        "rule_id":7,
+        "phone":phone,
+        "content":"【网利科技】您的元宵节红包加息券组合豪礼已经存入您的账户，请登录网利宝账户进行查看。",
+        "user_type":"phone"
+        })
+        return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
+
+class MarchAwardTemplate(TemplateView):
+    """
+    三月活动
+    """
+
+    def get_context_data(self, **kwargs):
+        rank_activity = Activity.objects.filter(code='march_awards').first()
+        # utc_now = timezone.now()
+        yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        yesterday_end = local_to_utc(yesterday, 'max')
+        yesterday_start = local_to_utc(yesterday, 'min')
+        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
+            user = self.request.user
+            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+            try:
+                ranks = redis_backend()._get('top_ranks')
+            except:
+                ranks = getTodayTop10Ranks()
+        else:
+            ranks = []
+            chances = 0
+        
+        return {
+           "chances": chances,
+           "top_ranks":ranks
+            }
+
+
+class FetchMarchAwardAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        rank_activity = Activity.objects.filter(code='march_awards').first()
+        # utc_now = timezone.now()
+        yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        yesterday_end = local_to_utc(yesterday, 'max')
+        yesterday_start = local_to_utc(yesterday, 'min')
+        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
+            user = request.user
+                # {u'highest': 50000,
+                #  u'invest_amounts': [5000, 10000, 20000, 30000, 40000, 50000],
+                #  u'invest_rewards': [371, 372, 373, 374, 375],
+                #  u'lowest': 5000,
+                #  u'rank_awards': {u'0': 376,
+                #  u'1': 377,
+                #  u'2': 377,
+                #  u'3': 378,
+                #  u'4': 378,
+                #  u'5': 378,
+                #  u'6': 379,
+                #  u'7': 379,
+                #  u'8': 379,
+                #  u'9': 379}}
+            p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
+            with transaction.atomic():
+                p2pRecord = P2PRecord.objects.filter(order_id=p2pReward.order_id).first()
+                if not p2pRecord:
+                    return Response({"ret_code":-1, "message":"投资条件不符合"})
+                product = p2pRecord.product
+                period = product.period
+                if product.pay_method.startswith(u'日计息'):
+                    period = product.period/30
+                if period < 3:
+                    return Response({"ret_code":-1, "message":"投资条件不符合"})
+                misc = Misc.objects.filter(key='march_awards').first()
+                march_awards = json.loads(misc.value)
+                redpack_event_id = 0
+                invest_amounts = march_awards['invest_amounts']
+                for index, invest_amount in enumerate(invest_amounts):
+                    if index < len(invest_amounts)-1:
+                        if float(p2pRecord.amount) >= invest_amount and float(p2pRecord.amount) < invest_amounts[index+1]:
+                            redpack_event_id = march_awards['invest_rewards'][index]
+                            break
+                if redpack_event_id == 0:
+                    return Response({"ret_code":-1, "message":"红包错误"})
+                redpack_event = RedPackEvent.objects.filter(id=int(redpack_event_id)).first()
+                if not redpack_event:
+                    return Response({"ret_code":-1, "message":"红包错误"})
+                device = split_ua(self.request)
+                device_type = device['device_type']
+                status, messege, record = redpack_backends.give_activity_redpack_new(user, redpack_event, device_type)
+                if not status:
+                    return Response({"ret_code":-1, "message":messege})
+                p2pReward.redpack_event_id =  redpack_event.id
+                p2pReward.redpack_record_id = record.id
+                p2pReward.status = True
+                p2pReward.save()
+            return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}})
+        return Response({"ret_code":-1, "message":"活动已经截止"})
+
+
+
+
+
+

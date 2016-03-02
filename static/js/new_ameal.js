@@ -47,22 +47,26 @@
             }
           }
         });
+        var is = 0;
         $(".years_pot_minbox").on("click",function(){
             var data = $(this).attr("data");
-            isdata(data)
-            ajaxfn(null, "/api/wlb_reward/qm_banque/", function(data){
-                var txt=data.message;
-                if(data.ret_code == 0) {
-                    $.each(data.redpack_txts,function(idx,val){
-                        var text="<li>"+val+"</li>";
-                        $(".years_smkal").show().find("ul").append(text);
-                    })
-                }else{
-                    $('.years_smak').show().find("h3").text(txt);
-                }
-
-
-            })
+            if(is == 0){
+                isdata(data);
+                ajaxfn(null, "/api/wlb_reward/qm_banque/", function(data){
+                    var txt=data.message;
+                    if(data.ret_code == 0) {
+                        $.each(data.redpack_txts,function(idx,val){
+                            var text="<li>"+val+"</li>";
+                            $(".years_smkal").show().find("ul").append(text);
+                        })
+                    }else{
+                        $('.years_smak').show().find("h3").text(txt);
+                        $('.years_smak').find("p").text("进入“我的账户”--“理财券”“体验金专区”查看");
+                    }
+                    $(".cover_layer").show();
+                });
+                is=1;
+            }
         })
         function ajaxfn(id, url, fn){
             $.ajax({
@@ -71,24 +75,43 @@
                 data: {redpack_id : id},
                 success: function(data){
                     fn(data)
+                },
+                error: function(xml){
+                    if(xml.status === 403){
+                        window.location.href="/accounts/login/?next=/weixin_activity/new_ameal/";
+                    }
                 }
             })
         }
         $(".years_paper a").on("click",function(){
             var data_id=$(this).attr("data_id");
-            ajaxfn(data_id, "/api/wlb_reward/hm_banque/#", function(data){
-                var txt=data.message;
-                if(data.ret_code == 0){
-                    $('.years_smak').show();
-
-                }else{
-                    $('.years_smak').show().find("h3").text(txt);
-                }
-            })
-
+            var smak = $('.years_smak'),
+                smakH = smak.find("h3"),
+                smakP = smak.find("p");
+            if(is == 0){
+                ajaxfn(data_id, "/api/wlb_reward/hm_banque/#", function(data){
+                    var txt=data.message;
+                    if(data.ret_code == 0){
+                        //$('.years_smak').show();
+                        smakH.text("领取成功!");
+                        smakP.text('进入“我的账户”--“理财券”查看');
+                        smak.show();
+                    }else{
+                        //$('.years_smak').show().find("h3").text(txt);
+                        //$('.years_smak').find("p").text("进入“我的账户”--“理财券”查看");
+                        smakH.text(txt);
+                        smakP.text("进入“我的账户”--“理财券”查看");
+                        smak.show();
+                    }
+                    $(".cover_layer").show();
+                });
+                is=1;
+            }
         })
         $(".years_close").on("click",function(){
             $(this).parent().parent().hide();
+            $(".cover_layer").hide();
+            is=0;
         })
         isdata = function(data){
             if(data == 2){
@@ -101,9 +124,10 @@
                 $("#boil").animate({"left" : 50+"%", "top" : -85+"px"},500);
             }
         }
-        dialog = function(){
-
-        }
+        $(".years_explain_box").hide();
+        $("#years_gui").on('click',function(){
+            $(".years_explain_box").slideToggle(500);
+        })
 
     })
 })()

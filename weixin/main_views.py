@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
+from django.db.models import Q
 from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import is_check_id_verify
 from weixin.models import WeixinAccounts, WeixinUser
@@ -24,9 +25,13 @@ from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from wanglibao_rest import utils
 from wanglibao_redpack import backends
-from .util import _generate_ajax_template, FWH_LOGIN_URL
-from wanglibao_pay.models import Bank
+from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
+from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from shumi_backend.exception import FetchException, AccessException
+from shumi_backend.fetch import UserInfoFetcher
+from wanglibao_buy.models import BindBank
+from wanglibao_announcement.utility import AnnouncementAccounts
 
 logger = logging.getLogger("weixin")
 
@@ -65,9 +70,10 @@ class WXLogin(TemplateView):
                     oauth = WeChatOAuth(account.app_id, account.app_secret, )
                     user_info = oauth.fetch_access_token(code)
                     self.openid = user_info.get('openid')
-                    w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
-                    if is_first:
-                        w_user.save()
+                    w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
+                    # w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
+                    # if is_first:
+                    #     w_user.save()
                 except WeChatException, e:
                     error_msg = e.message
             else:
@@ -167,8 +173,20 @@ class AccountTemplate(TemplateView):
 
 class RechargeTemplate(TemplateView):
     def get_context_data(self, **kwargs):
+        banks = Bank.get_kuai_deposit_banks()
+        next = self.request.GET.get('rechargeNext', '')
+        user = self.request.user
+        pay_info = PayInfo.objects.filter(user=user)
+
+        if pay_info.filter(status="成功"):
+            recharge = True
+        else:
+            recharge = False
         margin = self.request.user.margin.margin
         return {
+            'recharge': recharge,
+            'banks': banks,
+            'next' : next,
             'margin': margin if margin else 0.0,
         }
 
@@ -261,6 +279,3 @@ class FWHIdValidate(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         return super(FWHIdValidate, self).dispatch(request, *args, **kwargs)
-
-
-

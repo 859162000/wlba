@@ -28,6 +28,7 @@ from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEM
 
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
+from wanglibao_reward.tasks import sendWechatPhoneReward
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -95,6 +96,9 @@ def register_ok(user_id, device):
         utils.log_clientinfo(device, "register", user_id)
     except Exception:
         pass
+    sendWechatPhoneReward.apply_async(kwargs={
+        "user_id": user_id,
+    })
 
 
 @app.task
@@ -207,7 +211,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id):
                                         "keyword1":"%s 元"%str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
-                                        "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % order_id,
+                                        #"url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
                                             })},
                                         queue='celery02')
 
@@ -245,8 +249,8 @@ def send_income_message_sms():
     phones_list = []
     messages_list = []
     if incomes:
-        i = 0
-        data_messages = {}
+        # i = 0
+        # data_messages = {}
         for income in incomes:
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile')\
@@ -257,20 +261,20 @@ def send_income_message_sms():
                 from wanglibao.templatetags.formatters import safe_phone_str
                 name = safe_phone_str(phone)
 
-            data_messages[i] = {
-                'user_id': phone,
-                'user_type': 'phone',
-                'params': {
-                    'name': name,
-                    'count': income.get('invite__count'),
-                    'amount': income.get('earning__sum')
-                }
-            }
-            i += 1
-            # phones_list.append(phone)
-            # messages_list.append(messages.sms_income(name,
-            #                                          income.get('invite__count'),
-            #                                          income.get('earning__sum')))
+            # data_messages[i] = {
+            #     'user_id': phone,
+            #     'user_type': 'phone',
+            #     'params': {
+            #         'name': name,
+            #         'count': int(income.get('invite__count')),
+            #         'amount': float(income.get('earning__sum'))
+            #     }
+            # }
+            # i += 1
+            phones_list.append(phone)
+            messages_list.append(messages.sms_income(name,
+                                                     income.get('invite__count'),
+                                                     income.get('earning__sum')))
 
             # 发送站内信
             title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
@@ -283,12 +287,11 @@ def send_income_message_sms():
 
         # 批量发送短信
         # 功能推送id: 3
-        PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
-        # send_messages.apply_async(kwargs={
-        #     "phones": phones_list,
-        #     "messages": messages_list,
-        #     "ext": 666
-        # })
+        # PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list,
+        })
 
 
 @app.task

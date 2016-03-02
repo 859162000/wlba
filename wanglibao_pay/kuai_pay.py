@@ -333,10 +333,9 @@ class KuaiPay:
 
         return {"ret_code":0, "message":"ok"}
 
-    def delete_bind_new(self, request, card, bank):
-        storable_no = card.no if len(card.no) == 10 else card.no[:6] + card.no[-4:]
-        dic = {"user_id": request.user.id, "bank_id": card.bank.kuai_code, "storable_no": storable_no}
-
+    def unbind_card(self, card_short_no, bank_kuai_code, user_id):
+        dic = {"user_id": user_id, "bank_id": bank_kuai_code, "storable_no":
+                card_short_no}
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
         logger.critical(data)
@@ -351,9 +350,18 @@ class KuaiPay:
             return {"ret_code": 20103, "message": result['message']}
 
         card.is_bind_kuai = False
+        if not card.is_bind_yee:
+            card.is_the_one_card = False
         card.save()
 
         return {"ret_code": 0, "message": "ok"}
+
+    def delete_bind_new(self, request, card, bank):
+        storable_no = card.no if len(card.no) == 10 else card.no[:6] + card.no[-4:]
+
+        return self.unbind_card(storable_no, card.bank.kuai_code,
+                request.user.id)
+
     
     def pre_pay(self, request):
         if not request.user.wanglibaouserprofile.id_is_valid:
@@ -983,6 +991,8 @@ class KuaiShortPay:
             result.update({"ret_code": 4, "message":"不能使用信用卡"})
         elif res_code == "51":
             result.update({"ret_code": 51, "message":"余额不足"})
+        elif res_code == 't3':
+            result.update({'ret_code': 7, 'message': message})
         else:
             result.update({"ret_code": 5, "message":message})
         return result
@@ -1028,10 +1038,9 @@ class KuaiShortPay:
             return {"ret_code":20103, "message":result['message']}
         return {"ret_code":0, "message":"ok"}
 
-    def delete_bind_new(self, user, card, bank):
-        storable_no = card.no if len(card.no) == 10 else card.no[:6] + card.no[-4:]
-        dic = {"user_id": user.id, "bank_id": card.bank.kuai_code, "storable_no": storable_no}
-
+    def unbind_card(self, card_short_no, bank_kuai_code, user_id):
+        dic = {"user_id": user_id, "bank_id": bank_kuai_code, "storable_no":
+                card_short_no}
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
         logger.critical(data)
@@ -1045,19 +1054,32 @@ class KuaiShortPay:
         elif result['ret_code']:
             return {"ret_code": 20103, "message": result['message']}
 
-        card.is_bind_kuai = False
-        card.save()
+        cards = [c for c in Card.objects.filter(user_id=user_id).all() if
+                 (c.no[:6] + c.no[-4:]) == card_short_no]
+        for card in cards:
+            card.is_bind_kuai = False
+            if not card.is_bind_yee:
+                card.is_the_one_card = False
+            card.save()
 
         return {"ret_code": 0, "message": "ok"}
+
+    def delete_bind_new(self, user, card, bank):
+        storable_no = card.no if len(card.no) == 10 else card.no[:6] + card.no[-4:]
+
+        return self.unbind_card(storable_no, card.bank.kuai_code, user.id)
 
     @method_decorator(transaction.atomic)
     def _handle_third_pay_error(self, error, user_id, payinfo_id, order_id):
         logger.exception(error)
+        user = User.objects.get(id=user_id)
+        # t3错误，一个银行不能绑定多张卡或者未绑定
+        if error.code == 201183:
+            self.sync_bind_card(user)
         pay_info = PayInfo.objects.select_for_update().get(id=payinfo_id)
 
         if pay_info.status == PayInfo.PROCESSING:
             order = Order.objects.get(id=order_id)
-            user = User.objects.get(id=user_id)
 
             if isinstance(error, ThirdPayError):
                 error_code = error.code
@@ -1110,12 +1132,18 @@ class KuaiShortPay:
             bank = Bank.objects.filter(gate_id=gate_id).first()
             if not bank or not bank.kuai_code.strip():
                 return {"ret_code":201151, "message":"不支持该银行"}
+        #fix bink new bank card warning message
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
-            card = Card.objects.filter(no=card_no, user=user).first()
-            if bank and card and bank != card.bank:
+            card = Card.objects.filter(no=card_no, user=user, bank=bank).first()
+            pay_record = PayInfo.objects.filter(card_no=card_no, user=user, bank=bank)
+            if pay_record.filter(error_message='银行与银行卡不匹配'):
                 return {"ret_code":201153, "message":"银行卡与银行不匹配"}
+            #card = Card.objects.filter(no=card_no, user=user).first()
+            #pay_record = PayInfo.objects.filter(card_no=card_no, user=user, bank=bank, status='成功').count()
+            #if bank and card and bank != card.bank and pay_record==0:
+                #return {"ret_code":201153, "message":"银行卡与银行不匹配"}
 
         if not card:
             card = self.add_card_unbind(user, card_no, bank, request)
@@ -1187,6 +1215,8 @@ class KuaiShortPay:
                 elif result['ret_code'] >0:
                     if result['ret_code'] == 2:
                         raise ThirdPayError(self.ERR_CODE_WAITING, result['message'])
+                    elif result['ret_code'] == 7:
+                        raise ThirdPayError(201183, result['message'])
                     else:
                         raise ThirdPayError(201181, result['message'])
                 # device = split_ua(request)
@@ -1236,6 +1266,9 @@ class KuaiShortPay:
             logger.critical(res.content)
             if res.status_code != 200 or "errorCode" in res.content:
                 if "B.MGW.0120" in res.content:
+                    pay_info.error_message = '银行与银行卡不匹配'
+                    pay_info.error_code = '201221'
+                    pay_info.save()
                     raise ThirdPayError(201221, "银行与银行卡不匹配")
                 raise ThirdPayError(20122, "服务器异常")
             result = self.handle_pay_result(res.content)
@@ -1429,3 +1462,19 @@ class KuaiShortPay:
         #         logger.error(e)
 
         return card
+
+    def sync_bind_card(self, user):
+        # 查询块钱已经绑定卡
+        res = self.query_bind_new(user.id)
+        if res['ret_code'] != 0: return res
+        if 'cards' in res:
+            kuai_card_no_list = []
+            for car in res['cards']:
+                card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
+                if card:
+                    kuai_card_no_list.append(card.no)
+            # suppoort kuai_card_no_list = []
+            Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
+            Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
+            Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
+                                is_the_one_card=True).update(is_the_one_card=False)

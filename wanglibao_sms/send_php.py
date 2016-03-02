@@ -78,11 +78,14 @@ class PHPSendSMS(SMSBackEnd):
         response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers)
 
         status_code = response.status_code
-        res_text = json.loads(response.text)
+        try:
+            res_text = json.loads(response.text)
+        except:
+            res_text = response.text
 
         # 写入日志
-        logger.debug(">>>> json data: {}".format(post_data_json))
-        logger.debug("<<<< {}; rule_id: {}; status_code: {}; response_text: {}".format(
+        logger.info(">>>> json data: {}".format(post_data_json))
+        logger.info("<<<< {}; rule_id: {}; status_code: {}; response_text: {}".format(
             datetime.now(), rule_id, status_code, res_text
         ))
         return status_code, res_text
@@ -90,7 +93,7 @@ class PHPSendSMS(SMSBackEnd):
     @classmethod
     def send_sms_one(cls, rule_id, user_id, user_type, **kwargs):
         if not rule_id or not user_id or not user_type:
-            logger.debug(">>>> 参数不全,发送失败 ")
+            logger.info(">>>> 参数不全,发送失败 ")
             return
 
         if not user_type:
@@ -101,7 +104,7 @@ class PHPSendSMS(SMSBackEnd):
                 'user_id': user_id,
                 'user_type': user_type,
                 'params': {
-                    key: kwargs[key] for key in kwargs.keys()
+                    key: str(kwargs[key]) for key in kwargs.keys()
                 }
             }
         }
@@ -111,7 +114,7 @@ class PHPSendSMS(SMSBackEnd):
     @classmethod
     def send_sms_msg_one(cls, rule_id, user_id, user_type, msg):
         if not rule_id or not user_id or not user_type or not msg:
-            logger.debug(">>>> 参数不全,发送失败 ")
+            logger.info(">>>> 参数不全,发送失败 ")
             return
 
         if not user_type:

@@ -19,7 +19,8 @@ urlpatterns = patterns(
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
-    url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
+    #url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
+    url(r'^regist/second/$', login_required(views.WeixinRegisterBindCard.as_view(), login_url='/weixin/login/'), name='weixin_regist_bind_card'),
     url(r'^regist/three/$', TemplateView.as_view(template_name="weixin_registProcess_three.jade")),
 
 
@@ -79,7 +80,7 @@ urlpatterns = patterns(
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
 
     url(r'^sub_regist_first/$', login_required(TemplateView.as_view(template_name="service_registProcess_first.jade"), login_url="/weixin/sub_login_redirect/")),
-    url(r'^sub_regist_second/$', login_required(TemplateView.as_view(template_name="service_registProcess_second.jade"), login_url="/weixin/sub_login_redirect/")),
+    url(r'^sub_regist_second/$', login_required(views.WeixinRegisterBindCard.as_view(template_name="service_registProcess_second.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_regist_three/$', login_required(TemplateView.as_view(template_name="service_registProcess_three.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_account/$', login_required(main_views.AccountTemplate.as_view(template_name="service_account.jade"), login_url="/weixin/sub_login_redirect/"), name='sub_account'),
 
@@ -90,6 +91,9 @@ urlpatterns = patterns(
     url(r'^sub_transaction/(?P<status>\w+)/$', login_required(views.WeixinTransaction.as_view(template_name="service_transaction_repay.jade", source='fwh'), login_url="/weixin/sub_login_redirect/")),
 
     url(r'^sub_reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(template_name="service_reward.jade"), login_url="/weixin/sub_login_redirect/")),
+    #银行卡管理
+    url(r'^sub_bankcards/$', login_required(views.WeixinAccountBankCard.as_view(template_name="service_bankcard.jade"), login_url="/weixin/sub_login_redirect/")),
+    url(r'^sub_pwd_back/$', TemplateView.as_view(template_name="service_tradepwd_back.jade")),
     #微站 api
     url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),
     url(r'api/fwh/p2p_ajax_list/$', main_views.P2PListFWH.as_view(), name='fwh_p2p_ajax_list'),

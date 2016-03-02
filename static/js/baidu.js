@@ -16,6 +16,9 @@
         registerTitle :'注册即送50元红包',    //注册框标语
         isNOShow : '1'
     });
+    if($('#ganjiwang-model')){
+      $('#denglu-user').hide();
+    }
     $('.receiveBtns').click(function(){
         var tag = $(this).attr('tag');
         if($('.banner-form').length >0){

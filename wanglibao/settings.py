@@ -182,7 +182,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        # 'HOST': '192.168.1.242',
+        #'HOST': '192.168.1.242',
     }
 
 import sys
@@ -707,6 +707,11 @@ CELERYBEAT_SCHEDULE = {
     'p2p-product-push-5-minutes': {
         'task': 'wanglibao_p2p.tasks.bajinshe_product_push',
         'schedule': timedelta(minutes=5),
+    },
+    # 每天发放昨天的排名奖励, by HMM
+    'march_top10_rank_awards': {
+        'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
+        'schedule': crontab(minute=0, hour=1),
     },
 }
 

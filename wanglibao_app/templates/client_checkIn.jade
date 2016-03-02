@@ -1,0 +1,32 @@
+-load formatters
+doctype html
+html(style='background: #FFE9D0')
+  head
+    include include/app_header.jade
+  body
+
+    img(src='/static/imgs/app/checkin/banner.jpg').check-in-banner
+
+
+    section.check-in-operation
+      .checkin-op-status
+        i.checkin-op-icon.icon-status
+        .checkin-op-dec
+          .op-dec-title 今日已签到
+          .op-dec-detail.op-detail-orange ＋800体验金
+
+      .checkin-op-share
+        i.checkin-op-icon.icon-share
+        .checkin-op-dec
+          .op-dec-title 今日未分享
+          .op-dec-detail 分享得双倍
+    section.check-in-bar
+      .bar-layout
+        .bar-content 距离神秘礼包还有4天
+        .bar-before
+        .bar-after
+
+    section.check-in-process
+    section.check-in-rules
+
+    section.check-in-alert

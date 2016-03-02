@@ -631,7 +631,11 @@ class YeeShortPay:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:],
                                        is_bind_yee=True).first()
         else:
-            card = Card.objects.filter(no=card_no, user=user).first()
+            #card = Card.objects.filter(no=card_no, user=user).first()
+            card = Card.objects.filter(no=card_no, user=user, bank=bank).first()
+            pay_record = PayInfo.objects.filter(card_no=card_no, user=user, bank=bank)
+            if pay_record.filter(error_message__icontains='不匹配'):
+                return {"ret_code":200118, "message":"银行卡与银行不匹配"}
 
         if not card:
             card = self.add_card_unbind(user, card_no, bank, request)
@@ -639,8 +643,8 @@ class YeeShortPay:
         if not card and not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
 
-        if bank and card and bank != card.bank:
-            return {"ret_code": 200118, "message": "银行卡与银行不匹配"}
+        #if bank and card and bank != card.bank:
+            #return {"ret_code": 200118, "message": "银行卡与银行不匹配"}
 
         # 商户生成的唯一绑卡请求号，最长50位
         request_id = '{phone}{time}'.format(phone=profile.phone, time=timezone.now().strftime("%Y%m%d%H%M%S"))
@@ -650,9 +654,9 @@ class YeeShortPay:
                 # 请求绑定银行卡
                 res = self._bind_card_request(request, input_phone, card_no, request_id)
                 if res['ret_code'] != 0:
-                    if res['ret_code'] == '600326':
-                        card.is_bind_yee = True
-                        card.save()
+                    # 600326已绑定，600302绑卡数超限
+                    if res['ret_code'] in ['600326', '600302']:
+                        self.sync_bind_card(user)
                         return {'ret_code': '20119', 'message': '银行卡已绑定，请返回使用快捷充值'}
                     else:
                         logger.error(res)
@@ -913,3 +917,23 @@ class YeeShortPay:
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
         return rs
+ 
+    def sync_bind_card(self, user):
+        """
+        同步一个用户的所有卡列表
+        """
+
+        # 查询易宝已经绑定卡
+        res = YeeShortPay().bind_card_query(user=user)
+        if res['ret_code'] not in (0, 20011): return res
+        if 'data' in res and 'cardlist' in res['data']:
+            yee_card_no_list = []
+            for car in res['data']['cardlist']:
+                card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
+                if card:
+                    yee_card_no_list.append(card.no)
+            # support yee_card_no_list = []
+            Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+            Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+            Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
+                                is_the_one_card=True).update(is_the_one_card=False)

@@ -2,6 +2,41 @@
  * Created by rsj217 on 16-1-21.
  */
 
+var video_1 = document.getElementById('really-cool-video'),
+    video_2 = document.getElementById('really-cool-video2');
+// 原生的JavaScript事件绑定函数
+  function bindEvent(ele, eventName, func){
+      if(window.addEventListener){
+          ele.addEventListener(eventName, func);
+      }
+      else{
+          ele.attachEvent('on' + eventName, func);
+      }
+  }
+
+  bindEvent(video_1,'ended',function(){
+    document.getElementsByClassName('vjs-poster')[0].style.display='block';
+    document.getElementsByClassName('vjs-big-play-button')[0].style.display='block';
+    video_1.currentTime = 0;
+  });
+
+  bindEvent(video_1,'play',function(){
+    document.getElementsByClassName('vjs-poster')[0].style.display='none';
+    document.getElementsByClassName('vjs-big-play-button')[0].style.display='none';
+  });
+
+   bindEvent(video_2,'ended',function(){
+      document.getElementsByClassName('vjs-poster')[1].style.display='block';
+      document.getElementsByClassName('vjs-big-play-button')[1].style.display='block';
+      video_2.currentTime = 0;
+    });
+
+    bindEvent(video_2,'play',function(){
+      document.getElementsByClassName('vjs-poster')[1].style.display='none';
+      document.getElementsByClassName('vjs-big-play-button')[1].style.display='none';
+    });
+
+
 require.config({
   paths: {
     'scrollify': 'lib/jquery.fullPage.min',
@@ -14,27 +49,47 @@ require.config({
 
 require(['jquery','videojs','scrollify'], function($, videojs, scrollify) {
   //视屏播放
-  $('#really-cool-video').height(283);
-  $('#really-cool-video2').height(283);
-  var player = videojs('really-cool-video', { /* Options */ }, function() {
+//  $('#really-cool-video').height(283);
+//  $('#really-cool-video2').height(283);
+//  var player = videojs('really-cool-video', { /* Options */ }, function() {
 //    console.log('Good to go!');
-  });
+//
+//
+//  });
+
+
+
+
+
+  $('.tv-box1').on('click',function(){
+    $(this).children('.black').hide()
+  })
 
   //判断高度
   var _index = $(".section").length-1;
-  $('.tv-box1,.tv-box2').css({"height":299});
-  $('.show-box h1').css({"height":$(window).height()/3});
+  $('.tv-box1,.tv-box2').css({"height":355});
+  $('.show-box h1').css({"height":$(window).height()/4});
 
   $('#fullpage').fullpage({
-    normalScrollElements :'#main-box'
+    normalScrollElements :'#main-box',
+    afterLoad : function(anchorLink,index){
+      if (index == 1){
+        $(".section").eq(1).show();
+      }else if (index ==2){
+        $(".section").eq(2).show();
+      }
+
+    },
+    navigation : true
+
   });
 
   var h_win = $(window).height();
   var Top = $('.banner').offset().top;
   var H = h_win-Top;
   $('.banner').height(H+'px');
-  $('.main-box').height(h_win-170+'px');
-  $('.main-box .lei-box').height(h_win-210+'px');
+  $('.main-box').height(h_win-130+'px');
+  $('.main-box .lei-box').height(h_win-180+'px');
   var T = $('.main-box').height()/2-67+'px';
   $('.fp-prev,.fp-next').css({'top':T});
 
@@ -108,8 +163,8 @@ point();
   function tab(ele,number){
     var sum = number;
     $(ele).css({'left':'0px'});
-    $('.next').on('click',function(){
-      $(this).removeClass('next')
+    $('.next').off().on('click',function(){
+      $(this).removeClass('next');
       sum++;
       if(sum==$(ele).children('.slide-div').length){
         sum = 0;
@@ -122,7 +177,7 @@ point();
         })
       $('.ul-point ul li').eq(sum).addClass('point-hight').siblings().removeClass('point-hight');
     });
-    $('.prev').on('click',function(){
+    $('.prev').off().on('click',function(){
       $(this).removeClass('prev');
       sum--;
       if(sum<0){

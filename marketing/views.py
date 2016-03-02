@@ -1,5 +1,7 @@
 # encoding:utf-8
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
+from experience_gold.models import ExperienceEvent
+from experience_gold.backends import SendExperienceGold
 import base64
 import hashlib
 import os
@@ -2008,7 +2010,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_one.jade'
+    template_name = 'xunlei_three.jade'
     wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
@@ -2059,7 +2061,7 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         for device in device_list:
             match = re.search(device, user_agent)
             if match and match.group():
-                self.template_name = 'app_xunlei.jade'
+                self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
@@ -2439,7 +2441,9 @@ class RewardDistributeAPIView(APIView):
         self.activity = None
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
-        self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        #self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.amounts = (0.5, 1, 1.5, 1.8, 2, 188, 588, 888, 1888)
+        self.rates = (20, 15, 10, 4, 3, 25, 12, 6, 5)
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
@@ -2489,11 +2493,16 @@ class RewardDistributeAPIView(APIView):
         try:
             redpacks = list(rules.redpack.split(","))
             logger.debug(u"后台配置的红包id是：{0}".format(redpacks))
-            QSet = RedPackEvent.objects.filter(id__in=redpacks)
+            QSet_Exp = set(ExperienceEvent.objects.filter(id__in=redpacks).all())
+            QSet_RPE = set(RedPackEvent.objects.filter(id__in=redpacks).all())
+            QSet = QSet_Exp | QSet_RPE
         except Exception, reason:
             logger.debug(u"获得配置红包报异常, reason:%s" % (reason,))
             raise
-        for item in QSet:
+        for item in list(QSet):
+            if item.amount not in self.amounts:
+                QSet.remove(item)
+                continue
             self.redpacks[item.amount] = item
 
         self.redpack_amount = sorted(self.redpacks.keys(), reverse=True)
@@ -2504,7 +2513,7 @@ class RewardDistributeAPIView(APIView):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        rate = 50
+        rate = 3
 
         for item in self.rates:
             if sent_count%(100/item)==0:
@@ -2547,17 +2556,31 @@ class RewardDistributeAPIView(APIView):
         else:
             logger.debug("join_log.amount的值为:{0}, redpack_event的值为:{1}, redpacks的值为:{2}".format(join_log.amount, redpack_event, self.redpacks))
 
-        try:
-            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-        except Exception, reason:
-            logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
-            join_log.save()
-            raise
-        else:
-            logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
-            join_log.join_times -= 1
-            join_log.save()
-            return join_log
+        if redpack_event.amount < 10:
+            try:
+                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+            except Exception, reason:
+                logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+                join_log.save()
+                raise
+            else:
+                logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
+                join_log.join_times -= 1
+                join_log.save()
+                return join_log
+
+        if redpack_event.amount >= 10:
+            try:
+                SendExperienceGold(user).send(redpack_event.id)
+            except Exception, reason:
+                logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+                join_log.save()
+                raise
+            else:
+                logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
+                join_log.join_times -= 1
+                join_log.save()
+                return join_log
 
     @method_decorator(transaction.atomic)
     def ignore_post_action(self, user):
@@ -2990,7 +3013,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        if channel_code and (channel_code == user_channel.code and channel_user
+        if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
@@ -3106,6 +3129,7 @@ class CustomerAccount2015ApiView(APIView):
                 account_dict['zc_ranking'] = zc_ranking
                 account_dict['tz_amount'] = 0
                 account_dict['income_reward'] = 0
+                account_dict['invite_income'] = 0
 
             profile = user.wanglibaouserprofile
             user_name = u'网利宝用户'

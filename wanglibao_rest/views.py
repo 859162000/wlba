@@ -56,6 +56,7 @@ from marketing.utils import local_to_utc, get_channel_record
 from django.conf import settings
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
+from wanglibao_margin.models import MarginRecord
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
@@ -556,6 +557,47 @@ class SendVoiceCodeAPIView(APIView):
         if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
             return Response({"ret_code": 30112, "message": u"手机号输入有误"})
 
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        if phone_validate_code_item:
+            count = phone_validate_code_item.code_send_count
+            if count >= 10:
+                return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
+
+                # phone_validate_code_item.code_send_count += 1
+                # phone_validate_code_item.save()
+        else:
+            now = timezone.now()
+            phone_validate_code_item = PhoneValidateCode()
+            validate_code = generate_validate_code()
+            phone_validate_code_item.validate_code = validate_code
+            phone_validate_code_item.phone = phone_number
+            phone_validate_code_item.last_send_time = now
+            phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.is_validated = False
+            phone_validate_code_item.save()
+
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
+        return Response({"ret_code": 0, "message": 'ok'})
+
+
+class SendVoiceCodeNewAPIView(APIView):
+    """
+    汇讯群呼(快易通)语音短信验证码接口
+    """
+    # TODO 此接口节后需要优化去掉
+    permission_classes = ()
+
+    def post(self, request):
+        phone_number = request.DATA.get("phone", "").strip()
+        if not phone_number or not phone_number.isdigit():
+            return Response({"ret_code": 30111, "message": u"信息输入不完整"})
+
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code": 30112, "message": u"手机号输入有误"})
+
         # 验证图片验证码
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
@@ -592,6 +634,7 @@ class SendVoiceCodeAPIView(APIView):
 
 
 class SendVoiceCodeTwoAPIView(APIView):
+    # TODO 此接口节后需要优化去掉
     permission_classes = ()
     throttle_classes = (UserRateThrottle,)
 
@@ -622,8 +665,11 @@ class SendVoiceCodeTwoAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
-        logger.info("voice_code2: %s" % cont)
+        # status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info("voice_code2: %s" % res_text)
         return Response({"ret_code": 0, "message": "ok"})
 
 
@@ -1098,6 +1144,17 @@ class StatisticsInside(APIView):
         start_fmt = yesterday_start.strftime('%Y-%m-%d %H:%M:%S')
         end_fmt = today_start.strftime('%Y-%m-%d %H:%M:%S')
 
+        # 每日累计申请提现, Add by hb on 2016-02-03
+        today_utc = local_to_utc(today, 'now')
+        start_withdraw = today_start + timedelta(hours=16)
+        # 当日16点前查询以昨日16点作为起始时间
+        if today_utc < start_withdraw :
+            start_withdraw = yesterday_start + timedelta(hours=16)
+        stop_withdraw = today_utc
+        yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
+            .filter(catalog='取款预冻结').aggregate(Sum('amount'))
+        yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
+
         # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
@@ -1145,7 +1202,8 @@ class StatisticsInside(APIView):
             'today_repayment_total': today_repayment_total,  # 今日还款额
             'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
-            'yesterday_new_amount': yesterday_new_amount  # 昨日新用户投资金额
+            'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
+            'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
         }
 
         data.update(get_public_statistics())

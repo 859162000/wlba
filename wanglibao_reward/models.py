@@ -218,8 +218,34 @@ class ActivityRewardRecord(models.Model):
     experience_record_ids = models.CharField(u'活动代码对应的领取体验金流水ｉｄ', max_length=64, null=True)
     redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID', null=True)
     redpack_record_id_time = models.DateTimeField(u'领取redpack_rule对应奖品时间', null=True)
-
+    activity_desc = models.CharField(u'活动描述', max_length=64, null=True)
 
     class Meta:
         unique_together = (("user", "create_date"),)  # 联合唯一索引
 
+class WechatPhoneRewardRecord(models.Model):
+
+    openid = models.CharField('用户标识', max_length=128)
+    phone = models.CharField(max_length=64, blank=True, help_text=u'手机号码')
+    create_date = models.DateField(u'创建日期', auto_now_add=True,  db_index=True)
+    activity_code = models.CharField(u'活动代码*', max_length=64, null=True)
+    redpack_event_ids = models.CharField(u'优惠券IDs', max_length=64, null=True)
+    status = models.BooleanField(default=False, verbose_name=u'优惠券是否已经领取', help_text=u'默认是没有领取')
+    create_time = models.DateTimeField(u'记录创建时间', auto_now_add=True)
+    redpack_record_ids = models.CharField(u'领取优惠券流水ｉｄ', max_length=64, null=True)
+    experience_record_ids = models.CharField(u'领取体验金流水ｉｄ', max_length=64, null=True)
+
+    class Meta:
+        unique_together = (("openid", "phone", "create_date"),)  # 联合唯一索引
+
+class P2pOrderRewardRecord(models.Model):
+    user = models.ForeignKey(User, default=None, blank=True, null=True, on_delete=models.SET_NULL)
+    order_id = models.IntegerField(default=0, verbose_name=u'订单ID', unique=True)
+    redpack_event_id = models.IntegerField(default=0, verbose_name=u'优惠券ID', null=True)
+    redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID', null=True)
+    status = models.BooleanField(default=False, verbose_name=u'优惠券是否已经领取', help_text=u'默认是没有领取')
+    activity_desc = models.CharField(u'活动描述', max_length=64, null=True)
+    update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    create_time = models.DateTimeField(u'记录创建时间', auto_now_add=True)
+    class Meta:
+        ordering = '-create_time',
