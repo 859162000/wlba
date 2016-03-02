@@ -324,12 +324,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $('.card_box').click(function(){
             if(h5_user_static){
                 $(this).find('.card_box_main').addClass('card_box_open');
-                $('.popup_box').show();
-
-
-                time_count = 3;
-                time_intervalId = setInterval(timerFunction, 1000);
-                time_intervalId;
+                //$('.popup_box').show();
+				//
+				//
+                //time_count = 3;
+                //time_intervalId = setInterval(timerFunction, 1000);
+                //time_intervalId;
 
 
             }else{
