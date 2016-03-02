@@ -2513,7 +2513,7 @@ class RewardDistributeAPIView(APIView):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        rate = 25
+        rate = 3
 
         for item in self.rates:
             if sent_count%(100/item)==0:
