@@ -5,6 +5,7 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 import math
 
+
 class AmortizationPlan(object):
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None, coupon_year_rate=0):
@@ -15,7 +16,7 @@ class AmortizationPlan(object):
         amortizations = product.amortizations.all()
         today = timezone.now()
         for index, amortization in enumerate(amortizations):
-            #if amortization.term_date is None:
+            # if amortization.term_date is None:
             amortization.term_date = today + relativedelta(months=index + 1)
             amortization.save()
 
@@ -39,6 +40,7 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
         term_amount = Decimal(term_amount).quantize(Decimal('.01'))
 
         total = period * term_amount
+        # coupon_total = period * coupon_term_amount - amount
         coupon_total = 0
 
         result = []
@@ -47,14 +49,15 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
             interest = principal_left * month_rate
             interest = interest.quantize(Decimal('.01'), rounding=ROUND_UP)
 
+            coupon_interest = principal_left * coupon_month_rate
+            coupon_interest = coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
+
             principal = term_amount - interest
             principal = principal.quantize(Decimal('.01'), rounding=ROUND_UP)
 
-            principal_left -= principal
-
-            coupon_interest = principal * coupon_month_rate
-            coupon_interest = coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
             coupon_total += coupon_interest
+
+            principal_left -= principal
 
             result.append((term_amount, principal, interest, principal_left, coupon_interest,
                            term_amount * (period - i - 1), interest_begin_date + relativedelta(months=i + 1)))
