@@ -211,7 +211,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id):
                                         "keyword1":"%s 元"%str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
-                                        "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
+                                        #"url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
                                             })},
                                         queue='celery02')
 
