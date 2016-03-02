@@ -616,3 +616,21 @@ def process_for_bind_card(user, card, req_res, request):
 
 def yee_callback(request):
     return YeeShortPay().pay_callback(request)
+
+def query_trx(order_id):
+    pay_info = PayInfo.objects.get(order_id=order_id)
+    if pay_info.channel == 'yeepay_bind':
+        return YeeShortPay().query_trx_result(order_id)
+    elif pay_info.channel == 'kuaipay':
+        return KuaiShortPay().query_trx_result(order_id)
+    else:
+        return None
+
+
+
+
+
+
+
+
+

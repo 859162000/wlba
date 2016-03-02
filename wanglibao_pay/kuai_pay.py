@@ -31,8 +31,6 @@ class KuaiPay:
     FEE = 0
 
     def __init__(self):
-        self.MER_ID = settings.KUAI_MER_ID
-        self.MER_PASS = settings.KUAI_MER_PASS
         #self.PAY_URL = settings.KUAI_PAY_URL
         #self.QUERY_URL = settings.KUAI_QUERY_URL
         #self.DEL_URL = settings.KUAI_DEL_URL
@@ -843,6 +841,14 @@ class KuaiShortPay:
         res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
         return res
 
+    def _find_in_xml(self, byte_content, key):
+        doc = etree.fromstring(byte_content)
+        namespace = doc.nsmap.get(None)
+        try:
+            return doc.find('.//{%s}%s' % (namespace, key)).text
+        except:
+            return None
+
     def _result2dict(self, content):
         xml = etree.XML(content)
         nsmap = xml.nsmap.values()
@@ -1417,14 +1423,20 @@ class KuaiShortPay:
         return self._sp_pay_tr4_xml(ref_number)
         # return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
 
-    def query_trx_result(self, pay_id):
+    def query_trx_result(self, order_id):
         """
         去第三方查询交易结果
-        快钱使用order_id查询，易宝使用payinfo的id查询
         """
-        trx_data  = self._sp_query_xml(pay_id)
-        trx_result_resp = self._request(trx_data, self.QUERY_TRANSACTION_URL)
-        return trx_result_resp
+        trx_data  = self._sp_query_xml(order_id)
+        res = self._request(trx_data, self.QUERY_TRANSACTION_URL)
+        try:
+            last_card_no = self._find_in_xml(res.content, 'storableCardNo')[-4:]
+        except:
+            last_card_no = None
+        return {'code': self._find_in_xml(res.content, 'responseCode'),
+                'message': self._find_in_xml(res.content, 'responseTextMessage'),
+                'last_card_no': last_card_no, 
+                'amount': self._find_in_xml(res.content, 'amount')
 
     def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """

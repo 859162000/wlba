@@ -329,6 +329,7 @@ class YeeShortPay:
         self.BIND_CARD_QUERY = settings.YEE_SHORT_BIND_CARD_QUERY
         self.BIND_PAY_REQUEST = settings.YEE_SHORT_BIND_PAY_REQUEST
         self.YEE_CALLBACK = settings.YEE_SHORT_CALLBACK
+        self.QUERY_TRX_RESULT = settings.YEE_SHORT_QUERY_TRX_RESULT
 
     def _sign(self, dic):
         values = self._sort(dic)
@@ -555,6 +556,15 @@ class YeeShortPay:
         post['callbackurl'] = self.YEE_CALLBACK
         post['userip'] = util.get_client_ip(request)
         return self._request_yee(url=self.BIND_PAY_REQUEST, data=post)
+
+    def _query_trx_result(self, order_id):
+        """
+        去第三方查询交易结果
+        """
+        post = dict()
+        post['merchantaccount'] = self.MER_ID
+        post['orderid'] = str(order_id)
+        return self._request_yee_get(url=self.QUERY_TRX_RESULT, data=post)
 
     def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
@@ -913,3 +923,12 @@ class YeeShortPay:
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
         return rs
+
+    def query_trx_result(self, order_id):
+        res = self._query_trx_result(order_id)
+        res_data = res.get('data')
+
+        return {'code': res_data.get('errorcode'),
+                'message': res_data.get('errormsg'),
+                'last_card_no': res_data.get('lastno'),
+                'amount': res_data.get('amount')}

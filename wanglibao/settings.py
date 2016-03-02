@@ -840,7 +840,7 @@ YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
 YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
 YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
 YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
-YEE_SHORT_BIND_QUERY = '%s/api/query/order' %  YEE_URL
+YEE_SHORT_QUERY_TRX_RESULT = '%s/api/query/order' %  YEE_URL
 
 
 

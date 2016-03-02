@@ -1,4 +1,3 @@
-# encoding:utf-8
 from decimal import Decimal
 from string import Template
 from django.core.exceptions import ObjectDoesNotExist
@@ -493,8 +492,6 @@ class YeeProxyPayCallbackMessageTest(TestCase):
         self.assertEqual(0.01, float(pay_message.amount))
         self.assertEqual(1925745, pay_message.order_id)
 
-['p1_MerId', 'r0_Cmd', 'r1_Code', 'r2_TrxId', 'r3_Amt', 'r4_Cur', 'r5_Pid', 'r6_Order',
-                               'r7_Uid', 'r8_MP', 'r9_BType']
 
 
 
