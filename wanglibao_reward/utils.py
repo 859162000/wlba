@@ -2,12 +2,23 @@
 import datetime
 from django.utils import timezone
 from django.db import transaction
-from wanglibao_reward.models import WechatPhoneRewardRecord
+from django.db.models import Sum
+import json
+from wanglibao_reward.models import WechatPhoneRewardRecord, P2pOrderRewardRecord
 from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_redpack.models import RedPack, RedPackEvent
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_message_for_hby, get_start_end_time
+from marketing.utils import local_to_utc
+from wanglibao_p2p.models import P2PRecord
+from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_account.auth_backends import User
+from wanglibao_redis.backend import redis_backend
+from misc.models import Misc
+import logging
+
+logger = logging.getLogger('wanglibao_reward')
 
 def sendWechatPhoneRewardByRegister(user, device_type="all"):
     phone = user.wanglibaouserprofile.phone
@@ -137,3 +148,59 @@ def getRewardsByActivity(code):
                 rewards.get('experience').append({'experience_event':experience})
     return rewards
 
+def getTodayTop10Ranks():
+    today = datetime.datetime.now()-datetime.timedelta(1)
+    today_start = local_to_utc(today, 'min')
+    today_end = local_to_utc(today, 'max')
+    top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
+    uids = [rank['user'] for rank in top_ranks]
+    userprofiles = WanglibaoUserProfile.objects.filter(user__in=uids).all()
+    for rank in top_ranks:
+        for userprofile in userprofiles:
+            if userprofile.user_id == rank['user']:
+                rank['phone'] = userprofile.phone
+                break
+    return top_ranks
+
+
+def getYesterdayTop10Ranks():
+    yesterday = datetime.datetime.now()-datetime.timedelta(1)
+    yesterday_start = local_to_utc(yesterday, 'min')
+    yesterday_end = local_to_utc(yesterday, 'max')
+    top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=yesterday_start, create_time__lte=yesterday_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
+    return top_ranks
+
+
+def updateRedisTopRank():
+    try:
+        top_ranks = getTodayTop10Ranks()
+        redis_backend()._set('top_ranks', top_ranks)
+    except Exception,e:
+        logger.error("====updateRedisTopRank======="+e.message)
+
+def processMarchAwardAfterP2pBuy(user, product, order_id, amount):
+    try:
+        rank_activity = Activity.objects.filter(code='march_awards').first()
+        utc_now = timezone.now()
+        if rank_activity and not rank_activity.is_stopped and rank_activity.start_at<=utc_now and rank_activity.end_at>=utc_now:
+            # updateRedisTopRank.apply_async()
+            updateRedisTopRank()
+
+            period = product.period
+            if product.pay_method.startswith(u'日计息'):
+                period = product.period/30
+            if period >= 3:
+                misc = Misc.objects.filter(key='march_awards').first()
+                march_awards = json.loads(misc.value)
+                if march_awards and isinstance(march_awards, json):
+                    highest = march_awards.get('highest', 0)
+                    lowest = march_awards.get('lowest', 0)
+
+                    if float(amount) >= lowest and float(amount) <= highest:
+                        P2pOrderRewardRecord.objects.create(
+                            user=user,
+                            activity_desc=u'投资额度奖励',
+                            order_id=order_id,
+                            )
+    except Exception, e:
+        logger.error("===========processMarchAwardAfterP2pBuy==================="+e.message)
