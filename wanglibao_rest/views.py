@@ -1633,9 +1633,7 @@ class AccessUserExistsApi(APIView):
 
 class LandOpenApi(APIView):
     """
-    渠道跳转页，
-    确定渠道来源，记录访问时间到redis中，
-    跳转活动页
+    渠道跳转页
     """
 
     permission_classes = ()
