@@ -13,7 +13,8 @@ from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_mess
 from marketing.utils import local_to_utc
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_reward.tasks import updateRedisTopRank
+from wanglibao_account.auth_backends import User
+from wanglibao_redis.backend import redis_backend
 from misc.models import Misc
 import logging
 
@@ -169,6 +170,13 @@ def getYesterdayTop10Ranks():
     top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=yesterday_start, create_time__lte=yesterday_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
     return top_ranks
 
+
+def updateRedisTopRank():
+    try:
+        top_ranks = getTodayTop10Ranks()
+        redis_backend()._set('top_ranks', top_ranks)
+    except Exception,e:
+        logger.error("====updateRedisTopRank======="+e.message)
 
 def processMarchAwardAfterP2pBuy(user, product, order_id, amount):
     try:
