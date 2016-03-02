@@ -2,7 +2,6 @@
 import logging
 from datetime import *
 from decimal import *
-from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Sum
@@ -11,8 +10,7 @@ from order.mixins import KeeperBaseMixin
 from wanglibao_account.utils import generate_contract
 from wanglibao_margin.marginkeeper import MarginKeeper
 from models import P2PProduct, P2PRecord, P2PEquity, EquityRecord, AmortizationRecord, ProductAmortization,\
-    UserAmortization, P2PContract, InterestPrecisionBalance, P2PProductContract, ProductInterestPrecision,\
-    InterestInAdvance, P2PEquityJiuxian
+    UserAmortization, P2PContract, InterestPrecisionBalance, P2PProductContract, ProductInterestPrecision
 from exceptions import ProductLack, P2PException
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_sms import messages
@@ -29,8 +27,8 @@ from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
 
 
-
 logger = logging.getLogger(__name__)
+
 
 class ProductKeeper(KeeperBaseMixin):
 
@@ -92,18 +90,9 @@ class EquityKeeperDecorator():
 
         with transaction.atomic(savepoint=savepoint):
             contract_list = list()
-            #p2p_quities = self.product.equities.select_related('user', 'product').all()
-            p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
+            p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile',
+                                                            'product__contract_template').filter(product=self.product)
             for p2p_equity in p2p_equities:
-                #EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
-
-                # product = p2p_equity.product
-                # user = p2p_equity.user
-                # equity_query = P2PEquity.objects.filter(user=user, product=product)
-                # if (not equity_query.exists()) or (len(equity_query) != 1):
-                #     raise P2PException('can not get equity info.')
-                #
-                # equity = equity_query.first()
                 contract_string = generate_contract(p2p_equity, None, p2p_equities)
 
                 contract = P2PContract()
@@ -116,17 +105,12 @@ class EquityKeeperDecorator():
     def generate_contract_one(self, equity_id, savepoint=True):
 
         with transaction.atomic(savepoint=savepoint):
-            # p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
             p2p_equity = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template')\
                                           .select_related('product').filter(id=equity_id).first()
-            amortizations = UserAmortization.objects.filter(user=p2p_equity.user, product_amortization__product=p2p_equity.product)
+            amortizations = UserAmortization.objects.filter(user=p2p_equity.user,
+                                                            product_amortization__product=p2p_equity.product)
             productAmortizations = ProductAmortization.objects.filter(product=p2p_equity.product).select_related('product').all()
             contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
-
-            #酒仙众筹标信息
-            jiuxian_equity = P2PEquityJiuxian.objects.filter(user=p2p_equity.user, equity=p2p_equity).first()
-            if jiuxian_equity:
-                p2p_equity.jiuxian = jiuxian_equity
 
             p2p_equity.contract_info = contract_info
             p2p_equity.amortizations_all = amortizations
@@ -146,7 +130,6 @@ class EquityKeeper(KeeperBaseMixin):
         super(EquityKeeper, self).__init__(user=user, product=product, order_id=order_id)
         self.product = product
         self.equity = None
-        self.equity_jiuxian = None
 
     def reserve(self, amount, description=u'', savepoint=True):
         check_amount(amount)
@@ -167,15 +150,6 @@ class EquityKeeper(KeeperBaseMixin):
             catalog = u'申购'
             record = self.__tracer(catalog, amount, description)
 
-            #酒仙网众筹用户增加额外的记录
-            # if self.product.category == u'酒仙众筹标':
-            #     self.equity_jiuxian, created = P2PEquityJiuxian.objects\
-            #         .get_or_create(user=self.user, product=self.product, equity=self.equity)
-            #     self.equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(pk=self.equity_jiuxian.id).first()
-            #     self.equity_jiuxian.equity_amount += amount
-            #     self.equity_jiuxian.created_at = datetime.now()
-            #     self.equity_jiuxian.save()
-
             return record
 
     def rollback(self, description=u'', savepoint=True):
@@ -191,18 +165,13 @@ class EquityKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount)
             user_margin_keeper = MarginKeeper(self.user, self.order_id)
             user_margin_keeper.unfreeze(amount, savepoint=False)
-            #流标要将红包退回账号
+            # 流标要将红包退回账号
             p2precord = P2PRecord.objects.filter(user=self.user, product=self.product, catalog=u"申购")
             if p2precord:
                 for p2p in p2precord:
                     result = redpack_backends.restore(p2p.order_id, p2p.amount, p2p.user)
                     if result['ret_code'] == 0:
                         user_margin_keeper.redpack_return(result['deduct'], description=u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct']))
-            #酒仙网流标后删除酒仙标用户持仓记录
-            # if self.product.category == u'酒仙众筹标':
-            #     equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(user=self.user, product=self.product).first()
-            #     if equity_jiuxian and equity_jiuxian.confirm is False:
-            #         equity_jiuxian.delete()
             return record
 
     def settle(self, savepoint=True):
@@ -219,14 +188,6 @@ class EquityKeeper(KeeperBaseMixin):
             self.__tracer(catalog, equity.equity, description)
             user_margin_keeper = MarginKeeper(self.user)
             user_margin_keeper.settle(equity.equity, savepoint=False)
-
-            #酒仙网众筹用户增加额外的记录
-            # if self.product.category == u'酒仙众筹标':
-            #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.user, product=self.product).first()
-            #     if equity_jiuxian:
-            #         equity_jiuxian.confirm = True
-            #         equity_jiuxian.confirm_at = datetime.now()
-            #         equity_jiuxian.save()
 
     def generate_contract(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
@@ -275,19 +236,10 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         # Delete all old user amortizations
         with transaction.atomic(savepoint=savepoint):
-            #UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete() 生成产品还款计划时，删除的时候就已经删除了
-
             self.amortizations = self.product.amortizations.all()
-
-            #self.amortizations = self.__generate_product_amortization(self.product)
             self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
             equities = self.product.equities.select_related('user').all()
 
-            #ProductAmortization.objects.select_for_update().filter(product=self.product)
-            # for equity in equities:
-            #     self.__dispatch(equity)
-            #self.__generate_useramortization(equities)
-            
             self.__generate_user_amortization(equities)
 
     def __generate_product_amortization(self, product):
@@ -303,8 +255,8 @@ class AmortizationKeeper(KeeperBaseMixin):
         logger.info(u'The product status is 录标完成, start to generate amortization plan')
 
         terms = get_amortization_plan(product.pay_method).generate(product.total_amount,
-                product.expected_earning_rate / 100,
-                datetime.now(), product.period)
+                                                                   product.expected_earning_rate / 100,
+                                                                   datetime.now(), product.period)
 
         for index, term in enumerate(terms['terms']):
             amortization = ProductAmortization()
@@ -387,59 +339,6 @@ class AmortizationKeeper(KeeperBaseMixin):
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
-    # def __generate_useramortization(self, equities):
-    #     """
-    #     :param equities: 批量生成用户还款计划提高数据库存储性能
-    #     :return:
-    #     """
-    #     user_amos = list()
-    #     interest_precisions = list()
-    #     exp = Decimal('0.00000001')
-    #
-    #     total_actual = Decimal('0')
-    #
-    #     for equity in equities:
-    #         total_principal = equity.equity
-    #         # total_interest = self.product_interest * equity.ratio
-    #         paid_principal = Decimal('0')
-    #         # paid_interest = Decimal('0')
-    #         count = len(self.amortizations)
-    #         for i, amo in enumerate(self.amortizations):
-    #             if i+1 != count:
-    #                 principal = equity.ratio * amo.principal
-    #
-    #             # paid_interest += interest
-    #                 paid_principal += principal
-    #             else:
-    #                 principal = total_principal - paid_principal
-    #                 # interest = total_interest - paid_interest
-    #
-    #             interest = equity.ratio * amo.interest
-    #             principal_actual = principal.quantize(Decimal('.01'))
-    #             interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
-    #
-    #             total_actual += interest_actual
-    #
-    #             user_amo = UserAmortization(
-    #                 product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
-    #                 principal=principal_actual, interest=interest_actual
-    #             )
-    #
-    #             interest_precision = InterestPrecisionBalance(
-    #                 equity=equity, principal=principal.quantize(exp),
-    #                 interest_actual=interest_actual, interest_receivable=interest,
-    #                 interest_precision_balance=(interest-interest_actual).quantize(exp)
-    #             )
-    #
-    #             user_amos.append(user_amo)
-    #             interest_precisions.append(interest_precision)
-    #
-    #     #记录某个标的总精度差额 author:hetao
-    #     self.__precision(total_actual)
-    #
-    #     UserAmortization.objects.bulk_create(user_amos)
-    #     InterestPrecisionBalance.objects.bulk_create(interest_precisions)
-
     def __precision(self, interest_actual):
         """
         记录某个标的总精度差额 author:hetao
@@ -486,7 +385,6 @@ class AmortizationKeeper(KeeperBaseMixin):
                 principal=principal, interest=interest
             )
             user_amos.append(user_amo)
-            #user_amo.save()
 
         UserAmortization.objects.bulk_create(user_amos)
 
@@ -548,21 +446,22 @@ class AmortizationKeeper(KeeperBaseMixin):
                     ))
                 try:
                     weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
-        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
                     if weixin_user and weixin_user.subscribe:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
-                                        "kwargs":json.dumps({
-                                                        "openid": weixin_user.openid,
-                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                                        "keyword1": product.name,
-                                                        "keyword2": "%s 元"%str(amo_amount),
-                                                        "keyword3": now,
-                                                            })},
-                                                        queue='celery02')
+                            "kwargs": json.dumps(
+                                {
+                                    "openid": weixin_user.openid,
+                                    "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                    "keyword1": product.name,
+                                    "keyword2": "%s 元" % str(amo_amount),
+                                    "keyword3": now,
+                                }
+                            )
+                        }, queue='celery02')
 
-                except Exception,e:
+                except Exception, e:
                     pass
             amortization.settled = True
             amortization.save()

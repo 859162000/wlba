@@ -1,33 +1,27 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
-from django.contrib.auth.models import User
 
 from django.db import transaction
 from django.utils import timezone
 from marketing import tools
-#from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 from django.conf import settings
-#from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_reward.views import RewardDistributer
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
-from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
+from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper
 from exceptions import P2PException
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
-import logging
-# from wanglibao_account.utils import CjdaoUtils
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
-import json, datetime
+import json
+import datetime
 
 from wanglibao_redis.backend import redis_backend
 
@@ -38,11 +32,12 @@ from weixin.tasks import sentTemplate
 
 logger = logging.getLogger('wanglibao_account')
 
+
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
         self.user = user
         self.product = product
-        
+
         if self.product.status != u"正在招标":
             raise P2PException(u'购买的标不在招标状态')
 
@@ -62,11 +57,12 @@ class P2PTrader(object):
             self.device_type = "pc"
 
     def purchase(self, amount, redpack=0, platform=u''):
-        description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
+        description = u'共计购买P2P产品 %s %s 份' % (self.product.short_name, amount)
         is_full = False
         if self.user.wanglibaouserprofile.frozen:
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
+            redpack_amount = 0  # 红包金额
             if redpack:
                 # 为防止用户同时打开两个浏览器同时使用加息券和红包，须先检测
                 coupons = RedPackRecord.objects.filter(user=self.user, product_id=self.product.id) \
@@ -83,17 +79,27 @@ class P2PTrader(object):
 
                 redpack_order_id = OrderHelper.place_order(self.user, order_type=u'优惠券消费', redpack=redpack,
                                                            product_id=self.product.id, status=u'新建').id
-                result = redpack_backends.consume(redpack, amount, self.user, self.order_id, self.device_type, self.product.id)
+                result = redpack_backends.consume(redpack, amount, self.user, self.order_id, self.device_type,
+                                                  self.product.id)
                 if result['ret_code'] != 0:
-                    raise Exception,result['message']
+                    raise Exception, result['message']
                 if result['rtype'] != 'interest_coupon':
                     red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'],
                                                                     order_id=redpack_order_id, savepoint=False)
-                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
-                                        amount=amount, deduct=result['deduct'], redpack=redpack)
+                    redpack_amount = result['deduct']
+                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功',
+                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
+            # 更新标已购金额或满标状态
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False, platform=platform)
-            margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
+            # 冻结投资金额,如果使用红包,则将红包的投资拆出来多生成一条流水记录
+            actual_amount = amount - redpack_amount
+            description_actual = u'本金购买P2P产品 %s %s 份' % (self.product.short_name, actual_amount)
+            margin_record = self.margin_keeper.freeze(actual_amount, description=description_actual, savepoint=False)
+            if redpack_amount > 0:
+                description_redpack = u'红包购买P2P产品 %s %s 份' % (self.product.short_name, redpack_amount)
+                margin_record = self.margin_keeper.freeze_redpack(redpack_amount, description=description_redpack, savepoint=False)
+            # 更新用户持仓信息
             equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
@@ -103,25 +109,27 @@ class P2PTrader(object):
 
         # fix@chenweibin, add order_id
         # Modify by hb on 2015-11-25 : add "try-except"
+        log_now = datetime.datetime.now()
         try:
-            logger.debug("=20151125= decide_first.apply_async : [%s], [%s], [%s], [%s], [%s], [%s]" % \
-                         (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
+            logger.debug("=%s= decide_first.apply_async : [%s], [%s], [%s], [%s], [%s], [%s]"
+                         % (log_now, self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full))
             tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
                                                    "device": self.device, "order_id": self.order_id,
                                                    "product_id": self.product.id, "is_full": is_full})
         except Exception, reason:
-            logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
+            logger.debug("={0}= decide_first.apply_async Except:{1}".format(log_now, reason))
             pass
 
         try:
-            logger.debug("=20151125= CoopRegister.process_for_purchase : [%s], [%s]" % (self.user.id, self.order_id) )
+            logger.debug("=%s= CoopRegister.process_for_purchase : [%s], [%s]" % (log_now, self.user.id, self.order_id))
             CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
         except Exception, reason:
-            logger.debug("=20151125= CoopRegister.process_for_purchase Except:{0}".format(reason) )
+            logger.debug("={0}= CoopRegister.process_for_purchase Except:{1}".format(log_now, reason))
             pass
 
         try:
-            logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
+            logger.debug(
+                "=%s= RewardDistributer.processor_for_distribute : [%s], [%s]" % (log_now, self.user.id, self.order_id))
             kwargs = {
                 'amount': amount,
                 'order_id': self.order_id,
@@ -129,10 +137,10 @@ class P2PTrader(object):
 
             RewardDistributer(self.request, kwargs).processor_for_distribute()
         except Exception, reason:
-            logger.debug("=20151125= RewardDistributer.processor_for_distribute Except:{0}".format(reason) )
+            logger.debug("={0}= RewardDistributer.processor_for_distribute Except:{1}".format(log_now, reason))
             pass
         else:
-            logger.debug("=20151125= RewardDistributer.processor_for_distribute : {0}购标成功".format(self.user) )
+            logger.debug("={0}= RewardDistributer.processor_for_distribute : {1}购标成功".format(log_now, self.user))
 
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
@@ -149,7 +157,7 @@ class P2PTrader(object):
             "mtype": "purchase"
 
         })
-        logger.debug("=20151125= inside_message.send_one : {0}购标站内信发成功".format(self.user) )
+        logger.debug("={0}= inside_message.send_one : {1}购标站内信发成功".format(log_now, self.user))
 
         # 满标给管理员发短信
         if is_full:
@@ -172,26 +180,26 @@ class P2PTrader(object):
         try:
             weixin_user = WeixinUser.objects.filter(user=self.user).first()
             now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
-    #         投标成功通知
-    #         您好，您已投标成功。
-    #         标的编号：10023
-    #         投标金额：￥3000.00
-    #         投标时间：2015-09-12
-    #         投标成功,可在投标记录里查看.
-    # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
+            #         投标成功通知
+            #         您好，您已投标成功。
+            #         标的编号：10023
+            #         投标金额：￥3000.00
+            #         投标时间：2015-09-12
+            #         投标成功,可在投标记录里查看.
+            # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
             if weixin_user:
                 sentTemplate.apply_async(kwargs={
-                                "kwargs":json.dumps({
-                                                "openid": weixin_user.openid,
-                                                "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
-                                                "keyword1": self.product.name,
-                                                "keyword2": "%s 元"%str(amount),
-                                                "keyword3": now,
-                                                "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % (self.order_id),
-                                                    })},
-                                                queue='celery02')
+                    "kwargs": json.dumps({
+                        "openid": weixin_user.openid,
+                        "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
+                        "keyword1": self.product.name,
+                        "keyword2": "%s 元" % str(amount),
+                        "keyword3": now,
+                        "url": settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % self.order_id,
+                    })
+                }, queue='celery02')
         except Exception, e:
-            logger.debug("=====sentTemplate=================%s"%e.message)
+            logger.debug("=====sentTemplate=================%s" % e.message)
 
         return product_record, margin_record, equity
 
@@ -242,7 +250,7 @@ class P2POperator(object):
         Automatic().auto_trade()
 
     @classmethod
-    #@transaction.commit_manually
+    # @transaction.commit_manually
     def preprocess_for_settle(cls, product):
         cls.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
 
@@ -381,14 +389,3 @@ class P2POperator(object):
 
                 # 将标信息从还款中的redis列表中挪到已完成的redis列表
                 cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
-
-    @classmethod
-    def settle_hike(cls, product):
-        result = redpack_backends.settle_hike(product)
-        if not result:
-            return
-        for x in result:
-            order_id = OrderHelper.place_order(x['user'], order_type=u'加息', product_id=product.id, status=u'新建').id
-            margin_keeper = MarginKeeper(user=x['user'], order_id=order_id)
-            margin_keeper.hike_deposit(x['amount'], u"加息存入%s元" % x['amount'], savepoint=False)
-            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x['user'], status=u'成功', amount=x['amount'])
