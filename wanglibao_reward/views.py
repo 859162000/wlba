@@ -2698,7 +2698,8 @@ class FetchMarchAwardAPI(APIView):
                 p2pReward.redpack_record_id = record.id
                 p2pReward.status = True
                 p2pReward.save()
-            return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}})
+            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+            return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}, 'chances':chances})
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
 
