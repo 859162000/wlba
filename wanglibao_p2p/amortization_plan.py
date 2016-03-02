@@ -30,17 +30,11 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
         month_rate = get_base_decimal(year_rate / 12)
 
         coupon_month_rate = get_base_decimal(coupon_year_rate / 12)
-        if coupon_year_rate == 0:
-            coupon_term_amount = 0
-        else:
-            coupon_term_amount = amount * (coupon_month_rate * pow(1 + coupon_month_rate, period)) / (pow(1 + coupon_month_rate, period) - 1)
-            coupon_term_amount = Decimal(coupon_term_amount).quantize(Decimal('.01'))
 
         term_amount = amount * (month_rate * pow(1 + month_rate, period)) / (pow(1 + month_rate, period) - 1)
         term_amount = Decimal(term_amount).quantize(Decimal('.01'))
 
         total = period * term_amount
-        # coupon_total = period * coupon_term_amount - amount
         coupon_total = 0
 
         result = []
@@ -62,6 +56,7 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
             result.append((term_amount, principal, interest, principal_left, coupon_interest,
                            term_amount * (period - i - 1), interest_begin_date + relativedelta(months=i + 1)))
 
+        # 计算加息利率最后一期的利息
         last_coupon_interest = principal_left * coupon_month_rate
         last_coupon_interest = last_coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
 
