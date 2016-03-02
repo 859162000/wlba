@@ -1274,3 +1274,11 @@ OAUTH2_CRYPTO_IV = 'a2xiMjAxNgo'
 # 渠道数据中心平台--数据同步密钥
 BASE_SYNC_KEY = ''
 YLB_SYNC_KEY = ''
+
+
+# 渠道数据中心平台认证授权密钥
+CHANNEL_CENTER_KEY = 'd2xiOXMwZA'
+if ENV == ENV_PRODUCTION:
+    OAUTH2_URL = ''
+else:
+    OAUTH2_URL = ''
