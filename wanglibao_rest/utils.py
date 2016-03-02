@@ -2,13 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import re
+import time
 import logging
 import hashlib
+import requests
 import datetime
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
-from wanglibao_oauth2.tools import oauth_token_login
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.contrib.auth import login as auth_login
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from marketing.utils import get_user_channel_record
@@ -118,6 +122,68 @@ def process_for_fuba_landpage(request, channel_code):
             redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
+def generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
+    sign = hashlib.md5(str(user_id) + client_id + utc_timestamp + key).hexdigest()
+    return sign
+
+
+def get_current_utc_timestamp():
+    time_format = '%Y-%m-%d %H:%M:%S'
+    utc_time = timezone.now().strftime(time_format)
+    utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
+    return utc_timestamp
+
+
+def token_auth(request, phone, client_id, token):
+    logger.info("user[%s] enter oauth_token_login with client_id[%s] token[%s]" % (phone, client_id, token))
+    is_auth = False
+    message = None
+    user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+    if user:
+        utc_timestamp = get_current_utc_timestamp()
+        sign = generate_oauth2_sign(user.id, client_id, utc_timestamp, settings.CHANNEL_CENTER_OAUTH_KEY)
+        data = {
+            'user_id': user.id,
+            'client_id': client_id,
+            'access_token': token,
+            'time': utc_timestamp,
+            'sign': sign,
+        }
+        try:
+            res = requests.post(url=settings.OAUTH2_URL, data=data)
+            if res.status_code == 200:
+                result = res.json()
+                logger.info("oauth_token_login connected return [%s]" % result)
+                res_code = result["ret_code"]
+                message = result["message"]
+                if res_code == 10000:
+                    sign = result["sign"]
+                    user_id = result["user_id"]
+                    client_id = result["client_id"]
+                    utc_timestamp = result["time"]
+                    if (int(get_current_utc_timestamp) - int(utc_timestamp)) <= 120:
+                        local_sign = generate_oauth2_sign(user_id, client_id,
+                                                          int(utc_timestamp) - 50,
+                                                          settings.CHANNEL_CENTER_OAUTH_KEY)
+                        if local_sign == sign:
+                            auth_login(request, user)
+                            is_auth = True
+                        else:
+                            message = u'无效签名'
+                    else:
+                        message = u'无效时间戳'
+            else:
+                logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+        except Exception, e:
+            logger.info("oauth_token_login error: %s" % e)
+            message = 'api error'
+    else:
+        message = 'invalid phone number'
+
+    logger.info("oauth_token_login process result: %s" % message)
+    return is_auth, message
+
+
 def process_for_bajinshe_landpage(request, channel_code):
     phone = request.session.get('phone', None)
     client_id = request.session.get('client_id', None)
@@ -125,7 +191,7 @@ def process_for_bajinshe_landpage(request, channel_code):
 
     if phone and client_id and access_token:
         try:
-            oauth_token_login(request, phone, client_id, access_token)
+            token_auth(request, phone, client_id, access_token)
         except Exception, e:
             logger.info('internal request oauth failed with error %s' % e)
 

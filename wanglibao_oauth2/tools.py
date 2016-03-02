@@ -26,7 +26,7 @@ def get_current_utc_timestamp():
     return utc_timestamp
 
 
-def oauth_token_login(request, phone, client_id, token):
+def token_auth(request, phone, client_id, token):
     logger.info("user[%s] enter oauth_token_login with client_id[%s] token[%s]" % (phone, client_id, token))
     is_auth = False
     message = None
@@ -49,13 +49,15 @@ def oauth_token_login(request, phone, client_id, token):
                 res_code = result["ret_code"]
                 message = result["message"]
                 if res_code == 10000:
-                    ticket = result["ticket"]
+                    sign = result["sign"]
                     user_id = result["user_id"]
                     client_id = result["client_id"]
                     utc_timestamp = result["time"]
                     if (int(get_current_utc_timestamp) - int(utc_timestamp)) <= 120:
-                        sign = generate_oauth2_sign(user_id, client_id, utc_timestamp, settings.CHANNEL_CENTER_OAUTH_KEY)
-                        if sign == ticket:
+                        local_sign = generate_oauth2_sign(user_id, client_id,
+                                                          int(utc_timestamp) - 50,
+                                                          settings.CHANNEL_CENTER_OAUTH_KEY)
+                        if local_sign == sign:
                             auth_login(request, user)
                             is_auth = True
                         else:
