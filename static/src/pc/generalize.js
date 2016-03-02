@@ -15,7 +15,6 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
     }, {
       offset: -100
     })
-
     var
         $download_layout = $('.generalize-dec-pub'),
         $download_layout_copy = $('.generalize-dec-other'),
@@ -25,9 +24,9 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
     var scrollTimer = null;
     $(window).on('scroll', function () {
         if (scrollTimer) {
-            clearTimeout(scrollTimer)
+           window.clearTimeout(scrollTimer)
         }
-        scrollTimer = setTimeout(function () {
+        scrollTimer = window.setTimeout(function () {
             repeat_sign($(window).scrollTop())
             if($(window).scrollTop() > $download_layout_TOP){
                 if($(window).scrollTop() > 3768){
@@ -37,6 +36,7 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
                     $download_layout.show();
                     $download_layout_copy.hide()
                 }
+
                 $download_layout.addClass('generalize-dec-fixed').css('right', $download_layout_RIGHT).animate({top: 150}, 300)
             }else if($(window).scrollTop() < $download_layout_TOP){
                 $download_layout.stop(!0, !0).removeAttr('style').removeClass('generalize-dec-fixed');
@@ -44,9 +44,9 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
 
         }, 20);
     });
-
+    var MODEL_INDEX = 0;
     function repeat_sign(scroll){
-        var MODEL_INDEX = 0;
+        //alert(scroll)
         if(scroll < 690){
             return $('.model-animate').removeClass('active');
         }else if(690 <= scroll && scroll < 1037){
@@ -65,9 +65,9 @@ require(['jquery', 'jquery.waypoints'], function ($, waypoints) {
             MODEL_INDEX = 5
             console.log(5, scroll)
         }
-        $('.generalize-explain-title-'+ MODEL_INDEX).fadeIn().siblings('.generalize-explain-title-pub').hide();
-        $('.generalize-explain-content-'+ MODEL_INDEX).fadeIn().siblings('.generalize-explain-content-pub').hide()
-
+        //alert(MODEL_INDEX)
+        $('.generalize-explain-title-'+ MODEL_INDEX).show().siblings('.generalize-explain-title-pub').hide();
+        $('.generalize-explain-content-'+ MODEL_INDEX).show().siblings('.generalize-explain-content-pub').hide()
     }
 
 });

@@ -1,0 +1,99 @@
+
+.check-in-banner
+  display: block
+  margin-bottom: 1.2rem
+
+.check-in-operation
+  display: -webkit-box
+
+
+.checkin-op-share, .checkin-op-status
+  -webkit-box-flex: 1
+  display: -webkit-box
+  -webkit-box-orient: horizontal
+
+.checkin-op-status
+  -webkit-box-pack: end
+  margin-right: 1rem
+
+.checkin-op-share
+  -webkit-box-pack: start
+  margin-left: 1rem
+
+.checkin-op-icon
+  display: inline-block
+  width: rem(90)
+  height: rem(90)
+  margin-right: .2rem
+
+.icon-status
+  background: url("/static/imgs/app/checkin/icon_checkin.png") no-repeat center
+  background-size: 100%
+.icon-share
+  background: url("/static/imgs/app/checkin/icon_share.png") no-repeat center
+  background-size: 100%
+
+.checkin-op-dec
+  padding-top: .2rem
+  text-align: right
+  .op-dec-title
+    font-size: .75rem
+    color: #666
+  .op-dec-detail
+    color: #999
+    font-size: .6rem
+  .op-detail-orange
+    color: #f5a623
+
+.check-in-bar
+  position: relative
+  text-align: center
+.bar-layout
+  display: inline-block
+  position: relative
+  font-size: .75rem
+  color: #fff
+
+  .bar-content
+    position: relative
+    width: 9rem
+    height: 1.75rem
+    line-height: 1.75rem
+    background: #DB493F
+    z-index: 2
+  .bar-before
+    position: absolute
+    top: 1rem
+    right: 0
+    width: 2.2rem
+    height: 1.125rem
+    background: #B74743
+    z-index: 1
+    &:before
+      content: ''
+      position: absolute
+      left: 0
+      top: 0
+      width: 0
+      height: 0
+      border-top: .5625rem solid transparent
+      border-bottom: .5625rem solid transparent
+      border-left: .4rem solid #FFE9D0
+  .bar-after
+    position: absolute
+    top: 1rem
+    right: 0
+    width: 2.2rem
+    height: 1.125rem
+    background: #B74743
+    z-index: 1
+    &:before
+      content: ''
+      position: absolute
+      right: 0
+      top: 0
+      width: 0
+      height: 0
+      border-top: .5625rem solid transparent
+      border-bottom: .5625rem solid transparent
+      border-right: .4rem solid #FFE9D0

@@ -12,7 +12,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
                                  AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppAreaView,
                                  AppAreaApiView, AppMemorabiliaView, AppDataModuleView, AppActivateScoreImageAPIView,
-                                 AppFinanceView, AppPraiseAwardView)
+                                 AppFinanceView, AppPraiseAwardView, AppCheckInView)
 from wanglibao_account.views import MarginRecordsAPIView
 router = DefaultRouter()
 
@@ -55,6 +55,7 @@ urlpatterns = patterns(
     url(r'^finance/$', AppFinanceView.as_view()),
     url(r'^share-finance/$', TemplateView.as_view(template_name="client_share_finance.jade"), name='app_finance'),
     url(r'^praise-award/$', AppPraiseAwardView.as_view()),
+    url(r'^check-in/$', AppCheckInView.as_view()),
 
     # 用户账户流水
     url(r'^margin_records/$', MarginRecordsAPIView.as_view()),

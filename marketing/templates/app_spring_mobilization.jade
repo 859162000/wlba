@@ -1,0 +1,210 @@
+- load formatters
+doctype html
+html(style="background: #91ce00")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2016022601", rel="stylesheet")
+        - csrf_token
+    body
+        .body_wrap.clear
+            .banner
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/banner.jpg')
+                .banner_text 万份豪礼倾情送，全民来抢乐出游！
+            .title_img
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/banner_text_bg.png')
+                .title_img_text 跟随LEO去踏青，投资福利送不停!
+            .title_text.title_text1 在5000元≤单笔投资额＜50000元（任意标期）即可获得一次翻牌机会，随机抽中10元~100元红包投资金额越高，<br>中大奖机会越大，出游红包伴你春日好心情！
+            .card_wrap
+                .card_main
+                    .card_box.card_left
+                        .card
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_1.png')
+                    .card_box.card_right
+                        .card
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_2.png')
+                    img.grass_1(src='/static/imgs/mobile_activity/app_spring_mobilization/grass_1.png')
+                    .card_box.card_left
+                        .card
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_3.png')
+                    .card_box.card_right
+                        .card
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_4.png')
+                    img.grass_2(src='/static/imgs/mobile_activity/app_spring_mobilization/grass_2.png')
+                    .card_box.card_left
+                        .card
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_5.png')
+                    .card_box.card_right
+                        .card
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_6.png')
+            .card_chance!=' 你有<span id="chance_num">3</span>次翻牌机会'
+            .button.button_1
+                img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
+                img.grass_3(src='/static/imgs/mobile_activity/app_spring_mobilization/grass.png')
+            .title_text.title_text2 温馨提示：单笔满额投资成功后，才可以选择一只LEO翻它牌子啦，100%中奖
+            .title_img
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/title_img.png')
+                .title_img_text 满额投资送豪礼
+            .title_text.title_text3 投资满额送大奖（限三月标及以上），享受豪礼~
+            .price_wrap
+                .price_main
+                    .price_box
+                        .title_top 5万元≤单笔投资＜10万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_1.png')
+                        .price_img_text 200元
+                        .price_text 200元红包
+                    .price_box.price_box_right
+                        .title_top 10万元≤单笔投资＜20万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_2.png')
+                        .price_text 500元京东E卡
+                    .price_box
+                        .title_top 20万元≤单笔投资＜30万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_3.png')
+                        .price_text 1098元 beats头戴式耳机
+                    .price_box.price_box_right
+                        .title_top 30万元≤单笔投资＜50万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_5.png')
+                        .price_text 2199元 小米平衡车
+                    .price_box.price_box_center
+                        .title_top 50万元≤单笔投资
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_4.png')
+                        .price_text 3300元 Apple Watch 运动<br>智能手表
+            .button.button_2
+                img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
+                img.grass_4(src='/static/imgs/mobile_activity/app_spring_mobilization/grass.png')
+            .title_text.title_text2 温馨提示：投资成功后，红包请至“我的账户”—“理财券”专区查看；获得实物奖的用户，活动结束后，客服会电话联系您，请保持手机畅通。
+            .title_img
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/title_img.png')
+                .title_img_text 每日排名送加息券
+            .title_text.title_text5 每日排名前10名的投资客户，均可享受获得高额加息券福利，每天排名每天送！
+            .ranking_wrap
+                .ranking_main
+                    .ranking_main_1
+                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__1.png')
+                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__2.png')
+                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__3.png')
+                        img.ranking_box(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon__4.png')
+                    .ranking_main_2
+                        .list_wrap
+                            .list_main
+                                .title_box 每日投资排行榜（更新时间为：14:00）
+                                table
+                                    thead
+                                        tr
+                                            th.one 用户名
+                                            th.two 投资金额
+                                            th.three 获得福利
+                                    tbody
+                                        tr.first
+                                            td.one
+                                                span.ico
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr.second
+                                            td.one
+                                                span.ico
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr.third
+                                            td.one
+                                                span.ico
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr
+                                            td.one
+                                                span.num 4
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr
+                                            td.one
+                                                span.num 5
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr
+                                            td.one
+                                                span.num 6
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr
+                                            td.one
+                                                span.num 7
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr
+                                            td.one
+                                                span.num 8
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr
+                                            td.one
+                                                span.num 9
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                        tr
+                                            td.one
+                                                span.num 10
+                                                span.phone 139 XXXX 2453
+                                            td.two 25,000 元
+                                            td.three 2%加息券
+                                .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名
+            .button.button_3
+                img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
+            .rule_wrap
+                .title_text 活动规则
+                dl
+                    dt 1、
+                    dd 活动有效期：2016年3月X日0：00-2016年3月X日23:59；
+                dl
+                    dt 2、
+                    dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
+                dl
+                    dt 3、
+                    dd 每个红包仅限使用一次，不可叠加使用，也不可与加息券同时使用。红包使用后无论是否有余额均失效，使用详情请见我的账户-理财券红包列表查看；
+                dl
+                    dt 4、
+                    dd 获得实物奖励资格的用户，需在用户中心里完善收货信息，在活动结束后7个工作日内会有客服人员与您联系，请保持手机畅通，所有实物奖品均会在4月10日前发放完毕；
+                dl
+                    dt 5、
+                    dd 活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2016022601")
+        //script.
+        //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+        //        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+        //        ios = ipad || iphone;
+        //    if (ios) {
+        //        document.getElementById('ios-show').style.display = 'block';
+        //    }
