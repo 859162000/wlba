@@ -2613,10 +2613,29 @@ class MarchAwardTemplate(TemplateView):
         else:
             ranks = []
             chances = 0
-        
+        award_list = []
+        misc = Misc.objects.filter(key='march_awards').first()
+        if misc:
+            march_awards = json.loads(misc.value)
+            rank_awards = march_awards.get('rank_awards', [])
+            rank_awards_set = set(rank_awards)
+
+            for event_id in rank_awards_set:
+                indexes = []
+                for idx, e_id in enumerate(rank_awards):
+                    if event_id==e_id:
+                        indexes.append(idx+1)
+                indexes.sort()
+                print indexes
+                indexes = [str(x) for x in indexes]
+                redpack_event = RedPackEvent.objects.filter(id=int(event_id)).first()
+                award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
+            # [376,377,377,378,378,378,379,379,379,379]
+
         return {
            "chances": chances,
-           "top_ranks":ranks
+           "top_ranks":ranks,
+           "award_list":award_list,
             }
 
 
