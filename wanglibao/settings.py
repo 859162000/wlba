@@ -1266,19 +1266,13 @@ DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
 
-# Oauth2 加密密钥
-OAUTH2_CRYPTO_KEY = 'd2xiOTkK'
-OAUTH2_CRYPTO_IV = 'a2xiMjAxNgo'
-
-
-# 渠道数据中心平台--数据同步密钥
-BASE_SYNC_KEY = ''
-YLB_SYNC_KEY = ''
-
 
 # 渠道数据中心平台认证授权密钥
-CHANNEL_CENTER_KEY = 'd2xiOXMwZA'
+CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
 if ENV == ENV_PRODUCTION:
     OAUTH2_URL = ''
+    CHANNEL_CENTER_CALL_BACK_URL = ''
 else:
     OAUTH2_URL = ''
+    CHANNEL_CENTER_CALL_BACK_URL = ''

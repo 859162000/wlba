@@ -75,6 +75,7 @@ from .utils import xunleivip_generate_sign
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 from wanglibao_oauth2.models import OauthUser, Client
 import json
+from wanglibao_oauth2.tools import get_current_utc_timestamp
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1596,6 +1597,8 @@ class BaJinSheRegister(CoopRegister):
         self.external_channel_user_id_key = 'p_user_id'
         self.external_channel_order_id_key = 'orderNum'
         self.internal_channel_order_id_key = 'order_id'
+        self.call_back_url = settings.CHANNEL_CENTER_CALL_BACK_URL
+        self.coop_key = settings.CHANNEL_CENTER_CALL_BACK_KEY
 
     @property
     def oauth2_client_id(self):
@@ -1649,86 +1652,45 @@ class BaJinSheRegister(CoopRegister):
         :param user:
         :return:
         """
-        channel_user = self.channel_user
-        if not channel_user:
-            crypto = Crypto()
-            data_buf = crypto.encrypt_mode_cbc(str(user.id), settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
-            channel_user = crypto.encode_bytes(data_buf)
-
-        channel_name = self.channel_name
-        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-        if channel_name and channel_user and len(channel_user) <= bid_len:
-            has_binding = Binding.objects.filter(btype=channel_name, bid=channel_user).exists()
-            if not has_binding:
-                binding = Binding()
-                binding.user = user
-                binding.btype = channel_name
-                binding.bid = channel_user
-                binding.save()
-                # logger.debug('save user %s to binding'%user)
+        pass
 
     def generate_sign(self, channel, _time, key):
         sign = hashlib.md5(channel + key + _time).hexdigest()
         return sign
 
-    def bajinshe_call_back(self, user, order_id):
-        channel_order_id = self.channel_order_id
-        oauth2_client_id = self.oauth2_client_id
-        if channel_order_id:
-            oauth_user = OauthUser.objects.filter(client__client_id=oauth2_client_id, user=user).first()
-            if oauth_user:
-                # 创建渠道订单记录
-                channel_recode = get_user_channel_record(user.id)
-                order = UserThreeOrder(user=user,
-                                       order_on=channel_recode,
-                                       request_no=order_id,
-                                       thrid_order_id=channel_order_id)
-                order.save()
-
     def register_call_back(self, user):
         client_id = self.channel_client_id
         logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
-        # FixMe, 是否需要异步同步数据到渠道中心，如果异步，数据在队列中延迟，而用户执行了其他操作的时候，渠道中心将无法找到用户匹配数据
         if client_id:
             try:
-                channel_data_dispatch_url = ''
                 channel = 'base'
-                time = ''
-                key = ''
+                time = get_current_utc_timestamp()
                 data = {
                     'user_id': user.id,
                     'client_id': client_id,
-                    'sign': self.generate_sign(channel, time, key),
+                    'sign': self.generate_sign(channel, time, self.coop_key),
                     'time': time,
                     'act': 'register',
                     'channel': channel,
-                    'phone': '',
+                    'phone': user.wanglibaoprofile.phone,
                     'btype': self.channel_code,
                 }
-                res = requests.post(url=channel_data_dispatch_url, data=data)
+                res = requests.post(url=self.call_back_url, data=data)
+                if res.status_code == 200:
+                    result = res.json()
+                    logger.info("register_call_back connected return [%s]" % result)
+                else:
+                    logger.info("oauth_token_login connected status code[%s]" % res.status_code)
             except Exception, e:
                 logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
             else:
                 logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
 
-        # push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
-        # coop_id = settings.BAJINSHE_COOP_ID
-        # coop_key = settings.BAJINSHE_COOP_KEY
-        # order_id = '%s_0001' % timezone.now().strftime("%Y%m%d%H%M%S")
-        # access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
-        # bid = get_tid_for_coop(user.id)
-        # phone = get_phone_for_coop(user.id)
-        # if access_token and bid:
-        #     tran = {
-        #         'bingdingUid': bid,
-        #         'usn': phone,
-        #     }
-
     def purchase_call_back(self, user, order_id):
-        self.bajinshe_call_back(user, order_id)
+        pass
 
     def recharge_call_back(self, user, order_id):
-        self.bajinshe_call_back(user, order_id)
+        pass
 
 
 class RenRenLiRegister(CoopRegister):

@@ -15,8 +15,15 @@ logger = logging.getLogger(__name__)
 
 
 def generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
-    sign = hashlib.md5(str(user_id) + client_id + str(utc_timestamp) + key).hexdigest()
+    sign = hashlib.md5(str(user_id) + client_id + utc_timestamp + key).hexdigest()
     return sign
+
+
+def get_current_utc_timestamp():
+    time_format = '%Y-%m-%d %H:%M:%S'
+    utc_time = timezone.now().strftime(time_format)
+    utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
+    return utc_timestamp
 
 
 def oauth_token_login(request, phone, client_id, token):
@@ -25,10 +32,8 @@ def oauth_token_login(request, phone, client_id, token):
     message = None
     user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
     if user:
-        time_format = '%Y-%m-%d %H:%M:%S'
-        utc_time = timezone.now().strftime(time_format)
-        utc_timestamp = int(time.mktime(time.strptime(utc_time, time_format)))
-        sign = generate_oauth2_sign(user.id, client_id, utc_timestamp, settings.CHANNEL_CENTER_KEY)
+        utc_timestamp = get_current_utc_timestamp()
+        sign = generate_oauth2_sign(user.id, client_id, utc_timestamp, settings.CHANNEL_CENTER_OAUTH_KEY)
         data = {
             'user_id': user.id,
             'client_id': client_id,
@@ -45,8 +50,18 @@ def oauth_token_login(request, phone, client_id, token):
                 message = result["message"]
                 if res_code == 10000:
                     ticket = result["ticket"]
-                    auth_login(request, user)
-                    is_auth = True
+                    user_id = result["user_id"]
+                    client_id = result["client_id"]
+                    utc_timestamp = result["time"]
+                    if (int(get_current_utc_timestamp) - int(utc_timestamp)) <= 120:
+                        sign = generate_oauth2_sign(user_id, client_id, utc_timestamp, settings.CHANNEL_CENTER_OAUTH_KEY)
+                        if sign == ticket:
+                            auth_login(request, user)
+                            is_auth = True
+                        else:
+                            message = u'无效签名'
+                    else:
+                        message = u'无效时间戳'
             else:
                 logger.info("oauth_token_login connected status code[%s]" % res.status_code)
         except Exception, e:
