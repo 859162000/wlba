@@ -297,10 +297,72 @@
       display: inline-block
       .ranking_main_1
         width: 100%
+        position: relative
+        display: inline-block
         .ranking_box
-          float: left
           width: 25%
           display: block
+          position: absolute
+          bottom: 0
+          .coupon
+            display: block
+            position: relative
+            width: 100%
+            img
+              width: 100%
+              display: block
+            .coupon_text
+              position: absolute
+              width: 83%
+              left: 7.4%
+              top: 42.2%
+              z-index: 2
+              color: #fff
+              font-size: 0.6rem
+              text-align: center
+          .coupon_box
+            display: block
+            position: relative
+            width: 100%
+            img
+              width: 100%
+              display: block
+            .coupon_box_text
+              position: absolute
+              width: 100%
+              left: 0%
+              top: 50%
+              z-index: 2
+              color: #ed2b4e
+              font-size: 0.6rem
+              text-align: center
+              margin-top: -0.35rem
+          .ranking_no
+            display: block
+            position: relative
+            width: 100%
+            img
+              width: 100%
+              display: block
+            .ranking_no_text
+              position: absolute
+              width: 100%
+              left: 0%
+              top: 50%
+              z-index: 2
+              color: #ed2b4e
+              font-size: 0.6rem
+              text-align: center
+              margin-top: -0.35rem
+        .ranking_box_1
+          left: 0
+          position: relative
+        .ranking_box_2
+          left: 25%
+        .ranking_box_3
+          left: 50%
+        .ranking_box_4
+          left: 75%
       .ranking_main_2
         width: 100%
         display: block
@@ -454,7 +516,31 @@
     z-index: 2
     display: block
     width: 8%
-
+  .popup_box
+    position: fixed
+    left: 0
+    top: 0
+    width: 100%
+    height: 100%
+    z-index: 999
+    display: none
+    background: rgba(0,0,0,0.7)
+    .main
+      width: 400px
+      position: absolute
+      left: 50%
+      top: 50%
+      margin: -50px 0 0 -200px
+      float: none
+      background: #fff
+      border-radius: 40px
+      z-index: 99
+      .text
+        width: 100%
+        text-align: center
+        line-height: 20px
+        font-size: 18px
+        padding: 30px 0
 
 
 
