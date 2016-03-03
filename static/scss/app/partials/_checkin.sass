@@ -1,0 +1,268 @@
+
+.check-in-banner
+  display: block
+  width: 100%
+  height: auto
+  margin-bottom: 1.2rem
+
+.check-in-operation
+  display: -webkit-box
+
+
+.checkin-op-share, .checkin-op-status
+  -webkit-box-flex: 1
+  display: -webkit-box
+  -webkit-box-orient: horizontal
+
+.checkin-op-status
+  -webkit-box-pack: end
+  margin-right: 1rem
+
+.checkin-op-share
+  -webkit-box-pack: start
+  margin-left: 1rem
+
+.checkin-op-icon
+  display: inline-block
+  width: rem(90)
+  height: rem(90)
+  margin-right: .2rem
+
+.icon-status
+  background: url("/static/imgs/app/checkin/icon_checkin.png") no-repeat center
+  background-size: 100%
+.icon-share
+  background: url("/static/imgs/app/checkin/icon_share.png") no-repeat center
+  background-size: 100%
+
+.checkin-op-dec
+  padding-top: .2rem
+  text-align: right
+  .op-dec-title
+    font-size: .75rem
+    color: #666
+  .op-dec-detail
+    color: #999
+    font-size: .6rem
+  .op-detail-orange
+    color: #f5a623
+
+.check-in-bar
+  position: relative
+  text-align: center
+  margin-top: 1rem
+.bar-layout
+  display: inline-block
+  position: relative
+  font-size: .75rem
+  color: #fff
+
+  .bar-content
+    position: relative
+    width: 9rem
+    height: 1.75rem
+    line-height: 1.75rem
+    background: #DB493F
+    z-index: 2
+  .bar-before
+    position: absolute
+    top: 1rem
+    left: -1.4rem
+    width: 2.2rem
+    height: 1.125rem
+    background: #B74743
+    z-index: 1
+    &:before
+      content: ''
+      position: absolute
+      left: -1px
+      top: 0
+      width: 0
+      height: 0
+      border-top: .5625rem solid transparent
+      border-bottom: .5625rem solid transparent
+      border-left: .4rem solid #FFE9D0
+  .bar-after
+    position: absolute
+    top: 1rem
+    right: -1.4rem
+    width: 2.2rem
+    height: 1.125rem
+    background: #B74743
+    z-index: 1
+    &:before
+      content: ''
+      position: absolute
+      right: -1px
+      top: 0
+      width: 0
+      height: 0
+      border-top: .5625rem solid transparent
+      border-bottom: .5625rem solid transparent
+      border-right: .4rem solid #FFE9D0
+
+
+
+.check-in-process
+  position: relative
+  margin: 2rem 0 1rem 0
+  .check-in-process-line
+    position: absolute
+    top: .8rem
+    left: 0
+    width: 100%
+    height: .075rem
+    background: #DB493F
+    z-index: 1
+  .check-in-flag-lists
+    position: relative
+    z-index: 2
+    text-align: center
+  .circle-item-warp
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    width: 1.6rem
+    height: 1.6rem
+  .flag-items
+    display: inline-block
+    text-align: center
+    margin: 0 .2rem
+    @media screen and (min-device-width: 374px)
+      margin: 0 .3rem
+    @media screen and (min-device-width: 413px)
+      margin: 0 .5rem
+  .circle-item
+    display: inline-block
+    position: relative
+    width: .6rem
+    height: .6rem
+    border-radius: .3rem
+    border: rem(2) solid #DB493F
+    background: #fff
+  .opactiy-layout
+    opacity: 0
+    -webkit-transition: opacity 1s
+    transition: opacity 1s
+  .circle-min,.circle-animate
+    position: absolute
+    left: 50%
+    top: 50%
+    width: .3rem
+    height: .3rem
+    border-radius: .3rem
+    background: #DB493F
+    margin: -.15rem 0 0 -.15rem
+    @extend .opactiy-layout
+  .check-in-flag
+    position: absolute
+    top: -1.15rem
+    left: -.1rem
+    width: .7rem
+    height: 1rem
+    background: url("/static/imgs/app/checkin/icon_flag.png") no-repeat center
+    background-size: 100%
+    @extend .opactiy-layout
+  .text-item
+    font-size: .6rem
+    color: #B99B6A
+    margin-top: .3rem
+
+//process status
+.active-did
+  .text-item
+    color: #DB493F
+  .circle-min,.circle-animate
+    opacity: 1
+.active-doing
+  .check-in-flag
+    opacity: 1
+
+.active-gift
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/icon_gift.png") no-repeat center
+    background-size: 100%
+  .circle-item
+    opacity: 0
+
+
+.check-in-rules-layout
+  padding: 0 1rem
+  font-size: .6rem
+  color: #666
+  max-height: 9999rem
+  .check-rules-title
+    font-weight: bold
+    line-height: 1.8
+  .check-rules-detail
+    margin-bottom: 1rem
+    line-height: 1.4
+
+
+
+.check-in-alert-layout
+  position: fixed
+  top: 0
+  left: 0
+  bottom: 0
+  width: 100%
+  height: 100%
+  z-index: 3
+  display: none
+  .check-alert-mask
+    display: -webkit-box
+    -webkit-box-pack: center
+    -webkit-box-align: center
+    height: 100%
+    background: rgba(0,0,0, .5)
+  .check-alert-body
+    position: relative
+    width: rem(590)
+    text-align: center
+    font-size: .6rem
+    background: #fff
+    border-radius: .2rem
+    border: .1rem solid #FF5353
+    padding: 1.5rem 0 .8rem 0
+  .check-body-overflow-icon
+    position: absolute
+    top: 0
+    left: 50%
+  .overflow-flag
+    width: rem(376)
+    height: rem(149)
+    background: url("/static/imgs/app/checkin/check_success.png") no-repeat center
+    background-size: 100%
+    margin: -(rem(149/2)) 0 0 -(rem(376/2))
+  .overflow-share
+    width: rem(360)
+    height: rem(144)
+    background: url("/static/imgs/app/checkin/share_success.png") no-repeat center
+    background-size: 100%
+    margin: -(rem(144/2)) 0 0 -(rem(360/2))
+  .overflow-gift
+    width: rem(388)
+    height: rem(125)
+    background: url("/static/imgs/app/checkin/touch_gift.png") no-repeat center
+    background-size: 100%
+    margin: -(rem(125/2)) 0 0 -(rem(388/2))
+
+  .check-body-leo
+    display: block
+    width: rem(156)
+    height: rem(156)
+    margin:  0 auto
+  .check-body-gift-information
+    font-size: .75rem
+    color: #666
+    margin-top: .6rem
+  .check-body-where-information
+    color: #999
+    margin-top: .6rem
+  .check-body-opeartion-btn
+    display: inline-block
+    padding: .5rem 1rem
+    color: #fff
+    background: #FF5353
+    border-radius: .2rem
+    margin-top: .6rem

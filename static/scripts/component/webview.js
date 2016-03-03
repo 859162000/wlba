@@ -119,7 +119,7 @@ var wlb = (function () {
         },
         /**
          * 获取分享信息 app2.7.6版本
-         * @param data {title: 活动标题, content: 活动描述, shareUrl:'指定分享的url'}
+         * @param data {title: 活动标题, content: 活动描述, shareUrl:'指定分享的url', image: ''}
          */
         shareData: function (data) {
             this.bridge.registerHandler('shareData', function (backdata, responseCallback) {
@@ -130,7 +130,7 @@ var wlb = (function () {
          * 调用分享按钮 app2.7.6版本
          * @function touchShare
          * @param data 自定义分享信息
-         * @param callback 回调
+         * @param callback 回调 {title: 活动标题, content: 活动描述, shareUrl:'指定分享的url', image: ''}
          */
         touchShare: function(data, callback){
             var options = this._setData(data, callback);
