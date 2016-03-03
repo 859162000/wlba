@@ -2611,7 +2611,6 @@ class MarchAwardTemplate(TemplateView):
                 chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
             try:
                 ranks = redis_backend()._lrange('top_ranks', 0, -1)
-                print '===========================2', ranks
             except:
                 pass
             if not ranks:
@@ -2637,7 +2636,6 @@ class MarchAwardTemplate(TemplateView):
                 award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
 
             idx = 0
-            print '===========================1',type(ranks)
 
             for rank in ranks:
                 print rank
@@ -2647,8 +2645,6 @@ class MarchAwardTemplate(TemplateView):
                 idx+=1
 
         award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
-        # print award_list
-        print '----------------------------------chances:', chances
         return {
            "chances": chances,
            "top_ranks":ranks,
