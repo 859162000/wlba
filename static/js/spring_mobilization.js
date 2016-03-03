@@ -53,6 +53,14 @@
             type: 'post',
             success: function (data1) {
                 h5_user_static = data1.login;
+                if(h5_user_static){
+                    $('span#zero').hide();
+                    $('span#chance_num').css('display','inline-block');
+                }else{
+                    $('span#chance_num').hide();
+                    $('span#zero').css('display','inline-block');
+
+                }
             }
         })
 

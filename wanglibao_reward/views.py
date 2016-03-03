@@ -2640,8 +2640,9 @@ class MarchAwardTemplate(TemplateView):
                 event = redpack_events[rank_awards[idx]]
                 rank['coupon'] = event.amount
                 idx+=1
-        # print ranks
 
+        award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
+        # print award_list
         return {
            "chances": chances,
            "top_ranks":ranks,
