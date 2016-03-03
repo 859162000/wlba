@@ -129,8 +129,14 @@ class AnnouncementHasNewestApi(APIView):
     permission_classes = ()
 
     def get(self, request, id):
-        req_data = request.GET
-        device_type = req_data.get('device_type')
+        device_type = 'pc'
+        device_list = ['android', 'iphone']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                device_type = 'mobile'
+
         announcements = Announcement.objects.filter(Q(pk__gt=id, status=1, hideinlist=False, device=device_type) |
                                                     Q(pk__gt=id, status=1, hideinlist=False, device='pc&app'))
 
