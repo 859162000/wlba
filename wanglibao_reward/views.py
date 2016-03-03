@@ -2648,6 +2648,7 @@ class MarchAwardTemplate(TemplateView):
 
         award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
         # print award_list
+        print '----------------------------------chances:', chances
         return {
            "chances": chances,
            "top_ranks":ranks,
@@ -2709,11 +2710,11 @@ class FetchMarchAwardAPI(APIView):
                     return Response({"ret_code":-1, "message":"红包错误"})
                 device = split_ua(self.request)
                 device_type = device['device_type']
-                status, messege, record = redpack_backends.give_activity_redpack_new(user, redpack_event, device_type)
+                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(user, redpack_event, device_type)
                 if not status:
                     return Response({"ret_code":-1, "message":messege})
                 p2pReward.redpack_event_id =  redpack_event.id
-                p2pReward.redpack_record_id = record.id
+                p2pReward.redpack_record_id = redpack_record_id
                 p2pReward.status = True
                 p2pReward.save()
             chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()

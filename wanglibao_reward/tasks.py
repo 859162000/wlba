@@ -64,11 +64,11 @@ def sendYesterdayTopRankAward():
                     with transaction.atomic():
                         rank_reward_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=user).first()
                         if not rank_reward_record.redpack_record_id:
-                            status, messege, record = give_activity_redpack_new(user, redpack_event, 'all')
+                            status, messege, redpack_record_id = give_activity_redpack_new(user, redpack_event, 'all')
                             if not status:
                                 logger.error('排名奖励，排名第%s名的用户%s没有得到%s,因为%s'%(index+1,rank['user'], redpack_event_id, messege))
                                 break
-                            rank_reward_record.redpack_record_id = record.id
+                            rank_reward_record.redpack_record_id = redpack_record_id
                             rank_reward_record.redpack_record_id_time = timezone.now()
                             rank_reward_record.save()
                     break
