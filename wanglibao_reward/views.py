@@ -2664,8 +2664,10 @@ class FetchMarchAwardAPI(APIView):
                 #  u'7': 379,
                 #  u'8': 379,
                 #  u'9': 379}}
-            p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
             with transaction.atomic():
+                p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
+                if not p2pReward:
+                    return Response({"ret_code":-1, "message":"没有翻牌机会"})
                 p2pRecord = P2PRecord.objects.filter(order_id=p2pReward.order_id).first()
                 if not p2pRecord:
                     return Response({"ret_code":-1, "message":"投资条件不符合"})
