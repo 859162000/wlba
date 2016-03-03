@@ -2607,7 +2607,8 @@ class MarchAwardTemplate(TemplateView):
         chances = 0
         if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
             user = self.request.user
-            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+            if user.is_authenticated():
+                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
             try:
                 ranks = redis_backend()._get('top_ranks')
             except:
