@@ -5,65 +5,44 @@
         type: 'post',
         success: function(data1) {
             h5_user_static = data1.login;
+            if(h5_user_static){
+                    $('span#zero').hide();
+                    $('span#chance_num').css('display','inline-block');
+                }else {
+                $('span#chance_num').hide();
+                $('span#zero').css('display', 'inline-block');
+
+            }
         }
     });
     var login = false;
     wlb.ready({
         app: function(mixins) {
-            $('.code_wrap').hide();
-            $('#take').click(function() {
-                window.location.href = '/activity/experience/redirect/'
-                //体验金
-            });
 
-            $('#take_red').click(function() {
-                mixins.jumpToManageMoney();
-            });
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
                     login = false;
-                    $('#register').click(function() {
-                       window.location.href = '/activity/experience/redirect/'
-                    });
-                    $('#go_user').on('click',
-                    function() {
+
+                    $('.button').click(function() {
                         mixins.loginApp();
-                    })
+                    });
+
                 } else {
                     login = true;
-                    $('#register').click(function() {
+                    $('.button').click(function() {
                         mixins.jumpToManageMoney();
                     });
-                    $('#go_user').on('click',
-                    function() {
-                        mixins.jumpToManageMoney();
-                    })
                 }
             })
         },
         other: function() {
-            $('.code_wrap').show();
-
-            $('#take').click(function() {
-                window.location.href = '/activity/experience/mobile/';
-                //体验金
-            });
-
-            $('#register').click(function() {
-				window.location.href = '/activity/experience/mobile/';
-            });
-            $('#go_user').on('click',
-            function() {
-                window.location.href = '/activity/app_gold_season/';
-            });
-            $('#take_red').on('click',
-            function() {
+            $('.button').click(function() {
                 if (h5_user_static) {
                     window.location.href = '/weixin/list/'
                 } else {
-                    window.location.href = '/weixin/regist/?next=/weixin/list/'
+                    window.location.href = '/weixin/login/?next=/weixin/list/'
                 }
-            });
+            })
             //console.log('其他场景的业务逻辑');
 
         }
@@ -86,12 +65,12 @@
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
-			shareName = '网利宝用户专享福利',
-			shareImg = host + '/static/imgs/mobile_activity/app_noviceDecember_h5/300x300.jpg',
-			shareLink = host + '/activity/app_noviceDecember_h5/',
-			shareMainTit = '网利宝用户专享福利',
-			shareBody = '网利宝送你新手福利大红包，快来领哦！';
+		var host = 'https://staging.wanglibao.com/',
+			shareName = '春日总动员',
+			shareImg = host + '/static/imgs/mobile_activity/app_spring_mobilization/300x300.jpg',
+			shareLink = host + 'march_reward/app/',
+			shareMainTit = '春日总动员',
+			shareBody = '万份豪礼倾情送，全民来抢乐出游！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -101,7 +80,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝用户专享福利',
+			title: '春日总动员',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -114,7 +93,78 @@
 		})
 	})
 
-    $('.card_box').click(function(){
-        $(this).find('.card').addClass('card_box_open');
-    })
+        var time_count = 3;
+        /*倒数秒数*/
+        var time_intervalId;
+        /*定义倒计时的名字*/
+
+        var timerFunction = function () {
+        /*定义倒计时内容*/
+            if (time_count > 1) {
+                time_count--;
+                return $('.popup_box').show();
+            } else {
+                clearInterval(time_intervalId);
+                /*清除倒计时*/
+                $('.popup_box').hide();
+                /*解锁按钮，可以点击*/
+            }
+        };
+
+        /*翻牌*/
+        var chance_num;
+        var card_no;
+        $('.card_box').click(function(){
+            card_no=$(this).attr('data-card');
+            if(h5_user_static){
+                chance_num = $('#chance_num').text();
+                if(chance_num>0){
+                    if(!$(this).find('.card').hasClass('card_box_open')){
+                        chance_num--;
+                        $('#chance_num').text(chance_num);
+                        luck_draw();
+                        //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
+                        //$(this).find('.card').addClass('card_box_open');
+                    }
+
+                }else{
+                    $('.popup_box .text').text('您还没有测试机会，赶紧去投资吧');
+                    $('.popup_box').show();
+                    time_count = 3;
+                    time_intervalId = setInterval(timerFunction, 1000);
+                    time_intervalId;
+                }
+
+
+
+            }else{
+                window.location.href = '/weixin/login/?next=/weixin_activity/spring_reward/'
+            }
+
+        });
+        /*翻牌结束*/
+
+
+        /*翻牌抽奖*/
+        function luck_draw(){
+            org.ajax({
+                url: '/api/march_reward/fetch/',
+                type: 'post',
+                success: function (data1) {
+
+                    $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount+'元');
+                    $('.card_box[data-card="'+card_no+'"]').find('.card').addClass('card_box_open');
+
+                },error: function(data1){
+                    $('.popup_box .text').text(data1.message);
+                    $('.popup_box').show();
+                    time_count = 3;
+                    time_intervalId = setInterval(timerFunction, 1000);
+                    time_intervalId;
+                }
+            })
+        }
+        /*翻牌抽奖结束*/
+
+
 })(org);

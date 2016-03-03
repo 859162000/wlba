@@ -134,7 +134,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 type: options.type,
                 data: options.data,
                 dataType: options.dataType,
-                async: options.async,
+                async: options.async || true,
                 beforeSend: function (xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求

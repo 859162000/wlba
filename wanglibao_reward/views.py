@@ -50,7 +50,7 @@ import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, getTodayTop10Ranks
+from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import  WeChatException
@@ -1657,11 +1657,11 @@ class WeixinActivityAPIView(APIView):
 
     def generate_reward_activity(self, user, order_id):
         points = {
-            "0-5": ("weixin_guagua_0.9", 0.9),
-            "1-6": ("weixin_guagua_1.0", 1.0),
-            "2-7": ("weixin_guagua_1.2", 1.2),
-            "3-8": ("weixin_guagua_1.5", 1.5),
-            "4-9": ("weixin_guagua_2.0", 2.0)
+            "0-5": ("weixin_guagua_0.2", 0.2),
+            "1-6": ("weixin_guagua_0.3", 0.3),
+            "2-7": ("weixin_guagua_0.5", 0.5),
+            "3-8": ("weixin_guagua_0.8", 0.8),
+            "4-9": ("weixin_guagua_1.0", 1.0)
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
@@ -2591,7 +2591,7 @@ class Lantern_FetchRewardAPI(APIView):
         "user_type":"phone"
         })
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
-
+from decimal import Decimal
 class MarchAwardTemplate(TemplateView):
     """
     三月活动
@@ -2603,20 +2603,52 @@ class MarchAwardTemplate(TemplateView):
         yesterday = datetime.datetime.now()-datetime.timedelta(1)
         yesterday_end = local_to_utc(yesterday, 'max')
         yesterday_start = local_to_utc(yesterday, 'min')
+        ranks = []
+        chances = 0
         if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
             user = self.request.user
-            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+            if user.is_authenticated():
+                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
             try:
-                ranks = redis_backend()._get('top_ranks')
+                ranks = redis_backend()._lrange('top_ranks', 0, -1)
             except:
-                ranks = getTodayTop10Ranks()
-        else:
-            ranks = []
-            chances = 0
-        
+                pass
+            if not ranks:
+                ranks = updateRedisTopRank()
+
+        award_list = []
+        redpack_events = {}
+        misc = Misc.objects.filter(key='march_awards').first()
+        if misc:
+            march_awards = json.loads(misc.value)
+            rank_awards = march_awards.get('rank_awards', [])
+            rank_awards_set = set(rank_awards)
+
+            for event_id in rank_awards_set:
+                indexes = []
+                for idx, e_id in enumerate(rank_awards):
+                    if event_id==e_id:
+                        indexes.append(idx+1)
+                indexes.sort()
+                indexes = [str(x) for x in indexes]
+                redpack_event = RedPackEvent.objects.filter(id=int(event_id)).first()
+                redpack_events[redpack_event.id]=redpack_event
+                award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
+
+            idx = 0
+
+            for rank in ranks:
+                print rank
+                rank['amount__sum'] = float(rank['amount__sum'])
+                event = redpack_events[rank_awards[idx]]
+                rank['coupon'] = event.amount
+                idx+=1
+
+        award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
         return {
            "chances": chances,
-           "top_ranks":ranks
+           "top_ranks":ranks,
+           "award_list":award_list,
             }
 
 
@@ -2645,8 +2677,10 @@ class FetchMarchAwardAPI(APIView):
                 #  u'7': 379,
                 #  u'8': 379,
                 #  u'9': 379}}
-            p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
             with transaction.atomic():
+                p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
+                if not p2pReward:
+                    return Response({"ret_code":-1, "message":"没有翻牌机会"})
                 p2pRecord = P2PRecord.objects.filter(order_id=p2pReward.order_id).first()
                 if not p2pRecord:
                     return Response({"ret_code":-1, "message":"投资条件不符合"})
@@ -2672,14 +2706,15 @@ class FetchMarchAwardAPI(APIView):
                     return Response({"ret_code":-1, "message":"红包错误"})
                 device = split_ua(self.request)
                 device_type = device['device_type']
-                status, messege, record = redpack_backends.give_activity_redpack_new(user, redpack_event, device_type)
+                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(user, redpack_event, device_type)
                 if not status:
                     return Response({"ret_code":-1, "message":messege})
                 p2pReward.redpack_event_id =  redpack_event.id
-                p2pReward.redpack_record_id = record.id
+                p2pReward.redpack_record_id = redpack_record_id
                 p2pReward.status = True
                 p2pReward.save()
-            return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}})
+            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+            return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}, 'chances':chances})
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
 

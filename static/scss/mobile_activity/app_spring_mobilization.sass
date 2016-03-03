@@ -58,7 +58,7 @@
       font-size: 0.8rem
       margin-top: -0.375rem
       line-height: 0.75rem
-      @media screen and (max-device-width: 350px)
+      @media screen and (max-width: 370px)
         font-size: 0.65rem
   .title_text
     width: 90%
@@ -69,7 +69,7 @@
     font-size: 0.6rem
     color: #5b7100
     max-height: 9999rem
-    @media screen and (max-device-width: 350px)
+    @media screen and (max-width: 370px)
       font-size: 0.55rem
   .title_text1
     padding: 0.55rem 0 0.85rem
@@ -88,7 +88,8 @@
         -o-transform-style: preserve-3d
         transform-style: preserve-3d
         position: relative
-
+        box-shadow: 1px 2px 6px #493600
+        border-radius: 0.25rem
       .card_box .card_box_open
         -webkit-animation-name: donghua
         -webkit-animation-duration: 0.5s
@@ -131,8 +132,7 @@
       .card_box
         width: 42%
         display: block
-        box-shadow: 1px 2px 6px #493600
-        border-radius: 0.25rem
+
         .card_img
           width: 100%
           display: block
@@ -169,20 +169,28 @@
         .card_prize
           backface-visibility: visible
   .card_chance
+
     width: 100%
     text-align: center
     line-height: 0.75rem
     font-size: 0.625rem
     font-weight: bold
     color: #607900
-    span
+    span#chance_num
       color: #f24642
       font-size: 0.75rem
-      height: 1rem
-      line-height: 1rem
       font-weight: bold
       width: 1.25rem
       border-bottom: 2px #f24642 solid
+      display: inline-block
+    span#zero
+      color: #f24642
+      font-size: 0.75rem
+      font-weight: bold
+      width: 1.25rem
+      border-bottom: 2px #f24642 solid
+      display: none
+    span
       display: inline-block
   .button
     width: 100%
@@ -237,7 +245,7 @@
           color: #fff
           font-size: 0.6rem
           line-height: 2rem
-          @media screen and (max-device-width: 350px)
+          @media screen and (max-width: 370px)
             font-size: 0.55rem
         .send_text
           width: 1.35rem
@@ -245,12 +253,13 @@
           position: absolute
           left: 50%
           top: 1.4rem
-          background: url("/static/imgs/mobile_activity/app_spring_mobilization/send_bg.png") no-repeat
           color: #fff
           text-align: center
-          font-size: 30px
-          line-height: 1.35rem
+          font-size: 0.75rem
+          border-radius: 50%
+          background: #ed2b4e
           margin-left: - 0.675rem
+          line-height: 1.35rem
         .price_img
           padding-top: 0.65rem
           display: block
@@ -265,7 +274,7 @@
           padding: 0.25rem 0 0.35rem
           margin: 0 auto
           display: block
-          @media screen and (max-device-width: 350px)
+          @media screen and (max-width: 370px)
             font-size: 0.5rem
         .price_img_text
           position: absolute
@@ -273,8 +282,8 @@
           text-align: center
           top: 60%
           width: 100%
-          line-height: 40px
-          font-size: 40px
+          line-height: 1rem
+          font-size: 1rem
           color: #fff
           z-index: 2
       .price_box_right
@@ -291,16 +300,83 @@
     width: 100%
     display: block
     position: relative
+    font-size: 0
     .ranking_main
       width: 100%
       padding: 0 2.5%
+      font-size: 0
       display: inline-block
       .ranking_main_1
         width: 100%
+        position: relative
+        display: inline-block
         .ranking_box
-          float: left
           width: 25%
           display: block
+          position: absolute
+          bottom: 0
+          .coupon
+            display: block
+            position: relative
+            width: 100%
+            img
+              width: 100%
+              display: block
+            .coupon_text
+              position: absolute
+              width: 83%
+              left: 7.4%
+              top: 42.2%
+              z-index: 2
+              color: #fff
+              font-size: 0.6rem
+              text-align: center
+          .coupon_box
+            display: block
+            position: relative
+            width: 100%
+            img
+              width: 100%
+              display: block
+            .coupon_box_text
+              position: absolute
+              width: 100%
+              left: 0%
+              top: 50%
+              z-index: 2
+              color: #ed2b4e
+              font-size: 0.6rem
+              text-align: center
+              margin-top: -0.35rem
+          .ranking_no
+            display: block
+            position: relative
+            width: 100%
+            img
+              width: 100%
+              display: block
+            .ranking_no_text
+              position: absolute
+              width: 100%
+              left: 0%
+              top: 50%
+              z-index: 2
+              color: #ed2b4e
+              font-size: 0.6rem
+              text-align: center
+              margin-top: -0.35rem
+              @media screen and (max-width: 370px)
+                font-size: 0.5rem
+
+        .ranking_box_1
+          left: 0
+          position: relative
+        .ranking_box_2
+          left: 25%
+        .ranking_box_3
+          left: 50%
+        .ranking_box_4
+          left: 75%
       .ranking_main_2
         width: 100%
         display: block
@@ -325,7 +401,7 @@
               color: #e1342f
               font-size: 0.75rem
               border-radius: 0.25rem
-              @media screen and (max-device-width: 350px)
+              @media screen and (max-width: 370px)
                 font-size: 0.65rem
             table
               width: 100%
@@ -381,7 +457,6 @@
                 td.two
                   font-size: 0.5rem
                   color: #333
-                  padding-left: 1%
                 td.three
                   font-size: 0.5rem
                   color: #333
@@ -454,7 +529,31 @@
     z-index: 2
     display: block
     width: 8%
-
+  .popup_box
+    position: fixed
+    left: 0
+    top: 0
+    width: 100%
+    height: 100%
+    z-index: 999
+    display: none
+    background: rgba(0,0,0,0.7)
+    .main
+      width: 70%
+      position: absolute
+      left: 50%
+      top: 50%
+      margin: -1.4rem 0 0 -35%
+      float: none
+      background: #fff
+      border-radius: 1rem
+      z-index: 99
+      .text
+        width: 100%
+        text-align: center
+        line-height: 0.6rem
+        font-size: 0.5rem
+        padding: 0.75rem 0
 
 
 

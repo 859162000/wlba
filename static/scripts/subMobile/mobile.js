@@ -2860,31 +2860,31 @@ function isIphone(id){
 function isAwards(k){//判断抽奖是第几项
     var is = 0;
     switch(k){
-        case 0.5:
+        case 0.2:
             is = 1;
             break;
-        case 188:
+        case 0.3:
             is = 2;
             break;
-        case 1:
+        case 0.4:
             is = 3;
             break;
-        case 588:
+        case 1:
             is = 4;
             break;
         case 1.5:
             is = 5;
             break;
-        case 888:
+        case 25:
             is = 6;
             break;
-        case 1.8:
+        case 2:
             is = 7;
             break;
-        case 1888:
+        case 6:
             is = 8;
             break;
-        case 2:
+        case 10:
             is = 9;
             break;
         default :

@@ -29,7 +29,7 @@ def sendWechatPhoneReward(user_id):
 def updateRedisTopRank():
     try:
         top_ranks = getTodayTop10Ranks()
-        redis_backend()._set('top_ranks', top_ranks)
+        redis_backend()._lpush('top_ranks', top_ranks)
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
 
@@ -49,8 +49,7 @@ def sendYesterdayTopRankAward():
         users = User.objects.filter(id__in=uids).all()
         now_date = datetime.date.today()
         for index, rank in enumerate(top_ranks):
-            award_key = str(index)
-            redpack_event_id = rank_awards[award_key]
+            redpack_event_id = rank_awards[index]
             redpack_event = RedPackEvent.objects.filter(id=int(redpack_event_id)).first()
             if not redpack_event:
                 logger.error('排名奖励，第%s名的奖励配置的id为%s的红包不存在,导致该排名的用户%s没有得到'%(index+1, redpack_event_id, rank['user']))
@@ -62,14 +61,14 @@ def sendYesterdayTopRankAward():
                         user=user,
                         activity_desc=u'获得%s排名%s奖励'%(yesterday.date(), (index+1))
                         )
-                    rank_reward_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=user).first()
-                    if not rank_reward_record.redpack_record_id:
-                        with transaction.atomic():
-                            status, messege, record = give_activity_redpack_new(user, redpack_event, 'all')
+                    with transaction.atomic():
+                        rank_reward_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=user).first()
+                        if not rank_reward_record.redpack_record_id:
+                            status, messege, redpack_record_id = give_activity_redpack_new(user, redpack_event, 'all')
                             if not status:
                                 logger.error('排名奖励，排名第%s名的用户%s没有得到%s,因为%s'%(index+1,rank['user'], redpack_event_id, messege))
                                 break
-                            rank_reward_record.redpack_record_id = record.id
+                            rank_reward_record.redpack_record_id = redpack_record_id
                             rank_reward_record.redpack_record_id_time = timezone.now()
                             rank_reward_record.save()
                     break
