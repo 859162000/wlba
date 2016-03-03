@@ -6,14 +6,17 @@ import collections
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.utils import timezone
+from django.utils.timezone import utc
 
+from wanglibao.fields import JSONFieldUtf8
 from .common.wechat import gen_token
 from wechatpy.client import WeChatClient
 from wechatpy.client.api.qrcode import WeChatQRCode
 import logging
-from django.core.exceptions import ValidationError
-from django.conf import settings
-from wanglibao.fields import JSONFieldUtf8
+
 
 
 logger = logging.getLogger("weixin")
@@ -51,7 +54,6 @@ class Account(models.Model):
 
     @staticmethod
     def _now():
-        from django.utils.timezone import utc
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         return now
 
@@ -465,7 +467,6 @@ class Material(models.Model):
 
     @staticmethod
     def _now():
-        from django.utils.timezone import utc
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         return now
 
@@ -563,6 +564,85 @@ class WeiXinUserActionRecord(models.Model):
     action_describe = models.CharField(u'动作描述', max_length=64)
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
     create_time = models.IntegerField('创建时间', default=0)
+
+class SeriesActionActivity(models.Model):
+    ACTION_TYPES = (
+        ('sign_in', u'用户签到'),
+        # ('share', u'用户分享')
+    )
+    name = models.CharField(u'活动名称*', max_length=128)
+    code = models.CharField(u'活动代码*', max_length=64, unique=True, help_text=u'字母或数字的组合')
+    description = models.TextField(u'描述', null=True, blank=True)
+    action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
+    days = models.IntegerField(u'天数', help_text=u'连续天数', default=0, blank=False)
+    start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
+    end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动结束时间*")
+    is_stopped = models.BooleanField(u'是否停止', default=False)
+    stopped_at = models.DateTimeField(null=True, verbose_name=u"停止时间", blank=True)
+    created_at = models.DateTimeField(u'添加时间', default=timezone.now, auto_now_add=True)
+    priority = models.IntegerField(u'优先级*', help_text=u'越小越优先', default=0, blank=False)
+
+    class Meta:
+        verbose_name = u'连续操作活动'
+        verbose_name_plural = u'连续操作活动'
+        unique_together = (("action_type", "days"),)
+
+class SeriesActionActivityRule(models.Model):
+    GIFT_TYPE = (
+        ('reward', u'奖品'),
+        ('redpack', u'优惠券'),
+        ('experience_gold', u'体验金'),
+    )
+    activity = models.ForeignKey(SeriesActionActivity, verbose_name=u'活动名称')
+    rule_name = models.CharField(u'规则名称', max_length=128)
+    rule_description = models.TextField(u'规则描述', null=True, blank=True)
+    gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
+    redpack = models.CharField(u'对应活动ID', max_length=200, blank=True,
+                               help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，否则会导致无法发放<br/>\
+                               如需要多个ID则用英文逗号隔开,如:1,2,3')
+
+    reward = models.CharField(u'奖品类型名称', max_length=200, blank=True,
+                              help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
+
+    msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
+                                    help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
+                                              内置：注册人手机：“{{mobile}}，奖品激活码：{{reward}}，截止日期{{end_date}}<br/>\
+                                              邀请人：{{inviter}}，被邀请人：{{invited}}，赠送金额/比率{{income}}<br/>\
+                                              活动名称：{{name}}，红包最高抵扣金额：{{highest_amount}}，充值/投资金额{{amount}}<br/>\
+                                              优惠券金额/百分比：{{redpack_amount}}，优惠券投资门槛：{{invest_amount}}”')
+    sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
+                                    help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，变量：同上')
+    wx_template = models.CharField(u'微信消息模板', blank=True,
+                                    choices=(), default="", max_length=32)
+    msg_template_introduce = models.TextField(u'邀请人站内信模板', blank=True,
+                                              help_text=u'邀请人站内信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
+    sms_template_introduce = models.TextField(u'邀请人短信模板', blank=True,
+                                              help_text=u'邀请人短信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
+    is_used = models.BooleanField(u'是否启用', default=False)
+
+    class Meta:
+        verbose_name = u'连续操作活动奖励规则'
+        verbose_name_plural = u'连续操作活动奖励规则'
+
+class UserDailyActionRecord(models.Model):
+    ACTION_TYPES = (
+        (u'sign_in', u'用户签到'),
+        (u'share', u'用户分享')
+    )
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
+    action_describe = models.CharField(u'动作描述', max_length=64)
+    extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    create_date = models.DateField(u'创建日期', auto_now_add=True,  db_index=True)
+    create_time = models.DateTimeField('创建时间', auto_now_add=True)
+    continue_days = models.IntegerField('连续天数', default=0)
+    experience_record_id = models.IntegerField(default=0, verbose_name=u'体验金发放流水ID')
+    status = models.BooleanField(default=False, verbose_name=u'是否成功')
+    class Meta:
+        unique_together = (("user", "action_type", "create_date"), )
+
+
 
 class SceneRecord(models.Model):
     openid = models.CharField('用户标识', max_length=128, db_index=True)

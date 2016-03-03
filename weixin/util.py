@@ -3,14 +3,17 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
 from django.template.loader import get_template
-from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord, SceneRecord
+from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord, SceneRecord, UserDailyActionRecord
 from wechatpy import WeChatClient
 from wechatpy.exceptions import WeChatException
 from misc.models import Misc
+
 from django.conf import settings
 
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+import datetime
+from django.db import transaction
 import logging
 import time
 import json
@@ -118,6 +121,7 @@ def _process_record(w_user, user, type, describe):
     war.create_time = int(time.time())
     war.save()
 
+
 def _process_scene_record(w_user, scene_str):
     sr = SceneRecord()
     sr.openid = w_user.openid
@@ -214,3 +218,44 @@ def _generate_ajax_template(content, template_name=None):
         template = Template('<div></div>')
 
     return template.render(context)
+
+from experience_gold.backends import SendExperienceGold
+def process_user_sign_in(user):
+    today = datetime.date.today()
+    yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
+    daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=u'sign_in').first()
+    if not daily_record:
+        UserDailyActionRecord.objects.create(
+            user=user,
+            action_type=u'sign_in'
+        )
+    if record.status:
+        return 1, False, daily_record.continue_days, ''
+    with transaction.atomic():
+        daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=u'sign_in').first()
+        seg = SendExperienceGold(user)
+        experience_event = getSignExperience_gold()
+        if not experience_event:
+            return 2, False, 0, "系统错误，签到失败"
+        experience_record_id, experience_event = seg.send(experience_event.id)
+        daily_record.experience_record_id = experience_record_id
+        daily_record.status=True
+        yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=u'sign_in').first()
+        continue_days = 1
+        if yesterday_record:
+            continue_days += yesterday_record.continue_days
+        daily_record.continue_days=continue_days
+        daily_record.save()
+    return 0, True, daily_record.continue_days, ''
+
+
+def getSignExperience_gold():
+    now = timezone.now()
+    query_object = ExperienceEvent.objects.filter(invalid=False, give_mode='weixin_sign_in',
+                                                      available_at__lt=now, unavailable_at__gt=now)
+    experience_events = query_object.order_by('amount').all()
+    length = len(experience_events)
+    if length > 1:
+        random_int = random.randint(0, length-1)
+        return experience_events[random_int]
+    return None
