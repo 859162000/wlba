@@ -29,7 +29,7 @@ def sendWechatPhoneReward(user_id):
 def updateRedisTopRank():
     try:
         top_ranks = getTodayTop10Ranks()
-        redis_backend()._set('top_ranks', top_ranks)
+        redis_backend()._lpush('top_ranks', top_ranks)
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
 

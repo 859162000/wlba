@@ -2610,7 +2610,8 @@ class MarchAwardTemplate(TemplateView):
             if user.is_authenticated():
                 chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
             try:
-                ranks = redis_backend()._get('top_ranks')
+                ranks = redis_backend()._lrange('top_ranks', 0, -1)
+                print '===========================2', ranks
             except:
                 pass
             if not ranks:
@@ -2636,7 +2637,10 @@ class MarchAwardTemplate(TemplateView):
                 award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
 
             idx = 0
+            print '===========================1',type(ranks)
+
             for rank in ranks:
+                print rank
                 rank['amount__sum'] = float(rank['amount__sum'])
                 event = redpack_events[rank_awards[idx]]
                 rank['coupon'] = event.amount
