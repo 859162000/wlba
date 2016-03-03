@@ -50,7 +50,7 @@ import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, getTodayTop10Ranks
+from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import  WeChatException
@@ -2603,18 +2603,20 @@ class MarchAwardTemplate(TemplateView):
         yesterday = datetime.datetime.now()-datetime.timedelta(1)
         yesterday_end = local_to_utc(yesterday, 'max')
         yesterday_start = local_to_utc(yesterday, 'min')
+        ranks = []
+        chances = 0
         if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
             user = self.request.user
             chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
             try:
                 ranks = redis_backend()._get('top_ranks')
             except:
-                ranks = getTodayTop10Ranks()
-        else:
-            ranks = []
-            chances = 0
+                pass
+            if not ranks:
+                ranks = updateRedisTopRank()
 
         award_list = []
+        redpack_events = {}
         misc = Misc.objects.filter(key='march_awards').first()
         if misc:
             march_awards = json.loads(misc.value)
@@ -2627,11 +2629,19 @@ class MarchAwardTemplate(TemplateView):
                     if event_id==e_id:
                         indexes.append(idx+1)
                 indexes.sort()
-                print indexes
                 indexes = [str(x) for x in indexes]
                 redpack_event = RedPackEvent.objects.filter(id=int(event_id)).first()
+                redpack_events[redpack_event.id]=redpack_event
                 award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
-            # [376,377,377,378,378,378,379,379,379,379]
+
+            idx = 0
+            for rank in ranks:
+                rank['amount__sum'] = float(rank['amount__sum'])
+                event = redpack_events[rank_awards[idx]]
+                rank['coupon'] = event.amount
+                idx+=1
+        # print ranks
+
         return {
            "chances": chances,
            "top_ranks":ranks,

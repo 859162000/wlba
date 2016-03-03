@@ -172,11 +172,13 @@ def getYesterdayTop10Ranks():
 
 
 def updateRedisTopRank():
+    top_ranks = []
     try:
         top_ranks = getTodayTop10Ranks()
         redis_backend()._set('top_ranks', top_ranks)
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
+    return top_ranks
 
 def processMarchAwardAfterP2pBuy(user, product, order_id, amount):
     try:
