@@ -474,10 +474,10 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
         # 还有天数大于这个周期月的也可以使用
         records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
             .filter(redpack__event__p2p_types__isnull=True)\
-            .filter(Q(Q(redpack__event__period__gte=period) &
-                      (Q(redpack__event__period_type='month') | Q(redpack__event__period_type='month_gte'))) |
-                    Q(Q(redpack__event__period__gte=period*30) &
-                      (Q(redpack__event__period_type='day') | Q(redpack__event__period_type='day_gte'))) |
+            .filter(Q(redpack__event__period=period, redpack__event__period_type='month') |
+                    Q(redpack__event__period__lte=period, redpack__event__period_type='month_gte') |
+                    Q(redpack__event__period=period*30, redpack__event__period_type='day') |
+                    Q(redpack__event__period__lte=period*30, redpack__event__period_type='day_gte') |
                     # 不限制时间的优惠券
                     Q(Q(redpack__event__period=0)))\
             .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
@@ -515,12 +515,13 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
             # 显示加息券, 月利宝可以多次使用加息券
             coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
                 .filter(redpack__event__p2p_types__isnull=True)\
-                .filter(Q(Q(redpack__event__period__gte=period) &
-                          (Q(redpack__event__period_type='month') | Q(redpack__event__period_type='month_gte'))) |
-                        Q(Q(redpack__event__period__gte=period*30) &
-                          (Q(redpack__event__period_type='day') | Q(redpack__event__period_type='day_gte'))) |
+                .filter(Q(redpack__event__period=period, redpack__event__period_type='month') |
+                        Q(redpack__event__period__lte=period, redpack__event__period_type='month_gte') |
+                        Q(redpack__event__period=period*30, redpack__event__period_type='day') |
+                        Q(redpack__event__period__lte=period*30, redpack__event__period_type='day_gte') |
                         Q(Q(redpack__event__period=0)))\
                 .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+
             for coupon in coupons:
                 if coupon.order_id:
                     continue
@@ -629,15 +630,14 @@ def php_redpack_restore(order_id, product_id, amount, user):
         return {"ret_code": 0, "deduct": deduct}
 
 
-def send_redpacks(event_id, user_ids):
+def send_redpacks(redpack_id, user_ids):
     """
     发送此红包给对应的用户
-    :param event_id:        红包活动id
+    :param redpack_id:         红包活动id
     :param user_ids:           用户list
     :return:
     """
-    event = RedPackEvent.objects.filter(pk=event_id).first()
-    red_pack = RedPack.objects.filter(event=event).first()
+    red_pack = RedPack.objects.filter(pk=redpack_id).first()
 
     users = User.objects.filter(id__in=user_ids)
     args_list = []

@@ -684,14 +684,14 @@ class SendRedPacks(APIView):
 
     def post(self, request):
 
-        redpack_id = int(self.request.REQUEST.get('redpack_id'))
+        redpack_id = self.request.REQUEST.get('redpack_id')
         user_ids = self.request.REQUEST.get('userIds').split(',')
 
-        if 1:
+        if redpack_id and user_ids:
             ret = send_redpacks(redpack_id, user_ids)
 
         else:
             ret = {'status': 0,
-                   'msg': 'authentic error!'}
+                   'msg': 'args error!'}
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
