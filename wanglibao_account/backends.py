@@ -190,7 +190,7 @@ class ProductionIDVerifyV2BackEnd(object):
 
         record.save()
 
-        return record, message
+        return record, None
 
 
 def parse_id_verify_response_v2(text):
