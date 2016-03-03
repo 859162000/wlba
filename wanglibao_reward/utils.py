@@ -194,7 +194,7 @@ def processMarchAwardAfterP2pBuy(user, product, order_id, amount):
             if period >= 3:
                 misc = Misc.objects.filter(key='march_awards').first()
                 march_awards = json.loads(misc.value)
-                if march_awards and isinstance(march_awards, json):
+                if march_awards and isinstance(march_awards, dict):
                     highest = march_awards.get('highest', 0)
                     lowest = march_awards.get('lowest', 0)
 
