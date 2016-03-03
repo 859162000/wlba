@@ -359,6 +359,7 @@ class WeixinJoinView(View):
         if not reply:
             if not user:
                 txt = self.getBindTxt(fromUserName)
+                txt += u"\n网利宝自2014年8月上线以来，注册用户已突破119万人，投资额超过47亿元，目前已完成B轮融资！"
             else:
                 txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)
@@ -888,7 +889,8 @@ class P2PDetailView(TemplateView):
         redpacks = []
         user = self.request.user
         id_is_valid = False
-        card_is_bind = False
+        is_one = False
+        is_bind = False
         if user.is_authenticated():
             user_margin = user.margin.margin
             equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
@@ -899,8 +901,15 @@ class P2PDetailView(TemplateView):
             result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
             redpacks = result['packages'].get('available', [])
             id_is_valid = user.wanglibaouserprofile.id_is_valid,
-            cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
-            card_is_bind = cards.exists()
+            try:
+                p2p_cards = card_bind_list(self.request)['cards']
+                for card in p2p_cards:
+                    is_bind = True
+                    if card['is_the_one_card']:
+                        is_one = True
+            except:
+                pass
+
         orderable_amount = min(p2p['limit_amount_per_user'] - current_equity, p2p['remain'])
         total_buy_user = P2PEquity.objects.filter(product=p2p['id']).count()
 
@@ -922,7 +931,8 @@ class P2PDetailView(TemplateView):
             'next': next,
             'amount_profit': amount_profit,
             'id_is_valid':id_is_valid,
-            'card_is_bind':card_is_bind
+            'is_one':is_one,
+            'is_bind':is_bind
         })
 
         return context
@@ -1291,38 +1301,41 @@ class AuthorizeUser(APIView):
             except WeChatException, e:
                 return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
             openid = res.get('openid')
-            w_user = WeixinUser.objects.filter(openid=openid).first()
-            save_user = False
+            try:
+                w_user = WeixinUser.objects.filter(openid=openid).first()
+                save_user = False
+                if not w_user:
+                    w_user = WeixinUser()
+                    w_user.account_original_id = account.original_id
+                    w_user.openid = openid
+                    w_user.save()
 
-            if not w_user:
-                w_user = WeixinUser()
-                w_user.account_original_id = account.original_id
-                w_user.openid = openid
-                save_user = True
+                if w_user.account_original_id != account.original_id:
+                    w_user.account_original_id = account.original_id
+                    save_user = True
 
-            if w_user.account_original_id != account.original_id:
-                w_user.account_original_id = account.original_id
-                save_user = True
-
-            if not w_user.auth_info:
-                auth_info = AuthorizeInfo()
-                auth_info.access_token = res.get('access_token')
-                auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
-                auth_info.refresh_token = res.get('refresh_token')
-                auth_info.save()
-                w_user.auth_info = auth_info
-                save_user = True
-            else:
-                w_user.auth_info.access_token = res.get('access_token')
-                w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
-                w_user.auth_info.refresh_token = res.get('refresh_token')
-                w_user.auth_info.save()
-            if save_user:
-                w_user.save()
+                if not w_user.auth_info:
+                    auth_info = AuthorizeInfo()
+                    auth_info.access_token = res.get('access_token')
+                    auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                    auth_info.refresh_token = res.get('refresh_token')
+                    auth_info.save()
+                    w_user.auth_info = auth_info
+                    save_user = True
+                else:
+                    w_user.auth_info.access_token = res.get('access_token')
+                    w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                    w_user.auth_info.refresh_token = res.get('refresh_token')
+                    w_user.auth_info.save()
+                if save_user:
+                    w_user.save()
+            except IntegrityError, e:
+                logger.debug("=========================并发了====")
+                logger.debug(traceback.format_exc())
 
             appendkeys = []
             for key in request.GET.keys():
-                if key == u'state' or key == u'code':
+                if key == u'state' or key == u'code' or key== u'redirect_uri':
                     continue
                 appendkeys.append(key)
 

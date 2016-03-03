@@ -1481,11 +1481,11 @@ class WeixinActivityAPIView(APIView):
 
     def generate_reward_activity(self, user, order_id):
         points = {
-            "0-5": ("weixin_guagua_0.9", 0.9),
-            "1-6": ("weixin_guagua_1.0", 1.0),
-            "2-7": ("weixin_guagua_1.2", 1.2),
-            "3-8": ("weixin_guagua_1.5", 1.5),
-            "4-9": ("weixin_guagua_2.0", 2.0)
+            "0-5": ("weixin_guagua_0.2", 0.2),
+            "1-6": ("weixin_guagua_0.3", 0.3),
+            "2-7": ("weixin_guagua_0.5", 0.5),
+            "3-8": ("weixin_guagua_0.8", 0.8),
+            "4-9": ("weixin_guagua_1.0", 1.0)
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
@@ -1535,7 +1535,7 @@ class WeixinActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         order_id = request.POST.get('order_id')
-        if not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
+        if order_id and not MarginRecord.objects.filter(user=request.user, order_id=order_id).first():
             json_to_response = {
                 'code': 1001,
                 'message': u'Order和User不匹配'

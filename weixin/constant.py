@@ -113,7 +113,7 @@ Message_template = {
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": "",
     },
     PRODUCT_AMORTIZATION_TEMPLATE_ID:{
         "top_color":'#88ffdd',
@@ -213,11 +213,11 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":u'您可以使用下方微信菜单进行更多体验。',
+                   "value":'',
                    "color":"#173177"
                }
         },
-        "url": '',
+        "url": "",
     },
 
     BIND_SUCCESS_TEMPLATE_ID:{
