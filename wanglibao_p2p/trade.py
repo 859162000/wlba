@@ -189,6 +189,7 @@ class P2PTrader(object):
                                                 "keyword2": "%s 元"%str(amount),
                                                 "keyword3": now,
                                                 "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % (self.order_id),
+                                                "remark": u'\n恭喜您获得3次刮奖机会，速来戳"详情"拼运气!'
                                                     })},
                                                 queue='celery02')
 
