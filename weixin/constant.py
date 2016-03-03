@@ -109,7 +109,7 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":"恭喜您获得３次刮奖机会，点击“详情”进行刮奖",
+                   "value":"",
                    "color":"#173177"
                }
         },
