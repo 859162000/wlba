@@ -224,6 +224,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         type: 'post',
         success: function(data1) {
             h5_user_static = data1.login;
+            if(h5_user_static){
+                    $('span#zero').hide();
+                    $('span#chance_num').css('display','inline-block');
+                }else {
+                $('span#chance_num').hide();
+                $('span#zero').css('display', 'inline-block');
+
+            }
         }
     });
     var login = false;
