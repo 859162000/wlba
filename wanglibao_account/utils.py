@@ -133,25 +133,28 @@ def verify_id(name, id_number):
     elif class_name == 'ProductionIDVerifyBackEnd':
         return ProductionIDVerifyBackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyV2BackEnd':
+        return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+    elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
         key = 'valid_v1_count'
+        valid_v1_total = settings.VALID_V1_TOTAL
         redis = redis_backend()
         if redis.redis.ping():
             if redis._exists(key):
                 valid_v1_count = redis._get(key)
                 valid_v1_count = int(valid_v1_count)
                 if valid_v1_count <= 0:
-                    print ">>>>>>>>>>>>>valid_v1_count[%s] v2" % valid_v1_count
+                    logger.info(">>>>>>>>>>>>>valid_v1_count[%s] v2" % valid_v1_count)
                     return ProductionIDVerifyV2BackEnd.verify(name, id_number)
                 else:
                     redis._set(key, valid_v1_count - 1)
-                    print ">>>>>>>>>>>>>valid_v1_count[%s] v1" % (valid_v1_count - 1,)
+                    logger.info(">>>>>>>>>>>>>valid_v1_count[%s] v1" % (valid_v1_count - 1,))
                     return ProductionIDVerifyBackEnd.verify(name, id_number)
             else:
-                redis._set(key, 8000)
-                print ">>>>>>>>>>>>>valid_v1_count[5] v1"
+                redis._set(key, valid_v1_total)
+                logger.info(">>>>>>>>>>>>>valid_v1_count[%s] v1" % valid_v1_total)
                 return ProductionIDVerifyBackEnd.verify(name, id_number)
         else:
-            print ">>>>>>>>>>>>>redis._is_invaild v2"
+            logger.info(">>>>>>>>>>>>>redis._is_invaild v2")
             return ProductionIDVerifyV2BackEnd.verify(name, id_number)
     else:
         raise NameError("The specific backend not implemented")

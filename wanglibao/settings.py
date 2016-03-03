@@ -896,8 +896,13 @@ VOICE_HX_UID = '52361'
 VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
 
 # Modify by hb on 2015-11-25 for new id-verify-channel
-#ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+# ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+
+# 用户实名接口v1剩余可用次数 Modify by chenweibin on 2016-03-03
+VALID_V1_TOTAL = 8000
+
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV1&V2AutoBackEnd'
+# ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     # Modify by hb on 2015-12-02
