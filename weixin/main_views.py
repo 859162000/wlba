@@ -22,16 +22,10 @@ from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
 from wanglibao_p2p.common import get_p2p_list
-from wanglibao_redis.backend import redis_backend
-from wanglibao_rest import utils
-from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
-from shumi_backend.exception import FetchException, AccessException
-from shumi_backend.fetch import UserInfoFetcher
-from wanglibao_buy.models import BindBank
-from wanglibao_announcement.utility import AnnouncementAccounts
+
 
 logger = logging.getLogger("weixin")
 
