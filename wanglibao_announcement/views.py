@@ -43,16 +43,18 @@ class AnnouncementDetailView(TemplateView):
     def get_context_data(self, id, **kwargs):
         context = super(AnnouncementDetailView, self).get_context_data(**kwargs)
 
+        device_type = "pc"
+
         device_list = ['android', 'iphone']
         user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
         for device in device_list:
             match = re.search(device, user_agent)
             if match and match.group():
+                device_type = 'mobile'
                 self.template_name = 'client_announcement_detail.jade'
 
         try:
-            announce = Announcement.objects.get(pk=id, status=1, device='pc')
-
+            announce = Announcement.objects.get(Q(pk=id, status=1) & (Q(device=device_type) | Q(device='pc&app')))
         except Announcement.DoesNotExist:
             raise Http404(u'您查找的公告不存在')
 
@@ -87,15 +89,16 @@ class AnnouncementPreviewView(TemplateView):
 class AnnouncementHomeApi(APIView):
     permission_classes = ()
 
-    def get(self, request):
-        req_data = request.GET
+    def post(self, request):
+        req_data = request.POST
         device_type = req_data.get('device_type')
         page = int(req_data.get('page', 1))
         page_size = int(req_data.get('page_size', 10))
 
-        announcements = Announcement.objects.filter(Q(status=1, hideinlist=False,) & (Q(device=device_type) | Q(device='pc&app'))
-                                                    ).order_by('-createtime').values('id', 'title',
-                                                                                     'content', 'createtime')
+        _announcements = Announcement.objects.filter(Q(status=1, hideinlist=False,) & (Q(device=device_type) | Q(device='pc&app'))
+                                                    ).order_by('-createtime')
+
+        announcements = _announcements.values('id', 'title', 'content')
         if announcements:
             paginator = Paginator(announcements, page_size)
             try:
@@ -114,7 +117,9 @@ class AnnouncementHomeApi(APIView):
 
         announcements_list = []
         for announce in announcements:
-            announce["createtime"] = timezone.localtime(announce["createtime"]).strftime('%Y-%m-%d')
+            announce_obj = _announcements.get(pk=announce["id"])
+            announce["createtime"] = timezone.localtime(announce_obj.createtime).strftime('%Y-%m-%d')
+            announce["detail_link"] = announce_obj.get_absolute_url()
             announcements_list.append(announce)
 
         return Response({'ret_code': 0, 'data': announcements_list, 'page': page, 'num': page_size, 'count': count})

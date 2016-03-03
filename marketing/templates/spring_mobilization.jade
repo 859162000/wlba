@@ -6,7 +6,7 @@ html
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030301")
+        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030302")
         - csrf_token
     body(style="background:#91ce00")
         include global/g_nav
@@ -43,6 +43,7 @@ html
                             .card_img.card_img_6 请翻牌
                  .card_chance 你有
                      span#chance_num {{chances}}
+                     span#zero 0
                      span 次翻牌机会
                 .button.button_1 立即投资
                 .grass.grass_1
@@ -113,7 +114,7 @@ html
                     .ranking_main_2
                         .list_wrap
                             .list_main
-                                .title_box 每日投资排行榜（更新时间为：14:00）
+                                .title_box 每日投资排行榜
                                 table
                                     thead
                                         tr
@@ -160,7 +161,7 @@ html
                         .title_text 活动规则
                         dl
                             dt 1、
-                            dd 活动有效期：2016年3月X日0：00-2016年3月X日23:59；
+                            dd 活动有效期：2016年3月X日0:00-2016年3月X日23:59；
                         dl
                             dt 2、
                             dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
@@ -180,5 +181,5 @@ html
         include global/g_footer
 script.
     require(['/static/js/lib/modernizr.js?v=2015030301'])
-    require(['/static/js/spring_mobilization.js?v=2015030301'])
+    require(['/static/js/spring_mobilization.js?v=2015030303'])
                                                                     

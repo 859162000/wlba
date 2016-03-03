@@ -53,6 +53,14 @@
             type: 'post',
             success: function (data1) {
                 h5_user_static = data1.login;
+                if(h5_user_static){
+                    $('span#zero').hide();
+                    $('span#chance_num').css('display','inline-block');
+                }else{
+                    $('span#chance_num').hide();
+                    $('span#zero').css('display','inline-block');
+
+                }
             }
         })
 
@@ -113,8 +121,8 @@
                 type: 'post',
                 success: function (data1) {
 
-                    $('.card_box[data-card="'+card_no+'"] .card_prize').text(data1.redpack.amount);
-                    $(this).find('.card_box_main').addClass('card_box_open');
+                    $('.card_box[data-card="'+card_no+'"] .card_prize').text(data1.redpack.amount+'元');
+                    $('.card_box[data-card="'+card_no+'"]').find('.card_box_main').addClass('card_box_open');
 
                 },error: function(data1){
                     $('.popup_box .text').text(data1.message);

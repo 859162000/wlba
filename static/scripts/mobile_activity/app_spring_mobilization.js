@@ -224,6 +224,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         type: 'post',
         success: function(data1) {
             h5_user_static = data1.login;
+            if(h5_user_static){
+                    $('span#zero').hide();
+                    $('span#chance_num').css('display','inline-block');
+                }else {
+                $('span#chance_num').hide();
+                $('span#zero').css('display', 'inline-block');
+
+            }
         }
     });
     var login = false;
@@ -358,13 +366,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
         /*翻牌抽奖*/
         function luck_draw(){
-            $.ajax({
+            org.ajax({
                 url: '/api/march_reward/fetch/',
                 type: 'post',
                 success: function (data1) {
 
-                    $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount);
-                    $(this).find('.card').addClass('card_box_open');
+                    $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount+'元');
+                    $('.card_box[data-card="'+card_no+'"]').find('.card').addClass('card_box_open');
 
                 },error: function(data1){
                     $('.popup_box .text').text(data1.message);
