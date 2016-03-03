@@ -41,7 +41,6 @@ class MarginKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.margin:
-                # TODO, check why 201? Magic number sucks, unless its famous, like 404 or 500
                 raise MarginLack(u'201')
             margin.margin -= amount
             margin.freeze += amount
@@ -67,6 +66,21 @@ class MarginKeeper(KeeperBaseMixin):
 
             margin.save()
             catalog = u'交易解冻'
+            record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
+
+    def unfreeze_redpack(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            if amount > margin.freeze:
+                raise MarginLack(u'202')
+            margin.freeze -= amount
+            margin.margin += amount
+
+            margin.save()
+            catalog = u'红包投资解冻'
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 

@@ -131,7 +131,7 @@ class EquityKeeper(KeeperBaseMixin):
         self.product = product
         self.equity = None
 
-    def reserve(self, amount, description=u'', savepoint=True):
+    def reserve(self, amount, redpack_amount=0, description=u'', savepoint=True):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             self.equity, _ = P2PEquity.objects.get_or_create(user=self.user, product=self.product)
@@ -145,6 +145,7 @@ class EquityKeeper(KeeperBaseMixin):
                                    u'该产品每个客户最大投资金额为%s元' % str(self.product.limit_amount_per_user))
 
             self.equity.equity += amount
+            self.equity.equity_redpack += redpack_amount
             self.equity.created_at = datetime.now()
             self.equity.save()
             catalog = u'申购'

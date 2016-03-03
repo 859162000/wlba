@@ -94,13 +94,13 @@ class P2PTrader(object):
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False, platform=platform)
             # 冻结投资金额,如果使用红包,则将红包的投资拆出来多生成一条流水记录
             actual_amount = amount - redpack_amount
-            description_actual = u'本金购买P2P产品 %s %s 份' % (self.product.short_name, actual_amount)
+            description_actual = u'购买P2P产品 %s %s 份' % (self.product.short_name, actual_amount)
             margin_record = self.margin_keeper.freeze(actual_amount, description=description_actual, savepoint=False)
             if redpack_amount > 0:
                 description_redpack = u'红包购买P2P产品 %s %s 份' % (self.product.short_name, redpack_amount)
                 margin_record = self.margin_keeper.freeze_redpack(redpack_amount, description=description_redpack, savepoint=False)
             # 更新用户持仓信息
-            equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
+            equity = self.equity_keeper.reserve(amount, redpack_amount, description=description, savepoint=False)
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
