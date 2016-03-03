@@ -701,6 +701,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_unavailable_3_days',
         'schedule': crontab(minute=0, hour=11),
     },
+    #每天发放昨天的排名奖励, by HMM
+    'march_top10_rank_awards': {
+        'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
+        'schedule': crontab(minute=0, hour=1),
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
