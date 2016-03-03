@@ -87,8 +87,8 @@ class AnnouncementPreviewView(TemplateView):
 class AnnouncementHomeApi(APIView):
     permission_classes = ()
 
-    def get(self, request):
-        req_data = request.GET
+    def post(self, request):
+        req_data = request.POST
         device_type = req_data.get('device_type')
         page = int(req_data.get('page', 1))
         page_size = int(req_data.get('page_size', 10))
