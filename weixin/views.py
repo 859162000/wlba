@@ -359,6 +359,7 @@ class WeixinJoinView(View):
         if not reply:
             if not user:
                 txt = self.getBindTxt(fromUserName)
+                txt += u"\n网利宝自2014年8月上线以来，注册用户已突破119万人，投资额超过47亿元，目前已完成B轮融资！"
             else:
                 txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)

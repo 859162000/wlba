@@ -1657,11 +1657,11 @@ class WeixinActivityAPIView(APIView):
 
     def generate_reward_activity(self, user, order_id):
         points = {
-            "0-5": ("weixin_guagua_0.9", 0.9),
-            "1-6": ("weixin_guagua_1.0", 1.0),
-            "2-7": ("weixin_guagua_1.2", 1.2),
-            "3-8": ("weixin_guagua_1.5", 1.5),
-            "4-9": ("weixin_guagua_2.0", 2.0)
+            "0-5": ("weixin_guagua_0.2", 0.2),
+            "1-6": ("weixin_guagua_0.3", 0.3),
+            "2-7": ("weixin_guagua_0.5", 0.5),
+            "3-8": ("weixin_guagua_0.8", 0.8),
+            "4-9": ("weixin_guagua_1.0", 1.0)
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
@@ -2613,15 +2613,29 @@ class MarchAwardTemplate(TemplateView):
         else:
             ranks = []
             chances = 0
-        ranks = [{'phone': u'12281719233', 'amount__sum': Decimal('88977701.00'), 'user': 71660L}, {'phone': u'13700000001', 'amount__sum': Decimal('15000300.00'), 'user': 100L}, {'phone': u'18910505634', 'amount__sum': Decimal('14740651.00'), 'user': 38L}, {'phone': u'12312311190', 'amount__sum': Decimal('13995800.00'), 'user': 71326L}, {'phone': u'12400000042', 'amount__sum': Decimal('10000000.00'), 'user': 206L}, {'phone': u'tester', 'amount__sum': Decimal('9916821.00'), 'user': 22L}, {'phone': u'12400000199', 'amount__sum': Decimal('8000000.00'), 'user': 390L}, {'phone': u'12400000024', 'amount__sum': Decimal('4997100.00'), 'user': 197L}, {'phone': u'12400001161', 'amount__sum': Decimal('4501100.00'), 'user': 543L}, {'phone': u'12312312341', 'amount__sum': Decimal('4152300.00'), 'user': 439L}]
-        for rank in ranks:
-            rank['amount__sum'] = float(rank['amount__sum'])
-            rank['coupon'] = 1.6
-        print ranks
 
+        award_list = []
+        misc = Misc.objects.filter(key='march_awards').first()
+        if misc:
+            march_awards = json.loads(misc.value)
+            rank_awards = march_awards.get('rank_awards', [])
+            rank_awards_set = set(rank_awards)
+
+            for event_id in rank_awards_set:
+                indexes = []
+                for idx, e_id in enumerate(rank_awards):
+                    if event_id==e_id:
+                        indexes.append(idx+1)
+                indexes.sort()
+                print indexes
+                indexes = [str(x) for x in indexes]
+                redpack_event = RedPackEvent.objects.filter(id=int(event_id)).first()
+                award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
+            # [376,377,377,378,378,378,379,379,379,379]
         return {
            "chances": chances,
-           "top_ranks":ranks
+           "top_ranks":ranks,
+           "award_list":award_list,
             }
 
 
@@ -2684,7 +2698,8 @@ class FetchMarchAwardAPI(APIView):
                 p2pReward.redpack_record_id = record.id
                 p2pReward.status = True
                 p2pReward.save()
-            return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}})
+            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+            return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}, 'chances':chances})
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
 

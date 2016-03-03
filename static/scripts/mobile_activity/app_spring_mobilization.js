@@ -247,11 +247,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         },
         other: function() {
-            if(h5_user_static){
-                window.location.href = '/p2p/list/'
-            }else{
-                window.location.href = '/accounts/login/?next=/p2p/list/'
-            }
+            $('.button').click(function() {
+                if (h5_user_static) {
+                    window.location.href = '/weixin/list/'
+                } else {
+                    window.location.href = '/weixin/login/?next=/weixin/list/'
+                }
+            })
             //console.log('其他场景的业务逻辑');
 
         }
@@ -321,19 +323,33 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         };
 
         /*翻牌*/
+        var chance_num;
+        var card_no;
         $('.card_box').click(function(){
+            card_no=$(this).attr('data-card');
             if(h5_user_static){
-                $(this).find('.card_box_main').addClass('card_box_open');
-                //$('.popup_box').show();
-				//
-				//
-                //time_count = 3;
-                //time_intervalId = setInterval(timerFunction, 1000);
-                //time_intervalId;
+                chance_num = $('#chance_num').text();
+                if(chance_num>0){
+                    if(!$(this).find('.card').hasClass('card_box_open')){
+                        chance_num--;
+                        $('#chance_num').text(chance_num);
+                        luck_draw();
+                        //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
+                        //$(this).find('.card').addClass('card_box_open');
+                    }
+
+                }else{
+                    $('.popup_box .text').text('您还没有测试机会，赶紧去投资吧');
+                    $('.popup_box').show();
+                    time_count = 3;
+                    time_intervalId = setInterval(timerFunction, 1000);
+                    time_intervalId;
+                }
+
 
 
             }else{
-                window.location.href = '/accounts/login/?next=/weixin_activity/march_reward/'
+                window.location.href = '/weixin/login/?next=/weixin_activity/spring_reward/'
             }
 
         });
@@ -341,15 +357,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 
         /*翻牌抽奖*/
-        $.ajax({
-            url: '/api/march_reward/fetch/',
-            type: 'post',
-            success: function (data1) {
+        function luck_draw(){
+            $.ajax({
+                url: '/api/march_reward/fetch/',
+                type: 'post',
+                success: function (data1) {
 
-            },error: function(data1){
+                    $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount);
+                    $(this).find('.card').addClass('card_box_open');
 
-            }
-        })
+                },error: function(data1){
+                    $('.popup_box .text').text(data1.message);
+                    $('.popup_box').show();
+                    time_count = 3;
+                    time_intervalId = setInterval(timerFunction, 1000);
+                    time_intervalId;
+                }
+            })
+        }
         /*翻牌抽奖结束*/
 
 
