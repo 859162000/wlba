@@ -147,13 +147,13 @@
 
         /*翻牌抽奖*/
         function luck_draw(){
-            $.ajax({
+            org.ajax({
                 url: '/api/march_reward/fetch/',
                 type: 'post',
                 success: function (data1) {
 
-                    $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount);
-                    $(this).find('.card').addClass('card_box_open');
+                    $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount+'元');
+                    $('.card_box[data-card="'+card_no+'"]').find('.card').addClass('card_box_open');
 
                 },error: function(data1){
                     $('.popup_box .text').text(data1.message);
