@@ -1481,11 +1481,11 @@ class WeixinActivityAPIView(APIView):
 
     def generate_reward_activity(self, user, order_id):
         points = {
-            "0-5": ("weixin_guagua_0.2", 0.2),
-            "1-6": ("weixin_guagua_0.3", 0.3),
-            "2-7": ("weixin_guagua_0.5", 0.5),
-            "3-8": ("weixin_guagua_0.8", 0.8),
-            "4-9": ("weixin_guagua_1.0", 1.0)
+            "0-5": ("微信刮刮乐0.2加息券", 0.2, 959),
+            "1-6": ("微信刮刮乐0.3加息券", 0.3, 960),
+            "2-7": ("微信刮刮乐0.5加息券", 0.5, 961),
+            "3-8": ("微信刮刮乐0.8加息券", 0.8, 962),
+            "4-9": ("微信刮刮乐1.0加息券", 1.0, 963)
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
@@ -1497,7 +1497,7 @@ class WeixinActivityAPIView(APIView):
                         WanglibaoActivityReward.objects.create(
                             order_id=order_id,
                             user=user,
-                            redpack_event=RedPackEvent.objects.filter(name=value[0]).first(),
+                            redpack_event=RedPackEvent.objects.filter(id=value[2]).first(),
                             experience=None,
                             activity=self.activity_name,
                             when_dist=1,
