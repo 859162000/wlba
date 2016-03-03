@@ -366,7 +366,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
         /*翻牌抽奖*/
         function luck_draw(){
-            $.ajax({
+            org.ajax({
                 url: '/api/march_reward/fetch/',
                 type: 'post',
                 success: function (data1) {

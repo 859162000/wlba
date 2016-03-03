@@ -147,7 +147,7 @@
 
         /*翻牌抽奖*/
         function luck_draw(){
-            $.ajax({
+            org.ajax({
                 url: '/api/march_reward/fetch/',
                 type: 'post',
                 success: function (data1) {
