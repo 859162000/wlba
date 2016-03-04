@@ -22,23 +22,22 @@ html(style='background: #FFE9D0')
           .op-dec-title 今日已签到
           .op-dec-detail.op-detail-orange ＋800体验金
 
-      .checkin-op-share(style="display:none")
+      .checkin-op-share
         i.checkin-op-icon.icon-share
-        .checkin-op-dec
+        .checkin-op-dec.no-share
           .op-dec-title 今日未分享
           .op-dec-detail 分享得双倍
-      .checkin-op-share.checkin-share-ok
-        i.checkin-op-icon.icon-share
-        .checkin-op-dec
+        .checkin-op-dec.has-share
           .op-dec-title 今日已分享
-          .op-dec-detail.op-detail-orange ＋800体验金
+          .op-dec-detail.op-detail-orange
+
     section.check-in-bar
       .bar-layout
         if giftDay < checkDay
           giftNum = nextGift - checkDay
         else
           giftNum = giftDay - checkDay
-        .bar-content 距离神秘礼包还有<span id="">{{ giftNum }}</span>天
+        .bar-content 距离神秘礼包还有<span id="giftDay">{{ giftNum }}</span>天
         .bar-before
         .bar-after
 

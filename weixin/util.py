@@ -8,8 +8,9 @@ from wechatpy import WeChatClient
 from wechatpy.exceptions import WeChatException
 from misc.models import Misc
 from experience_gold.backends import SendExperienceGold
+from experience_gold.models import ExperienceEvent
 from django.conf import settings
-
+from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import datetime
@@ -19,6 +20,7 @@ import time
 import json
 import urllib
 import re
+import random
 
 
 logger = logging.getLogger("weixin")
@@ -232,7 +234,7 @@ def process_user_daily_action(user, action_type=u'sign_in'):
             user=user,
             action_type=action_type
         )
-    if record.status:
+    if daily_record.status:
         return 1, False, daily_record
     with transaction.atomic():
         daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()

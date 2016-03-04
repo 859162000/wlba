@@ -251,7 +251,7 @@ class WeixinJoinView(View):
             reply = create_reply(articles, self.msg)
 
         if self.msg.key == 'sign_in':
-            reply = self.process_sign_in(w_user.openid)
+            reply = self.process_sign_in(user)
         if self.msg.key == 'my_experience_gold':
             seg = SendExperienceGold(user)
             amount = seg.get_amount()
