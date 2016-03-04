@@ -1,10 +1,14 @@
 define ['jquery'], ($)->
   calculate = (amount, rate, period, pay_method) ->
     if /等额本息/ig.test(pay_method)
-      rate_pow = Math.pow(1 + rate, period)
-      divisor = rate_pow - 1
-      term_amount = amount * (rate * rate_pow) / divisor
-      result  = term_amount * period - amount
+      month_rate = rate / 12
+
+      rate_pow = Math.pow(1 + month_rate, period)
+
+      term_amount = amount * (month_rate * rate_pow) / (rate_pow-1)
+      term_amount = term_amount.toFixed(2)
+      result  = (term_amount * period - amount).toFixed(2)
+      console.log(result)
     else if /日计息/ig.test(pay_method)
       result = amount * rate * period / 360
     else
@@ -67,67 +71,6 @@ define ['jquery'], ($)->
         $('#poundage').text(strs)
         $('#actual-amount').text(xhr.actual_amount)
 
-    ###fee_element = target.attr 'data-target-fee'
-    actual_element = target.attr 'data-target-actual'
-    fee_switch = target.attr 'data-switch'
-    fee_interval = target.attr 'data-interval'
-    fee_count = target.attr 'data-count'
-    fee_poundage = target.attr 'data-poundage'
-    data_balance = target.attr 'data-balance'
-    uninvested = $('input[name=uninvested]').val()
-    arrays = eval(fee_interval)
-    if fee_switch == 'on'
-      if amount != ''
-        if fee_count > 2
-          for array , i in arrays
-            if amount > arrays[i][0] && amount <= arrays[i][1]
-              sxf = arrays[i][2]
-          if sxf == undefined
-            sxf = 5
-        else
-          sxf = 0
-      else
-         sxf = 0
-
-      m = data_balance - amount
-      if m >= uninvested
-        zjglf = 0
-      else
-        zjglf = Math.abs(uninvested - m)*rate
-
-      fee = (sxf+zjglf).toFixed(2)
-      actual = (amount - fee).toFixed(2)
-      if actual < 0
-        actual=0
-      if fee and $.isNumeric(fee)
-        $(fee_element).text fee
-      else
-        $(fee_element).text "0.00"
-
-      if actual and $.isNumeric(actual)
-        $(actual_element).text actual
-      else
-        $(actual_element).text "0.00"
-
-      if sxf == 0 &&  zjglf == 0
-        str = '0'
-      else
-        if sxf == 0
-          sxf_str = '0'
-        else
-          sxf_str = sxf
-
-        if zjglf == 0
-          zjglf_str = ''
-        else
-          zjglf_str = zjglf.toFixed(2)
-        if zjglf_str == ''
-          str = sxf_str
-        else
-          str = sxf_str + '+' +zjglf_str
-      $(fee_poundage).text str###
-
-  ######$('input[data-role=fee-calculator]').keyup()
 
   p2pCalculate = () ->
     target = $('input[data-role=p2p-calculator]')
@@ -177,4 +120,3 @@ define ['jquery'], ($)->
     calculate : calculate,
     p2pCalculate :p2pCalculate,
   }
-
