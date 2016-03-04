@@ -11,7 +11,6 @@
                 }else {
                 $('span#chance_num').hide();
                 $('span#zero').css('display', 'inline-block');
-
             }
         }
     });
@@ -24,7 +23,7 @@
                     login = false;
 
                     $('.button').click(function() {
-                        mixins.loginApp();
+                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
                     });
 
                 } else {
@@ -111,6 +110,24 @@
             }
         };
 
+        var time_count2 = 3;
+        /*倒数秒数*/
+        var time_intervalId2;
+        /*定义倒计时的名字*/
+
+        var timerFunction2 = function () {
+        /*定义倒计时内容*/
+            if (time_count2 > 1) {
+                time_count2--;
+                return
+            } else {
+                clearInterval(time_intervalId2);
+                /*清除倒计时*/
+                $('.popup_box').show();
+                /*解锁按钮，可以点击*/
+            }
+        };
+
         /*翻牌*/
         var chance_num;
         var card_no;
@@ -142,6 +159,12 @@
             }
 
         });
+
+        $('.popup_button').click(function(){
+            $('.popup_box').hide();
+            $('.popup_box .popup_button').hide();
+            $('.card').removeClass('card_box_open');
+        });
         /*翻牌结束*/
 
 
@@ -154,6 +177,14 @@
                     if(data1.ret_code==0){
                         $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount+'元');
                         $('.card_box[data-card="'+card_no+'"]').find('.card').addClass('card_box_open');
+
+                        $('.popup_box .text').text('"恭喜您获得"+data1.redpack.amount+"元红包"');
+                        $('.popup_box .popup_button').show();
+                        $('.popup_box').show();
+
+                        time_count2 = 3;
+                        time_intervalId2 = setInterval(timerFunction2, 1000);
+                        time_intervalId2;
                     }else{
                         $('.popup_box .text').text(data1.message);
                         $('.popup_box').show();
@@ -173,6 +204,5 @@
             })
         }
         /*翻牌抽奖结束*/
-
 
 })(org);
