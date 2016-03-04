@@ -230,7 +230,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 }else {
                 $('span#chance_num').hide();
                 $('span#zero').css('display', 'inline-block');
-
             }
         }
     });
@@ -243,7 +242,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     login = false;
 
                     $('.button').click(function() {
-                        mixins.loginApp();
+                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
                     });
 
                 } else {
