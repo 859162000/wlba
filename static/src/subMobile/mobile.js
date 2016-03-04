@@ -2554,6 +2554,19 @@ org.checkIn = (function(org){
                         nextNum = giftNum - nowDay,
                         className = '',
                         html = '';
+                    var checkIn = $(".checkin-op-status"),
+                        checkIn_detail = checkIn.find(".op-dec-detail"),
+                        checkShare = $(".checkin-op-share");
+                    if(!result.sign_in.status){//签到
+                        checkIn.find("div.op-dec-title").text("今日未签到");
+                        checkIn_detail.hide();
+                    }else{
+                        checkIn_detail.text(result.sign_in.amount);
+                    }
+                    if(result.share.status){//分享
+                        checkShare.addClass("checkin-share-ok");
+                        checkShare.find(".op-detail-orange").text(result.sign_in.amount);
+                    }
                     for(var i=1; i<=giftNum; i++){
                         if(nowDay === giftNum){
                             className = 'active-did active-gift active-doing';
@@ -2580,6 +2593,7 @@ org.checkIn = (function(org){
                                 '</div>';
                     }
                     $("div.check-in-flag-lists").html(html);
+                    $("#giftDay").text(nextNum);
                 }
             });
         },
