@@ -330,6 +330,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         };
 
+        var time_count2 = 3;
+        /*倒数秒数*/
+        var time_intervalId2;
+        /*定义倒计时的名字*/
+
+        var timerFunction2 = function () {
+        /*定义倒计时内容*/
+            if (time_count2 > 1) {
+                time_count2--;
+                return
+            } else {
+                clearInterval(time_intervalId2);
+                /*清除倒计时*/
+                $('.popup_box').show();
+                /*解锁按钮，可以点击*/
+            }
+        };
+
         /*翻牌*/
         var chance_num;
         var card_no;
@@ -361,6 +379,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
 
         });
+
+        $('.popup_button').click(function(){
+            $('.popup_box').hide();
+            $('.popup_box .popup_button').hide();
+            $('.card').removeClass('card_box_open');
+        });
         /*翻牌结束*/
 
 
@@ -373,6 +397,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     if(data1.ret_code==0){
                         $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount+'元');
                         $('.card_box[data-card="'+card_no+'"]').find('.card').addClass('card_box_open');
+
+                        $('.popup_box .text').text('"恭喜您获得"+data1.redpack.amount+"元红包"');
+                        $('.popup_box .popup_button').show();
+                        $('.popup_box').show();
+
+                        time_count2 = 3;
+                        time_intervalId2 = setInterval(timerFunction2, 1000);
+                        time_intervalId2;
                     }else{
                         $('.popup_box .text').text(data1.message);
                         $('.popup_box').show();
@@ -392,6 +424,5 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         }
         /*翻牌抽奖结束*/
-
 
 })(org);
