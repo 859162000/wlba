@@ -586,6 +586,7 @@ class SeriesActionActivity(models.Model):
         verbose_name = u'连续操作活动'
         verbose_name_plural = u'连续操作活动'
         unique_together = (("action_type", "days"),)
+        ordering = 'days',
 
 class SeriesActionActivityRule(models.Model):
     GIFT_TYPE = (

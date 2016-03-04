@@ -7,7 +7,7 @@ from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord, SceneRec
 from wechatpy import WeChatClient
 from wechatpy.exceptions import WeChatException
 from misc.models import Misc
-
+from experience_gold.backends import SendExperienceGold
 from django.conf import settings
 
 from django.http import HttpResponseRedirect
@@ -219,34 +219,36 @@ def _generate_ajax_template(content, template_name=None):
 
     return template.render(context)
 
-from experience_gold.backends import SendExperienceGold
-def process_user_sign_in(user):
+
+def process_user_daily_action(user, action_type=u'sign_in'):
+
+    if action_type not in [u'share', u'sign_in']:
+        return -1, False, None
     today = datetime.date.today()
     yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
-    daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=u'sign_in').first()
+    daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=action_type).first()
     if not daily_record:
         UserDailyActionRecord.objects.create(
             user=user,
-            action_type=u'sign_in'
+            action_type=action_type
         )
     if record.status:
-        return 1, False, daily_record.continue_days, ''
+        return 1, False, daily_record
     with transaction.atomic():
-        daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=u'sign_in').first()
+        daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
         seg = SendExperienceGold(user)
         experience_event = getSignExperience_gold()
-        if not experience_event:
-            return 2, False, 0, "系统错误，签到失败"
-        experience_record_id, experience_event = seg.send(experience_event.id)
-        daily_record.experience_record_id = experience_record_id
+        if experience_event:
+            experience_record_id, experience_event = seg.send(experience_event.id)
+            daily_record.experience_record_id = experience_record_id
         daily_record.status=True
-        yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=u'sign_in').first()
+        yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=action_type).first()
         continue_days = 1
         if yesterday_record:
             continue_days += yesterday_record.continue_days
         daily_record.continue_days=continue_days
         daily_record.save()
-    return 0, True, daily_record.continue_days, ''
+    return 0, True, daily_record
 
 
 def getSignExperience_gold():

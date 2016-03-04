@@ -102,8 +102,13 @@ urlpatterns = patterns(
     url(r'^activity_ggl/$', login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='activity_ggl'),
 
-)
 
+)
+#活动api
+urlpatterns += patterns(
+    '',
+    url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
+)
 # 微信管理后台
 urlpatterns += patterns(
     '',
