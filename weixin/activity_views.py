@@ -73,9 +73,10 @@ class GetSignShareInfo(APIView):
                 if activity.days >= recycle_continue_days:
                     nextDayNote=activity.days
                     break
-            needDays = nextDayNote-recycle_continue_days
+            # needDays = nextDayNote-recycle_continue_days
             sign_info['nextDayNote'] = nextDayNote
-            sign_info['needDays'] = needDays
+            # sign_info['needDays'] = needDays
+            sign_info['current_day'] = recycle_continue_days
 
         share_info = data.setdefault('share', {})
         share_info['status'] = False
