@@ -60,9 +60,10 @@ class DailyActionAPIView(APIView):
 class GetContinueActionReward(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def post(self, request):
+    def get(self, request):
         user = request.user
-        days = request.POST.get('action_type', '').strip()
+        # days = request.POST.get('days', '').strip()
+        days = request.GET.get('days', '').strip()
         if not days or not days.isdigit():
             return Response({'ret_code':-1, 'message':u'参数错误'})
         days = int(days)
@@ -135,9 +136,9 @@ class GetContinueActionReward(APIView):
                     redpack_txts.append('%s元体验金'%int(experience_event.amount))
                     experience_record_ids += (str(experience_record_id) + ",")
                     reward_record.experience_record_ids = experience_record_ids
-                reward_record.activity_code_time = timezone.now()
-                reward_record.status = True
-                reward_record.save()
+            reward_record.activity_code_time = timezone.now()
+            reward_record.status = True
+            reward_record.save()
         try:
             for idx, event in enumerate(events):
                 record = records[idx]
