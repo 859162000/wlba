@@ -147,6 +147,7 @@ class GetContinueActionReward(APIView):
                 _send_message_for_hby(request.user, event, end_time)
         except Exception, e:
             logger.debug(traceback.format_exc())
+        logger.debug(redpack_txts)
         result_msg = "恭喜您~领取%s成功!"%(",".join(redpack_txts))
         return Response({"ret_code":0, "message":result_msg})
 
