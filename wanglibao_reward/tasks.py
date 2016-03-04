@@ -71,6 +71,7 @@ def sendYesterdayTopRankAward():
                                 break
                             rank_reward_record.redpack_record_id = redpack_record_id
                             rank_reward_record.redpack_record_id_time = timezone.now()
+                            rank_reward_record.status = True
                             rank_reward_record.save()
                     break
 
