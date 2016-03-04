@@ -1657,11 +1657,11 @@ class WeixinActivityAPIView(APIView):
 
     def generate_reward_activity(self, user, order_id):
         points = {
-            "0-5": ("weixin_guagua_0.2", 0.2),
-            "1-6": ("weixin_guagua_0.3", 0.3),
-            "2-7": ("weixin_guagua_0.5", 0.5),
-            "3-8": ("weixin_guagua_0.8", 0.8),
-            "4-9": ("weixin_guagua_1.0", 1.0)
+            "0-5": ("微信刮刮乐0.2加息券", 0.2, 959),
+            "1-6": ("微信刮刮乐0.3加息券", 0.3, 960),
+            "2-7": ("微信刮刮乐0.5加息券", 0.5, 961),
+            "3-8": ("微信刮刮乐0.8加息券", 0.8, 962),
+            "4-9": ("微信刮刮乐1.0加息券", 1.0, 963)
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
@@ -1673,7 +1673,7 @@ class WeixinActivityAPIView(APIView):
                         WanglibaoActivityReward.objects.create(
                             order_id=order_id,
                             user=user,
-                            redpack_event=RedPackEvent.objects.filter(name=value[0]).first(),
+                            redpack_event=RedPackEvent.objects.filter(id=value[2]).first(),
                             experience=None,
                             activity=self.activity_name,
                             when_dist=1,
@@ -2607,9 +2607,10 @@ class MarchAwardTemplate(TemplateView):
         chances = 0
         if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
             user = self.request.user
-            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+            if user.is_authenticated():
+                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
             try:
-                ranks = redis_backend()._get('top_ranks')
+                ranks = redis_backend()._lrange('top_ranks', 0, -1)
             except:
                 pass
             if not ranks:
@@ -2635,13 +2636,15 @@ class MarchAwardTemplate(TemplateView):
                 award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
 
             idx = 0
+
             for rank in ranks:
+                print rank
                 rank['amount__sum'] = float(rank['amount__sum'])
                 event = redpack_events[rank_awards[idx]]
                 rank['coupon'] = event.amount
                 idx+=1
-        # print ranks
 
+        award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
         return {
            "chances": chances,
            "top_ranks":ranks,
@@ -2703,11 +2706,11 @@ class FetchMarchAwardAPI(APIView):
                     return Response({"ret_code":-1, "message":"红包错误"})
                 device = split_ua(self.request)
                 device_type = device['device_type']
-                status, messege, record = redpack_backends.give_activity_redpack_new(user, redpack_event, device_type)
+                status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(user, redpack_event, device_type)
                 if not status:
                     return Response({"ret_code":-1, "message":messege})
                 p2pReward.redpack_event_id =  redpack_event.id
-                p2pReward.redpack_record_id = record.id
+                p2pReward.redpack_record_id = redpack_record_id
                 p2pReward.status = True
                 p2pReward.save()
             chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()

@@ -145,7 +145,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 success: function (data) {
                     options.success && options.success(data);
                 },
-                error: function (xhr) {  
+                error: function (xhr) {
                     options.error && options.error(xhr);
                 },
                 complete: function () {
