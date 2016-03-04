@@ -1,13 +1,14 @@
 -load formatters
 -load mathfilters
 doctype html
-html
+html.no-js(lang="en-gb")
     head
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030302")
+        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030402")
         - csrf_token
+        script(src="/static/js/lib/modernizr-2.8.js?v=2015030304")
     body(style="background:#91ce00")
         include global/g_nav
         .body_wrap.clear
@@ -161,7 +162,7 @@ html
                         .title_text 活动规则
                         dl
                             dt 1、
-                            dd 活动有效期：2016年3月X日0:00-2016年3月X日23:59；
+                            dd 活动有效期：2016年3月11日0:00-2016年3月20日23:59；
                         dl
                             dt 2、
                             dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
@@ -181,5 +182,6 @@ html
         include global/g_footer
 script.
     require(['/static/js/lib/modernizr.js?v=2015030301'])
-    require(['/static/js/spring_mobilization.js?v=2015030303'])
+    require(['/static/js/spring_mobilization.js?v=2015030401'])
+
                                                                     

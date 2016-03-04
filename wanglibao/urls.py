@@ -16,6 +16,7 @@ from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestme
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
+from wanglibao_margin.php_api import SendRedPacks
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -186,6 +187,8 @@ urlpatterns += patterns(
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
 
     url(r'^rock/finance/qrcode/$', RockFinanceQRCodeView.as_view(), name="qrcode"),
+
+    url(r'^php/redpacks/send/$', SendRedPacks.as_view(), name='send_redpacks_by_push'),
 
 )
 

@@ -30,43 +30,55 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
         month_rate = get_base_decimal(year_rate / 12)
 
         coupon_month_rate = get_base_decimal(coupon_year_rate / 12)
+        if coupon_year_rate == 0:
+            coupon_term_amount = 0
+        else:
+            coupon_term_amount = amount * (coupon_month_rate * pow(1 + coupon_month_rate, period)) / (pow(1 + coupon_month_rate, period) - 1)
+            coupon_term_amount = Decimal(coupon_term_amount).quantize(Decimal('.01'))
 
         term_amount = amount * (month_rate * pow(1 + month_rate, period)) / (pow(1 + month_rate, period) - 1)
         term_amount = Decimal(term_amount).quantize(Decimal('.01'))
 
         total = period * term_amount
-        coupon_total = 0
+        coupon_total = period * coupon_term_amount - amount
+        if coupon_total < 0:
+            coupon_total = 0
 
         result = []
         principal_left = amount
+
+        if coupon_year_rate == 0:
+            principal_left_coupon = 0
+        else:
+            principal_left_coupon = amount
+
         for i in xrange(0, period - 1):
             interest = principal_left * month_rate
             interest = interest.quantize(Decimal('.01'), rounding=ROUND_UP)
 
-            coupon_interest = principal_left * coupon_month_rate
-            coupon_interest = coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
-
             principal = term_amount - interest
             principal = principal.quantize(Decimal('.01'), rounding=ROUND_UP)
 
-            coupon_total += coupon_interest
+            coupon_interest = principal_left_coupon * coupon_month_rate
+            coupon_interest = coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
+
+            principal_coupon = coupon_term_amount - coupon_interest
+            principal_coupon = principal_coupon.quantize(Decimal('.01'), rounding=ROUND_UP)
 
             principal_left -= principal
+            principal_left_coupon -= principal_coupon
 
             result.append((term_amount, principal, interest, principal_left, coupon_interest,
                            term_amount * (period - i - 1), interest_begin_date + relativedelta(months=i + 1)))
 
-        # 计算加息利率最后一期的利息
-        last_coupon_interest = principal_left * coupon_month_rate
-        last_coupon_interest = last_coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
-
         result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0),
-                       last_coupon_interest, Decimal(0), interest_begin_date + relativedelta(months=period)))
+                       coupon_term_amount - principal_left_coupon, Decimal(0),
+                       interest_begin_date + relativedelta(months=period)))
 
         return {
             "terms": result,
             "total": total,
-            "coupon_total": coupon_total + last_coupon_interest,
+            "coupon_total": coupon_total,
             "interest_arguments": None
         }
 
