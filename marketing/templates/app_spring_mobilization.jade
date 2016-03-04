@@ -4,7 +4,7 @@ html(style="background: #91ce00")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015030303", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015030401", rel="stylesheet")
         - csrf_token
     body
         .body_wrap.clear
@@ -220,9 +220,10 @@ html(style="background: #91ce00")
             .popup_box
                 .main
                     .text 您还没有测试机会，赶紧去投资吧
+                    .popup_button 我知道了
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015030401")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015030402")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
