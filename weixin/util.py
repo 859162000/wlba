@@ -9,7 +9,7 @@ from wechatpy.exceptions import WeChatException
 from misc.models import Misc
 from experience_gold.backends import SendExperienceGold
 from django.conf import settings
-
+from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import datetime
