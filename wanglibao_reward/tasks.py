@@ -59,6 +59,7 @@ def sendYesterdayTopRankAward():
                     if not ActivityRewardRecord.objects.filter(create_date=now_date, user=user).exists():
                         ActivityRewardRecord.objects.create(
                         user=user,
+                        activity_code=u'march_awards',
                         activity_desc=u'获得%s排名%s奖励'%(yesterday.date(), (index+1))
                         )
                     with transaction.atomic():

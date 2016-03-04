@@ -221,7 +221,7 @@ class ActivityRewardRecord(models.Model):
     activity_desc = models.CharField(u'活动描述', max_length=64, null=True)
 
     class Meta:
-        unique_together = (("user", "create_date"),)  # 联合唯一索引
+        unique_together = (("user", "create_date", "activity_code"),)  # 联合唯一索引
 
 class WechatPhoneRewardRecord(models.Model):
 
