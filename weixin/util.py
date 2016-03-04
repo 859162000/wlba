@@ -232,7 +232,7 @@ def process_user_daily_action(user, action_type=u'sign_in'):
             user=user,
             action_type=action_type
         )
-    if record.status:
+    if daily_record.status:
         return 1, False, daily_record
     with transaction.atomic():
         daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
