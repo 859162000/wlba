@@ -155,7 +155,7 @@
                         $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount+'元');
                         $('.card_box[data-card="'+card_no+'"]').find('.card').addClass('card_box_open');
                     }else{
-                         $('.popup_box .text').text(data1.message);
+                        $('.popup_box .text').text(data1.message);
                         $('.popup_box').show();
                         time_count = 3;
                         time_intervalId = setInterval(timerFunction, 1000);
