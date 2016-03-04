@@ -679,7 +679,6 @@ class P2PEquity(models.Model):
     user = models.ForeignKey(User, related_name='equities')
     product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
     equity = models.BigIntegerField(u'用户所持份额', default=0)
-    equity_redpack = models.BigIntegerField(u'总持仓中红包的份额', default=0)
     confirm = models.BooleanField(u'确认成功', default=False)
     confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
     contract = models.FileField(u'合同文件', null=True, blank=True, upload_to='contracts')

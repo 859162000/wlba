@@ -100,7 +100,7 @@ class P2PTrader(object):
                 description_redpack = u'红包购买P2P产品 %s %s 份' % (self.product.short_name, redpack_amount)
                 margin_record = self.margin_keeper.freeze_redpack(redpack_amount, description=description_redpack, savepoint=False)
             # 更新用户持仓信息
-            equity = self.equity_keeper.reserve(amount, redpack_amount, description=description, savepoint=False)
+            equity = self.equity_keeper.reserve(amount, description=description, savepoint=False)
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 

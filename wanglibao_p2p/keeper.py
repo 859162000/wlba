@@ -131,7 +131,7 @@ class EquityKeeper(KeeperBaseMixin):
         self.product = product
         self.equity = None
 
-    def reserve(self, amount, redpack_amount=0, description=u'', savepoint=True):
+    def reserve(self, amount, description=u'', savepoint=True):
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             self.equity, _ = P2PEquity.objects.get_or_create(user=self.user, product=self.product)
@@ -145,7 +145,6 @@ class EquityKeeper(KeeperBaseMixin):
                                    u'该产品每个客户最大投资金额为%s元' % str(self.product.limit_amount_per_user))
 
             self.equity.equity += amount
-            self.equity.equity_redpack += redpack_amount
             self.equity.created_at = datetime.now()
             self.equity.save()
             catalog = u'申购'
@@ -165,14 +164,19 @@ class EquityKeeper(KeeperBaseMixin):
             catalog = u'流标取消'
             record = self.__tracer(catalog, amount)
             user_margin_keeper = MarginKeeper(self.user, self.order_id)
-            user_margin_keeper.unfreeze(amount, savepoint=False)
+            user_margin_keeper.unfreeze(amount, description=description, savepoint=False)
             # 流标要将红包退回账号
             p2precord = P2PRecord.objects.filter(user=self.user, product=self.product, catalog=u"申购")
             if p2precord:
                 for p2p in p2precord:
                     result = redpack_backends.restore(p2p.order_id, p2p.amount, p2p.user)
                     if result['ret_code'] == 0:
-                        user_margin_keeper.redpack_return(result['deduct'], description=u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct']))
+                        description1 = u"%s 流标 红包解冻%s元" % (self.product.short_name, result['deduct'])
+                        description2 = u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct'])
+                        # 1:红包解冻到账户
+                        user_margin_keeper.unfreeze_redpack(result['deduct'], description=description1, savepoint=False)
+                        # 2:红包退回
+                        user_margin_keeper.redpack_return(result['deduct'], description=description2)
             return record
 
     def settle(self, savepoint=True):
