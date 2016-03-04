@@ -2548,7 +2548,6 @@ org.checkIn = (function(org){
                 dataType: "json",
                 success: function(data){
                     var result = data.data;
-                    console.log(result,result.sign_in);
                     var giftNum = result.sign_in.nextDayNote,//礼物天数
                         nowDay = result.sign_in.current_day,
                         nextNum = giftNum - nowDay,

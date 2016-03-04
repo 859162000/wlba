@@ -101,7 +101,8 @@ urlpatterns = patterns(
     #刮刮乐
     url(r'^activity_ggl/$', login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='activity_ggl'),
-    url(r'^sub_checkIn/$', TemplateView.as_view(template_name="service_checkIn.jade")),
+    url(r'^sub_checkIn/$', login_required(WeixinGGLTemplate.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
+                                          ),name='sub_checkIn'),
 
 )
 #活动api
