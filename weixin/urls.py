@@ -109,6 +109,7 @@ urlpatterns += patterns(
     '',
     url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
     url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
+    url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
 )
 # 微信管理后台
 urlpatterns += patterns(

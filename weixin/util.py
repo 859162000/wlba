@@ -263,3 +263,39 @@ def getSignExperience_gold():
         random_int = random.randint(0, length-1)
         return experience_events[random_int]
     return None
+
+from wanglibao_redpack.models import RedPackEvent
+def sendContinueRuleReward(activity_rule):
+    if activity_rule.gift_type == "redpack":
+        redpack_record_ids = ""
+        redpack_ids = activity_rule.redpack.split(',')
+        for redpack_id in redpack_ids:
+            redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+            if not redpack_event:
+                return Response({"ret_code":5,"message":'QMBanquetRewardAPI post redpack_event not exist'})
+            status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, redpack_event, device_type)
+            if not status:
+                return Response({"ret_code":6,"message":messege})
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                redpack_text = "%s%%百分比红包"%redpack_event.amount
+            if redpack_event.rtype == 'direct':
+                redpack_text = "%s元红包"%int(redpack_event.amount)
+            redpack_txts.append(redpack_text)
+            redpack_record_ids += (str(record.id) + ",")
+            events.append(redpack_event)
+            records.append(record)
+        gift_record.redpack_record_ids = redpack_record_ids
+    if activity_rule.gift_type == "experience_gold":
+        experience_record_ids = ""
+        experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+        if not experience_record_id:
+            return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
+        redpack_txts.append('%s元体验金'%int(experience_event.amount))
+        experience_record_ids += (str(experience_record_id) + ",")
+        gift_record.experience_record_ids = experience_record_ids
+    gift_record.activity_code = self.activity.code
+    gift_record.activity_code_time = timezone.now()
+    gift_record.save()
