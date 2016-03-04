@@ -23,9 +23,11 @@ module.exports = {
         detail: path.resolve(JS_PATH, 'detail'),
         calculator: path.resolve(JS_PATH, 'calculator'),
         bankOneCard: path.resolve(JS_PATH, 'bankOneCard'),
+        recharge: path.resolve(JS_PATH, 'recharge'),
+        trade_check: path.resolve(JS_PATH, 'trade_check'),
+
         process_authentication: path.resolve(JS_PATH, 'process_authentication'),
         process_addbank: path.resolve(JS_PATH, 'process_addbank'),
-
         vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto')]
     },
     output: {
