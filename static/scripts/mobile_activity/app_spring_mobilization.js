@@ -397,7 +397,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         $('.card_box[data-card="'+card_no+'"] .num').text(data1.redpack.amount+'元');
                         $('.card_box[data-card="'+card_no+'"]').find('.card').addClass('card_box_open');
 
-                        $('.popup_box .text').text('"恭喜您获得"+data1.redpack.amount+"元红包"');
+                        $('.popup_box .text').text('恭喜您获得'+data1.redpack.amount+'元红包');
                         $('.popup_box .popup_button').show();
                         $('.popup_box').show();
 

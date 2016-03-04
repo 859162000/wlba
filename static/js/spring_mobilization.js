@@ -146,7 +146,7 @@
                         $('.card_box[data-card="'+card_no+'"] .card_prize').text(data1.redpack.amount+'元');
                         $('.card_box[data-card="'+card_no+'"]').find('.card_box_main').addClass('card_box_open');
 
-                        $('.popup_box .text').text('"恭喜您获得"+data1.redpack.amount+"元红包"');
+                        $('.popup_box .text').text('恭喜您获得'+data1.redpack.amount+'元红包');
                         $('.popup_box .popup_button').show();
                         $('.popup_box').show();
 
