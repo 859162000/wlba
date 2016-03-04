@@ -56,14 +56,14 @@ def sendYesterdayTopRankAward():
                 continue
             for user in users:
                 if user.id == rank['user']:
-                    if not ActivityRewardRecord.objects.filter(create_date=now_date, user=user).exists():
+                    if not ActivityRewardRecord.objects.filter(create_date=now_date, activity_code=u'march_awards', user=user).exists():
                         ActivityRewardRecord.objects.create(
                         user=user,
                         activity_code=u'march_awards',
                         activity_desc=u'获得%s排名%s奖励'%(yesterday.date(), (index+1))
                         )
                     with transaction.atomic():
-                        rank_reward_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, user=user).first()
+                        rank_reward_record = ActivityRewardRecord.objects.select_for_update().filter(create_date=now_date, activity_code=u'march_awards', user=user).first()
                         if not rank_reward_record.redpack_record_id:
                             status, messege, redpack_record_id = give_activity_redpack_new(user, redpack_event, 'all')
                             if not status:
