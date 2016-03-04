@@ -4,12 +4,15 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-import json
+from django.utils import timezone
 import logging
 import base64
-from .models import WeixinUser
+import datetime
 from wanglibao_account.backends import invite_earning
-from .base import BaseWeixinTemplate
+from weixin.models import UserDailyActionRecord, SeriesActionActivity
+from experience_gold.models import ExperienceEventRecord
+
+
 
 logger = logging.getLogger("weixin")
 # https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
@@ -31,11 +34,6 @@ class InviteWeixinFriendTemplate(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         self.url_name = 'sub_invite'
         return super(InviteWeixinFriendTemplate, self).dispatch(request, *args, **kwargs)
-
-from weixin.models import UserDailyActionRecord, SeriesActionActivity
-from experience_gold.models import ExperienceEventRecord
-import datetime
-from django.utils import timezone
 
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
