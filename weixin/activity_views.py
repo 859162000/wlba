@@ -89,7 +89,7 @@ class GetContinueActionReward(APIView):
 
         reward_record = ActivityRewardRecord.objects.filter(activity_code=current_activity.code, create_date=today, user=user).first()
         if not reward_record:
-            ActivityRewardRecord.objects.create(
+            reward_record = ActivityRewardRecord.objects.create(
                 activity_code=current_activity.code,
                 create_date=today,
                 user=user,
