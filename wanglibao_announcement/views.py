@@ -96,7 +96,7 @@ class AnnouncementHomeApi(APIView):
         page_size = int(req_data.get('page_size', 10))
 
         _announcements = Announcement.objects.filter(Q(status=1, hideinlist=False,) & (Q(device=device_type) | Q(device='pc&app'))
-                                                    ).order_by('-createtime')
+                                                    ).order_by('-createtime', '-id')
 
         announcements = _announcements.values('id', 'title', 'content')
         if announcements:
