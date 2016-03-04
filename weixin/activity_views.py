@@ -11,7 +11,7 @@ import datetime
 from wanglibao_account.backends import invite_earning
 from weixin.models import UserDailyActionRecord, SeriesActionActivity
 from experience_gold.models import ExperienceEventRecord
-
+from util import process_user_daily_action
 
 
 logger = logging.getLogger("weixin")
@@ -34,6 +34,24 @@ class InviteWeixinFriendTemplate(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         self.url_name = 'sub_invite'
         return super(InviteWeixinFriendTemplate, self).dispatch(request, *args, **kwargs)
+
+class DailyActionAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        action_type = request.POST.get('action_type', '').strip()
+        if not action_type or action_type not in [u'share', u'sign_in']:
+            return Response({'ret_code':-1, 'message':'系统错误'})
+        ret_code, status, daily_record = process_user_daily_action(user, action_type=action_type)
+        experience_amount = 0
+        if daily_record.experience_record_id:
+            experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
+            experience_amount=experience_record.event.amount
+        Response({'ret_code':0, "data":{'status':status, 'experience_amount':experience_amount}})
+
+
+
 
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
