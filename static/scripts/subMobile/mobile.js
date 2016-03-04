@@ -904,6 +904,7 @@ org.detail = (function (org) {
                     imgUrl: shareImg,
                     success: function(){
                         //alert(shareMainTit);
+                        success && success();
                     }
                 });
                 //分享给微信朋友圈
@@ -913,6 +914,7 @@ org.detail = (function (org) {
                     imgUrl: shareImg,
                     success: function(){
                         //alert(shareMainTit);
+                        success && success();
                     }
                 });
                 //分享给QQ
@@ -920,7 +922,10 @@ org.detail = (function (org) {
                     title: shareMainTit,
                     desc: shareBody,
                     link : shareLink,
-                    imgUrl: shareImg
+                    imgUrl: shareImg,
+                    success: function(){
+                        success && success();
+                    }
                 });
             })
         },
@@ -2462,7 +2467,7 @@ org.received_ui = (function(){
         list: list,
         detail: detail
     }
-})()
+})();
 org.received_all = (function(){
     var lib = {
         init: function(){
@@ -2539,7 +2544,7 @@ org.received_all = (function(){
     return {
         init : lib.init
     }
-})()
+})();
 
 org.received_month = (function(){
     var lib = {
@@ -2607,9 +2612,7 @@ org.received_month = (function(){
     return {
         init : lib.init
     }
-})()
-
-
+})();
 
 org.received_detail = (function(){
     var lib = {
@@ -2652,6 +2655,96 @@ function closePage(){
         window.close();
     }
 }
+
+//签到
+org.checkIn = (function(org){
+    var lib = {
+        giftOk: true,
+        altDom: $(".check-in-alert-layout"),
+        init: function(){
+            lib.getGift();
+            lib.closeAlt();
+            lib.loadInit();
+        },
+        loadInit: function(){
+            org.ajax({
+                url: "/weixin/sign_info/",
+                type: "GET",
+                dataType: "json",
+                success: function(data){
+                    var result = data.data;
+                    console.log(result,result.sign_in);
+                    var giftNum = result.sign_in.nextDayNote,//礼物天数
+                        nowDay = result.sign_in.current_day,
+                        nextNum = giftNum - nowDay,
+                        className = '',
+                        html = '';
+                    for(var i=1; i<=giftNum; i++){
+                        if(nowDay === giftNum){
+                            className = 'active-did active-gift active-doing';
+                        }else{
+                            if(i < nowDay){
+                                className = 'active-did';
+                            }else if(i === nowDay){
+                                className = 'active-did active-doing';
+                            }else if(i === giftNum){
+                                className = 'active-gift';
+                            }else{
+                                className = '';
+                            }
+                        }
+                        html += '<div class="flag-items '+ className +'">' +
+                                    '<div class="circle-item-warp">' +
+                                        '<div class="circle-item">' +
+                                            '<div class="circle-min"></div>'+
+                                            '<div class="circle-animate"></div>'+
+                                            '<div class="check-in-flag"></div>'+
+                                        '</div>'+
+                                    '</div>' +
+                                    '<div class="text-item">'+ i +'天</div>' +
+                                '</div>';
+                    }
+                    $("div.check-in-flag-lists").html(html);
+                }
+            });
+        },
+        closeAlt: function(){
+            $(".close-alert").on("click",function(){
+                $(this).parents(".check-in-alert-layout").hide();
+            });
+        },
+        getGift: function(){
+            var giftOk = lib.giftOk;
+            $(".active-gift.active-did").on("touchstart",function(){
+                var self = $(this);
+                if(self.hasClass("active-gift-open")){
+                    return;
+                }
+                if(giftOk){
+                    giftOk = false;
+                    self.addClass("active-gift-open");
+                    if(lib.altDom.hasClass("check-in-share")){
+                        lib.altDom.removeClass("check-in-share");
+                    }
+                    lib.altDom.show();
+                }
+            });
+        },
+        shareFn: function(){
+            if(!lib.altDom.hasClass("check-in-share")){
+                lib.altDom.addClass("check-in-share");
+            }
+            lib.altDom.show();
+        },
+        shareOk: function(){
+            var share = {shareLink:'', shareMainTit:'网利宝天天送我钱，不想要都不行～朋友们快来领啊～', shareBody:'', success:shareFn};
+            org.detail.share(share);
+        }
+    };
+    return {
+        init: lib.init
+    }
+})(org);
 
 ;(function(org){
     $.each($('script'), function(){
@@ -2913,3 +3006,5 @@ org.awardEvent = (function(org){ //微信抽奖
     };
     return awardFun;
 })(org);
+
+
