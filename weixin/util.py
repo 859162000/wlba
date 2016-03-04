@@ -8,6 +8,7 @@ from wechatpy import WeChatClient
 from wechatpy.exceptions import WeChatException
 from misc.models import Misc
 from experience_gold.backends import SendExperienceGold
+from experience_gold.models import ExperienceEvent
 from django.conf import settings
 from django.utils import timezone
 from django.http import HttpResponseRedirect
@@ -19,6 +20,7 @@ import time
 import json
 import urllib
 import re
+import random
 
 
 logger = logging.getLogger("weixin")
