@@ -120,9 +120,17 @@
                 url: '/api/march_reward/fetch/',
                 type: 'post',
                 success: function (data1) {
+                    if(data1.ret_code==0){
+                        $('.card_box[data-card="'+card_no+'"] .card_prize').text(data1.redpack.amount+'元');
+                        $('.card_box[data-card="'+card_no+'"]').find('.card_box_main').addClass('card_box_open');
+                    }else{
+                        $('.popup_box .text').text(data1.message);
+                        $('.popup_box').show();
+                        time_count = 3;
+                        time_intervalId = setInterval(timerFunction, 1000);
+                        time_intervalId;
+                    }
 
-                    $('.card_box[data-card="'+card_no+'"] .card_prize').text(data1.redpack.amount+'元');
-                    $('.card_box[data-card="'+card_no+'"]').find('.card_box_main').addClass('card_box_open');
 
                 },error: function(data1){
                     $('.popup_box .text').text(data1.message);
