@@ -84,7 +84,6 @@ INSTALLED_APPS = (
     'wanglibao_profile',
     'wanglibao_rest',
     'wanglibao_pay',
-    # 'order',
     'wanglibao_margin',
     'wanglibao_oauth2',
 

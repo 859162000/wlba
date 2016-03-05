@@ -246,7 +246,6 @@ class CoopDataDispatchApi(APIView):
         pass
 
     def post(self, request):
-        print ">>>>>>>>>>>aaaa"
         try:
             req_data = request.POST
             logger.info("channel data dispatch processing with %s" % req_data)

@@ -231,7 +231,7 @@ class CoopCallback(object):
         """
         channel_processor = coop_callback_processor.get(channel_code.lower())
         if channel_processor:
-            channel_processor = locals().get(channel_processor, None)
+            channel_processor = _LOCALS_VAR.get(channel_processor, None)
         else:
             channel_processor = None
         return channel_processor

@@ -25,7 +25,7 @@ class Binding(models.Model):
         third app bind table, store bind related
     """
     user = models.ForeignKey(User)
-    channel = models.ForeignKey(Channels, verbose_name=u"渠道")
+    channel = models.ForeignKey(Channels, verbose_name=u"渠道", related_name='binding')
     bid = models.CharField(u"第三方用户id", max_length=50, db_index=True, blank=True)
     extra = models.CharField(max_length=200, default="", blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)

@@ -12,5 +12,5 @@ def get_channel_record(channel_code):
 
 
 def get_user_channel_record(user_id):
-    channel = Channels.objects.filter(introducedby__user_id=user_id).first()
+    channel = Channels.objects.filter(binding__user_id=user_id).first()
     return channel
