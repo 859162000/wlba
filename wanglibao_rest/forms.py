@@ -35,7 +35,7 @@ class CoopDataDispatchForm(forms.Form):
         _time = self.cleaned_data['time']
         current_time = get_current_utc_timestamp()
         # FixMe,修改超时时间
-        if int(current_time) - _time <= 120000:
+        if int(current_time) - _time <= 120:
             return _time
         else:
             raise forms.ValidationError(

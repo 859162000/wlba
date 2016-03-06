@@ -10,7 +10,7 @@ import hashlib
 
 
 def generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
-    sign = hashlib.md5(str(user_id) + client_id + utc_timestamp + key).hexdigest()
+    sign = hashlib.md5(str(user_id) + client_id + str(utc_timestamp) + key).hexdigest()
     return sign
 
 

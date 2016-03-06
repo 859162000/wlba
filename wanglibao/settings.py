@@ -1,3 +1,5 @@
+# encoding:utf-8
+
 """
 Django settings for wanglibao project.
 
@@ -107,6 +109,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'marketing.middlewares.PromotionTokenMiddleWare',
 )
 
 
@@ -374,8 +377,8 @@ CELERY_QUEUES = {
 from datetime import timedelta
 
 CELERYBEAT_SCHEDULE = {
-    'p2p-watchdog-1-minutes': {
-        'task': 'wanglibao_p2p.tasks.p2p_watchdog',
+    'bajinshe_product_push-5-minutes': {
+        'task': 'wanglibao_p2p.tasks.bajinshe_product_push',
         'schedule': timedelta(minutes=5),
     },
 }
@@ -398,5 +401,33 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = 'wanglibank_redis'
 
-
+# Chanel settings
 BASE_SYNC_KEY = 'jIzNGRrd2xi'
+
+
+PROMO_TOKEN_QUERY_STRING = 'promo_token'
+PROMO_TOKEN_USER_KEY = 'tid'
+CLIENT_ID_QUERY_STRING = 'app_id'
+
+CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
+if ENV == ENV_PRODUCTION:
+    BASE_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_URL = ''
+else:
+    BASE_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_URL = ''
+
+
+# 八金社渠道
+BAJINSHE_COOP_ID = 'wanglibao'
+BAJINSHE_COOP_KEY = '3795dd52-3ad9-47cf-9fe7-67d69566c1ba'
+if ENV == ENV_PRODUCTION:
+    BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
+    BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
+    BAJINSHE_ACCOUNT_PUSH_URL = ''
+    BAJINSHE_RECHARGE_PUSH_URL = ''
+else:
+    BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
+    BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
+    BAJINSHE_ACCOUNT_PUSH_URL = ''
+    BAJINSHE_RECHARGE_PUSH_URL = ''

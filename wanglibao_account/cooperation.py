@@ -12,6 +12,8 @@ from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client
+from wanglibao import settings
+from .tasks import bajinshe_account_push
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -58,6 +60,14 @@ def get_phone_for_coop(user_id):
         return None
 
 
+def get_user_phone_for_coop(user_id):
+    try:
+        phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
+        return phone_number
+    except:
+        return None
+
+
 def get_tid_for_coop(user_id):
     try:
         return Binding.objects.filter(user_id=user_id).get().bid
@@ -66,6 +76,108 @@ def get_tid_for_coop(user_id):
 
 
 _LOCALS_VAR = locals()
+
+
+class CoopSessionProcessor(object):
+    """
+    第三方请求参数保存session
+    """
+    def __init__(self, request):
+        self.request = request
+        # 传递渠道邀请码时使用的变量名
+        self.external_channel_key = settings.PROMO_TOKEN_QUERY_STRING
+        self.internal_channel_key = 'channel_code'
+        # 传递渠道用户时使用的变量名
+        self.external_channel_user_key = settings.PROMO_TOKEN_USER_KEY
+        self.internal_channel_user_key = 'channel_user'
+        # 传递渠道oauth客户端ID时使用的变量名
+        self.external_channel_client_id_key = settings.CLIENT_ID_QUERY_STRING
+        self.internal_channel_client_id_key = 'client_id'
+
+    def get_channel_code_from_request(self):
+        return self.request.GET.get(self.external_channel_key, None)
+
+    def save_to_session(self):
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.GET.get(self.external_channel_user_key, None)
+
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+
+    def clear_session(self):
+        self.request.session.pop(self.internal_channel_key, None)
+        self.request.session.pop(self.internal_channel_user_key, None)
+
+    def get_channel_processor(self, channel_code):
+        """
+        返回该用户的渠道处理器
+        """
+        channel_processor = coop_session_processor.get(channel_code.lower())
+        if channel_processor:
+            channel_processor = _LOCALS_VAR.get(channel_processor, None)
+        else:
+            channel_processor = None
+        return channel_processor
+
+    def all_processors_for_session(self, session_act):
+        """
+        session_act ==> 0 保存参数到session
+        session_act ==> 1 清除session参数
+        """
+
+        channel_code = self.get_channel_code_from_request()
+        channel_processor = self.get_channel_processor(channel_code)
+        if channel_processor:
+            try:
+                if session_act == 0:
+                    channel_processor(self.request).save_to_session()
+                elif session_act == 1:
+                    channel_processor(self.request).clear_session()
+            except Exception, e:
+                logger.info("%s raise error: %s" % (channel_processor.__name__, e))
+        else:
+            logger.info("all_processors_for_user_register not found processor matched for channel_code[%s]" % channel_code)
+
+
+class BaJinSheSession(CoopSessionProcessor):
+    def __init__(self, request):
+        super(BaJinSheSession, self).__init__(request)
+        self.external_channel_client_id_key = 'appid'
+        self.external_channel_phone_key = 'usn'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_sign_key = 'signature'
+        self.internal_channel_sign_key = 'sign'
+        self.external_channel_user_key = 'p_user_id'
+
+    def save_to_session(self):
+        super(BaJinSheSession, self).save_to_session()
+        channel_phone = self.request.REQUEST.get(self.external_channel_phone_key, None)
+        sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
+        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
+
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
+
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+    def clear_session(self):
+        super(BaJinSheSession, self).clear_session()
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+
+
+# 注册第三方通道
+coop_session_processor = {
+    'bajinshe': 'BaJinSheSession',
+    'renrenli': 'RenRenLiSession',
+}
 
 
 # ######################第三方用户注册#####################
@@ -124,7 +236,7 @@ class CoopRegister(object):
         self.save_to_oauthuser(user)
         self.register_call_back(user)
 
-    def get_user_channel_processor(self, channel_code):
+    def get_channel_processor(self, channel_code):
         """
         返回该用户的渠道处理器
         """
@@ -138,7 +250,7 @@ class CoopRegister(object):
     def all_processors_for_user_register(self, user):
         logger.info("user[%s] enter all_processors_for_user_register" % user.id)
         if self.channel:
-            channel_processor = self.get_user_channel_processor(self.channel.code)
+            channel_processor = self.get_channel_processor(self.channel.code)
             if channel_processor:
                 try:
                     channel_processor(self.btype, self.bid, self.client_id, self.order_id).process_for_register(user)
@@ -154,6 +266,20 @@ class BaJinSheRegister(CoopRegister):
     def __init__(self, *args, **kwargs):
         super(BaJinSheRegister, self).__init__(*args, **kwargs)
 
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        logger.info("user[%s] enter save_to_binding with btype[%s] bid[%s]" % (user.id, self.btype, self.bid))
+        if self.channel:
+            binding = Binding()
+            binding.user = user
+            binding.channel = self.channel
+            binding.bid = get_uid_for_coop(user.id)
+            binding.save()
+
 
 # 注册第三方通道
 coop_register_processor = {
@@ -161,6 +287,8 @@ coop_register_processor = {
     'renrenli': 'RenRenLiRegister',
 }
 
+
+# ######################用户第三方回调#####################
 
 class CoopCallback(object):
     """
@@ -225,7 +353,7 @@ class CoopCallback(object):
         """
         pass
 
-    def get_user_channel_processor(self, channel_code):
+    def get_channel_processor(self, channel_code):
         """
         返回该用户的渠道处理器
         """
@@ -240,7 +368,7 @@ class CoopCallback(object):
         logger.info("coop callback enter process_all_callback with user[%s] act[%s] order_id[%s]" % (user_id, act, order_id))
         channel = get_user_channel_record(user_id)
         if channel:
-            channel_processor = self.get_user_channel_processor(channel.code)
+            channel_processor = self.get_channel_processor(channel.code)
             if channel_processor:
                 try:
                     call_back_processor = getattr(channel_processor(channel), '%s_call_back' % act.lower(), None)
@@ -257,6 +385,11 @@ class BaJinSheCallback(CoopCallback):
     def __init__(self, *args, **kwargs):
         super(BaJinSheCallback, self).__init__(*args, **kwargs)
 
+    def register_call_back(self, user_id, bid, order_id):
+        super(BaJinSheCallback, self).register_call_back(user_id, bid, order_id)
+        # 异步回调
+        bajinshe_account_push.apply_async(
+            kwargs={'user_id': user_id})
 
 # 第三方回调通道
 coop_callback_processor = {

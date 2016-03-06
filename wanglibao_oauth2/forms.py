@@ -4,10 +4,9 @@ import hashlib
 from django import forms
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
-from django.conf import settings
-from wanglibao_account.utils import Crypto
 from .models import Client, RefreshToken, OauthUser
 from wanglibao_account.utils import detect_identifier_type
+from wanglibao_account.models import Binding
 from marketing.utils import get_channel_record
 
 
@@ -121,9 +120,8 @@ class UserAuthForm(OAuthForm):
                 'message': _("invalid user_id")
             })
         else:
-            crypto = Crypto()
-            data_buf = crypto.decode_bytes(str(user_id))
-            user_id = crypto.decrypt_mode_cbc(data_buf, settings.OAUTH2_CRYPTO_KEY, settings.OAUTH2_CRYPTO_IV)
+            binding = Binding.objects.filter(bid=user_id).first()
+            user_id = binding.user.id if binding else None
 
         usn = self.cleaned_data.get('usn', '').strip()
         if not usn:

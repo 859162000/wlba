@@ -3,10 +3,11 @@
 
 import json
 import logging
+import hashlib
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from rest_framework.views import APIView
-from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.cooperation import CoopRegister, get_client, get_uid_for_coop, CoopSessionProcessor
 from wanglibao_p2p.models import P2PRecord
 from django.utils import timezone
 from wanglibao_rest.utils import has_binding_for_bid, get_coop_binding_for_phone
@@ -54,44 +55,94 @@ class AccessUserExistsApi(APIView):
 
     permission_classes = ()
 
-    def get(self, request, **kwargs):
+    def check_sign(self, client_id, phone, key, sign):
+        local_sign = hashlib.md5(str(client_id) + key + str(phone)).hexdigest()
+        if local_sign == sign:
+            sign_is_ok = True
+        else:
+            sign_is_ok = False
+
+        return sign_is_ok
+
+    def post(self, request, **kwargs):
         channel_code = request.GET.get('promo_token', None)
         if channel_code:
             channel = get_channel_record(channel_code)
             if channel:
-                phone = request.session.get('phone')
-                binding = get_coop_binding_for_phone(channel_code, phone)
-                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-                if binding and user:
-                    response_data = {
-                        'user_id': binding.bid,
-                        'ret_code': 10000,
-                        'message': u'该号已注册'
-                    }
-                elif not user:
-                    response_data = {
-                        'user_id': None,
-                        'ret_code': 10001,
-                        'message': u'该号未注册'
-                    }
+                sign = request.session.get('sign')
+                print sign
+                if sign:
+                    client_id = request.session.get('client_id')
+                    if client_id:
+                        client = get_client(channel_code)
+                        if client:
+                            phone = request.session.get('phone')
+                            if phone:
+                                if self.check_sign(client_id, phone, client.client_secret, sign):
+                                    binding = get_coop_binding_for_phone(channel_code, phone)
+                                    user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                                    if binding and user:
+                                        response_data = {
+                                            'user_id': binding.bid,
+                                            'ret_code': 10000,
+                                            'message': u'该号已注册'
+                                        }
+                                    elif not user:
+                                        response_data = {
+                                            'user_id': None,
+                                            'ret_code': 10001,
+                                            'message': u'该号未注册'
+                                        }
+                                    else:
+                                        response_data = {
+                                            'user_id': None,
+                                            'ret_code': 10002,
+                                            'message': u'该号已注册，非本渠道用户'
+                                        }
+
+                                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+                                else:
+                                    response_data = {
+                                        'user_id': None,
+                                        'ret_code': 10008,
+                                        'message': u'无效签名'
+                                    }
+                            else:
+                                response_data = {
+                                    'user_id': None,
+                                    'ret_code': 10007,
+                                    'message': u'手机号不存在'
+                                }
+                        else:
+                            response_data = {
+                                'user_id': None,
+                                'ret_code': 10006,
+                                'message': u'无效客户端id不存在'
+                            }
+                    else:
+                        response_data = {
+                            'user_id': None,
+                            'ret_code': 10005,
+                            'message': u'客户端id参数不存在'
+                        }
                 else:
                     response_data = {
                         'user_id': None,
-                        'ret_code': 10002,
-                        'message': u'该号已注册，非本渠道用户'
+                        'ret_code': 10004,
+                        'message': u'签名参数不存在'
                     }
-
-                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
                 response_data = {
                     'user_id': None,
-                    'ret_code': 10002,
+                    'ret_code': 10003,
                     'message': u'无效promo_token'
                 }
         else:
             return Http404(u'页面不存在')
 
-        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+        CoopSessionProcessor(request).all_processors_for_session(1)
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
 class CoopDataDispatchApi(APIView):
@@ -246,44 +297,41 @@ class CoopDataDispatchApi(APIView):
         pass
 
     def post(self, request):
-        try:
-            req_data = request.POST
-            logger.info("channel data dispatch processing with %s" % req_data)
-            form = CoopDataDispatchForm(req_data)
-            if form.is_valid():
-                channel = form.cleaned_data['channel']
-                _time = form.cleaned_data['time']
-                sign = form.cleaned_data['sign']
-                act = form.cleaned_data['act']
-                # 判断数据签名有效性
-                key = getattr(settings, '%s_SYNC_KEY' % channel.upper(), None)
-                if key:
-                    is_right_sign = form.check_sign(channel, _time, key, sign)
-                    if is_right_sign:
-                        # 判断动作有效性，并调度相关处理器
-                        processer = getattr(self, 'process_%s' % act, None)
-                        if processer:
-                            response_data = processer(req_data)
-                        else:
-                            response_data = {
-                                'ret_code': 10004,
-                                'message': u'无效动作',
-                            }
+        req_data = request.POST
+        logger.info("channel data dispatch processing with %s" % req_data)
+        form = CoopDataDispatchForm(req_data)
+        if form.is_valid():
+            channel = form.cleaned_data['channel']
+            _time = form.cleaned_data['time']
+            sign = form.cleaned_data['sign']
+            act = form.cleaned_data['act']
+            # 判断数据签名有效性
+            key = getattr(settings, '%s_SYNC_KEY' % channel.upper(), None)
+            if key:
+                is_right_sign = form.check_sign(channel, _time, key, sign)
+                if is_right_sign:
+                    # 判断动作有效性，并调度相关处理器
+                    processer = getattr(self, 'process_%s' % act, None)
+                    if processer:
+                        response_data = processer(req_data)
                     else:
                         response_data = {
-                            'ret_code': 10003,
-                            'message': u'无效签名',
+                            'ret_code': 10004,
+                            'message': u'无效动作',
                         }
                 else:
                     response_data = {
-                        'ret_code': 10001,
-                        'message': u'渠道签名key不存在',
+                        'ret_code': 10003,
+                        'message': u'无效签名',
                     }
             else:
-                response_data = self.parase_form_error(form.errors)
+                response_data = {
+                    'ret_code': 10001,
+                    'message': u'渠道签名key不存在',
+                }
+        else:
+            response_data = self.parase_form_error(form.errors)
 
-            logger.info('channel data dispatch process result:%s' % response_data['message'])
-        except Exception, e:
-            print e, ">>>>>>>>>>>>>>>>"
-            response_data = {}
+        logger.info('channel data dispatch process result:%s' % response_data['message'])
+
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

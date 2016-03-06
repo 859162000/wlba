@@ -13,6 +13,7 @@ urlpatterns = patterns(
     '',
     url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api/', include('wanglibao_rest.urls')),
+    url(r'^oauth2/', include('wanglibao_oauth2.urls', namespace='oauth2')),
 )
 
 handler500 = 'wanglibao.views.server_error'

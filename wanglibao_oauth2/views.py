@@ -1,14 +1,13 @@
 # encoding: utf-8
 
+import json
 import hashlib
 import logging
 from datetime import timedelta
 
-from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
-from rest_framework import renderers
 
 from . import OAuthError
 from . import BasicClientBackend
@@ -16,12 +15,11 @@ from . import AccessTokenBaseView
 from .models import AccessToken, RefreshToken
 from .forms import RefreshTokenGrantForm, UserAuthForm
 from .utils import now
-from .tools import oauth_token_login, oauth_token_login_v2, get_current_utc_timestamp, generate_oauth2_sign
+from .tools import get_current_utc_timestamp, generate_oauth2_sign
 import constants
-from django.core.urlresolvers import reverse
 from django.conf import settings
-from wanglibao_account.models import Binding
 from django.utils import timezone
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +87,7 @@ class AccessTokenView(AccessTokenBaseView):
         """
         As per :rfc:`3.2` the token endpoint *only* supports POST requests.
         """
+
         if constants.ENFORCE_SECURE and not request.is_secure():
             return self.error_response({
                 'code': '10100',
@@ -138,11 +137,12 @@ class AccessTokenOauthView(APIView):
         utc_timestamp = data.get('time', '')
         sign = data.get('sign', None)
         channel = data.get('channel', '')
+        logger.info("enter AccessTokenOauthView with data: %s" % data)
         if token and client_id and user_id and utc_timestamp and sign and channel:
             key = getattr(settings, '%s_OAUTH_KEY' % channel.upper(), None)
             if key:
                 try:
-                    if (int(get_current_utc_timestamp()) - int(utc_timestamp)) <= 120:
+                    if (int(get_current_utc_timestamp()) - int(utc_timestamp)) <= 120000:
                         if sign == generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
                             access_token = AccessToken.objects.filter(token=token, expires__gte=timezone.now())
                             if access_token.exists():
@@ -171,6 +171,7 @@ class AccessTokenOauthView(APIView):
                             'message': u'无效时间戳',
                         }
                 except Exception, e:
+                    logger.info("AccessTokenOauthView raise error: %s" % e)
                     response_data = {
                         'ret_code': 50002,
                         'message': 'api error',
@@ -185,3 +186,7 @@ class AccessTokenOauthView(APIView):
                 'ret_code': 50001,
                 'message': u'非法请求',
             }
+
+        logger.info("AccessTokenOauthView process result: %s" % response_data["message"])
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
