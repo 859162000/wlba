@@ -222,6 +222,25 @@ org.checin_in = (function (org) {
     var lib = {
         init: function(){
 
+            lib.fetch()
+        },
+        listen: function(){
+
+        },
+        touchGift: function(){
+
+        },
+        share: function(){
+
+        },
+        fetch: function(){
+            org.ajax({
+                url: '/weixin/sign_info/',
+                type: 'post',
+                success: function(data){
+
+                }
+            })
         }
     }
     return {
@@ -261,7 +280,8 @@ wlb.ready({
 
     },
     other: function () {
-        alert('open in app!')
+        org.checin_in.init()
+        //alert('open in app!')
     }
 })
 
