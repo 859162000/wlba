@@ -98,19 +98,19 @@ Message_template = {
         # {{remark.DATA}}
                 "first": {
                     "value": "签到",
-                   "color": "#173177"
+                   "color": "#000000"
                 },
                 "keyword1": {
                     "value": "",
-                    "color": "#173177"
+                    "color": "#000000"
                 },
                 "keyword2": {
                     "value": "",
-                    "color": "#173177"
+                    "color": "#000000"
                 },
                 "keyword3": {
                     "value": "",
-                    "color": "#173177"
+                    "color": "#000000"
                 },
                "remark":{
                    "value":"",

@@ -269,7 +269,7 @@ class WeixinJoinView(View):
             if daily_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
                 experience_amount=experience_record.event.amount
-            reply_msg =u"%s,连续签到可获得更多奖励，记得明天再来哦！\n奖励金额:%s元体验金"
+            reply_msg =u"%s，连续签到可获得更多奖励，记得明天再来哦！\n奖励金额：%s元体验金"
         # 签到时间：{{keyword1.DATA}}
         # 连续签到：{{keyword2.DATA}}
         # 累计签到：{{keyword3.DATA}}
@@ -278,7 +278,7 @@ class WeixinJoinView(View):
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":SIGN_IN_TEMPLATE_ID,
-                    "first":reply_msg%(u"今日你已签到,", experience_amount),
+                    "first":reply_msg%(u"今日你已签到", experience_amount),
                     "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                     "keyword2":"%s天" % daily_record.continue_days,
                     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
