@@ -15,6 +15,11 @@ from django.template.loader import render_to_string, get_template
 from django.utils import timezone
 from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd, ProductionIDVerifyV2BackEnd
+from marketing.utils import get_user_channel_record
+from wanglibao_pay.models import PayInfo
+from wanglibao_p2p.models import P2PRecord
+from wanglibao import settings
+from wanglibao.settings import ENV, ENV_PRODUCTION
 import logging
 import hashlib
 import pytz
@@ -23,6 +28,7 @@ import urllib
 from .models import UserThreeOrder
 import requests
 import json
+from wanglibao_redis.backend import redis_backend
 
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
@@ -128,6 +134,28 @@ def verify_id(name, id_number):
         return ProductionIDVerifyBackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyV2BackEnd':
         return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+    elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
+        key = 'valid_count_v1'
+        valid_v1_total = settings.VALID_V1_TOTAL
+        redis = redis_backend()
+        if redis.redis.ping():
+            if redis._exists(key):
+                valid_v1_count = redis._get(key)
+                valid_v1_count = int(valid_v1_count)
+                if valid_v1_count <= 0:
+                    logger.info(">>>>>>>>>>>>>user valid auto used v2 v1_count[%s]" % valid_v1_count)
+                    return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+                else:
+                    redis._set(key, valid_v1_count - 1)
+                    logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % (valid_v1_count - 1,))
+                    return ProductionIDVerifyBackEnd.verify(name, id_number)
+            else:
+                redis._set(key, valid_v1_total)
+                logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
+                return ProductionIDVerifyBackEnd.verify(name, id_number)
+        else:
+            logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
+            return ProductionIDVerifyV2BackEnd.verify(name, id_number)
     else:
         raise NameError("The specific backend not implemented")
 
@@ -135,7 +163,6 @@ def verify_id(name, id_number):
 def generate_contract(equity, template_name=None, equities=None):
     """
     Generate the contract file for the equity.
-
     :param equity: Equity param, which links the product and user
     :return: The string representation of the contract
     """
@@ -160,7 +187,6 @@ def generate_contract(equity, template_name=None, equities=None):
 def generate_contract_preview(productAmortizations, product, template_name=None):
     """
     Generate the contract file for the equity.
-
     :param equity: Equity param, which links the product and user
     :return: The string representation of the contract
     """
@@ -337,7 +363,6 @@ def str_to_utc(time_str):
 
 def str_to_float(time_str):
     """
-
     :param time_str:
     :return:
     """
