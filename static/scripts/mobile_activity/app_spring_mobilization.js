@@ -403,7 +403,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     }else{
                         $('.popup_box .text').text(data1.message);
                         $('.popup_box .popup_button').hide();
-                        time_count = 3;
+                        time_count = 2;
                         time_intervalId = setInterval(timerFunction, 1000);
                         time_intervalId;
                     }
