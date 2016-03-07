@@ -51,19 +51,20 @@ class DailyActionAPIView(APIView):
         if not action_type or action_type not in [u'share', u'sign_in']:
             return Response({'ret_code':-1, 'message':'系统错误'})
         ret_code, status, daily_record = process_user_daily_action(user, action_type=action_type)
-        experience_amount = 0
-        if daily_record.experience_record_id:
+        data = {'status':status}
+        if status and daily_record.experience_record_id:
             experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
             experience_amount=experience_record.event.amount
-        Response({'ret_code':0, "data":{'status':status, 'experience_amount':experience_amount}})
+            data['experience_amount'] = experience_amount
+        return Response({'ret_code':0, "data":data})
 
 class GetContinueActionReward(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def post(self, request):
         user = request.user
-        # days = request.POST.get('days', '').strip()
-        days = request.GET.get('days', '').strip()
+        days = request.POST.get('days', '').strip()
+        # days = request.GET.get('days', '').strip()
         if not days or not days.isdigit():
             return Response({'ret_code':-1, 'message':u'参数错误'})
         days = int(days)
@@ -154,7 +155,7 @@ class GetContinueActionReward(APIView):
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def post(self, request):
         user = request.user
         today = datetime.date.today()
         yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
@@ -186,11 +187,11 @@ class GetSignShareInfo(APIView):
             for activity in activities:
                 if activity.days >= recycle_continue_days:
                     nextDayNote=activity.days
-                    sign_info['securityGiftFetched']=False
+                    sign_info['continueGiftFetched']=False
                     if activity.days == recycle_continue_days:
                         reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, create_date=today, user=user).first()
                         if reward_record:
-                            sign_info['securityGiftFetched']=reward_record.status#是否已经领取神秘礼物
+                            sign_info['continueGiftFetched']=reward_record.status#是否已经领取神秘礼物
                     break
             # needDays = nextDayNote-recycle_continue_days
             sign_info['nextDayNote'] = nextDayNote#下一个神秘礼物在第几天
