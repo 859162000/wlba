@@ -1694,23 +1694,30 @@ class BaJinSheRegister(CoopRegister):
         sign = hashlib.md5(channel + key + str(_time)).hexdigest()
         return sign
 
+    def generate_base_data(self, user, act):
+        channel = 'base'
+        utc_timestamp = get_current_utc_timestamp()
+        data = {
+            'user_id': user.id,
+            'sign': self.generate_sign(channel, utc_timestamp, self.coop_key),
+            'time': utc_timestamp,
+            'act': act,
+            'channel': channel,
+        }
+        return data
+
     def register_call_back(self, user):
         client_id = self.channel_client_id
         logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
         if client_id:
             try:
-                channel = 'base'
-                utc_timestamp = get_current_utc_timestamp()
-                data = {
-                    'user_id': user.id,
+                base_data = self.generate_base_data(user, 'register')
+                act_data = {
                     'client_id': client_id,
-                    'sign': self.generate_sign(channel, utc_timestamp, self.coop_key),
-                    'time': utc_timestamp,
-                    'act': 'register',
-                    'channel': channel,
                     'phone': user.wanglibaouserprofile.phone,
                     'btype': self.channel_code,
                 }
+                data = dict(base_data, **act_data)
                 res = requests.post(url=self.call_back_url, data=data)
                 if res.status_code == 200:
                     result = res.json()
@@ -1726,7 +1733,45 @@ class BaJinSheRegister(CoopRegister):
         pass
 
     def recharge_call_back(self, user, order_id):
-        pass
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter recharge_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
+        penny = Decimal(0.01).quantize(Decimal('.01'))
+        pay_info = PayInfo.objects.filter(user=user, type='D',
+                                          amount__gt=penny,
+                                          status=PayInfo.SUCCESS,
+                                          order_id=order_id).select_related('margin_record').first()
+        if pay_info:
+            base_data = self.generate_base_data(user, 'recharge')
+            pay_info_data = {
+                'type': pay_info.type,
+                'uuid': pay_info.uuid,
+                'amount': pay_info.amount,
+                'fee': pay_info.fee,
+                'management_fee': pay_info.management_fee,
+                'management_amount': pay_info.management_amount,
+                'total_amount': pay_info.total_amount,
+                'status': pay_info.status,
+                'user_id': pay_info.user.id,
+                'order_id': pay_info.order.id,
+                'create_time': timezone.localtime(pay_info.create_time).strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            margin_record = pay_info.margin_record
+            margin_record_data = {
+                'catalog': margin_record.catalog,
+                'order_id': margin_record.order_id,
+                'user_id': margin_record.user.id,
+                'amount': margin_record.amount,
+                'margin_current': margin_record.margin_current,
+                'description': margin_record.description,
+            }
+            act_data = {
+                'pay_info': pay_info_data,
+                'margin_record': margin_record_data,
+            }
+            data = dict(base_data, **act_data)
+
+            common_callback_for_post.apply_async(
+                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
 
 class RenRenLiRegister(CoopRegister):
