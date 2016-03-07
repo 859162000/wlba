@@ -1254,7 +1254,7 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
         user_profile.login_failed_count = 0
         user_profile.login_failed_time = timezone.now()
         user_profile.save()
-        
+
         return Response({'ret_code': 0, 'message': u'修改成功'})
 
 
