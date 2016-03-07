@@ -113,11 +113,11 @@ Message_template = {
                     "color": "#000000"
                 },
                "remark":{
-                   "value":"",
+                   "value":"分享活动拿更多奖励，速戳详情领取！",
                    "color":"#173177"
                }
         },
-        "url": settings.CALLBACK_HOST + "/weixin/sign_info/",
+        "url": settings.CALLBACK_HOST + "/weixin/sub_checkIn/",
     },
     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',
