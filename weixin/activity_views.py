@@ -171,9 +171,9 @@ class GetSignShareInfo(APIView):
         sign_total_count = UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
         sign_info['sign_total_count'] = sign_total_count
         sign_info['status'] = False
+        sign_info['amount']=0
         if sign_record and sign_record.status:
             sign_info['status'] = True
-            sign_info['amount']=0
             sign_info['continue_days'] = sign_record.continue_days
             if sign_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=sign_record.experience_record_id)
@@ -211,9 +211,9 @@ class GetSignShareInfo(APIView):
 
         share_info = data.setdefault('share', {})
         share_info['status'] = False
+        share_info['amount']=0
         if share_record and share_record.status:
             share_info['status'] = True
-            share_info['amount']=0
             if share_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=share_record.experience_record_id)
                 share_info['amount']=experience_record.event.amount

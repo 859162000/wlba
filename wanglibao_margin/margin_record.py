@@ -69,7 +69,7 @@ def margin_records(request):
 
     # 展示的起始时间为2016年2月8日,此前有账单变动的用户由此时间开始展示,历史数据不展示
     date_start = local_to_utc(datetime.datetime(2016, 2, 8), 'min')
-    records = MarginRecord.objects.filter(user=user, create_time__gt=date_start)[(page-1)*pagesize:page*pagesize]
+    records = MarginRecord.objects.filter(user=user, create_time__gt=date_start).order_by('-id')[(page-1)*pagesize:page*pagesize]
 
     res = []
     for record in records:

@@ -989,7 +989,6 @@ class AdminIdValidate(APIView):
                                 "error_number": ErrorNumber.unknown_error
                             }, status=400)
 
-        #user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
         user = User.objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
@@ -1000,6 +999,7 @@ class AdminIdValidate(APIView):
         return Response({
                             "validate": True
                         }, status=200)
+
 
 class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
@@ -1019,11 +1019,17 @@ class LoginAPIView(DecryptParmsAPIView):
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+            return Response({"token": "false", "message": u"用户名或密码错误"}, status=400)
         if not user.is_active:
-            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+            return Response({"token": "false", "message": u"用户已被关闭"}, status=400)
         if user.wanglibaouserprofile.frozen:
-            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+            return Response({"token": "false", "message": u"用户已被冻结"}, status=400)
+
+        # 登录成功后将用户的错误登录次数清零
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
 
         push_user_id = request.DATA.get("user_id", "")
         push_channel_id = request.DATA.get("channel_id", "")
@@ -1049,6 +1055,7 @@ class LoginAPIView(DecryptParmsAPIView):
         #     token.delete()
         #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
+
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
     permission_classes = ()
@@ -1084,6 +1091,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             if device_type == "ios":
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': "false"}, status=status.HTTP_200_OK)
+
 
 def get_public_statistics():
     today = datetime.now()

@@ -82,49 +82,16 @@
       display: inline-block
       .card
         width: 100%
-        -webkit-transform-style: preserve-3d
-        -moz-transform-style: preserve-3d
-        -ms-transform-style: preserve-3d
-        -o-transform-style: preserve-3d
-        transform-style: preserve-3d
+        //-webkit-transform-style: preserve-3d
+        //-moz-transform-style: preserve-3d
+        //-ms-transform-style: preserve-3d
+        //-o-transform-style: preserve-3d
+        //transform-style: preserve-3d
         position: relative
         box-shadow: 1px 2px 6px #493600
         border-radius: 0.25rem
-      .card_box .card_box_open
-        -webkit-animation-name: donghua
-        -webkit-animation-duration: 0.5s
-        -webkit-animation-timing-function: linear
-        -webkit-animation-delay: 0s
-        -webkit-animation-iteration-count: 1
-        -webkit-animation-fill-mode: forwards
-
-        -moz-animation-name: donghua
-        -moz-animation-duration: 0.5s
-        -moz-animation-timing-function: linear
-        -moz-animation-delay: 0s
-        -moz-animation-iteration-count: 1
-        -moz-animation-fill-mode: forwards
-
-        -ms-animation-name: donghua
-        -ms-animation-duration: 0.5s
-        -ms-animation-timing-function: linear
-        -ms-animation-delay: 0s
-        -ms-animation-iteration-count: 1
-        -ms-animation-fill-mode: forwards
-
-        -o-animation-name: donghua
-        -o-animation-duration: 0.5s
-        -o-animation-timing-function: linear
-        -o-animation-delay: 0s
-        -o-animation-iteration-count: 1
-        -o-animation-fill-mode: forwards
-
-        animation-name: donghua
-        animation-duration: 0.5s
-        animation-timing-function: linear
-        animation-delay: 0s
-        animation-iteration-count: 1
-        animation-fill-mode: forwards
+      .card_box .card_box_open .card_img
+        display: none
       .card_left
         float: left
       .card_right
@@ -137,7 +104,7 @@
           width: 100%
           display: block
           text-align: center
-          transform: rotateY(0deg)
+          //transform: rotateY(0deg)
           position: absolute
           left: 0
           top: 0
@@ -146,9 +113,9 @@
           width: 100%
           display: block
           position: relative
-          backface-visibility: hidden
+          //backface-visibility: hidden
           z-index: 2
-          transform: rotateY(180deg)
+          //transform: rotateY(180deg)
 
           .prize_bg
             width: 100%

@@ -149,7 +149,7 @@ def getRewardsByActivity(code):
     return rewards
 
 def getTodayTop10Ranks():
-    today = datetime.datetime.now()-datetime.timedelta(1)
+    today = datetime.datetime.now()
     today_start = local_to_utc(today, 'min')
     today_end = local_to_utc(today, 'max')
     top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]

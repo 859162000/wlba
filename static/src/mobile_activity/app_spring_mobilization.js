@@ -92,7 +92,7 @@
 		})
 	})
 
-        var time_count = 3;
+        var time_count = 2;
         /*倒数秒数*/
         var time_intervalId;
         /*定义倒计时的名字*/
@@ -110,7 +110,7 @@
             }
         };
 
-        var time_count2 = 3;
+        var time_count2 = 2;
         /*倒数秒数*/
         var time_intervalId2;
         /*定义倒计时的名字*/
@@ -119,7 +119,7 @@
         /*定义倒计时内容*/
             if (time_count2 > 1) {
                 time_count2--;
-                return
+                return $('.popup_box').hide();
             } else {
                 clearInterval(time_intervalId2);
                 /*清除倒计时*/
@@ -147,13 +147,10 @@
                 }else{
                     $('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
                     $('.popup_box').show();
-                    time_count = 3;
+                    time_count = 2;
                     time_intervalId = setInterval(timerFunction, 1000);
                     time_intervalId;
                 }
-
-
-
             }else{
                 window.location.href = '/weixin/login/?next=/weixin_activity/spring_reward/'
             }
@@ -180,24 +177,21 @@
 
                         $('.popup_box .text').text('恭喜您获得'+data1.redpack.amount+'元红包');
                         $('.popup_box .popup_button').show();
-                        $('.popup_box').show();
 
-                        time_count2 = 3;
+                        time_count2 = 2;
                         time_intervalId2 = setInterval(timerFunction2, 1000);
                         time_intervalId2;
                     }else{
                         $('.popup_box .text').text(data1.message);
-                        $('.popup_box').show();
-                        time_count = 3;
+                        $('.popup_box .popup_button').hide();
+                        time_count = 2;
                         time_intervalId = setInterval(timerFunction, 1000);
                         time_intervalId;
                     }
-
-
                 },error: function(data1){
                     $('.popup_box .text').text(data1.message);
-                    $('.popup_box').show();
-                    time_count = 3;
+                    $('.popup_box .popup_button').hide();
+                    time_count = 2;
                     time_intervalId = setInterval(timerFunction, 1000);
                     time_intervalId;
                 }
