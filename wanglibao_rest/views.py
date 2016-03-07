@@ -1028,11 +1028,17 @@ class LoginAPIView(DecryptParmsAPIView):
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+            return Response({"token": "false", "message": u"用户名或密码错误"}, status=400)
         if not user.is_active:
-            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+            return Response({"token": "false", "message": u"用户已被关闭"}, status=400)
         if user.wanglibaouserprofile.frozen:
-            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+            return Response({"token": "false", "message": u"用户已被冻结"}, status=400)
+
+        # 登录成功后将用户的错误登录次数清零
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
 
         push_user_id = request.DATA.get("user_id", "")
         push_channel_id = request.DATA.get("channel_id", "")
