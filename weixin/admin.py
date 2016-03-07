@@ -63,10 +63,9 @@ class SubscribeServiceAdmin(admin.ModelAdmin):
 
 class SeriesActionActivityAdmin(admin.ModelAdmin):
     list_display = ('id', 'code', 'description', 'action_type', 'days', 'start_at', 'end_at', 'is_stopped')
-    pass
 
 class SeriesActionActivityRuleAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id','rule_name', 'rule_description', 'gift_type', 'redpack', 'reward', 'is_used')
 
 admin.site.register(Account, AccountAdmin)
 admin.site.register(QrCode, QrCodeAdmin)
