@@ -12,14 +12,16 @@ html(style='background: #FFE9D0')
       .checkin-op-status
         i.checkin-op-icon.icon-status
         .checkin-op-dec
-          .op-dec-title 今日已签到
-          .op-dec-detail.op-detail-orange ＋800体验金
+          include include/app_loading
+          //.op-dec-title 今日已签到
+          //.op-dec-detail.op-detail-orange ＋800体验金
 
       .checkin-op-share
         i.checkin-op-icon.icon-share
         .checkin-op-dec
-          .op-dec-title 今日未分享
-          .op-dec-detail 分享得双倍
+          include include/app_loading
+          //.op-dec-title 今日未分享
+          //.op-dec-detail 分享得双倍
     section.check-in-bar
       .bar-layout
         .bar-content 距离神秘礼包还有4天
@@ -27,6 +29,7 @@ html(style='background: #FFE9D0')
         .bar-after
 
     section.check-in-process
+      include include/app_loading
       .check-in-process-line
       .check-in-flag-lists
         mixin items(day, active)
@@ -58,5 +61,8 @@ html(style='background: #FFE9D0')
           .check-body-gift-information 今日签到成功！获得888元体验金
           .check-body-where-information 在(我的账户－体验金)中查看
           .check-body-opeartion-btn 我知道了
+
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(src='/static/scripts/app/check_in.js?v=2015122181')
 
 
