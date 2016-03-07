@@ -370,9 +370,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     time_intervalId = setInterval(timerFunction, 1000);
                     time_intervalId;
                 }
-
-
-
             }else{
                 window.location.href = '/weixin/login/?next=/weixin_activity/spring_reward/'
             }
