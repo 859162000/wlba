@@ -151,9 +151,6 @@
                     time_intervalId = setInterval(timerFunction, 1000);
                     time_intervalId;
                 }
-
-
-
             }else{
                 window.location.href = '/weixin/login/?next=/weixin_activity/spring_reward/'
             }
