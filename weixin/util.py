@@ -230,7 +230,7 @@ def process_user_daily_action(user, action_type=u'sign_in'):
     yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
     daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=action_type).first()
     if not daily_record:
-        UserDailyActionRecord.objects.create(
+        daily_record = UserDailyActionRecord.objects.create(
             user=user,
             action_type=action_type
         )
