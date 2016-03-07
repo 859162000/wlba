@@ -76,6 +76,7 @@ class GetContinueActionReward(APIView):
             return Response({'ret_code':-1, 'message':u'不符合领取条件'})
         activities = SeriesActionActivity.objects.filter(action_type=u'sign_in', is_stopped=False, start_at__lte=timezone.now(), end_at__gte=timezone.now()).all()
         current_activity= None
+
         for activity in activities:
             if activity.days==days:
                 current_activity=activity
@@ -150,7 +151,10 @@ class GetContinueActionReward(APIView):
             logger.debug(traceback.format_exc())
         logger.debug(redpack_txts)
         result_msg = "恭喜您~领取%s成功!"%(",".join(redpack_txts))
-        return Response({"ret_code":0, "message":result_msg})
+        mysterious_day = maxDayNote - recycle_continue_days
+        if maxDayNote == recycle_continue_days:
+            mysterious_day = maxDayNote
+        return Response({"ret_code":0, "message":result_msg, "mysterious_day":mysterious_day})
 
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
