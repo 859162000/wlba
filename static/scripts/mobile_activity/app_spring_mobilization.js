@@ -311,7 +311,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		})
 	})
 
-        var time_count = 3;
+        var time_count = 2;
         /*倒数秒数*/
         var time_intervalId;
         /*定义倒计时的名字*/
@@ -329,7 +329,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         };
 
-        var time_count2 = 3;
+        var time_count2 = 2;
         /*倒数秒数*/
         var time_intervalId2;
         /*定义倒计时的名字*/
@@ -366,7 +366,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 }else{
                     $('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
                     $('.popup_box').show();
-                    time_count = 3;
+                    time_count = 2;
                     time_intervalId = setInterval(timerFunction, 1000);
                     time_intervalId;
                 }
@@ -397,20 +397,20 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         $('.popup_box .text').text('恭喜您获得'+data1.redpack.amount+'元红包');
                         $('.popup_box .popup_button').show();
 
-                        time_count2 = 3;
+                        time_count2 = 2;
                         time_intervalId2 = setInterval(timerFunction2, 1000);
                         time_intervalId2;
                     }else{
                         $('.popup_box .text').text(data1.message);
                         $('.popup_box .popup_button').hide();
-                        time_count = 3;
+                        time_count = 2;
                         time_intervalId = setInterval(timerFunction, 1000);
                         time_intervalId;
                     }
                 },error: function(data1){
                     $('.popup_box .text').text(data1.message);
                     $('.popup_box .popup_button').hide();
-                    time_count = 3;
+                    time_count = 2;
                     time_intervalId = setInterval(timerFunction, 1000);
                     time_intervalId;
                 }
