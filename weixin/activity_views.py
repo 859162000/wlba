@@ -197,6 +197,7 @@ class GetSignShareInfo(APIView):
             sign_info['nextDayNote'] = nextDayNote#下一个神秘礼物在第几天
             # sign_info['needDays'] = needDays
             sign_info['current_day'] = recycle_continue_days#当前是连续签到活动的第几天
+            sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
 
         share_info = data.setdefault('share', {})
         share_info['status'] = False
