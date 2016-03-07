@@ -51,13 +51,13 @@ class DailyActionAPIView(APIView):
         if not action_type or action_type not in [u'share', u'sign_in']:
             return Response({'ret_code':-1, 'message':'系统错误'})
         ret_code, status, daily_record = process_user_daily_action(user, action_type=action_type)
-        print status, '================='
-        data = {'status':status}
+        data = {'status': status, 'continue_days': daily_record.continue_days}
         if status and daily_record.experience_record_id:
             experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
             experience_amount=experience_record.event.amount
             data['experience_amount'] = experience_amount
-        return Response({'ret_code':0, "data":data})
+
+        return Response({'ret_code': 0, "data":data})
 
 class GetContinueActionReward(APIView):
     permission_classes = (IsAuthenticated, )

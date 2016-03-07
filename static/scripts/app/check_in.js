@@ -246,14 +246,14 @@ org.checin_in = (function (org) {
             }
             $('.share-status').find('.op-dec-detail').text('分享得双倍')
         },
-        signIn: function(result){
+        signIn: function(status, amount){
             $('.checIn-status').addClass('rm-loading');
-            if(result.data.sign_in.status){
+            if(status){
                 $('.checIn-status').find('.op-dec-title').text('今日已签到')
             }else{
                 $('.checIn-status').find('.op-dec-title').text('今日未签到')
             }
-            $('.checIn-status').find('.op-dec-detail').text('+800体验金')
+            $('.checIn-status').find('.op-dec-detail').text('+'+amount+'体验金');
         },
         steriousGift:function(acount){
             $('.bar-content').text('距离神秘礼包还有'+acount+'天')
@@ -268,13 +268,10 @@ org.checin_in = (function (org) {
             var itemStatus = '';
             var continueDay = result.data.sign_in.continue_days;
             var currentDay = result.data.sign_in.current_day;
-
+            var giftStatus = result.data.sign_in.continueGiftFetched;
             for(var i= itemStart; i <= itemEnd;i++){
-                itemStatus = ''
-                if(i == itemEnd){
-                    //礼物所在天数
-                    itemStatus = "active-gift "
-                }
+                itemStatus = '';
+
                 if(i <= continueDay){
                     //已签到的天数
                     itemStatus += " active-did "
@@ -285,7 +282,12 @@ org.checin_in = (function (org) {
                     itemStatus += " active-doing"
                 }
 
-                str += "<div class='flag-items "+itemStatus+"'>";
+                if(i == itemEnd){
+                    //礼物所在天数
+                    itemStatus = giftStatus ? "active-gift-open " : "active-gift ";
+                }
+
+                str += "<div data-continue='"+i+"' class='flag-items "+itemStatus+"'>";
                 str += "<div class='circle-item-warp'>";
                 str += "<div class='circle-item'>";
                 str += "<div class='circle-min'></div>"
@@ -299,28 +301,42 @@ org.checin_in = (function (org) {
             str += '</div>';
             return $process.append(str)
         },
-        canCheckIn: function(result){
+        checkIn: function(result){
             var _self = this;
-            var touchGift = null;
-            if(result.data.sign_in.nextDayNote > 1){
-                touchGift = false
+
+            var continue_days = result.data.sign_in.continue_days;
+
+            if(!result.data.sign_in.status){
                 _self.checkInOpeartion('sign_in', function(data){
                     if(data.data.status){
                         console.log('今天签到成功')
+                        _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
+                            triggerUI(data.data.continue_days)
+                            _self.signIn(true, data.data.experience_amount)
+                        })
+                    }
+                    continue_days = data.data.continue_days;
+                    function triggerUI(count){
+                        $.each($('.flag-items'), function(){
+                            if($(this).attr('data-continue') * 1 == count){
+                                $(this).addClass('active-did active-doing')
+                            }
+                        })
                     }
                 })
-            }else if(result.data.sign_in.nextDayNote == 1){
-                touchGift = true
-                $('.active-gift').on('click', function(){
-                    if(touchGift){
-                        console.log('获取礼物')
-                        _self.fetchGift(result.data.sign_in.continue_days)
-                    }else{
-                        alert('还未到达礼品日！')
-                    }
-                })
-
             }
+
+            $('.active-gift').on('click', function(){
+                if(result.data.sign_in.nextDayNote == 1){
+                    if(result.data.sign_in.continueGiftFetched){
+                        console.log('礼物已另取锅了')
+                    }else{
+                        _self.fetchGift(continue_days)
+                    }
+                }else{
+                    alert('还未到达礼品日！')
+                }
+            })
         },
         checkInOpeartion: function(action_type, callback){
             var _self = this;
@@ -344,7 +360,14 @@ org.checin_in = (function (org) {
                     days: days
                 },
                 success: function(data){
-                    console.log(data)
+                    if(data.ret_code ===0){
+                        _self.checkInAlert('flag', data.message, '在(我的账户)中查看')
+                        $('.active-gift-open').addClass('.active-gift-open')
+                    }
+
+                    if(data.ret_code < 0){
+                        alert(data.message)
+                    }
                 }
             })
         },
@@ -354,13 +377,28 @@ org.checin_in = (function (org) {
                 url: '/weixin/sign_info/',
                 type: 'GET',
                 success: function(data){
-                    _self.signIn(data)
+                    _self.signIn(result.data.sign_in.status, result.data.sign_in.amount)
                     _self.share(data)
                     _self.steriousGift(data.data.sign_in.mysterious_day)
                     _self.process(data)
-
-                    _self.canCheckIn(data)
+                    _self.checkIn(data)
                 }
+            })
+        },
+        checkInAlert: function(type, giftText,whereText, callback){
+            var $target = $('.check-in-alert-layout');
+            var types = {
+                'gift': 'overflow-gift',
+                'flag': 'overflow-flag',
+                'share': 'overflow-share'
+            }
+            $target.find('#check-body-overflow-icon').removeAttr('class').addClass(types[type])
+            $target.find('.check-body-gift-information').text(giftText)
+            $target.find('.check-body-where-information').text(whereText)
+            $target.show()
+            $('.check-body-opeartion-btn').on('click',function(){
+                $target.hide()
+                callback && callback()
             })
         }
     }

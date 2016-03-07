@@ -30,24 +30,7 @@ html(style='background: #FFE9D0')
 
     section.check-in-process
       include include/app_loading
-      //.check-in-process-line
-      //.check-in-flag-lists
-        mixin items(day, active)
-          .flag-items(class=active)
-            .circle-item-warp
-              .circle-item
-                .circle-min
-                .circle-animate
-                .check-in-flag
-            .text-item=day
 
-        +items('1天', 'active-did')
-        +items('2天', 'active-did')
-        +items('3天', 'active-did active-doing')
-        +items('4天', '')
-        +items('5天', '')
-        +items('6天', '')
-        +items('7天', 'active-gift')
     section.check-in-rules-layout
       .check-rules-title 详细规则:
       .check-rules-detail  GIF 图片作为一种主流的文件格式，贯穿于我们的生活。由于其体积小巧，又以动态图片的形式展示，GIF 图片被广泛用于即时通讯以及社交网络之中，最常见的就是各种搞笑的表情包。
@@ -56,11 +39,12 @@ html(style='background: #FFE9D0')
     section.check-in-alert-layout
       .check-alert-mask
         .check-alert-body
-          .check-body-overflow-icon.overflow-gift
+          #check-body-overflow-icon.overflow-gift
           img(src='/static/imgs/app/checkin/alert_leo.png').check-body-leo
           .check-body-gift-information 今日签到成功！获得888元体验金
           .check-body-where-information 在(我的账户－体验金)中查看
           .check-body-opeartion-btn 我知道了
+
 
     script(src="/static/scripts/component/webview.js")
     script(src='/static/scripts/app/check_in.js?v=2015122181')
