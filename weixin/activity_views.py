@@ -61,10 +61,10 @@ class DailyActionAPIView(APIView):
 class GetContinueActionReward(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def post(self, request):
         user = request.user
-        # days = request.POST.get('days', '').strip()
-        days = request.GET.get('days', '').strip()
+        days = request.POST.get('days', '').strip()
+        # days = request.GET.get('days', '').strip()
         if not days or not days.isdigit():
             return Response({'ret_code':-1, 'message':u'参数错误'})
         days = int(days)
@@ -155,7 +155,7 @@ class GetContinueActionReward(APIView):
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    def post(self, request):
         user = request.user
         today = datetime.date.today()
         yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
