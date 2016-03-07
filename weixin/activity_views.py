@@ -189,14 +189,16 @@ class GetSignShareInfo(APIView):
             start_day = 1
             maxDayNote=activities[length-1].days
             recycle_continue_days = sign_info['continue_days'] % (maxDayNote + 1)
+            sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
             for activity in activities:
                 if activity.days >= recycle_continue_days:
                     nextDayNote=activity.days
                     sign_info['continueGiftFetched']=False
                     if activity.days == recycle_continue_days:
                         reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, create_date=today, user=user).first()
-                        if reward_record:
+                        if reward_record and reward_record.status:
                             sign_info['continueGiftFetched']=reward_record.status#是否已经领取神秘礼物
+                            sign_info['mysterious_day'] = maxDayNote
                     break
                 start_day = activity.days + 1
 
@@ -205,7 +207,6 @@ class GetSignShareInfo(APIView):
             # sign_info['needDays'] = needDays
             sign_info['current_day'] = recycle_continue_days#当前是连续签到活动的第几天
             sign_info['start_day'] = start_day
-            sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
 
         share_info = data.setdefault('share', {})
         share_info['status'] = False
