@@ -155,7 +155,7 @@ class GetContinueActionReward(APIView):
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def post(self, request):
+    def get(self, request):
         user = request.user
         today = datetime.date.today()
         yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
@@ -182,6 +182,7 @@ class GetSignShareInfo(APIView):
         activities = SeriesActionActivity.objects.filter(is_stopped=False, start_at__lte=timezone.now(), end_at__gte=timezone.now()).all()
         length = len(activities)
         if length > 0:
+            start_day = 1
             maxDayNote=activities[length-1].days
             recycle_continue_days = sign_info['continue_days'] % (maxDayNote + 1)
             for activity in activities:
@@ -193,10 +194,14 @@ class GetSignShareInfo(APIView):
                         if reward_record:
                             sign_info['continueGiftFetched']=reward_record.status#是否已经领取神秘礼物
                     break
+                start_day = activity.days + 1
+
             # needDays = nextDayNote-recycle_continue_days
             sign_info['nextDayNote'] = nextDayNote#下一个神秘礼物在第几天
             # sign_info['needDays'] = needDays
             sign_info['current_day'] = recycle_continue_days#当前是连续签到活动的第几天
+            sign_info['start_day'] = start_day
+            sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
 
         share_info = data.setdefault('share', {})
         share_info['status'] = False
