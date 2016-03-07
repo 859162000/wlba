@@ -4,7 +4,7 @@ html(style="background: #91ce00")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015030303", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015030401", rel="stylesheet")
         - csrf_token
     body
         .body_wrap.clear
@@ -201,7 +201,7 @@ html(style="background: #91ce00")
                 .title_text 活动规则
                 dl
                     dt 1、
-                    dd 活动有效期：2016年3月X日0:00-2016年3月X日23:59；
+                    dd 活动有效期：2016年3月11日0:00-2016年3月20日23:59；
                 dl
                     dt 2、
                     dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
@@ -220,9 +220,10 @@ html(style="background: #91ce00")
             .popup_box
                 .main
                     .text 您还没有测试机会，赶紧去投资吧
+                    .popup_button 我知道了
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015030304")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015030404")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,

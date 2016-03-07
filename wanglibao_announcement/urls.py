@@ -25,4 +25,10 @@ urlpatterns = patterns(
     url(r'^trading-B/$', TemplateView.as_view(template_name="client_announcement_trading_B.jade")),
     url(r'^abc-pay/$', TemplateView.as_view(template_name="client_announcement_abc_pay.jade")),
     url(r'^top10/$', TemplateView.as_view(template_name="client_announcement_top10.jade")),
+
+    url(r'^bozhan/$', TemplateView.as_view(template_name="client_announcement_bozhan.jade")),
+    url(r'^ceca/$', TemplateView.as_view(template_name="client_announcement_CECA.jade")),
+    url(r'^top100/$', TemplateView.as_view(template_name="client_announcement_top100.jade")),
+    url(r'^user/$', TemplateView.as_view(template_name="client_announcement_user.jade")),
+    url(r'^zhongxin/$', TemplateView.as_view(template_name="client_announcement_zhongxin.jade")),
 )

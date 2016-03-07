@@ -61,11 +61,11 @@ import datetime, time
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
-from experience_gold.models import ExperienceEvent
+from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from wanglibao_profile.models import WanglibaoUserProfile
 from weixin.tasks import detect_product_biding, sentTemplate
-from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
+from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record, process_user_daily_action
 from weixin.util import FWH_UNBIND_URL, filter_emoji
 from rest_framework.permissions import IsAuthenticated
 
@@ -251,7 +251,7 @@ class WeixinJoinView(View):
             reply = create_reply(articles, self.msg)
 
         if self.msg.key == 'sign_in':
-            reply = self.process_sign_in(w_user.openid)
+            reply = self.process_sign_in(user)
         if self.msg.key == 'my_experience_gold':
             seg = SendExperienceGold(user)
             amount = seg.get_amount()
@@ -261,35 +261,55 @@ class WeixinJoinView(View):
 
         return reply
 
-    def process_sign_in(self, openid):
+    def process_sign_in(self, user):
         reply = -1
         try:
-            with transaction.atomic():
-                w_user = WeixinUser.objects.select_for_update().filter(openid=openid).first()
-                now = datetime.datetime.now()
-                start = datetime.datetime(now.year,now.month, now.day)
-                end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
-                war = WeiXinUserActionRecord.objects.filter(user_id=w_user.user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
-                if not war:
-                    _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
-                    seg = SendExperienceGold(w_user.user)
-                    experience_event = self.getSignExperience_gold()
-                    if experience_event:
-                        seg.send(experience_event.id)
-                        txt = u"恭喜您，签到成功！\n" \
-                              u"奖励金额：%s元体验金\n" \
-                              u"体验期限：1天\n" \
-                              u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
-                        reply = create_reply(txt, self.msg)
-                    else:
-                        reply = create_reply(u'恭喜您，签到成功！', self.msg)
-                        logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
-                else:
-                    txt = u"今日已经签到，明日再来"
-                    reply = create_reply(txt, self.msg)
+            ret_code, status, daily_record = process_user_daily_action(user, action_type=u'sign_in')
+            title = u"恭喜您，签到成功！\n"
+            if ret_code != 0:
+                title = u"今日你已签到\n"
+            experience_amount = 0
+            if daily_record.experience_record_id:
+                experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
+                experience_amount=experience_record.event.amount
+            txt =u"奖励金额：%s元体验金\n" \
+                  u"体验期限：1天\n" \
+                  u"每日签到积少成多，记得明天再来哦~"%experience_amount
+            txt = title + txt
+            reply = create_reply(txt, self.msg)
         except Exception,e:
             logger.debug(traceback.format_exc())
         return reply
+
+    # def process_sign_in(self, openid):
+    #     reply = -1
+    #     try:
+    #         with transaction.atomic():
+    #             w_user = WeixinUser.objects.select_for_update().filter(openid=openid).first()
+    #             now = datetime.datetime.now()
+    #             start = datetime.datetime(now.year,now.month, now.day)
+    #             end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
+    #             war = WeiXinUserActionRecord.objects.filter(user_id=w_user.user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+    #             if not war:
+    #                 _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
+    #                 seg = SendExperienceGold(w_user.user)
+    #                 experience_event = self.getSignExperience_gold()
+    #                 if experience_event:
+    #                     seg.send(experience_event.id)
+    #                     txt = u"恭喜您，签到成功！\n" \
+    #                           u"奖励金额：%s元体验金\n" \
+    #                           u"体验期限：1天\n" \
+    #                           u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
+    #                     reply = create_reply(txt, self.msg)
+    #                 else:
+    #                     reply = create_reply(u'恭喜您，签到成功！', self.msg)
+    #                     logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
+    #             else:
+    #                 txt = u"今日已经签到，明日再来"
+    #                 reply = create_reply(txt, self.msg)
+    #     except Exception,e:
+    #         logger.debug(traceback.format_exc())
+    #     return reply
 
         # except Exception, e:
         #     reply = -1

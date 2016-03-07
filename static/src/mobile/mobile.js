@@ -30,12 +30,14 @@ var org = (function () {
         },
         _calculate: function (dom, callback) {
             var calculate = function (amount, rate, period, pay_method) {
-                var divisor, rate_pow, result, term_amount;
+                var divisor, rate_pow, result, term_amount, month_rate;
                 if (/等额本息/ig.test(pay_method)) {
-                    rate_pow = Math.pow(1 + rate, period);
-                    divisor = rate_pow - 1;
-                    term_amount = amount * (rate * rate_pow) / divisor;
-                    result = term_amount * period - amount;
+                    month_rate = rate / 12
+                    rate_pow = Math.pow(1 + month_rate, period)
+
+                    term_amount = amount * (month_rate * rate_pow) / (rate_pow-1)
+                    term_amount = term_amount.toFixed(2)
+                    result  = (term_amount * period - amount).toFixed(2)
                 } else if (/日计息/ig.test(pay_method)) {
                     result = amount * rate * period / 360;
                 } else {
