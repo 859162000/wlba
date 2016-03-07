@@ -1276,7 +1276,7 @@ CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
 CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
 if ENV == ENV_PRODUCTION:
     OAUTH2_URL = 'https://127.0.0.1:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = ''
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://127.0.0.1:8001/api/dispatch/'
 else:
     OAUTH2_URL = 'https://127.0.0.1:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = ''
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://127.0.0.1:8001/api/dispatch/'

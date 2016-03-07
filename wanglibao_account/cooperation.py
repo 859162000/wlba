@@ -1691,7 +1691,7 @@ class BaJinSheRegister(CoopRegister):
         pass
 
     def generate_sign(self, channel, _time, key):
-        sign = hashlib.md5(channel + key + _time).hexdigest()
+        sign = hashlib.md5(channel + key + str(_time)).hexdigest()
         return sign
 
     def register_call_back(self, user):
@@ -1700,15 +1700,15 @@ class BaJinSheRegister(CoopRegister):
         if client_id:
             try:
                 channel = 'base'
-                time = get_current_utc_timestamp()
+                utc_timestamp = get_current_utc_timestamp()
                 data = {
                     'user_id': user.id,
                     'client_id': client_id,
-                    'sign': self.generate_sign(channel, time, self.coop_key),
-                    'time': time,
+                    'sign': self.generate_sign(channel, utc_timestamp, self.coop_key),
+                    'time': utc_timestamp,
                     'act': 'register',
                     'channel': channel,
-                    'phone': user.wanglibaoprofile.phone,
+                    'phone': user.wanglibaouserprofile.phone,
                     'btype': self.channel_code,
                 }
                 res = requests.post(url=self.call_back_url, data=data)
