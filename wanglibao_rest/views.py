@@ -331,6 +331,7 @@ class CoopDataDispatchApi(APIView):
                 }
         else:
             response_data = self.parase_form_error(form.errors)
+            # sfsfw232342sdfsfsdfsfsdgddf
 
         logger.info('channel data dispatch process result:%s' % response_data['message'])
 

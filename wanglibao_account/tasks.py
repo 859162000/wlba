@@ -8,14 +8,11 @@ import urllib
 from decimal import Decimal
 from wanglibao.celery import app
 from wanglibao import settings
-from wanglibao_p2p.models import P2PProduct
 from wanglibao_pay.models import PayInfo
 from wanglibao_margin.models import MarginRecord
-from .models import Binding
 from .utils import get_bajinshe_access_token
-from cooperation import get_tid_for_coop, get_user_phone_for_coop
+from wanglibao_account.tools import get_tid_for_coop, get_user_phone_for_coop
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +55,7 @@ def common_callback_for_post(url, params, channel):
 
 @app.task
 def bajinshe_account_push(user_id):
+    logger.info("enter bajinshe_account_push with user[%s]" % user_id)
     push_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
     coop_id = settings.BAJINSHE_COOP_ID
     coop_key = settings.BAJINSHE_COOP_KEY

@@ -279,7 +279,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'propagate': True,
             'level': 'DEBUG',
         },
@@ -424,10 +424,10 @@ BAJINSHE_COOP_KEY = '3795dd52-3ad9-47cf-9fe7-67d69566c1ba'
 if ENV == ENV_PRODUCTION:
     BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
     BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
-    BAJINSHE_ACCOUNT_PUSH_URL = ''
+    BAJINSHE_ACCOUNT_PUSH_URL = 'http://test.jr360.com/json/v1/external/AccountService/pushAccount/gzip'
     BAJINSHE_RECHARGE_PUSH_URL = ''
 else:
     BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
     BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
-    BAJINSHE_ACCOUNT_PUSH_URL = ''
+    BAJINSHE_ACCOUNT_PUSH_URL = 'http://test.jr360.com/json/v1/external/AccountService/pushAccount/gzip'
     BAJINSHE_RECHARGE_PUSH_URL = ''
