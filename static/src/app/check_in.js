@@ -158,7 +158,7 @@ org.checin_in = (function (org) {
                 url: '/weixin/sign_info/',
                 type: 'GET',
                 success: function(data){
-                    _self.signIn(result.data.sign_in.status, result.data.sign_in.amount)
+                    _self.signIn(data.data.sign_in.status, data.data.sign_in.amount)
                     _self.share(data)
                     _self.steriousGift(data.data.sign_in.mysterious_day)
                     _self.process(data)
