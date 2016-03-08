@@ -1193,6 +1193,8 @@ class XunleiDistribute(ActivityRewardDistribute):
                     continue
 
                 counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(experience=None).count()
+                # Modify by hb on 2015-03-08
+                counts = counts % 9
                 for key, value in experience_rate.items():
                     if counts+1 not in value:
                         continue
