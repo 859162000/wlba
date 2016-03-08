@@ -32,6 +32,8 @@ from wanglibao_redis.backend import redis_backend
 
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_rest.utils import get_current_utc_timestamp
+
 
 
 logger = logging.getLogger(__name__)
@@ -859,3 +861,20 @@ def get_bajinshe_access_token(coop_id, coop_key, order_id):
         logger.info(res.text)
 
     return access_token, message
+
+
+def coop_base_sign(channel, _time, key):
+    sign = hashlib.md5(channel + key + str(_time)).hexdigest()
+    return sign
+
+
+def generate_coop_base_data(act):
+    channel = 'base'
+    utc_timestamp = get_current_utc_timestamp()
+    data = {
+        'sign': coop_base_sign(channel, utc_timestamp, settings.CHANNEL_CENTER_CALL_BACK_KEY),
+        'time': utc_timestamp,
+        'act': act,
+        'channel': channel,
+    }
+    return data

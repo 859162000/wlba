@@ -27,6 +27,7 @@ import json
 from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
+from .tasks import coop_amortizations_push
 
 
 
@@ -512,6 +513,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             phone_list = list()
             message_list = list()
+            settled_sub_amos = list()
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
@@ -564,6 +566,20 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 except Exception,e:
                     pass
+
+                settled_sub_amos.append({
+                    'id': sub_amo.id,
+                    'product_id': product.id,
+                    'user_id': sub_amo.user.id,
+                    'term': sub_amo.term,
+                    'settlement_time': sub_amo.settlement_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'principal': sub_amo.principal,
+                    'interest': sub_amo.interest,
+                    'penal_interest': sub_amo.penal_interest,
+                    'coupon_interest': sub_amo.coupon_interest,
+                    'description': sub_amo.description,
+                })
+
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
@@ -574,6 +590,10 @@ class AmortizationKeeper(KeeperBaseMixin):
             })
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
+
+            if settled_sub_amos:
+                coop_amortizations_push.apply_async(
+                    kwargs={'amortizations': settled_sub_amos, 'product_id': amortization.product.id})
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(

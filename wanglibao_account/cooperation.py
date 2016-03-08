@@ -71,10 +71,9 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
-from .utils import xunleivip_generate_sign
+from .utils import xunleivip_generate_sign, generate_coop_base_data
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
-from wanglibao_rest.utils import get_current_utc_timestamp
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1634,7 +1633,6 @@ class BaJinSheRegister(CoopRegister):
         self.external_channel_order_id_key = 'orderNum'
         self.internal_channel_order_id_key = 'order_id'
         self.call_back_url = settings.CHANNEL_CENTER_CALL_BACK_URL
-        self.coop_key = settings.CHANNEL_CENTER_CALL_BACK_KEY
 
     @property
     def oauth2_client_id(self):
@@ -1690,28 +1688,12 @@ class BaJinSheRegister(CoopRegister):
         """
         pass
 
-    def generate_sign(self, channel, _time, key):
-        sign = hashlib.md5(channel + key + str(_time)).hexdigest()
-        return sign
-
-    def generate_base_data(self, user, act):
-        channel = 'base'
-        utc_timestamp = get_current_utc_timestamp()
-        data = {
-            'user_id': user.id,
-            'sign': self.generate_sign(channel, utc_timestamp, self.coop_key),
-            'time': utc_timestamp,
-            'act': act,
-            'channel': channel,
-        }
-        return data
-
     def register_call_back(self, user):
         client_id = self.channel_client_id
         logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
         if client_id:
             try:
-                base_data = self.generate_base_data(user, 'register')
+                base_data = generate_coop_base_data('register')
                 act_data = {
                     'client_id': client_id,
                     'phone': user.wanglibaouserprofile.phone,
@@ -1741,7 +1723,7 @@ class BaJinSheRegister(CoopRegister):
                                           status=PayInfo.SUCCESS,
                                           order_id=order_id).select_related('margin_record').first()
         if pay_info:
-            base_data = self.generate_base_data(user, 'recharge')
+            base_data = generate_coop_base_data('recharge')
             pay_info_data = {
                 'type': pay_info.type,
                 'uuid': pay_info.uuid,
@@ -4259,37 +4241,3 @@ class XiguaP2PQueryView(APIView):
             ret['dataList'] = data_list
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
-
-
-class CoopAmortizationCallback(object):
-    """
-    渠道用户标的回款后第三方回调处理
-    """
-    def __init__(self):
-        self.c_code = None
-
-    def amortization_call_back(self, user, order_id):
-        pass
-
-    @property
-    def processors(self):
-        return [processor_class() for processor_class in coop_processor_classes]
-
-    def get_user_channel_processor(self, user):
-        """
-        返回该用户的渠道处理器
-        """
-        channel = get_user_channel_record(user.id)
-        if channel:
-            channel_code = channel.code
-            for channel_processor in self.processors:
-                if channel_processor.c_code == channel_code:
-                    return channel_processor
-
-    def process_for_purchase(self, user, order_id):
-        try:
-            channel_processor = self.get_user_channel_processor(user)
-            if channel_processor:
-                channel_processor.purchase_call_back(user, order_id)
-        except:
-            logger.exception('channel bind purchase process error for user %s'%(user.id))

@@ -24,7 +24,9 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
-from wanglibao_account.utils import get_bajinshe_access_token
+from wanglibao_account.utils import get_bajinshe_access_token, generate_coop_base_data
+from wanglibao_account.tasks import common_callback_for_post
+from marketing.utils import get_user_channel_record
 from django.conf import settings
 
 logger = get_task_logger(__name__)
@@ -292,3 +294,22 @@ def bajinshe_product_push():
             else:
                 logger.info("bajinshe push product connect failed with status code [%s]" % res_status_code)
                 logger.info(res.text)
+
+
+@app.task
+def coop_amortizations_push(amortizations, product_id):
+    amortization_list = list()
+    for amo in amortizations:
+        channel = get_user_channel_record(amo["user_id"])
+        if channel:
+            amortization_list.append(amo)
+
+    if amortization_list:
+        base_data = generate_coop_base_data('amortize')
+        act_data = {
+            'product_id': product_id,
+            'amortizations': json.dumps(amortization_list)
+        }
+        data = dict(base_data, **act_data)
+        common_callback_for_post.apply_async(
+            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'wanglibao'})
