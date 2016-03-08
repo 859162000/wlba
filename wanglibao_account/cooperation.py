@@ -1753,7 +1753,7 @@ class BaJinSheRegister(CoopRegister):
                 'status': pay_info.status,
                 'user_id': pay_info.user.id,
                 'order_id': pay_info.order.id,
-                'create_time': timezone.localtime(pay_info.create_time).strftime('%Y-%m-%d %H:%M:%S'),
+                'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             margin_record = pay_info.margin_record
             margin_record_data = {
@@ -1763,10 +1763,11 @@ class BaJinSheRegister(CoopRegister):
                 'amount': margin_record.amount,
                 'margin_current': margin_record.margin_current,
                 'description': margin_record.description,
+                'create_time': margin_record.create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             act_data = {
-                'pay_info': pay_info_data,
-                'margin_record': margin_record_data,
+                'pay_info': json.dumps(pay_info_data),
+                'margin_record': json.dumps(margin_record_data),
             }
             data = dict(base_data, **act_data)
 
