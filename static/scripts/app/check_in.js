@@ -218,57 +218,89 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;
-org.checin_in = (function (org) {
+org.ui = (function () {
     var lib = {
-        init: function(){
-            $('.icon-status').on('click', function(){
-                lib.checkInOpeartion('sign_in', function(data){
-                    if(data.data.status){
-                        console.log('签到成功')
-                    }
-
-                })
+        _alert: function (txt, callback) {
+            if (document.getElementById("alert-cont")) {
+                document.getElementById("alertTxt").innerHTML = txt;
+                document.getElementById("popubMask").style.display = "block";
+                document.getElementById("alert-cont").style.display = "block";
+            } else {
+                var shield = document.createElement("DIV");
+                shield.id = "popubMask";
+                shield.style.cssText = "position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+                var alertFram = document.createElement("DIV");
+                alertFram.id = "alert-cont";
+                alertFram.style.cssText = "position:fixed; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
+                strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>" + txt + "</div>";
+                strHtml += " <div class='popub-footer' style='width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;'>确认</div>";
+                alertFram.innerHTML = strHtml;
+                document.body.appendChild(alertFram);
+                document.body.appendChild(shield);
+            }
+            $('.popub-footer').on('click', function () {
+                $('#alert-cont, #popubMask').hide()
+                callback && callback();
             })
+            document.body.onselectstart = function () {
+                return false;
+            };
+        }
+    }
+
+    return {
+        alert: lib._alert
+    }
+})();
+org.checin_in = (function () {
+    var lib = {
+        appShare: null,
+        init: function(mixins){
+            lib.appShare = mixins
             lib.fetch();
         },
-        listen: function(){
-
-        },
-        touchGift: function(){
-
-        },
         share: function(result){
-            $('.share-status').addClass('rm-loading');
-            if(result.data.share.status){
-                $('.share-status').find('.op-dec-title ').text('今日已分享')
-            }else{
-                $('.share-status').find('.op-dec-title ').text('今日未分享')
-            }
-            $('.share-status').find('.op-dec-detail').text('分享得双倍')
+            var $share =  $('.share-status'), shareText = '';
+            $share.addClass('rm-loading');
+            shareText = result.data.share.status ? '今日已分享' : '今日未分享';
+            $share.find('.op-dec-title ').text(shareText)
+            $share.find('.op-dec-detail').text('分享得双倍')
+
+            $('.icon-share').on('touchend',function(){
+                if(result.data.share.status) return org.ui.alert('今天你已经分享过了')
+                lib.appShare.touchShare({
+                    title: '每日签到title',
+                    content: '每日签到content',
+                    shareUrl: 'http://192.168.20.45:8000/api/m/check-in-share/'
+                },function(data){
+                    _self.checkInAlert('share', '今日分享成功！获得888元体验金', '在(我的账户－体验金)中查看');
+                })
+            })
         },
         signIn: function(status, amount){
-            $('.checIn-status').addClass('rm-loading');
-            if(status){
-                $('.checIn-status').find('.op-dec-title').text('今日已签到')
-            }else{
-                $('.checIn-status').find('.op-dec-title').text('今日未签到')
-            }
-            $('.checIn-status').find('.op-dec-detail').text('+'+amount+'体验金');
+            var $checkIn = $('.checIn-status'), checkInText ='';
+
+            $checkIn.addClass('rm-loading');
+            checkInText = status ? '今日已签到' : '今日未签到';
+            $checkIn.find('.op-dec-title').text(checkInText)
+            $checkIn.find('.op-dec-detail').text('+'+amount+'体验金');
         },
         steriousGift:function(acount){
             $('.bar-content').text('距离神秘礼包还有'+acount+'天')
         },
         process: function(result){
-            var str = "<div class='check-in-process-line'></div>";
+            var resultCopy = result.data.sign_in,
+                itemStart =  resultCopy.start_day,
+                itemEnd   = resultCopy.nextDayNote,
+                continueDay = resultCopy.continue_days,
+                currentDay = resultCopy.current_day,
+                giftStatus = resultCopy.continueGiftFetched,
+                itemStatus = '',
+                $process = $('.check-in-process'),
+                str = "<div class='check-in-process-line'></div>";
                 str +="<div class='check-in-flag-lists'>";
-            var $process = $('.check-in-process');
-            var itemStart =  result.data.sign_in.start_day;
-            var itemEnd =itemStart + result.data.sign_in.nextDayNote -1;
+
             $process.addClass('rm-loading');
-            var itemStatus = '';
-            var continueDay = result.data.sign_in.continue_days;
-            var currentDay = result.data.sign_in.current_day;
-            var giftStatus = result.data.sign_in.continueGiftFetched;
             for(var i= itemStart; i <= itemEnd;i++){
                 itemStatus = '';
 
@@ -302,11 +334,12 @@ org.checin_in = (function (org) {
             return $process.append(str)
         },
         checkIn: function(result){
-            var _self = this;
+            var _self = this, resultCopy = result.data.sign_in;
 
-            var continue_days = result.data.sign_in.continue_days;
+            var continue_days = resultCopy.continue_days;
 
-            if(!result.data.sign_in.status){
+            if(!resultCopy.status){
+
                 _self.checkInOpeartion('sign_in', function(data){
                     if(data.data.status){
                         console.log('今天签到成功')
@@ -316,25 +349,29 @@ org.checin_in = (function (org) {
                         })
                     }
                     continue_days = data.data.continue_days;
+
                     function triggerUI(count){
                         $.each($('.flag-items'), function(){
                             if($(this).attr('data-continue') * 1 == count){
-                                $(this).addClass('active-did active-doing')
+                                $(this).addClass('active-did active-doing').siblings('.flag-items').removeClass('active-doing')
                             }
                         })
                     }
+
                 })
             }
 
-            $('.active-gift').on('click', function(){
-                if(result.data.sign_in.nextDayNote == 1){
-                    if(result.data.sign_in.continueGiftFetched){
+            $('.active-gift').on('touchend', function(){
+                var giftDay = resultCopy.nextDayNote - resultCopy.continue_days;
+                if(giftDay == 0){
+                    if(resultCopy.continueGiftFetched){
                         console.log('礼物已另取锅了')
                     }else{
                         _self.fetchGift(continue_days)
                     }
-                }else{
-                    alert('还未到达礼品日！')
+                }else if(giftDay > 0){
+                    console.log(giftDay)
+                    org.ui.alert('还未到达礼品日！')
                 }
             })
         },
@@ -361,12 +398,12 @@ org.checin_in = (function (org) {
                 },
                 success: function(data){
                     if(data.ret_code ===0){
-                        _self.checkInAlert('flag', data.message, '在(我的账户)中查看')
-                        $('.active-gift-open').addClass('.active-gift-open')
+                        _self.checkInAlert('gift', data.message, '在(我的账户)中查看');
+                        _self.steriousGift(data.mysterious_day)
+                        $('.active-gift').addClass('active-gift-open')
                     }
-
                     if(data.ret_code < 0){
-                        alert(data.message)
+                        org.ui.alert(data.message)
                     }
                 }
             })
@@ -405,7 +442,7 @@ org.checin_in = (function (org) {
     return {
         init: lib.init
     }
-})(org);
+})();
 
 
 wlb.ready({
@@ -420,16 +457,14 @@ wlb.ready({
                     ts: data.ts
                 },
                 success: function (data) {
-                    org.checin_in.init()
+                    org.checin_in.init(mixins)
                 }
             })
         }
-        //mixins.shareData({title: '2015年，我终于拥有了自己的荣誉标签:...', content: '我就是我，不一样的烟火。刚出炉的荣誉标签，求围观，求瞻仰。'})
+
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
-                finance_alert.show('你还没有登录哦，登录获取更多资讯吧', function(mixin){
-                    mixin.loginApp({refresh: 1, url: ''})
-                },mixins)
+                mixins.loginApp({refresh: 1, url: ''})
 
             } else {
                 connect(data)

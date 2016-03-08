@@ -56,6 +56,7 @@ urlpatterns = patterns(
     url(r'^share-finance/$', TemplateView.as_view(template_name="client_share_finance.jade"), name='app_finance'),
     url(r'^praise-award/$', AppPraiseAwardView.as_view()),
     url(r'^check-in/$', AppCheckInView.as_view()),
+    url(r'^check-in-share/$', TemplateView.as_view(template_name="client_checkIn_share.jade"), name='client_checkIn_share'),
 
     # 用户账户流水
     url(r'^margin_records/$', MarginRecordsAPIView.as_view()),

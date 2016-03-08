@@ -1,0 +1,22 @@
+-load formatters
+doctype html
+html(style='background: #FFE9D0')
+  head
+    meta(charset="utf-8")
+    meta(name="format-detection" content="telephone=no,email=no")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    meta(name="viewport", content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
+    link(href="/static/styles/app/webview.css?v=20160201", rel="stylesheet")
+
+  body
+    .checIn-share-warp
+      .checIn-share-body
+        img(src='/static/imgs/app/checkin/wx_erweima.png').checIn-share-erweima
+
+        .checIn-rules
+          .checIn-rules-max-title 领取细则：
+          .checIn-rules-min-title 1.关注网利宝微信公众号
+          img(src='/static/imgs/app/checkin/weixin_gongzhong.jpg').checIn-rules-cont.gongzhong1
+          .checIn-rules-min-title 2.今日微信公众号再[热门活动－每日签到]领取体验金
+          img(src='/static/imgs/app/checkin/weixin_gongzhong2.jpg').checIn-rules-cont.gongzhong2
