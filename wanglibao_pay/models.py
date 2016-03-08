@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from wanglibao_margin.models import MarginRecord
 
 
 class PayInfo(models.Model):
@@ -15,12 +16,10 @@ class PayInfo(models.Model):
     management_amount = models.DecimalField(u'资金管理金额', max_digits=20, decimal_places=2, default=0)
     total_amount = models.DecimalField(u'总金额', max_digits=20, decimal_places=2, default=0)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    update_time = models.DateTimeField(u'更新时间', auto_now=True)
-    confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
     status = models.CharField(u'状态', max_length=15)
-    user = models.IntegerField(u'用户id', max_length=50)
-    order = models.IntegerField(u'支付流水号', blank=True, null=True)
-    margin_record = models.IntegerField(u'账户资金记录', blank=True, null=True)
+    user_id = models.IntegerField(u'用户id', max_length=50)
+    order_id = models.IntegerField(u'支付流水号', blank=True, null=True)
+    margin_record = models.ForeignKey(MarginRecord, verbose_name=u'账户资金记录', blank=True, null=True)
 
     class Meta:
         ordering = ['-create_time']
@@ -28,7 +27,3 @@ class PayInfo(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.pk
-
-    def toJSON(self):
-        import simplejson
-        return simplejson.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))

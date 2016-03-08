@@ -3,6 +3,7 @@
 import django.forms as forms
 from django.contrib.auth.models import User
 from django.utils import timezone
+from .models import PayInfo
 
 
 class RechargeForm(forms.Form):
@@ -49,3 +50,8 @@ class RechargeForm(forms.Form):
             )
 
         return recharge_at
+
+
+class PayInfoForm(forms.ModelForm):
+    class Meta:
+        model = PayInfo

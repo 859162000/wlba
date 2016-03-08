@@ -25,7 +25,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('catalog', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
+            ('user_id', self.gf('django.db.models.fields.IntegerField')(max_length=50)),
             ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
             ('margin_current', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
@@ -98,7 +98,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'margin_current': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
+            'user_id': ('django.db.models.fields.IntegerField', [], {'max_length': '50'})
         }
     }
 

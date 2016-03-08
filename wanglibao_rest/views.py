@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
+import time
 import json
 import logging
 import hashlib
@@ -17,7 +18,8 @@ from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.utils import create_user
 from wanglibao_p2p.forms import PurchaseForm
-from wanglibao_pay.forms import RechargeForm
+from wanglibao_pay.forms import RechargeForm, PayInfoForm
+from wanglibao_margin.forms import MarginRecordForm
 from wanglibao_pay.models import PayInfo
 from .forms import CoopDataDispatchForm
 from marketing.forms import ChannelForm
@@ -216,23 +218,36 @@ class CoopDataDispatchApi(APIView):
         return response_data
 
     def process_recharge(self, req_data):
-        form = RechargeForm(req_data)
-        if form.is_valid():
-            pay_info = PayInfo()
-            pay_info.order_id = form.cleaned_data['order_id']
-            pay_info.amount = form.cleaned_data['amount']
-            pay_info.user = form.cleaned_data['user_id']
-            pay_info.recharge_at = form.cleaned_data['recharge_at']
-            pay_info.status = form.cleaned_data['status']
-            pay_info.save()
-            # FixMe,异步回调给第三方
-            response_data = {
-                'ret_code': 10000,
-                'message': 'success',
-            }
+        pay_info = req_data.get("pay_info")
+        margin_record = req_data.get("margin_record")
+        if pay_info and margin_record:
+            margin_record = json.loads(margin_record) if margin_record else None
+            margin_record["create_time"] = time.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
+            margin_record_form = MarginRecordForm(margin_record)
+            if margin_record_form.is_valid():
+                pay_info = json.loads(pay_info) if pay_info else None
+                margin_record = margin_record.save()
+                margin_record.save()
+                pay_info["margin_record"] = margin_record
+                pay_info["create_time"] = time.strptime(pay_info["create_time"], '%Y-%m-%d %H:%M:%S')
+                pay_info_form = PayInfoForm(pay_info)
+                if pay_info_form.is_valid():
+                    pay_info = pay_info_form.save()
+                    pay_info.save()
+                    # FixMe,异步回调给第三方
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                    }
+                else:
+                    response_data = self.parase_form_error(pay_info_form.errors)
+            else:
+                response_data = self.parase_form_error(margin_record_form.errors)
         else:
-            response_data = self.parase_form_error(form.error)
-
+            response_data = {
+                'ret_code': 10111,
+                'message': u'缺少业务参数',
+            }
         return response_data
 
     def process_purchase(self, req_data):
@@ -313,7 +328,14 @@ class CoopDataDispatchApi(APIView):
                     # 判断动作有效性，并调度相关处理器
                     processer = getattr(self, 'process_%s' % act, None)
                     if processer:
-                        response_data = processer(req_data)
+                        try:
+                            response_data = processer(req_data)
+                        except Exception, e:
+                            logger.info("CoopDataDispatchApi %s raise error: %s" % (processer.__name__, e))
+                            response_data = {
+                                'ret_code': 50001,
+                                'message': 'api error',
+                            }
                     else:
                         response_data = {
                             'ret_code': 10004,
