@@ -1214,6 +1214,8 @@ class XunleiDistribute(ActivityRewardDistribute):
             for unused in xrange(3):
                 if when_reward == unused:
                     counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(redpack_event=None).count()
+                    # Modify by hb on 2015-03-08
+                    counts = counts % 9
                     for key, value in event_rate.items():
                         if counts+1 not in value:
                             continue
