@@ -2285,16 +2285,16 @@ class ValidateAccountInfoAPI(APIView):
         if form.is_valid():
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
-            #todo
-            # 同卡之后要对银行卡号进行验证
+        # 同卡之后要对银行卡号进行验证
             card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
-            if card.exists():
-                card_no = request.DATA.get('card_no', "").strip()
-                if not card_no:
-                    return Response({'message': "绑卡用户需要提供绑定的银行卡号"}, status=400)
-                card = card.first()
-                if card.no != card_no:
-                    return Response({'message': "银行卡号输入错误"}, status=400)
+            if not card.exists():
+                return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+            card_no = request.DATA.get('card_no', "").strip()
+            if not card_no:
+                return Response({'message': "用户需要提供绑定的银行卡号"}, status=400)
+            card = card.first()
+            if card.no != card_no:
+                return Response({'message': "银行卡号输入错误"}, status=400)
             return Response({'ret_code': 0})
         message = ""
         for key, value in form.errors.iteritems():
@@ -2332,11 +2332,11 @@ class ManualModifyPhoneTemplate(TemplateView):
         user = self.request.user
         profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
-        # modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
         return {
                 'form':form,
                 'user_name':profile.name,
-                # 'modify_phone_record':modify_phone_record
+                'modify_phone_record':modify_phone_record
                 }
 
 
@@ -2348,6 +2348,9 @@ class ManualModifyPhoneAPI(APIView):
         profile = user.wanglibaouserprofile
         if not profile.id_is_valid or not profile.id_number:
             return Response({'message':"还没有实名认证"}, status=400)
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
         form = ManualModifyPhoneForm(self.request.DATA, self.request.FILES)
         if form.is_valid():
             id_front_image = form.cleaned_data['id_front_image']
@@ -2411,6 +2414,16 @@ class SMSModifyPhoneValidateAPI(APIView):
             return Response({'message':"还没有实名认证"}, status=400)
         if not validate_code or not id_number or not new_phone:
             return Response({'message':"参数为空"}, status=400)
+        # 同卡之后要对银行卡号进行验证
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+        card_no = request.DATA.get('card_no', "").strip()
+        if not card_no:
+            return Response({'message': "用户需要提供绑定的银行卡号"}, status=400)
+        card = card.first()
+        if card.no != card_no:
+            return Response({'message': "银行卡号输入错误"}, status=400)
         params = request.DATA
         data = {}
         for k,v in params.iteritems():
@@ -2428,16 +2441,6 @@ class SMSModifyPhoneValidateAPI(APIView):
             new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
             if new_phone_user:
                 return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
-            #todo
-            # 同卡之后要对银行卡号进行验证
-            card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
-            if card.exists():
-                card_no = request.DATA.get('card_no', "").strip()
-                if not card_no:
-                    return Response({'message': "绑卡用户需要提供绑定的银行卡号"}, status=400)
-                card = card.first()
-                if card.no != card_no:
-                    return Response({'message': "银行卡号输入错误"}, status=400)
 
             sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
             if not sms_modify_record:
@@ -2493,6 +2496,9 @@ class SMSModifyPhoneAPI(APIView):
         new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
         if new_phone_user:
             return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
         with transaction.atomic(savepoint=True):
             old_phone = profile.phone
             profile.phone = new_phone
