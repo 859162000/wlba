@@ -446,6 +446,7 @@ class ManualModifyPhoneForm(forms.Form):
     id_front_image = forms.ImageField(label='身份证正面照片')
     id_back_image = forms.ImageField(label='身份证反面照片')
     id_user_image = forms.ImageField(label='手持身份证照片')
+    card_user_image = forms.ImageField(label='手持银行卡照片')
     new_phone = forms.CharField(max_length=64, label='新的手机号码')
     validate_code = forms.CharField(label="Validate code for phone", required=False)
     def clean_validate_code(self):
