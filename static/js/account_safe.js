@@ -80,6 +80,18 @@
         }
       })
 
+      /**/
+      $('.people_wrap').click(function(){
+          if(true){
+              window.location.href = '/accounts/manual_modify/vali_acc_info/';
+          }else{
+              $('.tieOnCard_popup').show();
+          }
+      })
+
+      $('.tieOnCard_popup .close_ico').click(function(){
+          $('.tieOnCard_popup').hide();
+      })
       /*密码管理*/
 
       $('#setPWDA').click(function() {

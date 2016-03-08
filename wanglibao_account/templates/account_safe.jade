@@ -42,7 +42,7 @@ block main
                             dl
                                 dt 短信认证
                                 dd 原手机可收取短信
-                        a.wrap_box.people_wrap(href='/accounts/manual_modify/vali_acc_info/')
+                        .wrap_box.people_wrap
                             .img
                             dl
                                 dt 人工审核
@@ -112,6 +112,14 @@ block main
     .phone_modify_popup
         .phone_modify_popup_text 请先完成实名认证
         .phone_modify_bg
+
+    .tieOnCard_popup
+        .tieOnCard_main
+            .tieOnCard_text 请先在PC端绑定银行卡
+                .close_ico
+            a(href='/accounts/bankcard/') 去绑卡
+        .phone_modify_bg
+
     script.
-        require(["/static/js/account_safe.js?v=2016022401","/static/js/account_setting.js"])
+        require(["/static/js/account_safe.js?v=2016030801","/static/js/account_setting.js"])
 
