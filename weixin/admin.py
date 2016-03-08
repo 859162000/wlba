@@ -1,6 +1,6 @@
 # encoding:utf-8
 from django.contrib import admin
-from .models import Account, QrCode, SubscribeService,WeiXinChannel
+from .models import Account, QrCode, SubscribeService,WeiXinChannel, SeriesActionActivity, SeriesActionActivityRule
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -61,7 +61,15 @@ class QrCodeAdmin(admin.ModelAdmin):
 class SubscribeServiceAdmin(admin.ModelAdmin):
     list_display = ('id', 'key', 'describe', 'type', 'num_limit', 'channel', 'is_open')
 
+class SeriesActionActivityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'code', 'description', 'action_type', 'days', 'start_at', 'end_at', 'is_stopped')
+
+class SeriesActionActivityRuleAdmin(admin.ModelAdmin):
+    list_display = ('id','rule_name', 'rule_description', 'gift_type', 'redpack', 'reward', 'is_used')
+
 admin.site.register(Account, AccountAdmin)
 admin.site.register(QrCode, QrCodeAdmin)
 admin.site.register(SubscribeService, SubscribeServiceAdmin)
 admin.site.register(WeiXinChannel, WeiXinChannelAdmin)
+admin.site.register(SeriesActionActivity, SeriesActionActivityAdmin)
+admin.site.register(SeriesActionActivityRule, SeriesActionActivityRuleAdmin)

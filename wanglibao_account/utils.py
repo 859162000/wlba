@@ -138,7 +138,7 @@ def verify_id(name, id_number):
         key = 'valid_count_v1'
         valid_v1_total = settings.VALID_V1_TOTAL
         redis = redis_backend()
-        if redis.redis.ping():
+        if redis.redis and redis.redis.ping():
             if redis._exists(key):
                 valid_v1_count = redis._get(key)
                 valid_v1_count = int(valid_v1_count)

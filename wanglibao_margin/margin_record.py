@@ -33,11 +33,11 @@ MARGIN_CATALOG_MAPPING = {
 MARGIN_CATALOG_SIGN_MAPPING = {
     u"现金存入": u"+",
     u"交易冻结": u"-",
-    u"交易成功扣款": u"-",
+    u"交易成功扣款": u"",
     u"交易解冻": u"+",
     u"取款预冻结": u"-",
     u"取款失败解冻": u"+",
-    u"取款确认": u"-",
+    u"取款确认": u"",
     u"返还手续费": u"+",
     u"本金入账": u"+",
     u"利息入账": u"+",
@@ -69,7 +69,7 @@ def margin_records(request):
 
     # 展示的起始时间为2016年2月8日,此前有账单变动的用户由此时间开始展示,历史数据不展示
     date_start = local_to_utc(datetime.datetime(2016, 2, 8), 'min')
-    records = MarginRecord.objects.filter(user=user, create_time__gt=date_start)[(page-1)*pagesize:page*pagesize]
+    records = MarginRecord.objects.filter(user=user, create_time__gt=date_start).order_by('-id')[(page-1)*pagesize:page*pagesize]
 
     res = []
     for record in records:

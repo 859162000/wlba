@@ -2591,7 +2591,7 @@ class Lantern_FetchRewardAPI(APIView):
         "user_type":"phone"
         })
         return Response({"ret_code":0, "message":"success", "is_wanglibao":False})
-from decimal import Decimal
+
 class MarchAwardTemplate(TemplateView):
     """
     三月活动

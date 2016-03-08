@@ -6,9 +6,9 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030401")
+        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030403")
         - csrf_token
-        script(src="/static/js/lib/modernizr-2.8.js?v=2015030304")
+        script(src="/static/js/lib/modernizr-2.8.js?v=2015030403")
     body(style="background:#91ce00")
         include global/g_nav
         .body_wrap.clear
@@ -154,7 +154,7 @@ html.no-js(lang="en-gb")
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
                                                     td.three {{rank.coupon}} 加息劵
-                                .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名
+                                .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名；每日奖励发放，以当天23:59:59排名为准
                         .button.button_3 立即投资
                         .grass.grass_6
                         .grass.grass_7
@@ -162,7 +162,7 @@ html.no-js(lang="en-gb")
                         .title_text 活动规则
                         dl
                             dt 1、
-                            dd 活动有效期：2016年3月X日0:00-2016年3月X日23:59；
+                            dd 活动有效期：2016年3月11日0:00-2016年3月20日23:59；
                         dl
                             dt 2、
                             dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
@@ -178,10 +178,11 @@ html.no-js(lang="en-gb")
             .popup_box
                 .main
                     .text 您还没有测试机会，赶紧去投资吧
+                    .popup_button 我知道了
                 .popup_bg
         include global/g_footer
 script.
     require(['/static/js/lib/modernizr.js?v=2015030301'])
-    require(['/static/js/spring_mobilization.js?v=2015030304'])
+    require(['/static/js/spring_mobilization.js?v=2015030404'])
 
                                                                     
