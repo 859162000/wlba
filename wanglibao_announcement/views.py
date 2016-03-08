@@ -98,7 +98,7 @@ class AnnouncementHomeApi(APIView):
         _announcements = Announcement.objects.filter(Q(status=1, hideinlist=False,) & (Q(device=device_type) | Q(device='pc&app'))
                                                     ).order_by('-createtime', '-id')
 
-        announcements = _announcements.values('id', 'title', 'content')
+        announcements = _announcements.values('id', 'title', 'content', 'page_title')
         if announcements:
             paginator = Paginator(announcements, page_size)
             try:
