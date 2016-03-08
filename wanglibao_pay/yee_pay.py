@@ -928,7 +928,27 @@ class YeeShortPay:
         res = self._query_trx_result(order_id)
         res_data = res.get('data')
 
-        return {'code': res_data.get('errorcode'),
-                'message': res_data.get('errormsg'),
-                'last_card_no': res_data.get('lastno'),
-                'amount': res_data.get('amount')}
+        code = res_data.get('errorcode')
+        message = res_data.get('errormsg')
+        last_card_no = res_data.get('lastno')
+        amount = res_data.get('amount')
+
+        if not code and last_card_no and amount:
+            code = '0'
+
+        return {'code': code,
+                'message': message,
+                'last_card_no': last_card_no,
+                'amount': amount}
+
+
+
+
+
+
+
+
+
+
+
+    

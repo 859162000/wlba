@@ -1,9 +1,5 @@
-#!/usr/bin/env python
-# encoding:utf-8
-from base64 import b64decode
-
-import logging
-import traceback
+#!/usr/bin/env python # encoding:utf-8
+from base64 import b64decode import logging import traceback
 from M2Crypto import X509
 from django.contrib.auth.models import User
 from lxml import etree
@@ -1429,6 +1425,7 @@ class KuaiShortPay:
         """
         trx_data  = self._sp_query_xml(order_id)
         res = self._request(trx_data, self.QUERY_TRANSACTION_URL)
+        logger.info('kuai_pay_result_for_trx_result:'+res.text)
         try:
             last_card_no = self._find_in_xml(res.content, 'storableCardNo')[-4:]
         except:
@@ -1436,7 +1433,7 @@ class KuaiShortPay:
         return {'code': self._find_in_xml(res.content, 'responseCode'),
                 'message': self._find_in_xml(res.content, 'responseTextMessage'),
                 'last_card_no': last_card_no, 
-                'amount': self._find_in_xml(res.content, 'amount')
+                'amount': self._find_in_xml(res.content, 'amount')}
 
     def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
