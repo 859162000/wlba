@@ -1,7 +1,5 @@
 # encoding:utf-8
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
-from experience_gold.models import ExperienceEvent
-from experience_gold.backends import SendExperienceGold
 import base64
 import hashlib
 import os
@@ -2441,9 +2439,7 @@ class RewardDistributeAPIView(APIView):
         self.activity = None
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
-        #self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
-        self.amounts = (0.5, 1, 1.5, 1.8, 2, 188, 588, 888, 1888)
-        self.rates = (20, 15, 10, 4, 3, 25, 12, 6, 5)
+        self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
@@ -2493,16 +2489,11 @@ class RewardDistributeAPIView(APIView):
         try:
             redpacks = list(rules.redpack.split(","))
             logger.debug(u"后台配置的红包id是：{0}".format(redpacks))
-            QSet_Exp = set(ExperienceEvent.objects.filter(id__in=redpacks).all())
-            QSet_RPE = set(RedPackEvent.objects.filter(id__in=redpacks).all())
-            QSet = QSet_Exp | QSet_RPE
+            QSet = RedPackEvent.objects.filter(id__in=redpacks)
         except Exception, reason:
             logger.debug(u"获得配置红包报异常, reason:%s" % (reason,))
             raise
-        for item in list(QSet):
-            if item.amount not in self.amounts:
-                QSet.remove(item)
-                continue
+        for item in QSet:
             self.redpacks[item.amount] = item
 
         self.redpack_amount = sorted(self.redpacks.keys(), reverse=True)
@@ -2513,7 +2504,7 @@ class RewardDistributeAPIView(APIView):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        rate = 3
+        rate = 50
 
         for item in self.rates:
             if sent_count%(100/item)==0:
@@ -2556,31 +2547,17 @@ class RewardDistributeAPIView(APIView):
         else:
             logger.debug("join_log.amount的值为:{0}, redpack_event的值为:{1}, redpacks的值为:{2}".format(join_log.amount, redpack_event, self.redpacks))
 
-        if redpack_event.amount < 10:
-            try:
-                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-            except Exception, reason:
-                logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
-                join_log.save()
-                raise
-            else:
-                logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
-                join_log.join_times -= 1
-                join_log.save()
-                return join_log
-
-        if redpack_event.amount >= 10:
-            try:
-                SendExperienceGold(user).send(redpack_event.id)
-            except Exception, reason:
-                logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
-                join_log.save()
-                raise
-            else:
-                logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
-                join_log.join_times -= 1
-                join_log.save()
-                return join_log
+        try:
+            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+        except Exception, reason:
+            logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+            join_log.save()
+            raise
+        else:
+            logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
+            join_log.join_times -= 1
+            join_log.save()
+            return join_log
 
     @method_decorator(transaction.atomic)
     def ignore_post_action(self, user):

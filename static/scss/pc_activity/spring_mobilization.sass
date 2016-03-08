@@ -124,9 +124,8 @@
         height: 416px
         float: left
         display: block
-        box-shadow: 1px 2px 6px #493600
         margin: 0 100px 40px 0
-        border-radius: 5px
+        cursor: pointer
         .card_box_main
           width: 100%
           height: 416px
@@ -136,7 +135,8 @@
           -o-transform-style: preserve-3d
           transform-style: preserve-3d
           position: relative
-
+          box-shadow: 1px 2px 6px #493600
+          border-radius: 5px
         .card_img
           width: 300px
           height: 416px
@@ -193,12 +193,22 @@
     font-size: 24px
     font-weight: bold
     color: #607900
-    span
+    span#chance_num
       color: #f24642
       font-size: 30px
       font-weight: bold
       width: 50px
       border-bottom: 2px #f24642 solid
+      display: inline-block
+    span#zero
+      color: #f24642
+      font-size: 30px
+      font-weight: bold
+      width: 50px
+      border-bottom: 2px #f24642 solid
+      display: none
+
+    span
       display: inline-block
   .button
     width: 340px
@@ -211,6 +221,7 @@
     font-weight: bold
     padding-bottom: 20px
     line-height: 64px
+    cursor: pointer
   .button_1
     margin-top: 30px
   .button:hover
@@ -331,7 +342,7 @@
             text-align: center
             color: #fff
             font-size: 30px
-            padding-top: 14px
+            padding-top: 5px
             line-height: 137px
             margin-left: 19px
           .coupon_box
@@ -463,14 +474,15 @@
                 td
                   height: 50px
                   line-height: 50px
+                  color: #333
                 td.two
-                  padding-left: 180px
+                  padding-left: 170px
                   font-size: 18px
-                  color: #333
                 td.three
-                  padding-left: 110px
+                  padding-left: 102px
                   font-size: 18px
-                  color: #333
+                tr.first td,tr.second td,tr.third td
+                  color: #ff4300
             .title_bottom
               margin-top: 10px
               width: 100%
@@ -533,21 +545,41 @@
       background: #fff
       border-radius: 40px
       z-index: 99
+      padding-bottom: 10px
       .text
         width: 100%
         text-align: center
         line-height: 20px
         font-size: 18px
-        padding: 30px 0
+        padding: 30px 0 20px
+      .popup_button
+        width: 100px
+        height: 30px
+        line-height: 30px
+        text-align: center
+        margin: 0 auto 10px
+        display: block
+        background: #ed2b4e
+        border-radius: 10px
+        color: #fff
+        font-size: 18px
+        cursor: pointer
     .popup_bg
       width: 100%
       height: 100%
       background: #000
+      filter: alpha(opacity=70)
       opacity: 0.7
       position: fixed
       left: 0
       top: 0
       z-index: 9
+
+.no-csstransforms3d .body_wrap .card_wrap .card_box .card_box_open .card_img
+  display: none
+
+.no-csstransforms .body_wrap .card_wrap .card_box .card_box_open .card_img
+  display: none
 
 
 

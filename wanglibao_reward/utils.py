@@ -149,7 +149,7 @@ def getRewardsByActivity(code):
     return rewards
 
 def getTodayTop10Ranks():
-    today = datetime.datetime.now()-datetime.timedelta(1)
+    today = datetime.datetime.now()
     today_start = local_to_utc(today, 'min')
     today_end = local_to_utc(today, 'max')
     top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
@@ -172,11 +172,13 @@ def getYesterdayTop10Ranks():
 
 
 def updateRedisTopRank():
+    top_ranks = []
     try:
         top_ranks = getTodayTop10Ranks()
-        redis_backend()._set('top_ranks', top_ranks)
+        redis_backend()._lpush('top_ranks', top_ranks)
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
+    return top_ranks
 
 def processMarchAwardAfterP2pBuy(user, product, order_id, amount):
     try:
@@ -192,7 +194,7 @@ def processMarchAwardAfterP2pBuy(user, product, order_id, amount):
             if period >= 3:
                 misc = Misc.objects.filter(key='march_awards').first()
                 march_awards = json.loads(misc.value)
-                if march_awards and isinstance(march_awards, json):
+                if march_awards and isinstance(march_awards, dict):
                     highest = march_awards.get('highest', 0)
                     lowest = march_awards.get('lowest', 0)
 

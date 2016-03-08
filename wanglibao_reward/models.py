@@ -219,9 +219,9 @@ class ActivityRewardRecord(models.Model):
     redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID', null=True)
     redpack_record_id_time = models.DateTimeField(u'领取redpack_rule对应奖品时间', null=True)
     activity_desc = models.CharField(u'活动描述', max_length=64, null=True)
-
+    status = models.BooleanField(default=False, verbose_name=u'已经领取', help_text=u'默认是没有领取')
     class Meta:
-        unique_together = (("user", "create_date"),)  # 联合唯一索引
+        unique_together = (("user", "create_date", "activity_code"),)  # 联合唯一索引
 
 class WechatPhoneRewardRecord(models.Model):
 
