@@ -2536,39 +2536,65 @@ org.checkIn = (function(org){
     var lib = {
         giftOk: true,
         altDom: $(".check-in-alert-layout"),
+        money: 0,
+        isShare: false,
+        shareAmount: 0,
         init: function(){
             lib.getGift();
             lib.closeAlt();
             lib.loadInit();
+            lib.shareOk();
         },
-        loadInit: function(){
+        checkIn: function(){//签到
+            var checkDom = $("div.checkin-op-status");
+            org.ajax({
+                url: "/weixin/daily_action/",
+                type: "post",
+                data: {action_type: 'sign_in'},
+                dataType: "json",
+                success: function(res){
+                    //checkDom.find(".op-dec-title").html("今日已签到");
+                    //checkDom.find(".op-dec-detail").html("＋"+ res.data.experience_amount +"体验金");
+                    lib.altDom.prop("class","check-in-alert-layout check-in-now");
+                    lib.altDom.find(".share-money").html("今日签到成功！获得"+ res.data.experience_amount +"元体验金");
+                    lib.altDom.show();
+                }
+            });
+        },
+        loadInit: function(){//初始化
             org.ajax({
                 url: "/weixin/sign_info/",
                 type: "GET",
                 dataType: "json",
                 success: function(data){
                     var result = data.data;
-                    var giftNum = result.sign_in.nextDayNote,//礼物天数
-                        nowDay = result.sign_in.current_day,
-                        nextNum = giftNum - nowDay,
+                    var giftNum = result.sign_in.nextDayNote,//礼物位置
+                        nowDay = result.sign_in.current_day,//当前签到天数
+                        nextNum = result.sign_in.mysterious_day,//距离神秘礼物天数
+                        hasGift = result.sign_in.continueGiftFetched, //礼物是否领取
                         className = '',
                         html = '';
+                    lib.money = result.sign_in.amount;
                     var checkIn = $(".checkin-op-status"),
                         checkIn_detail = checkIn.find(".op-dec-detail"),
                         checkShare = $(".checkin-op-share");
                     if(!result.sign_in.status){//签到
-                        checkIn.find("div.op-dec-title").text("今日未签到");
-                        checkIn_detail.hide();
+                        lib.checkIn();
                     }else{
-                        checkIn_detail.text(result.sign_in.amount);
+                        checkIn_detail.text("＋"+ lib.money +"体验金");
                     }
                     if(result.share.status){//分享
+                        lib.isShare = true;
+                        lib.shareAmount = result.share.amount;
                         checkShare.addClass("checkin-share-ok");
-                        checkShare.find(".op-detail-orange").text(result.sign_in.amount);
+                        checkShare.find(".op-detail-orange").text("＋"+ result.share.amount +"体验金");
                     }
-                    for(var i=1; i<=giftNum; i++){
+                    for(var i=result.sign_in.start_day; i<=giftNum; i++){
                         if(nowDay === giftNum){
                             className = 'active-did active-gift active-doing';
+                            if(hasGift){
+                               className += " active-gift-open";
+                            }
                         }else{
                             if(i < nowDay){
                                 className = 'active-did';
@@ -2576,6 +2602,9 @@ org.checkIn = (function(org){
                                 className = 'active-did active-doing';
                             }else if(i === giftNum){
                                 className = 'active-gift';
+                                if(hasGift){
+                                   className += " active-gift-open";
+                                }
                             }else{
                                 className = '';
                             }
@@ -2592,40 +2621,79 @@ org.checkIn = (function(org){
                                 '</div>';
                     }
                     $("div.check-in-flag-lists").html(html);
-                    $("#giftDay").text(nextNum);
-                }
-            });
-        },
-        closeAlt: function(){
-            $(".close-alert").on("click",function(){
-                $(this).parents(".check-in-alert-layout").hide();
-            });
-        },
-        getGift: function(){
-            var giftOk = lib.giftOk;
-            $(".active-gift.active-did").on("touchstart",function(){
-                var self = $(this);
-                if(self.hasClass("active-gift-open")){
-                    return;
-                }
-                if(giftOk){
-                    giftOk = false;
-                    self.addClass("active-gift-open");
-                    if(lib.altDom.hasClass("check-in-share")){
-                        lib.altDom.removeClass("check-in-share");
+                    if(nextNum === 0 && !hasGift){
+                        $("div.bar-content").html("请领取神秘礼物");
+                    }else{
+                        $("#giftDay").text(nextNum);
                     }
-                    lib.altDom.show();
+
                 }
             });
         },
-        shareFn: function(){
-            if(!lib.altDom.hasClass("check-in-share")){
-                lib.altDom.addClass("check-in-share");
+        closeAlt: function(){//弹出层 - 知道了
+            $(".close-alert").on("click",function(){
+                var self = $(this),
+                    parent = self.parents(".check-in-alert-layout");
+                if(parent.hasClass("check-in-now")){
+                    window.location.reload();
+                }else{
+                    parent.hide();
+                }
+            });
+        },
+        getGift: function(){//领取礼物
+            var giftOk = lib.giftOk;
+            $("div.check-in-flag-lists").on("click",".active-did.active-gift",function(){
+                //lib.shareFn();
+                var self = $(this),
+                    now = 0;
+                lib.altDom.prop("class","check-in-alert-layout");
+                if(self.hasClass("active-gift-open")){
+                    lib.altDom.find("#gift-msg").html("您已领取礼物！");
+                }else{
+                    if(giftOk){
+                        giftOk = false;
+                        now = parseInt(self.find(".text-item").text());
+                        org.ajax({
+                            url:"/weixin/continue_action_reward/",
+                            type:"post",
+                            data: {days:now},
+                            dataType: "json",
+                            success: function(data){
+                                self.addClass("active-gift-open");
+                                lib.altDom.find("#gift-msg").html(data.message);
+                                $("div.bar-content").html('距离神秘礼包还有<span id="giftDay">'+ data.mysterious_day +'</span>天');
+                                giftOk = true;
+                            }
+                        });
+                    }
+                }
+                lib.altDom.show();
+            });
+        },
+        shareFn: function(){//分享成功后，领取奖励
+            var shareAmount = 0;
+            lib.altDom.prop("class","check-in-alert-layout check-in-share");
+            if(lib.isShare){
+                lib.altDom.find(".share-money").html("今日已分享！");
+            }else{
+                org.ajax({
+                    url:"/weixin/daily_action/",
+                    type:"post",
+                    data: {action_type:'share'},
+                    dataType: "json",
+                    success: function(res){
+                        shareAmount = res.data.experience_amount;
+                        lib.altDom.find(".share-money").html("今日分享成功！获得"+ shareAmount +"元体验金");
+                        $(".checkin-op-share").addClass("checkin-share-ok").find(".op-detail-orange").text("＋"+ shareAmount +"体验金");
+                    }
+                });
             }
             lib.altDom.show();
         },
         shareOk: function(){
-            var share = {shareLink:'', shareMainTit:'网利宝天天送我钱，不想要都不行～朋友们快来领啊～', shareBody:'', success:shareFn};
+            var url = window.location.protocol + window.location.host;
+            var share = {shareLink:url+'/weixin/sub_checkIn/', shareMainTit:'网利宝天天送我钱，不想要都不行～朋友们快来领啊～', shareBody:'速来网利宝抢钱，你还等什么', success:lib.shareFn};
             org.detail.share(share);
         }
     };
