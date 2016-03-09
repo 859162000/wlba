@@ -3,9 +3,9 @@
  */
 export class Automatic {
 
-    constructor({submit = null, checklist = [], otherlist = []} = {}) {
+    constructor({submit = null, checklist = [], otherlist = [], done = null} = {}) {
 
-        [this.submit, this.otherlist, this.checklist] = [submit, otherlist, checklist];
+        [this.submit, this.otherlist, this.checklist, this.callback] = [submit, otherlist, checklist, done];
 
         this.allCheck = this.allRequire();
         this.canSubmit = this.canSubmit.bind(this);
@@ -37,10 +37,14 @@ export class Automatic {
             return console.log('checklist is none');
 
         const _self = this;
+        let status = null;
         this.checklist.forEach((dom) => {
             dom.target.on('input', function () {
                 _self.style(dom.target);
-                _self.canSubmit();
+                status =  _self.canSubmit();
+                dom.callback && dom.callback($(this).val());
+                _self.callback && _self.callback(status)
+
             })
         });
     }
@@ -95,6 +99,7 @@ export class Automatic {
         });
 
         state ? this.submit.removeAttr('disabled') : this.submit.attr('disabled', 'true');
+        return state
     }
 
     operationClear() {

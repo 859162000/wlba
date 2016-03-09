@@ -1,221 +1,101 @@
-webpackJsonp([6],[
+webpackJsonp([1],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _automatic_detection = __webpack_require__(4);
 
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	var _api = __webpack_require__(3);
 
 	var _ui = __webpack_require__(2);
 
 	var _from_validation = __webpack_require__(5);
 
-	var _automatic_detection = __webpack_require__(4);
-
-	var _api = __webpack_require__(3);
-
-	var _simple_validation = __webpack_require__(7);
-
-	var _bank_limit = __webpack_require__(8);
+	var _trade_validation = __webpack_require__(6);
 
 	(function () {
 
 	    var $submit = $('button[type=submit]'),
-	        $bank = $('select[name=bank]'),
-	        $bankcard = $('input[name=bankcard]'),
-	        $bankphone = $('input[name=bankphone]'),
-	        $validation = $('input[name=validation]'),
-	        $money = $('input[name=money]');
+	        $inputCalculator = $('input[data-role=p2p-calculator]'),
+	        $repack = $('select[name=redpack]');
 
+	    var $redpackSign = $('.redpack-sign');
+	    var $showAmount = $('.need-amount');
+	    var $showredPackAmount = $(".redpack-amount");
+	    var $redpackInvestamount = $(".redpack-investamount");
+
+	    var repackSelect = function repackSelect(inputTarget, _self) {
+	        var selectOption = _self.find('option').eq(_self.get(0).selectedIndex),
+	            selectAmount = parseFloat(selectOption.attr('data-amount')),
+	            inputTargetAmount = parseInt(inputTarget.val()),
+	            redPackAmount = selectOption.attr("data-amount"),
+	            //红包金额
+	        redPackMethod = selectOption.attr("data-method"),
+	            //红包类型
+	        redPackInvestamount = parseInt(selectOption.attr("data-investamount")),
+	            //红包门槛
+	        redPackHighest_amount = parseInt(selectOption.attr("data-highest_amount")),
+	            //红包最高抵扣（百分比红包才有）
+	        repPackDikou = 0,
+	            //抵扣金额
+	        senderAmount = 0; //实际支付金额;
+	        var redPackAmountNew = 0;
+
+	        $redpackForAmount.hide();
+	        $redpackSign.hide();
+	        $redpackInvestamount.hide();
+
+	        if (inputTargetAmount < redPackInvestamount) {
+	            return $redpackInvestamount.show(); //未达到红包使用门槛
+	        }
+
+	        if (inputTargetAmount >= redPackInvestamount) {
+	            $inputCalculator.attr('activity-jiaxi', 0);
+	            if (redPackMethod == '*') {
+	                //百分比红包
+	                if (inputAmount * redPackAmount >= redPackHighest_amount && redPackHighest_amount > 0) {
+	                    //是否超过最高抵扣
+	                    repPackDikou = redPackHighest_amount;
+	                } else {
+	                    //没有超过最高抵扣
+	                    repPackDikou = inputAmount * redPackAmount;
+	                }
+	            } else if (redPackMethod == '~') {
+	                //加息券
+	                $inputCalculator.attr('activity-jiaxi', redPackAmount * 100);
+	                repPackDikou = 0;
+	            } else {
+	                //直抵红包
+	                repPackDikou = parseInt(redPackAmount);
+	            }
+
+	            senderAmount = inputAmount - repPackDikou; //实际支付金额
+
+	            //lib.redPackAmountNew = repPackDikou; 抵扣金额保存
+	            if (redPackMethod != '~') {
+	                $showredPackAmount.text(repPackDikou); //红包抵扣金额
+	                $showAmount.text(senderAmount); //实际支付金额
+	                $redpackSign.show(); //红包直抵提示
+	            }
+	        }
+	    };
 	    //---------------初始化操作start---------
-	    var autolist = [{ target: $bank, required: true }, { target: $bankcard, required: true }, { target: $bankphone, required: true }, { target: $validation, required: true }, { target: $money, required: true }];
+	    var autolist = [{ target: $inputCalculator, required: true }, { target: $repack, required: true, callback: function callback() {
+	            repackSelect($inputCalculator, $repack);
+	        } }];
+
 	    //自动检查
 	    var auto = new _automatic_detection.Automatic({
 	        submit: $submit,
-	        checklist: autolist
+	        checklist: autolist,
+	        done: function done(status) {
+	            console.log($inputCalculator);
+	            _api.calculate.operation($inputCalculator);
+	        }
 	    });
-	    auto.operationClear();
 
-	    var codeAutoList = [{ target: $bank, required: true }, { target: $bankcard, required: true }, { target: $bankphone, required: true }];
-	    var code = new _automatic_detection.Automatic({
-	        submit: $('.regist-validation'),
-	        checklist: codeAutoList
-	    });
 	    //---------------初始化操作end---------
-
-	    //验证短信码所需表单
-	    var checkOperation_validation = function checkOperation_validation() {
-	        return new Promise(function (resolve, reject) {
-	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }];
-	                return (0, _from_validation.check)(checklist);
-	            }
-
-	            var _checkOperation = checkOperation();
-
-	            var _checkOperation2 = _slicedToArray(_checkOperation, 2);
-
-	            var isThrough = _checkOperation2[0];
-	            var sign = _checkOperation2[1];
-
-	            if (isThrough) return resolve('验证成功');
-
-	            (0, _ui.signModel)(sign);
-	            return console.log('验证失败');
-	        });
-	    };
-
-	    //验证表单
-	    var checkOperation_submit = function checkOperation_submit() {
-	        return new Promise(function (resolve, reject) {
-	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }, { type: 'isEmpty', value: $validation.val() }];
-	                return (0, _from_validation.check)(checklist);
-	            }
-
-	            var _checkOperation3 = checkOperation();
-
-	            var _checkOperation4 = _slicedToArray(_checkOperation3, 2);
-
-	            var isThrough = _checkOperation4[0];
-	            var sign = _checkOperation4[1];
-
-	            if (isThrough) return resolve('验证成功');
-
-	            (0, _ui.signModel)(sign);
-	            return console.log('验证失败');
-	        });
-	    };
-
-	    var appendBanks = function appendBanks(banks) {
-	        var str = '';
-	        for (var bank in banks) {
-	            str += '<option value ="' + banks[bank].gate_id + '" >' + banks[bank].name + '</option>';
-	        }
-	        return str;
-	    };
-
-	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank')) {
-	            var content = JSON.parse(localStorage.getItem('bank'));
-	            $bank.append(appendBanks(content));
-	            return callback && callback(content);
-	        } else {
-	            (0, _api.ajax)({
-	                type: 'POST',
-	                url: '/api/bank/list_new/',
-	                success: function success(results) {
-	                    if (results.ret_code === 0) {
-	                        var content = JSON.stringify(results.banks);
-	                        $bank.append(appendBanks(results.banks));
-	                        window.localStorage.setItem('bank', content);
-	                        return callback && callback(content);
-	                    } else {
-	                        return alert(results.message);
-	                    }
-	                },
-	                error: function error(data) {
-	                    console.log(data);
-	                }
-	            });
-	        }
-	    };
-
-	    fetch_banklist(function (banklist) {
-	        _bank_limit.limit.getInstance({
-	            target: $('.limit-bank-item'),
-	            limit_data: banklist
-	        });
-	    });
-
-	    var $validation_btn = $('button[name=validation_btn]');
-
-	    var simple_validation = new _simple_validation.Simple_validation({
-	        target: $validation_btn,
-	        VALIDATION_URL: '/api/pay/deposit_new/'
-	    });
-
-	    //短信验证码
-	    $validation_btn.on('click', function () {
-
-	        simple_validation.set_check_list([{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }]);
-
-	        simple_validation.set_ajax_data({
-	            card_no: $bankcard.val(),
-	            gate_id: $bank.val(),
-	            phone: $bankphone.val(),
-	            amount: 0.01
-	        });
-	        simple_validation.start();
-	    });
-	    //绑卡操作
-	    $submit.on('click', function () {
-	        var _this = this;
-
-	        checkOperation_submit().then(function (result) {
-	            var check_recharge = $(_this).attr('data-recharge');
-	            if (check_recharge == 'true') {
-	                confirm("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
-	            } else {
-	                recharge({ firstRecharge: false });
-	            }
-	        }).catch(function (result) {});
-	    });
-
-	    function recharge(check) {
-	        org.ajax({
-	            type: 'POST',
-	            url: '/api/pay/cnp/dynnum_new/',
-	            data: {
-	                phone: $bankphone.val(),
-	                vcode: $validation.val(),
-	                order_id: $('input[name=order_id]').val(),
-	                token: $('input[name=token]').val(),
-	                set_the_one_card: true
-	            },
-	            beforeSend: function beforeSend() {
-	                if (check.firstRecharge) {
-	                    $submit.attr('disabled', 'disabled').text('充值中...');
-	                } else {
-	                    $submit.attr('disabled', 'disabled').text('绑卡中...');
-	                }
-	            },
-	            success: function success(data) {
-	                if (data.ret_code > 0) {
-	                    return alert(data.message);
-	                } else {
-	                    if (check.firstRecharge) {
-	                        $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
-	                    } else {
-	                        var _ret = function () {
-	                            var next_url = (0, _api.getQueryStringByName)('next'),
-	                                next = next_url == '' ? '/weixin/list/' : next_url;
-	                            return {
-	                                v: alert('绑卡成功！', function () {
-	                                    window.location.href = next;
-	                                })
-	                            };
-	                        }();
-
-	                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	                    }
-	                }
-	            },
-	            error: function error(result) {
-	                var data = JSON.parse(result.responseText);
-	                return alert(data.detail);
-	            },
-	            complete: function complete() {
-	                if (check.firstRecharge) {
-	                    $submit.removeAttr('disabled').text('绑卡并充值');
-	                } else {
-	                    $submit.removeAttr('disabled').text('立即绑卡');
-	                }
-	            }
-	        });
-	    }
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
@@ -732,8 +612,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 6 */,
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -741,258 +620,210 @@ webpackJsonp([6],[
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.Simple_validation = undefined;
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _api = __webpack_require__(3);
-
-	var _ui = __webpack_require__(2);
-
-	var _from_validation = __webpack_require__(5);
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	/**
-	 * 短信验证码按钮封装
-	 * @param VALIDATION_URL 必填
-	 * @param target  必填
-	 * @param validation_form 必填
-	 * @param callback 选填
-	 */
-
-	var Simple_validation = exports.Simple_validation = function () {
-	    function Simple_validation() {
+	var Trade = exports.Trade = function () {
+	    function Trade() {
 	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-	        var _ref$target = _ref.target;
-	        var target = _ref$target === undefined ? null : _ref$target;
-	        var _ref$VALIDATION_URL = _ref.VALIDATION_URL;
-	        var VALIDATION_URL = _ref$VALIDATION_URL === undefined ? null : _ref$VALIDATION_URL;
-	        var _ref$callback = _ref.callback;
-	        var callback = _ref$callback === undefined ? null : _ref$callback;
+	        var _ref$header = _ref.header;
+	        var header = _ref$header === undefined ? '交易密码' : _ref$header;
+	        var _ref$explain = _ref.explain;
+	        var explain = _ref$explain === undefined ? '充值金额' : _ref$explain;
+	        var _ref$done = _ref.done;
+	        var done = _ref$done === undefined ? null : _ref$done;
 
-	        _classCallCheck(this, Simple_validation);
+	        _classCallCheck(this, Trade);
 
-	        var _ref2 = [target, VALIDATION_URL, callback];
-	        this.target = _ref2[0];
-	        this.VALIDATION_URL = _ref2[1];
-	        this.callback = _ref2[2];
+	        var _ref2 = [header, explain, done];
+	        this.header = _ref2[0];
+	        this.explain = _ref2[1];
+	        this.done = _ref2[2];
 
-	        this.post_data = null;
-	        this.check_list = null;
-	        this.intervalId = null;
-	        this.before_validation = this.before_validation.bind(this);
-	        this.timerFunction = this.timerFunction.bind(this);
-	        this.execute_request = this.execute_request.bind(this);
+
+	        this.$layout = $('.tran-warp');
+	        this.$digt = $('.six-digt-password');
+	        this.$input = null;
+	        this.password = null;
+	        this.rectangleWidth = null;
+	        this.hash = this.hash.bind(this);
+	        this.createInput = this.createInput.bind(this);
+	        this.rectangleShow = this.rectangleShow.bind(this);
+	        this.rectangleHide = this.rectangleHide.bind(this);
+	        this.layoutHide = this.layoutHide.bind(this);
+	        this.callback = this.callback.bind(this);
+	        this.build();
+	        this.render();
 	    }
 
-	    _createClass(Simple_validation, [{
-	        key: 'set_ajax_data',
-	        value: function set_ajax_data(data_list) {
-	            this.post_data = data_list;
+	    _createClass(Trade, [{
+	        key: 'hash',
+	        value: function hash() {
+	            var hash = Math.random().toString(36).substr(2);
+	            if ($('#' + hash).length > 0) return this.hash();
+	            return hash;
 	        }
 	    }, {
-	        key: 'set_check_list',
-	        value: function set_check_list(list) {
-	            this.check_list = list;
+	        key: 'createInput',
+	        value: function createInput() {
+	            var HASH = this.hash();
+	            var input_body = '<input type=\'tel\' name=' + HASH + ' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
+	            this.$layout.append(input_body);
+	            this.$input = $('#' + HASH);
 	        }
 	    }, {
-	        key: 'before_validation',
-	        value: function before_validation() {
-	            var checklist = this.check_list;
+	        key: 'render',
+	        value: function render() {
+	            var _self = this;
+	            $('.head-title').html(this.header);
+	            $('.tran-sign').html(this.explain);
 
-	            return new Promise(function (resolve, reject) {
-	                function validation_operation() {
-	                    var form_list = checklist;
-	                    return (0, _from_validation.check)(form_list);
-	                }
+	            this.createInput();
 
-	                var _validation_operation = validation_operation();
+	            this.$layout.find('.tran-close').one('click', function () {
+	                _self.layoutHide();
+	            });
 
-	                var _validation_operation2 = _slicedToArray(_validation_operation, 2);
+	            this.$digt.on('click', function (e) {
+	                _self.$input.focus();
+	                _self.rectangleFixed('click');
+	                e.stopPropagation();
+	            });
 
-	                var isThrough = _validation_operation2[0];
-	                var sign = _validation_operation2[1];
+	            this.$input.on('input', function () {
+	                _self.rectangleFixed('input');
+	            });
 
-	                if (isThrough) return resolve('验证成功');
-
-	                return reject(sign);
+	            $(document).on('click', function () {
+	                _self.$digt.find('i').removeClass('active');
+	                _self.rectangleHide();
 	            });
 	        }
 	    }, {
-	        key: 'execute_request',
-	        value: function execute_request() {
-	            var $target = this.target,
-	                VALIDATION_URL = this.VALIDATION_URL,
-	                post_data = this.post_data,
-	                intervalId = this.intervalId;
-
-	            return new Promise(function (resolve, reject) {
-	                (0, _api.ajax)({
-	                    url: VALIDATION_URL,
-	                    type: 'POST',
-	                    data: post_data,
-	                    beforeSend: function beforeSend() {
-	                        $target.attr('disabled', 'disabled').text('发送中..');
-	                    },
-	                    success: function success(data) {
-	                        if (data.ret_code > 0) {
-	                            clearInterval(intervalId);
-	                            $target.text('重新获取').removeAttr('disabled').css('background', '#50b143');
-
-	                            return reject(data.message);
-	                        } else {
-	                            $("input[name='order_id']").val(data.order_id);
-	                            $("input[name='token']").val(data.token);
-	                            return resolve('短信已发送，请注意查收！');
-	                        }
-	                    },
-	                    error: function error(result) {
-	                        clearInterval(intervalId);
-	                        $target.text('重新获取').removeAttr('disabled').css('background', '#50b143');
-	                        return reject(result);
-	                    }
-	                });
-	            });
+	        key: 'build',
+	        value: function build() {
+	            this.$input && this.$input.off('input');
+	            $(document).off('click');
+	            this.$digt.off('click').find('i').removeClass('active');
+	            this.$layout.find('.circle').hide();
 	        }
 	    }, {
-	        key: 'timerFunction',
-	        value: function timerFunction(count) {
-	            var timerInside = function timerInside() {
-	                if (count > 1) {
-	                    count--;
-	                    return this.target.text(count + '秒后可重发');
-	                } else {
-	                    clearInterval(this.intervalId);
-	                    this.target.text('重新获取').removeAttr('disabled');
-	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
+	        key: 'destroy',
+	        value: function destroy() {
+	            this.$input.val('');
+	            this.$digt.find('i').removeClass('active');
+	            $('.six-digt-password i ').find('.circle').hide();
+	        }
+	    }, {
+	        key: 'rectangleFixed',
+	        value: function rectangleFixed(type) {
+	            var value_num = this.$input.val().length;
+	            var move_space = this.rectangleWidth * value_num;
+	            $('.circle').hide();
+
+	            for (var i = 0; i < value_num; i++) {
+	                $('.six-digt-password i ').eq(i).find('.circle').show();
+	            }
+
+	            this.password = this.$input.val();
+
+	            this.rectangleShow();
+
+	            if (value_num == 6) {
+	                move_space = this.rectangleWidth * 5;
+	            }
+
+	            this.$layout.find('.blue').animate({
+	                'translate3d': move_space + "px, 0 , 0"
+	            }, 0);
+
+	            if (value_num == 6) {
+	                this.$digt.find('i').removeClass('active');
+	                if (type == 'input') {
+	                    this.rectangleHide();
+	                    this.$input.blur();
+	                    this.callback();
 	                }
-	            };
-	            timerInside();
-	            return this.intervalId = setInterval(timerInside, 1000);
+	            }
+
+	            this.$digt.find('i').eq(value_num).addClass('active').siblings('i').removeClass('active');
 	        }
 	    }, {
-	        key: 'start',
-	        value: function start() {
-	            var _this = this;
-
-	            this.before_validation().then(function (result) {
-	                console.log('验证通过');
-	                return _this.execute_request();
-	            }).then(function (result) {
-	                (0, _ui.signModel)(result);
-	                _this.timerFunction(60);
-	            }).catch(function (result) {
-	                return (0, _ui.signModel)(result);
+	        key: 'rectangleShow',
+	        value: function rectangleShow() {
+	            this.rectangleWidth = Math.floor(this.$layout.find('.blue').width());
+	            return this.$layout.find('.blue').css('visibility', 'visible');
+	        }
+	    }, {
+	        key: 'rectangleHide',
+	        value: function rectangleHide() {
+	            return this.$layout.find('.blue').css('visibility', 'hidden');
+	        }
+	    }, {
+	        key: 'loadingShow',
+	        value: function loadingShow() {
+	            return this.$layout.find('.tran-loading').css('display', '-webkit-box');
+	        }
+	    }, {
+	        key: 'loadingHide',
+	        value: function loadingHide() {
+	            return this.$layout.find('.tran-loading').css('display', 'none');
+	        }
+	    }, {
+	        key: 'layoutShow',
+	        value: function layoutShow() {
+	            return this.$layout.show();
+	        }
+	    }, {
+	        key: 'layoutHide',
+	        value: function layoutHide() {
+	            return this.$layout.hide();
+	        }
+	    }, {
+	        key: 'callback',
+	        value: function callback() {
+	            this.done && this.done({
+	                password: this.password
 	            });
 	        }
 	    }]);
 
-	    return Simple_validation;
+	    return Trade;
 	}();
+
+	var Deal_ui = exports.Deal_ui = {
+	    show_alert: function show_alert(state, callback, state_message) {
+	        $('.tran-alert-error').show().find('.' + state).show().siblings().hide();
+	        if (state_message) $('.tran-alert-error').show().find('.' + state).find('p').html(state_message);
+	        $('.tran-alert-error').find('.alert-bottom').one('click', function () {
+	            $('.tran-alert-error').hide();
+	            callback && callback();
+	        });
+	        return;
+	    },
+	    show_entry: function show_entry(count, callback) {
+	        $('.tran-alert-entry').show().find('.count_pwd').html(count);
+	        $('.tran-alert-entry').find('.alert-bottom').one('click', function () {
+	            $('.tran-alert-entry').hide();
+	            callback && callback();
+	        });
+	        return;
+	    },
+	    show_lock: function show_lock(left, right, dec, callback) {
+	        $('.tran-alert-lock').show();
+	        $('.lock-close').html(left).one('click', function () {
+	            $('.tran-alert-lock').hide();
+	        });
+	        $('.tran-alert-lock').find('.tran-dec-entry').html(dec);
+	        $('.lock-back').html(right).one('click', function () {
+	            callback && callback();
+	        });
+	    }
+	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * 银行限额
-	 * @type {{getInstance}}
-	 *
-	 */
-
-	var limit = exports.limit = function () {
-
-	    var _instance = null;
-
-	    var Limit = function () {
-	        function Limit() {
-	            var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	            var _ref$target = _ref.target;
-	            var target = _ref$target === undefined ? null : _ref$target;
-	            var _ref$limit_data = _ref.limit_data;
-	            var limit_data = _ref$limit_data === undefined ? null : _ref$limit_data;
-
-	            _classCallCheck(this, Limit);
-
-	            var _ref2 = [target, limit_data];
-	            this.target = _ref2[0];
-	            this.limit_data = _ref2[1];
-
-
-	            this._format_limit = this._format_limit.bind(this);
-	            this.target.html(this._style(this.limit_data));
-	        }
-
-	        _createClass(Limit, [{
-	            key: "_style",
-	            value: function _style(limit_data) {
-	                var string_list = '';
-	                for (var i = 0; i < limit_data.length; i++) {
-	                    string_list += "<div class='limit-bank-list'>";
-	                    string_list += "<div class='limit-list-dec'>";
-	                    string_list += "<div class='bank-name'>" + limit_data[i].name + "</div>";
-	                    string_list += "<div class='bank-limit'>首次限额" + this._format_limit(limit_data[i].first_one) + "/单笔限额" + this._format_limit(limit_data[i].first_one) + "/日限额" + this._format_limit(limit_data[i].second_day) + "</div>";
-	                    string_list += "</div>";
-	                    string_list += "<div class='limit-list-icon " + limit_data[i].bank_id + "'></div>";
-	                    string_list += "</div>";
-	                }
-
-	                return string_list;
-	            }
-	        }, {
-	            key: "_format_limit",
-	            value: function _format_limit(amount) {
-	                var money = amount,
-	                    reg = /^\d{5,}$/,
-	                    reg2 = /^\d{4}$/;
-	                if (reg.test(amount)) {
-	                    return money = amount.replace('0000', '') + '万';
-	                }
-	                if (reg2.test(amount)) {
-	                    return money = amount.replace('000', '') + '千';
-	                }
-	            }
-	            //
-	            //show(){
-	            //    this.target.show()
-	            //}
-	            //
-	            //hide(){
-	            //    this.target.hide()
-	            //}
-
-	        }]);
-
-	        return Limit;
-	    }();
-
-	    var getInstance = function getInstance(data) {
-	        if (!_instance) {
-	            _instance = new Limit(data);
-	        }
-	        return _instance;
-	    };
-
-	    return {
-	        getInstance: getInstance
-	    };
-	}();
 
 /***/ }
 ]);

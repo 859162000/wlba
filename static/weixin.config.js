@@ -21,6 +21,7 @@ module.exports = {
         regist: path.resolve(JS_PATH, 'regist'),
         list: path.resolve(JS_PATH, 'list'),
         detail: path.resolve(JS_PATH, 'detail'),
+        buy: path.resolve(JS_PATH, 'buy'),
         calculator: path.resolve(JS_PATH, 'calculator'),
         bankOneCard: path.resolve(JS_PATH, 'bankOneCard'),
         recharge: path.resolve(JS_PATH, 'recharge'),

@@ -31,7 +31,8 @@ html
         em#expected_income 0.00
         |元
 
-    a(href="#1",data-productId="{{p2p.id}}").calculator-buy 立即购买
+    a(href="javascript:void(0)",data-productId="{{p2p.id}}").calculator-buy 立即购买
+    include include/ui_model/mobile_alert
     include include/tracking
     script(src='/static/scripts/mobile/dev/vendor.zepto.js')
     script(src='/static/scripts/mobile/dev/calculator.js')

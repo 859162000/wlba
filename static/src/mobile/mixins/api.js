@@ -81,15 +81,17 @@ const _sameOrigin = (url) => {
 /**
  * 计算器
  */
-export const calculate = (dom, callback) => {
+export const calculate = (() => {
 
     const _calculate = function (amount, rate, period, pay_method) {
-        var divisor, rate_pow, result, term_amount;
+        var divisor, rate_pow, result, term_amount, month_rate;
         if (/等额本息/ig.test(pay_method)) {
-            rate_pow = Math.pow(1 + rate, period);
-            divisor = rate_pow - 1;
-            term_amount = amount * (rate * rate_pow) / divisor;
-            result = term_amount * period - amount;
+            month_rate = rate / 12
+            rate_pow = Math.pow(1 + month_rate, period)
+
+            term_amount = amount * (month_rate * rate_pow) / (rate_pow-1)
+            term_amount = term_amount.toFixed(2)
+            result  = (term_amount * period - amount).toFixed(2)
         } else if (/日计息/ig.test(pay_method)) {
             result = amount * rate * period / 360;
         } else {
@@ -98,20 +100,21 @@ export const calculate = (dom, callback) => {
         return Math.floor(result * 100) / 100;
     };
 
-    dom.on('input', function () {
-        _inputCallback();
-    });
+    //dom.on('input', function () {
+    //    _inputCallback();
+    //});
 
-    function _inputCallback() {
-        let earning, earning_element, earning_elements, fee_earning, activity_rate, activity_jiaxi, amount;
-        let target = $('input[data-role=p2p-calculator]'),
+    function operation(dom, callback) {
+        let earning, earning_element, earning_elements, fee_earning;
+
+        let target = dom,
             existing = parseFloat(target.attr('data-existing')),
             period = target.attr('data-period'),
             rate = target.attr('data-rate') / 100,
-            pay_method = target.attr('data-paymethod');
-        activity_rate = target.attr('activity-rate') / 100;
-        activity_jiaxi = target.attr('activity-jiaxi') / 100;
-        amount = parseFloat(target.val()) || 0;
+            pay_method = target.attr('data-paymethod'),
+            activity_rate = target.attr('activity-rate') / 100,
+            activity_jiaxi = target.attr('activity-jiaxi') / 100,
+            amount = parseFloat(target.val()) || 0;
 
         if (amount > target.attr('data-max')) {
             amount = target.attr('data-max');
@@ -139,7 +142,11 @@ export const calculate = (dom, callback) => {
         }
         callback && callback();
     }
-}
+
+    return {
+        operation : operation
+    }
+})()
 
 
 

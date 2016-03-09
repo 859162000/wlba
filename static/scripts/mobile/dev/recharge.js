@@ -1,4 +1,4 @@
-webpackJsonp([10],[
+webpackJsonp([11],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -14,7 +14,7 @@ webpackJsonp([10],[
 
 	var _from_validation = __webpack_require__(5);
 
-	var _trade_validation = __webpack_require__(9);
+	var _trade_validation = __webpack_require__(6);
 
 	(function () {
 
@@ -440,15 +440,17 @@ webpackJsonp([10],[
 	/**
 	 * 计算器
 	 */
-	var calculate = exports.calculate = function calculate(dom, callback) {
+	var calculate = exports.calculate = function () {
 
 	    var _calculate = function _calculate(amount, rate, period, pay_method) {
-	        var divisor, rate_pow, result, term_amount;
+	        var divisor, rate_pow, result, term_amount, month_rate;
 	        if (/等额本息/ig.test(pay_method)) {
-	            rate_pow = Math.pow(1 + rate, period);
-	            divisor = rate_pow - 1;
-	            term_amount = amount * (rate * rate_pow) / divisor;
-	            result = term_amount * period - amount;
+	            month_rate = rate / 12;
+	            rate_pow = Math.pow(1 + month_rate, period);
+
+	            term_amount = amount * (month_rate * rate_pow) / (rate_pow - 1);
+	            term_amount = term_amount.toFixed(2);
+	            result = (term_amount * period - amount).toFixed(2);
 	        } else if (/日计息/ig.test(pay_method)) {
 	            result = amount * rate * period / 360;
 	        } else {
@@ -457,26 +459,24 @@ webpackJsonp([10],[
 	        return Math.floor(result * 100) / 100;
 	    };
 
-	    dom.on('input', function () {
-	        _inputCallback();
-	    });
+	    //dom.on('input', function () {
+	    //    _inputCallback();
+	    //});
 
-	    function _inputCallback() {
+	    function operation(dom, callback) {
 	        var earning = undefined,
 	            earning_element = undefined,
 	            earning_elements = undefined,
-	            fee_earning = undefined,
-	            activity_rate = undefined,
-	            activity_jiaxi = undefined,
-	            amount = undefined;
-	        var target = $('input[data-role=p2p-calculator]'),
+	            fee_earning = undefined;
+
+	        var target = dom,
 	            existing = parseFloat(target.attr('data-existing')),
 	            period = target.attr('data-period'),
 	            rate = target.attr('data-rate') / 100,
-	            pay_method = target.attr('data-paymethod');
-	        activity_rate = target.attr('activity-rate') / 100;
-	        activity_jiaxi = target.attr('activity-jiaxi') / 100;
-	        amount = parseFloat(target.val()) || 0;
+	            pay_method = target.attr('data-paymethod'),
+	            activity_rate = target.attr('activity-rate') / 100,
+	            activity_jiaxi = target.attr('activity-jiaxi') / 100,
+	            amount = parseFloat(target.val()) || 0;
 
 	        if (amount > target.attr('data-max')) {
 	            amount = target.attr('data-max');
@@ -504,7 +504,11 @@ webpackJsonp([10],[
 	        }
 	        callback && callback();
 	    }
-	};
+
+	    return {
+	        operation: operation
+	    };
+	}();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -537,13 +541,16 @@ webpackJsonp([10],[
 	        var checklist = _ref$checklist === undefined ? [] : _ref$checklist;
 	        var _ref$otherlist = _ref.otherlist;
 	        var otherlist = _ref$otherlist === undefined ? [] : _ref$otherlist;
+	        var _ref$done = _ref.done;
+	        var done = _ref$done === undefined ? null : _ref$done;
 
 	        _classCallCheck(this, Automatic);
 
-	        var _ref2 = [submit, otherlist, checklist];
+	        var _ref2 = [submit, otherlist, checklist, done];
 	        this.submit = _ref2[0];
 	        this.otherlist = _ref2[1];
 	        this.checklist = _ref2[2];
+	        this.callback = _ref2[3];
 
 
 	        this.allCheck = this.allRequire();
@@ -580,10 +587,13 @@ webpackJsonp([10],[
 	            if (this.isEmptyArray(this.checklist)) return console.log('checklist is none');
 
 	            var _self = this;
+	            var status = null;
 	            this.checklist.forEach(function (dom) {
 	                dom.target.on('input', function () {
 	                    _self.style(dom.target);
-	                    _self.canSubmit();
+	                    status = _self.canSubmit();
+	                    dom.callback && dom.callback($(this).val());
+	                    _self.callback && _self.callback(status);
 	                });
 	            });
 	        }
@@ -638,6 +648,7 @@ webpackJsonp([10],[
 	            });
 
 	            state ? this.submit.removeAttr('disabled') : this.submit.attr('disabled', 'true');
+	            return state;
 	        }
 	    }, {
 	        key: 'operationClear',
@@ -779,10 +790,7 @@ webpackJsonp([10],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';

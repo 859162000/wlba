@@ -51,6 +51,7 @@ html
                         option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{red_amountSet}}{{pack_unit}}/{{redpack.invest_amount}}元起投
                     else
                       option(value = '')  无可用理财券
+                      option(value = '1')  1
 
         .buy-earnings
             p.redpack-already *您已使用过
@@ -72,7 +73,7 @@ html
           .is_invested-sign 只有未进行投资的用户才可以购买
         else
           .buy-snap-up
-              button(type='submit',name='submit').snap-up 立即投资
+              button(type='submit',name='submit', disabled=true).public-submit 立即投资
         .buy-sufficient
           p
            |余额不足，
@@ -89,4 +90,6 @@ html
         include include/tran_password
         include include/confirm
         include include/tracking
-        script(data-init="buy", src="/static/scripts/mobile/mobile.js?v=20151202")
+        //script(data-init="buy", src="/static/scripts/mobile/mobile.js?v=20151202")
+        script(src='/static/scripts/mobile/dev/vendor.zepto.js')
+        script(src='/static/scripts/mobile/dev/buy.js')
