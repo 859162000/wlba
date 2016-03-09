@@ -2632,8 +2632,7 @@ class MarchAwardTemplate(TemplateView):
         ranks = []
         chances = 0
         user = self.request.user
-        if user.is_authenticated():
-            chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+
         if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
                 ranks = redis_backend()._lrange('top_ranks', 0, -1)
@@ -2641,6 +2640,8 @@ class MarchAwardTemplate(TemplateView):
                 pass
             if not ranks:
                 ranks = updateRedisTopRank()
+            if user.is_authenticated():
+                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
 
         award_list = []
         redpack_events = {}
