@@ -249,3 +249,13 @@ class P2pOrderRewardRecord(models.Model):
     create_time = models.DateTimeField(u'记录创建时间', auto_now_add=True)
     class Meta:
         ordering = '-create_time',
+
+class WanglibaoRewardJoinRecord(models.Model):
+    user = models.ForeignKey(User, db_index=True)
+    activity_code = models.CharField(u'活动代码', max_length=64, db_index=True, null=False)
+    remain_chance = models.IntegerField(u'剩余机会', default=0, null=False)
+    first_join_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    last_join_time = models.DateTimeField(u'更新时间', auto_now=True)
+    class Meta:
+        unique_together = (("user", "activity_code"),)  # 联合唯一索引
+

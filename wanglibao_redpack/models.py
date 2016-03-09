@@ -109,7 +109,6 @@ class RedPackRecord(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
     apply_amount = models.FloatField(null=True, default=0.0, verbose_name=u'使用金额')
-    is_month_product = models.BooleanField(default=False, verbose_name=u"是否是月利宝产品")
     order_id = models.IntegerField(verbose_name=u'关联订单', null=True, db_index=True)
     product_id = models.IntegerField(verbose_name=u'关联产品', null=True, db_index=True)
 
@@ -140,19 +139,6 @@ class Income(models.Model):
     invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="invite")
     level = models.IntegerField(verbose_name=u"级别", default=0, blank=False, null=False)
     product = models.ForeignKey(P2PProduct, verbose_name=u"产品")
-    amount = models.DecimalField(verbose_name=u'投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
-    earning = models.DecimalField(verbose_name=u'收益金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
-    order_id = models.IntegerField(verbose_name=u"订单号", default=0, blank=False, null=False)
-    paid = models.BooleanField(verbose_name=u'已打款', default=False)
-    created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
-
-
-# 新平台佣金单独处理
-class PhpIncome(models.Model):
-    user = models.ForeignKey(User, verbose_name=u"用户", related_name="php_user")
-    invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="php_invite")
-    level = models.IntegerField(verbose_name=u"级别", default=0, blank=False, null=False)
-    product_id = models.IntegerField(verbose_name=u"月利宝ID", null=False)
     amount = models.DecimalField(verbose_name=u'投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     earning = models.DecimalField(verbose_name=u'收益金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     order_id = models.IntegerField(verbose_name=u"订单号", default=0, blank=False, null=False)
