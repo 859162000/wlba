@@ -2707,7 +2707,7 @@ class FetchMarchAwardAPI(APIView):
             with transaction.atomic():
                 p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
                 if not p2pReward:
-                    return Response({"ret_code":-1, "message":"没有翻牌机会"})
+                    return Response({"ret_code":-1, "message":"您还没有翻牌机会，赶紧去投资吧"})
                 p2pRecord = P2PRecord.objects.filter(order_id=p2pReward.order_id).first()
                 if not p2pRecord:
                     return Response({"ret_code":-1, "message":"投资条件不符合"})
