@@ -25,7 +25,7 @@ html
     .calculator-body
       .calculator-count
         .count-txt-left 投资金额
-        input(type="tel",placeholder="输入100的整数被金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="#xunlei-vip-income-head",data-target="#expected_income", data-existing="0", data-rate="{{earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").count-input
+        input(type="tel",placeholder="输入100的整数被金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator", data-target="#expected_income", data-existing="0", data-rate="{{earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").count-input
         .count-txt-right 元
       .calculator-result 预期收益：
         em#expected_income 0.00

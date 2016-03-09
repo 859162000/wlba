@@ -42,7 +42,6 @@ export class Automatic {
             dom.target.on('input', function () {
                 _self.style(dom.target);
                 status =  _self.canSubmit();
-                dom.callback && dom.callback($(this).val());
                 _self.callback && _self.callback(status)
 
             })

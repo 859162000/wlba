@@ -274,7 +274,6 @@ webpackJsonp([5],[
 	        if (/等额本息/ig.test(pay_method)) {
 	            month_rate = rate / 12;
 	            rate_pow = Math.pow(1 + month_rate, period);
-
 	            term_amount = amount * (month_rate * rate_pow) / (rate_pow - 1);
 	            term_amount = term_amount.toFixed(2);
 	            result = (term_amount * period - amount).toFixed(2);
@@ -285,10 +284,6 @@ webpackJsonp([5],[
 	        }
 	        return Math.floor(result * 100) / 100;
 	    };
-
-	    //dom.on('input', function () {
-	    //    _inputCallback();
-	    //});
 
 	    function operation(dom, callback) {
 	        var earning = undefined,
@@ -419,7 +414,6 @@ webpackJsonp([5],[
 	                dom.target.on('input', function () {
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
-	                    dom.callback && dom.callback($(this).val());
 	                    _self.callback && _self.callback(status);
 	                });
 	            });

@@ -10,11 +10,17 @@ webpackJsonp([2],[
 
 	(function () {
 
-	    (0, _api.calculate)($('input[data-role=p2p-calculator]'));
-
-	    var $calculatorBuy = $('.calculator-buy'),
+	    var $inputCalculator = $('input[data-role=p2p-calculator]'),
+	        $calculatorBuy = $('.calculator-buy'),
 	        $countInput = $('.count-input');
-	    var productId, amount_profit, amount;
+
+	    var productId = undefined,
+	        amount_profit = undefined,
+	        amount = undefined;
+
+	    $inputCalculator.on('input', function () {
+	        _api.calculate.operation($(this));
+	    });
 
 	    $calculatorBuy.on('click', function () {
 	        productId = $(this).attr('data-productid');
@@ -23,7 +29,7 @@ webpackJsonp([2],[
 	        if (amount % 100 !== 0 || amount == '') {
 	            return alert("请输入100的整数倍");
 	        } else {
-	            window.location.href = '/weixin/view/buy/' + productId + '/?amount=' + amount + '&amount_profit=' + amount_profit;
+	            window.location.href = '/weixin/view/buy/' + productId + '/?amount=' + amount;
 	        }
 	    });
 	})();
@@ -199,7 +205,6 @@ webpackJsonp([2],[
 	        if (/等额本息/ig.test(pay_method)) {
 	            month_rate = rate / 12;
 	            rate_pow = Math.pow(1 + month_rate, period);
-
 	            term_amount = amount * (month_rate * rate_pow) / (rate_pow - 1);
 	            term_amount = term_amount.toFixed(2);
 	            result = (term_amount * period - amount).toFixed(2);
@@ -210,10 +215,6 @@ webpackJsonp([2],[
 	        }
 	        return Math.floor(result * 100) / 100;
 	    };
-
-	    //dom.on('input', function () {
-	    //    _inputCallback();
-	    //});
 
 	    function operation(dom, callback) {
 	        var earning = undefined,

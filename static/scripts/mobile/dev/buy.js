@@ -4,6 +4,10 @@ webpackJsonp([1],[
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	__webpack_require__(11);
+
 	var _automatic_detection = __webpack_require__(4);
 
 	var _api = __webpack_require__(3);
@@ -18,17 +22,21 @@ webpackJsonp([1],[
 
 	    var $submit = $('button[type=submit]'),
 	        $inputCalculator = $('input[data-role=p2p-calculator]'),
-	        $repack = $('select[name=redpack]');
+	        $repack = $('select[name=redpack]'),
+	        $redpackSign = $('.redpack-sign'),
+	        $showAmount = $('.need-amount'),
+	        $showredPackAmount = $(".redpack-amount"),
+	        $redpackInvestamount = $(".redpack-investamount"),
+	        productID = $(".invest-one").attr('data-protuctid'),
+	        $alreadyReadPack = $('.redpack-already');
 
-	    var $redpackSign = $('.redpack-sign');
-	    var $showAmount = $('.need-amount');
-	    var $showredPackAmount = $(".redpack-amount");
-	    var $redpackInvestamount = $(".redpack-investamount");
+	    var tradeStatus = null,
+	        redPackDikouCopy = 0; //抵扣金额－全局
 
+	    //检测select
 	    var repackSelect = function repackSelect(inputTarget, _self) {
 	        var selectOption = _self.find('option').eq(_self.get(0).selectedIndex),
-	            selectAmount = parseFloat(selectOption.attr('data-amount')),
-	            inputTargetAmount = parseInt(inputTarget.val()),
+	            inputTargetAmount = parseInt(inputTarget.val()) || 0,
 	            redPackAmount = selectOption.attr("data-amount"),
 	            //红包金额
 	        redPackMethod = selectOption.attr("data-method"),
@@ -40,9 +48,9 @@ webpackJsonp([1],[
 	        repPackDikou = 0,
 	            //抵扣金额
 	        senderAmount = 0; //实际支付金额;
-	        var redPackAmountNew = 0;
 
-	        $redpackForAmount.hide();
+	        redPackDikouCopy = 0; //抵扣金额全局
+
 	        $redpackSign.hide();
 	        $redpackInvestamount.hide();
 
@@ -54,12 +62,12 @@ webpackJsonp([1],[
 	            $inputCalculator.attr('activity-jiaxi', 0);
 	            if (redPackMethod == '*') {
 	                //百分比红包
-	                if (inputAmount * redPackAmount >= redPackHighest_amount && redPackHighest_amount > 0) {
+	                if (inputTargetAmount * redPackAmount >= redPackHighest_amount && redPackHighest_amount > 0) {
 	                    //是否超过最高抵扣
 	                    repPackDikou = redPackHighest_amount;
 	                } else {
 	                    //没有超过最高抵扣
-	                    repPackDikou = inputAmount * redPackAmount;
+	                    repPackDikou = inputTargetAmount * redPackAmount;
 	                }
 	            } else if (redPackMethod == '~') {
 	                //加息券
@@ -70,9 +78,9 @@ webpackJsonp([1],[
 	                repPackDikou = parseInt(redPackAmount);
 	            }
 
-	            senderAmount = inputAmount - repPackDikou; //实际支付金额
+	            senderAmount = inputTargetAmount - repPackDikou; //实际支付金额
 
-	            //lib.redPackAmountNew = repPackDikou; 抵扣金额保存
+	            redPackDikouCopy = repPackDikou; //抵扣金额保存
 	            if (redPackMethod != '~') {
 	                $showredPackAmount.text(repPackDikou); //红包抵扣金额
 	                $showAmount.text(senderAmount); //实际支付金额
@@ -80,19 +88,239 @@ webpackJsonp([1],[
 	            }
 	        }
 	    };
-	    //---------------初始化操作start---------
-	    var autolist = [{ target: $inputCalculator, required: true }, { target: $repack, required: true, callback: function callback() {
-	            repackSelect($inputCalculator, $repack);
-	        } }];
 
-	    //自动检查
+	    //投资历史
+	    var investHistory = function investHistory() {
+	        return new Promise(function (resolve, reject) {
+	            (0, _api.ajax)({
+	                type: 'POST',
+	                url: '/api/redpacket/selected/',
+	                data: { product_id: productID },
+	                success: function success(data) {
+	                    if (data.ret_code === 0) {
+	                        if (data.used_type == 'redpack') $alreadyReadPack.html(data.message).show();else if (data.used_type == 'coupon') {
+	                            $inputCalculator.attr('activity-jiaxi', data.amount);
+	                            $alreadyReadPack.show().find('.already-amount').text(data.amount + '%');
+
+	                            return resolve('重新计算收益');
+	                        }
+	                    }
+	                    reject('不需要重新计算收益');
+	                },
+	                error: function error() {
+	                    reject('不需要重新计算收益');
+	                }
+	            });
+	        });
+	    };
+
+	    //检测交易密码
+	    var seachTrade = function seachTrade() {
+	        (0, _api.ajax)({
+	            url: '/api/profile/',
+	            type: 'GET',
+	            success: function success(result) {
+	                tradeStatus = result.trade_pwd_is_set ? true : false;
+	            }
+	        });
+	    };
+
+	    //设置交易密码
+	    var trade_set = function trade_set(model_operation, new_trade_pwd) {
+	        (0, _api.ajax)({
+	            url: '/api/trade_pwd/',
+	            type: 'post',
+	            data: {
+	                action_type: 1,
+	                new_trade_pwd: new_trade_pwd
+	            },
+	            success: function success(result) {
+	                model_operation.loadingHide();
+	                model_operation.destroy();
+	                model_operation.layoutHide();
+	                if (result.ret_code == 0) {
+	                    _trade_validation.Deal_ui.show_alert('success', function () {
+	                        window.location = window.location.href;
+	                    }, '交易密码设置成功，请牢记！');
+	                }
+
+	                if (result.ret_code > 0) {
+	                    alert(result.message);
+	                }
+	            }
+	        });
+	    };
+	    //交易密码
+	    var trade_operation = function trade_operation(amount, callback) {
+	        tradeStatus ? entry_trade() : set_trade();
+
+	        function entry_trade() {
+	            var operation = new _trade_validation.Trade({
+	                header: '请输入交易密码',
+	                explain: '投资金额<br>￥' + amount,
+	                done: function done(result) {
+	                    operation.loadingShow();
+	                    callback && callback(operation, result.password, amount);
+	                }
+	            });
+	            operation.layoutShow();
+	        }
+
+	        var set_trade_data = {};
+	        function set_trade() {
+	            var set_operation_1 = new _trade_validation.Trade({
+	                header: '设置交易密码',
+	                explain: '请设置6位数字作为交易密码',
+	                done: function done(result) {
+	                    set_trade_data.password_1 = result.password;
+	                    set_operation_1.destroy();
+	                    set_operation_1.layoutHide();
+	                    set_operation_2();
+	                }
+	            });
+	            set_operation_1.layoutShow();
+
+	            function set_operation_2() {
+	                var set_operation_2 = new _trade_validation.Trade({
+	                    header: '设置交易密码',
+	                    explain: '请再次确认交易密码',
+	                    done: function done(result) {
+	                        set_trade_data.password_2 = result.password;
+	                        if (set_trade_data.password_2 != set_trade_data.password_1) {
+	                            set_operation_2.destroy();
+	                            set_operation_2.layoutHide();
+	                            return _trade_validation.Deal_ui.show_alert('error', function () {
+	                                set_trade();
+	                            });
+	                        }
+	                        set_operation_2.loadingShow();
+
+	                        //设置交易密码
+	                        trade_set(set_operation_2, result.password);
+	                    }
+	                });
+	                set_operation_2.layoutShow();
+	            }
+	        }
+	    };
+
+	    //购买
+	    var buy = function buy(trade_operation, trade_pwd, investAmount) {
+	        var balance = parseFloat($("#balance").attr("data-value")),
+	            redPackValue = $repack.val() == '' ? null : $repack.val();
+
+	        (0, _api.ajax)({
+	            type: 'POST',
+	            url: '/api/p2p/purchase/mobile/',
+	            data: {
+	                amount: investAmount,
+	                product: productID,
+	                redpack: redPackValue,
+	                trade_pwd: trade_pwd
+	            },
+	            beforeSend: function beforeSend() {
+	                $submit.attr('disabled', true).text("抢购中...");
+	            },
+	            success: function success(result) {
+	                trade_operation.loadingHide();
+	                trade_operation.destroy();
+	                trade_operation.layoutHide();
+	                if (result.ret_code == 0) {
+	                    $('.balance-sign').text(balance - result.data + redPackDikouCopy + '元');
+	                    $(".sign-main").css("display", "-webkit-box");
+	                    return;
+	                }
+
+	                if (result.ret_code == 30047) {
+	                    _trade_validation.Deal_ui.show_entry(result.retry_count, function () {
+	                        trade_operation.layoutShow();
+	                    });
+	                    return;
+	                }
+	                if (result.ret_code == 30048) {
+	                    _trade_validation.Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试', function () {
+	                        window.location = '/weixin/trade-pwd/back/?next=/weixin/view/buy/' + productID + '/';
+	                    });
+	                    return;
+	                }
+	                if (result.error_number > 0) {
+	                    return alert(result.message);
+	                }
+	            },
+	            error: function error(xhr) {
+	                alert('服务器异常');
+	            },
+	            complete: function complete() {
+	                $submit.removeAttr('disabled').text("立即投资");
+	            }
+	        });
+	    };
+
+	    //自动检查,计算器
 	    var auto = new _automatic_detection.Automatic({
 	        submit: $submit,
-	        checklist: autolist,
+	        checklist: [{ target: $inputCalculator, required: true }, { target: $repack, required: false }],
 	        done: function done(status) {
-	            console.log($inputCalculator);
+	            //触发自动检测之后的回调(计算收益)
+	            repackSelect($inputCalculator, $repack);
 	            _api.calculate.operation($inputCalculator);
 	        }
+	    });
+
+	    //验证表单
+	    var checkOperation = function checkOperation() {
+	        return new Promise(function (resolve, reject) {
+	            function checkOperation() {
+	                var checklist = [{ type: 'isEmpty', value: $inputCalculator.val() }];
+	                return (0, _from_validation.check)(checklist);
+	            }
+
+	            var _checkOperation = checkOperation();
+
+	            var _checkOperation2 = _slicedToArray(_checkOperation, 2);
+
+	            var isThrough = _checkOperation2[0];
+	            var sign = _checkOperation2[1];
+
+	            if (isThrough) return resolve({ message: '验证成功', amount: $inputCalculator.val() });
+
+	            (0, _ui.signModel)(sign);
+	            return console.log('验证失败');
+	        });
+	    };
+
+	    //confirm
+	    var confirm_ui = function confirm_ui(amount) {
+	        return new Promise(function (resolve, reject) {
+	            confirm('购买金额为' + amount, '确认投资', function () {
+	                resolve(amount);
+	            });
+	        });
+	    };
+	    //---------------初始化操作start---------
+
+	    //判断是否使用过理财券
+	    investHistory().then(function (result) {
+	        console.log(result);
+	        $inputCalculator.trigger('input');
+	    }).catch(function (result) {
+	        console.log(result);
+	    }).done(function () {
+	        console.log('查询是否设置过交易密码');
+	        seachTrade();
+	    });
+
+	    //提交逻辑操作
+	    $submit.on('click', function () {
+	        checkOperation().then(function (result) {
+	            console.log('验证成功，投资金额为' + result.amount); //check success
+	            return confirm_ui(result.amount);
+	        }).then(function (amount) {
+	            //交易密码操作
+	            trade_operation(amount, buy);
+	        }).catch(function (res) {
+	            alert(res);
+	        });
 	    });
 
 	    //---------------初始化操作end---------
@@ -269,7 +497,6 @@ webpackJsonp([1],[
 	        if (/等额本息/ig.test(pay_method)) {
 	            month_rate = rate / 12;
 	            rate_pow = Math.pow(1 + month_rate, period);
-
 	            term_amount = amount * (month_rate * rate_pow) / (rate_pow - 1);
 	            term_amount = term_amount.toFixed(2);
 	            result = (term_amount * period - amount).toFixed(2);
@@ -280,10 +507,6 @@ webpackJsonp([1],[
 	        }
 	        return Math.floor(result * 100) / 100;
 	    };
-
-	    //dom.on('input', function () {
-	    //    _inputCallback();
-	    //});
 
 	    function operation(dom, callback) {
 	        var earning = undefined,
@@ -414,7 +637,6 @@ webpackJsonp([1],[
 	                dom.target.on('input', function () {
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
-	                    dom.callback && dom.callback($(this).val());
 	                    _self.callback && _self.callback(status);
 	                });
 	            });
@@ -824,6 +1046,38 @@ webpackJsonp([1],[
 	    }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Promise.prototype.done = function (onFulfilled, onRejected) {
+	  this.then(onFulfilled, onRejected).catch(function (reason) {
+	    // 抛出一个全局错误
+	    setTimeout(function () {
+	      throw reason;
+	    }, 0);
+	  });
+	};
+
+	Promise.prototype.finally = function (callback) {
+	  var P = this.constructor;
+	  return this.then(function (value) {
+	    return P.resolve(callback()).then(function () {
+	      return value;
+	    });
+	  }, function (reason) {
+	    return P.resolve(callback()).then(function () {
+	      throw reason;
+	    });
+	  });
+	};
 
 /***/ }
 ]);
