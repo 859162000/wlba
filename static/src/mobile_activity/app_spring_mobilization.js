@@ -67,7 +67,7 @@
 		var host = 'https://staging.wanglibao.com/',
 			shareName = '春日总动员',
 			shareImg = host + '/static/imgs/mobile_activity/app_spring_mobilization/300x300.jpg',
-			shareLink = host + 'march_reward/app/',
+			shareLink = host + 'weixin_activity/spring_reward/',
 			shareMainTit = '春日总动员',
 			shareBody = '万份豪礼倾情送，全民来抢乐出游！';
 		//分享给微信好友
