@@ -630,14 +630,23 @@ def php_redpack_restore(order_id, product_id, amount, user):
         return {"ret_code": 0, "deduct": deduct}
 
 
-def send_redpacks(redpack_id, user_ids):
+def send_redpacks(event_id, user_ids):
     """
     发送此红包给对应的用户
-    :param redpack_id:         红包活动id
+    :param event_id:         红包活动id
     :param user_ids:           用户list
     :return:
     """
-    red_pack = RedPack.objects.filter(pk=redpack_id).first()
+    now = timezone.now()
+    red_pack_event = RedPackEvent.objects.filter(pk=event_id, invalid=False,
+                                                 give_start_at__lt=now, give_end_at__gt=now).first()
+
+    if not red_pack_event:
+        return {'status': 0, 'msg': 'red_pack not valid!'}
+
+    red_pack = RedPack.objects.filter(event=red_pack_event, token='', status='unused').first()
+    if not red_pack:
+        return {'status': 0, 'msg': 'red_pack can not be send by broadcast!'}
 
     users = User.objects.filter(id__in=user_ids)
     args_list = []
@@ -649,4 +658,4 @@ def send_redpacks(redpack_id, user_ids):
         RedPackRecord.objects.bulk_create(args_list)
         return {'status': 1, 'msg': 'success!'}
     except Exception, e:
-        return {'status': 0, 'msg': 'send redpacks error: {}'.format(str(e))}
+        return {'status': 0, 'msg': 'send red_packs error: {}'.format(str(e))}
