@@ -132,28 +132,28 @@ html.no-js(lang="en-gb")
                                                         span.ico
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                             if idx == 2
                                                 tr.second
                                                     td.one
                                                         span.ico
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                             if idx == 3
                                                 tr.third
                                                     td.one
                                                         span.ico
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                             if idx > 3
                                                 tr
                                                     td.one
                                                         span.ico {{idx}}
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                 .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名；每日奖励发放，以当天23:59:59排名为准
                         .button.button_3 立即投资
                         .grass.grass_6
@@ -183,6 +183,6 @@ html.no-js(lang="en-gb")
         include global/g_footer
 script.
     require(['/static/js/lib/modernizr.js?v=2015030301'])
-    require(['/static/js/spring_mobilization.js?v=2015030901'])
+    require(['/static/js/spring_mobilization.js?v=2015030902'])
 
                                                                     
