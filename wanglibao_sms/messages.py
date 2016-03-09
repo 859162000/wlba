@@ -510,7 +510,7 @@ def sms_alert_unbanding_xunlei(reward_dsct, url):
 
 
 @suffix
-def changed_mobile_success():
+def changed_mobile_success(user_name):
     """
     修改手机号成功短信
     """
@@ -519,7 +519,7 @@ def changed_mobile_success():
             redis = redis_backend()
             obj = redis._get('changed_mobile_success')
             content = cPickle.loads(obj)['content']
-            return content
+            return content.format(user_name)
         except Exception:
             return u"尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。"
     else:
@@ -527,7 +527,7 @@ def changed_mobile_success():
 
 
 @suffix
-def changed_mobile_fail():
+def changed_mobile_fail(user_name):
     """
     修改手机号失败短信
     """
@@ -536,7 +536,7 @@ def changed_mobile_fail():
             redis = redis_backend()
             obj = redis._get('changed_mobile_fail')
             content = cPickle.loads(obj)['content']
-            return content
+            return content.format(user_name)
         except Exception:
             return u"尊敬的网利宝用户，由于所上传的资料不符要求，您的修改手机号申请未通过，请按照要求上传资料文件或联系客服，感谢您的支持。"
     else:

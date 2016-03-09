@@ -2379,10 +2379,10 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.id_user_image = id_user_image
             manual_record.card_user_image = card_user_image
             manual_record.save()
-
+            msg = "尊敬的%s，您已申请人工审核修改手机号，申请结果将在3个工作日内通过短信发送到本手机，请留意，退订回TD【网利科技】"%profile.name
             send_messages.apply_async(kwargs={
                 "phones": [new_phone, ],
-                "messages": ["尊敬的网利宝用户，您已申请人工审核修改手机号，申请结果将在1-2个工作日内通过短信发送到本手机，请留意", ],
+                "messages": [msg, ],
             })
             return Response({'ret_code': 0})
         else:
@@ -2531,9 +2531,10 @@ class SMSModifyPhoneAPI(APIView):
             sms_modify_record.status=u'短信修改手机号成功'
             sms_modify_record.save()
             #todo force user login again
+            msg = "尊敬的%s，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。退订回TD【网利科技】"%profile.name
             send_messages.apply_async(kwargs={
                 "phones": [new_phone, ],
-                "messages": ["尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。", ],
+                "messages": [msg, ],
             })
             return Response({'message':'ok'})
 
