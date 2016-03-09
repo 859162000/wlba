@@ -703,9 +703,9 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_unavailable_3_days',
         'schedule': crontab(minute=0, hour=11),
     },
-    # 定期向八金社推送标的信息
-    'p2p-product-push-5-minutes': {
-        'task': 'wanglibao_p2p.tasks.bajinshe_product_push',
+    # 定期向渠道中心推送标的信息
+    'p2p_product_push_to_coop': {
+        'task': 'wanglibao_p2p.tasks.coop_product_push',
         'schedule': timedelta(minutes=5),
     },
     # 每天发放昨天的排名奖励, by HMM

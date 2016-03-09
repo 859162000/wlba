@@ -217,99 +217,53 @@ def p2p_auto_ready_for_settle():
 
 
 @app.task
-def bajinshe_product_push():
-    push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
-    coop_id = settings.BAJINSHE_COOP_ID
-    coop_key = settings.BAJINSHE_COOP_KEY
-    order_id = '%s_0000' % timezone.now().strftime("%Y%m%d%H%M%S")
-    access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
-    if access_token:
-        product_list = P2PProduct.objects.exclude(types__name=u'还款等额兑奖')
-        if product_list.exists():
-            product_data_list = []
-            for product in product_list:
-                product_total_amount = product.total_amount
-                product_status = product.status
-                pay_method = product.pay_method
-                if pay_method == u'等额本息':
-                    pay_method_code = 3
-                elif pay_method == u'按月付息':
-                    pay_method_code = 1
-                elif pay_method == u'日计息一次性还本付息':
-                    pay_method_code = 2
-                else:
-                    pay_method_code = 11
+def coop_product_push():
+    product_query_status = [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核',
+                            u'满标已审核', u'还款中', u'流标']
+    products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
+                                         (Q(status__in=product_query_status) |
+                                          (Q(status=u'已完成') &
+                                           Q(make_loans_time__isnull=False) &
+                                           Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1)))))
+    products = products.values('id', 'version', 'category', 'types', 'name',
+                               'short_name', 'serial_number', 'status', 'period',
+                               'brief', 'expected_earning_rate', 'excess_earning_rate',
+                               'excess_earning_description', 'pay_method', 'amortization_count',
+                               'repaying_source', 'total_amount', 'ordered_amount',
+                               'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
+                               'limit_per_user')
+    for product in products:
+        product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
+        product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
+        product['soldout_time'] = product['soldout_time'].strftime('%Y-%m-%d %H:%M:%S')
+        product['make_loans_time'] = product['make_loans_time'].strftime('%Y-%m-%d %H:%M:%S')
 
-                if product_status == u'正在招标':
-                    product_status_code = 1
-                elif product_status == u'已完成':
-                    product_status_code = 2
-                elif product_status in (u'录标', u'录标完成', u'待审核'):
-                    product_status_code = 3
-                elif product_status == u'还款中':
-                    product_status_code = 5
-                else:
-                    product_status_code = 0
-
-                if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-                    periodType = 1
-                else:
-                    periodType = 2
-
-                product_data = {
-                    'pid': product.id,
-                    'productType': 2,
-                    'productName': product.name,
-                    'apr': product.expected_earning_rate,
-                    'amount': product_total_amount,
-                    'pmType': pay_method_code,
-                    'minIa': 100,
-                    'progress': float('%.1f' % (float(product.ordered_amount) / product_total_amount * 100)),
-                    'status': product_status_code,
-                    'period': product.period,
-                    'periodType': periodType,
-                }
-
-                product_data_list.append(product_data)
-            else:
-                data = {
-                    'access_token': access_token,
-                    'platform': coop_id,
-                    'order_id': order_id,
-                    'prod': product_data_list,
-                }
-
-            headers = {
-               'Content-Type': 'application/json',
-            }
-            res = requests.post(url=push_url, data=json.dumps(data), headers=headers)
-            res_status_code = res.status_code
-            logger.info("bajinshe push product url %s" % res.url)
-            if res_status_code == 200:
-                res_data = res.json()
-                if res_data['code'] != '10000':
-                    logger.info("bajinshe push product return %s" % res_data)
-                else:
-                    logger.info("bajinshe push product,count[%s],suceess" % len(product_data_list))
-            else:
-                logger.info("bajinshe push product connect failed with status code [%s]" % res_status_code)
-                logger.info(res.text)
+    if products:
+        base_data = generate_coop_base_data('products_push')
+        act_data = {
+            'products': json.dumps(products)
+        }
+        data = dict(base_data, **act_data)
+        common_callback_for_post.apply_async(
+            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_products_push'})
 
 
 @app.task
 def coop_amortizations_push(amortizations, product_id):
     amortization_list = list()
+    amo_terms = ProductAmortization.objects.filter(product_id=product_id).count()
     for amo in amortizations:
         channel = get_user_channel_record(amo["user_id"])
         if channel:
+            amo['terms'] = amo_terms
             amortization_list.append(amo)
 
     if amortization_list:
-        base_data = generate_coop_base_data('amortize')
+        base_data = generate_coop_base_data('amortizations_push')
         act_data = {
             'product_id': product_id,
             'amortizations': json.dumps(amortization_list)
         }
         data = dict(base_data, **act_data)
         common_callback_for_post.apply_async(
-            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'wanglibao'})
+            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_amos_push'})
