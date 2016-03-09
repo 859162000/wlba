@@ -1167,17 +1167,31 @@ class XunleiDistribute(ActivityRewardDistribute):
         counts = WanglibaoActivityReward.objects.filter(user=request.user, activity=self.token).count()
         if counts > 0:
             return
+
+        ### Modify by hb on 2016-03-09
+        # experience_rate = {
+        #     1588: ('xunlei_experience_1588', 0, 4, 9),
+        #     1888: ('xunlei_experience_1888', 3, 8),
+        #     2588: ('xunlei_experience_2588', 2, 7),
+        #     3588: ('xunlei_experience_3588', 1, 6),
+        #     5888: ('xunlei_experience_5888', 5, ),
+        # }
+        # event_rate = {
+        #     1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
+        #     1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+        # }
         experience_rate = {
-            1588: ('xunlei_experience_1588', 0, 4, 9),
-            1888: ('xunlei_experience_1888', 3, 8),
-            2588: ('xunlei_experience_2588', 2, 7),
-            3588: ('xunlei_experience_3588', 1, 6),
-            5888: ('xunlei_experience_5888', 5, ),
+            1588: (u'春季迅雷活动奖励-体验金1588', 0, 4, 9),
+            1888: (u'春季迅雷活动奖励-体验金1888', 3, 8),
+            2588: (u'春季迅雷活动奖励-体验金2588', 2, 7),
+            3588: (u'春季迅雷活动奖励-体验金3588', 1, 6),
+            5888: (u'春季迅雷活动奖励-体验金5888', 5, ),
         }
         event_rate = {
-            1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
-            1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+            1.0: (u'春季迅雷活动奖励-加息券1.0', 0, 2, 4, 6, 8),
+            1.5: (u'春季迅雷活动奖励-加息券1.5', 1, 3, 5, 7, 9)
         }
+
         p2p_record = P2PRecord.objects.filter(user=request.user).first()
         if not p2p_record:  # 新用户
             no_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的

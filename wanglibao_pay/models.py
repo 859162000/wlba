@@ -120,7 +120,7 @@ class PayInfo(models.Model):
     PROCESSING = u'处理中'
     SUCCESS = u'成功'
     FAIL = u'失败'
-    EXCEPTION = u'异常'
+    EjtyXCEPTION = u'异常'
     ACCEPTED = u'已受理'
 
     DEPOSIT = 'D'  # 充值
@@ -176,8 +176,8 @@ class PayInfo(models.Model):
         return simplejson.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
 
     def save_error(self, error_code, error_message, is_inner_error=False):
-        self.error_code = str(error_code)
-        self.error_message = error_message
+        self.error_code += '|' + str(error_code)
+        self.error_message = '|' + error_message
         if is_inner_error:
             self.status = self.EXCEPTION
         else:

@@ -31,9 +31,9 @@ class ProfileView(APIView):
 
         idn = profile.id_number
         if idn and not idn[0].isdigit():
-            is_mainland_user = False 
+            is_mainland_user = False
         else:
-            is_mainland_user = True 
+            is_mainland_user = True
 
         if len(idn) == 18:
             id_number = "%s********%s" % (idn[:6], idn[-4:])

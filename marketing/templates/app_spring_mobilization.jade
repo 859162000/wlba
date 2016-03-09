@@ -4,7 +4,7 @@ html(style="background: #91ce00")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015030701", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015030901", rel="stylesheet")
         - csrf_token
     body
         .body_wrap.clear
@@ -14,7 +14,7 @@ html(style="background: #91ce00")
             .title_img
                 img(src='/static/imgs/mobile_activity/app_spring_mobilization/banner_text_bg.png')
                 .title_img_text 跟随LEO去踏青，投资福利送不停!
-            .title_text.title_text1 在5000元≤单笔投资额＜50000元（任意标期）即可获得一次翻牌机会，随机抽中10元~100元红包投资金额越高，<br>中大奖机会越大，出游红包伴你春日好心情！
+            .title_text.title_text1 在5000元≤单笔投资额＜50000元（任意标期）即可获得一次翻牌机会，随机抽中10元~100元红包，投资金额越高中大奖机会越大，出游红包伴你春日好心情！
             .card_wrap
                 .card_main
                     .card_box.card_left(data-card='1')
@@ -62,7 +62,7 @@ html(style="background: #91ce00")
             .button.button_1
                 img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
                 img.grass_3(src='/static/imgs/mobile_activity/app_spring_mobilization/grass.png')
-            .title_text.title_text2 温馨提示：单笔满额投资成功后，才可以选择一只LEO翻它牌子啦，100%中奖
+            .title_text.title_text2 温馨提示：单笔满额投资成功后，就可以选择一只LEO翻它牌子啦，100%中奖。活动结束后，翻牌次数清零。
             .title_img
                 img(src='/static/imgs/mobile_activity/app_spring_mobilization/title_img.png')
                 .title_img_text 满额投资送豪礼
@@ -112,10 +112,10 @@ html(style="background: #91ce00")
                                 .ranking_box.ranking_box_1
                                     .coupon
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
-                                        .coupon_text {{award.amount}}加息券
+                                        .coupon_text {{award.amount}}%加息券
                                     .coupon_box
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img1.png')
-                                        .coupon_box_text {{award.amount}}加息券
+                                        .coupon_box_text {{award.amount}}%加息券
                                     .ranking_no
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img1.png')
                                         .ranking_no_text 第{{award.rank_desc}}名
@@ -123,10 +123,10 @@ html(style="background: #91ce00")
                                 .ranking_box.ranking_box_2
                                     .coupon
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
-                                        .coupon_text {{award.amount}}加息券
+                                        .coupon_text {{award.amount}}%加息券
                                     .coupon_box
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img2.png')
-                                        .coupon_box_text {{award.amount}}加息券
+                                        .coupon_box_text {{award.amount}}%加息券
                                     .ranking_no
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img2.png')
                                         .ranking_no_text 第{{award.rank_desc}}名
@@ -134,10 +134,10 @@ html(style="background: #91ce00")
                                 .ranking_box.ranking_box_3
                                     .coupon
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
-                                        .coupon_text {{award.amount}}加息券
+                                        .coupon_text {{award.amount}}%加息券
                                     .coupon_box
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img3.png')
-                                        .coupon_box_text {{award.amount}}加息券
+                                        .coupon_box_text {{award.amount}}%加息券
                                     .ranking_no
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img3.png')
                                         .ranking_no_text 第{{award.rank_desc}}名
@@ -145,10 +145,10 @@ html(style="background: #91ce00")
                                 .ranking_box.ranking_box_4
                                     .coupon
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
-                                        .coupon_text {{award.amount}}加息券
+                                        .coupon_text {{award.amount}}%加息券
                                     .coupon_box
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img4.png')
-                                        .coupon_box_text {{award.amount}}加息券
+                                        .coupon_box_text {{award.amount}}%加息券
                                     .ranking_no
                                         img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img4.png')
                                         .ranking_no_text 第{{award.rank_desc}}名
@@ -172,28 +172,28 @@ html(style="background: #91ce00")
                                                         span.ico
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                             if idx == 2
                                                 tr.second
                                                     td.one
                                                         span.ico
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                             if idx == 3
                                                 tr.third
                                                     td.one
                                                         span.ico
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                             if idx > 3
                                                 tr
                                                     td.one
                                                         span.ico {{idx}}
                                                         span.phone {{rank.phone|safe_phone_new}}
                                                     td.two {{rank.amount__sum}}
-                                                    td.three {{rank.coupon}} 加息劵
+                                                    td.three {{rank.coupon}}%加息劵
                                 .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名；每日奖励发放，以当天23:59:59排名为准
             .button.button_3
                 img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
@@ -201,7 +201,7 @@ html(style="background: #91ce00")
                 .title_text 活动规则
                 dl
                     dt 1、
-                    dd 活动有效期：2016年3月11日0:00-2016年3月20日23:59；
+                    dd 活动有效期：2016年3月11日0:00:00-2016年3月20日23:59:59；
                 dl
                     dt 2、
                     dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
@@ -219,11 +219,11 @@ html(style="background: #91ce00")
                     dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。网利宝对此活动享有最终解释权。
             .popup_box
                 .main
-                    .text 您还没有测试机会，赶紧去投资吧
+                    .text 您还没有抽奖机会，赶紧去投资吧
                     .popup_button 我知道了
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015030704")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015030902")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
