@@ -6,7 +6,7 @@ from django.contrib.sites.models import get_current_site
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
 
-from wanglibao_margin.php_utils import set_cookie
+from wanglibao_margin.php_utils import set_cookie, get_php_redis_principle
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
 import logging
