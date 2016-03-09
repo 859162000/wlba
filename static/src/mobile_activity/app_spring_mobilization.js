@@ -146,6 +146,7 @@
 
                 }else{
                     $('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
+                    $('.popup_box .popup_button').hide();
                     $('.popup_box').show();
                     time_count = 2;
                     time_intervalId = setInterval(timerFunction, 1000);

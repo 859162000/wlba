@@ -17,3 +17,17 @@ html
 
                 p.content-bootm-right 北京网利科技有限公司
                 p.content-bootm-right {{announce.createtime | date:'Y-m-d'}}
+        script.
+          var imgList = document.getElementsByTagName('img');
+          var screenWidth = document.body.clientWidth;
+          for(var i=0;i< imgList.length;i++){
+            (function(i){
+              imgList[i].onload = function(){
+                if(this.width > screenWidth){
+                  this.style.cssText = 'width: 100%; height: auto; display:block; margin: 0 auto;'
+                }else{
+                  this.style.cssText = 'height:'+this.width + 'px; height: auto; display:block; margin: 0 auto;'
+                }
+              }
+            })(i)
+          }

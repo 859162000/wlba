@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030403")
+        link(rel="stylesheet",href="/static/styles/pc_activity/spring_mobilization.css?v=2015030901")
         - csrf_token
         script(src="/static/js/lib/modernizr-2.8.js?v=2015030403")
     body(style="background:#91ce00")
@@ -15,7 +15,7 @@ html.no-js(lang="en-gb")
             .banner
                 .title_1 万份豪礼倾情送，全民来抢乐出游！
                 .title_2 跟随LEO去踏青，投资福利送不停!
-            .title_text.title_text1 在5000元≤单笔投资额＜50000元（任意标期）即可获得一次翻牌机会，随机抽中10元~100元红包投资金额越高，<br>中大奖机会越大，出游红包伴你春日好心情！
+            .title_text.title_text1 在5000元≤单笔投资额＜50000元（任意标期）即可获得一次翻牌机会，随机抽中10元~100元红包，投资金额越高中大奖机会越大，出游红包伴你春日好心情！
             .card_wrap
                 .card_main
                     .card_box(data-card='1')
@@ -50,7 +50,7 @@ html.no-js(lang="en-gb")
                 .grass.grass_1
                 .grass.grass_2
                 .grass.grass_3
-            .title_text.title_text2 温馨提示：单笔满额投资成功后，才可以选择一只LEO翻它牌子啦，100%中奖。活动结束后，翻牌次数清零。
+            .title_text.title_text2 温馨提示：单笔满额投资成功后，就可以选择一只LEO翻它牌子啦，100%中奖。活动结束后，翻牌次数清零。
             .title_img.title_img_1 满额投资送豪礼
             .title_text.title_text3 投资满额送大奖（限三月标及以上），享受豪礼~
             .price_wrap
@@ -82,7 +82,7 @@ html.no-js(lang="en-gb")
                         img.price_img(src='/static/imgs/pc_activity/spring_mobilization/prize_img_5.jpg')
                         .price_text 3300元 Apple Watch 运动智能手表
                 .button.button_2 立即投资
-                .title_text.title_text4 温馨提示：投资成功后，红包请至“我的账户”—“理财券”专区查看；获得实物奖的用户，<br>活动结束后，客服会电话联系您，请保持手机畅通。
+                .title_text.title_text4 温馨提示：投资成功后，红包请至“我的账户” — “理财券”专区查看；<br>获得实物奖的用户，活动结束后，客服会电话联系您，请保持手机畅通。
                 .grass.grass_4
                 .grass.grass_5
             .ranking_wrap
@@ -94,23 +94,23 @@ html.no-js(lang="en-gb")
                         for idx, award in award_list
                             if idx == 0
                                 .ranking_box.ranking_box_1
-                                    .coupon {{award.amount}}加息券
-                                    .coupon_box {{award.amount}}加息券
+                                    .coupon {{award.amount}}%加息券
+                                    .coupon_box {{award.amount}}%加息券
                                     .ranking_no 第{{award.rank_desc}}名
                             if idx == 1
                                 .ranking_box.ranking_box_2
-                                    .coupon {{award.amount}}加息券
-                                    .coupon_box {{award.amount}}加息券
+                                    .coupon {{award.amount}}%加息券
+                                    .coupon_box {{award.amount}}%加息券
                                     .ranking_no 第{{award.rank_desc}}名
                             if idx == 2
                                 .ranking_box.ranking_box_3
-                                    .coupon {{award.amount}}加息券
-                                    .coupon_box {{award.amount}}加息券
+                                    .coupon {{award.amount}}%加息券
+                                    .coupon_box {{award.amount}}%加息券
                                     .ranking_no 第{{award.rank_desc}}名
                             if idx == 3
                                 .ranking_box.ranking_box_4
-                                    .coupon {{award.amount}}加息券
-                                    .coupon_box {{award.amount}}加息券
+                                    .coupon {{award.amount}}%加息券
+                                    .coupon_box {{award.amount}}%加息券
                                     .ranking_no 第{{award.rank_desc}}名
                     .ranking_main_2
                         .list_wrap
@@ -162,7 +162,7 @@ html.no-js(lang="en-gb")
                         .title_text 活动规则
                         dl
                             dt 1、
-                            dd 活动有效期：2016年3月11日0:00-2016年3月20日23:59；
+                            dd 活动有效期：2016年3月11日0:00:00-2016年3月20日23:59:59；
                         dl
                             dt 2、
                             dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
@@ -177,12 +177,12 @@ html.no-js(lang="en-gb")
                             dd 活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
             .popup_box
                 .main
-                    .text 您还没有测试机会，赶紧去投资吧
+                    .text 您还没有抽奖机会，赶紧去投资吧
                     .popup_button 我知道了
                 .popup_bg
         include global/g_footer
 script.
     require(['/static/js/lib/modernizr.js?v=2015030301'])
-    require(['/static/js/spring_mobilization.js?v=2015030404'])
+    require(['/static/js/spring_mobilization.js?v=2015030901'])
 
                                                                     

@@ -524,6 +524,36 @@ class WeixinRegister(TemplateView):
         }
 
 
+class WeixinCoopRegister(TemplateView):
+    template_name = 'service_regist_bjs.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = 'weixin'
+
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
+
+        phone = self.request.GET.get('phone', 0)
+        _next = self.request.GET.get('next', '')
+
+        return {
+            'token': token,
+            'channel': channel,
+            'phone': phone,
+            'next': _next
+        }
+
+
 class WeixinRegisterBindCard(TemplateView):
     template_name = 'weixin_registProcess_second.jade'
 
