@@ -192,7 +192,8 @@ class PayOrder(object):
         return False
 
     @method_decorator(transaction.atomic)
-    def order_after_pay_succcess(self, amount, order_id, res_ip, res_content, request, need_bind_card=False):
+    def order_after_pay_succcess(self, amount, order_id, res_ip=None, 
+                                 res_content=None, request=None, need_bind_card=False):
         """
         处理订单和用户的账户
         :param amount:
@@ -216,9 +217,10 @@ class PayOrder(object):
 
         # 更新pay_info和margin信息
         pay_info.error_message = ""
-        pay_info.response = res_content
-        #
-        pay_info.response_ip = res_ip
+        if res_content:
+            pay_info.response = res_content
+        if res_ip:
+            pay_info.response_ip = res_ip
         pay_info.fee = self.FEE
         keeper = MarginKeeper(pay_info.user, pay_info.order.pk)
         margin_record = keeper.deposit(amount)
