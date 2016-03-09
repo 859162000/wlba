@@ -696,7 +696,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'experience_gold.tasks.experience_repayment_plan',
         'schedule': crontab(minute=0, hour=17),
     },
-<<<<<<< HEAD
     # 定期检查还有3天到期的用户优惠券,发送提醒
     'redpack_status_task_check': {
         'task': 'marketing.tools.check_unavailable_3_days',
@@ -707,7 +706,6 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
         'schedule': crontab(minute=0, hour=1),
     },
-=======
     # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
     'sync_pay_result': {
         'task': 'wanglibao_pay.tasks.sync_pay_result',
@@ -718,7 +716,6 @@ CELERYBEAT_SCHEDULE = {
     #     'task': 'marketing.tools.check_redpack_status',
     #     'schedule': crontab(minute=0, hour=11),
     # },
->>>>>>> feature/query_pay
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"

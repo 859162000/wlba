@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #!/usr/bin/env python
 # encoding:utf-8
 
@@ -10,6 +9,13 @@ from wanglibao.celery import app
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_pay.models import Card
 from django.contrib.auth.models import User
+from wanglibao.celery import  app
+from datetime import datetime, timedelta
+from django.utils.timezone import get_default_timezone
+from wanglibao_pay.models import PayInfo
+from wanglibao_pay.third_pay import query_trx
+from wanglibao_pay.pay import PayOrder
+from wanglibao_pay.exceptions import ThirdPayError
 
 @app.task
 def sync_bind_card(user_id):
@@ -48,14 +54,7 @@ def sync_bind_card(user_id):
     if kuai_card_no_list:
         Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
         Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
-=======
-from wanglibao.celery import  app
-from datetime import datetime, timedelta
-from django.utils.timezone import get_default_timezone
-from wanglibao_pay.models import PayInfo
-from wanglibao_pay.third_pay import query_trx
-from wanglibao_pay.pay import PayOrder
-from wanglibao_pay.exceptions import ThirdPayError
+
 
 @app.task()
 def sync_pay_result():
@@ -108,4 +107,3 @@ def sync_pay_result():
 
 
 
->>>>>>> feature/query_pay

@@ -927,8 +927,7 @@ class YeeShortPay:
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
         return rs
-<<<<<<< HEAD
- 
+
     def sync_bind_card(self, user):
         """
         同步一个用户的所有卡列表
@@ -948,7 +947,6 @@ class YeeShortPay:
             Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
             Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
                                 is_the_one_card=True).update(is_the_one_card=False)
-=======
 
     def query_trx_result(self, order_id):
         res = self._query_trx_result(order_id)
@@ -978,4 +976,3 @@ class YeeShortPay:
 
 
     
->>>>>>> feature/query_pay
