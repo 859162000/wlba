@@ -2590,7 +2590,7 @@ org.checkIn = (function(org){
                         checkShare.find(".op-detail-orange").text("＋"+ result.share.amount +"体验金");
                     }
                     for(var i=result.sign_in.start_day; i<=giftNum; i++){
-                        if(nowDay === giftNum){
+                        if(i === nowDay && nowDay === giftNum){
                             className = 'active-did active-gift active-doing';
                             if(hasGift){
                                className += " active-gift-open";
@@ -2602,9 +2602,6 @@ org.checkIn = (function(org){
                                 className = 'active-did active-doing';
                             }else if(i === giftNum){
                                 className = 'active-gift';
-                                if(hasGift){
-                                   className += " active-gift-open";
-                                }
                             }else{
                                 className = '';
                             }
