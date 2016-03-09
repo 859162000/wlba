@@ -103,6 +103,7 @@ urlpatterns = patterns(
                                           ),name='activity_ggl'),
     url(r'^sub_checkIn/$', login_required(WeixinGGLTemplate.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='sub_checkIn'),
+    url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
 
 )
 #活动api

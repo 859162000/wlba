@@ -42,7 +42,7 @@ from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
 from urllib import urlencode,quote
-from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
+from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote, WanglibaoRewardJoinRecord
 from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
@@ -1138,9 +1138,29 @@ class XunleiDistribute(ActivityRewardDistribute):
         status, response_msg = self.judge_valid_user(request, self.channels)
         if False==status:
             return response_msg
-        else:
-            self.generate(request)
-            return self.get_chances(request)
+        # Modify by hb on 2016-03-08
+        # else:
+        #     self.generate(request)
+        #     return self.get_chances(request)
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code=self.token).first()
+            if not join_record:
+                try :
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=request.user,
+                        activity_code=self.token,
+                        remain_chance=1,
+                    )
+                except Exception, ex :
+                    logger.exception("WanglibaoRewardJoinRecord: [%s] [%s] : [%s]" % (request.user, self.token, ex))
+                    rep = { 'err_code':2000, 'err_messege':u'系统繁忙，请稍后重试', }
+                    return HttpResponse(json.dumps(rep), content_type='application/json')
+            if join_record and join_record.remain_chance>0 :
+                self.generate(request)
+                join_record.remain_chance = join_record.remain_chance - 1
+                join_record.save()
+
+        return self.get_chances(request)
 
     def generate(self, request):
         #  判断有没有生成抽奖记录
@@ -1173,6 +1193,8 @@ class XunleiDistribute(ActivityRewardDistribute):
                     continue
 
                 counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(experience=None).count()
+                # Modify by hb on 2015-03-08
+                counts = counts % 9
                 for key, value in experience_rate.items():
                     if counts+1 not in value:
                         continue
@@ -1192,6 +1214,8 @@ class XunleiDistribute(ActivityRewardDistribute):
             for unused in xrange(3):
                 if when_reward == unused:
                     counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(redpack_event=None).count()
+                    # Modify by hb on 2015-03-08
+                    counts = counts % 9
                     for key, value in event_rate.items():
                         if counts+1 not in value:
                             continue
@@ -1220,7 +1244,9 @@ class XunleiDistribute(ActivityRewardDistribute):
         if False == status:
             return response_msg
 
-        self.generate(request)
+        #Modify by hb on 2015-03-08
+        # self.generate(request)
+        self.generate_rewards(request)
 
         with transaction.atomic():
             reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, has_sent=0, activity=self.token).first()
