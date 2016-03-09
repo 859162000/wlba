@@ -394,7 +394,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         UserAmortization.objects.bulk_create(user_amos)
 
     @classmethod
-    def get_ready_for_settle(self):
+    def get_ready_for_settle(cls):
         amos = ProductAmortization.is_ready.all()
         return amos
 
@@ -416,6 +416,9 @@ class AmortizationKeeper(KeeperBaseMixin):
             phone_list = list()
             message_list = list()
             for sub_amo in sub_amortizations:
+                # 计算用户使用的红包总金额,判断还款方式,将红包总金额随本金一起记入还款流水
+                redpack_amount_sum = RedPackRecord.objects.filter(user=sub_amo.user, product_id=product.id)\
+                    .aggregate(Sum('apply_amount'))['apply_amount__sum']
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                                             sub_amo.coupon_interest, savepoint=False, description=description)
