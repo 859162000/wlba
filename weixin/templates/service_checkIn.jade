@@ -7,20 +7,13 @@ html(style='background: #FFE9D0')
   body
 
     img(src='/static/imgs/sub_weixin/checkin/banner.jpg').check-in-banner
-    //当前时间
-    checkDay = 12
-    //礼物时间
-    giftDay = 12
-    //下一个礼物时间
-    nextGift = 20
-    //是否领取，true领取
-    giftOk = true
+
     section.check-in-operation
       .checkin-op-status
         i.checkin-op-icon.icon-status
         .checkin-op-dec
           .op-dec-title 今日已签到
-          .op-dec-detail.op-detail-orange ＋800体验金
+          .op-dec-detail.op-detail-orange
 
       .checkin-op-share
         i.checkin-op-icon.icon-share
@@ -33,72 +26,30 @@ html(style='background: #FFE9D0')
 
     section.check-in-bar
       .bar-layout
-        if giftDay < checkDay
-          giftNum = nextGift - checkDay
-        else
-          giftNum = giftDay - checkDay
-        .bar-content 距离神秘礼包还有<span id="giftDay">{{ giftNum }}</span>天
+        .bar-content 距离神秘礼包还有<span id="giftDay"></span>天
         .bar-before
         .bar-after
 
     section.check-in-process
       .check-in-process-line
       .check-in-flag-lists
-        mixin items(day, active)
-          .flag-items(class=active)
-            .circle-item-warp
-              .circle-item
-                .circle-min
-                .circle-animate
-                .check-in-flag
-            .text-item=day
-        checkWeek = checkDay%7
-        if checkWeek == 0
-          startDay = (int(checkDay / 7)-1)*7 +1
-        else
-          startDay = int(checkDay / 7)*7 +1
-        dayArr = [startDay, (startDay+1), startDay+2, startDay+3, startDay+4, startDay+5, startDay+6]
-        for i in dayArr
-          dayNum = str(i)+"天"
-          if i < checkDay
-            if i == giftDay
-              if giftOk
-                +items(dayNum, 'active-did active-gift active-gift-open')
-              else
-                +items(dayNum, 'active-did active-gift')
-            else
-              +items(dayNum, 'active-did')
-          else
-            if i == checkDay
-              if giftDay == checkDay
-                if giftOk
-                  +items(dayNum, 'active-did active-gift active-doing active-gift-open')
-                else
-                  +items(dayNum, 'active-did active-gift active-doing')
-              else
-                +items(dayNum, 'active-did active-doing')
-            else
-              if i == giftDay
-                +items(dayNum, 'active-gift')
-              else
-                +items(dayNum, '')
 
     section.check-in-rules-layout
       .check-rules-title 详细规则:
       .check-rules-detail  GIF 图片作为一种主流的文件格式，贯穿于我们的生活。由于其体积小巧，又以动态图片的形式展示，GIF 图片被广泛用于即时通讯以及社交网络之中，最常见的就是各种搞笑的表情包。
       .check-rules-detail  但是，GIF 图片的应用场景绝不仅限于此，对大多人来说它更多是娱乐用途，而对于像我这样经常需要在文章穿插应用演示图的写作者来说，GIF 动态演示无疑是最直观的方式。可这样的 GIF 展示往往需要保证图像质量，更好的画质意味着更大的体积，这不利于读者的阅读体验。因此，我对 GIF 制作有着更高的需求，我需要兼顾文章里 GIF 图的画质和体积，这并不容易。
 
-    section.check-in-alert-layout.check-in-share
+    section.check-in-alert-layout.check-in-now
       .check-alert-mask
         .check-alert-body
           .check-body-overflow-icon.overflow-gift
           img(src='/static/imgs/sub_weixin/checkin/alert_leo.png').check-body-leo
-          .check-body-gift-information.gift-txt 今日分享成功！获得888元体验金
+          .check-body-gift-information.gift-txt#gift-msg 2%加息券一张
           .check-body-where-information.gift-txt 微信信息中查看
-          .check-body-gift-information.share-txt 2%加息券一张
+          .check-body-gift-information.share-txt.share-money 今日分享成功！获得0元体验金
           .check-body-where-information.share-txt 在(我的体验金)中查看
           .check-body-opeartion-btn.close-alert 我知道了
 
     script(src='/static/src/subMobile/lib/weixin/wx.js')
-    script(data-init='checkIn', src="/static/scripts/subMobile/mobile.js?20160303")
+    script(data-init='checkIn', src="/static/scripts/subMobile/mobile.js?20160309")
 
