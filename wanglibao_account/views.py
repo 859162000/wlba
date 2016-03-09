@@ -2242,10 +2242,12 @@ class IdentityInformationTemplate(TemplateView):
         modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
         modify_phone_state = 0
         if modify_phone_record:
-            if modify_phone_record.status == u'复审通过':
+            if modify_phone_record.status in [u'复审通过', u"取消申请"]:
                 modify_phone_state = 1
             if modify_phone_record.status in [u'待初审', u'初审待定', u'待复审']:
                 modify_phone_state = 2
+            if modify_phone_record.status in [u"初审驳回", u"复审驳回"]:
+                modify_phone_state = 3
 
         return {
             "phone": safe_phone_str(profile.phone),
@@ -2388,6 +2390,25 @@ class ManualModifyPhoneAPI(APIView):
             for key, value in form.errors.iteritems():
                 message = ",".join(value)
             return Response({"message":message}, status=400)
+
+
+class CancelManualModifyPhoneAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        profile = user.wanglibaouserprofile
+        if not profile.id_is_valid or not profile.id_number:
+            return Response({'message':"还没有实名认证"}, status=400)
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"复审驳回", u"初审驳回"]).first()
+        if not modify_phone_record:
+            return Response({'message':"没有可以取消的申请"}, status=400)
+        modify_phone_record.status = u"取消申请"
+        modify_phone_record.save()
+        return Response({"message": "ok"})
 
 
 class SMSModifyPhoneValidateTemplate(TemplateView):
