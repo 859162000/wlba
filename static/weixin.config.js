@@ -25,7 +25,7 @@ module.exports = {
         calculator: path.resolve(JS_PATH, 'calculator'),
         bankOneCard: path.resolve(JS_PATH, 'bankOneCard'),
         recharge: path.resolve(JS_PATH, 'recharge'),
-        trade_check: path.resolve(JS_PATH, 'trade_check'),
+        trade_retrieve: path.resolve(JS_PATH, 'trade_retrieve'),
         received_all: path.resolve(JS_PATH, 'received_all'),
         received_detail: path.resolve(JS_PATH, 'received_detail'),
         received_month: path.resolve(JS_PATH, 'received_month'),

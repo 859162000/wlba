@@ -87,7 +87,9 @@ html
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
         include include/tran_password
-        include include/confirm
+        include include/ui_model/mobile_errorsign
+        include include/ui_model/mobile_confirm
+        include include/ui_model/mobile_alert
         include include/tracking
         //script(data-init="buy", src="/static/scripts/mobile/mobile.js?v=20151202")
         script(src='/static/scripts/mobile/dev/vendor.zepto.js')

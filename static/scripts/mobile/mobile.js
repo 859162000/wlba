@@ -2406,7 +2406,6 @@ org.received_all = (function(){
                 }
             })
         }
-
     }
 
     return {

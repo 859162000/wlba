@@ -1,4 +1,4 @@
-webpackJsonp([11],[
+webpackJsonp([13],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -17,18 +17,13 @@ webpackJsonp([11],[
 	var _trade_validation = __webpack_require__(7);
 
 	(function () {
-
 	    var $submit = $('button[type=submit]'),
-	        $amount = $('input[name=amount]'),
-	        $card_no = $("input[name='card_no']"),
-	        $loading = $(".recharge-loding"),
-	        $recharge_body = $('.recharge-main'),
-	        $bank_name = $(".bank-txt-name");
-
-	    var tradeStatus = null;
+	        $idNumber = $('input[name=id_number]'),
+	        $bankCard = $('input[name=bankcard]'),
+	        $cardName = $('input[name=cardname]');
 
 	    //自动检查
-	    var autolist = [{ target: $amount, required: true }];
+	    var autolist = [{ target: $idNumber, required: true }, { target: $bankCard, required: true }, { target: $cardName, required: true }];
 
 	    var auto = new _automatic_detection.Automatic({
 	        submit: $submit,
@@ -40,7 +35,7 @@ webpackJsonp([11],[
 	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
 	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $amount.val() }];
+	                var checklist = [{ type: 'idCard', value: $idNumber.val() }, { type: 'bankCard', value: $bankCard.val() }, { type: 'isEmpty', value: $cardName.val() }];
 	                return (0, _from_validation.check)(checklist);
 	            }
 
@@ -51,78 +46,78 @@ webpackJsonp([11],[
 	            var isThrough = _checkOperation2[0];
 	            var sign = _checkOperation2[1];
 
-	            if (isThrough) return resolve({ message: '验证成功', amount: $amount.val() });
+	            if (isThrough) return resolve({ message: '验证成功' });
 
 	            (0, _ui.signModel)(sign);
-	            return console.log('验证失败');
+	            return reject('验证失败');
 	        });
 	    };
 
-	    //confirm
-	    var confirm_ui = function confirm_ui(amount) {
-	        return new Promise(function (resolve, reject) {
-	            confirm('充值金额为' + amount, '确认充值', function () {
-	                resolve(amount);
-	            });
-	        });
-	    };
-	    var seachTrade = function seachTrade() {
+	    var the_one_card = function the_one_card() {
 	        (0, _api.ajax)({
-	            url: '/api/profile/',
-	            type: 'GET',
-	            success: function success(result) {
-	                tradeStatus = result.trade_pwd_is_set ? true : false;
+	            type: 'get',
+	            url: '/api/pay/the_one_card/',
+	            success: function success(data) {
+	                //同卡进出
+	                var cardName = data.bank.name;
+	                var cardNo = data.no.slice(-4);
+	                $('.bank-name').html(cardName);
+	                $('.bank-card').html(cardNo);
+	                $bankCard.attr('placeholder', '**' + cardNo + '（请输入完整卡号）');
+	                $('.trade-warp').show();
+	            },
+	            error: function error(data) {
+	                //没有同卡进出
+	                $('.unbankcard').show();
+	            },
+	            complete: function complete() {
+	                $('.recharge-loding').hide();
 	            }
 	        });
 	    };
-
 	    //设置交易密码
-	    var trade_set = function trade_set(model_operation, new_trade_pwd) {
+	    var trade_set = function trade_set(trade_operation, new_trade_pwd) {
+	        var cardId = $bankCard.val(),
+	            citizenId = $idNumber.val();
+
 	        (0, _api.ajax)({
 	            url: '/api/trade_pwd/',
 	            type: 'post',
 	            data: {
-	                action_type: 1,
-	                new_trade_pwd: new_trade_pwd
+	                action_type: 3,
+	                new_trade_pwd: new_trade_pwd,
+	                card_id: cardId,
+	                citizen_id: citizenId
 	            },
 	            success: function success(result) {
-	                model_operation.loadingHide();
-	                model_operation.destroy();
-	                model_operation.layoutHide();
+	                var next = (0, _api.getQueryStringByName)('next');
+	                next = next = '' ? '/weixin/list/' : next;
 	                if (result.ret_code == 0) {
 	                    _trade_validation.Deal_ui.show_alert('success', function () {
-	                        window.location = window.location.href;
-	                    }, '交易密码设置成功，请牢记！');
+	                        window.location = next;
+	                    });
 	                }
 
 	                if (result.ret_code > 0) {
 	                    alert(result.message);
 	                }
+	            },
+
+	            complete: function complete() {
+	                trade_operation.loadingHide();
+	                trade_operation.destroy();
+	                trade_operation.layoutHide();
 	            }
 	        });
 	    };
 	    //交易密码
-	    var trade_operation = function trade_operation(amount) {
-	        tradeStatus ? entry_trade() : set_trade();
-
-	        function entry_trade() {
-	            var operation = new _trade_validation.Trade({
-	                header: '请输入交易密码',
-	                explain: '充值金额<br>￥' + amount,
-	                done: function done(result) {
-	                    operation.loadingShow();
-
-	                    recharge(operation, result.password);
-	                }
-	            });
-	            operation.layoutShow();
-	        }
+	    var trade_operation = function trade_operation(callback) {
 
 	        var set_trade_data = {};
 	        function set_trade() {
 	            var set_operation_1 = new _trade_validation.Trade({
-	                header: '设置交易密码',
-	                explain: '请设置6位数字作为交易密码',
+	                header: '请输入新交易密码',
+	                explain: '请设置6位数字作为新交易密码',
 	                done: function done(result) {
 	                    set_trade_data.password_1 = result.password;
 	                    set_operation_1.destroy();
@@ -134,8 +129,8 @@ webpackJsonp([11],[
 
 	            function set_operation_2() {
 	                var set_operation_2 = new _trade_validation.Trade({
-	                    header: '设置交易密码',
-	                    explain: '请再次确认交易密码',
+	                    header: '请输入新交易密码',
+	                    explain: '请再次确认新交易密码',
 	                    done: function done(result) {
 	                        set_trade_data.password_2 = result.password;
 	                        if (set_trade_data.password_2 != set_trade_data.password_1) {
@@ -148,132 +143,26 @@ webpackJsonp([11],[
 	                        set_operation_2.loadingShow();
 
 	                        //设置交易密码
-	                        trade_set(set_operation_2, result.password);
+	                        callback && callback(set_operation_2, result.password);
 	                    }
 	                });
 	                set_operation_2.layoutShow();
 	            }
 	        }
+
+	        set_trade();
 	    };
 
-	    //渲染同卡进出的卡的卡片
-	    var dataCopy = null;
-	    var renderCard = function renderCard(data) {
-	        var card = data.no.slice(0, 6) + '********' + data.no.slice(-4);
-	        $loading.hide();
-	        $recharge_body.show();
-	        dataCopy = data;
-	        $amount.attr('placeholder', '该银行单笔限额' + data.bank.bank_limit.second_one / 10000 + '万元');
-	        $card_no.val(card);
-	        $bank_name.text(data.bank.name);
-	    };
-
-	    //获取银行卡列表
-	    var fetchBanks = function fetchBanks() {
-	        (0, _api.ajax)({
-	            url: '/api/pay/cnp/list_new/',
-	            type: 'POST',
-	            success: function success(data) {
-	                if (data.ret_code === 0) {
-	                    $loading.hide();
-	                    data.cards.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
-	                }
-	                if (data.ret_code > 0 && data.ret_code != 20071) {
-	                    return alert(data.message);
-	                }
-	            },
-	            error: function error(data) {
-	                return alert('系统异常，请稍后再试');
-	            }
-	        });
-	    };
-
-	    //判断是否有同卡绑定
-	    var the_one_card = function the_one_card() {
-	        (0, _api.ajax)({
-	            url: '/api/pay/the_one_card/',
-	            type: 'get',
-	            success: function success(data) {
-	                //同卡进出
-	                renderCard(data);
-	                //判断是否设置交易密码
-	                seachTrade();
-	            },
-	            error: function error(data) {
-	                //没有同卡进出
-	                if (data.status === 403) {
-	                    fetchBanks();
-	                }
-	            }
-	        });
-	    };
-	    //充值接口
-	    var recharge = function recharge(trade_operation, trade_pwd) {
-	        var card = dataCopy.no.slice(0, 6) + dataCopy.no.slice(-4),
-	            gate_id = dataCopy.bank.gate_id,
-	            amount = $amount.val() * 1;
-
-	        (0, _api.ajax)({
-	            type: 'POST',
-	            url: '/api/pay/deposit_new/',
-	            data: {
-	                phone: '',
-	                card_no: card,
-	                amount: amount,
-	                gate_id: gate_id,
-	                trade_pwd: trade_pwd
-	            },
-	            beforeSend: function beforeSend() {
-	                $submit.attr('disabled', true).text("充值中..");
-	            },
-	            success: function success(result) {
-	                trade_operation.loadingHide();
-	                trade_operation.destroy();
-	                trade_operation.layoutHide();
-	                if (result.ret_code == 0) {
-	                    return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(result.amount);
-	                }
-
-	                if (result.ret_code == 30047) {
-	                    return _trade_validation.Deal_ui.show_entry(result.retry_count, function () {
-	                        trade_operation.layoutShow();
-	                    });
-	                }
-	                if (result.ret_code == 30048) {
-	                    return _trade_validation.Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试', function () {
-	                        window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/';
-	                    });
-	                }
-	                if (result.ret_code > 0) {
-	                    return alert(result.message);
-	                }
-	            },
-	            error: function error(data) {
-	                if (data.status >= 403) {
-	                    alert('服务器繁忙，请稍后再试');
-	                }
-	            },
-	            complete: function complete() {
-	                $submit.removeAttr('disabled').text("充值");
-	            }
-	        });
-	    };
-
-	    //-------------------逻辑处理
 	    the_one_card();
 
 	    $submit.on('click', function () {
-	        checkOperation().then(function (result) {
-	            console.log('验证成功，充值金额为' + result.amount); //check success
-	            return confirm_ui(result.amount);
-	        }).then(function (amount) {
-	            //交易密码操作
-	            trade_operation(amount);
-	        }).catch(function (res) {
-	            alert(res);
+	        checkOperation().then(function () {
+	            console.log('验证成功'); //check success
+	            return trade_operation(trade_set);
+	        }).catch(function (message) {
+	            console.log(message);
 	        });
 	    });
-	    //---------------login操作end---------
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
