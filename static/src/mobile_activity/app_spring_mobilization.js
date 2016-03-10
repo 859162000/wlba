@@ -18,6 +18,7 @@
     wlb.ready({
         app: function(mixins) {
 
+			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
                     login = false;
@@ -36,14 +37,13 @@
         },
         other: function() {
             $('.button').click(function() {
-                if (h5_user_static) {
+                if(h5_user_static) {
                     window.location.href = '/weixin/list/'
-                } else {
+                }else {
                     window.location.href = '/weixin/login/?next=/weixin/list/'
                 }
             })
             //console.log('其他场景的业务逻辑');
-
         }
     });
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
