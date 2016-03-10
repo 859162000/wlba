@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
 # encoding:utf-8
+from wanglibao import settings
 from base64 import b64decode 
 import logging 
 import traceback
@@ -845,7 +846,11 @@ class KuaiShortPay:
     def _request(self, data, url):
         headers = self.headers
         headers['Content-Length'] = str(len(data))
-        res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
+        if settings.ENV ==  settings.ENV_DEV:
+            # kuai钱的ssl配置有问题，不被根信任，这儿就不校验了
+            res = requests.post(url, headers=headers, data=data, verify=False, auth=self.auth)
+        else:
+            res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
         return res
 
     def _find_in_xml(self, byte_content, key):
