@@ -861,6 +861,7 @@ else:
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
 
+KUAI_TEST_CA_PEM_PATH = os.path.join(CERT_DIR, 'kuai_test_ca.pem')
 
 YEE_URL = 'https://ok.yeepay.com/payapi'
 YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL

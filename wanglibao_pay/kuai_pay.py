@@ -673,6 +673,7 @@ class KuaiShortPay:
                         "Content-Type":"application/x-www-form-urlencoded"}
         self.xmlheader = '<?xml version="1.0" encoding="UTF-8"?>\n'
         self.pem = settings.KUAI_PEM_PATH
+        self.test_ca_pem = settings.KUAI_TEST_CA_PEM_PATH
         self.signature_pem = settings.KUAI_SIGNATURE_PEM_PATH
         self.auth = (self.MER_ID, self.MER_PASS)
         self.ERR_CODE_WAITING = '222222'
@@ -847,7 +848,7 @@ class KuaiShortPay:
         headers = self.headers
         headers['Content-Length'] = str(len(data))
         if settings.ENV ==  settings.ENV_STAGING:
-            # kuai钱的ssl配置有问题，不被根信任，这儿就不校验了
+            # kuai钱的ssl配置有问题，不被根信任，手动添加信任
             res = requests.post(url, headers=headers, data=data, verify=False, auth=self.auth)
         else:
             res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
