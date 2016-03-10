@@ -18,19 +18,26 @@ html
             tr
               th 名字
               th 产品总金额
-              th 产品已募集金额
+              th 年化收益率
+              th 期限
+              th 还款方式
+              th 已募集金额
 
           tbody
             tr
-              td {{p2p.name}}
+              td
+                a(href="/p2p/detail/{{p2p.id}}/", target="_blank", style="color:blue") {{p2p.name}}
               td {{p2p.total_amount}}
+              td {{p2p.expected_earning_rate}}
+              td {{p2p.period}}
+              td {{p2p.pay_method}}
               td {{p2p.ordered_amount}}
 
       .panel
         .panel-title-bar
           .panel-title
-            用户持仓情况
-            a(href="/p2p/equitydetail/{{p2p.id}}") 查看详情
+            | 用户持仓情况 >>
+            a(href="/p2p/equitydetail/{{p2p.id}}/", style="color:blue") 查看详情
 
         //equities = p2p.equities.all()
         table.table
@@ -57,10 +64,21 @@ html
       .panel
         .panel-title-bar
           .panel-title 用户还款计划
-        product_amortizations = p2p.amortizations.all()
+        product_plan_amount = 0
         for amort in product_amortizations
-          h2 {{amort.term_date | date:"Y-m-d"}} &nbsp;&nbsp;
-            a(href="/p2p/amortizationdetail/{{amort.id}}") 查看详情
+          product_plan_amount = product_plan_amount + amort.principal
+          table(style="width: 70%; padding:5px; text-align:left; background:#FFDD55; font-size:14px;")
+            tr
+              th 第 {{amort.term}} 期
+              th 还款日期: {{amort.term_date | date:"Y-m-d"}}
+              th
+                | 本金:
+                span(style="color:red") {{amort.principal}}
+              th
+                | 利息:
+                span(style="color:red") {{amort.interest}}
+              th
+                a(href="/p2p/amortizationdetail/{{amort.id}}/", style="color:blue") 查看详情
           table.table
             thead
               tr
@@ -89,7 +107,11 @@ html
         .well
           .pull-left(data-url='{{request.url}}')
             -csrf_token
-            button.button-audit(type="submit", style="width:220px; height:40px; font-size:16px;") 审核通过
+            if p2p.total_amount != product_plan_amount
+              button(style="width:450px; height:40px; font-size:16px; background:#FF3333;")
+                | 产品还款计划金额错误,不能审核通过, 请联系技术人员
+            else
+              button.button-audit(type="submit", style="width:220px; height:40px; font-size:16px;") 审核通过
 
           a.button-default.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回
       script(src="/static/js/lib/jquery.min.js")

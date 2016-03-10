@@ -9,7 +9,7 @@ var org = (function () {
                 type: options.type,
                 data: options.data,
                 dataType: options.dataType,
-                async: options.async,
+                async: options.async || true,
                 beforeSend: function (xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -30,12 +30,14 @@ var org = (function () {
         },
         _calculate: function (dom, callback) {
             var calculate = function (amount, rate, period, pay_method) {
-                var divisor, rate_pow, result, term_amount;
+                var divisor, rate_pow, result, term_amount, month_rate;
                 if (/等额本息/ig.test(pay_method)) {
-                    rate_pow = Math.pow(1 + rate, period);
-                    divisor = rate_pow - 1;
-                    term_amount = amount * (rate * rate_pow) / divisor;
-                    result = term_amount * period - amount;
+                    month_rate = rate / 12
+                    rate_pow = Math.pow(1 + month_rate, period)
+
+                    term_amount = amount * (month_rate * rate_pow) / (rate_pow-1)
+                    term_amount = term_amount.toFixed(2)
+                    result  = (term_amount * period - amount).toFixed(2)
                 } else if (/日计息/ig.test(pay_method)) {
                     result = amount * rate * period / 360;
                 } else {
@@ -1793,14 +1795,25 @@ org.processSecond = (function (org) {
                             if(check.firstRecharge){
                                 $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
                             }else{
-                                return org.ui.alert('绑卡成功！');
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+
+                                return org.ui.alert('绑卡成功！',function(){
+                                    window.location.href = next
+                                });
                             }
 
                         }
                     },
                     error: function(result){
                         var data = JSON.parse(result.responseText);
-                        return org.ui.alert(data.detail);
+                        return org.ui.alert(data.detail, function(){
+                            if(data.detail == '不能重复绑卡'){
+                                var next_url = org.getQueryStringByName('next'),
+                                    next = next_url == '' ? '/weixin/list/' : next_url;
+                                window.location.href = next
+                            }
+                        });
                     },
                     complete: function () {
                         if(check.firstRecharge){

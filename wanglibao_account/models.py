@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf8
 
-#from django.contrib.auth import get_user_model
 import time
 import datetime
 from django.contrib.auth.models import User
@@ -120,8 +119,11 @@ message_type = (
     ("transfer_success", u"债权转让成功"),
     ("transfer_accomplish", u"债权转让完成"),
 )
+
+
 def timestamp():
     return long(time.time())
+
 
 class MessageText(models.Model):
     """
@@ -150,6 +152,7 @@ class MessageText(models.Model):
     def format_time(self):
         return datetime.datetime.fromtimestamp(self.created_at)
 
+
 class Message(models.Model):
     """
         store station letters relation(站内信收发关系，不存在私信功能)
@@ -163,6 +166,7 @@ class Message(models.Model):
     class Meta:
         verbose_name = u"站内信收发关系"
         verbose_name_plural = u"站内信收发关系"
+
 
 class MessageNoticeSet(models.Model):
     """
@@ -188,6 +192,7 @@ class UserAddress(models.Model):
     postcode = models.CharField(max_length=6, verbose_name=u"邮政编码", blank=True)
     is_default = models.BooleanField(default=False, verbose_name=u"是否为默认")
 
+
 class UserSource(models.Model):
     """
         user baidu source keyword
@@ -212,6 +217,7 @@ class UserSource(models.Model):
     class Meta:
         verbose_name_plural = u'关键词统计'
         verbose_name = u'关键词统计'
+
 
 class UserPhoneBook(models.Model):
     user = models.ForeignKey(User)
@@ -248,9 +254,11 @@ class ManualModifyPhoneRecord(models.Model):
     remarks = models.CharField(max_length=64, blank=True, help_text=u'客服在审核过程中的备注')
     created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
     update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
+
     class Meta:
         verbose_name_plural = u'人工修改手机号'
         ordering = ('-created_at',)
+
 
 class SMSModifyPhoneRecord(models.Model):
     STATUS_CHOICES = (
@@ -266,12 +274,13 @@ class SMSModifyPhoneRecord(models.Model):
 
     created_at = models.DateTimeField(u'提交申请时间', auto_now_add=True)
     update_at = models.DateTimeField(u'申请更新时间', auto_now=True)
+
     class Meta:
         verbose_name_plural = u'短信修改手机号'
         ordering = ('-created_at',)
 
 
-#发给所有人
+# 发给所有人
 def send_public_message(sender, instance, **kwargs):
     if instance.mtype == "public":
         from wanglibao_account import message

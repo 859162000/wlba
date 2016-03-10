@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
                             AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
-                            AccountFundAssetAPI,
+                            AccountFundAssetAPI, LoginCounterVerifyAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
                             AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
@@ -48,7 +48,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                                  BidHasBindingForChannel)
+                                  BidHasBindingForChannel, CoopPvApi)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -61,7 +61,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -124,6 +124,7 @@ urlpatterns = patterns(
 
     url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
 
+    url(r'^login_verify/$', LoginCounterVerifyAPI.as_view()),
     url(r'^user_login/$', UserHasLoginAPI.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
@@ -239,7 +240,6 @@ urlpatterns = patterns(
     url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
     url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
     url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
-
 )
 
 urlpatterns += patterns('',
@@ -281,6 +281,7 @@ urlpatterns += patterns(
     url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
     url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
     url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
+    url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view())
 )
 
 # app端改版新接口
@@ -330,4 +331,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^sms/', include('wanglibao_sms.urls')),
+)
+
+# 渠道页面pv统计接口
+urlpatterns += patterns(
+    '',
+    url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
 )

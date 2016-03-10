@@ -10,6 +10,7 @@ require.config
   shims:
     "jquery.validate": ['jquery']
     "ddslick": ['jquery']
+  urlArgs: 'v=20160304'
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
   isFirst = true
@@ -241,7 +242,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     }
     .done (data)->
 
-      tool.modalAlert({height:'364px', title: '温馨提示', msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功', callback_ok: ()->
+      tool.modalAlert({height:'200px', title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
         if data.category == '酒仙众筹标'
           window.location.href="/accounts/home/jiuxian/"
         else
