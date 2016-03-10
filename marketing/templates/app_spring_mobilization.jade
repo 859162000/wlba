@@ -1,0 +1,236 @@
+- load formatters
+doctype html
+html(style="background: #91ce00")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015031002", rel="stylesheet")
+        - csrf_token
+    body
+        input(type='hidden',value='{{user.is_authenticated}}')#authenticated
+        .body_wrap.clear
+            .banner
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/banner.jpg')
+                .banner_text 万份豪礼倾情送，全民来抢乐出游！
+            .title_img
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/banner_text_bg.png')
+                .title_img_text.title_img_text_1 跟随LEO去踏青，投资福利送不停!
+            .title_text.title_text1 在5000元≤单笔投资额＜50000元（3月及以上标期）即可获得一次翻牌机会，随机抽中10元~100元红包，投资金额越高中大奖机会越大，出游红包伴你春日好心情！
+            .card_wrap
+                .card_main
+                    .card_box.card_left(data-card='1')
+                        .card(data-card='1')
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(data-card='1' src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_1.png')
+                    .card_box.card_right(data-card='2')
+                        .card(data-card='2')
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(data-card='2' src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_2.png')
+                    img.grass_1(src='/static/imgs/mobile_activity/app_spring_mobilization/grass_1.png')
+                    .card_box.card_left(data-card='3')
+                        .card(data-card='3')
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(data-card='3' src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_3.png')
+                    .card_box.card_right(data-card='4')
+                        .card(data-card='4')
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(data-card='4' src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_4.png')
+                    img.grass_2(src='/static/imgs/mobile_activity/app_spring_mobilization/grass_2.png')
+                    .card_box.card_left(data-card='5')
+                        .card(data-card='5')
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(data-card='5' src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_5.png')
+                    .card_box.card_right(data-card='6')
+                        .card(data-card='6')
+                            .card_prize
+                                img.prize_bg(src='/static/imgs/mobile_activity/app_spring_mobilization/card_prize.png')
+                                .num 1000元
+                            img.card_img(data-card='6' src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_6.png')
+            .card_chance 你有
+                     span#chance_num {{chances}}
+                     span#zero 0
+                     span 次翻牌机会
+            .button.button_1
+                img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
+                img.grass_3(src='/static/imgs/mobile_activity/app_spring_mobilization/grass.png')
+            .title_text.title_text2 温馨提示：单笔满额投资成功后，就可以选择一只LEO翻它牌子啦，100%中奖。活动结束后，翻牌次数清零。
+            .title_img
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/title_img.png')
+                .title_img_text 满额投资送豪礼
+            .title_text.title_text3 投资满额送大奖（限三月标及以上），享受豪礼~
+            .price_wrap
+                .price_main
+                    .price_box
+                        .title_top 5万元≤单笔投资＜10万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_1.png')
+                        .price_img_text 150元
+                        .price_text 150元红包
+                    .price_box.price_box_right
+                        .title_top 10万元≤单笔投资＜20万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_1.png')
+                        .price_img_text 350元
+                        .price_text 350元红包
+                    .price_box
+                        .title_top 20万元≤单笔投资＜30万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_1.png')
+                        .price_img_text 800元
+                        .price_text 800元红包
+                    .price_box.price_box_right
+                        .title_top 30万元≤单笔投资＜50万元
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_3.png')
+                        .price_text 1350元 beats头戴式耳机
+                    .price_box.price_box_center
+                        .title_top 50万元≤单笔投资
+                        .send_text 送
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_4.png')
+                        .price_text 2500元 Apple Watch 运动智能手表
+            .button.button_2
+                img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
+                img.grass_4(src='/static/imgs/mobile_activity/app_spring_mobilization/grass.png')
+            .title_text.title_text2 温馨提示：投资成功后，红包请至“我的账户”—“理财券”专区查看；获得实物奖的用户，活动结束后，客服会电话联系您，请保持手机畅通。
+            .title_img
+                img(src='/static/imgs/mobile_activity/app_spring_mobilization/title_img.png')
+                .title_img_text 每日排名送加息券
+            .title_text.title_text5 每日排名前10名的投资客户，均可享受获得高额加息券福利，每天排名每天送！
+            .ranking_wrap
+                .ranking_main
+                    .ranking_main_1
+                        award_list = enumerate(award_list)
+                        for idx, award in award_list
+                            if idx == 0
+                                .ranking_box.ranking_box_1
+                                    .coupon
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                        .coupon_text {{award.amount}}%加息券
+                                    .coupon_box
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img1.png')
+                                        .coupon_box_text {{award.amount}}%加息券
+                                    .ranking_no
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img1.png')
+                                        .ranking_no_text 第{{award.rank_desc}}名
+                            if idx == 1
+                                .ranking_box.ranking_box_2
+                                    .coupon
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                        .coupon_text {{award.amount}}%加息券
+                                    .coupon_box
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img2.png')
+                                        .coupon_box_text {{award.amount}}%加息券
+                                    .ranking_no
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img2.png')
+                                        .ranking_no_text 第{{award.rank_desc}}名
+                            if idx == 2
+                                .ranking_box.ranking_box_3
+                                    .coupon
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                        .coupon_text {{award.amount}}%加息券
+                                    .coupon_box
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img3.png')
+                                        .coupon_box_text {{award.amount}}%加息券
+                                    .ranking_no
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img3.png')
+                                        .ranking_no_text 第{{award.rank_desc}}名
+                            if idx == 3
+                                .ranking_box.ranking_box_4
+                                    .coupon
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bg.png')
+                                        .coupon_text {{award.amount}}%加息券
+                                    .coupon_box
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_center_img4.png')
+                                        .coupon_box_text {{award.amount}}%加息券
+                                    .ranking_no
+                                        img(src='/static/imgs/mobile_activity/app_spring_mobilization/coupon_bottom_img4.png')
+                                        .ranking_no_text 第{{award.rank_desc}}名
+                    .ranking_main_2
+                        .list_wrap
+                            .list_main
+                                .title_box 每日投资排行榜
+                                table
+                                    thead
+                                        tr
+                                            th.one 用户名
+                                            th.two 投资金额
+                                            th.three 获得福利
+                                    tbody
+                                        ranks = enumerate(top_ranks)
+                                        for idx, rank in ranks
+                                            idx = int(idx + 1)
+                                            if idx == 1
+                                                tr.first
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}}%加息劵
+                                            if idx == 2
+                                                tr.second
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}}%加息劵
+                                            if idx == 3
+                                                tr.third
+                                                    td.one
+                                                        span.ico
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}}%加息劵
+                                            if idx > 3
+                                                tr
+                                                    td.one
+                                                        span.ico {{idx}}
+                                                        span.phone {{rank.phone|safe_phone_new}}
+                                                    td.two {{rank.amount__sum}}
+                                                    td.three {{rank.coupon}}%加息劵
+                                .title_bottom 说明：投资额相同的情况下，按照投资时间先后顺序进行排名；每日奖励发放，以当天23:59:59排名为准
+            .button.button_3
+                img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
+            .rule_wrap
+                .title_text 活动规则
+                dl
+                    dt 1、
+                    dd 活动有效期：2016年3月11日00:00:00-2016年3月20日23:59:59；
+                dl
+                    dt 2、
+                    dd 新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
+                dl
+                    dt 3、
+                    dd 每个红包仅限使用一次，不可叠加使用，也不可与加息券同时使用。红包使用后无论是否有余额均失效，使用详情请见我的账户-理财券红包列表查看；
+                dl
+                    dt 4、
+                    dd 获得实物奖励资格的用户，需在用户中心里完善收货信息，在活动结束后7个工作日内会有客服人员与您联系，请保持手机畅通，所有实物奖品均会在4月10日前发放完毕；
+                dl
+                    dt 5、
+                    dd 活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                dl(style="display:none")#ios-show
+                    dt 6.
+                    dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。网利宝对此活动享有最终解释权。
+            .popup_box
+                .main
+                    .text 您还没有抽奖机会，赶紧去投资吧
+                    .popup_button 我知道了
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015031003")
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
