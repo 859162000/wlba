@@ -16,7 +16,7 @@
             img(src='/static/imgs/pc/nav/wechat_server.jpg')
             .wechat-hover-dec 关注网利宝微信
 
-      .samll-nav-app.samll-nav-animate
+      a(href='/generalize').samll-nav-app.samll-nav-animate
         span 网利宝APP
         span.icon-app
         .samll-wechat-hover
@@ -26,11 +26,12 @@
             .wechat-hover-dec 下载网利宝APP
 
     .g-samll-end
-      if user.is_authenticated
-        if user.wanglibaouserprofile.utype == '3'
-          a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
-      else
-        a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
+      //if user.is_authenticated
+      //  if user.wanglibaouserprofile.utype == '3'
+      //    a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
+      //else
+      //  a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
+      a(href='http://lianmeng.wanglibao.com/', target='_blank')#investment.samll-nav-guide 网利联盟
       a(href='/data_cube/',target="_blank").samll-nav-guide 平台数据
       a(href='/pc_guide/').samll-nav-guide 新手指引
       a(href='/help/').samll-nav-guide 帮助中心

@@ -1180,6 +1180,7 @@ class WithdrawAPIView(DecryptParmsAPIView):
 
         # 短信通知添加用户名
         user = request.user
+        device_type = split_ua(request)['device_type']
         name = user.wanglibaouserprofile.name or u'用户'
         if not result['ret_code']:
             withdraw_submit_ok.apply_async(kwargs={
@@ -1188,7 +1189,8 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "phone": request.user.wanglibaouserprofile.phone,
                 "amount": result['amount'],
                 "bank_name": result['bank_name'],
-                "order_id": result['order_id']
+                "order_id": result['order_id'],
+                "device_type": device_type
             })
         return Response(result)
 

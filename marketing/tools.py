@@ -31,6 +31,7 @@ from weixin.tasks import sentTemplate
 from wanglibao_reward.tasks import sendWechatPhoneReward
 from marketing.send_data import send_register_data, send_idvalidate_data, send_deposit_data, send_investment_data,\
      send_withdraw_data
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -58,7 +59,11 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
         pass
     # 发送红包
     # send_lottery.apply_async((user_id,))
-    send_investment_data.apply_async(user_id, amount, device_type, order_id, product_id)
+    processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
+    send_investment_data.apply_async(kwargs={
+        "user_id": user_id, "amount": amount, "device_type":device_type,
+        "order_id": order_id, "product_id": product_id,
+    })
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
@@ -77,7 +82,7 @@ def weixin_redpack_distribute(user):
 
 
 @app.task
-def register_ok(user_id, device, channel):
+def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
     try:
@@ -102,7 +107,7 @@ def register_ok(user_id, device, channel):
         "user_id": user_id,
     })
     send_register_data.apply_async(kwargs={
-        "user_id": user_id, "device_type":device_type, "channel":channel,
+        "user_id": user_id, "device_type":device_type,
     })
 
 
@@ -110,9 +115,6 @@ def register_ok(user_id, device, channel):
 def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
-    print '20====' * 20
-    print user_id,device,device_type
-    print 'abc123' * 30
 
     # 活动检测
     activity_backends.check_activity(user, 'validation', device_type)
@@ -126,7 +128,7 @@ def idvalidate_ok(user_id, device):
         })
 
 @app.task
-def deposit_ok(user_id, amount, device, order_id, pay_info_id):
+def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
     try:
         try:
@@ -189,7 +191,9 @@ def deposit_ok(user_id, amount, device, order_id, pay_info_id):
         logger.info('=deposit_ok= Success: [%s], [%s], [%s]' % (user_profile.phone, order_id, amount))
     except Exception, e:
         logger.exception('=deposit_ok= Except: [%s]' % str(e))
-    send_deposit_data.apply_async(user_id, amount, device_type, order_id)
+    send_deposit_data.apply_async(kwargs={
+        "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
+    })
 
 
 @app.task
@@ -228,7 +232,9 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
                                             })},
                                         queue='celery02')
     
-    send_withdraw_data.apply_async(user_id, amount, order_id, device_type)
+    send_withdraw_data.apply_async(kwargs={
+        "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
+    })
 
 
 @app.task
