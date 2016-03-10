@@ -31,6 +31,7 @@ from weixin.tasks import sentTemplate
 from wanglibao_reward.tasks import sendWechatPhoneReward
 from marketing.send_data import send_register_data, send_idvalidate_data, send_deposit_data, send_investment_data,\
      send_withdraw_data
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -59,6 +60,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # 发送红包
     # send_lottery.apply_async((user_id,))
     send_investment_data.apply_async(user_id, amount, device_type, order_id, product_id)
+    processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
