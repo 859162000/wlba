@@ -8,12 +8,19 @@ if __name__ == '__main__':
 
 import hashlib
 import logging
+from django.utils import timezone
+from django.db.models import Sum
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client
+from wanglibao_rest.utils import get_current_utc_timestamp
+from wanglibao_p2p.models import P2PRecord
+from wanglibao_margin.models import MarginRecord
 from wanglibao import settings
-from .tasks import bajinshe_account_push
+from .tasks import bajinshe_callback
+from .utils import get_bajinshe_base_data
+
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -226,7 +233,7 @@ class CoopRegister(object):
         :param user:
         :return:
         """
-        CoopCallback(self.channel).process_all_callback(user.id, 'register', self.bid, self.order_id)
+        CoopCallback(self.channel).process_all_callback(user.id, 'register', self.order_id)
 
     def process_for_register(self, user):
         """
@@ -294,32 +301,22 @@ class CoopCallback(object):
     """
     第三方用户数据回调api
     """
-    def __init__(self, channel):
+    def __init__(self, channel=None):
         self.channel = channel
         # 渠道提供给我们的秘钥
+        self.coop_id = None
         self.coop_key = None
         self.call_back_url = None
 
-    def channel_user_from_db(self, user):
-        """
-        从binding中获取用户在渠道中的id
-        :param user:
-        :return:
-        """
-        try:
-            return Binding.objects.filter(user=user).get().bid
-        except:
-            return None
-
-    def register_call_back(self, user_id, bid, order_id):
+    def register_call_back(self, user_id, order_id):
         """
         用户注册成功后的回调
         :param user:
         :return:
         """
-        logger.info("%s coop callback enter register_call_back with user[%s] bid[%s] order_id[%s]" % (self.channel.code, user_id, bid, order_id))
+        logger.info("%s enter register_call_back with user[%s] order_id[%s]" % (self.channel.code, user_id, order_id))
 
-    def validate_call_back(self, user):
+    def validate_call_back(self, user_id):
         """
         用户实名验证后的回调
         :param user:
@@ -327,7 +324,7 @@ class CoopCallback(object):
         """
         pass
 
-    def binding_card_call_back(self, user):
+    def binding_card_call_back(self, user_id):
         """
         用户绑定银行卡之后的回调
         :param user:
@@ -335,23 +332,31 @@ class CoopCallback(object):
         """
         pass
 
-    def purchase_call_back(self, user, order_id):
+    def purchase_call_back(self, user_id, order_id):
         """
         用户购买后回调，一般用于用于用户首次投资之后回调第三方接口
         :param order_id:
         :param user:
         :return:
         """
-        pass
+        logger.info("%s enter purchase_call_back with user[%s] order_id[%s]" % (self.channel.code, user_id, order_id))
 
-    def recharge_call_back(self, user, order_id):
+    def recharge_call_back(self, user_id, order_id):
         """
         用户充值后回调，一般用于用户首次充值之后回调第三方接口
         :param order_id:
         :param user:
         :return:
         """
-        pass
+        logger.info("%s enter recharge_call_back with user[%s] order_id[%s]" % (self.channel.code, user_id, order_id))
+
+    def amortization_push(self, user_amo):
+        """
+        用户还款计划结算回调
+        :param user_amo:
+        :return:
+        """
+        logger.info("%s enter register_call_back with user_amortization[%s]" % (self.channel.code, user_amo.id))
 
     def get_channel_processor(self, channel_code):
         """
@@ -364,7 +369,24 @@ class CoopCallback(object):
             channel_processor = None
         return channel_processor
 
-    def process_all_callback(self, user_id, act, bid=None, order_id=None):
+    def process_amortize_callback(self, amortizations):
+        logger.info("coop callback enter process_amortize_callback")
+        for amo in amortizations:
+            user_id = amo.user_id
+            channel = get_user_channel_record(user_id)
+            if channel:
+                channel_processor = self.get_channel_processor(channel.code)
+                if channel_processor:
+                    try:
+                        channel_processor(channel).amortization_push(amo)
+                    except Exception, e:
+                        logger.info("%s raise error: %s" % (channel_processor.__name__, e))
+                else:
+                    logger.info("coop callback not found processor matched for user[%s]" % user_id)
+            else:
+                logger.info("coop callback not found channel matched from db for user[%s]" % user_id)
+
+    def process_all_callback(self, user_id, act, order_id=None):
         logger.info("coop callback enter process_all_callback with user[%s] act[%s] order_id[%s]" % (user_id, act, order_id))
         channel = get_user_channel_record(user_id)
         if channel:
@@ -372,7 +394,7 @@ class CoopCallback(object):
             if channel_processor:
                 try:
                     call_back_processor = getattr(channel_processor(channel), '%s_call_back' % act.lower(), None)
-                    call_back_processor(user_id, bid, order_id)
+                    call_back_processor(user_id, order_id)
                 except Exception, e:
                     logger.info("%s raise error: %s" % (channel_processor.__name__, e))
             else:
@@ -384,12 +406,123 @@ class CoopCallback(object):
 class BaJinSheCallback(CoopCallback):
     def __init__(self, *args, **kwargs):
         super(BaJinSheCallback, self).__init__(*args, **kwargs)
+        self.coop_id = settings.BAJINSHE_COOP_ID
+        self.coop_key = settings.BAJINSHE_COOP_KEY
+        self.purchase_call_back_url = settings.BAJINSHE_PURCHASE_PUSH_URL
+        self.register_call_back_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
+        self.transaction_call_back_url = settings.BAJINSHE_TRANSACTION_PUSH_URL
 
-    def register_call_back(self, user_id, bid, order_id):
-        super(BaJinSheCallback, self).register_call_back(user_id, bid, order_id)
-        # 异步回调
-        bajinshe_account_push.apply_async(
-            kwargs={'user_id': user_id})
+    def register_call_back(self, user_id, order_id):
+        super(BaJinSheCallback, self).register_call_back(user_id, order_id)
+        utc_timestamp = get_current_utc_timestamp()
+        query_id = '%s_%s' % (utc_timestamp, '0001')
+        data = get_bajinshe_base_data(query_id)
+        if data:
+            act_data = {
+                'bingdingUid': self.channel.bid,
+                'usn': get_user_phone_for_coop(user_id),
+                'sumIncome': 0,
+                'totalBalance': 0,
+                'availableBalance': 0,
+            }
+            data['tran'] = [act_data]
+            # 异步回调
+            bajinshe_callback.apply_async(
+                kwargs={'data': data, 'url': self.purchase_call_back_url})
+
+    def recharge_call_back(self, user_id, order_id):
+        super(BaJinSheCallback, self).recharge_call_back(user_id, order_id)
+        utc_timestamp = get_current_utc_timestamp()
+        query_id = '%s_%s' % (utc_timestamp, '0002')
+        data = get_bajinshe_base_data(query_id)
+        if data:
+            margin_record = MarginRecord.object(user_id=user_id, order_id=order_id).first()
+            if margin_record:
+                act_data = {
+                    'bingdingUid': self.channel.bid,
+                    'usn': get_user_phone_for_coop(user_id),
+                    'businessName': margin_record.description,
+                    'businessType': 0,
+                    'businessBid': order_id,
+                    'money': margin_record.amount,
+                    'time': timezone.localtime(margin_record.create_time()).strftime('%Y%m%d%H%M%S'),
+                    'moneyType': 0,
+                    'availableBalance': margin_record.margin_current,
+                }
+                data['tran'] = [act_data]
+                # 异步回调
+                bajinshe_callback.apply_async(
+                    kwargs={'data': data, 'url': self.transaction_call_back_url})
+
+    def purchase_call_back(self, user_id, order_id):
+        super(BaJinSheCallback, self).purchase_call_back(user_id, order_id)
+        utc_timestamp = get_current_utc_timestamp()
+        query_id = '%s_%s' % (utc_timestamp, '0003')
+        data = get_bajinshe_base_data(query_id)
+        if data:
+            margin_record = MarginRecord.object(user_id=user_id, order_id=order_id).first()
+            if margin_record:
+                act_data = {
+                    'bingdingUid': self.channel.bid,
+                    'usn': get_user_phone_for_coop(user_id),
+                    'businessName': margin_record.description,
+                    'businessType': 3,
+                    'businessBid': order_id,
+                    'money': margin_record.amount,
+                    'time': timezone.localtime(margin_record.create_time()).strftime('%Y%m%d%H%M%S'),
+                    'moneyType': 1,
+                    'availableBalance': margin_record.margin_current,
+                }
+                data['tran'] = [act_data]
+                # 异步回调
+                bajinshe_callback.apply_async(
+                    kwargs={'data': data, 'url': self.transaction_call_back_url})
+
+    def amortization_push(self, user_amo):
+        super(BaJinSheCallback, self).amortization_push(user_amo)
+        utc_timestamp = get_current_utc_timestamp()
+        order_id = '%s_%s' % (utc_timestamp, '0005')
+        data = get_bajinshe_base_data(order_id)
+        if data:
+            period = user_amo.product.period
+            pay_method = user_amo.product.pay_method
+            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                period_type = 1
+            else:
+                period_type = 2
+
+            if pay_method == u'等额本息':
+                profit_methods = 3
+            elif pay_method == u'按月付息':
+                profit_methods = 1
+            elif pay_method == u'到期还本付息':
+                profit_methods = 2
+            else:
+                profit_methods = 11
+
+            act_data = {
+                'calendar': timezone.localtime(user_amo.settlement_time).strftime('%Y%m%d%H%M%S'),
+                'income': user_amo.interest,
+                'principal': user_amo.principal,
+                'incomeState': 2,
+                'investmentPid': user_amo.id,
+                'bingdingUid': self.channel.bid,
+                'usn': get_user_phone_for_coop(user_amo.user_id),
+                'money': user_amo.equity_amount,
+                'period': period,
+                'periodType': period_type,
+                'productPid': user_amo.product.id,
+                'productName': user_amo.product.name,
+                'productType': 2,
+                'profitMethods': profit_methods,
+                'apr': user_amo.product.expected_earning_rate,
+                'state': 1,
+                'purchases': timezone.localtime(user_amo.equity_confirm_at).strftime('%Y%m%d%H%M%S'),
+            }
+            data['tran'] = [act_data]
+            # 异步回调
+            bajinshe_callback.apply_async(
+                kwargs={'data': data, 'url': self.purchase_call_back_url})
 
 # 第三方回调通道
 coop_callback_processor = {

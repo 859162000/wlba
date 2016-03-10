@@ -2,7 +2,7 @@
 import django.forms as forms
 from django.contrib.auth.models import User
 from django.utils import timezone
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 
 
 class PurchaseForm(forms.Form):
@@ -75,3 +75,18 @@ class PurchaseForm(forms.Form):
             )
 
         return purchase_at
+
+
+class P2PProductForm(forms.ModelForm):
+    class Meta:
+        model = P2PProduct
+
+
+class UserAmortizationForm(forms.ModelForm):
+    class Meta:
+        model = UserAmortization
+
+
+class P2PRecordForm(forms.ModelForm):
+    class Meta:
+        model = P2PRecord

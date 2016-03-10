@@ -207,3 +207,18 @@ def get_bajinshe_access_token(coop_id, coop_key, order_id):
         logger.info(res.text)
 
     return access_token, message
+
+
+def get_bajinshe_base_data(order_id):
+    data = dict()
+    coop_id = settings.BAJINSHE_COOP_ID
+    coop_key = settings.BAJINSHE_COOP_KEY
+    access_token = get_bajinshe_access_token(coop_id, coop_key, order_id)
+    if access_token:
+        data = {
+            'access_token': access_token,
+            'platform': coop_id,
+            'order_id': order_id
+        }
+
+    return data

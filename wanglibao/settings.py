@@ -425,9 +425,11 @@ if ENV == ENV_PRODUCTION:
     BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
     BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
     BAJINSHE_ACCOUNT_PUSH_URL = 'http://test.jr360.com/json/v1/external/AccountService/pushAccount/gzip'
-    BAJINSHE_RECHARGE_PUSH_URL = ''
+    BAJINSHE_TRANSACTION_PUSH_URL = 'http://test.jr360.com/json/v1/external/BusinessLogService/pushBusinessLog/gzip'
+    BAJINSHE_PURCHASE_PUSH_URL = ''
 else:
     BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
     BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
     BAJINSHE_ACCOUNT_PUSH_URL = 'http://test.jr360.com/json/v1/external/AccountService/pushAccount/gzip'
-    BAJINSHE_RECHARGE_PUSH_URL = ''
+    BAJINSHE_TRANSACTION_PUSH_URL = 'http://test.jr360.com/json/v1/external/BusinessLogService/pushBusinessLog/gzip'
+    BAJINSHE_PURCHASE_PUSH_URL = 'http://test.jr360.com/json/v1/external/InvestmentService/pushInvestment/gzip'

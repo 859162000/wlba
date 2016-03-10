@@ -8,8 +8,7 @@ import hashlib
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from rest_framework.views import APIView
-from wanglibao_account.cooperation import CoopRegister, get_client, get_uid_for_coop, CoopSessionProcessor
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_account.cooperation import CoopRegister, get_client, CoopSessionProcessor
 from django.utils import timezone
 from wanglibao_rest.utils import has_binding_for_bid, get_coop_binding_for_phone
 from django.http import Http404
@@ -17,11 +16,12 @@ from marketing.models import Channels
 from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.utils import create_user
-from wanglibao_p2p.forms import PurchaseForm
-from wanglibao_pay.forms import RechargeForm, PayInfoForm
+from wanglibao_p2p.models import P2PRecord, P2PProduct
+from wanglibao_p2p.forms import P2PRecordForm, P2PProductForm
+from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
-from wanglibao_pay.models import PayInfo
 from .forms import CoopDataDispatchForm
+from .tasks import coop_common_callback, process_amortize
 from marketing.forms import ChannelForm
 from wanglibao_account.forms import UserRegisterForm, UserForm
 
@@ -197,16 +197,19 @@ class CoopDataDispatchApi(APIView):
             order_id = req_data.get('order_id')
             user = create_user(user_id, phone)
             if user:
-                # FixMe，异步调用渠道数据回调任务
                 try:
                     CoopRegister(btype, bid, client_id, order_id).all_processors_for_user_register(user)
                 except Exception, e:
+                    response_data = {
+                        'ret_code': 10025,
+                        'message': 'coop register error',
+                    }
                     logger.info("process_register raise error: %s" % e)
-
-                response_data = {
-                    'ret_code': 10000,
-                    'message': 'success',
-                }
+                else:
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                    }
             else:
                 response_data = {
                     'ret_code': 10023,
@@ -226,15 +229,16 @@ class CoopDataDispatchApi(APIView):
             margin_record_form = MarginRecordForm(margin_record)
             if margin_record_form.is_valid():
                 pay_info = json.loads(pay_info) if pay_info else None
-                margin_record = margin_record.save()
-                margin_record.save()
+                margin_record = margin_record_form.save()
                 pay_info["margin_record"] = margin_record
                 pay_info["create_time"] = time.strptime(pay_info["create_time"], '%Y-%m-%d %H:%M:%S')
                 pay_info_form = PayInfoForm(pay_info)
                 if pay_info_form.is_valid():
                     pay_info = pay_info_form.save()
-                    pay_info.save()
-                    # FixMe,异步回调给第三方
+
+                    coop_common_callback.apply_async(
+                        kwargs={'user_id': pay_info.user_id, 'act': 'recharge', 'order_id': pay_info.order_id})
+
                     response_data = {
                         'ret_code': 10000,
                         'message': 'success',
@@ -251,24 +255,35 @@ class CoopDataDispatchApi(APIView):
         return response_data
 
     def process_purchase(self, req_data):
-        form = PurchaseForm(req_data)
-        if form.is_valid():
-            p2p_record = P2PRecord()
-            p2p_record.catalog = form.cleaned_data['catalog']
-            p2p_record.order_id = form.cleaned_data['order_id']
-            p2p_record.amount = form.cleaned_data['amount']
-            p2p_record.product = form.cleaned_data['product_id']
-            p2p_record.user = form.cleaned_data['user_id']
-            p2p_record.purchase_at = form.cleaned_data['purchase_at']
-            p2p_record.save()
-            # FixMe,异步回调给第三方
-            response_data = {
-                'ret_code': 10000,
-                'message': 'success',
-            }
-        else:
-            response_data = self.parase_form_error(form.error)
+        p2p_record = req_data.get("p2p_record")
+        margin_record = req_data.get("margin_record")
+        if p2p_record and margin_record:
+            margin_record = json.loads(margin_record) if margin_record else None
+            margin_record["create_time"] = time.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
+            margin_record_form = MarginRecordForm(margin_record)
+            if margin_record_form.is_valid():
+                p2p_record = json.loads(p2p_record) if p2p_record else None
+                p2p_record["create_time"] = time.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
+                p2p_record_form = P2PProductForm(p2p_record)
+                if p2p_record_form.is_valid():
+                    p2p_record = p2p_record_form.save()
 
+                    coop_common_callback.apply_async(
+                        kwargs={'user_id': p2p_record.user_id, 'act': 'purchase', 'order_id': p2p_record.order_id})
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                    }
+                else:
+                    response_data = self.parase_form_error(p2p_record_form.errors)
+            else:
+                response_data = self.parase_form_error(margin_record_form.errors)
+        else:
+            response_data = {
+                'ret_code': 10111,
+                'message': u'缺少业务参数',
+            }
         return response_data
 
     def process_bind_card(self, req_data):
@@ -308,8 +323,57 @@ class CoopDataDispatchApi(APIView):
     def process_withdraw(self, req_data):
         pass
 
-    def process_amortization(self, req_data):
-        pass
+    def process_amortizations_push(self, req_data):
+        product_id = req_data.get('product_id')
+        amortizations = req_data.get('amortizations')
+        if product_id and amortizations:
+            try:
+                p2p_product = P2PProduct.objects.get(pk=product_id)
+            except P2PProduct.DoesNotExist:
+                p2p_product = None
+
+            if p2p_product:
+                amortizations = json.loads(amortizations)
+                process_amortize.apply_async(
+                    kwargs={'amortizations': amortizations, 'product_id': product_id})
+
+                response_data = {
+                    'ret_code': 10000,
+                    'message': 'success',
+                }
+            else:
+                response_data = {
+                    'ret_code': 10051,
+                    'message': u'无效产品id',
+                }
+        else:
+            response_data = {
+                'ret_code': 50002,
+                'message': u'非法请求',
+            }
+        return response_data
+
+    def process_products_push(self, req_data):
+        products = req_data.get('products')
+        if products:
+            products = json.loads(products)
+            for product in products:
+                product['publish_time'] = time.strptime(product['publish_time'], '%Y-%m-%d %H:%M:%S')
+                product['end_time'] = time.strptime(product['end_time'], '%Y-%m-%d %H:%M:%S')
+                product['soldout_time'] = time.strptime(product['soldout_time'], '%Y-%m-%d %H:%M:%S')
+                product['make_loans_time'] = time.strptime(product['make_loans_time'], '%Y-%m-%d %H:%M:%S')
+                product_form = P2PProductForm(product)
+                if product_form.is_valid():
+                    product_form.save()
+                else:
+                    logger.info("process_products_push data[%s] invalid" % product_form.errors)
+
+        logger.info("process_products_push done")
+        response_data = {
+            'ret_code': 10000,
+            'message': 'success',
+        }
+        return response_data
 
     def post(self, request):
         req_data = request.POST
@@ -353,7 +417,6 @@ class CoopDataDispatchApi(APIView):
                 }
         else:
             response_data = self.parase_form_error(form.errors)
-            # sfsfw232342sdfsfsdfsfsdgddf
 
         logger.info('channel data dispatch process result:%s' % response_data['message'])
 

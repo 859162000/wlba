@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import logging
+from decimal import Decimal
 from concurrency.fields import IntegerVersionField
 from django.db import models
 from django.utils import timezone
@@ -54,7 +55,7 @@ class P2PRecord(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
     product_balance_after = models.IntegerField(u'标的后余额', help_text=u'该笔流水发生后标的剩余量', null=True)
 
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    user_id = models.IntegerField(u'用户id', max_length=50)
 
     create_time = models.DateTimeField(u'发生时间', auto_now_add=True)
 
@@ -68,3 +69,29 @@ class P2PRecord(models.Model):
 
     def __unicode__(self):
         return u'流水号%s %s 发生金额%s' % (self.id, self.catalog, self.amount)
+
+
+class UserAmortization(models.Model):
+    product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
+    user_id = models.IntegerField(u'用户id', max_length=50)
+    term = models.IntegerField(u'还款期数')
+    terms = models.IntegerField(u'还款总期数')
+
+    principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
+    interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
+    penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    coupon_interest = models.DecimalField(u'加息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+
+    settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
+
+    description = models.CharField(u'摘要', max_length=500, blank=True)
+    created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    equity_amount = models.DecimalField(u'总持仓金额', max_digits=20, decimal_places=2)
+    equity_confirm_at = models.DateTimeField(u'持仓确认时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = u'用户还款计划'
+        ordering = ['user_id', 'term']
+
+    def __unicode__(self):
+        return u'用户%s 本金%s 利息%s' % (self.user, self.principal, self.interest)
