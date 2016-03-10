@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
+    url(r'^coop_regist/$', views.WeixinCoopRegister.as_view(), name="weixin_coop_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
     #url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
@@ -101,9 +102,18 @@ urlpatterns = patterns(
     #刮刮乐
     url(r'^activity_ggl/$', login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='activity_ggl'),
+    url(r'^sub_checkIn/$', login_required(WeixinGGLTemplate.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
+                                          ),name='sub_checkIn'),
+    url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
 
 )
-
+#活动api
+urlpatterns += patterns(
+    '',
+    url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
+    url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
+    url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
+)
 # 微信管理后台
 urlpatterns += patterns(
     '',

@@ -29,6 +29,7 @@ from wanglibao_rest.utils import split_ua
 from weixin.models import WeixinUser
 from weixin.constant import PRODUCT_INVEST_SUCCESS_TEMPLATE_ID
 from weixin.tasks import sentTemplate
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
 
 logger = logging.getLogger('wanglibao_account')
 
@@ -196,10 +197,14 @@ class P2PTrader(object):
                         "keyword2": "%s 元" % str(amount),
                         "keyword3": now,
                         "url": settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % self.order_id,
+                        "remark": u'恭喜您获得3次刮奖机会，速来戳"详情"拼运气!'
                     })
                 }, queue='celery02')
+
         except Exception, e:
             logger.debug("=====sentTemplate=================%s" % e.message)
+
+        processMarchAwardAfterP2pBuy(self.user, self.product, self.order_id, amount)
 
         return product_record, margin_record, equity
 

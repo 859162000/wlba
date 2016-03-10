@@ -11,6 +11,7 @@ if settings.ENV == settings.ENV_PRODUCTION:
     DEPOSIT_SUCCESS_TEMPLATE_ID = "EVvBX8AIlhih9E2YYdZYzMljF__JA-SrMSDTyUeNdcE"     #充值到账通知
     PRODUCT_AMORTIZATION_TEMPLATE_ID = "JlRMqfGNiPdeSjTrCR9w1OUgDEusr0e3YWwqyU89vQM"#项目还款通知
     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "jcgCbkXDebiZPe0iNP4GWkH-SK4iM-gLWRdfRxzM9Ew"#投标成功通知
+    SIGN_IN_TEMPLATE_ID = "kE8xpyj2o1vc1toTjdNPyMqWLO6cxMRZCwBR92ZYCd8"
 else:
     BIND_SUCCESS_TEMPLATE_ID = "v9Ol0oyYuaXK893W1pnMBAcncYu4a8TGKy4VQvsalJ4"
     UNBIND_SUCCESS_TEMPLATE_ID = "U9Py2H6uah6goLfNBsZREDkakU1iz6y_Qmxw1XgktXg"
@@ -22,6 +23,7 @@ else:
     DEPOSIT_SUCCESS_TEMPLATE_ID = "pp4ZxU9QdaAKUBvsR5z8JtGoNn3sYMliOH3HiaUUuGk"   #充值到账通知
     PRODUCT_AMORTIZATION_TEMPLATE_ID = "VogmmLb01RLW6RQrn3l4zpFpSh29pJw9Ki1YhnG4iPw"#项目还款通知
     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "dHNrT8forqmVaGHZ3LCPIBPMU3jsnNXd6tykaWzQvRk"#投标成功通知
+    SIGN_IN_TEMPLATE_ID = "DITnwhyhs4c7GRwpzZ7KzJnLoxRZdF5xXCb22TGxaOw"
 
 # else:#wangxiaoqing
 #     BIND_SUCCESS_TEMPLATE_ID = "ze8Mgao5wi5SJpfkQB_OQUTiX9NqnB0V6oLsm_GaTFI"
@@ -34,6 +36,7 @@ else:
 #     DEPOSIT_SUCCESS_TEMPLATE_ID = "_T5Akr3kBKo4gr5joQQseKqCjmAbbkawEBeHS9P4AuU"   #充值到账通知
 #     PRODUCT_AMORTIZATION_TEMPLATE_ID = "h9Fxr0BbHP20wfYJ5D44YUWHaSuURmDeqngeY7NIu8o"#项目还款通知
 #     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "wbV38-H2u0LkOZRGjB3fWMpj4CczgMdAP7aiTg4SM8A"#投标成功通知
+#     SIGN_IN_TEMPLATE_ID = "kE8xpyj2o1vc1toTjdNPyMqWLO6cxMRZCwBR92ZYCd8"
 
 # else:#hmm's
 #     BIND_SUCCESS_TEMPLATE_ID = "mxNfcoJ8lfpbL1gFdazCk1OFGBhm9wIGL21Q6ZeB5FI"
@@ -46,6 +49,7 @@ else:
 #     DEPOSIT_SUCCESS_TEMPLATE_ID = "LuwpMH6CdEP2IeEsB7h6uewLhZdrnQPb0vmjDlqWh70"     #充值到账通知
 #     PRODUCT_AMORTIZATION_TEMPLATE_ID = "wDHmjettSpgHys4HMXdcndUfkloiQNu2j9LXTa_qkO4"#项目还款通知
 #     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "JgSYj3TqABs9UbmA33QfkZ2ZGjHL436oBBvOMpyWGh8"#投标成功通知
+#     SIGN_IN_TEMPLATE_ID = "kE8xpyj2o1vc1toTjdNPyMqWLO6cxMRZCwBR92ZYCd8"
 # else:#玉姣's
 #     BIND_SUCCESS_TEMPLATE_ID = "XFyiciGriKwniC2SFGwh476H5kjQcnVzRCinWQpuDU8"#绑定通知
 #     UNBIND_SUCCESS_TEMPLATE_ID = "TjTDJSN5G02O0A6lBl16hDDMWa_QQ_W_msFiJJMB1hk"#解绑通知
@@ -57,6 +61,7 @@ else:
 #     DEPOSIT_SUCCESS_TEMPLATE_ID = "R3UNq2ZvB3JrwlKSlMeEBNlDPTDi_o5wuXXRQ2TCljI"     #充值到账通知
 #     PRODUCT_AMORTIZATION_TEMPLATE_ID = "dQZJtqzbGnw06fLrTBkvTyMRynEgZ0J93UD1Rs6maJY"#项目还款通知
 #     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "5cPoYu4IHv68uiPkBOGljhTw2ctHRYcDRFTfRxYFhzA"#投标成功通知
+#     SIGN_IN_TEMPLATE_ID = "kE8xpyj2o1vc1toTjdNPyMqWLO6cxMRZCwBR92ZYCd8"
 
 
 from copy import deepcopy
@@ -83,6 +88,37 @@ class MessageTemplate(object):
 
 
 Message_template = {
+    SIGN_IN_TEMPLATE_ID:{
+        "top_color":'#88ffdd',
+        "data": {
+        # {{first.DATA}}
+        # 签到时间：{{keyword1.DATA}}
+        # 连续签到：{{keyword2.DATA}}
+        # 累计签到：{{keyword3.DATA}}
+        # {{remark.DATA}}
+                "first": {
+                    "value": "签到",
+                   "color": "#000000"
+                },
+                "keyword1": {
+                    "value": "",
+                    "color": "#000000"
+                },
+                "keyword2": {
+                    "value": "",
+                    "color": "#000000"
+                },
+                "keyword3": {
+                    "value": "",
+                    "color": "#000000"
+                },
+               "remark":{
+                   "value":"分享活动拿更多奖励，速戳详情领取！",
+                   "color":"#173177"
+               }
+        },
+        "url": settings.CALLBACK_HOST + "/weixin/sub_checkIn/",
+    },
     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',
         "data": {
@@ -109,7 +145,7 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":"恭喜您获得３次刮奖机会，点击“详情”进行刮奖",
+                   "value":"",
                    "color":"#173177"
                }
         },
@@ -213,7 +249,7 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":u'恭喜您获得３次刮奖机会，点击“详情”进行刮奖。',
+                   "value":'',
                    "color":"#173177"
                }
         },

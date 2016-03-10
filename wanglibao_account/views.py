@@ -295,6 +295,7 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
+
 class PasswordCheckView(DecryptParmsAPIView):
     permission_classes = ()
     def post(self, request, **kwargs):
@@ -316,6 +317,7 @@ class PasswordCheckView(DecryptParmsAPIView):
             return Response({"token":False, "message":u"用户已被冻结"})
 
         return Response({'token':True, 'message':u'用户认证成功'})
+
 
 class PasswordResetValidateView(TemplateView):
     template_name = 'password_reset_phone.jade'
@@ -735,6 +737,7 @@ class AccountInviteIncomeAPIView(APIView):
         earning = account_backends.invite_earning(request.user)
         return Response({"ret_code":0, "earning":earning})
 
+
 class AccountInviteHikeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -757,6 +760,7 @@ class AccountInviteHikeAPIView(APIView):
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
                         "call_charge":30, "total_hike":"0.1%", "calls":callfee,
                         "amount":amount, "product_id":product_id})
+
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -1028,6 +1032,7 @@ class AccountTransactionP2P(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+
 class AccountRedPacket(TemplateView):
     template_name = 'redpacket_available.jade'
 
@@ -1168,7 +1173,7 @@ class ResetPasswordAPI(DecryptParmsAPIView):
         identifier_type = detect_identifier_type(identifier)
 
         if identifier_type == 'phone':
-            #user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
+            # user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
             user = User.objects.get(wanglibaouserprofile__phone=identifier)
         else:
             return Response({'ret_code': 30003, 'message': u'请输入手机号码'})
@@ -1180,7 +1185,7 @@ class ResetPasswordAPI(DecryptParmsAPIView):
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
             # Modify by hb on 2015-12-02
-            #return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            # return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
             return Response({'ret_code': 30004, 'message': message})
 
 
@@ -1196,7 +1201,6 @@ class Third_login_back(APIView):
     def get(self, request):
         result = third_login.login_back(request)
         return Response(result)
-
 
 
 class ChangePasswordAPIView(DecryptParmsAPIView):
@@ -1222,11 +1226,18 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
             # Modify by hb 0n 2015-12-02
-            #return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            # return Response({"ret_code": 30044, "message": u"验证码输入错误"})
             return Response({"ret_code": 30044, "message": message})
 
         user.set_password(new_password)
         user.save()
+        # 重置密码后将用户的错误登录次数清零
+        from wanglibao_profile.models import WanglibaoUserProfile
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
+
         return Response({'ret_code': 0, 'message': u'修改成功'})
 
 
@@ -1351,7 +1362,6 @@ def ajax_token_login(request, authentication_form=TokenSecretSignAuthenticationF
         return HttpResponseNotAllowed(["GET"])
 
 
-
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
@@ -1418,7 +1428,7 @@ def ajax_register(request):
                 device = utils.split_ua(request)
 
                 if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
-                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device,"channel": channel})
 
                 #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
                 if request.POST.get('IGNORE_PWD', ''):
@@ -2214,14 +2224,13 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
+
 class FirstPayResultView(TemplateView):
     template_name = 'register_three.jade'
 
     def get_context_data(self, **kwargs):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
-
-
 
 
 class IdentityInformationTemplate(TemplateView):
@@ -2259,6 +2268,7 @@ class ValidateAccountInfoTemplate(TemplateView):
             'is_bind_card': is_bind_card
         }
 
+
 class ValidateAccountInfoAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -2294,6 +2304,7 @@ class ValidateAccountInfoAPI(APIView):
                 message+=msg
         return Response({"message":message}, status=400)
 
+
 class ModifyPhoneValidateCode(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -2313,6 +2324,7 @@ class ModifyPhoneValidateCode(APIView):
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({'message': message, "type":"validation"}, status=status)
 
+
 class ManualModifyPhoneTemplate(TemplateView):
     template_name = 'phone_modify_manual.jade'
 
@@ -2326,7 +2338,6 @@ class ManualModifyPhoneTemplate(TemplateView):
                 'user_name':profile.name,
                 # 'modify_phone_record':modify_phone_record
                 }
-
 
 
 class ManualModifyPhoneAPI(APIView):
@@ -2384,6 +2395,7 @@ class SMSModifyPhoneValidateTemplate(TemplateView):
             "phone": profile.phone,
             'is_bind_card': is_bind_card,
             }
+
 
 class SMSModifyPhoneValidateAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -2447,6 +2459,7 @@ class SMSModifyPhoneValidateAPI(APIView):
                 message+=msg
         return Response({"message":message}, status=400)
 
+
 class SMSModifyPhoneTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
@@ -2460,6 +2473,7 @@ class SMSModifyPhoneTemplate(TemplateView):
         return {
             "new_phone": new_phone,
             }
+
 
 class SMSModifyPhoneAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -2498,9 +2512,10 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
     """
     登录次数验证,下面4个情况当天错误次数清零处理
     1、重置登录密码
-    2、退出登录
-    3、当天6次机会内验证正确
-    4、第二天清零
+    2、登录成功后
+    3、注销登录
+    4、6次机会内验证正确
+    5、第二天清零
     """
 
     permission_classes = (IsAuthenticated, )

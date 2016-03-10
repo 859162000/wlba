@@ -25,6 +25,7 @@ from wanglibao_pay.util import fmt_two_amount
 from misc.models import Misc
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing.models import IntroducedBy
+from wanglibao_sms.tasks import send_sms_one
 
 
 logger = logging.getLogger(__name__)
@@ -353,8 +354,14 @@ def _send_message(user, event, end_time):
     # 发送短信,功能推送id: 4
     # 模板中的参数变量必须以 name=value 的形式传入
     phone = user.wanglibaouserprofile.phone
-    PHPSendSMS().send_sms_one(4, phone, 'phone', amount=coupon_amount, rtype=rtype)
-
+    # PHPSendSMS().send_sms_one(4, phone, 'phone', amount=coupon_amount, rtype=rtype)
+    send_sms_one.apply_async(kwargs={
+                                "rule_id": 4,
+                                "phone": phone,
+                                "user_type":'phone',
+                                "amount":coupon_amount,
+                                "rtype":rtype
+                                    })
     # send_messages.apply_async(kwargs={
     #     'phones': [user.wanglibaouserprofile.phone],
     #     'messages': [messages.red_packet_get_alert(coupon_amount, rtype)],

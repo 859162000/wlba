@@ -28,7 +28,7 @@ from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
 from constant import (ACCOUNT_INFO_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
-                      PRODUCT_ONLINE_TEMPLATE_ID)
+                      PRODUCT_ONLINE_TEMPLATE_ID, SIGN_IN_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_pay.models import Bank, PayInfo
 from wechatpy import parse_message, create_reply, WeChatClient
@@ -38,7 +38,7 @@ from wechatpy.exceptions import InvalidSignatureException, WeChatException
 from wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
-from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord, WeiXinChannel, WeiXinUserActionRecord
+from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord, WeiXinChannel, UserDailyActionRecord
 # from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
@@ -61,11 +61,11 @@ import datetime, time
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
-from experience_gold.models import ExperienceEvent
+from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from wanglibao_profile.models import WanglibaoUserProfile
 from weixin.tasks import detect_product_biding, sentTemplate
-from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
+from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record, process_user_daily_action
 from weixin.util import FWH_UNBIND_URL, filter_emoji
 from rest_framework.permissions import IsAuthenticated
 
@@ -251,7 +251,7 @@ class WeixinJoinView(View):
             reply = create_reply(articles, self.msg)
 
         if self.msg.key == 'sign_in':
-            reply = self.process_sign_in(w_user.openid)
+            reply = self.process_sign_in(w_user, user)
         if self.msg.key == 'my_experience_gold':
             seg = SendExperienceGold(user)
             amount = seg.get_amount()
@@ -261,35 +261,74 @@ class WeixinJoinView(View):
 
         return reply
 
-    def process_sign_in(self, openid):
+    def process_sign_in(self, weixin_user, user):
         reply = -1
         try:
-            with transaction.atomic():
-                w_user = WeixinUser.objects.select_for_update().filter(openid=openid).first()
-                now = datetime.datetime.now()
-                start = datetime.datetime(now.year,now.month, now.day)
-                end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
-                war = WeiXinUserActionRecord.objects.filter(user_id=w_user.user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
-                if not war:
-                    _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
-                    seg = SendExperienceGold(w_user.user)
-                    experience_event = self.getSignExperience_gold()
-                    if experience_event:
-                        seg.send(experience_event.id)
-                        txt = u"恭喜您，签到成功！\n" \
-                              u"奖励金额：%s元体验金\n" \
-                              u"体验期限：1天\n" \
-                              u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
-                        reply = create_reply(txt, self.msg)
-                    else:
-                        reply = create_reply(u'恭喜您，签到成功！', self.msg)
-                        logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
-                else:
-                    txt = u"今日已经签到，明日再来"
-                    reply = create_reply(txt, self.msg)
+            ret_code, status, daily_record = process_user_daily_action(user, action_type=u'sign_in')
+            experience_amount = 0
+            if daily_record.experience_record_id:
+                experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
+                experience_amount=experience_record.event.amount
+            reply_msg =u"%s，连续签到可获得更多奖励，记得明天再来哦！\n奖励金额：%s元体验金"
+        # 签到时间：{{keyword1.DATA}}
+        # 连续签到：{{keyword2.DATA}}
+        # 累计签到：{{keyword3.DATA}}
+
+            if ret_code != 0:
+                sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                    "openid":weixin_user.openid,
+                    "template_id":SIGN_IN_TEMPLATE_ID,
+                    "first":reply_msg%(u"今日你已签到", experience_amount),
+                    "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "keyword2":"%s天" % daily_record.continue_days,
+                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
+                })},
+                                                queue='celery02')
+            else:
+                sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                    "openid":weixin_user.openid,
+                    "template_id":SIGN_IN_TEMPLATE_ID,
+                    "first":reply_msg%(u"恭喜您签到成功,", experience_amount),
+                    "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "keyword2":"%s天" % daily_record.continue_days,
+                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
+                })},
+                                                queue='celery02')
+
+            reply = -1
         except Exception,e:
             logger.debug(traceback.format_exc())
         return reply
+
+    # def process_sign_in(self, openid):
+    #     reply = -1
+    #     try:
+    #         with transaction.atomic():
+    #             w_user = WeixinUser.objects.select_for_update().filter(openid=openid).first()
+    #             now = datetime.datetime.now()
+    #             start = datetime.datetime(now.year,now.month, now.day)
+    #             end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
+    #             war = WeiXinUserActionRecord.objects.filter(user_id=w_user.user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+    #             if not war:
+    #                 _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
+    #                 seg = SendExperienceGold(w_user.user)
+    #                 experience_event = self.getSignExperience_gold()
+    #                 if experience_event:
+    #                     seg.send(experience_event.id)
+    #                     txt = u"恭喜您，签到成功！\n" \
+    #                           u"奖励金额：%s元体验金\n" \
+    #                           u"体验期限：1天\n" \
+    #                           u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
+    #                     reply = create_reply(txt, self.msg)
+    #                 else:
+    #                     reply = create_reply(u'恭喜您，签到成功！', self.msg)
+    #                     logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
+    #             else:
+    #                 txt = u"今日已经签到，明日再来"
+    #                 reply = create_reply(txt, self.msg)
+    #     except Exception,e:
+    #         logger.debug(traceback.format_exc())
+    #     return reply
 
         # except Exception, e:
         #     reply = -1
@@ -359,6 +398,7 @@ class WeixinJoinView(View):
         if not reply:
             if not user:
                 txt = self.getBindTxt(fromUserName)
+                txt += u"\n网利宝自2014年8月上线以来，注册用户已突破119万人，投资额超过47亿元，目前已完成B轮融资！"
             else:
                 txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)
@@ -481,6 +521,36 @@ class WeixinRegister(TemplateView):
             'channel': channel,
             'phone': phone,
             'next' : next
+        }
+
+
+class WeixinCoopRegister(TemplateView):
+    template_name = 'service_regist_bjs.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = 'weixin'
+
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
+
+        phone = self.request.GET.get('phone', 0)
+        _next = self.request.GET.get('next', '')
+
+        return {
+            'token': token,
+            'channel': channel,
+            'phone': phone,
+            'next': _next
         }
 
 
