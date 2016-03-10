@@ -15,7 +15,6 @@
         }
     });
     var login = false;
-    alert('321');
     wlb.ready({
         app: function(mixins) {
 
@@ -37,17 +36,14 @@
             })
         },
         other: function() {
-            alert('3');
-            //$('.button').click(function() {
-            //    alert('2');
-            //    if(h5_user_static) {
-            //        window.location.href = '/weixin/list/'
-            //    }else {
-            //        window.location.href = '/weixin/login/?next=/weixin/list/'
-            //    }
-            //})
+            $('.button').click(function() {
+                if(h5_user_static) {
+                    window.location.href = '/weixin/list/'
+                }else {
+                    window.location.href = '/weixin/login/?next=/weixin/list/'
+                }
+            })
             //console.log('其他场景的业务逻辑');
-
         }
     });
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];

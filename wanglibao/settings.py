@@ -358,7 +358,8 @@ LOGGING = {
             'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         },
     },
     'handlers': {
@@ -383,7 +384,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/marketing.log',
-            'formatter': 'verbose'
+            'formatter': 'simple'
         },
         'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
@@ -516,6 +517,9 @@ LOGGING = {
         },
     }
 }
+
+from logging.config import dictConfig
+dictConfig(LOGGING)
 
 
 if ENV != ENV_DEV:
