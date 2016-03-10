@@ -74,6 +74,7 @@ import urllib
 from .utils import xunleivip_generate_sign, generate_coop_base_data
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
+from wanglibao_margin.models import MarginRecord
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1688,6 +1689,22 @@ class BaJinSheRegister(CoopRegister):
         """
         pass
 
+    def validate_call_back(self, user):
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter validate_call_back for user[%s]" % (channel.code, user.id))
+        data = generate_coop_base_data('validate')
+        data['user_id'] = user.id
+        common_callback_for_post.apply_async(
+            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+
+    def binding_card_call_back(self, user):
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter binding_card_call_back for user[%s]" % (channel.code, user.id))
+        data = generate_coop_base_data('bind_card')
+        data['user_id'] = user.id
+        common_callback_for_post.apply_async(
+            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+
     def register_call_back(self, user):
         client_id = self.channel_client_id
         logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
@@ -1712,7 +1729,24 @@ class BaJinSheRegister(CoopRegister):
                 logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
 
     def purchase_call_back(self, user, order_id):
-        pass
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter purchase_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id, catalog=u'申购').values().first()
+        if p2p_record:
+            p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            base_data = generate_coop_base_data('purchase')
+
+            margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')
+            margin_record = margin_record_query.values().first()
+            margin_record['create_time'] = margin_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            act_data = {
+                'p2p_record': json.dumps(p2p_record),
+                'margin_record': json.dumps(margin_record),
+            }
+            data = dict(base_data, **act_data)
+
+            common_callback_for_post.apply_async(
+                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
     def recharge_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
@@ -1757,7 +1791,7 @@ class BaJinSheRegister(CoopRegister):
                 kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
 
-class RenRenLiRegister(CoopRegister):
+class RenRenLiRegister(BaJinSheRegister):
     def __init__(self, request):
         super(RenRenLiRegister, self).__init__(request)
         self.c_code = 'renrenli'
@@ -1808,64 +1842,6 @@ class RenRenLiRegister(CoopRegister):
         self.request.session.pop(self.internal_channel_phone_key, None)
         self.request.session.pop(self.internal_channel_sign_key, None)
         self.request.session.pop(self.internal_channel_user_id_key, None)
-
-    def save_to_binding(self, user):
-        """
-        处理从url获得的渠道参数
-        :param user:
-        :return:
-        """
-        channel_user = get_uid_for_coop(user.id)
-        channel_name = self.channel_name
-        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-        if channel_name and channel_user and len(channel_user) <= bid_len:
-            binding = Binding()
-            binding.user = user
-            binding.btype = channel_name
-            binding.bid = channel_user
-            binding.save()
-            # logger.debug('save user %s to binding'%user)
-
-    def purchase_call_back(self, user, order_id):
-        pass
-        # binding = Binding.objects.filter(user_id=user.id).first()
-        # if binding:
-        #     p2p_record = P2PRecord.objects.filter(user_id=user.id,
-        #                                           order_id=order_id,
-        #                                           catalog=u'申购').select_related('product').first()
-        #
-        #     channel_code = binding.btype
-        #     client = get_client(channel_code)
-        #     if not client:
-        #         logger.info("%s purchase call back failed with wrong not found client" % channel_code)
-        #         return
-        #
-        #     if p2p_record:
-        #         user_profile = WanglibaoUserProfile.objects.filter(user_id=user.id).first()
-        #         phone = user_profile.phone if user_profile else ''
-        #         data = {
-        #             'User_name': phone,
-        #             'Order_no': order_id,
-        #             'Pro_name': p2p_record.product.name,
-        #             'Pro_id': p2p_record.product.id,
-        #             'Invest_money': float(p2p_record.amount),
-        #             'Rate': p2p_record.product.expected_earning_rate,
-        #             'Invest_start_date': int(time.mktime(p2p_record.create_time.timetuple())),
-        #             'Invest_end_date': int(time.mktime(p2p_record.product.end_time.timetuple())),
-        #             # 'Back_money': '',
-        #             # 'Back_last_date': '',
-        #             'Cust_key': binding.bid,
-        #         }
-        #
-        #         params = {
-        #             'Data': json.dumps([data]),
-        #             'Cust_id': client.client_id,
-        #             'Sign_type': 'MD5',
-        #             'Sign': hashlib.md5(self.coop_id+self.coop_key+client.client_id+client.client_secret).hexdigest(),
-        #         }
-        #
-        #         common_callback_for_post.apply_async(
-        #             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
 # 注册第三方通道

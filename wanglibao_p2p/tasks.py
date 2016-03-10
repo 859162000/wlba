@@ -14,7 +14,7 @@ from order.utils import OrderHelper
 
 from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization, ProductType
+from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization, ProductType, EquityRecord
 from wanglibao_p2p.trade import P2POperator
 from wanglibao_p2p.automatic import Automatic
 from django.db.models import Sum, Q
@@ -256,6 +256,9 @@ def coop_amortizations_push(amortizations, product_id):
         channel = get_user_channel_record(amo["user_id"])
         if channel:
             amo['terms'] = amo_terms
+            equity_record = EquityRecord.objects.filter(catalog=u'申购确认', product_id=product_id, user_id=amo["user_id"]).first()
+            amo['equity_confirm_at'] = equity_record.create_time.strftime('%Y-%m-%d %H:%M:%S')
+            amo['equity_amount'] = equity_record.amount
             amortization_list.append(amo)
 
     if amortization_list:
