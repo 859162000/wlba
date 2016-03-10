@@ -224,13 +224,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         type: 'post',
         success: function(data1) {
             h5_user_static = data1.login;
-            if(h5_user_static){
-                    $('span#zero').hide();
-                    $('span#chance_num').css('display','inline-block');
-                }else {
-                $('span#chance_num').hide();
-                $('span#zero').css('display', 'inline-block');
-            }
         }
     });
     var login = false;
@@ -371,14 +364,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
                     login = false;
-
+                    $('span#chance_num').hide();
+                    $('span#zero').css('display', 'inline-block');
                     $('.button').click(function() {
                         mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
                     });
 
                 } else {
                     login = true;
-
+                    $('span#zero').hide();
+                    $('span#chance_num').css('display','inline-block');
                     $('.button').click(function() {
                         mixins.jumpToManageMoney();
                     });
@@ -411,6 +406,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         },
         other: function() {
+            if(h5_user_static){
+                $('span#zero').hide();
+                $('span#chance_num').css('display','inline-block');
+            }else {
+                $('span#chance_num').hide();
+                $('span#zero').css('display', 'inline-block');
+            }
             $('.button').click(function() {
                 if(h5_user_static) {
                     window.location.href = '/weixin/list/'
