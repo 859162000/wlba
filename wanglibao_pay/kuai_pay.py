@@ -846,7 +846,7 @@ class KuaiShortPay:
     def _request(self, data, url):
         headers = self.headers
         headers['Content-Length'] = str(len(data))
-        if settings.ENV ==  settings.ENV_DEV:
+        if settings.ENV ==  settings.ENV_STAGING:
             # kuai钱的ssl配置有问题，不被根信任，这儿就不校验了
             res = requests.post(url, headers=headers, data=data, verify=False, auth=self.auth)
         else:
