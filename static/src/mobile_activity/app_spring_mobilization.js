@@ -15,6 +15,7 @@
         }
     });
     var login = false;
+    alert('123');
     wlb.ready({
         app: function(mixins) {
 

@@ -234,6 +234,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     });
     var login = false;
+    alert('123');
     wlb.ready({
         app: function(mixins) {
 
