@@ -359,7 +359,20 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     wlb.ready({
         app: function(mixins) {
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
 
+                    }
+                })
+            }
 			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
@@ -371,6 +384,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     });
 
                 } else {
+                    connect(data);
                     login = true;
                     $('span#zero').hide();
                     $('span#chance_num').css('display','inline-block');
