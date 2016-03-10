@@ -11,12 +11,13 @@ from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_message_for_hby, get_start_end_time
 from marketing.utils import local_to_utc
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.auth_backends import User
 from wanglibao_redis.backend import redis_backend
 from misc.models import Misc
 import logging
+
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -180,29 +181,31 @@ def updateRedisTopRank():
         logger.error("====updateRedisTopRank======="+e.message)
     return top_ranks
 
-def processMarchAwardAfterP2pBuy(user, product, order_id, amount):
+def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
     try:
-        rank_activity = Activity.objects.filter(code='march_awards').first()
-        utc_now = timezone.now()
-        if rank_activity and not rank_activity.is_stopped and rank_activity.start_at<=utc_now and rank_activity.end_at>=utc_now:
-            # updateRedisTopRank.apply_async()
-            updateRedisTopRank()
+        product = P2PProduct.objects.filter(id=product_id).get()
+        if product:
+            rank_activity = Activity.objects.filter(code='march_awards').first()
+            utc_now = timezone.now()
+            if rank_activity and not rank_activity.is_stopped and rank_activity.start_at<=utc_now and rank_activity.end_at>=utc_now:
+                # updateRedisTopRank.apply_async()
+                updateRedisTopRank()
 
-            period = product.period
-            if product.pay_method.startswith(u'日计息'):
-                period = product.period/30
-            if period >= 3:
-                misc = Misc.objects.filter(key='march_awards').first()
-                march_awards = json.loads(misc.value)
-                if march_awards and isinstance(march_awards, dict):
-                    highest = march_awards.get('highest', 0)
-                    lowest = march_awards.get('lowest', 0)
+                period = product.period
+                if product.pay_method.startswith(u'日计息'):
+                    period = product.period/30
+                if period >= 3:
+                    misc = Misc.objects.filter(key='march_awards').first()
+                    march_awards = json.loads(misc.value)
+                    if march_awards and isinstance(march_awards, dict):
+                        highest = march_awards.get('highest', 0)
+                        lowest = march_awards.get('lowest', 0)
 
-                    if float(amount) >= lowest and float(amount) <= highest:
-                        P2pOrderRewardRecord.objects.create(
-                            user=user,
-                            activity_desc=u'投资额度奖励',
-                            order_id=order_id,
-                            )
+                        if float(amount) >= lowest and float(amount) <= highest:
+                            P2pOrderRewardRecord.objects.create(
+                                user=user,
+                                activity_desc=u'投资额度奖励',
+                                order_id=order_id,
+                                )
     except Exception, e:
         logger.error("===========processMarchAwardAfterP2pBuy==================="+e.message)
