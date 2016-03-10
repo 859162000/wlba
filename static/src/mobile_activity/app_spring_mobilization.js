@@ -167,7 +167,7 @@
 
                 $('.card_box').click(function(){
                     card_no=$(this).attr('data-card');
-                    if(data.ph == ''){
+                    if(data.ph != ''){
                         chance_num = $('#chance_num').text();
                         if(chance_num>0){
                             if(!$(this).find('.card').hasClass('card_box_open')){
