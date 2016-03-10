@@ -174,7 +174,14 @@
           box-shadow: 1px 2px 6px #493600
           border-radius: 5px
           transform: rotateY(180deg)
+          -webkit-backface-visibility: hidden
+          -moz-backface-visibility: hidden
+          -ms-backface-visibility: hidden
+          -o-backface-visibility: hidden
           backface-visibility: hidden
+
+
+
           position: absolute
           left: 0
           top: 0
@@ -183,8 +190,16 @@
         margin-right: 0
       .card_box_open
         .card_img
+          -webkit-backface-visibility: hidden
+          -moz-backface-visibility: hidden
+          -ms-backface-visibility: hidden
+          -o-backface-visibility: hidden
           backface-visibility: hidden
         .card_prize
+          -webkit-backface-visibility: visible
+          -moz-backface-visibility: visible
+          -ms-backface-visibility: visible
+          -o-backface-visibility: visible
           backface-visibility: visible
   .card_chance
     width: 100%
