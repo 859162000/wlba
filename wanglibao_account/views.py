@@ -1428,7 +1428,7 @@ def ajax_register(request):
                 device = utils.split_ua(request)
 
                 if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
-                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device,"channel": channel})
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
                 if request.POST.get('IGNORE_PWD', ''):
