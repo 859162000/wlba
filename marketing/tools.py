@@ -28,7 +28,7 @@ from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEM
 
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
-from wanglibao_reward.tasks import sendWechatPhoneReward
+#from wanglibao_reward.tasks import sendWechatPhoneReward
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -96,9 +96,10 @@ def register_ok(user_id, device):
         utils.log_clientinfo(device, "register", user_id)
     except Exception:
         pass
-    sendWechatPhoneReward.apply_async(kwargs={
-        "user_id": user_id,
-    })
+    ### Comment by hb on 2016-03-10
+    # sendWechatPhoneReward.apply_async(kwargs={
+    #     "user_id": user_id,
+    # })
 
 
 @app.task
