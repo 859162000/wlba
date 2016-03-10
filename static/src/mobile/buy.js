@@ -18,8 +18,8 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
         $showredPackAmount =$(".redpack-amount"),
         $redpackInvestamount = $(".redpack-investamount"),
         productID = $(".invest-one").attr('data-protuctid'),
-        $alreadyReadPack = $('.redpack-already');
-
+        $alreadyReadPack = $('.redpack-already'),
+        $buySufficient = $('.buy-sufficient');
     let tradeStatus = null,
         redPackDikouCopy = 0; //抵扣金额－全局
 
@@ -90,6 +90,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                             return resolve('重新计算收益')
                         }
                     }
+                    if($inputCalculator.val() > 0) return resolve('重新计算收益')
                     reject('不需要重新计算收益')
                 },
                 error(){
@@ -274,7 +275,17 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
             return console.log('验证失败');
         })
     }
+    const balance = (amount) => {
+        return new Promise((resolve,reject)=>{
+            const balance = parseFloat($("#balance").attr("data-value"));
+            if (amount > balance){
+                return $buySufficient.show();
+            }
+            $buySufficient.hide();
+            resolve(amount)
+        })
 
+    }
     //confirm
     const confirm_ui = (amount) => {
         return new Promise((resolve, reject)=> {
@@ -303,8 +314,10 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
     $submit.on('click', () => {
         checkOperation()
             .then((result)=> {
-                console.log(`验证成功，投资金额为${result.amount}`); //check success
-                return confirm_ui(result.amount);
+                return balance(result.amount);
+            })
+            .then((amount)=> {
+                return confirm_ui(amount);
             })
             .then((amount)=> {
                 //交易密码操作

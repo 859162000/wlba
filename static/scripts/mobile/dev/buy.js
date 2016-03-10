@@ -28,8 +28,8 @@ webpackJsonp([1],[
 	        $showredPackAmount = $(".redpack-amount"),
 	        $redpackInvestamount = $(".redpack-investamount"),
 	        productID = $(".invest-one").attr('data-protuctid'),
-	        $alreadyReadPack = $('.redpack-already');
-
+	        $alreadyReadPack = $('.redpack-already'),
+	        $buySufficient = $('.buy-sufficient');
 	    var tradeStatus = null,
 	        redPackDikouCopy = 0; //抵扣金额－全局
 
@@ -105,6 +105,7 @@ webpackJsonp([1],[
 	                            return resolve('重新计算收益');
 	                        }
 	                    }
+	                    if ($inputCalculator.val() > 0) return resolve('重新计算收益');
 	                    reject('不需要重新计算收益');
 	                },
 	                error: function error() {
@@ -288,7 +289,16 @@ webpackJsonp([1],[
 	            return console.log('验证失败');
 	        });
 	    };
-
+	    var balance = function balance(amount) {
+	        return new Promise(function (resolve, reject) {
+	            var balance = parseFloat($("#balance").attr("data-value"));
+	            if (amount > balance) {
+	                return $buySufficient.show();
+	            }
+	            $buySufficient.hide();
+	            resolve(amount);
+	        });
+	    };
 	    //confirm
 	    var confirm_ui = function confirm_ui(amount) {
 	        return new Promise(function (resolve, reject) {
@@ -313,8 +323,9 @@ webpackJsonp([1],[
 	    //提交逻辑操作
 	    $submit.on('click', function () {
 	        checkOperation().then(function (result) {
-	            console.log('验证成功，投资金额为' + result.amount); //check success
-	            return confirm_ui(result.amount);
+	            return balance(result.amount);
+	        }).then(function (amount) {
+	            return confirm_ui(amount);
 	        }).then(function (amount) {
 	            //交易密码操作
 	            trade_operation(amount, buy);

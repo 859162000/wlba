@@ -89,6 +89,7 @@ webpackJsonp([6],[
 	        });
 	    };
 
+	    //渲染银行卡
 	    var appendBanks = function appendBanks(banks) {
 	        var str = '';
 	        for (var bank in banks) {
@@ -97,6 +98,7 @@ webpackJsonp([6],[
 	        return str;
 	    };
 
+	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
 	        if (localStorage.getItem('bank')) {
 	            var content = JSON.parse(localStorage.getItem('bank'));
@@ -108,10 +110,10 @@ webpackJsonp([6],[
 	                url: '/api/bank/list_new/',
 	                success: function success(results) {
 	                    if (results.ret_code === 0) {
-	                        var content = JSON.stringify(results.banks);
+	                        var _content = JSON.stringify(results.banks);
 	                        $bank.append(appendBanks(results.banks));
-	                        window.localStorage.setItem('bank', content);
-	                        return callback && callback(content);
+	                        window.localStorage.setItem('bank', _content);
+	                        return callback && callback(_content);
 	                    } else {
 	                        return alert(results.message);
 	                    }

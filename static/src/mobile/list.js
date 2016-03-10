@@ -58,5 +58,4 @@ import { signModel } from './mixins/ui'
         canGetPage && fetch_data();
     })
 
-
 })()

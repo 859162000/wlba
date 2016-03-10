@@ -20,7 +20,6 @@ webpackJsonp([5],[
 	        $identifier = $('input[name=identifier]'),
 	        $password = $('input[name=password]');
 
-	    //---------------初始化操作start---------
 	    var autolist = [{ target: $identifier, required: true }, { target: $password, required: true }];
 	    //自动检查
 	    var auto = new _automatic_detection.Automatic({
@@ -29,7 +28,6 @@ webpackJsonp([5],[
 	    });
 	    auto.operationClear();
 	    auto.operationPassword();
-	    //---------------初始化操作end---------
 
 	    //---------------login操作start---------
 

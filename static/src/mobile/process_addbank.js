@@ -85,7 +85,7 @@ import { limit} from './mixins/bank_limit.js'
     }
 
 
-
+     //渲染银行卡
      const appendBanks = (banks) => {
         let str = '';
         for (let bank in banks) {
@@ -94,6 +94,7 @@ import { limit} from './mixins/bank_limit.js'
         return str
     }
 
+    //获取银行卡
     const fetch_banklist = (callback) => {
         if(localStorage.getItem('bank')){
             const content = JSON.parse(localStorage.getItem('bank'));

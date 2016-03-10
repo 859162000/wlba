@@ -10,7 +10,6 @@ import { check } from './mixins/from_validation'
         $identifier = $('input[name=identifier]'),
         $password = $('input[name=password]');
 
-//---------------初始化操作start---------
     const autolist = [
         {target: $identifier, required: true},
         {target: $password, required: true}
@@ -22,7 +21,6 @@ import { check } from './mixins/from_validation'
     });
     auto.operationClear();
     auto.operationPassword();
-//---------------初始化操作end---------
 
 
 //---------------login操作start---------

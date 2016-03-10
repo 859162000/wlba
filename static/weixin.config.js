@@ -6,6 +6,8 @@ var ROOT_PATH = path.resolve(__dirname);
 var JS_PATH = path.resolve(ROOT_PATH, "src/mobile");
 var BUILD_PATH = path.resolve(ROOT_PATH, "scripts/mobile/dev");
 
+var FileListPlugin = require('./webpack.plugins.doing')
+
 if(process.env.NODE_ENV == 'pro'){
     BUILD_PATH = 'scripts/mobile/pro';
 }
@@ -17,21 +19,21 @@ if(process.env.NODE_ENV == 'pro'){
 
 module.exports = {
     entry: {
-        login: path.resolve(JS_PATH, 'login'),
-        regist: path.resolve(JS_PATH, 'regist'),
-        list: path.resolve(JS_PATH, 'list'),
-        detail: path.resolve(JS_PATH, 'detail'),
-        buy: path.resolve(JS_PATH, 'buy'),
+        //login: path.resolve(JS_PATH, 'login'),
+        //regist: path.resolve(JS_PATH, 'regist'),
+        //list: path.resolve(JS_PATH, 'list'),
+        //detail: path.resolve(JS_PATH, 'detail'),
+        //buy: path.resolve(JS_PATH, 'buy'),
         calculator: path.resolve(JS_PATH, 'calculator'),
-        bankOneCard: path.resolve(JS_PATH, 'bankOneCard'),
-        recharge: path.resolve(JS_PATH, 'recharge'),
-        trade_retrieve: path.resolve(JS_PATH, 'trade_retrieve'),
-        received_all: path.resolve(JS_PATH, 'received_all'),
-        received_detail: path.resolve(JS_PATH, 'received_detail'),
-        received_month: path.resolve(JS_PATH, 'received_month'),
-
-        process_authentication: path.resolve(JS_PATH, 'process_authentication'),
-        process_addbank: path.resolve(JS_PATH, 'process_addbank'),
+        //bankOneCard: path.resolve(JS_PATH, 'bankOneCard'),
+        //recharge: path.resolve(JS_PATH, 'recharge'),
+        //trade_retrieve: path.resolve(JS_PATH, 'trade_retrieve'),
+        //received_all: path.resolve(JS_PATH, 'received_all'),
+        //received_detail: path.resolve(JS_PATH, 'received_detail'),
+        //received_month: path.resolve(JS_PATH, 'received_month'),
+        //
+        //process_authentication: path.resolve(JS_PATH, 'process_authentication'),
+        //process_addbank: path.resolve(JS_PATH, 'process_addbank'),
         vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto')]
     },
     output: {
@@ -59,6 +61,14 @@ module.exports = {
         new webpack.optimize.CommonsChunkPlugin({   //第三方库生成的文件
             name: ['vendor'],
            filename: "vendor.zepto.js"
-        })
+        }),
+        new FileListPlugin([
+            {
+                jade: 'page.jade',
+                script: 'script.js',
+                south: './'
+            }
+        ])
+
     ]
 };
