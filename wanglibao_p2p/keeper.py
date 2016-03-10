@@ -27,7 +27,6 @@ import json
 from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
-from .tasks import coop_amortizations_push
 
 
 
@@ -592,6 +591,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
             if settled_sub_amos:
+                from .tasks import coop_amortizations_push
                 coop_amortizations_push.apply_async(
                     kwargs={'amortizations': settled_sub_amos, 'product_id': amortization.product.id})
 

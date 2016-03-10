@@ -1747,61 +1747,60 @@ class OauthUserRegisterApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        pass
-        # data = request.session
-        # form = OauthUserRegisterForm(data)
-        # if form.is_valid():
-        #     sign = form.cleaned_data['sign']
-        #     if form.check_sign(sign):
-        #         phone = form.cleaned_data['phone']
-        #         channel_code = form.cleaned_data['channel_code']
-        #         password = generate_random_password(6)
-        #         user = create_user(phone, password, "")
-        #         client = form.get_client()
-        #         if user:
-        #             device = split_ua(request)
-        #             if device['device_type'] == "pc":
-        #                 auth_user = authenticate(identifier=phone, password=password)
-        #                 auth_login(request, auth_user)
-        #
-        #             send_messages.apply_async(kwargs={
-        #                 "phones": [phone, ],
-        #                 "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
-        #             })
-        #
-        #             # 处理第三方渠道的用户信息
-        #             CoopRegister(request).all_processors_for_user_register(user, channel_code)
-        #
-        #             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
-        #
-        #             tid = get_uid_for_coop(user.id)
-        #             callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
-        #             response_data = {
-        #                 'Code': 101,
-        #                 'message': u'成功',
-        #                 'Cust_key': tid,
-        #                 'Access_tokens': create_access_token(user, client).token,
-        #                 'Callback_url': callback_url,
-        #             }
-        #
-        #             return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-        #         else:
-        #             response_data = {
-        #                 'Code': 10009,
-        #                 'message': u'注册失败',
-        #             }
-        #     else:
-        #         response_data = {
-        #             'Code': 10008,
-        #             'message': u'签名错误',
-        #         }
-        # else:
-        #     form_errors = form.errors
-        #     form_error_keys = form_errors.keys()
-        #     form_error = form_errors[form_error_keys[0]][0]
-        #     response_data = {
-        #         'Code': 10010,
-        #         'message': form_error,
-        #     }
-        #
-        # return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+        data = request.session
+        form = OauthUserRegisterForm(data)
+        if form.is_valid():
+            sign = form.cleaned_data['sign']
+            if form.check_sign(sign):
+                phone = form.cleaned_data['phone']
+                channel_code = form.cleaned_data['channel_code']
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                client = form.get_client()
+                if user:
+                    device = split_ua(request)
+                    if device['device_type'] == "pc":
+                        auth_user = authenticate(identifier=phone, password=password)
+                        auth_login(request, auth_user)
+
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    tid = get_uid_for_coop(user.id)
+                    callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
+                    response_data = {
+                        'Code': 101,
+                        'message': u'成功',
+                        'Cust_key': tid,
+                        'Access_tokens': create_access_token(user, client).token,
+                        'Callback_url': callback_url,
+                    }
+
+                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+                else:
+                    response_data = {
+                        'Code': 10009,
+                        'message': u'注册失败',
+                    }
+            else:
+                response_data = {
+                    'Code': 10008,
+                    'message': u'签名错误',
+                }
+        else:
+            form_errors = form.errors
+            form_error_keys = form_errors.keys()
+            form_error = form_errors[form_error_keys[0]][0]
+            response_data = {
+                'Code': 10010,
+                'message': form_error,
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
