@@ -100,7 +100,7 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def amortize(self, principal, interest, penal_interest, coupon_interest, description=u'', savepoint=True):
+    def amortize(self, principal, interest, penal_interest, coupon_interest, redpack_amount=0, description=u'', savepoint=True):
         check_amount(principal)
         check_amount(interest)
         check_amount(penal_interest)
@@ -110,9 +110,19 @@ class MarginKeeper(KeeperBaseMixin):
         coupon_interest = Decimal(coupon_interest)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
-            catalog = u'还款入账'
-            margin.margin += principal
-            self.__tracer(u'本金入账', principal, margin.margin, u'本金入账')
+            # catalog = u'还款入账'
+            if redpack_amount == 0:
+                margin.margin += principal
+                self.__tracer(u'本金入账', principal, margin.margin, u'本金入账')
+            else:
+                # 拆分本金中含有的红包
+                principal_left = principal - redpack_amount
+                margin.margin += principal_left
+                self.__tracer(u'本金入账', principal_left, margin.margin, u'本金入账')
+
+                margin.margin += redpack_amount
+                self.__tracer(u'红包本金入账', redpack_amount, margin.margin, u'红包本金入账')
+
             margin.margin += interest
             self.__tracer(u'利息入账', interest, margin.margin, u'利息入账')
             if penal_interest > 0:

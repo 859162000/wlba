@@ -406,6 +406,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             description = unicode(amortization)
             catalog = u'分期还款'
             product = amortization.product
+            last_term = ProductAmortization.objects.filter(product=product).count()
 
             matches = re.search(u'日计息', product.pay_method)
             if matches and matches.group():
@@ -416,12 +417,29 @@ class AmortizationKeeper(KeeperBaseMixin):
             phone_list = list()
             message_list = list()
             for sub_amo in sub_amortizations:
+                # 折中处理,在还款时拆分红包金额
                 # 计算用户使用的红包总金额,判断还款方式,将红包总金额随本金一起记入还款流水
+                redpack_amount = 0
                 redpack_amount_sum = RedPackRecord.objects.filter(user=sub_amo.user, product_id=product.id)\
                     .aggregate(Sum('apply_amount'))['apply_amount__sum']
+                if redpack_amount_sum > 0:
+                    redpack_amount_sum = Decimal(str(redpack_amount_sum))
+                    if product.pay_method == u'等额本息':
+                        # 按期数平均拆分红包金额
+                        redpack_amount_avg = Decimal(str(redpack_amount_sum)) / Decimal(str(product.period))
+                        redpack_amount_avg = redpack_amount_avg.quantize(Decimal('.01'), rounding=ROUND_DOWN)
+                        if sub_amo.term == last_term:
+                            redpack_amount = redpack_amount_sum - redpack_amount_avg * (product.period - 1)
+                        else:
+                            redpack_amount = redpack_amount_avg
+                    else:
+                        if sub_amo.term == last_term:
+                            redpack_amount = redpack_amount_sum
+
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                                            sub_amo.coupon_interest, savepoint=False, description=description)
+                                            sub_amo.coupon_interest, redpack_amount=redpack_amount,
+                                            savepoint=False, description=description)
 
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
