@@ -4,7 +4,7 @@ html(style="background: #91ce00")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015031001", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015031002", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -15,7 +15,7 @@ html(style="background: #91ce00")
             .title_img
                 img(src='/static/imgs/mobile_activity/app_spring_mobilization/banner_text_bg.png')
                 .title_img_text.title_img_text_1 跟随LEO去踏青，投资福利送不停!
-            .title_text.title_text1 在5000元≤单笔投资额＜50000元（任意标期）即可获得一次翻牌机会，随机抽中10元~100元红包，投资金额越高中大奖机会越大，出游红包伴你春日好心情！
+            .title_text.title_text1 在5000元≤单笔投资额＜50000元（3月及以上标期）即可获得一次翻牌机会，随机抽中10元~100元红包，投资金额越高中大奖机会越大，出游红包伴你春日好心情！
             .card_wrap
                 .card_main
                     .card_box.card_left(data-card='1')
@@ -74,28 +74,30 @@ html(style="background: #91ce00")
                         .title_top 5万元≤单笔投资＜10万元
                         .send_text 送
                         img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_1.png')
-                        .price_img_text 200元
-                        .price_text 200元红包
+                        .price_img_text 150元
+                        .price_text 150元红包
                     .price_box.price_box_right
                         .title_top 10万元≤单笔投资＜20万元
                         .send_text 送
-                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_2.png')
-                        .price_text 500元京东E卡
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_1.png')
+                        .price_img_text 350元
+                        .price_text 350元红包
                     .price_box
                         .title_top 20万元≤单笔投资＜30万元
                         .send_text 送
-                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_3.png')
-                        .price_text 1098元 beats头戴式耳机
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_1.png')
+                        .price_img_text 800元
+                        .price_text 800元红包
                     .price_box.price_box_right
                         .title_top 30万元≤单笔投资＜50万元
                         .send_text 送
-                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_5.png')
-                        .price_text 2199元 小米平衡车
+                        img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_3.png')
+                        .price_text 1350元 beats头戴式耳机
                     .price_box.price_box_center
                         .title_top 50万元≤单笔投资
                         .send_text 送
                         img.price_img(src='/static/imgs/mobile_activity/app_spring_mobilization/prize_img_4.png')
-                        .price_text 3300元 Apple Watch 运动智能手表
+                        .price_text 2500元 Apple Watch 运动智能手表
             .button.button_2
                 img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
                 img.grass_4(src='/static/imgs/mobile_activity/app_spring_mobilization/grass.png')
@@ -224,7 +226,7 @@ html(style="background: #91ce00")
                     .popup_button 我知道了
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015031001")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015031003")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
