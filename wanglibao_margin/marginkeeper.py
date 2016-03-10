@@ -117,6 +117,8 @@ class MarginKeeper(KeeperBaseMixin):
             else:
                 # 拆分本金中含有的红包
                 principal_left = principal - redpack_amount
+                if principal_left < 0:
+                    principal_left = 0
                 margin.margin += principal_left
                 self.__tracer(u'本金入账', principal_left, margin.margin, u'本金入账')
 
