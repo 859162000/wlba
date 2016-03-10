@@ -234,7 +234,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     });
     var login = false;
-    alert('123');
+    alert('321');
     wlb.ready({
         app: function(mixins) {
 
@@ -256,15 +256,15 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         },
         other: function() {
-            alert('1');
-            $('.button').click(function() {
-                alert('2');
-                if(h5_user_static) {
-                    window.location.href = '/weixin/list/'
-                }else {
-                    window.location.href = '/weixin/login/?next=/weixin/list/'
-                }
-            })
+            alert('3');
+            //$('.button').click(function() {
+            //    alert('2');
+            //    if(h5_user_static) {
+            //        window.location.href = '/weixin/list/'
+            //    }else {
+            //        window.location.href = '/weixin/login/?next=/weixin/list/'
+            //    }
+            //})
             //console.log('其他场景的业务逻辑');
 
         }
