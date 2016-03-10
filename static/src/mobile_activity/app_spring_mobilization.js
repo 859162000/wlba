@@ -157,6 +157,7 @@
 			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
+                    connect(data);
                     login = false;
                     $('span#chance_num').hide();
                     $('span#zero').css('display', 'inline-block');
