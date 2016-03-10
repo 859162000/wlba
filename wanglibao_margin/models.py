@@ -93,8 +93,8 @@ class MonthProduct(models.Model):
     product_id = models.CharField(verbose_name=u'月利宝产品ID', max_length=100)
     trade_id = models.CharField(verbose_name=u'交易ID', max_length=100)
     token = models.CharField(db_index=True, verbose_name=u'订单号token', unique=True, max_length=64)
-    amount = models.DecimalField(verbose_name=u'交易金额', max_digits=12, decimal_places=2)
-    amount_source = models.DecimalField(verbose_name=u'交易金额', max_digits=12, decimal_places=2)
+    amount = models.DecimalField(verbose_name=u'交易金额', max_digits=12, decimal_places=2)             # 优惠后金额
+    amount_source = models.DecimalField(verbose_name=u'交易金额', max_digits=12, decimal_places=2)      # 总金额
     red_packet = models.DecimalField(verbose_name=u'红包金额', max_digits=10, decimal_places=2)
     red_packet_type = models.CharField(db_index=True, verbose_name=u'红包类型',
                                        choices=RED_PACKET_TYPE, default='-1', max_length=32)

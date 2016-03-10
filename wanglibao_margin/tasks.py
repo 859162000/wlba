@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import logging
+
 import requests
 import simplejson
 from django.contrib.auth.models import User
@@ -13,6 +15,9 @@ from wanglibao_margin.php_utils import PhpMarginKeeper, php_redpack_consume
 from wanglibao_redpack.models import RedPackRecord
 
 
+logger = logging.getLogger('wanglibao_margin')
+
+
 def save_to_sqs(url, data):
 
     response = requests.post(url, data)
@@ -21,14 +26,17 @@ def save_to_sqs(url, data):
 
 
 @app.task
-def buy_month_product(token=None, red_packet_id=None, amount=None, user=None, device_type=None):
+def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=None, device_type=None):
     """
     对这个购买的月利宝记录进行扣款冻结操作.
     :param token: month_product's unique token.
     ###  :param product: pass a month_product object error!
+    amount_source: 购买的总金额
+    ###### 以下  如果是 amount 是 优惠后的金额
     :return:
     """
     product = MonthProduct.objects.filter(token=token).first()
+
     if not product:
         return
 
@@ -43,20 +51,21 @@ def buy_month_product(token=None, red_packet_id=None, amount=None, user=None, de
         try:
             with transaction.atomic(savepoint=True):
                 buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
-                buyer_keeper.freeze(product.amount, description='')
+                buyer_keeper.freeze(amount_source, description=u'月利宝购买冻结')
                 product.trade_status = 'PAID'
                 product.save()
                 ret.update(status=1,
-                           token=product.token,
+                           token=token,
                            msg='success')
 
                 # 如果使用红包的话, 增加红包使用记录
                 if red_packet_id and int(red_packet_id) > 0:
+                    logger.debug('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
                     redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
                     user = User.objects.filter(pk=user).first()
                     redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
                                                                product_id=product.product_id, status=u'新建').id
-                    result = php_redpack_consume(red_packet_id, amount, user, product.id, device_type, product.product_id)
+                    result = php_redpack_consume(red_packet_id, amount_source, user, product.id, device_type, product.product_id)
                     if result['ret_code'] != 0:
                         raise Exception, result['message']
                     if result['rtype'] != 'interest_coupon':
@@ -64,11 +73,7 @@ def buy_month_product(token=None, red_packet_id=None, amount=None, user=None, de
                                                                   order_id=redpack_order_id, savepoint=False)
 
         except Exception, e:
-            f = open('.stdout.txt', 'a+')
-            print >> f, 'buy month product failed with error:'
-            print >> f, 'e = {}'.format(e)
-            print >>f, 'redpack id = {}'.format(red_packet_id)
-            f.close()
+            logger.debug('buy month product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
             product.trade_status = 'FAILED'
             product.save()
             ret.update(status=0,
@@ -83,6 +88,9 @@ def buy_month_product(token=None, red_packet_id=None, amount=None, user=None, de
     args = simplejson.dumps(args_data)
     request_url = settings.PHP_SQS_HOST
     res = save_to_sqs(request_url, args)
+
+    logger.info('in buy month product, token = {}, freeze = {}'.format(token, product.amount_source))
+    logger.info('save to sqs! args = {}, return = {}'.format(args, res))
 
     print res.text
 
@@ -126,6 +134,7 @@ def assignment_buy(buyer_token=None, seller_token=None):
                            sellToken=assignment.seller_token,
                            msg='success')
         except Exception, e:
+            logger.debug('buy month product failed with exception: {}'.format(str(e)))
             assignment.trade_status = 'FAILED'
             ret.update(status=0,
                        buyToken=assignment.buyer_token,
@@ -139,5 +148,8 @@ def assignment_buy(buyer_token=None, seller_token=None):
     data = simplejson.dumps(data)
     url = settings.PHP_SQS_HOST
     ret = save_to_sqs(url, data)
+
+    logger.info('in buy zhaizhuang, buyer_token = {}, seller_token = {}'.format(buyer_token, seller_token))
+    logger.info('save to sqs! args = {}, return = {}'.format(data, ret))
 
     print ret.text

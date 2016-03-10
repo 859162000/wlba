@@ -427,6 +427,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_sms.log',
             'formatter': 'verbose'
         },
+        'wanglibao_margin': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/yuelibao.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -475,7 +481,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_margin': {
-            'handlers': ['file'],
+            'handlers': ['file', 'wanglibao_margin'],
             'level': 'DEBUG',
         },
         'wanglibao_lottery': {

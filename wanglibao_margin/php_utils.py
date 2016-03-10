@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import decimal
+import logging
 from decimal import Decimal
 
 import datetime
@@ -22,6 +23,8 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_pay.util import fmt_two_amount
 from wanglibao_redpack.backends import _decide_device, get_start_end_time, REDPACK_RULE, stamp, _calc_deduct
 from wanglibao_redpack.models import PhpIncome, RedPackRecord, RedPackEvent, RedPack
+
+logger = logging.getLogger('wanglibao_margin')
 
 
 def set_cookie(response, key, value, hours_expire=1, domain=settings.SESSION_COOKIE_DOMAIN):
@@ -659,3 +662,4 @@ def send_redpacks(event_id, user_ids):
         return {'status': 1, 'msg': 'success!'}
     except Exception, e:
         return {'status': 0, 'msg': 'send red_packs error: {}'.format(str(e))}
+    logger.debug("{} ".format(timezone.now()))

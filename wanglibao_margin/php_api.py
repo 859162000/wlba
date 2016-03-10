@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+import logging
 
 from django.contrib import auth
 from django.db import transaction
@@ -13,13 +14,14 @@ from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
-    calc_php_commission, php_redpacks, send_redpacks
+    calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_redpack.backends import restore
 
 from wanglibao_rest import utils
+
+logger = logging.getLogger('wanglibao_margin')
 
 
 class GetUserInfo(APIView):
@@ -215,6 +217,7 @@ class CheckTradePassword(APIView):
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
             ret = {'status': 0, 'message': str(e)}
+            logger.debug('CheckTradePassword with {}!'.format(str(e)))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -256,10 +259,12 @@ class YueLiBaoBuy(APIView):
             )
             device = utils.split_ua(self.request)
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
-                                                  'amount': amount, 'user': user_id, 'device_type': device['device_type']})
+                                                  'amount_source': amount_source, 'user': user_id,
+                                                  'device_type': device['device_type']})
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
         except Exception, e:
+            logger.debug('buy month product failed with {}!'.format(str(e)))
             return HttpResponse(renderers.JSONRenderer().render(
                 {'status': '0', 'msg': 'args error! ' + str(e)}, 'application/json'))
 
@@ -305,7 +310,8 @@ class YueLiBaoBuyFail(APIView):
                     product.save()
 
                     # 增加回退红包接口
-                    restore(product.order_id, product_id, product.amount, user)
+                    php_redpack_restore(product.order_id, product_id, product.amount, user)
+                    logger.debug('purchase failed and restore red_pack. month_product_id = {},'.format(product_id))
 
             ret.update(status=1,
                        msg='success')
@@ -408,11 +414,15 @@ class YueLiBaoCancel(APIView):
                     user = product.user
                     product_id = product.product_id
                     buyer_keeper = PhpMarginKeeper(user, product_id)
-                    record = buyer_keeper.unfreeze(product.amount, description='')
+                    record = buyer_keeper.unfreeze(product.amount, description=u'月利宝流标')
 
                     # 状态置为已退款, 这个记录丢弃
                     product.cancel_status = True
                     product.save()
+
+                    # 增加回退红包接口
+                    php_redpack_restore(product.order_id, product_id, product.amount, user)
+                    logger.debug(u'流标返回红包. month_product_id = {},'.format(product_id))
 
                     status = 1 if record else 0
                     msg_list.append({'token': product.token, 'status': status})
