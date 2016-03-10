@@ -359,7 +359,20 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     wlb.ready({
         app: function(mixins) {
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
 
+                    }
+                })
+            }
 			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
@@ -371,6 +384,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     });
 
                 } else {
+                    connect(data);
                     login = true;
                     $('span#zero').hide();
                     $('span#chance_num').css('display','inline-block');
@@ -384,6 +398,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     if(data.ph != ''){
                         chance_num = $('#chance_num').text();
 
+                        if(chance_num>0){
                             if(!$(this).find('.card').hasClass('card_box_open')){
                                 chance_num--;
                                 $('#chance_num').text(chance_num);
@@ -391,14 +406,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                 //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
                                 //$(this).find('.card').addClass('card_box_open');
                             }
-
-                            //$('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
-                            //$('.popup_box .popup_button').hide();
-                            //$('.popup_box').show();
-                            //time_count = 2;
-                            //time_intervalId = setInterval(timerFunction, 1000);
-                            //time_intervalId;
-
+                        }else{
+                            $('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
+                            $('.popup_box .popup_button').hide();
+                            $('.popup_box').show();
+                            time_count = 2;
+                            time_intervalId = setInterval(timerFunction, 1000);
+                            time_intervalId;
+                        }
                     }else{
                         mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
                     }
