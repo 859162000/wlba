@@ -241,7 +241,7 @@ class WeixinCustomerServiceApi(AdminAPIView):
     @weixin_api_error
     def get(self, request):
         res = self.client.customservice.get_accounts()
-        self.client.customservice.upload_headimg()
+        # self.client.customservice.upload_headimg()
         return Response(res.json())
 
     @weixin_api_error
