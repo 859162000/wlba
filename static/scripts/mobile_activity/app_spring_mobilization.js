@@ -369,14 +369,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         ts: data.ts
                     },
                     success: function (data) {
-
+                        $('span#zero').hide();
+                        $('span#chance_num').css('display','inline-block');
                     }
                 })
             }
 			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
-                    mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
                     login = false;
                     $('span#chance_num').hide();
                     $('span#zero').css('display', 'inline-block');
