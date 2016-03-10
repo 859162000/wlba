@@ -28,7 +28,8 @@ from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEM
 
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
-#from wanglibao_reward.tasks import sendWechatPhoneReward
+from wanglibao_reward.tasks import sendWechatPhoneReward
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -57,6 +58,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # 发送红包
     # send_lottery.apply_async((user_id,))
 
+    processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
@@ -97,9 +99,9 @@ def register_ok(user_id, device):
     except Exception:
         pass
     ### Comment by hb on 2016-03-10
-    # sendWechatPhoneReward.apply_async(kwargs={
-    #     "user_id": user_id,
-    # })
+    #sendWechatPhoneReward.apply_async(kwargs={
+    #    "user_id": user_id,
+    #})
 
 
 @app.task
