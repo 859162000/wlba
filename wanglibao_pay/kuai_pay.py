@@ -849,7 +849,7 @@ class KuaiShortPay:
         headers['Content-Length'] = str(len(data))
         if settings.ENV ==  settings.ENV_STAGING:
             # kuai钱的ssl配置有问题，不被根信任，手动添加信任
-            res = requests.post(url, headers=headers, data=data, verify=False, auth=self.auth)
+            res = requests.post(url, headers=headers, data=data, verify=self.test_ca_pem, auth=self.auth)
         else:
             res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
         return res
