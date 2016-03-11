@@ -344,7 +344,8 @@ class PasswordResetGetIdentifierView(TemplateView):
 
             users = None
             if identifier_type == 'email':
-                users = User.objects.filter(email=identifier, is_active=True)
+                return HttpResponse(u"非法请求", status=400)
+                # users = User.objects.filter(email=identifier, is_active=True)
             elif identifier_type == 'phone':
                 users = User.objects.filter(wanglibaouserprofile__phone=identifier,
                                             wanglibaouserprofile__phone_verified=True)
@@ -355,6 +356,18 @@ class PasswordResetGetIdentifierView(TemplateView):
             if len(users) == 0:
                 return HttpResponse(u"找不到该用户", status=400)
             else:
+                try:
+                    # 清除session验证时间
+                    del request.session['phone_validated_time']
+
+                    # 如果session中已经有用户id,则验证已有的和当前提交的是否一致,不一致则认为是非法操作
+                    if request.session['user_to_reset']:
+                        session_user_id = request.session['user_to_reset']
+                        if session_user_id != users[0].id:
+                            return HttpResponse(u"非法请求", status=400)
+                except KeyError:
+                    pass
+
                 view = PasswordResetValidateView()
                 view.request = request
                 # if identifier_type == 'phone':
@@ -374,7 +387,6 @@ class PasswordResetGetIdentifierView(TemplateView):
 
 def send_validation_mail(request, **kwargs):
     user_id = request.session['user_to_reset']
-    #user_email = get_user_model().objects.get(pk=user_id).email
     user_email = User.objects.get(pk=user_id).email
 
     form = PasswordResetForm(data={
@@ -392,7 +404,6 @@ def send_validation_mail(request, **kwargs):
 
 def send_validation_phone_code(request, **kwargs):
     user_id = request.session['user_to_reset']
-    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
     user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
@@ -406,7 +417,6 @@ def validate_phone_code(request):
     logger.info("Enter validate_phone_code")
     validate_code = request.POST['validate_code']
     user_id = request.session['user_to_reset']
-    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
     user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
@@ -439,16 +449,24 @@ class ResetPassword(TemplateView):
             return HttpResponse(u'没有用户信息', status=500)
 
         user_id = request.session['user_to_reset']
-        #user = get_user_model().objects.get(pk=user_id)
         user = User.objects.get(pk=user_id)
 
         assert ('phone_validated_time' in request.session)
         last_validated_time = request.session['phone_validated_time']
         assert (last_validated_time != 0)
 
-        if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 30 * 60:
+        # 缩短session失效时间
+        if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 10 * 60:
             user.set_password(password1)
             user.save()
+            
+            # 清除session
+            try:
+                del request.session['phone_validated_time']
+                del request.session['user_to_reset']
+            except KeyError:
+                pass
+
             return HttpResponse(u'密码修改成功', status=200)
 
         else:
@@ -456,7 +474,6 @@ class ResetPassword(TemplateView):
 
 
 class UserViewSet(PaginatedModelViewSet):
-    #model = get_user_model()
     model = User
     serializer_class = UserSerializer
     permission_classes = IsAdminUser,
