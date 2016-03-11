@@ -182,7 +182,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        #'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
     }
 
 import sys
@@ -358,7 +358,8 @@ LOGGING = {
             'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         },
     },
     'handlers': {
@@ -383,7 +384,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/marketing.log',
-            'formatter': 'verbose'
+            'formatter': 'simple'
         },
         'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
@@ -516,6 +517,9 @@ LOGGING = {
         },
     }
 }
+
+from logging.config import dictConfig
+dictConfig(LOGGING)
 
 
 if ENV != ENV_DEV:
@@ -704,7 +708,7 @@ CELERYBEAT_SCHEDULE = {
     #每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
-        'schedule': crontab(minute=0, hour=1),
+        'schedule': crontab(minute=30, hour=0),
     },
     # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
     'sync_pay_result': {
@@ -857,6 +861,7 @@ else:
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
 
+KUAI_TEST_CA_PEM_PATH = os.path.join(CERT_DIR, 'kuai_test_ca.pem')
 
 YEE_URL = 'https://ok.yeepay.com/payapi'
 YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL

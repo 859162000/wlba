@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
 # encoding:utf-8
+from wanglibao import settings
 from base64 import b64decode 
 import logging 
 import traceback
@@ -672,6 +673,7 @@ class KuaiShortPay:
                         "Content-Type":"application/x-www-form-urlencoded"}
         self.xmlheader = '<?xml version="1.0" encoding="UTF-8"?>\n'
         self.pem = settings.KUAI_PEM_PATH
+        self.test_ca_pem = settings.KUAI_TEST_CA_PEM_PATH
         self.signature_pem = settings.KUAI_SIGNATURE_PEM_PATH
         self.auth = (self.MER_ID, self.MER_PASS)
         self.ERR_CODE_WAITING = '222222'

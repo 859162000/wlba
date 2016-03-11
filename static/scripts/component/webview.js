@@ -139,6 +139,11 @@ var wlb = (function () {
                 options.callback && options.callback(responseData);
             });
         },
+        shareStatus: function(callback){
+            this.bridge.registerHandler('shareStatus', function (backdata, responseCallback) {
+                callback && callback(backdata)
+            });
+        },
         /**
          * 获取用户信息
          * @param data 可不传
