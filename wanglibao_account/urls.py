@@ -121,7 +121,7 @@ urlpatterns = patterns(
     url(r'^password/reset/send_validate_code/', "wanglibao_account.views.send_validation_phone_code",
         name="send_validation_phone_code"),
     url(r'^password/reset/validate_phone_code/', "wanglibao_account.views.validate_phone_code"),
-    url(r'^password/reset/set_password/', ResetPassword.as_view(), name="password_reset_set_password"),
+    #url(r'^password/reset/set_password/', ResetPassword.as_view(), name="password_reset_set_password"),
     url(r'^password/reset/done/', TemplateView.as_view(template_name="password_reset_done.jade"),
         name="password_reset_done"),
     url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
