@@ -279,7 +279,7 @@ org.checin_in = (function () {
                 _self.appShare.touchShare({
                     title: '每日签到title',
                     content: '每日签到content',
-                    shareUrl: 'http://192.168.20.45:8000/api/m/check-in-share/'
+                    shareUrl: 'https://staging.wanglibao.com/api/m/check-in-share/'
                 })
             });
 
