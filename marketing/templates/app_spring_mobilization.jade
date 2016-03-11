@@ -58,7 +58,6 @@ html(style="background: #91ce00")
                             img.card_img(data-card='6' src='/static/imgs/mobile_activity/app_spring_mobilization/card_img_6.png')
             .card_chance 你有
                      span#chance_num {{chances}}
-                     span#zero 0
                      span 次翻牌机会
             .button.button_1
                 img.button_img(src='/static/imgs/mobile_activity/app_spring_mobilization/button.png')
@@ -226,7 +225,7 @@ html(style="background: #91ce00")
                     .popup_button 我知道了
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015031010")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015031102")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
