@@ -65,7 +65,7 @@ urlpatterns = patterns(
     url(r'^' + settings.ADMIN_ADDRESS + '/', include('weixin.admin_urls')),
     url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
@@ -104,6 +104,7 @@ urlpatterns = patterns(
 
     url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
     url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),
+    url(r'^generalize', TemplateView.as_view(template_name="client_generalize.jade")),
     url(r'^qiye/', include('wanglibao_qiye.urls')),
 )
 

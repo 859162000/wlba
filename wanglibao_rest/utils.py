@@ -15,7 +15,6 @@ from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
-from marketing.utils import get_user_channel_record
 
 logger = logging.getLogger(__name__)
 

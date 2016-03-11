@@ -344,7 +344,7 @@ class UserAddressAdmin(admin.ModelAdmin):
 
 class UserThreeOrderAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ("user", "order_on", "request_no", "thrid_order_id", "result_code", "created_at")
+    list_display = ("user", "order_on", "request_no", "result_code", "created_at")
     search_fields = ('user__wanglibaouserprofile__phone', "request_no")
     raw_id_fields = ('user', )
 

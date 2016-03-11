@@ -64,11 +64,9 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
-from wanglibao_account.utils import Crypto
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_account.cooperation import get_uid_for_coop
-import hashlib
 from .forms import OauthUserRegisterForm
 
 

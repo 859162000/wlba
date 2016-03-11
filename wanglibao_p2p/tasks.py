@@ -3,7 +3,6 @@
 
 import json
 import random
-import requests
 from celery.utils.log import get_task_logger
 
 from django.forms import model_to_dict
@@ -24,7 +23,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
-from wanglibao_account.utils import get_bajinshe_access_token, generate_coop_base_data
+from wanglibao_account.utils import generate_coop_base_data
 from wanglibao_account.tasks import common_callback_for_post
 from marketing.utils import get_user_channel_record
 from django.conf import settings

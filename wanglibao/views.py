@@ -19,9 +19,7 @@ from wanglibao import settings
 from wanglibao_rest import utils as rest_utils
 import logging
 from weixin.base import ChannelBaseTemplate
-from wanglibao_account.cooperation import CoopRegister
 from wanglibao_rest.utils import has_register_for_phone
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -324,7 +322,7 @@ def landpage_view(request):
                     else:
                         url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
             elif action == 'register':
-                action_uri = 'weixin_register' if is_mobile else 'auth_register'
+                action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
                 url = reverse(action_uri) + "?promo_token=" + channel_code
         else:
             url = reverse(activity_page) + "?promo_token=" + channel_code

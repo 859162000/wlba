@@ -119,8 +119,8 @@ INSTALLED_APPS = (
     'report',
     'misc',
 
-    # 'provider',
-    # 'provider.oauth2',
+    'provider',
+    'provider.oauth2',
 
     'widget_tweaks',
     'mathfilters',
@@ -217,8 +217,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
     'weixin.auth_backend.OpenidAuthBackend',
-    'wanglibao_oauth2.backends.AccessTokenBackend',
-    'wanglibao_oauth2.backends.AccessTokenBackendV2'
 )
 import django.contrib.auth.backends
 
