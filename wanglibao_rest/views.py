@@ -46,7 +46,8 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua, get_client_ip, has_binding_for_bid, get_coop_binding_for_phone
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
+                                  get_coop_binding_for_phone, get_coop_access_token)
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
@@ -68,6 +69,7 @@ from wanglibao.views import landpage_view
 import urllib
 from wanglibao_account.cooperation import get_uid_for_coop
 import hashlib
+from .forms import OauthUserRegisterForm
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1750,18 +1752,20 @@ class OauthUserRegisterApi(APIView):
         data = request.session
         form = OauthUserRegisterForm(data)
         if form.is_valid():
-            sign = form.cleaned_data['sign']
-            if form.check_sign(sign):
+            channel_code = form.cleaned_data['channel_code']
+            coop_key_str = '%s_COOP_KEY' % channel_code.upper()
+            coop_key = getattr(settings, coop_key_str, None)
+            if form.check_sign(coop_key):
                 phone = form.cleaned_data['phone']
-                channel_code = form.cleaned_data['channel_code']
                 password = generate_random_password(6)
                 user = create_user(phone, password, "")
-                client = form.get_client()
                 if user:
+                    client_id = form.cleaned_data['client_id']
+                    channel_code = form.cleaned_data['channel_code']
                     device = split_ua(request)
-                    if device['device_type'] == "pc":
-                        auth_user = authenticate(identifier=phone, password=password)
-                        auth_login(request, auth_user)
+                    # if device['device_type'] == "pc":
+                    #     auth_user = authenticate(identifier=phone, password=password)
+                    #     auth_login(request, auth_user)
 
                     send_messages.apply_async(kwargs={
                         "phones": [phone, ],
@@ -1774,16 +1778,21 @@ class OauthUserRegisterApi(APIView):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                     tid = get_uid_for_coop(user.id)
-                    callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
-                    response_data = {
-                        'Code': 101,
-                        'message': u'成功',
-                        'Cust_key': tid,
-                        'Access_tokens': create_access_token(user, client).token,
-                        'Callback_url': callback_url,
-                    }
-
-                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+                    res_data = get_coop_access_token(phone, client_id, tid, coop_key)
+                    if int(res_data['ret_code']) == 10000:
+                        callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
+                        response_data = {
+                            'Code': 101,
+                            'message': u'成功',
+                            'Cust_key': tid,
+                            'Access_tokens': res_data['token'],
+                            'Callback_url': callback_url,
+                        }
+                    else:
+                        response_data = {
+                            'Code': res_data['ret_code'],
+                            'message': res_data['message'],
+                        }
                 else:
                     response_data = {
                         'Code': 10009,

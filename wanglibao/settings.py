@@ -1277,11 +1277,15 @@ if ENV == ENV_PRODUCTION:
 
 
 # 渠道数据中心平台认证授权密钥
-CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
-CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
 if ENV == ENV_PRODUCTION:
+    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
     OAUTH2_URL = 'https://127.0.0.1:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://127.0.0.1:8001/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://127.0.0.1:8001/oauth2/access_token/'
 else:
+    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
     OAUTH2_URL = 'https://127.0.0.1:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://127.0.0.1:8001/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://127.0.0.1:8001/oauth2/access_token/'

@@ -218,3 +218,29 @@ def get_coop_binding_for_phone(channel_code, phone):
 
 def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
+
+
+def get_coop_access_token(phone, client_id, tid, coop_key):
+    url = settings.COOP_ACCESS_TOKEN_URL
+    logger.info('enter get_coop_access_token with url[%s]' % url)
+
+    sign = hashlib.md5(str(client_id) + str(phone) + coop_key).hexdigest()
+    data = {
+        'usn': phone,
+        'appid': client_id,
+        'signature': sign,
+        'p_user_id': tid,
+    }
+    try:
+        ret = requests.post(url, data=data)
+        response_data = ret.json()
+        logger.info('get_coop_access_token return: %s' % response_data)
+    except Exception, e:
+        response_data = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+        logger.info("get_coop_access_token failed to connect")
+        logger.info(e)
+
+    return response_data

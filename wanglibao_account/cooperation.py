@@ -58,14 +58,14 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL, RENRENLI_CALL_BACK_URL, RENRENLI_COOP_ID, RENRENLI_COOP_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback, common_callback_for_post
+                                    xunleivip_callback, coop_callback_for_post
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
-from wanglibao_account.utils import Crypto, get_bajinshe_access_token
+from wanglibao_account.utils import Crypto
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
@@ -1694,7 +1694,7 @@ class BaJinSheRegister(CoopRegister):
         logger.info("%s-Enter validate_call_back for user[%s]" % (channel.code, user.id))
         data = generate_coop_base_data('validate')
         data['user_id'] = user.id
-        common_callback_for_post.apply_async(
+        coop_callback_for_post.apply_async(
             kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
     def binding_card_call_back(self, user):
@@ -1702,7 +1702,7 @@ class BaJinSheRegister(CoopRegister):
         logger.info("%s-Enter binding_card_call_back for user[%s]" % (channel.code, user.id))
         data = generate_coop_base_data('bind_card')
         data['user_id'] = user.id
-        common_callback_for_post.apply_async(
+        coop_callback_for_post.apply_async(
             kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
     def register_call_back(self, user):
@@ -1715,6 +1715,7 @@ class BaJinSheRegister(CoopRegister):
                     'client_id': client_id,
                     'phone': user.wanglibaouserprofile.phone,
                     'btype': self.channel_code,
+                    'user': user.id,
                 }
                 data = dict(base_data, **act_data)
                 res = requests.post(url=self.call_back_url, data=data)
@@ -1745,7 +1746,7 @@ class BaJinSheRegister(CoopRegister):
             }
             data = dict(base_data, **act_data)
 
-            common_callback_for_post.apply_async(
+            coop_callback_for_post.apply_async(
                 kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
     def recharge_call_back(self, user, order_id):
@@ -1787,7 +1788,7 @@ class BaJinSheRegister(CoopRegister):
             }
             data = dict(base_data, **act_data)
 
-            common_callback_for_post.apply_async(
+            coop_callback_for_post.apply_async(
                 kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
 
