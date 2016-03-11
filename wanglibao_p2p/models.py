@@ -2,17 +2,15 @@
 
 import logging
 from decimal import Decimal
-from concurrency.fields import IntegerVersionField
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 
 logger = logging.getLogger(__name__)
 
 
 class P2PProduct(models.Model):
-    version = models.IntegerField(max_length=50)
+    version = models.CharField(max_length=50)
     category = models.CharField(max_length=16, default=u'普通', verbose_name=u'产品类别*')
     types = models.CharField(u"产品分类(新)", max_length=50, null=True)
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
