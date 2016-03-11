@@ -708,7 +708,7 @@ CELERYBEAT_SCHEDULE = {
     # 定期向渠道中心推送标的信息
     'p2p_product_push_to_coop': {
         'task': 'wanglibao_p2p.tasks.coop_product_push',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
     # 每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
