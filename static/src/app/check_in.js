@@ -41,29 +41,46 @@ org.checin_in = (function () {
             lib.fetch();
         },
         share: function(result){
-            var $share =  $('.share-status'), shareText = '';
+            var
+                _self = this,
+                $share =  $('.share-status'),
+                shareText = '',
+                shareStaus = result.data.share.status;
             $share.addClass('rm-loading');
-            shareText = result.data.share.status ? '今日已分享' : '今日未分享';
-            $share.find('.op-dec-title ').text(shareText)
-            $share.find('.op-dec-detail').text('分享得双倍')
 
-            $('.icon-share').on('touchend',function(){
-                if(result.data.share.status) return org.ui.alert('今天你已经分享过了')
-                lib.appShare.touchShare({
+            function shareInfo(status){
+                shareText = status ? '今日已分享' : '今日未分享';
+                $share.find('.op-dec-title ').text(shareText);
+                $share.find('.op-dec-detail').text('分享得双倍')
+            }
+            shareInfo(shareStaus)
+
+            $('.icon-share').on('click',function(){
+                if(shareStaus) return org.ui.alert('今天你已经分享过了')
+                _self.appShare.touchShare({
                     title: '每日签到title',
                     content: '每日签到content',
-                    shareUrl: 'http://192.168.20.45:8000/api/m/check-in-share/'
-                },function(data){
-                    _self.checkInAlert('share', '今日分享成功！获得888元体验金', '在(我的账户－体验金)中查看');
+                    shareUrl: 'https://staging.wanglibao.com/api/m/check-in-share/'
                 })
-            })
+            });
+
+            try{
+                _self.appShare.shareStatus(function(result){
+                    _self.checkInAlert('share', '今日签到成功！获得'+result.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看');
+                    shareStaus = true;
+                    shareInfo(shareStaus)
+                })
+            }catch(e){
+                alert('open in app')
+            }
+
         },
         signIn: function(status, amount){
             var $checkIn = $('.checIn-status'), checkInText ='';
 
-            $checkIn.addClass('rm-loading');
+            $checkIn.removeClass('active').addClass('rm-loading active');
             checkInText = status ? '今日已签到' : '今日未签到';
-            $checkIn.find('.op-dec-title').text(checkInText)
+            $checkIn.find('.op-dec-title').text(checkInText);
             $checkIn.find('.op-dec-detail').text('+'+amount+'体验金');
         },
         steriousGift:function(acount){
@@ -117,8 +134,10 @@ org.checin_in = (function () {
         checkIn: function(result){
             var _self = this, resultCopy = result.data.sign_in;
 
+            //连续签到日
             var continue_days = resultCopy.continue_days;
 
+            //当日是否签到
             if(!resultCopy.status){
 
                 _self.checkInOpeartion('sign_in', function(data){
@@ -126,9 +145,10 @@ org.checin_in = (function () {
                         console.log('今天签到成功')
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                             triggerUI(data.data.continue_days)
-                            _self.signIn(true, data.data.experience_amount)
+                            _self.signIn(true, data.data.experience_amount *2)
                         })
                     }
+                    //签到成功更新连续签到日
                     continue_days = data.data.continue_days;
 
                     function triggerUI(count){
@@ -142,11 +162,12 @@ org.checin_in = (function () {
                 })
             }
 
-            $('.active-gift').on('touchend', function(){
-                var giftDay = resultCopy.nextDayNote - resultCopy.continue_days;
+            var giftDay  = null;
+            $('.active-gift, .active-gift-open').on('click', function(){
+                giftDay = resultCopy.nextDayNote - continue_days;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
-                        console.log('礼物已另取锅了')
+                        org.ui.alert('礼物已经另取过了！')
                     }else{
                         _self.fetchGift(continue_days)
                     }
@@ -155,6 +176,9 @@ org.checin_in = (function () {
                     org.ui.alert('还未到达礼品日！')
                 }
             })
+
+
+
         },
         checkInOpeartion: function(action_type, callback){
             var _self = this;
@@ -256,7 +280,7 @@ wlb.ready({
     },
     other: function () {
         org.checin_in.init()
-        //alert('open in app!')
+        //alert('guy ! open in app!')
     }
 })
 
