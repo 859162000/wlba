@@ -197,10 +197,21 @@ def deposit_ok(user_id, amount, device, order_id):
 
 
 @app.task
-def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, device_type):
+def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, device):
     user = User.objects.filter(id=user_id).first()
     # 短信通知添加用户名
-
+    try:
+        # 支持通过字典传递完整的device信息或是通过str直接传device_type
+        if isinstance(device, dict):
+            device_type = device['device_type']
+        elif isinstance(device, str) or isinstance(device, unicode):
+            assert device in ['pc', 'ios', 'android']
+            device_type = device
+        else:
+            raise
+    except:
+        device_type = u'pc'
+        logger.exception("=withdraw_ok= Failed to get device_type")
 
     send_messages.apply_async(kwargs={
         'phones': [phone],
@@ -231,7 +242,12 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
                                         #"url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
                                             })},
                                         queue='celery02')
-    
+
+    try:
+        utils.log_clientinfo(device, "withdraw", user_id, order_id, amount)
+    except Exception:
+        pass
+
     send_withdraw_data.apply_async(kwargs={
         "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
     })
