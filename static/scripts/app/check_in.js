@@ -356,6 +356,7 @@ org.checin_in = (function () {
             //连续签到日
             var continue_days = resultCopy.continue_days;
 
+            //当日是否签到
             if(!resultCopy.status){
 
                 _self.checkInOpeartion('sign_in', function(data){
