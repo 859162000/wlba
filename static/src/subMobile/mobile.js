@@ -805,7 +805,7 @@ org.detail = (function (org) {
                 //alert(hide);
                 //if(hide){
                 //    alert("测试");
-                org.hideMenuItems({
+                wx.hideMenuItems({
                     menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
                 });
                 //}
