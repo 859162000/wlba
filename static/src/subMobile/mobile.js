@@ -149,7 +149,7 @@ var org = (function () {
         _onMenuShareTimeline: function (ops, suFn, canFn) {
             wx.onMenuShareTimeline(lib._setShareData(ops, suFn, canFn));
         },
-        _onMenuShareQQ: function () {
+        _onMenuShareQQ: function (ops, suFn, canFn) {
             wx.onMenuShareQQ(lib._setShareData(ops, suFn, canFn));
         }
     }
@@ -741,7 +741,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: false,
+                        debug: true,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
