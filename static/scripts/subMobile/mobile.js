@@ -858,7 +858,6 @@ org.detail = (function (org) {
         * 微信分享
          */
         _share: function(obj,hide){
-            alert("share");
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideOptionMenu'];
             org.ajax({
                 type : 'GET',
@@ -928,13 +927,13 @@ org.detail = (function (org) {
                         success && success();
                     }
                 });
-                alert(hide);
-                if(hide){
-                    alert("测试");
-                    org.hideMenuItems({
-                        menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
-                    });
-                }
+                //alert(hide);
+                //if(hide){
+                //    alert("测试");
+                org.hideMenuItems({
+                    menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+                });
+                //}
 
             })
         },
