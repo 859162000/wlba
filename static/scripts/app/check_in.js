@@ -353,6 +353,7 @@ org.checin_in = (function () {
         checkIn: function(result){
             var _self = this, resultCopy = result.data.sign_in;
 
+            //连续签到日
             var continue_days = resultCopy.continue_days;
 
             if(!resultCopy.status){
@@ -365,6 +366,7 @@ org.checin_in = (function () {
                             _self.signIn(true, data.data.experience_amount)
                         })
                     }
+                    //签到成功更新连续签到日
                     continue_days = data.data.continue_days;
 
                     function triggerUI(count){
@@ -378,8 +380,8 @@ org.checin_in = (function () {
                 })
             }
 
-            $('.active-gift').on('click', function(){
-                var giftDay = resultCopy.nextDayNote - resultCopy.continue_days;
+            $('.active-gift, .active-gift-open').on('click', function(){
+                var giftDay = resultCopy.nextDayNote - continue_days;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
                         org.ui.alert('礼物已经另取过了！')
