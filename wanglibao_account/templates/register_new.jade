@@ -30,7 +30,7 @@ html
                                 i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
                             li#passWordInput.pwdLi.clearfix
                                 label 输入密码 ：
-                                input.registerPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                                input.registerPwd.placeholderInput.checkPwd(type="text",onfocus="this.type='password'",name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
                             li.SMELI.clearfix
                                 label 验证码 ：
                                 input#registerSMSCode.w115.placeholderInput.checkSEMCode(type="text", name="button-get-validate-code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
@@ -55,7 +55,7 @@ html
                     .go_next_welfare 下一步奖励：
                     .red_packets.clearfix
                         i
-                        label 实名认证送20元现金红包
+                        label 首次充值送80元红包
                     .info_middle.clearfix
                         .welfare_ed 已获得的奖励：
                         .nothing 奖励空空如也～
