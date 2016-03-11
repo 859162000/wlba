@@ -84,20 +84,37 @@
 
       $('.phone_change_failed').click(function(){
 
+
           $('.phone_modify_popup .phone_modify_popup_text').text('您已成功取消手机号修改申请');
           $('.phone_modify_popup').show();
-          var time_count = 2;
-          var timerFunction2 = function () {
-              if (time_count > 0) {
-                  time_count--;
-                  return
-              } else {
-                  clearInterval(time_intervalId2);
-                  $('.phone_modify_popup').hide();
-              }
-          };
-          var time_intervalId2 = setInterval(timerFunction2, 1000);
-          time_intervalId2;
+
+
+          $.ajax({
+            url: '/api/manual_modify/cancel/',
+            type: 'POST',
+            success: function (xhr) {
+
+                var time_count = 2;
+                var timerFunction2 = function () {
+                  if (time_count > 0) {
+                      time_count--;
+                      return
+                  } else {
+                      clearInterval(time_intervalId2);
+                      $('.phone_change_button').text('修改');
+                      $('#user_phone_static').hide();
+                      $('.phone_modify_popup').hide();
+                  }
+                };
+                var time_intervalId2 = setInterval(timerFunction2, 1000);
+                time_intervalId2;
+
+
+            },
+            error: function (xhr) {
+
+            }
+        });
       });
 
       /**/

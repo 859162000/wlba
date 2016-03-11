@@ -2242,10 +2242,12 @@ class IdentityInformationTemplate(TemplateView):
         modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
         modify_phone_state = 0
         if modify_phone_record:
-            if modify_phone_record.status == u'复审通过':
+            if modify_phone_record.status in [u'复审通过', u"取消申请"]:
                 modify_phone_state = 1
             if modify_phone_record.status in [u'待初审', u'初审待定', u'待复审']:
                 modify_phone_state = 2
+            if modify_phone_record.status in [u"初审驳回", u"复审驳回"]:
+                modify_phone_state = 3
 
         return {
             "phone": safe_phone_str(profile.phone),
@@ -2377,10 +2379,10 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.id_user_image = id_user_image
             manual_record.card_user_image = card_user_image
             manual_record.save()
-
+            msg = "尊敬的%s，您已申请人工审核修改手机号，申请结果将在3个工作日内通过短信发送到本手机，请留意，退订回TD【网利科技】"%profile.name
             send_messages.apply_async(kwargs={
                 "phones": [new_phone, ],
-                "messages": ["尊敬的网利宝用户，您已申请人工审核修改手机号，申请结果将在1-2个工作日内通过短信发送到本手机，请留意", ],
+                "messages": [msg, ],
             })
             return Response({'ret_code': 0})
         else:
@@ -2388,6 +2390,25 @@ class ManualModifyPhoneAPI(APIView):
             for key, value in form.errors.iteritems():
                 message = ",".join(value)
             return Response({"message":message}, status=400)
+
+
+class CancelManualModifyPhoneAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        profile = user.wanglibaouserprofile
+        if not profile.id_is_valid or not profile.id_number:
+            return Response({'message':"还没有实名认证"}, status=400)
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"复审驳回", u"初审驳回"]).first()
+        if not modify_phone_record:
+            return Response({'message':"没有可以取消的申请"}, status=400)
+        modify_phone_record.status = u"取消申请"
+        modify_phone_record.save()
+        return Response({"message": "ok"})
 
 
 class SMSModifyPhoneValidateTemplate(TemplateView):
@@ -2510,9 +2531,10 @@ class SMSModifyPhoneAPI(APIView):
             sms_modify_record.status=u'短信修改手机号成功'
             sms_modify_record.save()
             #todo force user login again
+            msg = "尊敬的%s，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。退订回TD【网利科技】"%profile.name
             send_messages.apply_async(kwargs={
                 "phones": [new_phone, ],
-                "messages": ["尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。", ],
+                "messages": [msg, ],
             })
             return Response({'message':'ok'})
 
