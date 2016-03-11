@@ -4,6 +4,7 @@ from celery.utils.log import get_task_logger
 from wanglibao.celery import app
 from django.contrib.auth.models import User
 from marketing.models import IntroducedBy,Channels
+from marketing.utils import get_user_channel_record
 from wanglibao_pay.models import PayInfo
 import requests
 import json
@@ -28,24 +29,25 @@ def sendData(message,param):
     
 
 @app.task
-def send_register_data(user_id, device_type, channel):
+def send_register_data(user_id, device_type):
     """发送注册信息数据"""
     message = {}
     user = User.objects.filter(id=user_id).first()
     introduce = IntroducedBy.objects.filter(user=user).first()
-    channel_id = Channels.objects.filter(name=channel).first()
+    channel = get_user_channel_record(user_id)
     message['user_id'] = user.id
     message['zc_client'] = device_type
-    tel = user.wanglibaouserprofile.phone
-    message['tel'] = tel.replace(tel[3:-2], '*'*6)
+    #tel = user.wanglibaouserprofile.phone
+    #message['tel'] = tel.replace(tel[3:-2], '*'*6)
+    message['tel'] = user.wanglibaouserprofile.phone
     message['zc_time'] = user.date_joined.strftime('%Y-%m-%d %H:%M:%S')
     message['zc_from_userid'] = introduce.id if introduce else 0
-    message['channel_id'] = channel_id.id if channel_id else 0
-    message['channel_code'] = channel_id.code if channel_id else ''
-    message['channel_image'] = channel_id.image.name if channel_id else ''
-    message['channel_name'] = channel_id.name if channel_id else ''
-    message['channel_description'] = channel_id.description if channel_id else ''
-    message['channel_created_at'] = channel_id.created_at.strftime('%Y-%m-%d %H:%M:%S') if channel_id else ''
+    message['channel_id'] = channel.id if channel else 0
+    message['channel_code'] = channel.code if channel else ''
+    message['channel_image'] = channel.image.name if channel else ''
+    message['channel_name'] = channel.name if channel else ''
+    message['channel_description'] = channel.description if channel else ''
+    message['channel_created_at'] = channel.created_at.strftime('%Y-%m-%d %H:%M:%S') if channel else ''
     data = {'act':1}
     data['data'] = message
     sendData(data,'register')

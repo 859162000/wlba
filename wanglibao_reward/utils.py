@@ -201,7 +201,7 @@ def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
                         highest = march_awards.get('highest', 0)
                         lowest = march_awards.get('lowest', 0)
 
-                        if float(amount) >= lowest and float(amount) <= highest:
+                        if float(amount) >= float(lowest) and float(amount) < float(highest):
                             P2pOrderRewardRecord.objects.create(
                                 user=user,
                                 activity_desc=u'投资额度奖励',

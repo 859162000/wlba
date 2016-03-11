@@ -224,13 +224,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         type: 'post',
         success: function(data1) {
             h5_user_static = data1.login;
-            if(h5_user_static){
-                    $('span#zero').hide();
-                    $('span#chance_num').css('display','inline-block');
-                }else {
-                $('span#chance_num').hide();
-                $('span#zero').css('display', 'inline-block');
-            }
         }
     });
     var login = false;
@@ -366,19 +359,38 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     wlb.ready({
         app: function(mixins) {
-
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
+                    }
+                })
+            }
 			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
                     login = false;
-
+                    $('span#chance_num').text('0');
                     $('.button').click(function() {
                         mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
                     });
 
                 } else {
-                    login = true;
+                    connect(data);
 
+                    login = true;
                     $('.button').click(function() {
                         mixins.jumpToManageMoney();
                     });
@@ -386,8 +398,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
                 $('.card_box').click(function(){
                     card_no=$(this).attr('data-card');
-                    if(data.ph == ''){
+                    if(data.ph != ''){
                         chance_num = $('#chance_num').text();
+
                         if(chance_num>0){
                             if(!$(this).find('.card').hasClass('card_box_open')){
                                 chance_num--;
@@ -411,6 +424,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         },
         other: function() {
+            if(h5_user_static){
+            }else {
+                $('span#chance_num').text('0');
+            }
             $('.button').click(function() {
                 if(h5_user_static) {
                     window.location.href = '/weixin/list/'
