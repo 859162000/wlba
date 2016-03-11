@@ -14,7 +14,7 @@ webpackJsonp([12],[
 
 	var _from_validation = __webpack_require__(6);
 
-	var _images_validation = __webpack_require__(11);
+	var _images_validation = __webpack_require__(12);
 
 	(function () {
 
@@ -502,7 +502,8 @@ webpackJsonp([12],[
 /* 8 */,
 /* 9 */,
 /* 10 */,
-/* 11 */
+/* 11 */,
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';

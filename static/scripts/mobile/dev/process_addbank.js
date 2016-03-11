@@ -16,9 +16,9 @@ webpackJsonp([6],[
 
 	var _api = __webpack_require__(3);
 
-	var _simple_validation = __webpack_require__(8);
+	var _simple_validation = __webpack_require__(9);
 
-	var _bank_limit = __webpack_require__(9);
+	var _bank_limit = __webpack_require__(10);
 
 	(function () {
 
@@ -568,7 +568,8 @@ webpackJsonp([6],[
 
 /***/ },
 /* 7 */,
-/* 8 */
+/* 8 */,
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -731,7 +732,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";

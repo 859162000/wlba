@@ -11,10 +11,6 @@ if(process.env.NODE_ENV == 'pro'){
     BUILD_PATH = 'scripts/mobile/pro';
 }
 
-//var fs = require('fs');
-//fs.readdir(JS_PATH, function(err, files){
-//    console.log(files)
-//})
 
 module.exports = {
     entry: {
@@ -30,9 +26,10 @@ module.exports = {
         received_all: path.resolve(JS_PATH, 'received_all'),
         received_detail: path.resolve(JS_PATH, 'received_detail'),
         received_month: path.resolve(JS_PATH, 'received_month'),
-
         process_authentication: path.resolve(JS_PATH, 'process_authentication'),
         process_addbank: path.resolve(JS_PATH, 'process_addbank'),
+
+
         vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto')]
     },
     output: {
@@ -57,7 +54,7 @@ module.exports = {
     },
     plugins: [
         new webpack.ProvidePlugin({zepto: 'zepto', $: 'zepto'}),  //第三方库暴露到全局 不用import
-        new webpack.optimize.CommonsChunkPlugin({   //第三方库生成的文件
+        new webpack.optimize.CommonsChunkPlugin({
             name: ['vendor'],
            filename: "vendor.zepto.js"
         })

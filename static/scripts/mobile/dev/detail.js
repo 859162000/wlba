@@ -1,10 +1,13 @@
-webpackJsonp([3],[
-/* 0 */
+webpackJsonp([3],{
+
+/***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
 	var _api = __webpack_require__(3);
+
+	var _wx_share = __webpack_require__(8);
 
 	(function () {
 	    /**
@@ -19,7 +22,6 @@ webpackJsonp([3],[
 	     * 倒计时
 	     */
 	    var countDown = $('#countDown');
-
 	    var countDown_func = function countDown_func(target) {
 	        var endTimeList = target.attr('data-left').replace(/-/g, '/');
 	        var TimeTo = function TimeTo(dd) {
@@ -71,7 +73,7 @@ webpackJsonp([3],[
 	        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
 	        (0, _api.ajax)({
 	            type: 'GET',
-	            url: lib.weiURL,
+	            url: '/weixin/api/jsapi_config/',
 	            dataType: 'json',
 	            success: function success(data) {
 	                //请求成功，通过config注入配置信息,
@@ -97,20 +99,20 @@ webpackJsonp([3],[
 	                shareMainTit = '我在网利宝发现一个不错的投资标的，快来看看吧',
 	                shareBody = shareName + ',年收益' + $earningRate.attr('data-earn') + '%,期限' + $period.attr('data-period');
 	            //分享给微信好友
-	            wx.onMenuShareAppMessage({
+	            (0, _wx_share.onMenuShareAppMessage)({
 	                title: shareMainTit,
 	                desc: shareBody,
 	                link: shareLink,
 	                imgUrl: shareImg
 	            });
 	            //分享给微信朋友圈
-	            wx.onMenuShareTimeline({
+	            (0, _wx_share.onMenuShareTimeline)({
 	                title: shareMainTit,
 	                link: shareLink,
 	                imgUrl: shareImg
 	            });
 	            //分享给QQ
-	            wx.onMenuShareQQ({
+	            (0, _wx_share.onMenuShareQQ)({
 	                title: shareMainTit,
 	                desc: shareBody,
 	                link: shareLink,
@@ -122,5 +124,47 @@ webpackJsonp([3],[
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
+/***/ },
+
+/***/ 8:
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	var _setShareData = function _setShareData(ops, suFn, canFn) {
+	    var setData = {};
+	    if ((typeof ops === 'undefined' ? 'undefined' : _typeof(ops)) == 'object') {
+	        for (var p in ops) {
+	            setData[p] = ops[p];
+	        }
+	    }
+	    typeof suFn == 'function' && suFn != 'undefined' ? setData.success = suFn : '';
+	    typeof canFn == 'function' && canFn != 'undefined' ? setData.cancel = canFn : '';
+	    return setData;
+	};
+	/**
+	 * 分享到微信朋友
+	 */
+	var onMenuShareAppMessage = exports.onMenuShareAppMessage = function onMenuShareAppMessage(ops, suFn, canFn) {
+	    wx.onMenuShareAppMessage(_setShareData(ops, suFn, canFn));
+	};
+	/**
+	 * 分享到微信朋友圈
+	 */
+	var onMenuShareTimeline = exports.onMenuShareTimeline = function onMenuShareTimeline(ops, suFn, canFn) {
+	    wx.onMenuShareTimeline(_setShareData(ops, suFn, canFn));
+	};
+
+	var onMenuShareQQ = exports.onMenuShareQQ = function onMenuShareQQ() {
+	    wx.onMenuShareQQ(_setShareData(ops, suFn, canFn));
+	};
+
 /***/ }
-]);
+
+});
