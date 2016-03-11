@@ -65,7 +65,7 @@ class UserForm(forms.Form):
     def clean_user_id(self):
         user_id = self.cleaned_data['user_id']
         try:
-            user = User.object.get(pk=user_id)
+            user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             raise forms.ValidationError(
                 code=10020,

@@ -55,7 +55,7 @@ def common_callback_for_post(url, params, channel):
 
 @app.task
 def bajinshe_callback(url, data):
-    logger.info("enter bajinshe callback with url[%s]" % url)
+    logger.info("enter bajinshe callback with url[%s] data[%s]" % (url, data))
     headers = {
        'Content-Type': 'application/json',
     }
@@ -67,11 +67,7 @@ def bajinshe_callback(url, data):
     else:
         res_status_code = res.status_code
         if res_status_code == 200:
-            res_data = res.json()
-            if res_data['code'] != '10000':
-                logger.info("bajinshe callback return %s" % res_data)
-            else:
-                logger.info("bajinshe callback data[%s] suceess" % data)
+            logger.info("bajinshe callback return %s" % res.json())
         else:
             logger.info("bajinshe callback connect failed with status code [%s]" % res_status_code)
             logger.info(res.text)
