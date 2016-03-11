@@ -858,7 +858,7 @@ org.detail = (function (org) {
         * 微信分享
          */
         _share: function(obj,hide){
-            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideOptionMenu'];
+            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideMenuItems'];
             org.ajax({
                 type : 'GET',
                 url : lib.weiURL,
