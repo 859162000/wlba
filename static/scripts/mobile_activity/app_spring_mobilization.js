@@ -369,7 +369,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         ts: data.ts
                     },
                     success: function (data) {
-                        alert('启动');
                         var url = location.href;
                         var times = url.split("?");
                         if(times[1] != 1){
@@ -382,7 +381,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
-                    alert('weidenglu');
                     login = false;
                     $('span#chance_num').text('0');
                     $('.button').click(function() {
@@ -390,8 +388,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     });
 
                 } else {
-                    alert('denglu');
                     connect(data);
+
                     login = true;
                     $('.button').click(function() {
                         mixins.jumpToManageMoney();
