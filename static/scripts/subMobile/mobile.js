@@ -866,7 +866,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: true,
+                        debug: false,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -927,12 +927,10 @@ org.detail = (function (org) {
                         success && success();
                     }
                 });
-                //alert(hide);
                 //if(hide){
-                //    alert("测试");
-                wx.hideMenuItems({
-                    menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
-                });
+                //wx.hideMenuItems({
+                //    menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+                //});
                 //}
 
             })
