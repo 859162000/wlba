@@ -360,8 +360,12 @@ class CoopDataDispatchApi(APIView):
             for product in products:
                 product['publish_time'] = time.strptime(product['publish_time'], '%Y-%m-%d %H:%M:%S')
                 product['end_time'] = time.strptime(product['end_time'], '%Y-%m-%d %H:%M:%S')
-                product['soldout_time'] = time.strptime(product['soldout_time'], '%Y-%m-%d %H:%M:%S')
-                product['make_loans_time'] = time.strptime(product['make_loans_time'], '%Y-%m-%d %H:%M:%S')
+                p_soldout_time = product.get('soldout_time', None)
+                p_make_loans_time = product.get('make_loans_time', None)
+                if p_soldout_time:
+                    product['soldout_time'] = time.strptime(p_soldout_time, '%Y-%m-%d %H:%M:%S')
+                if p_make_loans_time:
+                    product['make_loans_time'] = time.strptime(p_make_loans_time, '%Y-%m-%d %H:%M:%S')
                 product_form = P2PProductForm(product)
                 if product_form.is_valid():
                     product_form.save()
