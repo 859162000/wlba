@@ -360,7 +360,8 @@ LOGGING = {
             'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         },
     },
     'handlers': {
@@ -385,7 +386,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/marketing.log',
-            'formatter': 'verbose'
+            'formatter': 'simple'
         },
         'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
@@ -518,6 +519,9 @@ LOGGING = {
         },
     }
 }
+
+from logging.config import dictConfig
+dictConfig(LOGGING)
 
 
 if ENV != ENV_DEV:
@@ -711,8 +715,18 @@ CELERYBEAT_SCHEDULE = {
     # 每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
-        'schedule': crontab(minute=0, hour=1),
+        'schedule': crontab(minute=30, hour=0),
     },
+    # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
+    'sync_pay_result': {
+        'task': 'wanglibao_pay.tasks.sync_pay_result',
+        'schedule': timedelta(minutes=10), 
+    },
+    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    # 'redpack_status_task_check': {
+    #     'task': 'marketing.tools.check_redpack_status',
+    #     'schedule': crontab(minute=0, hour=11),
+    # },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -748,16 +762,6 @@ if ENV == ENV_PRODUCTION:
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
-    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
-    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
-    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
-
-    YEE_URL = 'https://ok.yeepay.com/payapi'
-    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
-    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
-    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
-    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
-    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -802,13 +806,6 @@ elif ENV == ENV_PREPRODUCTION:
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
-
-    YEE_URL = 'https://ok.yeepay.com/payapi'
-    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
-    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
-    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
-    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
-    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -855,13 +852,6 @@ else:
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'staging_yee_mer_priv_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "staging_yee_public_key.pem"), "r").read())
 
-    YEE_URL = 'https://ok.yeepay.com/payapi'
-    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
-    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
-    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
-    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
-    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
-
     KUAI_PAY_URL = "https://sandbox.99bill.com:9445"
 
     #KUAI_PAY_URL = "https://sandbox.99bill.com:9445/cnp/purchase"
@@ -877,6 +867,18 @@ else:
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
+
+KUAI_TEST_CA_PEM_PATH = os.path.join(CERT_DIR, 'kuai_test_ca.pem')
+
+YEE_URL = 'https://ok.yeepay.com/payapi'
+YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
+YEE_SHORT_QUERY_TRX_RESULT = '%s/api/query/order' %  YEE_URL
+
+
 
 PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'

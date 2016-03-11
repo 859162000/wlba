@@ -42,7 +42,7 @@ from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
 from urllib import urlencode,quote
-from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
+from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote, WanglibaoRewardJoinRecord
 from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
@@ -1138,26 +1138,60 @@ class XunleiDistribute(ActivityRewardDistribute):
         status, response_msg = self.judge_valid_user(request, self.channels)
         if False==status:
             return response_msg
-        else:
-            self.generate(request)
-            return self.get_chances(request)
+        # Modify by hb on 2016-03-08
+        # else:
+        #     self.generate(request)
+        #     return self.get_chances(request)
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code=self.token).first()
+            if not join_record:
+                try :
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=request.user,
+                        activity_code=self.token,
+                        remain_chance=1,
+                    )
+                except Exception, ex :
+                    logger.exception("WanglibaoRewardJoinRecord: [%s] [%s] : [%s]" % (request.user, self.token, ex))
+                    rep = { 'err_code':2000, 'err_messege':u'系统繁忙，请稍后重试', }
+                    return HttpResponse(json.dumps(rep), content_type='application/json')
+            if join_record and join_record.remain_chance>0 :
+                self.generate(request)
+                join_record.remain_chance = join_record.remain_chance - 1
+                join_record.save()
+
+        return self.get_chances(request)
 
     def generate(self, request):
         #  判断有没有生成抽奖记录
         counts = WanglibaoActivityReward.objects.filter(user=request.user, activity=self.token).count()
         if counts > 0:
             return
+
+        ### Modify by hb on 2016-03-09
+        # experience_rate = {
+        #     1588: ('xunlei_experience_1588', 0, 4, 9),
+        #     1888: ('xunlei_experience_1888', 3, 8),
+        #     2588: ('xunlei_experience_2588', 2, 7),
+        #     3588: ('xunlei_experience_3588', 1, 6),
+        #     5888: ('xunlei_experience_5888', 5, ),
+        # }
+        # event_rate = {
+        #     1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
+        #     1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+        # }
         experience_rate = {
-            1588: ('xunlei_experience_1588', 0, 4, 9),
-            1888: ('xunlei_experience_1888', 3, 8),
-            2588: ('xunlei_experience_2588', 2, 7),
-            3588: ('xunlei_experience_3588', 1, 6),
-            5888: ('xunlei_experience_5888', 5, ),
+            1588: (u'春季迅雷活动奖励-体验金1588', 0, 4, 9),
+            1888: (u'春季迅雷活动奖励-体验金1888', 3, 8),
+            2588: (u'春季迅雷活动奖励-体验金2588', 2, 7),
+            3588: (u'春季迅雷活动奖励-体验金3588', 1, 6),
+            5888: (u'春季迅雷活动奖励-体验金5888', 5, ),
         }
         event_rate = {
-            1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
-            1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+            1.0: (u'春季迅雷活动奖励-加息券1.0', 0, 2, 4, 6, 8),
+            1.5: (u'春季迅雷活动奖励-加息券1.5', 1, 3, 5, 7, 9)
         }
+
         p2p_record = P2PRecord.objects.filter(user=request.user).first()
         if not p2p_record:  # 新用户
             no_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
@@ -1173,6 +1207,8 @@ class XunleiDistribute(ActivityRewardDistribute):
                     continue
 
                 counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(experience=None).count()
+                # Modify by hb on 2015-03-08
+                counts = counts % 9
                 for key, value in experience_rate.items():
                     if counts+1 not in value:
                         continue
@@ -1192,6 +1228,8 @@ class XunleiDistribute(ActivityRewardDistribute):
             for unused in xrange(3):
                 if when_reward == unused:
                     counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(redpack_event=None).count()
+                    # Modify by hb on 2015-03-08
+                    counts = counts % 9
                     for key, value in event_rate.items():
                         if counts+1 not in value:
                             continue
@@ -1220,7 +1258,9 @@ class XunleiDistribute(ActivityRewardDistribute):
         if False == status:
             return response_msg
 
-        self.generate(request)
+        #Modify by hb on 2015-03-08
+        # self.generate(request)
+        self.generate_rewards(request)
 
         with transaction.atomic():
             reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, has_sent=0, activity=self.token).first()
@@ -2599,22 +2639,27 @@ class MarchAwardTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         rank_activity = Activity.objects.filter(code='march_awards').first()
-        # utc_now = timezone.now()
-        yesterday = datetime.datetime.now()-datetime.timedelta(1)
-        yesterday_end = local_to_utc(yesterday, 'max')
-        yesterday_start = local_to_utc(yesterday, 'min')
+        utc_now = timezone.now()
+        # yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        # yesterday_end = local_to_utc(yesterday, 'max')
+        # yesterday_start = local_to_utc(yesterday, 'min')
         ranks = []
         chances = 0
-        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
-            user = self.request.user
-            if user.is_authenticated():
-                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+        user = self.request.user
+        yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        yesterday_end = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
+        yesterday_end = local_to_utc(yesterday_end, "")
+        # yesterday_start = local_to_utc(yesterday, 'min')
+
+        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
                 ranks = redis_backend()._lrange('top_ranks', 0, -1)
             except:
                 pass
             if not ranks:
                 ranks = updateRedisTopRank()
+            if user.is_authenticated():
+                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
 
         award_list = []
         redpack_events = {}
@@ -2680,7 +2725,7 @@ class FetchMarchAwardAPI(APIView):
             with transaction.atomic():
                 p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
                 if not p2pReward:
-                    return Response({"ret_code":-1, "message":"没有翻牌机会"})
+                    return Response({"ret_code":-1, "message":"您还没有翻牌机会，赶紧去投资吧"})
                 p2pRecord = P2PRecord.objects.filter(order_id=p2pReward.order_id).first()
                 if not p2pRecord:
                     return Response({"ret_code":-1, "message":"投资条件不符合"})
