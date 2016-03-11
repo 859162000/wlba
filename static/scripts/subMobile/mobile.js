@@ -2817,6 +2817,9 @@ org.checkIn = (function(org){
             var url = window.location.protocol +"//" + window.location.host;
             var share = {shareLink:url+'/weixin/sub_checkIn_share/', shareMainTit:'网利宝天天送我钱，不想要都不行～朋友们快来领啊～', shareBody:'速来网利宝抢钱，你还等什么', success:lib.shareFn};
             org.detail.share(share);
+            wx.hideMenuItems({
+                menuList: ['onMenuShareTimeline'] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+            });
         }
     };
     return {
