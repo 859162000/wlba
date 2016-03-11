@@ -733,6 +733,7 @@ org.detail = (function (org) {
         * 微信分享
          */
         _share: function(obj,hide){
+            alert("share");
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideOptionMenu'];
             org.ajax({
                 type : 'GET',
@@ -802,6 +803,7 @@ org.detail = (function (org) {
                         success && success();
                     }
                 });
+                alert(hide);
                 if(hide){
                     alert("测试");
                     org.hideMenuItems({
