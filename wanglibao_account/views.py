@@ -450,6 +450,14 @@ class ResetPassword(TemplateView):
         if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 10 * 60:
             user.set_password(password1)
             user.save()
+            
+            # 清除session
+            try:
+                del request.session['phone_validated_time']
+                del request.session['user_to_reset']
+            except KeyError:
+                pass
+
             return HttpResponse(u'密码修改成功', status=200)
 
         else:
