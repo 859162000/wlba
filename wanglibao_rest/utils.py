@@ -22,8 +22,15 @@ def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
 
 
-def get_current_utc_timestamp():
+def get_utc_timestamp(time_obj=timezone.now()):
     time_format = '%Y-%m-%d %H:%M:%S'
-    utc_time = timezone.now().strftime(time_format)
+    utc_time = time_obj.strftime(time_format)
+    utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
+    return utc_timestamp
+
+
+def utc_to_local_timestamp(time_obj=timezone.now()):
+    time_format = '%Y-%m-%d %H:%M:%S'
+    utc_time = timezone.localtime(time_obj).strftime(time_format)
     utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
     return utc_timestamp

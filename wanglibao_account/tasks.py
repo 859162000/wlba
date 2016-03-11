@@ -75,3 +75,27 @@ def bajinshe_callback(url, data):
         else:
             logger.info("bajinshe callback connect failed with status code [%s]" % res_status_code)
             logger.info(res.text)
+
+
+@app.task
+def renrenli_callback(url, data):
+    logger.info("enter renrenli callback with url[%s]" % url)
+    headers = {
+       'Content-Type': 'application/json',
+    }
+    data = json.dumps(data)
+    try:
+        res = requests.post(url=url, data=data, headers=headers)
+    except Exception, e:
+        logger.info("renrenli callback connect failed with error: %s" % e)
+    else:
+        res_status_code = res.status_code
+        if res_status_code == 200:
+            res_data = res.json()
+            if res_data['Code'] != '101':
+                logger.info("renrenli callback return %s" % res_data)
+            else:
+                logger.info("renrenli callback data[%s] suceess" % data)
+        else:
+            logger.info("renrenli callback connect failed with status code [%s]" % res_status_code)
+            logger.info(res.text)

@@ -366,13 +366,9 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 CELERY_QUEUES = {
-                "celery":  {"exchange": "celery",
-                              "routing_key": "celery"},
-                "celery01": {"exchange": "celery01",
-                              "routing_key": "celery01"},
-                "celery02": {"exchange": "celery02",
-                              "routing_key": "celery02"},
-                }
+    "coop_celery": {"exchange": "coop_celery",
+                    "routing_key": "coop_celery"},
+}
 
 from datetime import timedelta
 
@@ -433,3 +429,13 @@ else:
     BAJINSHE_ACCOUNT_PUSH_URL = 'http://test.jr360.com/json/v1/external/AccountService/pushAccount/gzip'
     BAJINSHE_TRANSACTION_PUSH_URL = 'http://test.jr360.com/json/v1/external/BusinessLogService/pushBusinessLog/gzip'
     BAJINSHE_PURCHASE_PUSH_URL = 'http://test.jr360.com/json/v1/external/InvestmentService/pushInvestment/gzip'
+
+
+# 人人利渠道
+WLB_FOR_RENRENLI_KEY = '2007'
+RENRENLI_COOP_ID = 'zlo_RrNuG'
+RENRENLI_COOP_KEY = 'zlopwd_ZAQ5bzRa'
+if ENV == ENV_PRODUCTION:
+    RENRENLI_PURCHASE_PUSH_URL = 'http://openapi.amoydao.com/zlo/getp2pinfo/getsubscribe/'
+else:
+    RENRENLI_PURCHASE_PUSH_URL = 'http://openapi.amoydao.com/zlo/getp2pinfo/getsubscribe/'

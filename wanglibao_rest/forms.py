@@ -31,17 +31,17 @@ class CoopDataDispatchForm(forms.Form):
                 code=10005,
             )
 
-    def clean_time(self):
-        _time = self.cleaned_data['time']
-        current_time = get_current_utc_timestamp()
-        # FixMe,修改超时时间
-        if int(current_time) - _time <= 120:
-            return _time
-        else:
-            raise forms.ValidationError(
-                message=u'无效时间戳',
-                code=10006,
-            )
+    # def clean_time(self):
+    #     _time = self.cleaned_data['time']
+    #     current_time = get_current_utc_timestamp()
+    #     # FixMe,修改超时时间
+    #     if int(current_time) - _time <= 120:
+    #         return _time
+    #     else:
+    #         raise forms.ValidationError(
+    #             message=u'无效时间戳',
+    #             code=10006,
+    #         )
 
     def check_sign(self, channel, _time, key, sign):
         local_sign = hashlib.md5(channel + key + str(_time)).hexdigest()

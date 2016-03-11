@@ -132,7 +132,7 @@ class UserAuthForm(OAuthForm):
 
         try:
             user = OauthUser.objects.get(user_id=user_id, client=self.client, user__wanglibaouserprofile__phone=usn).user
-        except OauthUser.DoesNotExist:
+        except Exception, e:
             raise OAuthValidationError({
                 'code': '10104',
                 'message': _("invalid user_id or usn or client")

@@ -14,11 +14,11 @@ from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client
-from wanglibao_rest.utils import get_current_utc_timestamp
+from wanglibao_rest.utils import get_utc_timestamp, utc_to_local_timestamp
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_margin.models import MarginRecord
 from wanglibao import settings
-from .tasks import bajinshe_callback
+from .tasks import bajinshe_callback, renrenli_callback
 from .utils import get_bajinshe_base_data
 
 
@@ -288,6 +288,11 @@ class BaJinSheRegister(CoopRegister):
             binding.save()
 
 
+class RenRenLiRegister(CoopRegister):
+    def __init__(self, *args, **kwargs):
+        super(RenRenLiRegister, self).__init__(*args, **kwargs)
+
+
 # 注册第三方通道
 coop_register_processor = {
     'bajinshe': 'BaJinSheRegister',
@@ -414,12 +419,13 @@ class BaJinSheCallback(CoopCallback):
 
     def register_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).register_call_back(user_id, order_id)
-        utc_timestamp = get_current_utc_timestamp()
+        utc_timestamp = get_utc_timestamp()
         query_id = '%s_%s' % (utc_timestamp, '0001')
         data = get_bajinshe_base_data(query_id)
-        if data:
+        bid = get_tid_for_coop(user_id)
+        if data and bid:
             act_data = {
-                'bingdingUid': self.channel.bid,
+                'bingdingUid': bid,
                 'usn': get_user_phone_for_coop(user_id),
                 'sumIncome': 0,
                 'totalBalance': 0,
@@ -432,20 +438,21 @@ class BaJinSheCallback(CoopCallback):
 
     def recharge_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).recharge_call_back(user_id, order_id)
-        utc_timestamp = get_current_utc_timestamp()
+        utc_timestamp = get_utc_timestamp()
         query_id = '%s_%s' % (utc_timestamp, '0002')
         data = get_bajinshe_base_data(query_id)
-        if data:
+        bid = get_tid_for_coop(user_id)
+        if data and bid:
             margin_record = MarginRecord.object(user_id=user_id, order_id=order_id).first()
             if margin_record:
                 act_data = {
-                    'bingdingUid': self.channel.bid,
+                    'bingdingUid': bid,
                     'usn': get_user_phone_for_coop(user_id),
                     'businessName': margin_record.description,
                     'businessType': 0,
                     'businessBid': order_id,
                     'money': margin_record.amount,
-                    'time': timezone.localtime(margin_record.create_time()).strftime('%Y%m%d%H%M%S'),
+                    'time': timezone.localtime(margin_record.create_time).strftime('%Y%m%d%H%M%S'),
                     'moneyType': 0,
                     'availableBalance': margin_record.margin_current,
                 }
@@ -456,20 +463,21 @@ class BaJinSheCallback(CoopCallback):
 
     def purchase_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).purchase_call_back(user_id, order_id)
-        utc_timestamp = get_current_utc_timestamp()
+        utc_timestamp = get_utc_timestamp()
         query_id = '%s_%s' % (utc_timestamp, '0003')
         data = get_bajinshe_base_data(query_id)
-        if data:
+        bid = get_tid_for_coop(user_id)
+        if data and bid:
             margin_record = MarginRecord.object(user_id=user_id, order_id=order_id).first()
             if margin_record:
                 act_data = {
-                    'bingdingUid': self.channel.bid,
+                    'bingdingUid': bid,
                     'usn': get_user_phone_for_coop(user_id),
                     'businessName': margin_record.description,
                     'businessType': 3,
                     'businessBid': order_id,
                     'money': margin_record.amount,
-                    'time': timezone.localtime(margin_record.create_time()).strftime('%Y%m%d%H%M%S'),
+                    'time': timezone.localtime(margin_record.create_time).strftime('%Y%m%d%H%M%S'),
                     'moneyType': 1,
                     'availableBalance': margin_record.margin_current,
                 }
@@ -480,10 +488,11 @@ class BaJinSheCallback(CoopCallback):
 
     def amortization_push(self, user_amo):
         super(BaJinSheCallback, self).amortization_push(user_amo)
-        utc_timestamp = get_current_utc_timestamp()
+        utc_timestamp = get_utc_timestamp()
         order_id = '%s_%s' % (utc_timestamp, '0005')
         data = get_bajinshe_base_data(order_id)
-        if data:
+        bid = get_tid_for_coop(user_amo.user_id)
+        if data and bid:
             period = user_amo.product.period
             pay_method = user_amo.product.pay_method
             if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
@@ -506,7 +515,7 @@ class BaJinSheCallback(CoopCallback):
                 'principal': user_amo.principal,
                 'incomeState': 2,
                 'investmentPid': user_amo.id,
-                'bingdingUid': self.channel.bid,
+                'bingdingUid': bid,
                 'usn': get_user_phone_for_coop(user_amo.user_id),
                 'money': user_amo.equity_amount,
                 'period': period,
@@ -523,6 +532,42 @@ class BaJinSheCallback(CoopCallback):
             # 异步回调
             bajinshe_callback.apply_async(
                 kwargs={'data': data, 'url': self.purchase_call_back_url})
+
+
+class RenRenLiCallback(CoopCallback):
+    def __init__(self, *args, **kwargs):
+        super(RenRenLiCallback, self).__init__(*args, **kwargs)
+        self.purchase_call_back_url = settings.RENRENLI_PURCHASE_PUSH_URL
+
+    def amortization_push(self, user_amo):
+        super(RenRenLiCallback, self).amortization_push(user_amo)
+        bid = get_tid_for_coop(user_amo.user_id)
+        if bid:
+            data = {
+                'Cust_id': '',
+                'Sign_type': 'MD5',
+                'Sign': ''
+            }
+
+            act_data = {
+                'User_name': '',
+                'Order_no': user_amo.id,
+                'Pro_name': user_amo.product.name,
+                'Pro_id': user_amo.product.id,
+                'Invest_money': user_amo.equity_amount,
+                'bingdingUid': self.channel.bid,
+                'Rate': user_amo.product.expected_earning_rate,
+                'Invest_start_date': utc_to_local_timestamp(user_amo.product.publish_time),
+                'Invest_end_date': utc_to_local_timestamp(user_amo.product.soldout_time),
+                'Back_money': user_amo.get_total_amount(),
+                'Back_last_date': utc_to_local_timestamp(user_amo.created_time),
+                'Cust_key': bid,
+            }
+            data['Data'] = [act_data]
+            # 异步回调
+            renrenli_callback.apply_async(
+                kwargs={'data': data, 'url': self.purchase_call_back_url})
+
 
 # 第三方回调通道
 coop_callback_processor = {
