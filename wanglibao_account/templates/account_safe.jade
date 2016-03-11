@@ -18,10 +18,13 @@ block main
             .well
                 .panel-title-bar__no-border
                     .panel-title 身份信息
-                        if modify_phone_state = 2
-                            .text 人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
+
                         if modify_phone_state = 1
-                            .true 手机号修改成功
+                            .true#user_phone_static 手机号修改成功
+                        if modify_phone_state = 2
+                            .text#user_phone_static  人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
+                        if modify_phone_state = 3
+                            .text#user_phone_static  人工修改手机号申请失败，请重新上传相关材料。点击"申请失败"按钮查看详情。
                 .info_box.margin_top_box.is_open
                     .img.img_1
                     dl
@@ -30,10 +33,13 @@ block main
                             .ico.is_set_ico
                             span.is_set_text 已绑定
                         dd {{phone}}
-                    if modify_phone_state != 2
+                    if modify_phone_state == 1
                         .button.phone_change_button 修改
-                    else
+                    if modify_phone_state == 2
                         .button.phone_changing 申请修改中
+                    if modify_phone_state == 3
+                        .button.phone_change_button 申请失败
+                        .phone_change_failed 取消申请
                 if id_is_valid
                     .phone_change_wrap
                         .line
