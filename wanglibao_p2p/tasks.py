@@ -231,16 +231,22 @@ def coop_product_push():
                                'repaying_source', 'total_amount', 'ordered_amount',
                                'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
                                'limit_per_user')
-    for product in products:
-        product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
-        product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
-        product['soldout_time'] = product['soldout_time'].strftime('%Y-%m-%d %H:%M:%S')
-        product['make_loans_time'] = product['make_loans_time'].strftime('%Y-%m-%d %H:%M:%S')
 
-    if products:
+    product_list = [product for product in products]
+    for product in product_list:
+        if product['soldout_time']:
+            product['soldout_time'] = product['soldout_time'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            product.pop('soldout_time', None)
+        if product['make_loans_time']:
+            product['make_loans_time'] = product['make_loans_time'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            product.pop('make_loans_time', None)
+
+    if product_list:
         base_data = generate_coop_base_data('products_push')
         act_data = {
-            'products': json.dumps(products)
+            'products': json.dumps(product_list)
         }
         data = dict(base_data, **act_data)
         common_callback_for_post.apply_async(
@@ -257,7 +263,7 @@ def coop_amortizations_push(amortizations, product_id):
             amo['terms'] = amo_terms
             equity_record = EquityRecord.objects.filter(catalog=u'申购确认', product_id=product_id, user_id=amo["user_id"]).first()
             amo['equity_confirm_at'] = equity_record.create_time.strftime('%Y-%m-%d %H:%M:%S')
-            amo['equity_amount'] = equity_record.amount
+            amo['equity_amount'] = float(equity_record.amount)
             amortization_list.append(amo)
 
     if amortization_list:
