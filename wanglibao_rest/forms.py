@@ -3,7 +3,7 @@
 import hashlib
 from django import forms
 from django.utils import timezone
-from .utils import get_current_utc_timestamp
+from .utils import get_utc_timestamp
 
 
 class CoopDataDispatchForm(forms.Form):
@@ -33,7 +33,7 @@ class CoopDataDispatchForm(forms.Form):
 
     # def clean_time(self):
     #     _time = self.cleaned_data['time']
-    #     current_time = get_current_utc_timestamp()
+    #     current_time = get_utc_timestamp()
     #     # FixMe,修改超时时间
     #     if int(current_time) - _time <= 120:
     #         return _time
