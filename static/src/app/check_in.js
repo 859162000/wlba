@@ -163,7 +163,7 @@ org.checin_in = (function () {
                 var giftDay = resultCopy.nextDayNote - resultCopy.continue_days;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
-                        console.log('礼物已另取锅了')
+                        org.ui.alert('礼物已经另取过了！')
                     }else{
                         _self.fetchGift(continue_days)
                     }
@@ -276,7 +276,7 @@ wlb.ready({
     },
     other: function () {
         org.checin_in.init()
-        alert('guy ! open in app!')
+        //alert('guy ! open in app!')
     }
 })
 
