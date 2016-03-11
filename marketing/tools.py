@@ -242,7 +242,12 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
                                         #"url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
                                             })},
                                         queue='celery02')
-    
+
+    try:
+        utils.log_clientinfo(device, "withdraw", user_id, order_id, amount)
+    except Exception:
+        pass
+
     send_withdraw_data.apply_async(kwargs={
         "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
     })
