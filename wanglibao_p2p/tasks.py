@@ -234,6 +234,8 @@ def coop_product_push():
 
     product_list = [product for product in products]
     for product in product_list:
+        product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
+        product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
         if product['soldout_time']:
             product['soldout_time'] = product['soldout_time'].strftime('%Y-%m-%d %H:%M:%S')
         else:
