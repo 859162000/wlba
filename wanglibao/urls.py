@@ -100,7 +100,7 @@ urlpatterns = patterns(
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
     url(r'^lottery/', include('wanglibao_lottery.urls')),
-    url(r'^landpage/', landpage_view),
+    url(r'^landpage/', 'wanglibao.views.landpage_view'),
 
     url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
     url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),
@@ -179,7 +179,7 @@ urlpatterns += patterns(
 
     url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
 
-    #url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    # url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
     url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
     url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
     url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),

@@ -140,7 +140,6 @@
         .card_prize
           backface-visibility: visible
   .card_chance
-
     width: 100%
     text-align: center
     line-height: 0.75rem
@@ -303,6 +302,10 @@
               color: #fff
               font-size: 0.6rem
               text-align: center
+              @media screen and (max-device-width: 370px)
+                font-size: 0.5rem
+              @media screen and (max-width: 370px)
+                font-size: 0.5rem
           .coupon_box
             display: block
             position: relative
@@ -337,9 +340,10 @@
               font-size: 0.6rem
               text-align: center
               margin-top: -0.35rem
+              @media screen and (max-device-width: 370px)
+                font-size: 0.5rem
               @media screen and (max-width: 370px)
                 font-size: 0.5rem
-
         .ranking_box_1
           left: 0
           position: relative

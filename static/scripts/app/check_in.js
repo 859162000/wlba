@@ -279,7 +279,7 @@ org.checin_in = (function () {
                 _self.appShare.touchShare({
                     title: '每日签到title',
                     content: '每日签到content',
-                    shareUrl: 'http://192.168.20.45:8000/api/m/check-in-share/'
+                    shareUrl: 'https://staging.wanglibao.com/api/m/check-in-share/'
                 })
             });
 
@@ -297,7 +297,7 @@ org.checin_in = (function () {
         signIn: function(status, amount){
             var $checkIn = $('.checIn-status'), checkInText ='';
 
-            $checkIn.addClass('rm-loading');
+            $checkIn.removeClass('active').addClass('rm-loading active');
             checkInText = status ? '今日已签到' : '今日未签到';
             $checkIn.find('.op-dec-title').text(checkInText);
             $checkIn.find('.op-dec-detail').text('+'+amount+'体验金');
@@ -353,8 +353,10 @@ org.checin_in = (function () {
         checkIn: function(result){
             var _self = this, resultCopy = result.data.sign_in;
 
+            //连续签到日
             var continue_days = resultCopy.continue_days;
 
+            //当日是否签到
             if(!resultCopy.status){
 
                 _self.checkInOpeartion('sign_in', function(data){
@@ -362,9 +364,10 @@ org.checin_in = (function () {
                         console.log('今天签到成功')
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                             triggerUI(data.data.continue_days)
-                            _self.signIn(true, data.data.experience_amount)
+                            _self.signIn(true, data.data.experience_amount *2)
                         })
                     }
+                    //签到成功更新连续签到日
                     continue_days = data.data.continue_days;
 
                     function triggerUI(count){
@@ -378,11 +381,12 @@ org.checin_in = (function () {
                 })
             }
 
-            $('.active-gift').on('click', function(){
-                var giftDay = resultCopy.nextDayNote - resultCopy.continue_days;
+            var giftDay  = null;
+            $('.active-gift, .active-gift-open').on('click', function(){
+                giftDay = resultCopy.nextDayNote - continue_days;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
-                        console.log('礼物已另取锅了')
+                        org.ui.alert('礼物已经另取过了！')
                     }else{
                         _self.fetchGift(continue_days)
                     }
@@ -494,8 +498,8 @@ wlb.ready({
 
     },
     other: function () {
-        //org.checin_in.init()
-        alert('guy ! open in app!')
+        org.checin_in.init()
+        //alert('guy ! open in app!')
     }
 })
 
