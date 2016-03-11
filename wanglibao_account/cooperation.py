@@ -55,7 +55,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, YZCJ_CALL_BACK_URL, YZCJ_COOP_KEY,\
-     XUNLEIVIP_LOGIN_URL, RENRENLI_CALL_BACK_URL, RENRENLI_COOP_ID, RENRENLI_COOP_KEY
+     XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
                                     xunleivip_callback, coop_callback_for_post
@@ -1796,9 +1796,6 @@ class RenRenLiRegister(BaJinSheRegister):
     def __init__(self, request):
         super(RenRenLiRegister, self).__init__(request)
         self.c_code = 'renrenli'
-        self.coop_id = RENRENLI_COOP_ID
-        self.coop_key = RENRENLI_COOP_KEY
-        self.call_back_url = RENRENLI_CALL_BACK_URL
         self.external_channel_client_id_key = 'Cust_id'
         self.external_channel_user_key = 'Phone'
         self.internal_channel_phone_key = 'phone'
