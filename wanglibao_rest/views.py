@@ -5,6 +5,8 @@ import time
 import json
 import logging
 import hashlib
+import traceback
+import StringIO
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from rest_framework.views import APIView
@@ -398,8 +400,12 @@ class CoopDataDispatchApi(APIView):
                     if processer:
                         try:
                             response_data = processer(req_data)
-                        except Exception, e:
-                            logger.info("CoopDataDispatchApi %s raise error: %s" % (processer.__name__, e))
+                        except:
+                            # 创建内存文件对象
+                            fp = StringIO.StringIO()
+                            traceback.print_exc(file=fp)
+                            message = fp.getvalue()
+                            logger.info("CoopDataDispatchApi %s raise error: %s" % (processer.__name__, message))
                             response_data = {
                                 'ret_code': 50001,
                                 'message': 'api error',
