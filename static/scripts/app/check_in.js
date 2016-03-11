@@ -297,7 +297,7 @@ org.checin_in = (function () {
         signIn: function(status, amount){
             var $checkIn = $('.checIn-status'), checkInText ='';
 
-            $checkIn.addClass('rm-loading');
+            $checkIn.removeClass('active').addClass('rm-loading active');
             checkInText = status ? '今日已签到' : '今日未签到';
             $checkIn.find('.op-dec-title').text(checkInText);
             $checkIn.find('.op-dec-detail').text('+'+amount+'体验金');
@@ -364,7 +364,7 @@ org.checin_in = (function () {
                         console.log('今天签到成功')
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                             triggerUI(data.data.continue_days)
-                            _self.signIn(true, data.data.experience_amount)
+                            _self.signIn(true, data.data.experience_amount *2)
                         })
                     }
                     //签到成功更新连续签到日
