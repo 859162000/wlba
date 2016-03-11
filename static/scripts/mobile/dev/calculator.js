@@ -136,7 +136,7 @@ webpackJsonp([0],[
 	var calculate = exports.calculate = function () {
 
 	    var _calculate = function _calculate(amount, rate, period, pay_method) {
-	        var divisor, rate_pow, result, term_amount, month_rate;
+	        var rate_pow, result, term_amount, month_rate;
 	        if (/等额本息/ig.test(pay_method)) {
 	            month_rate = rate / 12;
 	            rate_pow = Math.pow(1 + month_rate, period);
