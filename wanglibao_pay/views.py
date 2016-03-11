@@ -415,6 +415,11 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
+            try:
+                device = split_ua(request)
+            except:
+                device = {'device_type':'pc'}
+            
             name = user.wanglibaouserprofile.name or u'用户'
             withdraw_submit_ok.apply_async(kwargs={
                 "user_id": user.id,
@@ -422,7 +427,8 @@ class WithdrawCompleteView(TemplateView):
                 "phone": user.wanglibaouserprofile.phone,
                 "amount": amount,
                 "bank_name": card.bank.name,
-                "order_id": order.id
+                "order_id": order.id,
+                "device": device
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -1178,6 +1184,10 @@ class WithdrawAPIView(DecryptParmsAPIView):
 
         # 短信通知添加用户名
         user = request.user
+        try:
+            device = split_ua(request)
+        except:
+            device = {'device_type':'pc'}
         name = user.wanglibaouserprofile.name or u'用户'
         if not result['ret_code']:
             withdraw_submit_ok.apply_async(kwargs={
@@ -1186,7 +1196,8 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "phone": request.user.wanglibaouserprofile.phone,
                 "amount": result['amount'],
                 "bank_name": result['bank_name'],
-                "order_id": result['order_id']
+                "order_id": result['order_id'],
+                "device": device
             })
         return Response(result)
 

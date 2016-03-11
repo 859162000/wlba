@@ -26,12 +26,14 @@ def format_datetime(time, fmt):
 def suffix(f):
     def wrapper(*args, **kwargs):
         return unicode(f(*args, **kwargs)) + SMS_SIGN
+
     return wrapper
 
 
 def suffix_td(f):
     def wrapper(*args, **kwargs):
         return unicode(f(*args, **kwargs)) + SMS_SIGN_TD
+
     return wrapper
 
 
@@ -169,8 +171,8 @@ def product_failed(name, product):
             name, product.name, format_datetime(product.end_time, u'%Y年%m月%d日')
         )
 
-    # return u'%s[%s]在%s之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。' \
-    #        % (product.short_name, product.serial_number, format_datetime(product.end_time, u'%Y年%m月%d日%H:%M'))
+        # return u'%s[%s]在%s之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。' \
+        #        % (product.short_name, product.serial_number, format_datetime(product.end_time, u'%Y年%m月%d日%H:%M'))
 
 
 @suffix
@@ -193,7 +195,7 @@ def product_amortize(name, product, amount):
         return u'亲爱的{}，您投资的{}项目收到还款{}元，已到账，请登录您的网利宝账户进行查看。'.format(
             name, product.name, amount
         )
-    # return u'您投资的%s项目收到还款%s元，已到帐。请登录您的网利宝账户进行查看。' % (product.short_name, str(amount))
+        # return u'您投资的%s项目收到还款%s元，已到帐。请登录您的网利宝账户进行查看。' % (product.short_name, str(amount))
 
 
 @suffix
@@ -217,7 +219,7 @@ def product_prepayment(name, product, amount):
         return u'亲爱的{}，您投资的{}项目收到还款{}元，已到账，请登录您的网利宝账户进行查看。'.format(
             name, product.name, amount
         )
-    # return u'您投资的%s项目已提前还款%s元，已到帐。请登录您的网利宝账户进行查看。' % (product.short_name, str(amount))
+        # return u'您投资的%s项目已提前还款%s元，已到帐。请登录您的网利宝账户进行查看。' % (product.short_name, str(amount))
 
 
 @suffix
@@ -340,7 +342,6 @@ def product_full_message(name):
 
 # 站内信模板
 def msg_bid_purchase(order_id, product_name, amount):
-
     if get_stitch():
         try:
             redis = redis_backend()
@@ -541,6 +542,34 @@ def changed_mobile_fail(user_name):
             return u"尊敬的网利宝用户，由于所上传的资料不符要求，您的修改手机号申请未通过，请按照要求上传资料文件或联系客服，感谢您的支持。"
     else:
         return u"尊敬的网利宝用户，由于所上传的资料不符要求，您的修改手机号申请未通过，请按照要求上传资料文件或联系客服，感谢您的支持。"
+
+
+@suffix
+def experience_amortize(name, amount):
+    """
+    投资到账
+    :param name:
+    :param amount:
+    """
+    if get_stitch():
+        try:
+            redis = redis_backend()
+            obj = redis._get('experience_amortize')
+            content = cPickle.loads(obj)['content']
+            return content.format(name, amount)
+        except Exception, e:
+            print e
+            return u'亲爱的{}，您投资的体验金项目收到还款{}元，已到账，请登录您的网利宝账户进行查看。'.format(name, amount)
+    else:
+        return u'亲爱的{}，您投资的体验金项目收到还款{}元，已到账，请登录您的网利宝账户进行查看。'.format(name, amount)
+
+
+def experience_amortize_msg(name, product_name, period, settlement_time, amount):
+    title = u"项目还款"
+    content = u"亲爱的{}您好:体验金项目“{}”,期限{}天于{}还款{}元，请注意查收。<br/>" \
+              u"<a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>" \
+              u"感谢您对我们的支持与关注。<br/>网利宝".format(name, product_name, period, format_datetime(settlement_time, u"%Y年%m月%d日"), amount)
+    return title, content
 
 
 if __name__ == "__main__":
