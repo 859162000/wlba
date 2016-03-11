@@ -150,26 +150,30 @@
                         ts: data.ts
                     },
                     success: function (data) {
-                        $('span#zero').hide();
-                        $('span#chance_num').css('display','inline-block');
+                        alert('启动');
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
                     }
                 })
             }
 			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
             mixins.sendUserInfo(function(data) {
                 if (data.ph == '') {
+                    alert('weidenglu');
                     login = false;
-                    $('span#chance_num').hide();
-                    $('span#zero').css('display', 'inline-block');
+                    $('span#chance_num').text('0');
                     $('.button').click(function() {
                         mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
                     });
 
                 } else {
+                    alert('denglu');
                     connect(data);
                     login = true;
-                    $('span#zero').hide();
-                    $('span#chance_num').css('display','inline-block');
                     $('.button').click(function() {
                         mixins.jumpToManageMoney();
                     });
@@ -204,11 +208,8 @@
         },
         other: function() {
             if(h5_user_static){
-                $('span#zero').hide();
-                $('span#chance_num').css('display','inline-block');
             }else {
-                $('span#chance_num').hide();
-                $('span#zero').css('display', 'inline-block');
+                $('span#chance_num').text('0');
             }
             $('.button').click(function() {
                 if(h5_user_static) {
