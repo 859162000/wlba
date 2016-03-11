@@ -65,6 +65,7 @@
           }
         }else{
           //3秒后跳转到实名认证地址
+          $('.phone_modify_popup .phone_modify_popup_text').text('请先完成实名认证');
           $('.phone_modify_popup').show();
           var time_count = 2;
           var timerFunction = function () {
@@ -72,27 +73,31 @@
                   time_count--;
                   return
               } else {
-                  clearInterval(timerFunction);
+                  clearInterval(time_intervalId);
                   window.location.href = '/accounts/id_verify/';
               }
           };
-          setInterval(timerFunction, 1000);
+          var time_intervalId = setInterval(timerFunction, 1000);
+          time_intervalId;
         }
       })
 
       $('.phone_change_failed').click(function(){
 
+          $('.phone_modify_popup .phone_modify_popup_text').text('您已成功取消手机号修改申请');
+          $('.phone_modify_popup').show();
           var time_count = 2;
-          var timerFunction = function () {
+          var timerFunction2 = function () {
               if (time_count > 0) {
                   time_count--;
                   return
               } else {
-                  clearInterval(timerFunction);
-                  window.location.href = '/accounts/id_verify/';
+                  clearInterval(time_intervalId2);
+                  $('.phone_modify_popup').hide();
               }
           };
-          setInterval(timerFunction, 1000);
+          var time_intervalId2 = setInterval(timerFunction2, 1000);
+          time_intervalId2;
       });
 
       /**/
