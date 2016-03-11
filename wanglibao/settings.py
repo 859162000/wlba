@@ -705,7 +705,12 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_unavailable_3_days',
         'schedule': crontab(minute=0, hour=11),
     },
-    #每天发放昨天的排名奖励, by HMM
+    # 定期向渠道中心推送标的信息
+    'p2p_product_push_to_coop': {
+        'task': 'wanglibao_p2p.tasks.coop_product_push',
+        'schedule': timedelta(minutes=5),
+    },
+    # 每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
         'schedule': crontab(minute=30, hour=0),
@@ -1180,7 +1185,6 @@ if ENV == ENV_PRODUCTION:
 else:
     YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
-
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1252,3 +1256,18 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
+
+
+# 渠道数据中心平台认证授权密钥
+if ENV == ENV_PRODUCTION:
+    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
+    OAUTH2_URL = 'https://127.0.0.1:8001/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://127.0.0.1:8001/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://127.0.0.1:8001/oauth2/access_token/'
+else:
+    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
+    OAUTH2_URL = 'https://127.0.0.1:8001/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://127.0.0.1:8001/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://127.0.0.1:8001/oauth2/access_token/'
