@@ -347,17 +347,17 @@ class PasswordResetGetIdentifierView(TemplateView):
             if len(users) == 0:
                 return HttpResponse(u"找不到该用户", status=400)
             else:
-                # 清除session验证时间
                 try:
+                    # 清除session验证时间
                     del request.session['phone_validated_time']
+
+                    # 如果session中已经有用户id,则验证已有的和当前提交的是否一致,不一致则认为是非法操作
+                    if request.session['user_to_reset']:
+                        session_user_id = request.session['user_to_reset']
+                        if session_user_id != users[0].id:
+                            return HttpResponse(u"非法请求", status=400)
                 except KeyError:
                     pass
-
-                # 如果session中已经有用户id,则验证已有的和当前提交的是否一致,不一致则认为是非法操作
-                if request.session['user_to_reset']:
-                    session_user_id = request.session['user_to_reset']
-                    if session_user_id != users[0].id:
-                        return HttpResponse(u"非法请求", status=400)
 
                 view = PasswordResetValidateView()
                 view.request = request
