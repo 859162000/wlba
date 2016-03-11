@@ -80,6 +80,21 @@
         }
       })
 
+      $('.phone_change_failed').click(function(){
+
+          var time_count = 2;
+          var timerFunction = function () {
+              if (time_count > 0) {
+                  time_count--;
+                  return
+              } else {
+                  clearInterval(timerFunction);
+                  window.location.href = '/accounts/id_verify/';
+              }
+          };
+          setInterval(timerFunction, 1000);
+      });
+
       /**/
       $('.people_wrap').click(function(){
           if(true){
