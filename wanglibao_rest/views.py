@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
-import time
 import json
+from datetime import datetime as dt
 import logging
 import hashlib
 import traceback
@@ -18,8 +18,8 @@ from marketing.models import Channels
 from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.utils import create_user
-from wanglibao_p2p.models import P2PRecord, P2PProduct
-from wanglibao_p2p.forms import P2PRecordForm, P2PProductForm
+from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.forms import P2PProductForm
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
 from .forms import CoopDataDispatchForm
@@ -227,13 +227,13 @@ class CoopDataDispatchApi(APIView):
         margin_record = req_data.get("margin_record")
         if pay_info and margin_record:
             margin_record = json.loads(margin_record) if margin_record else None
-            margin_record["create_time"] = time.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
+            margin_record["create_time"] = dt.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
             margin_record_form = MarginRecordForm(margin_record)
             if margin_record_form.is_valid():
                 pay_info = json.loads(pay_info) if pay_info else None
                 margin_record = margin_record_form.save()
                 pay_info["margin_record"] = margin_record
-                pay_info["create_time"] = time.strptime(pay_info["create_time"], '%Y-%m-%d %H:%M:%S')
+                pay_info["create_time"] = dt.strptime(pay_info["create_time"], '%Y-%m-%d %H:%M:%S')
                 pay_info_form = PayInfoForm(pay_info)
                 if pay_info_form.is_valid():
                     pay_info = pay_info_form.save()
@@ -261,11 +261,11 @@ class CoopDataDispatchApi(APIView):
         margin_record = req_data.get("margin_record")
         if p2p_record and margin_record:
             margin_record = json.loads(margin_record) if margin_record else None
-            margin_record["create_time"] = time.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
+            margin_record["create_time"] = dt.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
             margin_record_form = MarginRecordForm(margin_record)
             if margin_record_form.is_valid():
                 p2p_record = json.loads(p2p_record) if p2p_record else None
-                p2p_record["create_time"] = time.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
+                p2p_record["create_time"] = dt.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
                 p2p_record_form = P2PProductForm(p2p_record)
                 if p2p_record_form.is_valid():
                     p2p_record = p2p_record_form.save()
@@ -360,19 +360,19 @@ class CoopDataDispatchApi(APIView):
         if products:
             products = json.loads(products)
             for product in products:
-                product['publish_time'] = time.strptime(product['publish_time'], '%Y-%m-%d %H:%M:%S')
-                product['end_time'] = time.strptime(product['end_time'], '%Y-%m-%d %H:%M:%S')
+                product['publish_time'] = dt.strptime(product['publish_time'], '%Y-%m-%d %H:%M:%S')
+                product['end_time'] = dt.strptime(product['end_time'], '%Y-%m-%d %H:%M:%S')
                 p_soldout_time = product.get('soldout_time', None)
                 p_make_loans_time = product.get('make_loans_time', None)
                 if p_soldout_time:
-                    product['soldout_time'] = time.strptime(p_soldout_time, '%Y-%m-%d %H:%M:%S')
+                    product['soldout_time'] = dt.strptime(p_soldout_time, '%Y-%m-%d %H:%M:%S')
                 if p_make_loans_time:
-                    product['make_loans_time'] = time.strptime(p_make_loans_time, '%Y-%m-%d %H:%M:%S')
+                    product['make_loans_time'] = dt.strptime(p_make_loans_time, '%Y-%m-%d %H:%M:%S')
                 product_form = P2PProductForm(product)
                 if product_form.is_valid():
                     product_form.save()
                 else:
-                    logger.info("process_products_push data[%s] invalid" % product_form.errors)
+                    logger.info("process_products_push data[%s] invalid" % product_form.errors[0][0])
 
         logger.info("process_products_push done")
         response_data = {

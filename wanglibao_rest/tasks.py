@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
+from datetime import datetime as dt
 import logging
 from wanglibao.celery import app
 from marketing.utils import get_user_channel_record
@@ -25,7 +25,7 @@ def process_amortize(amortizations, product_id):
     p2p_product = P2PProduct.objects.get(pk=product_id)
     for amo in amortizations:
         amo['product'] = p2p_product
-        amo['settlement_time'] = time.strptime(amo['settlement_time'], '%Y-%m-%d %H:%M:%S')
+        amo['settlement_time'] = dt.strptime(amo['settlement_time'], '%Y-%m-%d %H:%M:%S')
         user_amo_form = UserAmortizationForm(amo)
         if user_amo_form.is_valid():
             user_amo = user_amo_form.save()
