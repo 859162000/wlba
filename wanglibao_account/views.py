@@ -2242,7 +2242,7 @@ class IdentityInformationTemplate(TemplateView):
         modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
         modify_phone_state = 0
         if modify_phone_record:
-            if modify_phone_record.status in [u'复审通过', u"取消申请"]:
+            if modify_phone_record.status == u'复审通过':
                 modify_phone_state = 1
             if modify_phone_record.status in [u'待初审', u'初审待定', u'待复审']:
                 modify_phone_state = 2
