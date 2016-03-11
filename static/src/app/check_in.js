@@ -161,8 +161,9 @@ org.checin_in = (function () {
                 })
             }
 
+            var giftDay  = null;
             $('.active-gift, .active-gift-open').on('click', function(){
-                var giftDay = resultCopy.nextDayNote - continue_days;
+                giftDay = resultCopy.nextDayNote - continue_days;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
                         org.ui.alert('礼物已经另取过了！')
