@@ -1715,7 +1715,7 @@ class BaJinSheRegister(CoopRegister):
                     'client_id': client_id,
                     'phone': user.wanglibaouserprofile.phone,
                     'btype': self.channel_code,
-                    'user': user.id,
+                    'user_id': user.id,
                 }
                 data = dict(base_data, **act_data)
                 res = requests.post(url=self.call_back_url, data=data)
