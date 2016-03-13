@@ -92,7 +92,7 @@ class P2PRecordForm(forms.ModelForm):
     order_id = forms.IntegerField(label=u'关联订单编号', error_messages={'required': u'请输入关联订单编号'})
     amount = forms.DecimalField(label=u'发生数', error_messages={'required': u'请输入发生数'})
     product_balance_after = forms.IntegerField(label=u'标的后余额', error_messages={'required': u'请输入标的后余额'})
-    user_id = forms.IntegerField(label=u'用户id', max_length=50, error_messages={'required': u'请输入用户id'})
+    user_id = forms.IntegerField(label=u'用户id', error_messages={'required': u'请输入用户id'})
     create_time = forms.DateTimeField(label=u'发生时间', error_messages={'required': u'请输入发生时间'})
     description = forms.CharField(label=u'摘要', max_length=1000, error_messages={'required': u'请输入摘要'})
     platform = forms.CharField(label=u'购买平台', max_length=100, error_messages={'required': u'请输入购买平台'})
