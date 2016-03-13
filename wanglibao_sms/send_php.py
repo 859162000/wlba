@@ -11,7 +11,8 @@ from datetime import datetime
 
 logger = logging.getLogger('wanglibao_sms')
 
-PHP_SMS_HOST = 'http://101.200.149.172/index.php?s=/node_push/send.html'
+# PHP_SMS_HOST = 'http://101.200.149.172/index.php?s=/node_push/send.html'
+PHP_SMS_HOST = 'http://101.200.149.172/api.php?route=/send'
 # PHP_SMS_HOST = 'http://haopeiwen.dev.wanglibao.com/wanglibao_push/index.php?s=/node_push/send.html'
 PHP_AUTH_ID = 'admin'
 PHP_AUTH_KEY = '192006250b4c09247ec02edce69f6a2d'
@@ -144,22 +145,16 @@ def generate_random_str(count):
 def test():
     data = {
         0: {
-            'user_id': '18612803787',
-            'user_type': 'phone',
-            'params': {
-                'a': 'hello',
-            }
-        },
-        1: {
             'user_id': '15038038823',
             'user_type': 'phone',
             'params': {
-                'a': 'hello',
+                'count': 5,
+                'days': 3
             }
         },
     }
 
-    PHPSendSMS.send_sms(5, data)
+    PHPSendSMS.send_sms_one(3, '15038038823', 'phone', name='李先生', count=3, amount=123.45)
 
 
 if __name__ == "__main__":

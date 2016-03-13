@@ -4,6 +4,9 @@ html(style='background: #FFE9D0')
   head
     title 签到
     include include/app_header.jade
+    script(src='/static/scripts/mobile/fast/rogue.js')
+    script.
+      if("addEventListener" in document){document.addEventListener("DOMContentLoaded",function(){var a=Origami.fastclick;a(document.body)},false)};
   body
 
     img(src='/static/imgs/app/checkin/banner.jpg').check-in-banner
@@ -15,14 +18,14 @@ html(style='background: #FFE9D0')
         .checkin-op-dec.checIn-status
           include include/app_loading
           .op-dec-title
-          .op-dec-detail.op-detail-orange
+          .op-dec-detail.op-detail-orange.flipInX
 
       .checkin-op-share
         i.checkin-op-icon.icon-share
         .checkin-op-dec.share-status
           include include/app_loading
           .op-dec-title
-          .op-dec-detail
+          .op-dec-detail.op-detail-blue.flipInX
     section.check-in-bar
       .bar-layout
         .bar-content 距离神秘礼包还有天
@@ -34,8 +37,10 @@ html(style='background: #FFE9D0')
 
     section.check-in-rules-layout
       .check-rules-title 详细规则:
-      .check-rules-detail  GIF 图片作为一种主流的文件格式，贯穿于我们的生活。由于其体积小巧，又以动态图片的形式展示，GIF 图片被广泛用于即时通讯以及社交网络之中，最常见的就是各种搞笑的表情包。
-      .check-rules-detail  但是，GIF 图片的应用场景绝不仅限于此，对大多人来说它更多是娱乐用途，而对于像我这样经常需要在文章穿插应用演示图的写作者来说，GIF 动态演示无疑是最直观的方式。可这样的 GIF 展示往往需要保证图像质量，更好的画质意味着更大的体积，这不利于读者的阅读体验。因此，我对 GIF 制作有着更高的需求，我需要兼顾文章里 GIF 图的画质和体积，这并不容易。
+      .check-rules-detail  每天签到领体验金，金额随机
+      .check-rules-detail  分享后点击返回网利宝，体验金方可翻倍
+      .check-rules-detail  连续签到每满7天，可拆一次体验金礼包
+      .check-rules-detail  连续签到每满28天，可拆一次神秘大礼包
 
     section.check-in-alert-layout
       .check-alert-mask
@@ -47,7 +52,7 @@ html(style='background: #FFE9D0')
           .check-body-opeartion-btn 我知道了
 
 
-    script(src="/static/scripts/component/webview.js?v=22")
-    script(src='/static/scripts/app/check_in.js?v=20151222228221')
+    script(src="/static/scripts/component/webview.js?v=2222")
+    script(src='/static/scripts/app/check_in.js?v=20160322222221')
 
 

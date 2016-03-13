@@ -182,7 +182,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
     }
 
 import sys
@@ -358,7 +358,8 @@ LOGGING = {
             'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         },
     },
     'handlers': {
@@ -383,7 +384,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/marketing.log',
-            'formatter': 'verbose'
+            'formatter': 'simple'
         },
         'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
@@ -516,6 +517,9 @@ LOGGING = {
         },
     }
 }
+
+from logging.config import dictConfig
+dictConfig(LOGGING)
 
 
 if ENV != ENV_DEV:
@@ -701,10 +705,15 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_unavailable_3_days',
         'schedule': crontab(minute=0, hour=11),
     },
-    #每天发放昨天的排名奖励, by HMM
+    # 定期向渠道中心推送标的信息
+    'p2p_product_push_to_coop': {
+        'task': 'wanglibao_p2p.tasks.coop_product_push',
+        'schedule': timedelta(minutes=5),
+    },
+    # 每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
-        'schedule': crontab(minute=0, hour=1),
+        'schedule': crontab(minute=30, hour=0),
     },
     # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
     'sync_pay_result': {
@@ -857,6 +866,7 @@ else:
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
 
+KUAI_TEST_CA_PEM_PATH = os.path.join(CERT_DIR, 'kuai_test_ca.pem')
 
 YEE_URL = 'https://ok.yeepay.com/payapi'
 YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
@@ -1175,7 +1185,6 @@ if ENV == ENV_PRODUCTION:
 else:
     YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
-
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1247,3 +1256,18 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
+
+
+# 渠道数据中心平台认证授权密钥
+if ENV == ENV_PRODUCTION:
+    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
+    OAUTH2_URL = 'https://192.168.20.237:8001/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
+else:
+    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
+    OAUTH2_URL = 'https://192.168.20.237:8001/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'

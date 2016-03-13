@@ -33,13 +33,16 @@ def updateRedisTopRank():
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
 
+
 @app.task
 def sendYesterdayTopRankAward():
     rank_activity = Activity.objects.filter(code='march_awards').first()
     # utc_now = timezone.now()
+    # today_start = local_to_utc(datetime.datetime.now(), 'min')
     yesterday = datetime.datetime.now()-datetime.timedelta(1)
-    yesterday_end = local_to_utc(yesterday, 'max')
-    yesterday_start = local_to_utc(yesterday, 'min')
+    yesterday_end = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
+    yesterday_end = local_to_utc(yesterday_end, "")
+    # yesterday_start = local_to_utc(yesterday, 'min')
     if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_end and rank_activity.end_at>=yesterday_end:
         top_ranks = getYesterdayTop10Ranks()
         misc = Misc.objects.filter(key='march_awards').first()

@@ -149,7 +149,7 @@ var org = (function () {
         _onMenuShareTimeline: function (ops, suFn, canFn) {
             wx.onMenuShareTimeline(lib._setShareData(ops, suFn, canFn));
         },
-        _onMenuShareQQ: function () {
+        _onMenuShareQQ: function (ops, suFn, canFn) {
             wx.onMenuShareQQ(lib._setShareData(ops, suFn, canFn));
         }
     }
@@ -732,8 +732,8 @@ org.detail = (function (org) {
         /*
         * 微信分享
          */
-        _share: function(obj){
-            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+        _share: function(obj,hide){
+            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideMenuItems'];
             org.ajax({
                 type : 'GET',
                 url : lib.weiURL,
@@ -802,6 +802,12 @@ org.detail = (function (org) {
                         success && success();
                     }
                 });
+                //if(hide){
+                //wx.hideMenuItems({
+                //    menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+                //});
+                //}
+
             })
         },
         /*
@@ -2691,7 +2697,8 @@ org.checkIn = (function(org){
         shareOk: function(){
             var url = window.location.protocol +"//" + window.location.host;
             var share = {shareLink:url+'/weixin/sub_checkIn_share/', shareMainTit:'网利宝天天送我钱，不想要都不行～朋友们快来领啊～', shareBody:'速来网利宝抢钱，你还等什么', success:lib.shareFn};
-            org.detail.share(share);
+            org.detail.share(share, true);
+
         }
     };
     return {

@@ -9,6 +9,15 @@ html
         meta(content="yes" ,name="apple-mobile-web-app-capable")
         meta( name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
         link(href="/static/styles/app/webview.css?v=20160201", rel="stylesheet")
+        style.
+          img{
+            width: 100%;
+            height: auto;
+          }
+          .announce-warp{
+            overflow: hidden;
+          }
+
     body
         .announce-warp
             .announce-title {{announce.title}}
@@ -17,17 +26,21 @@ html
 
                 p.content-bootm-right 北京网利科技有限公司
                 p.content-bootm-right {{announce.createtime | date:'Y-m-d'}}
+
         script.
-          var imgList = document.getElementsByTagName('img');
-          var screenWidth = document.body.clientWidth;
-          for(var i=0;i< imgList.length;i++){
-            (function(i){
-              imgList[i].onload = function(){
-                if(this.width > screenWidth){
-                  this.style.cssText = 'width: 100%; height: auto; display:block; margin: 0 auto;'
-                }else{
-                  this.style.cssText = 'height:'+this.width + 'px; height: auto; display:block; margin: 0 auto;'
-                }
+          window.onload = function () {
+              var imgList = document.getElementsByTagName('img');
+              var screenWidth = document.body.clientWidth;
+              for(var i=0;i< imgList.length;i++){
+                  render(imgList[i])
               }
-            })(i)
-          }
+
+              function render(target){
+                if(target.width > screenWidth){
+                  target.style.cssText = 'width: 100%; height: auto; display:block; margin: 0 auto;'
+                }else{
+                  target.style.cssText = 'height:'+target.width + 'px; height: auto; display:block; margin: 0 auto;'
+                }
+
+              }
+          };
