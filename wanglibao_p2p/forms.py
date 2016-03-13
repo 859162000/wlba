@@ -78,6 +78,12 @@ class PurchaseForm(forms.Form):
 
 
 class P2PProductForm(forms.ModelForm):
+    serial_number = forms.CharField(lables=u'产品编号*', max_length=100, required=True)
+
+    def clean_serial_number(self):
+        serial_number = self.cleaned_data['serial_number']
+        return serial_number
+
     class Meta:
         model = P2PProduct
 
