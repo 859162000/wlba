@@ -95,7 +95,7 @@ class P2PRecordForm(forms.ModelForm):
     user_id = forms.IntegerField(label=u'用户id', error_messages={'required': u'请输入用户id'})
     create_time = forms.DateTimeField(label=u'发生时间', error_messages={'required': u'请输入发生时间'})
     description = forms.CharField(label=u'摘要', error_messages={'required': u'请输入摘要'})
-    platform = forms.CharField(label=u'购买平台', error_messages={'required': u'请输入购买平台'})
+    platform = forms.CharField(label=u'购买平台', required=False, error_messages={'required': u'请输入购买平台'})
 
     class Meta:
         model = P2PRecord
