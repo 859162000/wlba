@@ -15,7 +15,7 @@ class P2PProduct(models.Model):
     types = models.CharField(u"产品分类(新)", max_length=50, null=True)
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
     short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
-    serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, blank=False, null=True)
+    serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, unique=True, blank=False, null=True)
     status = models.CharField(u'产品状态*', max_length=16, default=u'录标', db_index=True)
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月/天)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品备注')

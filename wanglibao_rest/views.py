@@ -368,7 +368,9 @@ class CoopDataDispatchApi(APIView):
                     product['soldout_time'] = dt.strptime(p_soldout_time, '%Y-%m-%d %H:%M:%S')
                 if p_make_loans_time:
                     product['make_loans_time'] = dt.strptime(p_make_loans_time, '%Y-%m-%d %H:%M:%S')
-                product_form = P2PProductForm(product)
+
+                product_instance = P2PProduct.objects.filter(pk=product['id']).first()
+                product_form = P2PProductForm(product, instance=product_instance)
                 if product_form.is_valid():
                     product_form.save()
                 else:
