@@ -265,39 +265,56 @@ org.checin_in = (function () {
                 $share =  $('.share-status'),
                 shareText = '',
                 shareStaus = result.data.share.status;
+
             $share.addClass('rm-loading');
 
-            function shareInfo(status){
+            function shareInfo(status, amount){
                 shareText = status ? '今日已分享' : '今日未分享';
                 $share.find('.op-dec-title ').text(shareText);
-                $share.find('.op-dec-detail').text('分享得双倍')
-            }
-            shareInfo(shareStaus)
+                $share.addClass('active').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                  $(this).removeClass('active');
+                });
+                if(amount){
+                    $share.find('.op-dec-detail').addClass('op-detail-orange').text('+'+amount+'体验金');
+                }else{
+                    $share.find('.op-dec-detail').text('点击得双倍')
+                }
 
-            $('.icon-share').on('click',function(){
-                if(shareStaus) return org.ui.alert('今天你已经分享过了')
+            }
+
+            if(shareStaus){
+                shareInfo(shareStaus, result.data.share.amount)
+            }else{
+                shareInfo(shareStaus)
+            }
+
+
+            $('.checkin-op-share').on('click',function(){
+                if(shareStaus) return org.ui.alert('今天你已分享过了，你的奖励已翻倍')
                 _self.appShare.touchShare({
-                    title: '每日签到title',
-                    content: '每日签到content',
-                    shareUrl: 'http://192.168.20.45:8000/api/m/check-in-share/'
+                    title: '每天签到白拿体验金，签满7天打开大礼包！',
+                    content: '点我签到',
+                    shareUrl: 'https://staging.wanglibao.com/api/m/check-in-share/'
                 })
             });
 
             try{
                 _self.appShare.shareStatus(function(result){
-                    _self.checkInAlert('share', '今日签到成功！获得'+result.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看');
-                    shareStaus = true;
-                    shareInfo(shareStaus)
+                    _self.checkInAlert('share', '今日分享成功！获得'+result.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
+                        shareStaus = true;
+                        shareInfo(shareStaus, result.data.experience_amount)
+                        $('.checkin-op-share').off('click')
+                    });
                 })
             }catch(e){
-                alert('open in app')
+                //alert('open in app')
             }
 
         },
         signIn: function(status, amount){
             var $checkIn = $('.checIn-status'), checkInText ='';
 
-            $checkIn.addClass('rm-loading');
+            $checkIn.removeClass('active').addClass('rm-loading active');
             checkInText = status ? '今日已签到' : '今日未签到';
             $checkIn.find('.op-dec-title').text(checkInText);
             $checkIn.find('.op-dec-detail').text('+'+amount+'体验金');
@@ -333,7 +350,10 @@ org.checin_in = (function () {
 
                 if(i == itemEnd){
                     //礼物所在天数
-                    itemStatus = giftStatus ? "active-gift-open " : "active-gift ";
+                    itemStatus = giftStatus ?
+                        "active-gift-open "
+                        :
+                        itemEnd - continueDay === 0? 'active-gift-active ' :"active-gift ";
                 }
 
                 str += "<div data-continue='"+i+"' class='flag-items "+itemStatus+"'>";
@@ -358,10 +378,8 @@ org.checin_in = (function () {
 
             //当日是否签到
             if(!resultCopy.status){
-
                 _self.checkInOpeartion('sign_in', function(data){
                     if(data.data.status){
-                        console.log('今天签到成功')
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                             triggerUI(data.data.continue_days)
                             _self.signIn(true, data.data.experience_amount)
@@ -382,11 +400,11 @@ org.checin_in = (function () {
             }
 
             var giftDay  = null;
-            $('.active-gift, .active-gift-open').on('click', function(){
+            $('.active-gift, .active-gift-open, .active-gift-active').on('click', function(){
                 giftDay = resultCopy.nextDayNote - continue_days;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
-                        org.ui.alert('礼物已经另取过了！')
+                        org.ui.alert('礼物已经领取过了！')
                     }else{
                         _self.fetchGift(continue_days)
                     }
@@ -424,7 +442,7 @@ org.checin_in = (function () {
                     if(data.ret_code ===0){
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看');
                         _self.steriousGift(data.mysterious_day)
-                        $('.active-gift').addClass('active-gift-open')
+                        $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
                     }
                     if(data.ret_code < 0){
                         org.ui.alert(data.message)
@@ -494,7 +512,6 @@ wlb.ready({
                 connect(data)
             }
         })
-
 
     },
     other: function () {
