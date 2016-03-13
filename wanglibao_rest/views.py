@@ -373,7 +373,7 @@ class CoopDataDispatchApi(APIView):
                 if product_instance:
                     product_form = P2PProductForm(product, instance=product_instance)
                 else:
-                    product_form = P2PProduct()
+                    product_form = P2PProductForm(product)
                 if product_form.is_valid():
                     if product_instance:
                         product_form.save()
