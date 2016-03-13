@@ -372,7 +372,7 @@ class CoopDataDispatchApi(APIView):
                 if product_form.is_valid():
                     product_form.save()
                 else:
-                    message = self.parase_form_error(product_form.errors)
+                    message = product_form.errors.values()[0][0]
                     logger.info("process_products_push invalid with form error: %s" % message)
 
         logger.info("process_products_push done")
