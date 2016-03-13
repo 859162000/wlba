@@ -53,5 +53,17 @@ class RechargeForm(forms.Form):
 
 
 class PayInfoForm(forms.ModelForm):
+    type = forms.CharField(label=u'类型', max_length=5, error_messages={'required': u'请输入类型'})
+    uuid = forms.CharField(label=u'唯一标示', max_length=32, error_messages={'required': u'请输入唯一标示'})
+    amount = forms.DecimalField(label=u'实扣金额', error_messages={'required': u'请输入实扣金额'})
+    fee = forms.DecimalField(label=u'手续费', error_messages={'required': u'请输入手续费'})
+    management_fee = forms.DecimalField(label=u'资金管理费用', error_messages={'required': u'请输入资金管理费用'})
+    management_amount = forms.DecimalField(label=u'资金管理金额', error_messages={'required': u'请输入资金管理金额'})
+    total_amount = forms.DecimalField(label=u'总金额', error_messages={'required': u'请输入总金额'})
+    create_time = forms.DateTimeField(label=u'创建时间', error_messages={'required': u'请输入创建时间'})
+    status = forms.CharField(label=u'状态', max_length=15, error_messages={'required': u'请输入状态'})
+    user_id = forms.IntegerField(label=u'用户id', max_length=50, error_messages={'required': u'请输入用户id'})
+    order_id = forms.IntegerField(label=u'支付流水号', error_messages={'required': u'请输入支付流水号'})
+
     class Meta:
         model = PayInfo
