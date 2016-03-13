@@ -276,6 +276,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
             'formatter': 'verbose'
         },
+        'wanglibao_oauth2': {  #add by yihen@20151028
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_oauth2.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -310,7 +316,7 @@ LOGGING = {
         'wanglibao_rest': {  # add by yihen@20151028
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
-          },
+        },
         'wanglibao_cooperation': {  # add by yihen@20150915
             'handlers': ['wanglibao_cooperation', 'console'],
             'level': 'DEBUG'
@@ -318,6 +324,10 @@ LOGGING = {
         'wanglibao_profile': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG'
+        },
+        'wanglibao_oauth2': {  # add by yihen@20151028
+              'handlers': ['wanglibao_oauth2', 'console'],
+              'level': 'DEBUG'
         },
     }
 }
