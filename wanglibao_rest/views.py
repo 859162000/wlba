@@ -19,7 +19,7 @@ from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.utils import create_user
 from wanglibao_p2p.models import P2PProduct
-from wanglibao_p2p.forms import P2PProductForm
+from wanglibao_p2p.forms import P2PProductForm, P2PRecordForm
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
 from .forms import CoopDataDispatchForm
@@ -266,7 +266,7 @@ class CoopDataDispatchApi(APIView):
             if margin_record_form.is_valid():
                 p2p_record = json.loads(p2p_record) if p2p_record else None
                 p2p_record["create_time"] = dt.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
-                p2p_record_form = P2PProductForm(p2p_record)
+                p2p_record_form = P2PRecordForm(p2p_record)
                 if p2p_record_form.is_valid():
                     p2p_record = p2p_record_form.save()
 
@@ -397,6 +397,7 @@ class CoopDataDispatchApi(APIView):
         req_data = request.POST
         logger.info("channel data dispatch processing with %s" % req_data)
         form = CoopDataDispatchForm(req_data)
+        processer = None
         if form.is_valid():
             channel = form.cleaned_data['channel']
             _time = form.cleaned_data['time']
@@ -440,6 +441,9 @@ class CoopDataDispatchApi(APIView):
         else:
             response_data = self.parase_form_error(form.errors)
 
-        logger.info('channel data dispatch process result:%s' % response_data['message'])
+        if processer:
+            logger.info('channel data dispatch %s result:%s' % (processer.__name__, response_data['message']))
+        else:
+            logger.info('channel data dispatch process result:%s' % response_data['message'])
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
