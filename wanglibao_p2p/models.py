@@ -59,7 +59,7 @@ class P2PRecord(models.Model):
 
     description = models.CharField(u'摘要', default='', max_length=1000)
 
-    platform = models.CharField(u'购买平台', max_length=100, default=u'手动投标')
+    platform = models.CharField(u'购买平台', max_length=100, null=True, blank=True, default=u'手动投标')
 
     class Meta:
         ordering = ['-create_time']
