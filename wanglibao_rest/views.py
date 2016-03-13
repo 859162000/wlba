@@ -373,9 +373,15 @@ class CoopDataDispatchApi(APIView):
                 if product_instance:
                     product_form = P2PProductForm(product, instance=product_instance)
                 else:
-                    product_form = P2PProductForm(product)
+                    product_form = P2PProduct()
                 if product_form.is_valid():
-                    product_form.save()
+                    if product_instance:
+                        product_form.save()
+                    else:
+                        product_instance = P2PProduct()
+                        for k, v in product.iteritems():
+                            setattr(product_instance, k, v)
+                        product_instance.save()
                 else:
                     message = product_form.errors.values()[0][0]
                     logger.info("process_products_push invalid with form error: %s" % message)
