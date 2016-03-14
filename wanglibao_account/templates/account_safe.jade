@@ -18,10 +18,13 @@ block main
             .well
                 .panel-title-bar__no-border
                     .panel-title 身份信息
-                        if modify_phone_state = 2
-                            .text 人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
+
                         if modify_phone_state = 1
-                            .true 手机号修改成功
+                            .true#user_phone_static 手机号修改成功
+                        if modify_phone_state = 2
+                            .text#user_phone_static  人工修改手机号申请已提交，申请进展会以短信形式发送到您的新手机，请留意。
+                        if modify_phone_state = 3
+                            .text#user_phone_static  人工修改手机号申请失败，请重新上传相关材料。点击"申请失败"按钮查看详情。
                 .info_box.margin_top_box.is_open
                     .img.img_1
                     dl
@@ -30,10 +33,13 @@ block main
                             .ico.is_set_ico
                             span.is_set_text 已绑定
                         dd {{phone}}
-                    if modify_phone_state != 2
+                    if modify_phone_state <= 1
                         .button.phone_change_button 修改
-                    else
+                    if modify_phone_state == 2
                         .button.phone_changing 申请修改中
+                    if modify_phone_state == 3
+                        .button.phone_change_button 申请失败
+                        .phone_change_failed 取消申请
                 if id_is_valid
                     .phone_change_wrap
                         .line
@@ -42,7 +48,7 @@ block main
                             dl
                                 dt 短信认证
                                 dd 原手机可收取短信
-                        a.wrap_box.people_wrap(href='/accounts/manual_modify/vali_acc_info/')
+                        .wrap_box.people_wrap
                             .img
                             dl
                                 dt 人工审核
@@ -112,6 +118,14 @@ block main
     .phone_modify_popup
         .phone_modify_popup_text 请先完成实名认证
         .phone_modify_bg
+
+    .tieOnCard_popup
+        .tieOnCard_main
+            .tieOnCard_text 请先在PC端绑定银行卡
+                .close_ico
+            a(href='/accounts/bankcard/') 去绑卡
+        .phone_modify_bg
+
     script.
-        require(["/static/js/account_safe.js?v=2016022401","/static/js/account_setting.js"])
+        require(["/static/js/account_safe.js?v=2016030801","/static/js/account_setting.js"])
 
