@@ -66,7 +66,6 @@ def bajinshe_callback(url, data):
     else:
         res_status_code = res.status_code
         if res_status_code == 200:
-            logger.info(">>>>>>>>>>>>>>>%s" % data)
             logger.info("bajinshe callback return %s" % res.json())
         else:
             logger.info("bajinshe callback connect failed with status code [%s]" % res_status_code)
