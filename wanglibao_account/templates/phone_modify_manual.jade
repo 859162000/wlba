@@ -22,7 +22,7 @@ block main
                             .box_right
                                 .text {{user_name}}
                         if modify_phone_record
-                            <input class='user_id' type="text" name="modify_phone_record_id" val='{{modify_phone_record.id}}'/>
+                            <input class='user_id' type="text" name="modify_phone_record_id" value='{{modify_phone_record.id}}'/>
                             if modify_phone_record.id_front_image_status
                                 .box
                                     label!='<span>*</span>身份证正面'
@@ -180,6 +180,6 @@ block main
             .phone_modify_bg
 
     script.
-        require(["/static/js/phone_modify_manual.js?v=20160301401"])
+        require(["/static/js/phone_modify_manual.js?v=20160301402"])
 
 
