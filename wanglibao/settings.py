@@ -376,8 +376,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 CELERY_QUEUES = {
-    "coop_celery": {"exchange": "coop_celery",
-                    "routing_key": "coop_celery"},
+    "celery": {"exchange": "celery",
+               "routing_key": "celery"},
 }
 
 from datetime import timedelta
