@@ -103,7 +103,7 @@
                       clearInterval(time_intervalId2);
                       $('.phone_change_button').text('修改');
                       $('#user_phone_static').hide();
-                      $('.phone_modify_popup').hide();
+                      $('.phone_modify_popup,.phone_change_failed').hide();
                   }
                 };
                 var time_intervalId2 = setInterval(timerFunction2, 1000);
