@@ -16,6 +16,9 @@ from __future__ import absolute_import
 import os
 import json
 from celery.schedules import crontab
+import djcelery
+
+djcelery.setup_loader()
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CERT_DIR = os.path.join(BASE_DIR, "certificate")
