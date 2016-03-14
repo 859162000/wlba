@@ -223,8 +223,8 @@ def coop_product_push():
                                          (Q(status__in=product_query_status) |
                                           (Q(status=u'已完成') &
                                            Q(make_loans_time__isnull=False) &
-                                           Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1)))))
-    products = products.values('id', 'version', 'category', 'types', 'name',
+                                           Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+    products = products.values('id', 'version', 'category', 'types__name', 'name',
                                'short_name', 'serial_number', 'status', 'period',
                                'brief', 'expected_earning_rate', 'excess_earning_rate',
                                'excess_earning_description', 'pay_method', 'amortization_count',
@@ -234,6 +234,7 @@ def coop_product_push():
 
     product_list = [product for product in products]
     for product in product_list:
+        product['types'] = product['types__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
         if product['soldout_time']:

@@ -1736,6 +1736,7 @@ class BaJinSheRegister(CoopRegister):
         if p2p_record:
             p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
             p2p_record['amount'] = float(p2p_record['amount'])
+            p2p_record['product'] = p2p_record['product_id']
             base_data = generate_coop_base_data('purchase')
 
             margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')
