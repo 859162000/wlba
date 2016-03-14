@@ -454,6 +454,7 @@ class BaJinSheCallback(CoopCallback):
                     'time': timezone.localtime(margin_record.create_time).strftime('%Y%m%d%H%M%S'),
                     'moneyType': 0,
                     'availableBalance': margin_record.margin_current,
+                    'totalBalance': float(margin_record.margin_current),
                 }
                 data['tran'] = [act_data]
                 # 异步回调
@@ -479,6 +480,7 @@ class BaJinSheCallback(CoopCallback):
                     'time': timezone.localtime(margin_record.create_time).strftime('%Y%m%d%H%M%S'),
                     'moneyType': 1,
                     'availableBalance': float(margin_record.margin_current),
+                    'totalBalance': float(margin_record.margin_current),
                 }
                 data['tran'] = [act_data]
                 # 异步回调
