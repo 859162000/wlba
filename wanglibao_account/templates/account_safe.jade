@@ -33,7 +33,7 @@ block main
                             .ico.is_set_ico
                             span.is_set_text 已绑定
                         dd {{phone}}
-                    if modify_phone_state == 1
+                    if modify_phone_state <= 1
                         .button.phone_change_button 修改
                     if modify_phone_state == 2
                         .button.phone_changing 申请修改中
