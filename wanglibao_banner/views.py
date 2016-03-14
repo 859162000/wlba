@@ -203,10 +203,10 @@ class DynamicDetailView(TemplateView):
 
     def get_context_data(self, id, **kwargs):
         try:
-            announce = AboutDynamic.objects.get(pk=id, hide_in_list=False)
+            dynamic = AboutDynamic.objects.get(pk=id, hide_in_list=False)
         except AboutDynamic.DoesNotExist:
             raise Http404(u'您查找的公告不存在')
 
         return {
-            'data': announce
+            'data': dynamic
         }
