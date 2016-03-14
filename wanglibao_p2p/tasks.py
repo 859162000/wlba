@@ -5,6 +5,7 @@ import json
 import requests
 from celery.utils.log import get_task_logger
 
+from django.db.models import Q
 from django.utils import timezone
 from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct
@@ -22,7 +23,8 @@ def bajinshe_product_push():
     order_id = '%s_0000' % timezone.now().strftime("%Y%m%d%H%M%S")
     access_token = get_bajinshe_access_token(coop_id, coop_key, order_id)
     if access_token:
-        product_list = P2PProduct.objects.exclude(types__name=u'还款等额兑奖')
+        product_list = P2PProduct.objects.filter(Q(status=u'已完成') & Q(make_loans_time__isnull=False) &
+                                                 Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1)))
         if product_list.exists():
             product_data_list = []
             for product in product_list:
