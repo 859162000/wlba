@@ -144,6 +144,13 @@ urlpatterns = patterns(
     url(r'^sms_modify/phone/$', login_required(SMSModifyPhoneTemplate.as_view(template_name="sms_modify_phone.jade"), login_url='/accounts/login/'))
 )
 
+
+#新版个人中心
+urlpatterns += patterns(
+    '',
+    url(r'^test/', TemplateView.as_view(template_name="center_security.jade")),
+)
+
 if settings.DEBUG:
     urlpatterns += patterns(
         '',

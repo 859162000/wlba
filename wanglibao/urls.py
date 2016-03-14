@@ -108,11 +108,7 @@ urlpatterns = patterns(
     url(r'^qiye/', include('wanglibao_qiye.urls')),
 )
 
-#新版个人中心
-urlpatterns += patterns(
-    '',
-    url(r'^security', TemplateView.as_view(template_name="center_security.jade")),
-)
+
 
 urlpatterns += patterns(
     '',
