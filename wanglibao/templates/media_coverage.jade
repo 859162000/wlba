@@ -21,7 +21,7 @@ html
                             img(src="/media/{{news.image}}", alt="newsimg")
                         dd.media_title
                             a(href="/news/detail/{{news.id}}", target="_blank") {{news.name}}
-                        dd.media_content {{news.description}}
+                        dd.media_content.postion_dd {{news.description}}
                             a(href="/news/detail/{{news.id}}",target="_blank") [详细介绍]
                         dd.media_time {{news.created_at|date:"Y-m-d H:i"}}
 

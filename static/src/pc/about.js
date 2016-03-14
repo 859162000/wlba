@@ -62,6 +62,7 @@ require(['jquery', 'lightbox'], function( $ , lightbox){
         $(this).parent().removeClass('photo_hover')
     })
 
+    //招聘信息
     $('.job_title_h').on('click',function(){
         var self = $(this);
         $('.job_title_h').not(this).next().slideUp();$('.job_title_h i').removeClass('open');self.find('i').toggleClass('open')
@@ -70,5 +71,15 @@ require(['jquery', 'lightbox'], function( $ , lightbox){
                 self.find('i').removeClass('open');
             }
         });
+    })
+    $('.job_class span').click(function(){
+        var parent = $('.job_list_c'),text = $(this).text();
+        $('.job_class').find('.active').removeClass('active');$(this).addClass('active');parent.find('.job_detail').slideUp();$('.job_title_h i').removeClass('open');
+        if(text == '全部'){
+            parent.find('.job_title_h').show();
+        }else{
+            parent.find('.job_title_h').hide();
+            parent.find('.job_title_h[data-type="'+ $(this).text() +'"]').show();
+        }
     })
 });
