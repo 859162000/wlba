@@ -2380,7 +2380,7 @@ class ManualModifyPhoneAPI(APIView):
             if modify_phone_record  and modify_phone_record.status in [u"待初审", u"初审待定", u"待复审"]:
                 return Response({'message': u"您之前申请的人工修改手机号的请求还未处理完毕,请联系网利宝客服"}, status=400)
             if modify_phone_record and modify_phone_record.status in [u"复审驳回", u"初审驳回"]:
-                modify_phone_record_id = self.request.DATA.get('modify_phone_record_id', 0)
+                modify_phone_record_id = int(self.request.DATA.get('modify_phone_record_id', 0))
                 if modify_phone_record_id != modify_phone_record.id:
                     return Response({'message': u"申请的人工修改手机号id参数错误"}, status=400)
                 manual_record = modify_phone_record
