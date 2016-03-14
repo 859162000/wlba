@@ -13,19 +13,7 @@ html
         include include/about_sidebar
         - endwith
         .team_box
-            .team_banner
-                img(src='/static/imgs/pc/about/director.jpg')
-            .leader_list.clearfix
-                .photo_bg.fl
-                    .photo_bg_box
-                    img(src='/static/imgs/pc/about/zhaorunlong.jpg')
-                .leader_info.fr
-                    p.leader_name_job
-                        span 赵润龙
-                        label CEO
-                    p - 曾就职于摩根斯坦利、美银美林等世界级投行，主导了包括中华电信、无锡尚德、富力地产等数十亿美元标杆性项目
-                    p - 曾在硅谷创立中国版Facebook“友林网”，后发展成为全球最大的华人留学生社交平台，并成功被红杉资本旗下的“占座网”全额收购
-                    p - 赵润龙先生为美国加州伯克利大学经济学、HAAS商学院最高荣誉双学位毕业生、伯克利大学华人学生会主席
+            | {{about_us.content|safe}}
         include global/g_footer
         include include/tracking
                                                         

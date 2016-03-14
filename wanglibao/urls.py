@@ -74,8 +74,8 @@ urlpatterns = patterns(
 
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', HiringView.as_view(), name="hiring"),
-    url(r'^dynamic/', DynamicHomeView.as_view(), name="dynamic"),
-    url(r'^dynamic/detail/(?P<id>\d+)', DynamicDetailView.as_view(), name="dynamic_detail"),
+    url(r'^dynamic/$', DynamicHomeView.as_view(), name="dynamic"),
+    url(r'^dynamic/detail/(?P<id>\d+)/$', DynamicDetailView.as_view(), name="dynamic_detail"),
     url(r'^about/', AboutView.as_view(), name='about'),
     url(r'^company/', CompanyView.as_view(), name="company"),
     url(r'^team/', TeamView.as_view(), name="team"),
