@@ -217,6 +217,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
     'weixin.auth_backend.OpenidAuthBackend',
+    'wanglibao_account.auth_backends.CoopAccessTokenBackend'
 )
 import django.contrib.auth.backends
 
@@ -1185,6 +1186,9 @@ if ENV == ENV_PRODUCTION:
 else:
     YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
+# 八金社
+BAJINSHE_CHANNEL_CODE = 'bajinshe'
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1262,12 +1266,12 @@ if ENV == ENV_PRODUCTION:
 if ENV == ENV_PRODUCTION:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'https://192.168.20.237:8001/oauth2/auth/'
+    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
 else:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'https://192.168.20.237:8001/oauth2/auth/'
+    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
