@@ -443,7 +443,7 @@ class BaJinSheCallback(CoopCallback):
         data = get_bajinshe_base_data(query_id)
         bid = get_tid_for_coop(user_id)
         if data and bid:
-            margin_record = MarginRecord.object(user_id=user_id, order_id=order_id).first()
+            margin_record = MarginRecord.objects.filter(user_id=user_id, order_id=order_id).first()
             if margin_record:
                 act_data = {
                     'bingdingUid': bid,
@@ -468,7 +468,7 @@ class BaJinSheCallback(CoopCallback):
         data = get_bajinshe_base_data(query_id)
         bid = get_tid_for_coop(user_id)
         if data and bid:
-            margin_record = MarginRecord.object(user_id=user_id, order_id=order_id).first()
+            margin_record = MarginRecord.objects.filter(user_id=user_id, order_id=order_id).first()
             if margin_record:
                 act_data = {
                     'bingdingUid': bid,
