@@ -5,6 +5,7 @@ from .forms import ClientAuthForm
 
 logger = logging.getLogger(__name__)
 
+
 class BasicClientBackend(object):
     def authenticate(self, request=None):
         client = None

@@ -291,6 +291,20 @@ class RenRenLiRegister(CoopRegister):
     def __init__(self, *args, **kwargs):
         super(RenRenLiRegister, self).__init__(*args, **kwargs)
 
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        logger.info("user[%s] enter save_to_binding with btype[%s] bid[%s]" % (user.id, self.btype, self.bid))
+        if self.channel:
+            binding = Binding()
+            binding.user = user
+            binding.channel = self.channel
+            binding.bid = get_uid_for_coop(user.id)
+            binding.save()
+
 
 # 注册第三方通道
 coop_register_processor = {

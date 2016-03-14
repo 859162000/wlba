@@ -450,8 +450,6 @@ else:
 
 # 人人利渠道
 WLB_FOR_RENRENLI_KEY = '2007'
-RENRENLI_COOP_ID = 'zlo_RrNuG'
-RENRENLI_COOP_KEY = 'zlopwd_ZAQ5bzRa'
 if ENV == ENV_PRODUCTION:
     RENRENLI_PURCHASE_PUSH_URL = 'http://openapi.amoydao.com/zlo/getp2pinfo/getsubscribe/'
 else:
