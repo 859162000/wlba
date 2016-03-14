@@ -4,6 +4,7 @@ import logging
 from decimal import Decimal
 from django.db import models
 from django.utils import timezone
+from wanglibao_margin.models import MarginRecord
 
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ class P2PRecord(models.Model):
     description = models.CharField(u'摘要', max_length=1000, null=True, blank=True)
 
     platform = models.CharField(u'购买平台', max_length=100, null=True, blank=True)
+    margin_record = models.ForeignKey(MarginRecord, verbose_name=u'账户资金记录', blank=True, null=True)
 
     class Meta:
         ordering = ['-create_time']

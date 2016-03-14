@@ -265,6 +265,8 @@ class CoopDataDispatchApi(APIView):
             margin_record_form = MarginRecordForm(margin_record)
             if margin_record_form.is_valid():
                 p2p_record = json.loads(p2p_record) if p2p_record else None
+                margin_record = margin_record_form.save()
+                p2p_record["margin_record"] = margin_record
                 p2p_record["create_time"] = dt.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
                 p2p_record_form = P2PRecordForm(p2p_record)
                 if p2p_record_form.is_valid():
