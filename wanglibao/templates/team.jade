@@ -1,22 +1,46 @@
+-load formatters
 doctype html
-- with '网利宝理财平台告诉您互联网金融公司如何组建,管理技术团队_网利宝' as title
-include include/common_head
-- endwith
-meta(name="keywords", content="互联网金融,网利宝")
-meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝团队凝聚了一批充满活力、富有进取精神、有着丰富的金融经验以及互联网经验的精英们。")
-body
-  include global/g_nav
-  .container.margin-bottom-xxl
-    .siderbar-div
-      - with '核心团队' as title
-      include include/about_sidebar
-      - endwith
-    .panel-padding.span9-omega
-      .well-s
-        h1.about-title {{about_us.title}}
-        |{{about_us.content|safe}}
-
-
-
-  include global/g_footer
-  include include/tracking
+html
+    head
+        - with '关于我们' as title
+        include global/g_head
+        - endwith
+        meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+        meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    body
+        include global/g_nav
+        - with '关于我们' as title
+        include include/about_sidebar
+        - endwith
+        .team_box
+            .team_banner
+                img(src='/static/imgs/pc/about/director.jpg')
+            .leader_list.clearfix
+                img(src='/static/imgs/pc/about/zhaorunlong.jpg').fl
+                .leader_info.fr
+                    p.leader_name_job
+                        span 赵润龙
+                        label CEO
+                    p - 曾就职于摩根斯坦利、美银美林等世界级投行，主导了包括中华电信、无锡尚德、富力地产等数十亿美元标杆性项目
+                    p - 曾在硅谷创立中国版Facebook“友林网”，后发展成为全球最大的华人留学生社交平台，并成功被红杉资本旗下的“占座网”全额收购
+                    p - 赵润龙先生为美国加州伯克利大学经济学、HAAS商学院最高荣誉双学位毕业生、伯克利大学华人学生会主席
+            .leader_list.clearfix
+                img(src='/static/imgs/pc/about/zhaorunlong.jpg').fr
+                .leader_info.fl
+                    p.leader_name_job
+                        span 刘二飞
+                    p 中国著名金融家，国际知名投资银行家、30余年资深金融经验
+                    p - 曾担任美银美林中国区主席，并在高盛、摩根斯坦利、所罗门、及东方汇理银行担任高层
+                    p - 刘二飞先生在金融领域保持着长胜记录，并荣获多项奖项，其中包括被《银行家》杂志评选为2006年亚洲银行先生，2008年荣获亚太投资银行终身成就奖，同年被CCTV评选为年度十大经济人物等
+            .leader_list.clearfix
+                img(src='/static/imgs/pc/about/zhaorunlong.jpg').fl
+                .leader_info.fr
+                    p.leader_name_job
+                        span 赵润龙
+                        label CEO
+                    p - 曾就职于摩根斯坦利、美银美林等世界级投行，主导了包括中华电信、无锡尚德、富力地产等数十亿美元标杆性项目
+                    p - 曾在硅谷创立中国版Facebook“友林网”，后发展成为全球最大的华人留学生社交平台，并成功被红杉资本旗下的“占座网”全额收购
+                    p - 赵润龙先生为美国加州伯克利大学经济学、HAAS商学院最高荣誉双学位毕业生、伯克利大学华人学生会主席
+        include global/g_footer
+        include include/tracking
+                                                        

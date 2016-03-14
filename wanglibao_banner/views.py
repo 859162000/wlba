@@ -71,7 +71,7 @@ class HiringView(TemplateView):
 
 
 class AboutView(TemplateView):
-    template_name = 'about.jade'
+    template_name = 'about_new.jade'
 
     def get_context_data(self, **kwargs):
         about_us = Aboutus.objects.filter(code='about').first()
