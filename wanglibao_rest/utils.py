@@ -179,7 +179,7 @@ def get_coop_access_token(phone, client_id, tid, coop_key):
     sign = hashlib.md5(str(client_id) + str(phone) + coop_key).hexdigest()
     data = {
         'usn': phone,
-        'appid': client_id,
+        'client_id': client_id,
         'signature': sign,
         'p_user_id': tid,
     }
