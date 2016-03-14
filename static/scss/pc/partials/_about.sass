@@ -512,9 +512,20 @@
     .photo_bg
       width: 172px
       height: 172px
+      position: relative
+      overflow: hidden
+      .photo_bg_box
+        position: absolute
+        @include about-sprite(photo_bg)
+        width: 172px
+        height: 172px
+        z-index: 100
       img
         width: 172px
         height: 172px
+        position: absolute
+        left: 0px
+        top: 0px
     .leader_info
       width: 730px
       .leader_name_job
