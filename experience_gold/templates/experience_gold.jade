@@ -59,11 +59,12 @@ html
                                     label {{product.period}}天
                                     span 投资期限
                         .project_right
-                          if experience_amount > 0
-                            a(href='javascript:void(0)').investBtn 立即投资
-                          else
-                            a.invest_ed 立即投资
-                          p.income_fonts(style='display:none')
+                          img(src='/static/imgs/pc_activity/experience_gold/app_download.png')
+                          //if experience_amount > 0
+                          //  a(href='javascript:void(0)').investBtn 立即投资
+                          //else
+                          //  a.invest_ed 立即投资
+                          //p.income_fonts(style='display:none')
                 if user.is_authenticated and experience_amortization
                   .look_more_detail
                     .more_btn

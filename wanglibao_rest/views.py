@@ -46,15 +46,15 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua, get_client_ip
-from django.http import HttpResponseRedirect
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
+                                  get_coop_binding_for_phone, get_coop_access_token)
+from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, get_channel_record
 from django.conf import settings
-from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from wanglibao_margin.models import MarginRecord
@@ -64,10 +64,26 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
+from wanglibao.views import landpage_view
 import urllib
+from wanglibao_account.cooperation import get_uid_for_coop
+from .forms import OauthUserRegisterForm
 
 
 logger = logging.getLogger('wanglibao_rest')
+
+
+def generate_random_password(length):
+    if length < 0:
+        raise Exception(u"生成随机密码的长度有误")
+
+    random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    password = ""
+    index = 0
+    while index < length:
+            password += str(random_list[randint(0,len(random_list)-1)])
+            index += 1
+    return password
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -219,18 +235,6 @@ class WeixinSendRegisterValidationCodeView(APIView):
 class RegisterAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
-    def generate_random_password(self, length):
-        if length < 0:
-            raise Exception("生成随机密码的长度有误")
-
-        random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = ""
-        index = 0
-        while index < length:
-                password += str(random_list[randint(0,len(random_list)-1)])
-                index += 1
-        return password
-
     def post(self, request, *args, **kwargs):
         """ 
             modified by: Yihen@20150812
@@ -248,7 +252,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         password = password.strip()
         validate_code = validate_code.strip()
         if request.DATA.get('IGNORE_PWD', '') and not password:
-            password = self.generate_random_password(6)
+            password = generate_random_password(6)
             logger.debug('系统为用户 %s 生成的随机密码是：%s' % (identifier, password))
 
         if not identifier or not password or not validate_code:
@@ -989,7 +993,6 @@ class AdminIdValidate(APIView):
                                 "error_number": ErrorNumber.unknown_error
                             }, status=400)
 
-        #user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
         user = User.objects.get(wanglibaouserprofile__phone=phone)
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
@@ -1000,6 +1003,7 @@ class AdminIdValidate(APIView):
         return Response({
                             "validate": True
                         }, status=200)
+
 
 class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
@@ -1019,11 +1023,17 @@ class LoginAPIView(DecryptParmsAPIView):
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+            return Response({"token": "false", "message": u"用户名或密码错误"}, status=400)
         if not user.is_active:
-            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+            return Response({"token": "false", "message": u"用户已被关闭"}, status=400)
         if user.wanglibaouserprofile.frozen:
-            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+            return Response({"token": "false", "message": u"用户已被冻结"}, status=400)
+
+        # 登录成功后将用户的错误登录次数清零
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
 
         push_user_id = request.DATA.get("user_id", "")
         push_channel_id = request.DATA.get("channel_id", "")
@@ -1049,6 +1059,7 @@ class LoginAPIView(DecryptParmsAPIView):
         #     token.delete()
         #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
+
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
     permission_classes = ()
@@ -1084,6 +1095,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             if device_type == "ios":
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': "false"}, status=status.HTTP_200_OK)
+
 
 def get_public_statistics():
     today = datetime.now()
@@ -1623,8 +1635,8 @@ class BidHasBindingForChannel(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code, bid):
-        binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
-        if binding:
+        has_binding = has_binding_for_bid(channel_code, bid)
+        if has_binding:
             response_data = {
                 'ret_code': 10001,
                 'message': u'该bid已经绑定'
@@ -1636,6 +1648,62 @@ class BidHasBindingForChannel(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class AccessUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
+    permission_classes = ()
+
+    def get(self, request, **kwargs):
+        channel_code = request.GET.get('promo_token', None)
+        if channel_code:
+            channel = get_channel_record(channel_code)
+            if channel:
+                phone = request.session.get('phone')
+                binding = get_coop_binding_for_phone(channel_code, phone)
+                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                if binding and user:
+                    response_data = {
+                        'user_id': binding.bid,
+                        'ret_code': 10000,
+                        'message': u'该号已注册'
+                    }
+                elif not user:
+                    response_data = {
+                        'user_id': None,
+                        'ret_code': 10001,
+                        'message': u'该号未注册'
+                    }
+                else:
+                    response_data = {
+                        'user_id': None,
+                        'ret_code': 10002,
+                        'message': u'该号已注册，非本渠道用户'
+                    }
+
+                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+            else:
+                response_data = {
+                    'user_id': None,
+                    'ret_code': 10002,
+                    'message': u'无效promo_token'
+                }
+        else:
+            return Http404(u'页面不存在')
+
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+
+
+class LandOpenApi(APIView):
+    """
+    渠道跳转页
+    """
+
+    permission_classes = ()
+
+    def post(self, request):
+        return landpage_view(request)
 
 
 class CoopPvApi(APIView):
@@ -1673,3 +1741,73 @@ class CoopPvApi(APIView):
             'message': 'failed',
         }
         return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+
+
+class OauthUserRegisterApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        data = request.session
+        form = OauthUserRegisterForm(data)
+        if form.is_valid():
+            channel_code = form.cleaned_data['channel_code']
+            coop_key_str = '%s_COOP_KEY' % channel_code.upper()
+            coop_key = getattr(settings, coop_key_str, None)
+            if form.check_sign(coop_key):
+                phone = form.cleaned_data['phone']
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                if user:
+                    client_id = form.cleaned_data['client_id']
+                    channel_code = form.cleaned_data['channel_code']
+                    device = split_ua(request)
+                    # if device['device_type'] == "pc":
+                    #     auth_user = authenticate(identifier=phone, password=password)
+                    #     auth_login(request, auth_user)
+
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    tid = get_uid_for_coop(user.id)
+                    res_data = get_coop_access_token(phone, client_id, tid, coop_key)
+                    if int(res_data['ret_code']) == 10000:
+                        callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
+                        response_data = {
+                            'Code': 101,
+                            'message': u'成功',
+                            'Cust_key': tid,
+                            'Access_tokens': res_data['token'],
+                            'Callback_url': callback_url,
+                        }
+                    else:
+                        response_data = {
+                            'Code': res_data['ret_code'],
+                            'message': res_data['message'],
+                        }
+                else:
+                    response_data = {
+                        'Code': 10009,
+                        'message': u'注册失败',
+                    }
+            else:
+                response_data = {
+                    'Code': 10008,
+                    'message': u'签名错误',
+                }
+        else:
+            form_errors = form.errors
+            form_error_keys = form_errors.keys()
+            form_error = form_errors[form_error_keys[0]][0]
+            response_data = {
+                'Code': 10010,
+                'message': form_error,
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

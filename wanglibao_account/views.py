@@ -52,7 +52,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, LoginCounter,\
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, \
     UserThreeOrder, ManualModifyPhoneRecord, SMSModifyPhoneRecord
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
@@ -295,6 +295,7 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
+
 class PasswordCheckView(DecryptParmsAPIView):
     permission_classes = ()
     def post(self, request, **kwargs):
@@ -317,6 +318,7 @@ class PasswordCheckView(DecryptParmsAPIView):
 
         return Response({'token':True, 'message':u'用户认证成功'})
 
+
 class PasswordResetValidateView(TemplateView):
     template_name = 'password_reset_phone.jade'
 
@@ -335,7 +337,8 @@ class PasswordResetGetIdentifierView(TemplateView):
 
             users = None
             if identifier_type == 'email':
-                users = User.objects.filter(email=identifier, is_active=True)
+                return HttpResponse(u"非法请求", status=400)
+                # users = User.objects.filter(email=identifier, is_active=True)
             elif identifier_type == 'phone':
                 users = User.objects.filter(wanglibaouserprofile__phone=identifier,
                                             wanglibaouserprofile__phone_verified=True)
@@ -346,6 +349,18 @@ class PasswordResetGetIdentifierView(TemplateView):
             if len(users) == 0:
                 return HttpResponse(u"找不到该用户", status=400)
             else:
+                try:
+                    # 清除session验证时间
+                    del request.session['phone_validated_time']
+
+                    # 如果session中已经有用户id,则验证已有的和当前提交的是否一致,不一致则认为是非法操作
+                    if request.session['user_to_reset']:
+                        session_user_id = request.session['user_to_reset']
+                        if session_user_id != users[0].id:
+                            return HttpResponse(u"非法请求", status=400)
+                except KeyError:
+                    pass
+
                 view = PasswordResetValidateView()
                 view.request = request
                 # if identifier_type == 'phone':
@@ -365,7 +380,6 @@ class PasswordResetGetIdentifierView(TemplateView):
 
 def send_validation_mail(request, **kwargs):
     user_id = request.session['user_to_reset']
-    #user_email = get_user_model().objects.get(pk=user_id).email
     user_email = User.objects.get(pk=user_id).email
 
     form = PasswordResetForm(data={
@@ -383,7 +397,6 @@ def send_validation_mail(request, **kwargs):
 
 def send_validation_phone_code(request, **kwargs):
     user_id = request.session['user_to_reset']
-    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
     user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
@@ -397,7 +410,6 @@ def validate_phone_code(request):
     logger.info("Enter validate_phone_code")
     validate_code = request.POST['validate_code']
     user_id = request.session['user_to_reset']
-    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
     user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
@@ -430,16 +442,24 @@ class ResetPassword(TemplateView):
             return HttpResponse(u'没有用户信息', status=500)
 
         user_id = request.session['user_to_reset']
-        #user = get_user_model().objects.get(pk=user_id)
         user = User.objects.get(pk=user_id)
 
         assert ('phone_validated_time' in request.session)
         last_validated_time = request.session['phone_validated_time']
         assert (last_validated_time != 0)
 
-        if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 30 * 60:
+        # 缩短session失效时间
+        if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 10 * 60:
             user.set_password(password1)
             user.save()
+            
+            # 清除session
+            try:
+                del request.session['phone_validated_time']
+                del request.session['user_to_reset']
+            except KeyError:
+                pass
+
             return HttpResponse(u'密码修改成功', status=200)
 
         else:
@@ -447,7 +467,6 @@ class ResetPassword(TemplateView):
 
 
 class UserViewSet(PaginatedModelViewSet):
-    #model = get_user_model()
     model = User
     serializer_class = UserSerializer
     permission_classes = IsAdminUser,
@@ -735,6 +754,7 @@ class AccountInviteIncomeAPIView(APIView):
         earning = account_backends.invite_earning(request.user)
         return Response({"ret_code":0, "earning":earning})
 
+
 class AccountInviteHikeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -757,6 +777,7 @@ class AccountInviteHikeAPIView(APIView):
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
                         "call_charge":30, "total_hike":"0.1%", "calls":callfee,
                         "amount":amount, "product_id":product_id})
+
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -1028,6 +1049,7 @@ class AccountTransactionP2P(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+
 class AccountRedPacket(TemplateView):
     template_name = 'redpacket_available.jade'
 
@@ -1168,7 +1190,7 @@ class ResetPasswordAPI(DecryptParmsAPIView):
         identifier_type = detect_identifier_type(identifier)
 
         if identifier_type == 'phone':
-            #user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
+            # user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
             user = User.objects.get(wanglibaouserprofile__phone=identifier)
         else:
             return Response({'ret_code': 30003, 'message': u'请输入手机号码'})
@@ -1180,7 +1202,7 @@ class ResetPasswordAPI(DecryptParmsAPIView):
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
             # Modify by hb on 2015-12-02
-            #return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            # return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
             return Response({'ret_code': 30004, 'message': message})
 
 
@@ -1196,7 +1218,6 @@ class Third_login_back(APIView):
     def get(self, request):
         result = third_login.login_back(request)
         return Response(result)
-
 
 
 class ChangePasswordAPIView(DecryptParmsAPIView):
@@ -1222,11 +1243,18 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
             # Modify by hb 0n 2015-12-02
-            #return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            # return Response({"ret_code": 30044, "message": u"验证码输入错误"})
             return Response({"ret_code": 30044, "message": message})
 
         user.set_password(new_password)
         user.save()
+        # 重置密码后将用户的错误登录次数清零
+        from wanglibao_profile.models import WanglibaoUserProfile
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
+
         return Response({'ret_code': 0, 'message': u'修改成功'})
 
 
@@ -1349,7 +1377,6 @@ def ajax_token_login(request, authentication_form=TokenSecretSignAuthenticationF
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed(["GET"])
-
 
 
 @sensitive_post_parameters()
@@ -2214,14 +2241,13 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
+
 class FirstPayResultView(TemplateView):
     template_name = 'register_three.jade'
 
     def get_context_data(self, **kwargs):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
-
-
 
 
 class IdentityInformationTemplate(TemplateView):
@@ -2259,6 +2285,7 @@ class ValidateAccountInfoTemplate(TemplateView):
             'is_bind_card': is_bind_card
         }
 
+
 class ValidateAccountInfoAPI(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -2294,6 +2321,7 @@ class ValidateAccountInfoAPI(APIView):
                 message+=msg
         return Response({"message":message}, status=400)
 
+
 class ModifyPhoneValidateCode(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -2313,6 +2341,7 @@ class ModifyPhoneValidateCode(APIView):
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({'message': message, "type":"validation"}, status=status)
 
+
 class ManualModifyPhoneTemplate(TemplateView):
     template_name = 'phone_modify_manual.jade'
 
@@ -2326,7 +2355,6 @@ class ManualModifyPhoneTemplate(TemplateView):
                 'user_name':profile.name,
                 # 'modify_phone_record':modify_phone_record
                 }
-
 
 
 class ManualModifyPhoneAPI(APIView):
@@ -2384,6 +2412,7 @@ class SMSModifyPhoneValidateTemplate(TemplateView):
             "phone": profile.phone,
             'is_bind_card': is_bind_card,
             }
+
 
 class SMSModifyPhoneValidateAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -2447,6 +2476,7 @@ class SMSModifyPhoneValidateAPI(APIView):
                 message+=msg
         return Response({"message":message}, status=400)
 
+
 class SMSModifyPhoneTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
@@ -2460,6 +2490,7 @@ class SMSModifyPhoneTemplate(TemplateView):
         return {
             "new_phone": new_phone,
             }
+
 
 class SMSModifyPhoneAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -2494,40 +2525,66 @@ class SMSModifyPhoneAPI(APIView):
             return Response({'message':'ok'})
 
 
-class LoginCounterVerifyAPI(APIView):
-    """登录次数验证"""
+class LoginCounterVerifyAPI(DecryptParmsAPIView):
+    """
+    登录次数验证,下面4个情况当天错误次数清零处理
+    1、重置登录密码
+    2、登录成功后
+    3、注销登录
+    4、6次机会内验证正确
+    5、第二天清零
+    """
 
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
 
-        from django.db.models import F
+        # from django.db.models import F
+        from wanglibao_profile.models import WanglibaoUserProfile
 
         now = timezone.now()
         today_start = local_to_utc(now, 'min')
         today_end = local_to_utc(now, 'max')
         user = request.user
-        password = request.DATA.get('password').strip()
+        password = self.params.get('password').strip()
 
-        if user.check_password(password):
-            return Response({'ret_code': 0, 'message': 'ok'})
+        # 密码错误，请重新输入
+        # 错误大于6次, 密码错误频繁，为账户安全建议重置
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        failed_count = user_profile.login_failed_count
+
+        if failed_count > 6 and today_start < now <= today_end:
+            msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
         else:
-            # 密码错误，请重新输入
-            # 错误大于6次, 密码错误频繁，为账户安全建议重置
-            verify_counter, created = LoginCounter.objects.get_or_create(user=user)
-
-            if verify_counter.count > 6 and today_start < now < today_end:
-                msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+            if user.check_password(password):
+                user_profile.login_failed_count = 0
+                user_profile.login_failed_time = now
+                user_profile.save()
+                return Response({'ret_code': 0, 'message': 'ok'})
             else:
                 msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
 
-            if today_start < now < today_end:
-                verify_counter.count = F('count') + 1
-            else:
-                verify_counter.count = 1
-            verify_counter.save()
+                if today_start < now <= today_end:
+                    user_profile.login_failed_count = failed_count + 1
+                    user_profile.login_failed_time = now
+                else:
+                    user_profile.login_failed_count = 1
+                    user_profile.login_failed_time = now
 
-            return Response(msg)
+                user_profile.save()
+
+        return Response(msg)
 
 
+class MarginRecordsAPIView(APIView):
+    """
+    用户资金账户记录
+    """
+    permission_classes = (IsAuthenticated, )
+
+    @staticmethod
+    def post(request):
+        from wanglibao_margin.margin_record import margin_records
+        res = margin_records(request)
+        return Response(res)
 

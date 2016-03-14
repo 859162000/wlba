@@ -28,9 +28,12 @@ import urllib
 from .models import UserThreeOrder
 import requests
 import json
+from wanglibao_redis.backend import redis_backend
 
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_rest.utils import get_current_utc_timestamp
+
 
 
 logger = logging.getLogger(__name__)
@@ -133,6 +136,28 @@ def verify_id(name, id_number):
         return ProductionIDVerifyBackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyV2BackEnd':
         return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+    elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
+        key = 'valid_count_v1'
+        valid_v1_total = settings.VALID_V1_TOTAL
+        redis = redis_backend()
+        if redis.redis and redis.redis.ping():
+            if redis._exists(key):
+                valid_v1_count = redis._get(key)
+                valid_v1_count = int(valid_v1_count)
+                if valid_v1_count <= 0:
+                    logger.info(">>>>>>>>>>>>>user valid auto used v2 v1_count[%s]" % valid_v1_count)
+                    return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+                else:
+                    redis._set(key, valid_v1_count - 1)
+                    logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % (valid_v1_count - 1,))
+                    return ProductionIDVerifyBackEnd.verify(name, id_number)
+            else:
+                redis._set(key, valid_v1_total)
+                logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
+                return ProductionIDVerifyBackEnd.verify(name, id_number)
+        else:
+            logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
+            return ProductionIDVerifyV2BackEnd.verify(name, id_number)
     else:
         raise NameError("The specific backend not implemented")
 
@@ -346,41 +371,76 @@ def str_to_float(time_str):
     return time.mktime(time.strptime(time_str, "%Y-%m-%d"))
 
 
-def encrypt_mode_cbc(data, key, iv):
-    """
-    aes加密得到十进制串
-    :param data:
-    :param key:
-    :param iv:
-    :return:
-    """
+class Crypto(object):
+    def __init__(self, alg='aes_128_cbc'):
+        self.alg = alg
 
-    cipher = Cipher(alg='aes_128_cbc', key=key, iv=iv, op=1)
-    buf = cipher.update(data)
-    buf += cipher.final()
-    del cipher
+    def encrypt_mode_cbc(self, data, key, iv):
+        """
+        使用aes_128_cbc算法对数据加密得到字节流
+        :param data:
+        :param key:
+        :param iv:
+        :return:
+        """
 
-    # 将明文从字节流转为十进制
-    des_list = [int('%02X' % (ord(i)), 16) for i in buf]
+        cipher = Cipher(alg=self.alg, key=key, iv=iv, op=1)
+        buf = cipher.update(data)
+        buf += cipher.final()
+        del cipher
 
-    # 原码转补码
-    in_list = [~h ^ 255 if h > 128 else h for h in des_list]
+        return buf
 
-    return in_list
+    def encode_bytes(self, buf):
+        """
+        将字节流16进制加密
+        :param buf:
+        :return:
+        """
 
+        # 将字节流转为十进制
+        des_list = [ord(i) for i in buf]
 
-def encodeBytes(in_list):
-    """
-    十进制按电信规则16进制加密
-    :param bytelist:
-    :return:
-    """
+        # 原码转补码
+        in_list = [~h ^ 255 if h > 128 else h for h in des_list]
 
-    ret = []
-    for byte in in_list:
-        ret.append(chr(((byte >> 4) & 0xF) + 97))
-        ret.append(chr((byte & 0xF) + 97))
-    return ''.join(ret)
+        # 十六进制加密
+        ret = []
+        for byte in in_list:
+            ret.append(chr(((byte >> 4) & 0xF) + 97))
+            ret.append(chr((byte & 0xF) + 97))
+        return ''.join(ret)
+
+    def decode_bytes(self, enc_str):
+        """
+        将数据16进制解密为字节流
+        :param enc_str:
+        :return:
+        """
+
+        # 16进制解密
+        in_list = []
+        for i in range(0, len(enc_str), 2):
+            in_list.append(((ord(enc_str[i]) - 97) << 4) + (ord(enc_str[i + 1]) - 97))
+
+        # 十进制转字节流
+        data_buf = ''.join([chr(i) for i in in_list])
+        return data_buf
+
+    def decrypt_mode_cbc(self, data_buf, key, iv):
+        """
+        使用aes_128_cbc算法对数据加密得到字节流
+        :param data_buf:
+        :param key:
+        :param iv:
+        :return:
+        """
+
+        cipher = Cipher(alg=self.alg, key=key, iv=iv, op=0)
+        buf = cipher.update(data_buf)
+        data = buf + cipher.final()
+        del cipher
+        return data
 
 
 def get_client_ip(request):
@@ -444,9 +504,10 @@ def zgdx_order_query(params):
             'end_time': params.get('end_time', ''),
         }
 
-        encrypt_data = encrypt_mode_cbc(json.dumps(data), coop_key, iv)
+        crypto = Crypto()
+        data_buf = crypto.encrypt_mode_cbc(json.dumps(data), coop_key, iv)
         params = {
-            'code': encodeBytes(encrypt_data),
+            'code': crypto.encode_bytes(data_buf),
             'partner_no': params.get('partner_no', None),
         }
 
@@ -696,9 +757,11 @@ class ZGDXAdminCallback(object):
             'plat_offer_id': plat_offer_id,
             'effect_type': effect_type,
         }
-        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
+
+        crypto = Crypto()
+        data_buf = crypto.encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
         params = {
-            'code': encodeBytes(encrypt_str),
+            'code': crypto.encode_bytes(data_buf),
             'partner_no': self.partner_no,
         }
 
@@ -764,3 +827,19 @@ class ZGDXAdminCallback(object):
             self.binding_card_call_back(obj)
             self.purchase_call_back(obj)
 
+
+def coop_base_sign(channel, _time, key):
+    sign = hashlib.md5(channel + key + str(_time)).hexdigest()
+    return sign
+
+
+def generate_coop_base_data(act):
+    channel = 'base'
+    utc_timestamp = get_current_utc_timestamp()
+    data = {
+        'sign': coop_base_sign(channel, utc_timestamp, settings.CHANNEL_CENTER_CALL_BACK_KEY),
+        'time': utc_timestamp,
+        'act': act,
+        'channel': channel,
+    }
+    return data

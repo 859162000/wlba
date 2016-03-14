@@ -48,7 +48,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                                  BidHasBindingForChannel, CoopPvApi)
+                            BidHasBindingForChannel, AccessUserExistsApi, LandOpenApi, CoopPvApi, OauthUserRegisterApi)
+
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -61,7 +62,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -240,7 +241,6 @@ urlpatterns = patterns(
     url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
     url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
     url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
-
 )
 
 urlpatterns += patterns('',
@@ -282,6 +282,7 @@ urlpatterns += patterns(
     url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
     url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
     url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
+    url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view())
 )
 
 # app端改版新接口
@@ -303,6 +304,7 @@ urlpatterns += patterns(
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
 
+
 # 理财金接口
 urlpatterns += patterns(
     '',
@@ -321,6 +323,19 @@ urlpatterns += patterns(
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
 )
 
+
+# 判断手机号是否已经绑定渠道或被注册
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/exists/$', AccessUserExistsApi.as_view()),
+)
+
+# 渠道着陆页中间跳转接口
+urlpatterns += patterns(
+    '',
+    url(r'^landpage/$', LandOpenApi.as_view()),
+)
+
 #
 urlpatterns += patterns(
     '',
@@ -337,4 +352,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
+)
+
+# oauth用户注册接口
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/register/$', OauthUserRegisterApi.as_view()),
 )

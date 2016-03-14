@@ -44,11 +44,11 @@ Lottery.prototype = {
     },
     drawPoint: function (x, y) {
         this.maskCtx.beginPath();
-        var radgrad = this.maskCtx.createRadialGradient(x, y, 0, x, y, 30);
+        var radgrad = this.maskCtx.createRadialGradient(x, y, 0, x, y, 60);
         radgrad.addColorStop(0, 'rgba(0,0,0,1)');
         radgrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         this.maskCtx.fillStyle = radgrad;
-        this.maskCtx.arc(x, y, 30, 0, Math.PI * 2, true);
+        this.maskCtx.arc(x, y, 60, 0, Math.PI * 2, true);
         this.maskCtx.fill();
         if (this.drawPercentCallback) {
             this.drawPercentCallback.call(null, this.getTransparentPercent(this.maskCtx, this.width, this.height));

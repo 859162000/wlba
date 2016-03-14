@@ -8,8 +8,9 @@ html
     - endwith
     link(rel="stylesheet",href="/static/styles/pc_activity/xunlei_three.css")
   body(style="background:#ffdc79")
+    - csrf_token
     include include/activityTopNewxunlei0
-    //.ten-gif
+    .ten-gif
       .gif
         .ten-yun
         .money
@@ -49,8 +50,21 @@ html
             h1 幸运大翻牌
           p.titlexunlei
             |你有&nbsp;
-            span 3
+            span 0
             |&nbsp;次翻牌机会
+          #vertical.brand
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
+            a(href="javascript:void(0)").xun
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai1.png").imgg
+              img( alt="" src="/static/imgs/pc_activity/xunlei_three/xunlei-threepai2.png").info
         .three-maindraw1
           .maindraw-title1
             h1 新用户专享福利
@@ -60,37 +74,46 @@ html
                 dd 注册送
                 dt.drawtitle1
             dd.ddraw
-              a(href='javascript:void(0);') 立即注册
+              if user.is_authenticated
+                a(href='javascript:void(0);').buttonxunlei 立即注册
+              else
+                a(href='javascript:void(0);').buttonxunlei1 立即注册
           dl
             dt
               dl
                 dd 首充送
                 dt.drawtitle1.drawtitle11
             dd.ddraw
-              a(href='javascript:void(0);') 立即充值
+              if user.is_authenticated
+                a(href='/accounts/home/').buttonxunlei2 立即充值
+              else
+                a(href='javascript:void(0);').buttonxunlei3 立即充值
           dl
             dt
               dl
                 dd 首投送
                 dt.drawtitle1.drawtitle12
             dd.ddraw
-              a(href='javascript:void(0);') 立即投资
+              if user.is_authenticated
+                a(href='/p2p/list/').buttonxunlei4 立即投资
+              else
+                a(href='javascript:void(0);').buttonxunlei5 立即投资
 
         .three-maindraw2
           .maindraw-title2
             h1 活动规则
           ul
-            li 1、活动时间：2016年1月x日-2016年1月x日；
-            li 2、手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌网利宝新老用户均可参与；
-            li 3、活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益； 
-            li 4、新用户首次充值不低于100元即可获7天迅雷会员及50元直抵红包，50元直抵红包投资2000元即可抵扣使用，有效期自领取日起7天有效；
-            li 5、新用户首次投资即可获得100元直抵红包，投资5000元即可抵扣使用，有效期自领取日起7天有效；
-            li 6、新用户单笔首次投资不低于1000元附加获赠1年迅雷会员；
-            li 7、幸运翻牌中奖用户获赠随机金额体验金及加息券，体验金专享1天10%年化收益，加息券自领取之日起7天有效；
-            li 8、用户注册时建议根据注册提示登陆迅雷账号，以便迅雷会员奖励顺利发放；
-            li 9、 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次且仅限散标使用，不可叠加使用，使用后无论是 否有余额均失效；
-            li 10、 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
-            li 11、 本活动最终解释权在法律允许范围内归网利宝所有。
+            li 1. 活动时间：2016年3月1日开始；
+            li 2. 手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌网利宝新老用户均可参与；
+            li 3. 活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益； 
+            li 4. 新用户首次充值不低于100元即可获7天迅雷会员及50元直抵红包，50元直抵红包投资2000元即可抵扣使用，有效期自领取日起7天有效；
+            li 5. 新用户首次投资即可获得100元直抵红包，投资5000元即可抵扣使用，有效期自领取日起7天有效；
+            li 6. 新用户单笔首次投资不低于1000元附加获赠1年迅雷会员；
+            li 7. 幸运翻牌中奖用户获赠随机金额体验金及加息券，体验金专享1天10%年化收益，加息券自领取之日起7天有效；
+            li 8. 用户注册时建议根据注册提示登陆迅雷账号，以便迅雷会员奖励顺利发放；
+            li 9. 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次且仅限散标使用，不可叠加使用，使用后无论是 否有余额均失效；
+            li 10. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+            li 11. 本活动最终解释权在法律允许范围内归网利宝所有。
 
     include global/g_footer
     include include/tracking

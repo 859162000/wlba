@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
+
+import json
 import random
 from celery.utils.log import get_task_logger
 
@@ -11,7 +13,7 @@ from order.utils import OrderHelper
 
 from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization, ProductType
+from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization, ProductType, EquityRecord
 from wanglibao_p2p.trade import P2POperator
 from wanglibao_p2p.automatic import Automatic
 from django.db.models import Sum, Q
@@ -21,6 +23,10 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
+from wanglibao_account.utils import generate_coop_base_data
+from wanglibao_account.tasks import common_callback_for_post
+from marketing.utils import get_user_channel_record
+from django.conf import settings
 
 logger = get_task_logger(__name__)
 
@@ -209,6 +215,65 @@ def p2p_auto_ready_for_settle():
         amort.save()
 
 
+@app.task
+def coop_product_push():
+    product_query_status = [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核',
+                            u'满标已审核', u'还款中', u'流标']
+    products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
+                                         (Q(status__in=product_query_status) |
+                                          (Q(status=u'已完成') &
+                                           Q(make_loans_time__isnull=False) &
+                                           Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1)))))
+    products = products.values('id', 'version', 'category', 'types', 'name',
+                               'short_name', 'serial_number', 'status', 'period',
+                               'brief', 'expected_earning_rate', 'excess_earning_rate',
+                               'excess_earning_description', 'pay_method', 'amortization_count',
+                               'repaying_source', 'total_amount', 'ordered_amount',
+                               'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
+                               'limit_per_user')
+
+    product_list = [product for product in products]
+    for product in product_list:
+        product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
+        product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
+        if product['soldout_time']:
+            product['soldout_time'] = product['soldout_time'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            product.pop('soldout_time', None)
+        if product['make_loans_time']:
+            product['make_loans_time'] = product['make_loans_time'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            product.pop('make_loans_time', None)
+
+    if product_list:
+        base_data = generate_coop_base_data('products_push')
+        act_data = {
+            'products': json.dumps(product_list)
+        }
+        data = dict(base_data, **act_data)
+        common_callback_for_post.apply_async(
+            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_products_push'})
 
 
+@app.task
+def coop_amortizations_push(amortizations, product_id):
+    amortization_list = list()
+    amo_terms = ProductAmortization.objects.filter(product_id=product_id).count()
+    for amo in amortizations:
+        channel = get_user_channel_record(amo["user_id"])
+        if channel:
+            amo['terms'] = amo_terms
+            equity_record = EquityRecord.objects.filter(catalog=u'申购确认', product_id=product_id, user_id=amo["user_id"]).first()
+            amo['equity_confirm_at'] = equity_record.create_time.strftime('%Y-%m-%d %H:%M:%S')
+            amo['equity_amount'] = float(equity_record.amount)
+            amortization_list.append(amo)
 
+    if amortization_list:
+        base_data = generate_coop_base_data('amortizations_push')
+        act_data = {
+            'product_id': product_id,
+            'amortizations': json.dumps(amortization_list)
+        }
+        data = dict(base_data, **act_data)
+        common_callback_for_post.apply_async(
+            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_amos_push'})

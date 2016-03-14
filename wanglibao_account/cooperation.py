@@ -58,21 +58,23 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback
+                                    xunleivip_callback, coop_callback_for_post
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
-from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes
+from wanglibao_account.utils import Crypto
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
-from .utils import xunleivip_generate_sign
+from .utils import xunleivip_generate_sign, generate_coop_base_data
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
+import json
+from wanglibao_margin.models import MarginRecord
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -172,6 +174,10 @@ class CoopRegister(object):
         # 渠道提供给我们的秘钥
         self.coop_key = None
         self.call_back_url = None
+        # 传递渠道oauth客户端ID时使用的变量名
+        self.internal_channel_client_id_key = 'client_id'
+        self.channel_access_token_key = 'access_token'
+
 
     @property
     def channel_code(self):
@@ -198,6 +204,10 @@ class CoopRegister(object):
     @property
     def channel_user(self):
         return self.request.session.get(self.internal_channel_user_key, None)
+
+    @property
+    def channel_client_id(self):
+        return self.request.session.get(self.internal_channel_client_id_key, None)
 
     @property
     def channel_extra(self):
@@ -453,6 +463,16 @@ class CoopRegister(object):
                 return
         except:
             logger.exception('process after binding error for user %s' % user.id)
+
+    def process_for_clear_session(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.clear_session()
+        except Exception, e:
+            logger.exception('channel clear session error for user %s' % user.id)
+            logger.info(e)
 
 
 class TianMangRegister(CoopRegister):
@@ -1018,9 +1038,10 @@ class ZGDXRegister(CoopRegister):
             'plat_offer_id': plat_offer_id,
             'effect_type': effect_type,
         }
-        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
+        crypto = Crypto()
+        data_buf = crypto.encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
         params = {
-            'code': encodeBytes(encrypt_str),
+            'code': crypto.encode_bytes(data_buf),
             'partner_no': self.partner_no,
         }
 
@@ -1601,6 +1622,229 @@ class YZCJRegister(CoopRegister):
                     kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
+class BaJinSheRegister(CoopRegister):
+    def __init__(self, request):
+        super(BaJinSheRegister, self).__init__(request)
+        self.c_code = 'bajinshe'
+        self.channel_product_id_key = 'product_id'
+        self.external_channel_client_id_key = 'appid'
+        self.external_channel_phone_key = 'usn'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_user_id_key = 'p_user_id'
+        self.external_channel_order_id_key = 'orderNum'
+        self.internal_channel_order_id_key = 'order_id'
+        self.call_back_url = settings.CHANNEL_CENTER_CALL_BACK_URL
+
+    @property
+    def oauth2_client_id(self):
+        return self.request.session.get(self.internal_channel_client_id_key, None)
+
+    @property
+    def channel_order_id(self):
+        return self.request.session.get(self.internal_channel_order_id_key, None)
+
+    def save_to_session(self):
+        channel_code = self.get_channel_code_from_request()
+        channel_phone = self.request.REQUEST.get(self.external_channel_phone_key, None)
+        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
+        p_id = self.request.REQUEST.get(self.channel_product_id_key, None)
+        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
+        access_token = self.request.REQUEST.get(self.channel_access_token_key, None)
+        channel_order_id = self.request.REQUEST.get(self.external_channel_order_id_key, None)
+
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
+
+        if p_id:
+            self.request.session[self.channel_product_id_key] = p_id
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+        if access_token:
+            self.request.session[self.channel_access_token_key] = access_token
+
+        if channel_order_id:
+            self.request.session[self.internal_channel_order_id_key] = channel_order_id
+
+    def clear_session(self):
+        super(BaJinSheRegister, self).clear_session()
+        self.request.session.pop(self.channel_product_id_key, None)
+        self.request.session.pop(self.internal_channel_client_id_key, None)
+        self.request.session.pop(self.channel_access_token_key, None)
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_order_id_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        pass
+
+    def validate_call_back(self, user):
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter validate_call_back for user[%s]" % (channel.code, user.id))
+        data = generate_coop_base_data('validate')
+        data['user_id'] = user.id
+        coop_callback_for_post.apply_async(
+            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+
+    def binding_card_call_back(self, user):
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter binding_card_call_back for user[%s]" % (channel.code, user.id))
+        data = generate_coop_base_data('bind_card')
+        data['user_id'] = user.id
+        coop_callback_for_post.apply_async(
+            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+
+    def register_call_back(self, user):
+        client_id = self.channel_client_id
+        logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
+        if client_id:
+            try:
+                base_data = generate_coop_base_data('register')
+                act_data = {
+                    'client_id': client_id,
+                    'phone': user.wanglibaouserprofile.phone,
+                    'btype': self.channel_code,
+                    'user_id': user.id,
+                }
+                data = dict(base_data, **act_data)
+                res = requests.post(url=self.call_back_url, data=data)
+                if res.status_code == 200:
+                    result = res.json()
+                    logger.info("register_call_back connected return [%s]" % result)
+                else:
+                    logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+            except Exception, e:
+                logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
+            else:
+                logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
+
+    def purchase_call_back(self, user, order_id):
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter purchase_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id, catalog=u'申购').values().first()
+        if p2p_record:
+            p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            p2p_record['amount'] = float(p2p_record['amount'])
+            base_data = generate_coop_base_data('purchase')
+
+            margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')
+            margin_record = margin_record_query.values().first()
+            margin_record['create_time'] = margin_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            margin_record['amount'] = float(margin_record['amount'])
+            margin_record['margin_current'] = float(margin_record['margin_current'])
+            act_data = {
+                'p2p_record': json.dumps(p2p_record),
+                'margin_record': json.dumps(margin_record),
+            }
+            data = dict(base_data, **act_data)
+
+            coop_callback_for_post.apply_async(
+                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+
+    def recharge_call_back(self, user, order_id):
+        channel = get_user_channel_record(user.id)
+        logger.info("%s-Enter recharge_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
+        penny = Decimal(0.01).quantize(Decimal('.01'))
+        pay_info = PayInfo.objects.filter(user=user, type='D',
+                                          amount__gt=penny,
+                                          status=PayInfo.SUCCESS,
+                                          order_id=order_id).select_related('margin_record').first()
+        if pay_info:
+            base_data = generate_coop_base_data('recharge')
+            pay_info_data = {
+                'type': pay_info.type,
+                'uuid': pay_info.uuid,
+                'amount': float(pay_info.amount),
+                'fee': float(pay_info.fee),
+                'management_fee': float(pay_info.management_fee),
+                'management_amount': float(pay_info.management_amount),
+                'total_amount': float(pay_info.total_amount),
+                'status': pay_info.status,
+                'user_id': pay_info.user.id,
+                'order_id': pay_info.order.id,
+                'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            margin_record = pay_info.margin_record
+            margin_record_data = {
+                'catalog': margin_record.catalog,
+                'order_id': margin_record.order_id,
+                'user_id': margin_record.user.id,
+                'amount': float(margin_record.amount),
+                'margin_current': float(margin_record.margin_current),
+                'description': margin_record.description,
+                'create_time': margin_record.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            act_data = {
+                'pay_info': json.dumps(pay_info_data),
+                'margin_record': json.dumps(margin_record_data),
+            }
+            data = dict(base_data, **act_data)
+
+            coop_callback_for_post.apply_async(
+                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+
+
+class RenRenLiRegister(BaJinSheRegister):
+    def __init__(self, request):
+        super(RenRenLiRegister, self).__init__(request)
+        self.c_code = 'renrenli'
+        self.external_channel_client_id_key = 'Cust_id'
+        self.external_channel_user_key = 'Phone'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_sign_key = 'Sign'
+        self.internal_channel_sign_key = 'sign'
+        self.external_channel_access_token_key = 'Access_tokens'
+        self.internal_channel_access_token_key = 'access_token'
+        self.external_channel_user_id_key = 'Cust_key'
+        self.internal_channel_user_id_key = 'c_user_id'
+
+    def save_to_session(self):
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
+        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
+        access_token = self.request.REQUEST.get(self.external_channel_access_token_key, None)
+        sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
+        c_user_id = self.request.REQUEST.get(self.external_channel_user_id_key, None)
+
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+            self.request.session[self.internal_channel_phone_key] = channel_user
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+        if access_token:
+            self.request.session[self.internal_channel_access_token_key] = access_token
+
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        if c_user_id:
+            self.request.session[self.internal_channel_user_id_key] = c_user_id
+
+    def clear_session(self):
+        super(RenRenLiRegister, self).clear_session()
+        self.request.session.pop(self.internal_channel_client_id_key, None)
+        self.request.session.pop(self.internal_channel_access_token_key, None)
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_user_id_key, None)
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
@@ -1608,10 +1852,11 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister, XunleiMobileRegister, XingMeiRegister]
+                          YZCJRegister, RockFinanceRegister, BaJinSheRegister,
+                          RenRenLiRegister, XunleiMobileRegister, XingMeiRegister]
 
-#######################第三方用户查询#####################
 
+# ######################第三方用户查询#####################
 class CoopQuery(APIView):
     """
     第三方用户查询api
