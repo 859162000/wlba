@@ -1189,6 +1189,9 @@ else:
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
 
+# 人人利
+RENRENLI_COOP_KEY = 'wanglibaorrl'
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1266,12 +1269,12 @@ if ENV == ENV_PRODUCTION:
 if ENV == ENV_PRODUCTION:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
-    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
+    OAUTH2_URL = 'http://192.168.20.237:8000/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8000/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8000/oauth2/access_token/'
 else:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
-    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
+    OAUTH2_URL = 'http://192.168.20.237:8000/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8000/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8000/oauth2/access_token/'
