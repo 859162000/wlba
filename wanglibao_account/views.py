@@ -2376,11 +2376,17 @@ class ManualModifyPhoneAPI(APIView):
             id_user_image = form.cleaned_data['id_user_image']
             card_user_image = form.cleaned_data['card_user_image']
             new_phone = form.cleaned_data['new_phone']
-            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"待初审", u"初审待定", u"待复审"]).first()
-            if modify_phone_record:
+            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+            if modify_phone_record  and modify_phone_record.status in [u"待初审", u"初审待定", u"待复审"]:
                 return Response({'message': u"您之前申请的人工修改手机号的请求还未处理完毕,请联系网利宝客服"}, status=400)
+            if modify_phone_record and modify_phone_record.status in [u"复审驳回", u"初审驳回"]:
+                modify_phone_record_id = self.request.DATA.get('modify_phone_record_id', 0)
+                if modify_phone_record_id != modify_phone_record.id:
+                    return Response({'message': u"申请的人工修改手机号id参数错误"}, status=400)
+                manual_record = modify_phone_record
+            else:
+                manual_record = ManualModifyPhoneRecord()
             #todo
-            manual_record = ManualModifyPhoneRecord()
             manual_record.user = user
             manual_record.phone = profile.phone
             manual_record.new_phone = new_phone
@@ -2481,6 +2487,9 @@ class SMSModifyPhoneValidateAPI(APIView):
             new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
             if new_phone_user:
                 return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+            if modify_phone_record and modify_phone_record.status in [u"待初审", u"初审待定", u"待复审", u"复审驳回", u"初审驳回"]:
+                return Response({'message':"你有还未处理结束的人工修改手机号申请，请耐心等待客服处理"}, status=400)
 
             sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
             if not sms_modify_record:
