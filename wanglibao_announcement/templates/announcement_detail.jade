@@ -1,27 +1,27 @@
 -load formatters
-
 doctype html
-title1 =  announce.title + u'-网站公告'
-- with title1 as title
-include include/common_head
-- endwith
-body
-  include global/g_nav
-  .container.margin-bottom-xxl
-    .siderbar-div
-      - with '网站公告' as title
-      include include/about_sidebar
-      - endwith
-    .panel-padding.span9-omega
-      .row.announce-content-title
-        .span10
-          h2 {{announce.title}}
-        .span2-omega
-          .announce-date {{announce.createtime | date:'Y-m-d'}}
-      .announce-content
-        | {{announce.content|safe}}
-
-
-
-  include global/g_footer
-  include include/tracking
+html
+    head
+        title1 =  announce.title + u'-网站公告'
+        - with title1 as title
+        include global/g_head
+        - endwith
+        meta(name="keywords", content="{{news.keywords}}")
+        meta(name="description", content="{{news.description}}")
+    body
+        include global/g_nav
+        - with '网站公告' as title
+        include include/about_sidebar
+        - endwith
+        .section
+            .page_nav
+                a(href='/announcement/', target="_blank") 网站公告
+                | >公告详情
+            .media_box.detail_box.clearfix
+                .announcement_detail.clearfix
+                    h3 {{announce.title}}
+                    span {{announce.createtime | date:'Y-m-d'}}
+                .medil_detail {{announce.content|safe}}
+        include global/g_footer
+        include include/tracking
+                      
