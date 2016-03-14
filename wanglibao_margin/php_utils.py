@@ -561,7 +561,7 @@ def php_redpack_consume(redpack, amount, user, order_id, device_type, product_id
     :param redpack:
     :param amount:  投资的金额
     :param user:
-    :param order_id:
+    :param order_id:    month product id
     :param device_type:
     :param product_id:
     :return:

@@ -261,6 +261,8 @@ class YueLiBaoBuy(APIView):
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
                                                   'device_type': device['device_type']})
+            logger.info('buy month product success with product_id = {}, trade_id = {}, red_packet_id = {}'
+                        .format(product_id, trade_id, red_packet_id))
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
         except Exception, e:
@@ -406,6 +408,7 @@ class YueLiBaoCancel(APIView):
 
         tokens = request.POST.get('tokens')
         tokens = tokens.split('|')
+        logger.info(u'流标 tokens = {}'.format(tokens))
 
         try:
             with transaction.atomic(savepoint=True):
@@ -419,10 +422,11 @@ class YueLiBaoCancel(APIView):
                     # 状态置为已退款, 这个记录丢弃
                     product.cancel_status = True
                     product.save()
+                    logger.info('cancel_status saved as true!')
 
                     # 增加回退红包接口
-                    php_redpack_restore(product.order_id, product_id, product.amount, user)
-                    logger.debug(u'流标返回红包. month_product_id = {},'.format(product_id))
+                    php_redpack_restore(product.id, product_id, product.amount_source, user)
+                    logger.info(u'流标返回红包. month_product_id = {},'.format(product_id))
 
                     status = 1 if record else 0
                     msg_list.append({'token': product.token, 'status': status})
@@ -430,6 +434,7 @@ class YueLiBaoCancel(APIView):
             ret.update(status=1,
                        msg=msg_list)
         except Exception, e:
+            logger.info(u'流标失败: {}'.format(str(e)))
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

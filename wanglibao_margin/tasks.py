@@ -60,7 +60,7 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
 
                 # 如果使用红包的话, 增加红包使用记录
                 if red_packet_id and int(red_packet_id) > 0:
-                    logger.debug('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
+                    logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
                     redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
                     user = User.objects.filter(pk=user).first()
                     redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
