@@ -122,6 +122,7 @@ class MarginKeeper(KeeperBaseMixin):
         interest = Decimal(interest)
         penal_interest = Decimal(penal_interest)
         coupon_interest = Decimal(coupon_interest)
+        redpack_amount = Decimal(redpack_amount)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             # catalog = u'还款入账'
