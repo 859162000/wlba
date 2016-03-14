@@ -20,7 +20,7 @@ def bajinshe_product_push():
     coop_id = settings.BAJINSHE_COOP_ID
     coop_key = settings.BAJINSHE_COOP_KEY
     order_id = '%s_0000' % timezone.now().strftime("%Y%m%d%H%M%S")
-    access_token, message = get_bajinshe_access_token(coop_id, coop_key, order_id)
+    access_token = get_bajinshe_access_token(coop_id, coop_key, order_id)
     if access_token:
         product_list = P2PProduct.objects.exclude(types__name=u'还款等额兑奖')
         if product_list.exists():

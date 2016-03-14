@@ -206,7 +206,8 @@ def get_bajinshe_access_token(coop_id, coop_key, order_id):
         logger.info("bajinshe access token connect faild with status code[%s]" % res_status_code)
         logger.info(res.text)
 
-    return access_token, message
+    logger.info("get_bajinshe_access_token process result: %s" % message)
+    return access_token
 
 
 def get_bajinshe_base_data(order_id):
