@@ -2265,7 +2265,8 @@ class IdentityInformationTemplate(TemplateView):
                 modify_phone_state = 2
             if modify_phone_record.status in [u"初审驳回", u"复审驳回"]:
                 modify_phone_state = 3
-
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
         return {
             "phone": safe_phone_str(profile.phone),
             "id_is_valid": profile.id_is_valid,
@@ -2273,6 +2274,7 @@ class IdentityInformationTemplate(TemplateView):
             "modify_phone_state": modify_phone_state,
             'name': profile.name,
             "id_number": profile.id_number,
+            "is_bind_card":is_bind_card
         }
 
 
