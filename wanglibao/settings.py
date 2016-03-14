@@ -15,7 +15,11 @@ from __future__ import absolute_import
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import json
+import djcelery
 from celery.schedules import crontab
+
+djcelery.setup_loader()
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CERT_DIR = os.path.join(BASE_DIR, "certificate")
