@@ -49,6 +49,8 @@ block main
                                 dt 短信认证
                                 dd 原手机可收取短信
                         .wrap_box.people_wrap
+                            if is_bind_card
+                                .is_bind_card
                             .img
                             dl
                                 dt 人工审核
@@ -127,5 +129,5 @@ block main
         .phone_modify_bg
 
     script.
-        require(["/static/js/account_safe.js?v=2016030801","/static/js/account_setting.js"])
+        require(["/static/js/account_safe.js?v=2016031401","/static/js/account_setting.js"])
 

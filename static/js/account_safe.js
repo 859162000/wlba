@@ -119,7 +119,7 @@
 
       /**/
       $('.people_wrap').click(function(){
-          if(true){
+          if($('.is_bind_card ').length){
               window.location.href = '/accounts/manual_modify/vali_acc_info/';
           }else{
               $('.tieOnCard_popup').show();
