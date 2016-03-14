@@ -266,26 +266,19 @@ class CoopDataDispatchApi(APIView):
             if margin_record_form.is_valid():
                 p2p_record = json.loads(p2p_record) if p2p_record else None
                 p2p_record["create_time"] = dt.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
-                if 'product_id'in p2p_record:
-                    p2p_record['product'] = p2p_record['product_id']
-                    p2p_record_form = P2PRecordForm(p2p_record)
-                    if p2p_record_form.is_valid():
-                        p2p_record = p2p_record_form.save()
+                p2p_record_form = P2PRecordForm(p2p_record)
+                if p2p_record_form.is_valid():
+                    p2p_record = p2p_record_form.save()
 
-                        coop_common_callback.apply_async(
-                            kwargs={'user_id': p2p_record.user_id, 'act': 'purchase', 'order_id': p2p_record.order_id})
+                    coop_common_callback.apply_async(
+                        kwargs={'user_id': p2p_record.user_id, 'act': 'purchase', 'order_id': p2p_record.order_id})
 
-                        response_data = {
-                            'ret_code': 10000,
-                            'message': 'success',
-                        }
-                    else:
-                        response_data = self.parase_form_error(p2p_record_form.errors)
-                else:
                     response_data = {
-                        'ret_code': 50003,
-                        'message': '产品id必须存在'
+                        'ret_code': 10000,
+                        'message': 'success',
                     }
+                else:
+                    response_data = self.parase_form_error(p2p_record_form.errors)
             else:
                 response_data = self.parase_form_error(margin_record_form.errors)
         else:

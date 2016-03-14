@@ -11,7 +11,7 @@ class MarginRecordForm(forms.ModelForm):
     create_time = forms.DateTimeField(label=u'流水时间', error_messages={'required': u'请输入流水时间'})
     amount = forms.DecimalField(label=u'发生金额', error_messages={'required': u'请输入发生金额'})
     margin_current = forms.DecimalField(label=u'用户后余额', error_messages={'required': u'请输入用户后余额'})
-    description = forms.CharField(label=u'摘要', error_messages={'required': u'请输入摘要'})
+    description = forms.CharField(label=u'摘要', required=False, error_messages={'required': u'请输入摘要'})
 
     class Meta:
         model = MarginRecord
