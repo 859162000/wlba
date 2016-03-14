@@ -391,7 +391,12 @@ org.checin_in = (function () {
                     function triggerUI(count){
                         $.each($('.flag-items'), function(){
                             if($(this).attr('data-continue') * 1 == count){
-                                $(this).addClass('active-did active-doing').siblings('.flag-items').removeClass('active-doing')
+                                if($(this).hasClass('active-gift')){
+                                    $(this).addClass('active-gift-active').removeClass('active-gift');
+                                }else{
+                                    $(this).addClass('active-did active-doing').siblings('.flag-items').removeClass('active-doing')
+                                }
+
                             }
                         })
                     }

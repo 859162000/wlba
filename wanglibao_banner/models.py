@@ -69,6 +69,13 @@ class Partner(models.Model):
 
 
 class Hiring(models.Model):
+    TYPES = (
+        (u'全部', u'全部'),
+        (u'技术类', u'技术类'),
+        (u'运营类', u'运营类'),
+        (u'产品类', u'产品类'),
+    )
+
     class Meta:
         verbose_name_plural = u'招贤纳士'
         ordering = ['-priority', '-last_updated']
@@ -80,6 +87,7 @@ class Hiring(models.Model):
     is_hide = models.BooleanField(verbose_name=u'是否隐藏', default=False)
     priority = models.IntegerField(verbose_name=u'优先级', help_text=u'越大越优先', default=0)
     last_updated = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'更新时间')
+    position_types = models.CharField(u'招聘岗位分类', max_length=20, default=u'全部', choices=TYPES)
 
     def __unicode__(self):
         return "%s" % self.name
@@ -141,3 +149,23 @@ class AppActivate(models.Model):
                                        help_text=u'PC端跳转链接,请输入http://开头的完整网址')
 
 
+class AboutDynamic(models.Model):
+    title = models.CharField(u'动态标题', max_length=100)
+    content = RichTextField()
+    priority = models.IntegerField(u'优先级', blank=True, default=0, help_text=u'越大越优先')
+    hide_in_list = models.BooleanField(verbose_name=u'是否隐藏（动态列表页面）', default=False)
+    start_time = models.DateTimeField(u'展示开始时间', auto_now=False, blank=True, null=True)
+    end_time = models.DateTimeField(u'展示结束时间', auto_now=False, blank=True, null=True)
+    created_at = models.DateTimeField(u'发布时间', auto_now_add=True)
+    updated_time = models.DateTimeField(u'更新时间', auto_now=True)
+
+    class Meta:
+        verbose_name = u'动态'
+        verbose_name_plural = u'动态'
+        ordering = ['-created_at']
+
+    def __unicode__(self):
+        return "%s" % self.title
+
+    def get_absolute_url(self):
+        return '/dynamic/detail/%s' % self.id

@@ -1,63 +1,42 @@
+-load formatters
 doctype html
-- with '网利宝是中国领先的互联网金融_p2p理财_p2p网贷平台_网利宝' as title
-include include/common_head
-- endwith
-meta(name="keywords", content="网利宝")
-meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
-
-body
-  include global/g_nav
-  .container.margin-bottom-xxl
-    .siderbar-div
-      - with '招贤纳士' as title
-      include include/about_sidebar
-      - endwith
-    .panel-padding.span9-omega
-      .well-s
-        h1.about-title 招贤纳士
-        p.para “网利宝，中国第一家互联网私人银行”招募核心创始团队成员，我们期待“热情阳光、充满激情、热爱奋斗、有能力、有自信的你”与我们并肩奋斗！
-
-        br
-        img(src="/static/images/hiring.jpg", alt='p2p理财')
-        br
-
-        p.para 工作地点：北京
-        p.para 有意者请将简历发送至 <a class="red-link" href="mailto:hr@wanglibank.com">hr@wanglibank.com</a>
-        br
-        p.para 诚聘以下职位：
-        .seperator-gray-line
-
-        ul.job-list
-          for hiring in hirings
-            li.job-item
-              a(href="#job-{{ forloop.counter }}", data-role="modal") {{ hiring.name }}
-              if hiring.is_urgent
-                span.hot-gif
-                  img(src="/static/images/hot.gif", alt="p2p理财")
-
-        for hiring in hirings
-          .job-modal(id="job-{{forloop.counter}}", style="display:none")
-            .modal-title-bar
-              span.modal-title {{hiring.name}}
-                if hiring.is_urgent
-                  span.hot-gif
-                    img(src="/static/images/hot.gif", alt="网利宝")
-              a.icon-cancel.pull-right(rel="modal:close")
-
-            .hiring-container
-              .hiring-main
-                .hiring-position 岗位职责：
-                .hiring-content {{hiring.duties|safe}}
-                .hiring-requirement 任职要求：
-                .hiring-content {{hiring.requirements|safe}}
-
-              .margin-top-m.align-center
-                a.button-middle.button-red.padding-l-r-2em(href="mailto:hr@wanglibank.com") 发送简历
-                a.red-link(href="mailto:hr@wanglibank.com") &nbsp;hr@wanglibank.com
-
-  include global/g_footer
-  script.
-    require(["/static/js/hiring.js"])
-
-  include include/tracking
-
+html
+    head
+        - with '加入我们' as title
+        include global/g_head
+        - endwith
+        meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+        meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    body
+        include global/g_nav
+        - with '加入我们' as title
+        include include/about_sidebar
+        - endwith
+        .hiring_box
+            .hiring_banner
+            .hiring_content
+                .company_email 有意者请将简历发送至：
+                    a(href='mailto:hr@wanglibank.com') hr@wanglibank.com
+                .job_info 标题请注明：
+                    span 职位+名称
+                .job_class
+                    span.active 全部
+                    span 技术类
+                    span 产品类
+                    span 运营类
+                .job_list.clearfix
+                    .job_title.job_list_c.clearfix
+                        for hiring in hirings
+                            .job_title_h.clearfix(data-type='{{hiring.position_types}}')
+                                span {{hiring.name}}
+                                i
+                            .job_detail.clearfix(style='display:none')
+                                .job_address 工作地点：北京
+                                .duty 岗位职责：
+                                .clearfix {{hiring.duties|safe}}
+                                .duty 任职要求：
+                                .clearfix {{hiring.requirements|safe}}
+        include global/g_footer
+        script.
+            require(["/static/src/pc/about.js?v=22222"])
+        include include/tracking
