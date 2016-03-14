@@ -6,16 +6,15 @@ if __name__ == '__main__':
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
+import json
 import hashlib
 import logging
 from django.utils import timezone
-from django.db.models import Sum
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client
 from wanglibao_rest.utils import get_utc_timestamp, utc_to_local_timestamp
-from wanglibao_p2p.models import P2PRecord
 from wanglibao_margin.models import MarginRecord
 from wanglibao import settings
 from .tasks import bajinshe_callback, renrenli_callback
@@ -484,7 +483,7 @@ class BaJinSheCallback(CoopCallback):
                 data['tran'] = [act_data]
                 # 异步回调
                 bajinshe_callback.apply_async(
-                    kwargs={'data': data, 'url': self.transaction_call_back_url})
+                    kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
 
     def amortization_push(self, user_amo):
         super(BaJinSheCallback, self).amortization_push(user_amo)
