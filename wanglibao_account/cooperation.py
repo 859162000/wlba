@@ -475,10 +475,10 @@ class BaJinSheCallback(CoopCallback):
                     'businessName': margin_record.description,
                     'businessType': 3,
                     'businessBid': order_id,
-                    'money': margin_record.amount,
+                    'money': float(margin_record.amount),
                     'time': timezone.localtime(margin_record.create_time).strftime('%Y%m%d%H%M%S'),
                     'moneyType': 1,
-                    'availableBalance': margin_record.margin_current,
+                    'availableBalance': float(margin_record.margin_current),
                 }
                 data['tran'] = [act_data]
                 # 异步回调
