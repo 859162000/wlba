@@ -267,7 +267,7 @@ class CoopDataDispatchApi(APIView):
                 p2p_record = json.loads(p2p_record) if p2p_record else None
                 p2p_record["create_time"] = dt.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
                 if 'product_id'in p2p_record:
-                    p2p_record['product'] = P2PProduct.objects.filter(pk=p2p_record['product_id']).first()
+                    p2p_record['product'] = p2p_record['product_id']
                     p2p_record_form = P2PRecordForm(p2p_record)
                     if p2p_record_form.is_valid():
                         p2p_record = p2p_record_form.save()
