@@ -338,13 +338,23 @@
         font-size: $font-l
         padding-bottom: 10px
       .media_content
-        +line-height(28)
+        line-height: 28px
+        height: 56px
         font-size: $font-s
         color: #999999
         a
           color: #2294e5
           &:hover
             text-decoration: underline
+      .postion_dd
+        overflow: hidden
+        position: relative
+        a
+          background: #ffffff
+          padding-left: 20px
+          position: absolute
+          right: 0
+          top: 28px
       .media_time
         color: #999999
         font-size: $font-xs
@@ -377,6 +387,7 @@
     border-bottom: 1px solid #ebebeb
   .medil_detail
     padding: 40px 10px 0
+    text-align: left
   .announcement_detail
     border-bottom: 1px solid #ebebeb
     padding-bottom: 10px
@@ -404,6 +415,10 @@
       color: $t-d11
       font-size: $font-l
       float: left
+      +line-height(65)
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
       i
         width: 8px
         height: 14px
@@ -452,6 +467,7 @@
         border-radius: 5px
         border: 1px solid $t-d6
         margin-right: 13px
+        cursor: pointer
         &:hover
           border: 1px solid #4a7fea
           color: #4a7fea
@@ -512,9 +528,20 @@
     .photo_bg
       width: 172px
       height: 172px
+      position: relative
+      overflow: hidden
+      .photo_bg_box
+        position: absolute
+        @include about-sprite(photo_bg)
+        width: 172px
+        height: 172px
+        z-index: 100
       img
         width: 172px
         height: 172px
+        position: absolute
+        left: 0px
+        top: 0px
     .leader_info
       width: 730px
       .leader_name_job

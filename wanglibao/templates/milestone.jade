@@ -15,30 +15,22 @@ html
         .section
             .media_box.clearfix
                 .media_list
-                    dl.milestone_dd.clearfix
-                        dd.media_title
-                            a(href="", target="_blank") 标题标题标题
-                        dd.media_content 内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容
-                            a(href="",target="_blank") [详细介绍]
-                        dd.media_time 2011111111
-                    dl.milestone_dd.clearfix
-                        dd.media_title
-                            a(href="", target="_blank") 标题标题标题
-                        dd.media_content 内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容
-                            a(href="",target="_blank") [详细介绍]
-                        dd.media_time 2011111111
-                    dl.milestone_dd.clearfix
-                        dd.media_title
-                            a(href="", target="_blank") 标题标题标题
-                        dd.media_content 内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容
-                            a(href="",target="_blank") [详细介绍]
-                        dd.media_time 2011111111
-                    dl.milestone_dd.clearfix
-                        dd.media_title
-                            a(href="", target="_blank") 标题标题标题
-                        dd.media_content 内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容
-                            a(href="",target="_blank") [详细介绍]
-                        dd.media_time 2011111111
+                    for info in data
+                        dl.milestone_dd.clearfix
+                            dd.media_title
+                                a(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.title}}
+                            content = len(info.content)
+                            if content > 70
+                                dd.media_content.postion_dd {{info.content|safe}}
+                                    a(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
+                            else
+                                dd.media_content {{info.content|safe}}
+                                    a(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
+                            dd.media_time {{info.updated_time|date:"Y-m-d H:i"}} &nbsp;&nbsp;
+                    .pager
+                      - with data=data uri='/dynamic/'
+                      include include/pager
+                      - endwith
         include global/g_footer
         include include/tracking
                

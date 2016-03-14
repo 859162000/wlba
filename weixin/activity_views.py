@@ -199,7 +199,8 @@ class GetSignShareInfo(APIView):
                         reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, create_date=today, user=user).first()
                         if reward_record and reward_record.status:
                             sign_info['continueGiftFetched']=reward_record.status#是否已经领取神秘礼物
-                            sign_info['mysterious_day'] = maxDayNote
+                            if maxDayNote == activity.days:
+                                sign_info['mysterious_day'] = maxDayNote
                     break
                 start_day = activity.days + 1
 
@@ -217,7 +218,6 @@ class GetSignShareInfo(APIView):
             if share_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=share_record.experience_record_id)
                 share_info['amount']=experience_record.event.amount
-
         return Response({"ret_code": 0, "data": data})
 
 

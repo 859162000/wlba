@@ -2,12 +2,12 @@
 doctype html
 html
     head
-        title1 =  announce.title + u'-网利动态'
+        title1 =  data.title + u'-网利动态'
         - with title1 as title
         include global/g_head
         - endwith
-        meta(name="keywords", content="{{news.keywords}}")
-        meta(name="description", content="{{news.description}}")
+        meta(name="keywords", content="{{data.keywords}}")
+        meta(name="description", content="{{data.description}}")
     body
         include global/g_nav
         - with '网利动态' as title
@@ -15,12 +15,12 @@ html
         - endwith
         .section
             .page_nav
-                a(href='/announcement/', target="_blank") 网利动态
+                a(href='/dynamic/', target="_blank") 网利动态
                 | >动态详情
             .media_box.detail_box.clearfix
                 .announcement_detail.clearfix
-                    h3 测试测试测试
-                    span 201020201
-                .medil_detail 测试测试测试测试测试测试测试测试测试
+                    h3 {{data.title}}
+                    span {{data.updated_time|date:"Y-m-d H:i"}}
+                .medil_detail {{data.content|safe}}
         include global/g_footer
         include include/tracking
