@@ -232,7 +232,7 @@ class CoopDataDispatchApi(APIView):
             if margin_record_form.is_valid():
                 pay_info = json.loads(pay_info) if pay_info else None
                 margin_record = margin_record_form.save()
-                pay_info["margin_record"] = margin_record
+                pay_info["margin_record"] = margin_record.id
                 pay_info["create_time"] = dt.strptime(pay_info["create_time"], '%Y-%m-%d %H:%M:%S')
                 pay_info_form = PayInfoForm(pay_info)
                 if pay_info_form.is_valid():
@@ -266,7 +266,7 @@ class CoopDataDispatchApi(APIView):
             if margin_record_form.is_valid():
                 p2p_record = json.loads(p2p_record) if p2p_record else None
                 margin_record = margin_record_form.save()
-                p2p_record["margin_record"] = margin_record
+                p2p_record["margin_record"] = margin_record.id
                 p2p_record["create_time"] = dt.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
                 p2p_record_form = P2PRecordForm(p2p_record)
                 if p2p_record_form.is_valid():
