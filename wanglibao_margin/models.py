@@ -33,7 +33,7 @@ class MarginRecord(models.Model):
 
     amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
     margin_current = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
-    description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
+    description = models.CharField(verbose_name=u'摘要', max_length=1000, null=True, blank=True)
 
     def __unicode__(self):
         return u'%s , %s, 交易金额%s, 余额%s' % (self.catalog, self.user, self.amount, self.margin_current)
