@@ -196,9 +196,10 @@ def get_bajinshe_access_token(coop_id, coop_key, order_id):
     res_status_code = res.status_code
     if res_status_code == 200:
         res_data = res.json()
+        logger.info("get_bajinshe_access_token return: %s" % res_data)
         if res_data['code'] == '10000':
             access_token = res_data.get('access_token', None)
-            message = res_data.get('msg', '')
+            message = 'success'
         else:
             logger.info("bajinshe access token faild return %s" % res_data)
     else:
