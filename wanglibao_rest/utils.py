@@ -185,7 +185,11 @@ def get_coop_access_token(phone, client_id, tid, coop_key):
     }
     try:
         ret = requests.post(url, data=data)
-        response_data = ret.json()
+        res_data = ret.json()
+        response_data = {
+            'ret_code': res_data['code'],
+            'message': res_data['message'],
+        }
         logger.info('get_coop_access_token return: %s' % response_data)
     except Exception, e:
         response_data = {
