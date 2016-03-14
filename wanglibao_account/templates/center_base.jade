@@ -1,0 +1,17 @@
+-load formatters
+doctype html
+block head
+body(style='background: #f4f4f4;')
+  include global/g_nav
+  .padding-b-l
+  .mod.mod-center.clearfix
+    .center-aside
+      block sidebar
+    .center-main
+      block main
+  .padding-b-xxxllll
+  block script
+  include global/g_footer
+  include include/tracking
+  script.
+    require(['/static/src/pc/account.js'])
