@@ -2371,10 +2371,10 @@ class ManualModifyPhoneAPI(APIView):
             return Response({'message':"用户需要绑定的银行卡号"}, status=400)
         form = ManualModifyPhoneForm(self.request.DATA, self.request.FILES)
         if form.is_valid():
-            id_front_image = form.cleaned_data['id_front_image']
-            id_back_image = form.cleaned_data['id_back_image']
-            id_user_image = form.cleaned_data['id_user_image']
-            card_user_image = form.cleaned_data['card_user_image']
+            id_front_image = form.cleaned_data.get('id_front_image')
+            id_back_image = form.cleaned_data.get('id_back_image')
+            id_user_image = form.cleaned_data.get('id_user_image')
+            card_user_image = form.cleaned_data.get('card_user_image')
             new_phone = form.cleaned_data['new_phone']
             modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
             if modify_phone_record  and modify_phone_record.status in [u"待初审", u"初审待定", u"待复审"]:
@@ -2392,14 +2392,18 @@ class ManualModifyPhoneAPI(APIView):
             manual_record.new_phone = new_phone
             manual_record.status = u'待初审'
             manual_record.save()
-            id_front_image.name = "%s_%s_%s"%(user.id, manual_record.id, 0)
-            id_back_image.name = "%s_%s_%s"%(user.id, manual_record.id, 1)
-            id_user_image.name = "%s_%s_%s"%(user.id, manual_record.id, 2)
-            card_user_image.name = "%s_%s_%s"%(user.id, manual_record.id, 3)
-            manual_record.id_front_image = id_front_image
-            manual_record.id_back_image = id_back_image
-            manual_record.id_user_image = id_user_image
-            manual_record.card_user_image = card_user_image
+            if id_front_image:
+                id_front_image.name = "%s_%s_%s"%(user.id, manual_record.id, 0)
+                manual_record.id_front_image = id_front_image
+            if id_back_image:
+                id_back_image.name = "%s_%s_%s"%(user.id, manual_record.id, 1)
+                manual_record.id_back_image = id_back_image
+            if id_user_image:
+                id_user_image.name = "%s_%s_%s"%(user.id, manual_record.id, 2)
+                manual_record.id_user_image = id_user_image
+            if card_user_image:
+                card_user_image.name = "%s_%s_%s"%(user.id, manual_record.id, 3)
+                manual_record.card_user_image = card_user_image
             manual_record.save()
             msg = "尊敬的%s，您已申请人工审核修改手机号，申请结果将在3个工作日内通过短信发送到本手机，请留意，退订回TD【网利科技】"%profile.name
             send_messages.apply_async(kwargs={
