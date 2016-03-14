@@ -62,10 +62,8 @@
         var id_front_image,id_back_image,id_user_image,id_bank_image,new_phone;
         var docObj,imgObjPreview;
 
-        var file_1 = document.getElementById("id_front_image").value;
-        var file_2 = document.getElementById("id_back_image").value;
-        var file_3 = document.getElementById("id_user_image").value;
-        var file_4 = document.getElementById("id_bank_image").value;
+        var file_1,file_2,file_3,file_4
+
         var phone_true = false;
         var code_num = $('.input_code').val();
 
@@ -264,11 +262,36 @@
 
 
         $('.button').click(function(){
+
+            if($('#id_front_image').length==1){
+                file_1 = document.getElementById("id_front_image").value;
+            }else{
+                file_1 = true;
+            }
+
+            if($('#id_back_image').length==1){
+                file_2 = document.getElementById("id_back_image").value;
+            }else{
+                file_2 = true;
+            }
+
+            if($('#id_user_image').length==1){
+                file_3 = document.getElementById("id_user_image").value;
+            }else{
+                file_3 = true;
+            }
+
+            if($('#id_bank_image').length==1){
+                file_4 = document.getElementById("id_bank_image").value;
+            }else{
+                file_4 = true;
+            }
+
             $('.error_form').hide();
-            file_1 = document.getElementById("id_front_image").value;
-            file_2 = document.getElementById("id_back_image").value;
-            file_3 = document.getElementById("id_user_image").value;
-            file_4 = document.getElementById("id_bank_image").value;
+            //file_1 = document.getElementById("id_front_image").value;
+            //file_2 = document.getElementById("id_back_image").value;
+            //file_3 = document.getElementById("id_user_image").value;
+            //file_4 = document.getElementById("id_bank_image").value;
             code_num = $('.input_code').val();
 
             if(file_1&&file_2&&file_3&&file_4&&phone_true&&code_num){

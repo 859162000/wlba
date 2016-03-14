@@ -2351,9 +2351,8 @@ class ManualModifyPhoneTemplate(TemplateView):
         user = self.request.user
         profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"复审驳回", u"初审驳回"]).first()
         return {
-                'form':form,
                 'user_name':profile.name,
                 'modify_phone_record':modify_phone_record
                 }

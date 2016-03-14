@@ -10,6 +10,7 @@
     width: 100%
     clear: both
     margin-bottom: 55px
+    position: relative
     .img
       width: 57px
       height: 50px
@@ -89,6 +90,22 @@
       background: #f5f5f5
       color: #e4371f
       border-color: #e0e0e0
+    .phone_change_button
+      position: relative
+    .phone_change_failed
+      position: absolute
+      right: 80px
+      top: 53px
+      width: 98px
+      text-align: center
+      line-height: 20px
+      color: #487ad8
+      font-size: 14px
+      cursor: pointer
+    .phone_change_failed:hover
+      color: #e4371f
+    .phone_changing
+      position: relative
   .is_open
     margin-bottom: 57px
   .phone_change_wrap
@@ -269,13 +286,13 @@
   display: none
   .phone_modify_popup_text
     position: absolute
-    width: 188px
+    width: 260px
     height: 64px
     text-align: center
     line-height: 64px
     left: 50%
     top: 50%
-    margin: -32px 0 0 -94px
+    margin: -32px 0 0 -130px
     background: #fff
     color: #b72a0a
     font-size: 16px
