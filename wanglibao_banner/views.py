@@ -10,9 +10,11 @@ from wanglibao_banner.serializer import BannerSerializer
 from django.views.generic import TemplateView
 from wanglibao_rest import utils
 from misc.models import Misc
-from wanglibao_banner.models import Banner, Aboutus
+from wanglibao_banner.models import Banner, Aboutus, AboutDynamic
+from django.http import Http404
 from django.db.models import Q
 from django.utils import timezone
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 #class BannerViewSet(PaginatedModelViewSet):
@@ -157,4 +159,54 @@ class AgreementAutoView(TemplateView):
         about_us = Aboutus.objects.filter(code='agreement_auto').first()
         return {
             'about_us': about_us
+        }
+
+
+class DynamicHomeView(TemplateView):
+    template_name = 'milestone.jade'
+
+    def get_context_data(self, **kwargs):
+        about_dynamics = AboutDynamic.objects.filter(hide_in_list=False).order_by('-updated_time')
+
+        about_dynamic_list = []
+        about_dynamic_list.extend(about_dynamics)
+
+        limit = 10
+        page = self.request.GET.get('page', 1)
+
+        if about_dynamic_list:
+            paginator = Paginator(about_dynamic_list, limit)
+            try:
+                about_dynamic_list = paginator.page(page)
+            except PageNotAnInteger:
+                about_dynamic_list = paginator.page(1)
+            except EmptyPage:
+                about_dynamic_list = []
+            except Exception:
+                about_dynamic_list = paginator.page(paginator.num_pages)
+
+            count = paginator.num_pages
+        else:
+            about_dynamic_list = []
+            count = 0
+
+        return {
+            'data': about_dynamic_list,
+            'page': page,
+            'num': limit,
+            'count': count
+        }
+
+
+class DynamicDetailView(TemplateView):
+    template_name = 'milestone_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        try:
+            announce = AboutDynamic.objects.get(pk=id, hide_in_list=False)
+        except AboutDynamic.DoesNotExist:
+            raise Http404(u'您查找的公告不存在')
+
+        return {
+            'data': announce
         }
