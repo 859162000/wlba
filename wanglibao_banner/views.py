@@ -199,7 +199,7 @@ class DynamicHomeView(TemplateView):
 
 
 class DynamicDetailView(TemplateView):
-    template_name = 'announcement_detail.jade'
+    template_name = 'milestone_detail.jade'
 
     def get_context_data(self, id, **kwargs):
         try:
@@ -208,6 +208,5 @@ class DynamicDetailView(TemplateView):
             raise Http404(u'您查找的公告不存在')
 
         return {
-            'dynamic': announce
+            'data': announce
         }
-
