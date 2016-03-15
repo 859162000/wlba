@@ -1,2 +1,49 @@
-if activeItem
-  .test=activeItem
+
+mixin sidebarTitle(title)
+  .sidebar-list-title.font-m.tl=title
+
+mixin sidebarItem(name, link, target, iconName)
+  if activeItem == name
+    status = 'active'
+  else
+    status = ''
+  a(href=link, target=target, class=status).sidebar-item.fl
+    .sidebar-icon.tc
+      i.iconfont.icon(class=iconName)
+    .sidebar-item-name.t-d11.font-s=name
+
+
+.sidebar-warp.tc
+  .sidebar-title.font-m.t-d11 账户总览
+
+  .sidebar-list
+    +sidebarTitle('投资管理')
+    .sidebar-list-items.clearfix
+      +sidebarItem('投资记录', '1', '', 'icon-books-new')
+      +sidebarItem('流水账单', '1', '', 'icon-bill')
+      +sidebarItem('债权转让', '1', '', 'icon-arrows-2')
+    .sidebar-items-line
+
+  .sidebar-list
+    +sidebarTitle('资金管理')
+    .sidebar-list-items.clearfix
+      +sidebarItem('充值', '1', '', 'icon-rechare-bar')
+      +sidebarItem('提现', '1', '', 'icon-charge-bar')
+      +sidebarItem('银行卡', '1', '', 'icon-card-bar')
+    .sidebar-items-line
+
+  .sidebar-list
+    +sidebarTitle('活动奖励')
+    .sidebar-list-items.clearfix
+      +sidebarItem('体验金', '1', '', 'icon-gold-bar')
+      +sidebarItem('全民淘金', '1', '', 'icon-tao-random')
+      +sidebarItem('理财券', '1', '', 'icon-redpack-bar')
+    .sidebar-items-line
+
+  .sidebar-list
+    +sidebarTitle('会员信息')
+    .sidebar-list-items.clearfix
+      +sidebarItem('安全认证', '1', '', 'icon-security')
+      +sidebarItem('个人资料', '1', '', 'icon-pfofile')
+      +sidebarItem('站内信', '1', '', 'icon-web-message')
+    .sidebar-items-line

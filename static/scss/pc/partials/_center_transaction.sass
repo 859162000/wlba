@@ -1,0 +1,80 @@
+
+$center-border: #ebebeb
+
+
+.center-transaction-bar
+  background: #fafafa
+  font-size: 18px
+  border: 1px solid $center-border
+  a
+    position: relative
+    display: inline-block
+    color: #999
+    padding: 16px 50px
+    border-right: 1px solid $center-border
+  a.active-bar
+    border-top: 2px solid $bg-d14
+    border-bottom: 1px solid #fff
+    color: $bg-d14
+    background: #fff
+    &:after
+      content: ''
+      position: absolute
+      bottom: -2px
+      left: 0
+      width: 100%
+      height: 2px
+      background: #fff
+
+
+
+
+
+.center-from-opeartion
+  padding: 0 40px
+
+  .space-vertical-l
+    height: $space-l
+
+  .center-filter-checkbox
+    li
+      float: left
+      width: 60px
+      height: 28px
+      line-height: 28px
+      color: #999
+      font-size: $font-s
+      text-align: center
+      border: 1px solid $center-border
+      border-radius: 4px
+      margin-right: $space-s
+    li.active-on
+      color: $bg-d14
+      border: 1px solid $bg-d14
+
+
+//form-public style
+
+.center-table
+  width: 100%
+  thead
+    background: #fafafa
+    color: $t-d19
+  th,td
+    padding: 10px 5px
+    text-align: center
+    border: 1px solid $center-border
+
+  th
+    white-space: nowrap
+  td
+    color: $t-d10
+  a
+    +unstyled-link
+
+  .table-date
+    min-width: 65px
+
+  .table-product-name
+    max-width: 160px
+    +singleline-ellipsis()

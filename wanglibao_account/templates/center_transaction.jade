@@ -1,0 +1,82 @@
+extends center_base
+-load formatters
+
+block head
+  - with '投资记录' as title
+  include global/g_head
+  -endwith
+block sidebar
+  - with '投资记录' as activeItem
+  include include/center_sidebar
+  -endwith
+block main
+  .center-main-white
+    .center-transaction-bar
+      a(href='').active-bar 散标投资
+      a(href='') 月利宝
+      //.default-bar
+
+    .center-from-opeartion
+      .space-vertical-l
+
+      .center-transaction-filter.clearfix
+        .center-filter-checkbox.fl
+          ul
+            li.active-on 全部
+            li 投标中
+            li 还款中
+            li 已还款
+        .center-filter-date.fl
+
+      table.center-table
+        thead
+          tr
+            th 投资时间
+            th 项目名称
+            th 投资金额(元)
+            th 应收本息(元)
+            th 状态
+            th 汇款账单
+            th 借款合同
+        tbody
+            tr
+              td
+                span.table-date 2015-10-30
+                .t-d19  14:00:28
+              td
+                .tl.padding-l-sm
+                  .table-product-name 企业生产资金生产资金生产资金企业生产资金生产资金生产资金
+                  .t-d19 年化收益:12.5%
+                  .t-d19 投资期限:10个月
+              td
+                span 5,800.00
+              td
+                span 5,7878.00
+              td
+                span 未满标
+              td
+                span.t-d20 账单
+              td
+                .t-d20
+                  a(href='/') 合同
+            tr
+              td
+                .table-date 2015-10-30
+                .t-d19  14:00:28
+              td
+                .tl.padding-l-sm
+                  .table-product-name 企业生产资金生产资金生产资金企业生产资金生产资金生产资金
+                  .t-d19 年化收益:12.5%
+                  .t-d19 投资期限:10个月
+              td
+                span 5,800.00
+              td
+                span 5,7878.00
+              td
+                span 满标审核
+              td
+                span.t-d20 账单
+              td
+                .t-d20
+                  a(href='/') 合同
+
