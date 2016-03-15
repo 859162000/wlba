@@ -239,7 +239,10 @@ def process_user_daily_action(user, action_type=u'sign_in'):
     with transaction.atomic():
         daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
         seg = SendExperienceGold(user)
-        experience_event = getSignExperience_gold()
+        if action_type == u'share':
+            experience_event = getSignExperience_gold(give_mode=u"share")
+        else:
+            experience_event = getSignExperience_gold()
         if experience_event:
             experience_record_id, experience_event = seg.send(experience_event.id)
             daily_record.experience_record_id = experience_record_id
@@ -253,9 +256,9 @@ def process_user_daily_action(user, action_type=u'sign_in'):
     return 0, True, daily_record
 
 
-def getSignExperience_gold():
+def getSignExperience_gold(give_mode=u'weixin_sign_in'):
     now = timezone.now()
-    query_object = ExperienceEvent.objects.filter(invalid=False, give_mode='weixin_sign_in',
+    query_object = ExperienceEvent.objects.filter(invalid=False, give_mode=give_mode,
                                                       available_at__lt=now, unavailable_at__gt=now)
     experience_events = query_object.order_by('amount').all()
     length = len(experience_events)

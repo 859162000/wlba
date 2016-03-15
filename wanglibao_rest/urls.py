@@ -151,7 +151,7 @@ urlpatterns = patterns(
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^has_validate/', HasValidationAPIView.as_view()),
-    url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
+    # url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),

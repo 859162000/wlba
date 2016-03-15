@@ -804,7 +804,13 @@ org.detail = (function (org) {
                 });
                 if(hide){
                     wx.hideMenuItems({
-                        menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项
+                        menuList: ['menuItem:share:timeline'],
+                        success: function (res) {
+                          //alert('已隐藏“分享到朋友圈”按钮');
+                        },
+                        fail: function (res) {
+                          org.ui.alert(JSON.stringify(res));
+                        }
                     });
                 }
 
@@ -2204,7 +2210,7 @@ org.trade_back = (function (org) {
         return this.callback && this.callback(this.password);
     }
 
-    Deal_ui = {
+    var Deal_ui = {
         show_alert: function(state, callback, state_message){
             $('.tran-alert-error').show().find('.'+state).show().siblings().hide();
             if(state_message)  $('.tran-alert-error').show().find('.'+state).find('p').html(state_message);
@@ -2552,7 +2558,7 @@ org.checkIn = (function(org){
             lib.shareOk();
         },
         checkIn: function(){//签到
-            var checkDom = $("div.checkin-op-status");
+            //var checkDom = $("div.checkin-op-status");
             org.ajax({
                 url: "/weixin/daily_action/",
                 type: "post",
@@ -2643,6 +2649,12 @@ org.checkIn = (function(org){
                     parent.hide();
                 }
             });
+            $("#js-share-alt").on('touchstart',function(){
+                $(".weixin-share-alt").show();
+            });
+            $(".weixin-share-alt").on('touchstart',function(){
+                $(this).hide();
+            });
         },
         getGift: function(){//领取礼物
             var giftOk = lib.giftOk;
@@ -2696,9 +2708,8 @@ org.checkIn = (function(org){
         },
         shareOk: function(){
             var url = window.location.protocol +"//" + window.location.host;
-            var share = {shareLink:url+'/api/m/check-in-share/', shareMainTit:'网利宝天天送我钱，不想要都不行～朋友们快来领啊～', shareBody:'速来网利宝抢钱，你还等什么', success:lib.shareFn};
+            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'/api/m/check-in-share/', shareMainTit:'网利宝天天送我钱，连拿7天还送大礼包！', shareBody:'速来抢钱', success:lib.shareFn};
             org.detail.share(share, true);
-
         }
     };
     return {

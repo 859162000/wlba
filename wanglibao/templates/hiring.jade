@@ -25,8 +25,8 @@ html
                     span 产品类
                     span 运营类
                 .job_list.clearfix
-                    .job_title.job_list_c.clearfix
-                        for hiring in hirings
+                    for hiring in hirings
+                        .job_title.job_list_c.clearfix
                             .job_title_h.clearfix(data-type='{{hiring.position_types}}')
                                 span {{hiring.name}}
                                 i
