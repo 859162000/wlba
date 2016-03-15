@@ -151,7 +151,9 @@ urlpatterns += patterns(
     url(r'^test/', TemplateView.as_view(template_name="center_security.jade")),
     url(r'^transaction/', TemplateView.as_view(template_name="center_transaction.jade")),
     url(r'^rockoning/', TemplateView.as_view(template_name="center_rockoning.jade")),
-    url(r'^recharge/', TemplateView.as_view(template_name="center_recharge.jade")),
+    url(r'^recharge/huifu/', TemplateView.as_view(template_name="center_recharge_huifu.jade")),
+    url(r'^recharge/yipay/', TemplateView.as_view(template_name="center_recharge_yipay.jade")),
+    url(r'^recharge/kuaijie/', TemplateView.as_view(template_name="center_recharge_kuaijie.jade")),
 )
 
 if settings.DEBUG:
