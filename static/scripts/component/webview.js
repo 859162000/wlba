@@ -145,7 +145,8 @@ var wlb = (function () {
          */
         shareStatus: function(callback){
             this.bridge.registerHandler('shareStatus', function (backdata, responseCallback) {
-                callback && callback(backdata)
+                var responseData  = Mixin.filterJSON(backdata);
+                callback && callback(responseData)
             });
         },
         /**

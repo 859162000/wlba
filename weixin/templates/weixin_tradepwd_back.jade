@@ -14,18 +14,22 @@ html
         include  include/weixin_loading
     .trade-warp(style='display:none;')
       .trade-head 请先认证身份信息，再设置交易密码。
-      .form-list
-        .form-text 持卡人
-        .form-input
-          input(type="text", name="cardname", placeholder="请设置密码",value='{{user.wanglibaouserprofile.name | safe_name}}')
-      .form-list
-        .form-text 身份证号
-        .form-input
-          input(type="text", name="id_number", placeholder="请输入身份证号")
-      .form-list.no-mag
-        .form-text 银行卡号
-        .form-input
-          input(type="tel", name="bankcard", placeholder="**9432（请输入完整卡号）")
+      .wx-input-public.wx-input-space
+        .wx-input-name
+          .wx-input-name 持卡人
+        input(placeholder="", type="text", name="cardname",value='{{user.wanglibaouserprofile.name | safe_name}}').wx-input-main
+        .wx-operation-icon.wx-clear-input
+      .wx-input-public.wx-input-space
+        .wx-input-name
+          .wx-input-name 身份证号
+        input(placeholder="请输入身份证号", type="text", name="id_number", data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-clear-input
+      .wx-input-public
+        .wx-input-name
+          .wx-input-name 银行卡号
+        input(placeholder="（请输入完整卡号）", type="tel", name="bankcard", data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-clear-input
+
       .trade-bank-dec 请填写完整
         span.bank-name 招商银行
         |卡号（尾号
@@ -33,8 +37,8 @@ html
         |）
       .trade-dec-safe
         span 以上内容仅做为银行信息比对，网利宝将严格保密。
-      section#regist-submit.login-submit
-          button(type="submit", disabled=true) 下一步
+      section#regist-submit
+          button(type="submit",name='submit', disabled=true).public-submit 下一步
     .no-authentication-sign.unbankcard(style='display:none;') 你还没有绑定银行卡。
         .take-dec-list(style='text-align:left;')
           p 温馨提示
@@ -44,4 +48,9 @@ html
           p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
         a(href="/weixin/account/bankcard/").authentication-sign-btn 立即去绑卡
     include include/tran_password
-    script(data-init="trade_back", src="/static/scripts/mobile/mobile.js?v=20151120")
+    include include/ui_model/mobile_errorsign
+    include include/ui_model/mobile_confirm
+    include include/ui_model/mobile_alert
+    //script(data-init="trade_back", src="/static/scripts/mobile/mobile.js?v=20151120")
+    script(src='/static/scripts/mobile/pro/vendor.zepto.js')
+    script(src='/static/scripts/mobile/pro/trade_retrieve.js')

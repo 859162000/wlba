@@ -465,7 +465,7 @@ class WeixinJoinView(View):
 
 
 class WeixinLogin(TemplateView):
-    template_name = 'weixin_login_new.jade'
+    template_name = 'weixin_login.jade'
 
     def get_context_data(self, **kwargs):
         context = super(WeixinLogin, self).get_context_data(**kwargs)

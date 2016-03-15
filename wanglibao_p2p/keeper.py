@@ -572,10 +572,10 @@ class AmortizationKeeper(KeeperBaseMixin):
                     'user_id': sub_amo.user.id,
                     'term': sub_amo.term,
                     'settlement_time': sub_amo.settlement_time.strftime('%Y-%m-%d %H:%M:%S'),
-                    'principal': sub_amo.principal,
-                    'interest': sub_amo.interest,
-                    'penal_interest': sub_amo.penal_interest,
-                    'coupon_interest': sub_amo.coupon_interest,
+                    'principal': float(sub_amo.principal),
+                    'interest': float(sub_amo.interest),
+                    'penal_interest': float(sub_amo.penal_interest),
+                    'coupon_interest': float(sub_amo.coupon_interest),
                     'description': sub_amo.description,
                 })
 

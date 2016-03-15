@@ -34,11 +34,11 @@ html
               p.balance-left 理财券
               .balance-middle
                 .balance-middle-select
-                  select(name="redpack", type='select')#gifts-package.balance-middle-select-select
-                    //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
-                    //投资门槛investamount
-                    //百分比有个最高抵扣金额highest_amount
-                    if redpacks
+                  //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
+                  //投资门槛investamount
+                  //百分比有个最高抵扣金额highest_amount
+                  if redpacks
+                    select(name="redpack", type='select', data-redpack='true')#gifts-package.balance-middle-select-select
                       option(value = '')  不使用理财券
                       redpack_num = len(redpacks)
                       each redpack in redpacks
@@ -49,7 +49,8 @@ html
                           red_amountSet = redpack['amount'] * 100
                           pack_unit = '%'
                         option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{red_amountSet}}{{pack_unit}}/{{redpack.invest_amount}}元起投
-                    else
+                  else
+                    select(name="redpack", type='select', data-redpack='false')#gifts-package.balance-middle-select-select
                       option(value = '')  无可用理财券
 
         .buy-earnings
@@ -57,7 +58,6 @@ html
               span.already-amount
               |加息券，继续享有加息，不可使用其他理财券
             p.redpack-investamount * 未达到红包使用门槛
-            p.redpack-for-amount * 请输入投资金额
             p.redpack-sign 红包使用
               em.redpack-amount
               |元，实际支付
@@ -72,7 +72,7 @@ html
           .is_invested-sign 只有未进行投资的用户才可以购买
         else
           .buy-snap-up
-              button(type='submit',name='submit').snap-up 立即投资
+              button(type='submit',name='submit', disabled=true).public-submit 立即投资
         .buy-sufficient
           p
            |余额不足，
@@ -87,6 +87,11 @@ html
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
         include include/tran_password
-        include include/confirm
+        include include/ui_model/mobile_errorsign
+        include include/ui_model/mobile_confirm
+        include include/ui_model/mobile_alert
         include include/tracking
-        script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js?v=20160304")
+        //script(data-init="buy", src="/static/scripts/mobile/mobile.js?v=20151202")
+        script(src='/static/scripts/mobile/pro/vendor.zepto.js')
+        script(src='/static/scripts/mobile/pro/buy.js')
+
