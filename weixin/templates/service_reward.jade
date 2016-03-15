@@ -48,6 +48,12 @@ html
                         .reward-scope 无门槛
                       else
                         .reward-scope {{pack.invest_amount}}元起用
+                          if pack.period
+                            if pack.period_type == 'month'
+                              | &nbsp;&nbsp;(限{{ pack.period }}月标)
+                            else
+                              if pack.period_type == 'month_gte'
+                                | &nbsp;&nbsp;(限{{ pack.period }}月标及以上)
 
                     .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
                   if pack.method == '-'

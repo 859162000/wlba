@@ -741,7 +741,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: true,
+                        debug: false,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -802,16 +802,14 @@ org.detail = (function (org) {
                         success && success();
                     }
                 });
-                alert(typeof hide);
                 if(hide){
-                    alert("share-ok");
                     wx.hideMenuItems({
                         menuList: ['menuItem:share:timeline'],
                         success: function (res) {
-                          alert('已隐藏“分享到朋友圈”按钮');
+                          //alert('已隐藏“分享到朋友圈”按钮');
                         },
                         fail: function (res) {
-                          alert(JSON.stringify(res));
+                          org.ui.alert(JSON.stringify(res));
                         }
                     });
                 }
@@ -2560,7 +2558,7 @@ org.checkIn = (function(org){
             lib.shareOk();
         },
         checkIn: function(){//签到
-            var checkDom = $("div.checkin-op-status");
+            //var checkDom = $("div.checkin-op-status");
             org.ajax({
                 url: "/weixin/daily_action/",
                 type: "post",
