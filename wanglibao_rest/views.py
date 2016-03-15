@@ -1779,12 +1779,13 @@ class OauthUserRegisterApi(APIView):
                     res_data = get_coop_access_token(phone, client_id, tid, coop_key)
 
                     if int(res_data['ret_code']) == 10000:
-                        callback_url = request.get_host() + '/oauth2/login/v2/' + '?promo_token=' + channel_code
+                        callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
+                        callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
                         response_data = {
                             'Code': 101,
                             'message': u'成功',
                             'Cust_key': tid,
-                            'Access_tokens': res_data['token'],
+                            'Access_tokens': res_data['access_token'],
                             'Callback_url': callback_url,
                         }
                     else:
