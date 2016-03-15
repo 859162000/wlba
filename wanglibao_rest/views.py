@@ -18,7 +18,7 @@ from marketing.models import Channels
 from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.utils import create_user
-from wanglibao_p2p.models import P2PProduct, UserAmortization
+from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao_p2p.forms import P2PProductForm, P2PRecordForm
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
@@ -29,6 +29,7 @@ from wanglibao_account.forms import UserRegisterForm, UserForm
 from wanglibao_oauth2.models import Client
 from wanglibao_account.models import Binding
 from wanglibao_account.tools import get_client_with_channel_code
+from wanglibao_rest.utils import utc_to_local_timestamp
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -77,7 +78,6 @@ class AccessUserExistsApi(APIView):
             channel = get_channel_record(channel_code)
             if channel:
                 sign = request.session.get('sign')
-                print sign
                 if sign:
                     client_id = request.session.get('client_id')
                     if client_id:
@@ -466,6 +466,15 @@ class RenRenLiQueryApi(APIView):
         else:
             return False
 
+    def get_amotize_data(self, data, p2p_record):
+        if p2p_record.product.soldout_time:
+            data['Invest_full_scale_date'] = utc_to_local_timestamp(p2p_record.product.soldout_time)
+            data['Back_money'] = float(p2p_record.amotized_amount) or 0
+            data['Invest_end_date'] = utc_to_local_timestamp(p2p_record.invest_end_time)
+            data['Back_last_date'] = utc_to_local_timestamp(p2p_record.back_last_date)
+
+        return data
+
     def post(self, request):
         req_data = request.POST
         sign = req_data.get('Sign', None)
@@ -484,10 +493,11 @@ class RenRenLiQueryApi(APIView):
                         data_list = list()
                         renrenli_callback = RenRenLiCallback(client.channel)
                         if order_id:
-                            user_amo = UserAmortization.objects.filter(pk=order_id).first()
-                            if user_amo:
-                                data = renrenli_callback.get_amotize_data(user_amo)
+                            p2p_record = P2PRecord.objects.filter(order_id=order_id).select_related().first()
+                            if p2p_record:
+                                data = renrenli_callback.get_purchase_data(p2p_record)
                                 if data:
+                                    data = self.get_amotize_data(data, p2p_record)
                                     data_list.append(data)
 
                                 response_data = {
@@ -502,47 +512,41 @@ class RenRenLiQueryApi(APIView):
                         elif bid:
                             binding = Binding.objects.filter(btype=client.channel.code, bid=bid).first()
                             if binding:
-                                user_amos = UserAmortization.objects.filter(user_id=binding.user.id)
-                                if user_amos:
-                                    for user_amo in user_amos:
-                                        data = renrenli_callback.get_amotize_data(user_amo)
-                                        if data:
-                                            data_list.append(data)
+                                if start_time:
+                                    start_time = dt.fromtimestamp(start_time)
+                                    if end_time:
+                                        end_time = dt.fromtimestamp(end_time)
+                                    else:
+                                        end_time = dt.now()
+                                    p2p_records = P2PRecord.objects.filter(user_id=binding.user.id,
+                                                                           create_time__gte=start_time,
+                                                                           create_time__lte=end_time).select_related()
+                                    if p2p_records:
+                                        for p2p_record in p2p_records:
+                                            data = renrenli_callback.get_purchase_data(p2p_record)
+                                            if data:
+                                                data = self.get_amotize_data(data, p2p_record)
+                                                data_list.append(data)
 
-                                response_data = {
-                                    'Code': 101,
-                                    'Data': json.dumps(data_list),
-                                }
+                                    response_data = {
+                                        'Code': 101,
+                                        'Data': json.dumps(data_list),
+                                    }
+                                else:
+                                    response_data = {
+                                        'Code': 10016,
+                                        'Data': u'起始时间不存在',
+                                    }
                             else:
                                 response_data = {
                                     'Code': 10015,
                                     'Data': u'无效用户绑定id',
                                 }
                         else:
-                            if start_time:
-                                start_time = dt.fromtimestamp(start_time)
-                                if end_time:
-                                    end_time = dt.fromtimestamp(end_time)
-                                else:
-                                    end_time = dt.now()
-
-                                user_amos = UserAmortization.objects.filter(product__publish_time__gte=start_time,
-                                                                            product__soldout_time__lte=end_time)
-                                if user_amos:
-                                    for user_amo in user_amos:
-                                        data = renrenli_callback.get_amotize_data(user_amo)
-                                        if data:
-                                            data_list.append(data)
-
-                                response_data = {
-                                    'Code': 101,
-                                    'Data': json.dumps(data_list),
-                                }
-                            else:
-                                response_data = {
-                                    'Code': 10016,
-                                    'Data': u'起始时间不存在',
-                                }
+                            response_data = {
+                                'Code': 10017,
+                                'Data': u'订单号或用户绑定id必须存在',
+                            }
                     else:
                         response_data = {
                             'Code': 10013,

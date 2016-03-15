@@ -16,6 +16,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client
 from wanglibao_rest.utils import get_utc_timestamp, utc_to_local_timestamp
 from wanglibao_margin.models import MarginRecord
+from wanglibao_p2p.models import P2PRecord
 from wanglibao import settings
 from .tasks import bajinshe_callback, renrenli_callback
 from .utils import get_bajinshe_base_data, get_renrenli_base_data
@@ -546,23 +547,23 @@ class RenRenLiCallback(CoopCallback):
         self.purchase_call_back_url = settings.RENRENLI_PURCHASE_PUSH_URL
         self.coop_account_name = settings.RENRENLI_ACCOUNT_NAME
 
-    def get_amotize_data(self, user_amo):
-        bid = get_tid_for_coop(user_amo.user_id)
+    def get_purchase_data(self, p2p_record):
+        bid = get_tid_for_coop(p2p_record.user_id)
         data = get_renrenli_base_data(self.channel.code)
         if bid and data:
             act_data = {
                 'User_name': self.coop_account_name,
-                'Order_no': user_amo.id,
-                'Pro_name': user_amo.product.name,
-                'Pro_id': user_amo.product.id,
-                'Invest_money': float(user_amo.equity_amount),
-                'bingdingUid': self.channel.bid,
-                'Rate': user_amo.product.expected_earning_rate,
-                'Invest_start_date': utc_to_local_timestamp(user_amo.product.publish_time),
-                'Invest_end_date': utc_to_local_timestamp(user_amo.product.soldout_time),
-                'Back_money': user_amo.get_total_amount(),
-                'Back_last_date': utc_to_local_timestamp(user_amo.created_time),
+                'Order_no': p2p_record.order_id,
+                'Pro_name': p2p_record.product.name,
+                'Pro_id': p2p_record.product.id,
+                'Invest_money': float(p2p_record.amount),
+                'Rate': p2p_record.product.expected_earning_rate,
+                'Invest_start_date': utc_to_local_timestamp(p2p_record.create_time),
+                'Invest_end_date': 0,
+                'Back_money': 0,
+                'Back_last_date': 0,
                 'Cust_key': bid,
+                'Invest_full_scale_date': 0,
             }
             data['Data'] = [act_data]
         else:
@@ -573,10 +574,31 @@ class RenRenLiCallback(CoopCallback):
 
     def amortization_push(self, user_amo):
         super(RenRenLiCallback, self).amortization_push(user_amo)
-        data = self.get_amotize_data(user_amo)
-        if data:
-            renrenli_callback.apply_async(
-                kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
+        p2p_record = P2PRecord.objects.filter(product=user_amo.product,
+                                              user_id=user_amo.user_id
+                                              ).order_by('create_time').last()
+        if p2p_record:
+            if p2p_record.amotized_amount:
+                amotized_amount = p2p_record.amotized_amount + user_amo.get_total_amount()
+            else:
+                amotized_amount = user_amo.get_total_amount()
+
+            P2PRecord.objects.filter(product=user_amo.product,
+                                     user_id=user_amo.user_id
+                                     ).update(invest_end_time=p2p_record.invest_end_time,
+                                              back_last_date=user_amo.created_time,
+                                              amotized_amount=amotized_amount)
+
+    def purchase_call_back(self, user_id, order_id):
+        super(RenRenLiCallback, self).purchase_call_back(user_id, order_id)
+        p2p_record = P2PRecord.objects.filter(user_id=user_id,
+                                              order_id=order_id,
+                                              catalog=u'申购').select_related('product').first()
+        if p2p_record:
+            data = self.get_purchase_data(p2p_record)
+            if data:
+                renrenli_callback.apply_async(
+                    kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
 
 
 # 第三方回调通道

@@ -63,6 +63,11 @@ class P2PRecord(models.Model):
     platform = models.CharField(u'购买平台', max_length=100, null=True, blank=True)
     margin_record = models.ForeignKey(MarginRecord, verbose_name=u'账户资金记录', blank=True, null=True)
 
+    invest_end_time = models.DateTimeField(u'用户该标的最后投资时间', null=True, blank=True)
+    back_last_date = models.DateTimeField(u'最近还款时间', null=True, blank=True)
+    amotized_amount = models.DecimalField(u'已还金额', max_digits=20, decimal_places=2,
+                                          null=True, blank=True, default=Decimal('0.00'))
+
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'产品流水'
