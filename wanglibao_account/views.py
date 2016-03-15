@@ -2353,7 +2353,10 @@ class ManualModifyPhoneTemplate(TemplateView):
         user = self.request.user
         profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"复审驳回", u"初审驳回"]).first()
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        if modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
+            modify_phone_record = None
+
         return {
                 'user_name':profile.name,
                 'modify_phone_record':modify_phone_record
@@ -2431,8 +2434,8 @@ class CancelManualModifyPhoneAPI(APIView):
         card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
         if not card.exists():
             return Response({'message':"用户需要绑定的银行卡号"}, status=400)
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"复审驳回", u"初审驳回"]).first()
-        if not modify_phone_record:
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        if not modify_phone_record or modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
             return Response({'message':"没有可以取消的申请"}, status=400)
         modify_phone_record.status = u"取消申请"
         modify_phone_record.save()

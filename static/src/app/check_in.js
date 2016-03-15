@@ -56,7 +56,7 @@ org.checin_in = (function () {
                   $(this).removeClass('active');
                 });
                 if(amount){
-                    $share.find('.op-dec-detail').addClass('op-detail-orange').text('+'+amount+'体验金');
+                    $share.find('.op-dec-detail').addClass('op-detail-orange').text('+'+amount+'元体验金');
                 }else{
                     $share.find('.op-dec-detail').text('点击得双倍')
                 }
@@ -71,7 +71,7 @@ org.checin_in = (function () {
 
 
             $('.checkin-op-share').on('click',function(){
-                if(shareStaus) return org.ui.alert('今天你已分享过了，你的奖励已翻倍')
+                if(shareStaus) return
                 _self.appShare.touchShare({
                     title: '每天签到白拿体验金，签满7天打开大礼包！',
                     content: '点我签到',
@@ -98,7 +98,7 @@ org.checin_in = (function () {
             $checkIn.removeClass('active').addClass('rm-loading active');
             checkInText = status ? '今日已签到' : '今日未签到';
             $checkIn.find('.op-dec-title').text(checkInText);
-            $checkIn.find('.op-dec-detail').text('+'+amount+'体验金');
+            $checkIn.find('.op-dec-detail').text('+'+amount+'元体验金');
         },
         steriousGift:function(acount){
             $('.bar-content').text('距离神秘礼包还有'+acount+'天')

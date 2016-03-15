@@ -38,7 +38,8 @@ block main
                                             span 浏览
                                             <input id="id_front_image" class='input' type="file" name="id_front_image" multiple="true" val='选择'/>
                                             .error_right_title.error_right_file_1
-                                        .title 请上传彩色、完整证件图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
+                                            .reject_text.reject_text_1 该资料未通过审核，请重新上传
+                                        .title 请上传彩色、完整证件图片，支持jpg、png格式，<br>且文件大小不超过2M的图片
                                         .upload_img#user_img_1
                                             img.send_img#file_img_1(src="/static/images/account_safe/img.jpg")
                             if modify_phone_record.id_back_image_status
@@ -56,7 +57,8 @@ block main
                                             span 浏览
                                             <input id="id_back_image" class='input' type="file" name="id_back_image" multiple="true" val='选择'/>
                                             .error_right_title.error_right_file_2
-                                        .title 请上传彩色、完整证件图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
+                                            .reject_text.reject_text_2 该资料未通过审核，请重新上传
+                                        .title 请上传彩色、完整证件图片，支持jpg、png格式，<br>且文件大小不超过2M的图片
                                         .upload_img#user_img_2
                                             img.send_img#file_img_2(src="/static/images/account_safe/img.jpg")
                             if modify_phone_record.id_user_image_status
@@ -74,7 +76,8 @@ block main
                                             span 浏览
                                             <input id="id_user_image" class='input' type="file" name="id_user_image" multiple="true" val='选择'/>
                                             .error_right_title.error_right_file_3
-                                        .title 请上传本人手持身份证图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
+                                            .reject_text.reject_text_3 该资料未通过审核，请重新上传
+                                        .title 请上传本人手持身份证图片，支持jpg、png格式，<br>且文件大小不超过2M的图片
                                         .upload_img#user_img_3
                                             img.send_img#file_img_3(src="/static/images/account_safe/img.jpg")
                             if modify_phone_record.card_user_image_status
@@ -92,7 +95,8 @@ block main
                                             span 浏览
                                             <input id="id_bank_image" class='input' type="file" name="card_user_image" multiple="true" val='选择'/>
                                             .error_right_title.error_right_file_4
-                                        .title 请上传本人手持PC端已绑定银行卡的，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
+                                            .reject_text.reject_text_4 该资料未通过审核，请重新上传
+                                        .title!=' 请上传本人<span class="red">手持PC端已绑定银行卡</span>的正面照片，<br>支持jpg、png格式，且文件大小不超过2M的图片'
                                         .upload_img#user_img_4
                                             img.send_img#file_img_4(src="/static/images/account_safe/img.jpg")
                         else
@@ -103,8 +107,7 @@ block main
                                         span 浏览
                                         <input id="id_front_image" class='input' type="file" name="id_front_image" multiple="true" val='选择'/>
                                         .error_right_title.error_right_file_1
-                                    .title 请上传彩色、完整证件图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
-                                    .title_true 该资料已经通过审核
+                                    .title 请上传彩色、完整证件图片，支持jpg、png格式，<br>且文件大小不超过2M的图片
                                     .upload_img#user_img_1
                                         img.send_img#file_img_1(src="/static/images/account_safe/img.jpg")
                             .box
@@ -114,7 +117,7 @@ block main
                                         span 浏览
                                         <input id="id_back_image" class='input' type="file" name="id_back_image" multiple="true" val='选择'/>
                                         .error_right_title.error_right_file_2
-                                    .title 请上传彩色、完整证件图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
+                                    .title 请上传彩色、完整证件图片，支持jpg、png格式，<br>且文件大小不超过2M的图片
                                     .upload_img#user_img_2
                                         img.send_img#file_img_2(src="/static/images/account_safe/img.jpg")
                             .box
@@ -124,7 +127,7 @@ block main
                                         span 浏览
                                         <input id="id_user_image" class='input' type="file" name="id_user_image" multiple="true" val='选择'/>
                                         .error_right_title.error_right_file_3
-                                    .title 请上传本人手持身份证图片，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
+                                    .title 请上传本人手持身份证图片，支持jpg、png格式，<br>且文件大小不超过2M的图片
                                     .upload_img#user_img_3
                                         img.send_img#file_img_3(src="/static/images/account_safe/img.jpg")
                             .box
@@ -134,7 +137,7 @@ block main
                                         span 浏览
                                         <input id="id_bank_image" class='input' type="file" name="card_user_image" multiple="true" val='选择'/>
                                         .error_right_title.error_right_file_4
-                                    .title 请上传本人手持PC端已绑定银行卡的，支持jpg、png、bmp格式，<br>且文件大小不超过2M的图片
+                                    .title 请上传本人手持PC端已绑定银行卡的，支持jpg、png格式，<br>且文件大小不超过2M的图片
                                     .upload_img#user_img_4
                                         img.send_img#file_img_4(src="/static/images/account_safe/img.jpg")
                         .box
@@ -180,6 +183,6 @@ block main
             .phone_modify_bg
 
     script.
-        require(["/static/js/phone_modify_manual.js?v=20160301402"])
+        require(["/static/js/phone_modify_manual.js?v=20160301501"])
 
 
