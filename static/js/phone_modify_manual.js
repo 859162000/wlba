@@ -103,7 +103,7 @@
             //alert(mime);
             var file_size = docObj.files[0].size;
             //alert(file_size);
-            if((mime==".jpg"||mime==".png"||mime==".bmp")&&file_size<'2097152'){
+            if((mime==".jpg"||mime==".png")&&file_size<'2097152'){
 
                 setImagePreview(docObj,file_img);
             }else{
@@ -115,18 +115,22 @@
                 }
                 if(input_parent.hasClass('input_box_1')){
                     $('#user_img_1').hide();
+                    $('.reject_text_1').hide();
                     $('.error_right_file_1').text(error_file_status).show();
                 }
                 if(input_parent.hasClass('input_box_2')){
                     $('#user_img_2').hide();
+                    $('.reject_text_2').hide();
                     $('.error_right_file_2').text(error_file_status).show();
                 }
                 if(input_parent.hasClass('input_box_3')){
                     $('#user_img_3').hide();
+                    $('.reject_text_3').hide();
                     $('.error_right_file_3').text(error_file_status).show();
                 }
                 if(input_parent.hasClass('input_box_4')){
                     $('#user_img_4').hide();
+                    $('.reject_text_4').hide();
                     $('.error_right_file_4').text(error_file_status).show();
                 }
                 //return false;
