@@ -741,7 +741,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: false,
+                        debug: true,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -802,11 +802,18 @@ org.detail = (function (org) {
                         success && success();
                     }
                 });
-                if(hide){
+                alert(hide);
+                //if(hide){
                     wx.hideMenuItems({
-                        menuList: ['menuItem:share:timeline'] // 要隐藏的菜单项
+                        menuList: ['menuItem:share:timeline'],
+                        success: function (res) {
+                          alert('已隐藏“分享到朋友圈”按钮');
+                        },
+                        fail: function (res) {
+                          alert(JSON.stringify(res));
+                        }
                     });
-                }
+                //}
 
             })
         },
@@ -2204,7 +2211,7 @@ org.trade_back = (function (org) {
         return this.callback && this.callback(this.password);
     }
 
-    Deal_ui = {
+    var Deal_ui = {
         show_alert: function(state, callback, state_message){
             $('.tran-alert-error').show().find('.'+state).show().siblings().hide();
             if(state_message)  $('.tran-alert-error').show().find('.'+state).find('p').html(state_message);
