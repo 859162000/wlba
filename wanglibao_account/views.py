@@ -2353,7 +2353,10 @@ class ManualModifyPhoneTemplate(TemplateView):
         user = self.request.user
         profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"复审驳回", u"初审驳回"]).first()
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        if modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
+            modify_phone_record = None
+
         return {
                 'user_name':profile.name,
                 'modify_phone_record':modify_phone_record
