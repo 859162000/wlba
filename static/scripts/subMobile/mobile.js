@@ -2833,7 +2833,7 @@ org.checkIn = (function(org){
         },
         shareOk: function(){
             var url = window.location.protocol +"//" + window.location.host;
-            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'/api/m/check-in-share/', shareMainTit:'每天签到白拿体验金，签满7天打开大礼包！', shareBody:'点我签到', success:lib.shareFn};
+            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'/api/m/check-in-share/', shareMainTit:'网利宝天天送我钱，连拿7天还送大礼包！', shareBody:'速来抢钱', success:lib.shareFn};
             org.detail.share(share, true);
         }
     };
