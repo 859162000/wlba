@@ -2774,6 +2774,12 @@ org.checkIn = (function(org){
                     parent.hide();
                 }
             });
+            $("#js-share-alt").on('touchstart',function(){
+                $(".weixin-share-alt").show();
+            });
+            $(".weixin-share-alt").on('touchstart',function(){
+                $(this).hide();
+            });
         },
         getGift: function(){//领取礼物
             var giftOk = lib.giftOk;
