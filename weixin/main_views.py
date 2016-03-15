@@ -25,7 +25,8 @@ from wanglibao_p2p.common import get_p2p_list
 from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser, getMiscValue
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
-
+from wanglibao_redpack.backends import list_redpack
+from experience_gold.backends import SendExperienceGold
 
 logger = logging.getLogger("weixin")
 
@@ -170,23 +171,29 @@ class AccountTemplate(TemplateView):
                 fetch_experience_url=settings.CALLBACK_HOST + "/" + fetch_experience_url
             else:
                 fetch_experience_url=settings.CALLBACK_HOST + fetch_experience_url
-        #{"fetch_experience_url":"fetch_experience_url", "fetch_coupon_url":"fetch_experience_url"}
-        print account_info
-        print "========================================",{
+        result = list_redpack(self.request.user, 'all', 'all', 0, 'all')
+        seg = SendExperienceGold(self.request.user)
+        experience_amount = seg.get_amount()
+        print '=======================',{
             'total_asset': account_info['total_asset'],
             'total_unpaid_interest': account_info['p2p_total_unpaid_interest'],
             'total_paid_interest': account_info['p2p_total_paid_interest'],
             'margin': account_info['p2p_margin'],
             'fetch_experience_url':fetch_experience_url,
-            'fetch_coupon_url':fetch_coupon_url
+            'fetch_coupon_url':fetch_coupon_url,
+            'coupon_num':len(result["packages"]['unused']),
+            'experience_amount':experience_amount
         }
+
         return {
             'total_asset': account_info['total_asset'],
             'total_unpaid_interest': account_info['p2p_total_unpaid_interest'],
             'total_paid_interest': account_info['p2p_total_paid_interest'],
             'margin': account_info['p2p_margin'],
             'fetch_experience_url':fetch_experience_url,
-            'fetch_coupon_url':fetch_coupon_url
+            'fetch_coupon_url':fetch_coupon_url,
+            'coupon_num':len(result["packages"]['unused']),
+            'experience_amount':experience_amount
         }
 
 class RechargeTemplate(TemplateView):
