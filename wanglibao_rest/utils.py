@@ -146,11 +146,7 @@ def get_current_utc_timestamp():
     return utc_timestamp
 
 
-def process_for_bajinshe_landpage(request, channel_code):
-    phone = request.session.get('phone', None)
-    client_id = request.session.get('client_id', None)
-    access_token = request.session.get('access_token', None)
-
+def coop_token_login(request, phone, client_id, access_token):
     if phone and client_id and access_token:
         try:
             user = authenticate(phone=phone, client_id=client_id, token=access_token)
@@ -158,6 +154,28 @@ def process_for_bajinshe_landpage(request, channel_code):
                 auth_login(request, user)
         except Exception, e:
             logger.info('internal request oauth failed with error %s' % e)
+
+
+def process_for_bajinshe_landpage(request, channel_code):
+    phone = request.session.get('phone', None)
+    client_id = request.session.get('client_id', None)
+    access_token = request.session.get('access_token', None)
+
+    coop_token_login(request, phone, client_id, access_token)
+
+
+def process_for_renrenli_landpage(request, channel_code):
+    phone = request.GET.get('phone', None)
+    client_id = request.GET.get('client_id', None)
+    access_token = request.GET.get('access_token', None)
+    if not phone:
+        phone = request.session.get('phone', None)
+    if not client_id:
+        client_id = request.session.get('client_id', None)
+    if not access_token:
+        access_token = request.session.get('access_token', None)
+
+    coop_token_login(request, phone, client_id, access_token)
 
 
 def has_binding_for_bid(channel_code, bid):
@@ -185,11 +203,9 @@ def get_coop_access_token(phone, client_id, tid, coop_key):
     }
     try:
         ret = requests.post(url, data=data)
-        res_data = ret.json()
-        response_data = {
-            'ret_code': res_data['code'],
-            'message': res_data['message'],
-        }
+        response_data = ret.json()
+        response_data['ret_code'] = response_data['code']
+        response_data.pop('code')
         logger.info('get_coop_access_token return: %s' % response_data)
     except Exception, e:
         response_data = {
