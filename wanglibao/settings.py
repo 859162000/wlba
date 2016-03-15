@@ -182,7 +182,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
     }
 
 import sys
@@ -1191,6 +1191,7 @@ BAJINSHE_CHANNEL_CODE = 'bajinshe'
 
 # 人人利
 RENRENLI_COOP_KEY = 'wanglibaorrl'
+RENRENLI_CHANNEL_CODE = 'renrenli'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:

@@ -79,6 +79,9 @@ from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha
+from wanglibao_profile.models import WanglibaoUserProfile
+
+
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
 
@@ -1199,6 +1202,13 @@ class ResetPasswordAPI(DecryptParmsAPIView):
         if status == 200:
             user.set_password(password)
             user.save()
+
+            # 重置密码后将用户的错误登录次数清零
+            user_profile = WanglibaoUserProfile.objects.get(user=user)
+            user_profile.login_failed_count = 0
+            user_profile.login_failed_time = timezone.now()
+            user_profile.save()
+
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
             # Modify by hb on 2015-12-02
@@ -1249,7 +1259,6 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
         user.set_password(new_password)
         user.save()
         # 重置密码后将用户的错误登录次数清零
-        from wanglibao_profile.models import WanglibaoUserProfile
         user_profile = WanglibaoUserProfile.objects.get(user=user)
         user_profile.login_failed_count = 0
         user_profile.login_failed_time = timezone.now()
@@ -2354,7 +2363,7 @@ class ManualModifyPhoneTemplate(TemplateView):
         profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
         modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
-        if modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
+        if modify_phone_record and modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
             modify_phone_record = None
 
         return {
@@ -2434,8 +2443,8 @@ class CancelManualModifyPhoneAPI(APIView):
         card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
         if not card.exists():
             return Response({'message':"用户需要绑定的银行卡号"}, status=400)
-        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user, status__in=[u"复审驳回", u"初审驳回"]).first()
-        if not modify_phone_record:
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        if not modify_phone_record or modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
             return Response({'message':"没有可以取消的申请"}, status=400)
         modify_phone_record.status = u"取消申请"
         modify_phone_record.save()
@@ -2601,7 +2610,7 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
         user_profile = WanglibaoUserProfile.objects.get(user=user)
         failed_count = user_profile.login_failed_count
 
-        if failed_count > 6 and today_start < now <= today_end:
+        if failed_count >= 6 and today_start < now <= today_end:
             msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
         else:
             if user.check_password(password):
