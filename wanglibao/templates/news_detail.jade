@@ -18,7 +18,7 @@ html
                 | >报道详情
             .media_box.detail_box.clearfix
                 h3 {{news.name}}
-                .media_coverage_time 201110200
+                .media_coverage_time {{news.created_at|date:"Y-m-d H:i"}}
                 .medil_detail {{news.content|safe}}
         include global/g_footer
         include include/tracking

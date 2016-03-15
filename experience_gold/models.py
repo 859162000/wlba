@@ -52,7 +52,7 @@ class ExperienceEvent(models.Model):
         ('share', u'分享奖励'),
     ), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default=u"全平台", choices=PLATFORM)
-    target_channel = models.CharField(max_length=500, verbose_name=u"渠道", blank=True, default="",
+    target_channel = models.CharField(max_length=1000, verbose_name=u"渠道", blank=True, default="",
                                       help_text=u'不限渠道则留空即可,多个渠道用英文逗号间隔')
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
