@@ -888,6 +888,7 @@ class HasValidationAPIView(APIView):
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -932,8 +933,15 @@ class IdValidate(APIView):
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
 
-            id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-            if id_verify_count >= 1:
+            profile = WanglibaoUserProfile.objects.filter(user=user).first()
+            if profile.id_is_valid:
+                return Response({
+                    "message": u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066",
+                    "error_number": ErrorNumber.try_too_many_times
+                })
+
+            # id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
+            if profile.id_number == id_number:
                 return Response({
                                     "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.id_verify_times_error
@@ -962,7 +970,7 @@ class IdValidate(APIView):
             # 处理第三方用户实名回调
             CoopRegister(self.request).process_for_validate(user)
 
-            return Response({ "validate": True }, status=200)
+            return Response({"validate": True}, status=200)
 
         else:
             return Response({
@@ -971,38 +979,38 @@ class IdValidate(APIView):
                             }, status=400)
 
 
-class AdminIdValidate(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request, *args, **kwargs):
-        # add by ChenWeiBin@2010105
-        if request.user.wanglibaouserprofile.utype == '3':
-            return Response({
-                "message": u"企业用户无法通过此方式认证",
-                "error_number": 30056,
-            }, status=400)
-
-        phone = request.DATA.get("phone", "")
-        name = request.DATA.get("name", "")
-        id_number = request.DATA.get("id_number", "")
-        verify_record, error = verify_id(name, id_number)
-
-        if error:
-            return Response({
-                                "message": u"验证失败",
-                                "error_number": ErrorNumber.unknown_error
-                            }, status=400)
-
-        user = User.objects.get(wanglibaouserprofile__phone=phone)
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.id_valid_time = timezone.now()
-        user.wanglibaouserprofile.save()
-
-        return Response({
-                            "validate": True
-                        }, status=200)
+# class AdminIdValidate(APIView):
+#     permission_classes = (IsAuthenticated,)
+#
+#     def post(self, request, *args, **kwargs):
+#         # add by ChenWeiBin@2010105
+#         if request.user.wanglibaouserprofile.utype == '3':
+#             return Response({
+#                 "message": u"企业用户无法通过此方式认证",
+#                 "error_number": 30056,
+#             }, status=400)
+#
+#         phone = request.DATA.get("phone", "")
+#         name = request.DATA.get("name", "")
+#         id_number = request.DATA.get("id_number", "")
+#         verify_record, error = verify_id(name, id_number)
+#
+#         if error:
+#             return Response({
+#                                 "message": u"验证失败",
+#                                 "error_number": ErrorNumber.unknown_error
+#                             }, status=400)
+#
+#         user = User.objects.get(wanglibaouserprofile__phone=phone)
+#         user.wanglibaouserprofile.id_number = id_number
+#         user.wanglibaouserprofile.name = name
+#         user.wanglibaouserprofile.id_is_valid = True
+#         user.wanglibaouserprofile.id_valid_time = timezone.now()
+#         user.wanglibaouserprofile.save()
+#
+#         return Response({
+#                             "validate": True
+#                         }, status=200)
 
 
 class LoginAPIView(DecryptParmsAPIView):
