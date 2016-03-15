@@ -43,9 +43,19 @@ html
                     .reward-name {{pack.name}}
                     if pack.method == '*'
                       .reward-scope 抵扣投资额{{pack.amount | percentage_number_two}}%
+                        if pack.period
+                          if pack.period_type == 'month'
+                            | &nbsp;&nbsp;(限{{ pack.period }}月标)
+                          elif pack.period_type == 'month_gte'
+                              | &nbsp;&nbsp;(限{{ pack.period }}月标及以上)
                     else
                       if pack.invest_amount == 0
                         .reward-scope 无门槛
+                          if pack.period
+                            if pack.period_type == 'month'
+                              | &nbsp;&nbsp;(限{{ pack.period }}月标)
+                            elif pack.period_type == 'month_gte'
+                                | &nbsp;&nbsp;(限{{ pack.period }}月标及以上)
                       else
                         .reward-scope {{pack.invest_amount}}元起用
                           if pack.period
