@@ -802,8 +802,9 @@ org.detail = (function (org) {
                         success && success();
                     }
                 });
-                alert(hide);
-                //if(hide){
+                alert(typeof hide);
+                if(hide){
+                    alert("share-ok");
                     wx.hideMenuItems({
                         menuList: ['menuItem:share:timeline'],
                         success: function (res) {
@@ -813,7 +814,7 @@ org.detail = (function (org) {
                           alert(JSON.stringify(res));
                         }
                     });
-                //}
+                }
 
             })
         },
