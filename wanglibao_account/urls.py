@@ -150,6 +150,8 @@ urlpatterns += patterns(
     '',
     url(r'^test/', TemplateView.as_view(template_name="center_security.jade")),
     url(r'^transaction/', TemplateView.as_view(template_name="center_transaction.jade")),
+    url(r'^rockoning/', TemplateView.as_view(template_name="center_rockoning.jade")),
+    url(r'^recharge/', TemplateView.as_view(template_name="center_recharge.jade")),
 )
 
 if settings.DEBUG:

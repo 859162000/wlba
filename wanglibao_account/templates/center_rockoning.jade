@@ -1,0 +1,129 @@
+extends center_base
+-load formatters
+block head
+  - with '流水账单' as title
+  include global/g_head
+  -endwith
+block sidebar
+  - with '流水账单' as activeItem
+  include include/center_sidebar
+  -endwith
+block main
+  .center-main-white.center-layout
+
+    .center-rockoning-fund
+      .span3
+        .fund-amount 10,000
+          span.fund-point .00
+        .fund-explain 账户总资产
+      .span3
+        .fund-amount 500
+          span.fund-point .00
+        .fund-explain 账户余额
+      .span3
+        .fund-amount 500
+          span.fund-point .00
+        .fund-explain 待收本息
+      .span3
+        .fund-amount 95,000
+          span.fund-point .00
+        .fund-explain 暂冻结资金
+
+    .center-rockoning-earning
+      .span4.after-line
+        .earning-item
+          span.earning-expain 累计到帐收益：
+          span.earning-amount 29,500.00
+        .earning-item
+          span.earning-expain 昨日到帐收益：
+          span.earning-amount
+            span.earning-add-mark +
+            |10.58
+
+      .span4.after-line
+        .earning-item
+          span.earning-expain 累计特权收益：
+          span.earning-amount 29,500.00
+        .earning-item
+          span.earning-expain 昨日特权收益：
+          span.earning-amount
+            span.earning-add-mark +
+            |10.58
+      .span4
+        .earning-item
+          span.earning-expain 累计标的收益：
+          span.earning-amount 29,500.00
+        .earning-item
+          span.earning-expain 昨日标的收益：
+          span.earning-amount
+            span.earning-add-mark +
+            |10.58
+
+    .center-rockoning-filter
+      .rockoning-filter-title.t-d11.font-l 账单记录
+      .space-vertical-s
+      .rockoning-filter-item
+        .rockoning-filter-list.clearfix
+          .fl
+            span.t-d19.font-s 起止时间：
+            .checkbox-tager.active 全部
+            .checkbox-tager 近30天
+            .checkbox-tager 近60天
+
+          .fr
+            include include/center-filter-date
+        .rockoning-filter-list.clearfix
+          .fl
+            span.t-d19.font-s 资金类型：
+            .checkbox-tager.active 全部
+            .checkbox-tager 收入
+            .checkbox-tager 支出
+
+        .rockoning-filter-list.clearfix
+          .fl
+            span.t-d19.font-s 资金类型：
+            .checkbox-tager 全部
+            .checkbox-tager 充值
+            .checkbox-tager 投资
+            .checkbox-tager 提现
+            .checkbox-tager 收益
+            .checkbox-tager 债转
+            .checkbox-tager 佣金
+            .checkbox-tager 其他
+
+
+    .center-from-opeartion
+      .space-vertical-l
+      table.center-table
+        thead
+          tr
+            th 操作时间
+            th 名称
+            th 交易类型
+            th 交易状态
+            th 交易金额(元)
+            th 账户余额
+        tbody
+          mixin tr(status)
+            tr
+              td
+                span.table-date 2015-10-30
+                .t-d19  14:00:28
+              td
+                .tl.padding-l-sm
+                  .t-d19 300.00元
+                  .t-d19.table-product-name 企业生产资金生产资金生产资金企业生产资金生产资金生产资金
+
+              td
+                span 充值
+              td
+                span(class=status) 失败
+              td
+                span +300.00
+              td
+                span.t-d19 1,300.00
+          +tr('t-d2')
+          +tr('t-d21')
+          +tr('t-d22')
+          +tr('t-d22')
+    include include/center_pager

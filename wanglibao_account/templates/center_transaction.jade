@@ -10,11 +10,10 @@ block sidebar
   include include/center_sidebar
   -endwith
 block main
-  .center-main-white
+  .center-main-white.center-from-opeartion
     .center-transaction-bar
       a(href='').active-bar 散标投资
       a(href='') 月利宝
-      //.default-bar
 
     .center-from-opeartion
       .space-vertical-l
@@ -26,8 +25,10 @@ block main
             li 投标中
             li 还款中
             li 已还款
-        .center-filter-date.fl
+        .fr
+          include include/center-filter-date
 
+      .space-vertical-s
       table.center-table
         thead
           tr
@@ -39,6 +40,7 @@ block main
             th 汇款账单
             th 借款合同
         tbody
+          mixin tr()
             tr
               td
                 span.table-date 2015-10-30
@@ -59,25 +61,9 @@ block main
               td
                 .t-d20
                   a(href='/') 合同
-            tr
-              td
-                .table-date 2015-10-30
-                .t-d19  14:00:28
-              td
-                .tl.padding-l-sm
-                  .table-product-name 企业生产资金生产资金生产资金企业生产资金生产资金生产资金
-                  .t-d19 年化收益:12.5%
-                  .t-d19 投资期限:10个月
-              td
-                span 5,800.00
-              td
-                span 5,7878.00
-              td
-                span 满标审核
-              td
-                span.t-d20 账单
-              td
-                .t-d20
-                  a(href='/') 合同
+          +tr()
+          +tr()
+          +tr()
+          +tr()
     include include/center_pager
 
