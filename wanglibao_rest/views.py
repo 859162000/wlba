@@ -1658,51 +1658,6 @@ class BidHasBindingForChannel(APIView):
         return HttpResponse(json.dumps(response_data), content_type='application/json')
 
 
-class AccessUserExistsApi(APIView):
-    """第三方手机号注册及绑定状态检测接口"""
-
-    permission_classes = ()
-
-    def get(self, request, **kwargs):
-        channel_code = request.GET.get('promo_token', None)
-        if channel_code:
-            channel = get_channel_record(channel_code)
-            if channel:
-                phone = request.session.get('phone')
-                binding = get_coop_binding_for_phone(channel_code, phone)
-                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-                if binding and user:
-                    response_data = {
-                        'user_id': binding.bid,
-                        'ret_code': 10000,
-                        'message': u'该号已注册'
-                    }
-                elif not user:
-                    response_data = {
-                        'user_id': None,
-                        'ret_code': 10001,
-                        'message': u'该号未注册'
-                    }
-                else:
-                    response_data = {
-                        'user_id': None,
-                        'ret_code': 10002,
-                        'message': u'该号已注册，非本渠道用户'
-                    }
-
-                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-            else:
-                response_data = {
-                    'user_id': None,
-                    'ret_code': 10002,
-                    'message': u'无效promo_token'
-                }
-        else:
-            return Http404(u'页面不存在')
-
-        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
-
-
 class LandOpenApi(APIView):
     """
     渠道跳转页
@@ -1789,27 +1744,30 @@ class OauthUserRegisterApi(APIView):
                     if int(res_data['ret_code']) == 10000:
                         callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
                         callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
-                        response_data = {
-                            'Code': 101,
-                            'message': u'成功',
+                        data = {
                             'Cust_key': tid,
                             'Access_tokens': res_data['access_token'],
                             'Callback_url': callback_url,
                         }
+                        response_data = {
+                            'Code': 101,
+                            'Tip': u'成功',
+                            'Data': data,
+                        }
                     else:
                         response_data = {
                             'Code': res_data['ret_code'],
-                            'message': res_data['message'],
+                            'Tip': res_data['message'],
                         }
                 else:
                     response_data = {
                         'Code': 10009,
-                        'message': u'注册失败',
+                        'Tip': u'注册失败',
                     }
             else:
                 response_data = {
                     'Code': 10008,
-                    'message': u'签名错误',
+                    'Tip': u'签名错误',
                 }
         else:
             form_errors = form.errors
@@ -1817,7 +1775,7 @@ class OauthUserRegisterApi(APIView):
             form_error = form_errors[form_error_keys[0]][0]
             response_data = {
                 'Code': 10010,
-                'message': form_error,
+                'Tip': form_error,
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

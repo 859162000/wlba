@@ -325,13 +325,6 @@ urlpatterns += patterns(
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
 )
 
-
-# 判断手机号是否已经绑定渠道或被注册
-urlpatterns += patterns(
-    '',
-    url(r'^access_user/exists/$', AccessUserExistsApi.as_view()),
-)
-
 # 渠道着陆页中间跳转接口
 urlpatterns += patterns(
     '',
