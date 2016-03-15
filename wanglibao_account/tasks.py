@@ -78,7 +78,7 @@ def renrenli_callback(url, data):
     headers = {
        'Content-Type': 'application/json',
     }
-    data = json.dumps(data)
+
     try:
         res = requests.post(url=url, data=data, headers=headers)
     except Exception, e:

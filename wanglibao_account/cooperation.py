@@ -18,19 +18,10 @@ from wanglibao_rest.utils import get_utc_timestamp, utc_to_local_timestamp
 from wanglibao_margin.models import MarginRecord
 from wanglibao import settings
 from .tasks import bajinshe_callback, renrenli_callback
-from .utils import get_bajinshe_base_data
+from .utils import get_bajinshe_base_data, get_renrenli_base_data
 
 
 logger = logging.getLogger('wanglibao_cooperation')
-
-
-def get_client(channel_code):
-    try:
-        client = Client.objects.get(channel__code=channel_code)
-    except Client.DoesNotExist:
-        client = None
-
-    return client
 
 
 def get_uid_for_coop(user_id):
@@ -553,23 +544,18 @@ class RenRenLiCallback(CoopCallback):
     def __init__(self, *args, **kwargs):
         super(RenRenLiCallback, self).__init__(*args, **kwargs)
         self.purchase_call_back_url = settings.RENRENLI_PURCHASE_PUSH_URL
+        self.coop_account_name = settings.RENRENLI_ACCOUNT_NAME
 
-    def amortization_push(self, user_amo):
-        super(RenRenLiCallback, self).amortization_push(user_amo)
+    def get_amotize_data(self, user_amo):
         bid = get_tid_for_coop(user_amo.user_id)
-        if bid:
-            data = {
-                'Cust_id': '',
-                'Sign_type': 'MD5',
-                'Sign': ''
-            }
-
+        data = get_renrenli_base_data(self.channel.code)
+        if bid and data:
             act_data = {
-                'User_name': '',
+                'User_name': self.coop_account_name,
                 'Order_no': user_amo.id,
                 'Pro_name': user_amo.product.name,
                 'Pro_id': user_amo.product.id,
-                'Invest_money': user_amo.equity_amount,
+                'Invest_money': float(user_amo.equity_amount),
                 'bingdingUid': self.channel.bid,
                 'Rate': user_amo.product.expected_earning_rate,
                 'Invest_start_date': utc_to_local_timestamp(user_amo.product.publish_time),
@@ -579,9 +565,18 @@ class RenRenLiCallback(CoopCallback):
                 'Cust_key': bid,
             }
             data['Data'] = [act_data]
-            # 异步回调
+        else:
+            data = dict()
+            logger.info("renrenli get_amotize_data failed with bid[%s] data[%s]" % (bid, data))
+
+        return data
+
+    def amortization_push(self, user_amo):
+        super(RenRenLiCallback, self).amortization_push(user_amo)
+        data = self.get_amotize_data(user_amo)
+        if data:
             renrenli_callback.apply_async(
-                kwargs={'data': data, 'url': self.purchase_call_back_url})
+                kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
 
 
 # 第三方回调通道
