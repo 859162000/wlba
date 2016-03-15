@@ -2708,9 +2708,8 @@ org.checkIn = (function(org){
         },
         shareOk: function(){
             var url = window.location.protocol +"//" + window.location.host;
-            var share = {shareLink:url+'/api/m/check-in-share/', shareMainTit:'网利宝天天送我钱，不想要都不行～朋友们快来领啊～', shareBody:'速来网利宝抢钱，你还等什么', success:lib.shareFn};
+            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'/api/m/check-in-share/', shareMainTit:'网利宝天天送我钱，签满7天打开大礼包！', shareBody:'点我签到', success:lib.shareFn};
             org.detail.share(share, true);
-
         }
     };
     return {
