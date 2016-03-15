@@ -2354,7 +2354,7 @@ class ManualModifyPhoneTemplate(TemplateView):
         profile = user.wanglibaouserprofile
         form = ManualModifyPhoneForm()
         modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
-        if modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
+        if modify_phone_record and modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
             modify_phone_record = None
 
         return {
