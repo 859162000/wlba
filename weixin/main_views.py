@@ -22,7 +22,7 @@ from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
 from wanglibao_p2p.common import get_p2p_list
-from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
+from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser, getMiscValue
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
 
@@ -157,12 +157,36 @@ class WXRegister(TemplateView):
 class AccountTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         account_info = getAccountInfo(self.request.user)
+        info = getMiscValue("fwh_cfg_info")
+        fetch_experience_url = info.get('fetch_experience_url', "").strip()
+        fetch_coupon_url = info.get("fetch_coupon_url", "").strip()
+        if not fetch_coupon_url.startswith("http"):
+            if not fetch_coupon_url.startswith("/"):
+                fetch_coupon_url=settings.CALLBACK_HOST + "/" + fetch_coupon_url
+            else:
+                fetch_coupon_url=settings.CALLBACK_HOST + fetch_coupon_url
+        if not fetch_experience_url.startswith("http"):
+            if not fetch_experience_url.startswith("/"):
+                fetch_experience_url=settings.CALLBACK_HOST + "/" + fetch_experience_url
+            else:
+                fetch_experience_url=settings.CALLBACK_HOST + fetch_experience_url
+        #{"fetch_experience_url":"fetch_experience_url", "fetch_coupon_url":"fetch_experience_url"}
         print account_info
+        print "========================================",{
+            'total_asset': account_info['total_asset'],
+            'total_unpaid_interest': account_info['p2p_total_unpaid_interest'],
+            'total_paid_interest': account_info['p2p_total_paid_interest'],
+            'margin': account_info['p2p_margin'],
+            'fetch_experience_url':fetch_experience_url,
+            'fetch_coupon_url':fetch_coupon_url
+        }
         return {
             'total_asset': account_info['total_asset'],
             'total_unpaid_interest': account_info['p2p_total_unpaid_interest'],
             'total_paid_interest': account_info['p2p_total_paid_interest'],
             'margin': account_info['p2p_margin'],
+            'fetch_experience_url':fetch_experience_url,
+            'fetch_coupon_url':fetch_coupon_url
         }
 
 class RechargeTemplate(TemplateView):

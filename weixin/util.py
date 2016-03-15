@@ -299,3 +299,10 @@ def sendContinueRuleReward(activity_rule):
     gift_record.activity_code = self.activity.code
     gift_record.activity_code_time = timezone.now()
     gift_record.save()
+
+def getMiscValue(key):
+    m = Misc.objects.filter(key=key).first()
+    info = {}
+    if m and m.value:
+        info = json.loads(m.value)
+    return info
