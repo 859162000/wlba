@@ -49,6 +49,7 @@ class ExperienceEvent(models.Model):
         ('p2p_audit', u'满标审核'),
         ('repaid', u'还款'),
         ('weixin_sign_in', u'微信签到'),
+        ('share', u'分享奖励'),
     ), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default=u"全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=500, verbose_name=u"渠道", blank=True, default="",
