@@ -1636,6 +1636,10 @@ class BaJinSheRegister(CoopRegister):
         self.call_back_url = settings.CHANNEL_CENTER_CALL_BACK_URL
 
     @property
+    def channel_user(self):
+        return self.request.session.get(self.internal_channel_user_key, '')
+
+    @property
     def oauth2_client_id(self):
         return self.request.session.get(self.internal_channel_client_id_key, None)
 
@@ -1713,6 +1717,7 @@ class BaJinSheRegister(CoopRegister):
                 base_data = generate_coop_base_data('register')
                 act_data = {
                     'client_id': client_id,
+                    'bid': self.channel_user,
                     'phone': user.wanglibaouserprofile.phone,
                     'btype': self.channel_code,
                     'user_id': user.id,
@@ -1736,6 +1741,7 @@ class BaJinSheRegister(CoopRegister):
         if p2p_record:
             p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
             p2p_record['amount'] = float(p2p_record['amount'])
+            p2p_record['product'] = p2p_record['product_id']
             base_data = generate_coop_base_data('purchase')
 
             margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')

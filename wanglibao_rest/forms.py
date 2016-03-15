@@ -109,10 +109,9 @@ class OauthUserRegisterForm(OAuthForm):
 
     def check_sign(self, coop_key):
         client_id = self.cleaned_data['client_id']
-        client_secret = self.client.client_secret
         phone = self.cleaned_data['phone']
         sign = self.cleaned_data['sign']
-        local_sign = hashlib.md5(str(client_id)+str(phone)+str(client_secret)).hexdigest()
+        local_sign = hashlib.md5(str(client_id)+str(phone)+str(coop_key)).hexdigest()
         if sign == local_sign:
             return True
         else:
