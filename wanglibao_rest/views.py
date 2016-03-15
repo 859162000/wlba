@@ -10,7 +10,7 @@ import StringIO
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from rest_framework.views import APIView
-from wanglibao_account.cooperation import CoopRegister, get_client, CoopSessionProcessor
+from wanglibao_account.cooperation import CoopRegister, CoopSessionProcessor, RenRenLiCallback
 from django.utils import timezone
 from wanglibao_rest.utils import has_binding_for_bid, get_coop_binding_for_phone
 from django.http import Http404
@@ -18,7 +18,7 @@ from marketing.models import Channels
 from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.utils import create_user
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, UserAmortization
 from wanglibao_p2p.forms import P2PProductForm, P2PRecordForm
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
@@ -26,6 +26,9 @@ from .forms import CoopDataDispatchForm
 from .tasks import coop_common_callback, process_amortize
 from marketing.forms import ChannelForm
 from wanglibao_account.forms import UserRegisterForm, UserForm
+from wanglibao_oauth2.models import Client
+from wanglibao_account.models import Binding
+from wanglibao_account.tools import get_client_with_channel_code
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -78,7 +81,7 @@ class AccessUserExistsApi(APIView):
                 if sign:
                     client_id = request.session.get('client_id')
                     if client_id:
-                        client = get_client(channel_code)
+                        client = get_client_with_channel_code(channel_code)
                         if client:
                             phone = request.session.get('phone')
                             if phone:
@@ -448,5 +451,117 @@ class CoopDataDispatchApi(APIView):
             logger.info('channel data dispatch %s result:%s' % (processer.__name__, response_data['message']))
         else:
             logger.info('channel data dispatch process result:%s' % response_data['message'])
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class RenRenLiQueryApi(APIView):
+    permission_classes = ()
+
+    def check_sign(self, client_id, order_id, bid, key, sign):
+        local_sign = hashlib.md5(client_id + str(order_id) + str(bid) + key).hexdigest()
+
+        if local_sign == sign:
+            return True
+        else:
+            return False
+
+    def post(self, request):
+        req_data = request.POST
+        sign = req_data.get('Sign', None)
+        client_id = req_data.get('Cust_id', None)
+        order_id = req_data.get('Order_no', '')
+        bid = req_data.get('Cust_key', '')
+        start_time = req_data.get('Start_date', None)
+        end_time = req_data.get('End_date', None)
+
+        if sign:
+            if client_id:
+                client = Client.objects.filter(client_id=client_id).select_related('channel').first()
+                if client:
+                    is_right_sign = self.check_sign(client_id, order_id, bid, client.client_secret, sign)
+                    if is_right_sign:
+                        data_list = list()
+                        renrenli_callback = RenRenLiCallback(client.channel)
+                        if order_id:
+                            user_amo = UserAmortization.objects.filter(pk=order_id).first()
+                            if user_amo:
+                                data = renrenli_callback.get_amotize_data(user_amo)
+                                if data:
+                                    data_list.append(data)
+
+                                response_data = {
+                                    'Code': 101,
+                                    'Data': json.dumps(data_list),
+                                }
+                            else:
+                                response_data = {
+                                    'Code': 10014,
+                                    'Data': u'无效订单号',
+                                }
+                        elif bid:
+                            binding = Binding.objects.filter(btype=client.channel.code, bid=bid).first()
+                            if binding:
+                                user_amos = UserAmortization.objects.filter(user_id=binding.user.id)
+                                if user_amos:
+                                    for user_amo in user_amos:
+                                        data = renrenli_callback.get_amotize_data(user_amo)
+                                        if data:
+                                            data_list.append(data)
+
+                                response_data = {
+                                    'Code': 101,
+                                    'Data': json.dumps(data_list),
+                                }
+                            else:
+                                response_data = {
+                                    'Code': 10015,
+                                    'Data': u'无效用户绑定id',
+                                }
+                        else:
+                            if start_time:
+                                start_time = dt.fromtimestamp(start_time)
+                                if end_time:
+                                    end_time = dt.fromtimestamp(end_time)
+                                else:
+                                    end_time = dt.now()
+
+                                user_amos = UserAmortization.objects.filter(product__publish_time__gte=start_time,
+                                                                            product__soldout_time__lte=end_time)
+                                if user_amos:
+                                    for user_amo in user_amos:
+                                        data = renrenli_callback.get_amotize_data(user_amo)
+                                        if data:
+                                            data_list.append(data)
+
+                                response_data = {
+                                    'Code': 101,
+                                    'Data': json.dumps(data_list),
+                                }
+                            else:
+                                response_data = {
+                                    'Code': 10016,
+                                    'Data': u'起始时间不存在',
+                                }
+                    else:
+                        response_data = {
+                            'Code': 10013,
+                            'Data': u'无效签名',
+                        }
+                else:
+                    response_data = {
+                        'Code': 10012,
+                        'Data': u'无效客户端id不存在',
+                    }
+            else:
+                response_data = {
+                    'Code': 10011,
+                    'Data': u'客户端id不存在',
+                }
+        else:
+            response_data = {
+                'Code': 10010,
+                'Data': u'签名不存在',
+            }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import hashlib
 import string
 import uuid
 import re
@@ -15,6 +16,7 @@ import logging
 from M2Crypto.EVP import Cipher
 import requests
 import json
+from .tools import get_client_with_channel_code
 
 
 logger = logging.getLogger(__name__)
@@ -221,6 +223,23 @@ def get_bajinshe_base_data(order_id):
             'access_token': access_token,
             'platform': coop_id,
             'order_id': order_id
+        }
+
+    return data
+
+
+def get_renrenli_base_data(channel_code):
+    data = dict()
+    coop_account_name = settings.RENRENLI_ACCOUNT_NAME
+    coop_account_pwd = settings.RENRENLI_ACCOUNT_PWD
+    client = get_client_with_channel_code(channel_code)
+    if client:
+        sign = hashlib.md5(coop_account_name + coop_account_pwd +
+                           client.client_id + client.client_secret).hexdigest()
+        data = {
+            'Cust_id': client.client_id,
+            'Sign_type': 'MD5',
+            'Sign': sign,
         }
 
     return data
