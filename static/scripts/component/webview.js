@@ -139,9 +139,14 @@ var wlb = (function () {
                 options.callback && options.callback(responseData);
             });
         },
+        /**
+         * 分享状态
+         * @param callback
+         */
         shareStatus: function(callback){
             this.bridge.registerHandler('shareStatus', function (backdata, responseCallback) {
-                callback && callback(backdata)
+                var responseData  = Mixin.filterJSON(backdata);
+                callback && callback(responseData)
             });
         },
         /**
