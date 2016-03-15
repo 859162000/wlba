@@ -45,8 +45,11 @@
   .op-dec-detail
     color: #999
     font-size: .6rem
+  .op-detail-blue
+    color: #5DB5F2
   .op-detail-orange
     color: #f5a623
+
 
 .check-in-bar
   position: relative
@@ -185,13 +188,19 @@
     background-size: 100%
   .circle-item
     opacity: 0
+
+.active-gift-active
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/icon_gift_active.png") no-repeat center
+    background-size: 120%
+  .circle-item
+    opacity: 0
 .active-gift-open
   .circle-item-warp
     background: url("/static/imgs/app/checkin/icon_gift_open.png") no-repeat center
     background-size: 93%
   .circle-item
     opacity: 0
-
 .check-in-rules-layout
   padding: 0 1rem
   font-size: .6rem
@@ -200,8 +209,9 @@
   .check-rules-title
     font-weight: bold
     line-height: 1.8
+    margin-bottom: .4rem
   .check-rules-detail
-    margin-bottom: 1rem
+    margin-bottom: .3rem
     line-height: 1.4
 
 
@@ -213,7 +223,7 @@
   bottom: 0
   width: 100%
   height: 100%
-  z-index: 3
+  z-index: 10
   display: none
   .check-alert-mask
     display: -webkit-box
@@ -288,16 +298,32 @@
   margin: 0 auto rem(52) auto
 
 .checIn-rules
-  padding-left: rem(66)
+  padding: 0 rem(66)
+.checkin-nav-title
+  width: rem(534)
+  display: block
+  margin: 0 auto 1rem auto
+
+.checIn-rules-warp
+
+  position: relative
+  font-size: .6rem
+  color: #FFF219
+  border: 1px dashed #FFF219
+  border-radius: .2rem
+  padding: 0 .5rem .5rem .5rem
+  margin-bottom: 1.5rem
 .checIn-rules-max-title
-  font-size: .75rem
-  color: #FFF001
+  position: absolute
+  top: -10px
+  left: 10px
+  padding: 0 10px
+  background: #ff512f
 
 
 .checIn-rules-min-title
-  font-size: .6rem
   color: #fff
-  margin: rem(28) 0 rem(15) 0
+  margin: .5rem 0 rem(15) 0
 .checIn-rules-cont
   display: block
   width: rem(470)

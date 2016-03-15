@@ -1,0 +1,556 @@
+@mixin content_width
+  width: 1100px
+  margin: 0 auto
+.about_sidebar
+  height: 60px
+  line-height: 59px
+  background: #ffffff
+  border-bottom: 1px dashed #c5c5c5
+  .about_sidebar_div
+    +content_width
+    a
+      padding: 0 $space-l
+      display: inline-block
+      position: relative
+      font-size: $font-s
+      color: #999999
+      &:hover
+        color: #666666
+      &:first-child
+        padding-left: 0
+    a.about_sidebar_a
+      &:before
+        content: ''
+        position: absolute
+        top: 50%
+        right: -1px
+        width: 1px
+        height: 14px
+        background: #cccccc
+        margin-top: -7.5px
+    a.active
+      color: #d94a44
+.about_main
+  .wanglibao_about_banner
+    background: url(/static/imgs/pc/about/about.jpg) center center no-repeat
+    width: 100%
+    height: 435px
+    .i_about_item
+      +content_width
+      padding-top: 70px
+      .c_left
+        width: 580px
+        float: left
+        h3
+          font-size: $font-xll
+          color: #f97200
+          padding-bottom: $space-xl
+        .c_nav
+          padding-bottom: $space-s
+          a
+            padding: 0 $space-ssm
+            display: inline-block
+            position: relative
+            color: #b9c4e8
+            font-size: $font-l
+            &:hover
+              color: $t-d6
+            &:first-child
+              padding-left: 0
+          a.active
+            color: $t-d6
+          a.right_border
+            &:before  
+              content: ''
+              position: absolute
+              top: 50%
+              right: -1px
+              width: 1px
+              height: 14px
+              background: #666c80
+              margin-top: -7.5px
+        .c_content
+          line-height: 28px
+          color: $t-d6
+      .c_right
+        width: 480px
+        float: right
+        position: relative
+        .i_video_warp
+          right: 0
+          top: 0
+        .vjs-big-play-centered
+          border: 4px solid #0c132a
+  .wanglibao_introduction
+    background: #f0f4f7
+    .i_about_item
+      +content_width
+      padding: 80px 0 45px 55px
+      h3
+        color: #f97200
+        font-size: $font-xll
+        padding-bottom: 8px
+      .introduction
+        line-height: 28px
+        padding-bottom: 35px
+        color: $t-d11
+        font-size: $font-s
+  .why_choose
+    background: $t-d6
+    .i-guide-item
+      width: 1100px
+      margin: 75px auto 90px
+    .why_choose_title
+      text-align: center
+      color: #f97200
+      font-size: $font-xll
+    .ex_item_box
+      width: 220px
+      float: left
+      margin-right: 55px
+      text-align: center
+      .ex-item
+        width: 215px
+        height: 340px
+        margin: 0 auto
+        float: none
+        transition: all 0.2s ease-in-out
+        -webkit-transition: all 0.2s ease-in-out
+        -moz-transition: all 0.2s ease-in-out
+        -o-transition: all 0.2s ease-in-out
+
+        &:last-child
+          margin-right: 0
+        &:hover
+          box-shadow: 2px 2px 2px rgba(0,0,0,0.2)
+          transform: scale(1.05)
+          -webkit-transform: scale(1.043)
+          -moz-transform: scale(1.043)
+          -o-transform: scale(1.043)
+          -ms-transform: scale(1.043)
+          .ex-cont-tit
+            color: $t-d10
+          .ex-cont-small
+            color: $t-d11
+      .ex-item-head
+        height: 150px
+        line-height: 150px
+        .icon
+          font-size: 90px
+      .ex-item-cont
+        padding: 30px 0 0
+      .ex-cont-tit
+        color: $t-d11
+        padding-bottom: 0
+        margin-bottom: 0
+      .ex-cont-small
+        color: #999999
+        font-size: $font-s
+        line-height: 28px
+  .wanglibao_investor
+    background: #f0f4f7
+    .i-guide-item
+      width: 1100px
+      margin: 65px auto 0
+      .why_choose_title
+        text-align: center
+        color: #f97200
+        font-size: $font-xll
+    .guide-inver-us-cont
+      width: 970px
+      margin: 0
+      padding: 55px 0 0 55px
+  .wanglibao_leader_box
+    background: #324569
+    .i_about_item
+      +content_width
+      padding: 55px 0 75px
+      text-align: center
+      .why_choose_title
+        color: #f97200
+        font-size: $font-xll
+        padding-bottom: 40px
+      .mt64
+        margin-top: 64px
+      .wanglibao_leader
+        float: left
+        text-align: center
+        width: 198px
+        margin: 0 38px
+        .leader_photo
+          width: 130px
+          transition: all 0.1s ease-in-out
+          -webkit-transition: all 0.1s ease-in-out
+          -moz-transition: all 0.1s ease-in-out
+          -o-transition: all 0.1s ease-in-out
+          +line-height(130)
+          margin: 0 auto 8px
+          &:hover
+            -webkit-transform: scale(1.05)
+            -moz-transform: scale(1.05)
+            -o-transform: scale(1.05)
+            -ms-transform: scale(1.05)
+      @for $i from 1 through 8
+        .phone#{$i}
+          @include about-sprite(leader#{$i})
+        .leader_name
+          font-size: $font-l
+          color: $t-d6
+        .leader_title
+          color: #bec6d4
+          font-size: $font-m
+      .leader_info_detail
+        text-align: center
+        a
+          display: inline-block
+          width: 133px
+          +line-height(36)
+          color: #2294e5
+          font-size: $font-s
+          border: 1px solid #2294e5
+          border-radius: 5px
+          margin-top: 56px
+          &:hover
+            color: $t-d6
+            background: #2294e5
+  .wanglibao_style
+    background: $t-d6
+    .i_about_item
+      width: 1106px
+      margin: 0 auto
+      padding: 90px 0 105px
+      position: relative
+      .why_choose_title
+        color: #f97200
+        font-size: $font-xll
+        padding-bottom: 40px
+        text-align: center
+      .staff_style_boxs
+        width: 1106px
+        overflow: hidden
+        height: 370px
+        position: relative
+        .staff_photos
+          width: 100%
+          height: 370px
+          position: absolute
+          .staff_style_box
+            float: left
+            width: 1106px
+            a
+              overflow: hidden
+              position: relative
+              display: inline-block
+              width: 270px
+              height: 180px
+              margin-right: 6px
+              zoom: 1
+              .box-shadow
+                width: 270px
+                height: 180px
+                position: absolute
+                top: 0
+                left: 0
+                background: rgba(0,0,0,0.3)
+                transition: all 0.3s ease-in-out
+                -webkit-transition: all 0.3s ease-in-out
+                -moz-transition: all 0.3s ease-in-out
+                -o-transition: all 0.3s ease-in-out
+              img
+                width: 270px
+                height: 180px
+              &:hover
+                .box-shadow
+                  top: 180px
+      .pre_page,.next_page
+        position: absolute
+        width: 38px
+        +line-height(90)
+        top: 50%
+        left: -80px
+        text-align: center
+        cursor: pointer
+        i
+          @include about-sprite(pre)
+          width: 12px
+          height: 21px
+          display: inline-block
+          vertical-align: middle
+        &:hover
+          background: #b6b7b8
+          border-radius: 6px 0 0 6px
+          i
+            @include about-sprite(pre_hover)
+      .next_page
+        right: -80px
+        left: inherit
+        i
+          @include about-sprite(next)
+        &:hover
+          border-radius: 0 6px 6px 0
+          i
+            @include about-sprite(next_hover)
+    .photo_hover
+      .pre_page
+        background: #b6b7b8
+        border-radius: 6px 0 0 6px
+        i
+          @include about-sprite(pre_box_hover)
+      .next_page
+        background: #b6b7b8
+        border-radius: 0 6px 6px 0
+        i
+          @include about-sprite(next_box_hover)
+.video-js .vjs-big-play-button
+  line-height: 3em
+  height: 3em
+  border-radius: 1.5em
+.video-js .vjs-big-play-button
+  margin-top: -1.5em
+.vjs-big-play-button:before
+  font-size: 2em
+
+.media_box
+  +content_width
+  margin: 29px auto 80px
+  background: $bg-d3
+  .media_list
+    dl
+      padding: 40px 0
+      margin: 0 60px
+      border-bottom: 1px dotted #ebebeb
+      &:last-child
+        border: 0 none
+      dt
+        width: 220px
+        height: 140px
+        float: left
+        margin-right: 30px
+        img
+          margin-top: 5px
+          width: 100%
+          height: 100%
+      dd
+        float: left
+        width: 730px
+      .media_title
+        color: $t-d10
+        font-size: $font-l
+        padding-bottom: 10px
+      .media_content
+        line-height: 28px
+        height: 56px
+        font-size: $font-s
+        color: #999999
+        a
+          color: #2294e5
+          &:hover
+            text-decoration: underline
+      .postion_dd
+        overflow: hidden
+        position: relative
+        a
+          background: #ffffff
+          padding-left: 20px
+          position: absolute
+          right: 0
+          top: 28px
+      .media_time
+        color: #999999
+        font-size: $font-xs
+    dl.milestone_dd
+      dd
+        width: 100%
+        float: none
+.page_nav
+  +content_width
+  margin-top: 22px
+  color: #999999
+  font-size: $font-xs
+  a
+    color: #999999
+    &:hover
+      color: #666666
+      text-decoration: underline
+
+.detail_box
+  padding: 40px 60px 60px
+  text-align: center
+  margin-top: 12px
+  h3
+    color: $t-d10
+    font-size: $font-xll
+  .media_coverage_time
+    padding: 20px
+    color: #999999
+    font-size: $font-s
+    border-bottom: 1px solid #ebebeb
+  .medil_detail
+    padding: 40px 10px 0
+    text-align: left
+  .announcement_detail
+    border-bottom: 1px solid #ebebeb
+    padding-bottom: 10px
+    h3
+      float: left
+    span
+      float: right
+      padding-right: 18px
+      color: #999999
+      font-size: $font-s
+      +line-height(36)
+      display: inline-block
+.notice_list
+  padding: 24px 60px 20px
+  ul
+    margin-bottom: 30px
+  li.notice_title
+    +line-height(65)
+    &:last-child
+      border: 0 none
+    border-bottom: 1px dashed #ececec
+    a
+      width: 780px
+      display: inline-block
+      color: $t-d11
+      font-size: $font-l
+      float: left
+      +line-height(65)
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
+      i
+        width: 8px
+        height: 14px
+        display: inline-block
+        @include about-sprite(notice)
+        vertical-align: middle
+        margin-right: 8px
+      &:hover
+        color: #d94a44
+        i
+          @include about-sprite(notice_hover)
+    span
+      color: #999999
+      font-size: $font-m
+      float: right
+
+.hiring_box
+  +content_width
+  margin: 30px auto 70px
+  .hiring_banner
+    background: url(/static/imgs/pc/about/job.jpg) no-repeat
+    width: 100%
+    height: 340px
+  .hiring_content
+    padding: 55px 58px 90px
+    background: #ffffff
+    .company_email,.job_info
+      color: $t-d11
+      font-size: $font-s
+      a
+        color: #d94a44
+        font-weight: bold
+    .job_info
+      padding-top: 5px
+      span
+        color: $t-d10
+        font-weight: inherit
+    .job_class
+      margin-top: 60px
+      span
+        padding: 0 29px
+        display: inline-block
+        +line-height(32)
+        color: #999999
+        font-size: $font-m
+        border-radius: 5px
+        border: 1px solid $t-d6
+        margin-right: 13px
+        cursor: pointer
+        &:hover
+          border: 1px solid #4a7fea
+          color: #4a7fea
+      .active
+        background: #4a7fea
+        color: $t-d6
+        &:hover
+          color: $t-d6
+    .job_list
+      .job_title
+        .job_title_h
+          padding: 26px 0 23px
+          border-bottom: 1px dotted #ededed
+          cursor: pointer
+          &:hover
+            span
+              color: $t-d10
+          span
+            color: $t-d11
+            font-size: $font-l
+            display: inline-block
+            float: left
+            margin-left: 10px
+          i
+            width: 18px
+            height: 19px
+            display: inline-block
+            vertical-align: middle
+            float: right
+            margin: 5px 10px 0 0
+          i
+            @include about-sprite(close)
+          i.open
+            @include about-sprite(open)
+      .job_title:nth-child(even)
+        background: #f7f7f7
+      .job_detail
+        padding-left: 10px
+        .job_address
+          margin-top: 30px
+          color: #999999
+          font-size: $font-s
+        .duty
+          margin-top: 30px
+          color: $t-d10
+          font-size: $font-m
+        p
+          font-size: $font-s
+          line-height: 28px
+.team_box
+  +content_width
+  margin: 19px auto 70px
+  .team_banner
+    img
+      width: 100%
+  .leader_list
+    padding: 56px 80px 40px
+    .photo_bg
+      width: 172px
+      height: 172px
+      position: relative
+      overflow: hidden
+      .photo_bg_box
+        position: absolute
+        @include about-sprite(photo_bg)
+        width: 172px
+        height: 172px
+        z-index: 100
+      img
+        width: 172px
+        height: 172px
+        position: absolute
+        left: 0px
+        top: 0px
+    .leader_info
+      width: 730px
+      .leader_name_job
+        padding: 8px 0
+        span
+          color: #f57000
+          font-size: $font-xll
+        label
+          color: #999999
+          font-size: $font-xl
+      p
+        line-height: 29px

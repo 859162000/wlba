@@ -1636,6 +1636,10 @@ class BaJinSheRegister(CoopRegister):
         self.call_back_url = settings.CHANNEL_CENTER_CALL_BACK_URL
 
     @property
+    def channel_user(self):
+        return self.request.session.get(self.internal_channel_user_key, '')
+
+    @property
     def oauth2_client_id(self):
         return self.request.session.get(self.internal_channel_client_id_key, None)
 
@@ -1713,9 +1717,10 @@ class BaJinSheRegister(CoopRegister):
                 base_data = generate_coop_base_data('register')
                 act_data = {
                     'client_id': client_id,
+                    'bid': self.channel_user,
                     'phone': user.wanglibaouserprofile.phone,
                     'btype': self.channel_code,
-                    'user': user.id,
+                    'user_id': user.id,
                 }
                 data = dict(base_data, **act_data)
                 res = requests.post(url=self.call_back_url, data=data)
@@ -1735,11 +1740,15 @@ class BaJinSheRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id, catalog=u'申购').values().first()
         if p2p_record:
             p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            p2p_record['amount'] = float(p2p_record['amount'])
+            p2p_record['product'] = p2p_record['product_id']
             base_data = generate_coop_base_data('purchase')
 
             margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')
             margin_record = margin_record_query.values().first()
             margin_record['create_time'] = margin_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            margin_record['amount'] = float(margin_record['amount'])
+            margin_record['margin_current'] = float(margin_record['margin_current'])
             act_data = {
                 'p2p_record': json.dumps(p2p_record),
                 'margin_record': json.dumps(margin_record),
@@ -1762,11 +1771,11 @@ class BaJinSheRegister(CoopRegister):
             pay_info_data = {
                 'type': pay_info.type,
                 'uuid': pay_info.uuid,
-                'amount': pay_info.amount,
-                'fee': pay_info.fee,
-                'management_fee': pay_info.management_fee,
-                'management_amount': pay_info.management_amount,
-                'total_amount': pay_info.total_amount,
+                'amount': float(pay_info.amount),
+                'fee': float(pay_info.fee),
+                'management_fee': float(pay_info.management_fee),
+                'management_amount': float(pay_info.management_amount),
+                'total_amount': float(pay_info.total_amount),
                 'status': pay_info.status,
                 'user_id': pay_info.user.id,
                 'order_id': pay_info.order.id,
@@ -1777,8 +1786,8 @@ class BaJinSheRegister(CoopRegister):
                 'catalog': margin_record.catalog,
                 'order_id': margin_record.order_id,
                 'user_id': margin_record.user.id,
-                'amount': margin_record.amount,
-                'margin_current': margin_record.margin_current,
+                'amount': float(margin_record.amount),
+                'margin_current': float(margin_record.margin_current),
                 'description': margin_record.description,
                 'create_time': margin_record.create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
