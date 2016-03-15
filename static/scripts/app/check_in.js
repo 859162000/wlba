@@ -294,6 +294,7 @@ org.checin_in = (function () {
                 _self.appShare.touchShare({
                     title: '每天签到白拿体验金，签满7天打开大礼包！',
                     content: '点我签到',
+                    image: 'https://staging.wanglibao.com/static/imgs/app/checkin/share_img_check.png',
                     shareUrl: 'https://staging.wanglibao.com/api/m/check-in-share/'
                 })
             });

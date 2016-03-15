@@ -237,8 +237,8 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com/',
-                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+            var host = 'https://staging.wanglibao.com/',
+                shareImg = host + '/static/imgs/app/checkin/share_img_check.png',
                 shareLink = window.location.href,
                 shareMainTit = '每天签到白拿体验金，签满7天打开大礼包！',
                 shareBody = '点我签到';
