@@ -11,14 +11,6 @@ html(style='background: #FFE9D0')
 
     img(src='/static/imgs/app/checkin/banner.jpg').check-in-banner
 
-    section.check-in-alert-layout
-      .check-alert-mask
-        .check-alert-body
-          #check-body-overflow-icon.overflow-gift
-          img(src='/static/imgs/app/checkin/alert_leo.png').check-body-leo
-          .check-body-gift-information 今日签到成功！获得888元体验金
-          .check-body-where-information 在(我的账户－体验金)中查看
-          .check-body-opeartion-btn 我知道了
 
     section.check-in-operation
       .checkin-op-status
@@ -50,7 +42,14 @@ html(style='background: #FFE9D0')
       .check-rules-detail  3.连续签到每满7天，可拆一次体验金礼包
       .check-rules-detail  4.连续签到每满28天，可拆一次神秘大礼包
 
-
+    section.check-in-alert-layout
+      .check-alert-mask
+        .check-alert-body
+          #check-body-overflow-icon.overflow-gift
+          img(src='/static/imgs/app/checkin/alert_leo.png').check-body-leo
+          .check-body-gift-information 今日签到成功！获得888元体验金
+          .check-body-where-information 在(我的账户－体验金)中查看
+          .check-body-opeartion-btn 我知道了
 
 
     script(src="/static/scripts/component/webview.js?v=2222")
