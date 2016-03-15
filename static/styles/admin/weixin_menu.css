@@ -28,6 +28,7 @@
 }
 .weixin_menu_handler a {
     -webkit-flex: 1;
+    color: red;
     flex: 1;
     font-size: 16px;
     line-height: 48px;
