@@ -156,6 +156,8 @@ urlpatterns += patterns(
     url(r'^recharge/kuaijie/', TemplateView.as_view(template_name="center_recharge_kuaijie.jade")),
     url(r'^gold/', TemplateView.as_view(template_name="center_gold.jade")),
     url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
+    url(r'^accrual/', TemplateView.as_view(template_name="center_redpack_accrual.jade")),
+    url(r'^pack/', TemplateView.as_view(template_name="center_redpack_pack.jade")),
 )
 
 if settings.DEBUG:

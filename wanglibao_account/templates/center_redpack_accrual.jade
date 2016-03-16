@@ -1,0 +1,39 @@
+extends center_redpack_base
+
+
+
+block redpack
+  .c-transaction-bar
+    a(href='/accounts/accrual/').active-bar
+      span
+        i.iconfont.icon-gold-bar.icon.inline-block
+        span.inline-block 加息券
+
+    a(href='/accounts/pack/')
+      span
+        i.iconfont.icon-gold-bar.icon.inline-block
+        span.inline-block 红包
+
+  .c-layout
+    .c-redpack-status
+      a(href='').active 可使用
+      a(href='') 已使用
+      a(href='') 已过期
+    table.c-redpack-table
+      thead
+        tr
+          th 红包名称
+          th 金额(元)
+          th 使用详情
+          th 使用时间
+      tbody
+        mixin tr()
+          tr
+            td 黄金街加息
+            td 20.0
+            td 黄金宝hddd
+            td 2015-11-15 22:22:22
+        +tr()
+        +tr()
+        +tr()
+        +tr()

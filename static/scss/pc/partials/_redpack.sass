@@ -1,0 +1,45 @@
+
+.redpack-exchange-warp
+  display: inline-block
+  padding: 40px 0 50px
+.redpack-input
+  width: 238px
+  height: 40px
+  text-align: center
+  line-height: 40px
+  font-size: 14px
+  color: #b2b2b2
+  border: 1px solid #d9d9d9
+  &::-webkit-input-placeholder
+    color: #b2b2b2
+.c-blue-button
+  +c-blue-button()
+
+.c-layout
+  .c-redpack-status
+    padding: 40px 0 20px 0
+    a
+      display: inline-block
+      +c-blue-button(100, 30, 16, '#666', '#fff', '#fff')
+      &:hover
+        +c-blue-button(100, 30)
+    a.active
+      +c-blue-button(100, 30)
+
+table.c-redpack-table
+  width: 100%
+  table-layout: fixed
+  border-collapse: collapse
+  thead
+    tr
+      border-bottom:  1px solid #ebebeb
+      background: #fafafa
+  th,td
+    text-align: center
+    padding: 10px 0
+    color: #999
+    font-size: 12px
+  tr
+    &:nth-child(even)
+      background: #f5f5f5
+

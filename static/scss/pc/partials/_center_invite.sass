@@ -1,10 +1,19 @@
-
+@mixin c-blue-button($width: 90, $height: 40, $font: 16, $color: #fff, $bf: #477ced, $bf-ac: #245EDA)
+  width: $width + px
+  height: $height + px
+  color: $color
+  font-size: $font + px
+  text-align: center
+  line-height: $height + px
+  padding: 0
+  border: 0
+  background: $bf
+  &:hover
+    background: $bf-ac
 
 .c-invite-table
   width: 100%
   border: 1px solid #ebebeb
-  tr
-
   td
     width: 25%
     padding: 25px 5px
@@ -13,3 +22,69 @@
 .c-invite-rules
   .rule-list
     line-height: 24px
+
+.c-invite-opeartion
+  .invite-head-item
+    display: inline-block
+    vertical-align: middle
+    width: 100px
+    height: 40px
+    line-height: 40px
+    text-align: right
+    font-size: 16px
+    color: #666
+  .invite-code
+    width: 440px
+    height: 40px
+    line-height: 40px
+    text-align: center
+    font-size: 14px
+    color: #666
+    border: 1px solid #e6e6e6
+
+  input
+    +c-blue-button()
+
+  .invite-link
+    width: 542px
+    height: 100px
+    overflow: auto
+    border: 1px solid #e6e6e6
+    padding: 17px
+    line-height: 20px
+    
+  .share-icon
+    float: left
+    width: 32px
+    height: 32px
+    margin-right: 10px
+    cursor: pointer
+  .icon-weixin
+    background: url("/static/imgs/pc/center/invite_weixin.jpg") no-repeat center
+  .icon-weibo
+    background: url("/static/imgs/pc/center/invite_weibo.jpg") no-repeat center
+  .icon-kongjian
+    background: url("/static/imgs/pc/center/invite_kongjian.jpg") no-repeat center
+  .icon-douban
+    background: url("/static/imgs/pc/center/invite_douban.jpg") no-repeat center
+  .icon-renren
+    background: url("/static/imgs/pc/center/invite_renren.jpg") no-repeat center
+  .icon-kaixin
+    background: url("/static/imgs/pc/center/invite_kaixin.jpg") no-repeat center
+
+.c-invite-people-table
+  table-layout: fixed
+  border-collapse: collapse
+  font-size: 12px
+  width: 100%
+  thead
+    background: #fafafa
+    color: #999
+  th,td
+    text-align: center
+    padding: 10px 0
+  td
+    color: #666
+  tbody
+    tr
+      border-bottom: 1px solid #e6e6e6

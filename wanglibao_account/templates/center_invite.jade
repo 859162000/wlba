@@ -15,7 +15,7 @@ block main
         tbody
           tr
             td(rowspan='2').bg-d2
-              .t-d2.font-lll 1228.0元
+              .t-d2.font-lll 1228.0
               .t-d23.font-xs 理财佣金(元)
             td(colspan='2')
               .t-d10.font-ll 10000
@@ -29,7 +29,7 @@ block main
               .t-d23.font-xs 好友的好友(人)/投资额(元)
 
 
-     .c-invite-rules.font-ss
+     .c-invite-rules.font-ss.mg-b-xl
        .t-d10.font-xl.mg-b-s 邀请好友一起，成为百万富翁！
        .rule-list.t-d11 1、邀请好友注册网利宝，若好友注册后，投资3个月以上（含3个月）项目，则享有好友投资额3‰作为邀请佣金；若好友再邀请他人注册并投资3个月以上（含3个月）项目，可与好友一起享有投资额的3‰作为邀请佣金；
        .rule-list.t-d11 2、被邀请人注册时须使用邀请人提供的专属链接或专属邀请码，活动邀请关系方成立，网利宝仅以此确认邀请关系；
@@ -38,3 +38,57 @@ block main
        .rule-list.t-d2 5、被邀请人完成注册并投资后，邀请人最高可获得100元现金红包，满3000元可用；
        .rule-list.t-d11 6、此次活动解释权归网利宝官网所有。
        .rule-list.t-d19 活动有效期：2015年6月23日-2016年6月30日
+
+     .c-invite-opeartion
+       .invite-opeartion-list
+         .invite-head-item.inline-block 专属邀请码：
+         .invite-body.inline-block.clearfix
+           .invite-code.fl.mg-r-s ikasd92
+           input(type='button', value='复制').fr
+
+       .invite-opeartion-list.mg-b-sm
+         .invite-head-item.inline-block
+         .invite-body.inline-block
+           .t-d19.font-xs 这是您的专用邀请码，您可点击【复制】分享给朋友，让他们注册帐号时输入您的邀请码。
+
+       .invite-opeartion-list
+         .invite-head-item.inline-block 专属链接：
+         .invite-body.font-xs.inline-block
+           .invite-link.t-d11 来网利宝投资，让钱生钱！现在受邀注册理财即可获得28888元体验金及最高300元现金红包，APP投资分享还送加息券。IDG资本、百亿A股上市公司超4000万美金投资平台，100%本息保障，100元起投资，立即去看看～ 戳这里>>
+             span.t-d20 https://www.wanglibao.com/?promo_token=ik7j32
+
+       .invite-opeartion-list.mg-t-s
+         .invite-head-item.inline-block
+         .invite-body.clearfix.inline-block
+           .t-d19.font-xs.inline-block 这是您的专用邀请链接，您可点击【复制】，将本文粘贴并发送给您的好友。
+           input(type='button', value='复制').inline-block.mg-l-xl
+
+       .invite-opeartion-list.mg-t-sm.mg-b-xl
+         .invite-head-item.inline-block 分享到社区：
+         .invite-body.inline-block.clearfix
+           .icon-weixin.share-icon
+           .icon-weibo.share-icon
+           .icon-kongjian.share-icon
+           .icon-douban.share-icon
+           .icon-renren.share-icon
+           .icon-kaixin.share-icon
+     .c-invite-people-warp.tc
+       .c-invite-people-head.t-d10.font-m.mg-b-sm 邀请列表
+       table.c-invite-people-table
+         thead
+          tr
+            th 用户名
+            th 手机号
+            th 好友注册时间
+         tbody
+            tr
+              td ＊呵呵
+              td 151＊＊＊2333
+              td 2015-10-30 13:10:11
+            tr
+              td ＊呵呵
+              td 151＊＊＊2333
+              td 2015-10-30 13:10:11
+       .c-invite-people-pager.padding-b-l
+         include include/center_pager
+
