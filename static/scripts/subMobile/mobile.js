@@ -866,7 +866,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: false,
+                        debug: true,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -927,11 +927,15 @@ org.detail = (function (org) {
                     success: function(){
                         alert("QQ");
                         success && success();
+                    },
+                    cancel: function(){
+                        alert("取消QQ");
                     }
                 });
+                hide = false;
                 if(hide){
                     wx.hideMenuItems({
-                        menuList: ['menuItem:share:timeline'],
+                        menuList: ['menuItem:share:timeline','menuItem:favorite'],
                         success: function (res) {
                           //alert('已隐藏“分享到朋友圈”按钮');
                         },
