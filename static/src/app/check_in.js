@@ -36,6 +36,7 @@ org.ui = (function () {
 org.checin_in = (function () {
     var lib = {
         appShare: null,
+        limit_gift: false,
         init: function(mixins){
             lib.appShare = mixins
             lib.fetch();
@@ -73,8 +74,8 @@ org.checin_in = (function () {
             $('.checkin-op-share').on('click',function(){
                 if(shareStaus) return
                 _self.appShare.touchShare({
-                    title: '每天签到白拿体验金，签满7天打开大礼包！',
-                    content: '点我签到',
+                    title: '网利宝天天送我钱，连拿7天还送大礼包!',
+                    content: '速来抢钱',
                     image: 'https://staging.wanglibao.com/static/imgs/app/checkin/share_img_check.png',
                     shareUrl: 'https://staging.wanglibao.com/api/m/check-in-share/'
                 })
@@ -102,6 +103,7 @@ org.checin_in = (function () {
             $checkIn.find('.op-dec-detail').text('+'+amount+'元体验金');
         },
         steriousGift:function(acount){
+            if(acount ===0) return  $('.bar-content').text('请领取神秘礼物')
             $('.bar-content').text('距离神秘礼包还有'+acount+'天')
         },
         process: function(result){
@@ -157,6 +159,7 @@ org.checin_in = (function () {
 
             //连续签到日
             var continue_days = resultCopy.continue_days;
+            var steriousGift_days = resultCopy.mysterious_day;
 
             //当日是否签到
             if(!resultCopy.status){
@@ -165,6 +168,7 @@ org.checin_in = (function () {
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                             triggerUI(data.data.continue_days)
                             _self.signIn(true, data.data.experience_amount)
+                            _self.steriousGift(steriousGift_days - 1);
                         })
                     }
                     //签到成功更新连续签到日
@@ -174,7 +178,7 @@ org.checin_in = (function () {
                         $.each($('.flag-items'), function(){
                             if($(this).attr('data-continue') * 1 == count){
                                 if($(this).hasClass('active-gift')){
-                                    $(this).addClass('active-gift-active').removeClass('active-gift');
+                                    $(this).addClass('active-gift-active').removeClass('active-gift').siblings('.flag-items').removeClass('active-doing');
                                 }else{
                                     $(this).addClass('active-did active-doing').siblings('.flag-items').removeClass('active-doing')
                                 }
@@ -193,7 +197,10 @@ org.checin_in = (function () {
                     if(resultCopy.continueGiftFetched){
                         org.ui.alert('礼物已经领取过了！')
                     }else{
-                        _self.fetchGift(continue_days)
+                        if(!_self.limit_click){
+                            _self.limit_click =true
+                            _self.fetchGift(continue_days)
+                        }
                     }
                 }else if(giftDay > 0){
                     console.log(giftDay)
@@ -227,13 +234,17 @@ org.checin_in = (function () {
                 },
                 success: function(data){
                     if(data.ret_code ===0){
-                        _self.checkInAlert('gift', data.message, '在(我的账户)中查看');
-                        _self.steriousGift(data.mysterious_day)
-                        $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
+                        _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
+                            _self.steriousGift(data.mysterious_day)
+                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
+                        });
                     }
                     if(data.ret_code < 0){
                         org.ui.alert(data.message)
                     }
+                },
+                complete: function(){
+                    _self.limit_click = false
                 }
             })
         },
@@ -264,6 +275,7 @@ org.checin_in = (function () {
             $target.show()
             $('.check-body-opeartion-btn').on('click',function(){
                 $target.hide()
+                console.log(callback)
                 callback && callback()
             })
         }

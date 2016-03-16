@@ -23,7 +23,7 @@ html
                         dd.media_title
                             a(href="/news/detail/{{news.id}}", target="_blank") {{news.name}}
                         dd.media_content.postion_dd
-                            a(href="/news/detail/{{news.id}}",target="_blank") {{news.description}}
+                            a.description(href="/news/detail/{{news.id}}",target="_blank") {{news.description}}
                             a.link(href="/news/detail/{{news.id}}",target="_blank") [详细介绍]
                         dd.media_time {{news.created_at|date:"Y-m-d H:i"}}
 
@@ -31,5 +31,7 @@ html
               - with data=news_list uri='/news/list/'
               include include/pager
               - endwith
+    script.
+        require(["/static/src/pc/str.js?v=22"])
     include global/g_footer
     include include/tracking

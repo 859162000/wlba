@@ -22,7 +22,7 @@ html
                             content = len(info.content)
                             if content > 70
                                 dd.media_content.postion_dd
-                                 a(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.content|safe}}
+                                 a.contentA(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.content|safe}}
                                     a.link(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
                             else
                                 dd.media_content {{info.content|safe}}
@@ -32,6 +32,8 @@ html
                       - with data=data uri='/dynamic/'
                       include include/pager
                       - endwith
+        script.
+            require(["/static/src/pc/str.js?v=22"])
         include global/g_footer
         include include/tracking
                
