@@ -464,7 +464,7 @@ def msg_redpack_give_percent(amount, highest_amount, name, dt):
 
 
 # 全民淘金短信站内信模板
-@suffix_td
+@suffix
 def sms_income(name, count, amount):
     return u"亲爱的{}，今日您共有{}个好友参与投资，为您产生的理财佣金为{}元已发放，" \
            u"请进入我的账户－全民淘金中查询！感谢您的支持。".format(name, count, amount)
