@@ -2673,12 +2673,14 @@ org.checkIn = (function(org){
                     org.ui.alert("还未达到礼品日");
                     return;
                 }
-
                 var self = $(this),
                     now = 0;
                 lib.altDom.prop("class","check-in-alert-layout");
                 if(self.hasClass("active-gift-open")){
                     lib.altDom.find("#gift-msg").html("您已领取礼物！");
+                    setTimeout(function(){
+                        lib.altDom.show();
+                    },1);
                 }else{
                     if(giftOk){
                         giftOk = false;
@@ -2691,13 +2693,15 @@ org.checkIn = (function(org){
                             success: function(data){
                                 self.addClass("active-gift-open");
                                 lib.altDom.find("#gift-msg").html(data.message);
+                                setTimeout(function(){
+                                    lib.altDom.show();
+                                },1);
                                 $("div.bar-content").html('距离神秘礼包还有<span id="giftDay">'+ data.mysterious_day +'</span>天');
                                 giftOk = true;
                             }
                         });
                     }
                 }
-                lib.altDom.show();
             });
         },
         shareFn: function(){//分享成功后，领取奖励
