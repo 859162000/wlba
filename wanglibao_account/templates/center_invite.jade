@@ -1,0 +1,40 @@
+extends center_base
+-load formatters
+block head
+  - with '全民淘金' as title
+  include global/g_head
+  -endwith
+block sidebar
+  - with '全民淘金' as activeItem
+  include include/center_sidebar
+  -endwith
+block main
+  .c-main-white.c-auto-height.c-layout
+     .padding-t-xxl.mg-b-xxl
+      table.c-invite-table
+        tbody
+          tr
+            td(rowspan='2').bg-d2
+              .t-d2.font-lll 1228.0元
+              .t-d23.font-xs 理财佣金(元)
+            td(colspan='2')
+              .t-d10.font-ll 10000
+              .t-d23.font-xs 邀请投资总额(元)
+          tr
+            td
+              .t-d10.font-ll 2/1,000
+              .t-d23.font-xs 好友(人)/投资额(元)
+            td
+              .t-d10.font-ll 1/100
+              .t-d23.font-xs 好友的好友(人)/投资额(元)
+
+
+     .c-invite-rules.font-ss
+       .t-d10.font-xl.mg-b-s 邀请好友一起，成为百万富翁！
+       .rule-list.t-d11 1、邀请好友注册网利宝，若好友注册后，投资3个月以上（含3个月）项目，则享有好友投资额3‰作为邀请佣金；若好友再邀请他人注册并投资3个月以上（含3个月）项目，可与好友一起享有投资额的3‰作为邀请佣金；
+       .rule-list.t-d11 2、被邀请人注册时须使用邀请人提供的专属链接或专属邀请码，活动邀请关系方成立，网利宝仅以此确认邀请关系；
+       .rule-list.t-d2  3、活动期间内，邀请人获得的邀请佣金累计无上限；
+       .rule-list.t-d2 4、被邀请人受邀注册后，可获得28888元体验金及最高300元现金红包；
+       .rule-list.t-d2 5、被邀请人完成注册并投资后，邀请人最高可获得100元现金红包，满3000元可用；
+       .rule-list.t-d11 6、此次活动解释权归网利宝官网所有。
+       .rule-list.t-d19 活动有效期：2015年6月23日-2016年6月30日

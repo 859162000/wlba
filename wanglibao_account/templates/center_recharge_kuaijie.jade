@@ -9,14 +9,19 @@ block sidebar
   include include/center_sidebar
   -endwith
 block main
-  .center-main-white.center-auto-height
-    .center-transaction-bar
+  .c-main-white.c-auto-height
+    .c-transaction-bar
       a(href='/accounts/recharge/huifu/') 汇付天下
       a(href='/accounts/recharge/yipay/') 易宝支付
       a(href='/accounts/recharge/kuaijie/').active-bar 快捷支付
-    .center-racharge-warp.center-layout
+    .c-racharge-warp.recharge-kuaijie-layout
 
-      .rechar-bank
+      .recharge-bank-item
+        .bank-icon(style="background: url('/static/imgs/pc/center/bank_default.png')")
+        span.bank-info
+          .bank-name.t-d10.font-l 中国工商银行 | 6222****283
+          .font-sm.t-d19 单笔限额2000元，单日限额2万元
+
 
 
       table.withdraw-table

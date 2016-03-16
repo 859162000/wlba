@@ -9,9 +9,9 @@ block sidebar
   include include/center_sidebar
   -endwith
 block main
-  .center-main-white.center-layout
+  .c-main-white.c-layout
 
-    .center-rockoning-fund
+    .c-rockoning-fund
       .span3
         .fund-amount 10,000
           span.fund-point .00
@@ -29,7 +29,7 @@ block main
           span.fund-point .00
         .fund-explain 暂冻结资金
 
-    .center-rockoning-earning
+    .c-rockoning-earning
       .span4.after-line
         .earning-item
           span.earning-expain 累计到帐收益：
@@ -59,7 +59,7 @@ block main
             span.earning-add-mark +
             |10.58
 
-    .center-rockoning-filter
+    .c-rockoning-filter
       .rockoning-filter-title.t-d11.font-l 账单记录
       .space-vertical-s
       .rockoning-filter-item
@@ -71,7 +71,7 @@ block main
             .checkbox-tager 近60天
 
           .fr
-            include include/center-filter-date
+            include include/center_filter_date
         .rockoning-filter-list.clearfix
           .fl
             span.t-d19.font-s 资金类型：
@@ -92,9 +92,9 @@ block main
             .checkbox-tager 其他
 
 
-    .center-from-opeartion
+    .c-from-opeartion
       .space-vertical-l
-      table.center-table
+      table.c-table
         thead
           tr
             th 操作时间

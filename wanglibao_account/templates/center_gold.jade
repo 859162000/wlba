@@ -1,0 +1,65 @@
+extends center_base
+-load formatters
+
+block head
+
+  - with '体验金' as title
+  include global/g_head
+  -endwith
+
+block sidebar
+  - with '体验金' as activeItem
+  include include/center_sidebar
+  -endwith
+
+
+block main
+  .c-main-white.c-auto-height.c-layout
+    .c-gold-head.clearfix
+      .c-gold-title.t-d19.font-l.fl 体验金专区
+      .font-xs.fr.mg-t-xs
+        i.iconfont.icon-center-invest.font-xs.t-d16
+        a(href='/').open-gold-ac 查看体验金活动
+
+    .c-gold-rockoning-warp
+      .c-gold-rockoning.tc.clearfix
+        .span3
+          .t-d10.font-ll 10,02200.22
+          .t-d11.font-xs 体验金总资产(元)
+        .span3
+          .t-d10.font-ll 12500.22
+          .t-d11.font-xs 体验金余额(元)
+        .span3
+          .t-d2.font-ll 20.22
+          .t-d11.font-xs 到帐收益(元)
+        .span3
+          .t-d10.font-ll 95,000.22
+          .t-d11.font-xs 待收收益(元)
+      .c-gold-explain
+        .inline-block.t-d19.font-xs 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除，
+        .gold-rules
+          a(href='') 体验金领取及使用说明。
+
+    table.c-gold-p2p
+        thead
+          tr
+            th(colspan='4')
+              .t-d11.font-m 体验理财标
+        tbody
+          mixin tr()
+            tr
+              td
+                .t-d11.font-ll 1228.0元
+                .t-d19.font-s 体验金
+              td
+                .t-d11.font-ll 10.0%
+                .t-d19.font-s 年华收益
+              td
+                .t-d11.font-ll 一天
+                .t-d19.font-s 投资期限
+              td
+                .gold-submit 立即投资
+          +tr()
+          +tr()
+
+    .golg-history.t-d11.font-s.tc.mg-t-xxxlll 查看历史投资项目

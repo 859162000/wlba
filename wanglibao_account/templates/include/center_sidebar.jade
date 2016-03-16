@@ -19,15 +19,15 @@ mixin sidebarItem(name, link, target, iconName)
   .sidebar-list
     +sidebarTitle('投资管理')
     .sidebar-list-items.clearfix
-      +sidebarItem('投资记录', '1', '', 'icon-books-new')
-      +sidebarItem('流水账单', '1', '', 'icon-bill')
+      +sidebarItem('投资记录', '/accounts/transaction/', '', 'icon-books-new')
+      +sidebarItem('流水账单', '/accounts/rockoning/', '', 'icon-bill')
       +sidebarItem('债权转让', '1', '', 'icon-arrows-2')
     .sidebar-items-line
 
   .sidebar-list
     +sidebarTitle('资金管理')
     .sidebar-list-items.clearfix
-      +sidebarItem('充值', '1', '', 'icon-rechare-bar')
+      +sidebarItem('充值', '/accounts/recharge/huifu/', '', 'icon-rechare-bar')
       +sidebarItem('提现', '1', '', 'icon-charge-bar')
       +sidebarItem('银行卡', '1', '', 'icon-card-bar')
     .sidebar-items-line
@@ -35,8 +35,8 @@ mixin sidebarItem(name, link, target, iconName)
   .sidebar-list
     +sidebarTitle('活动奖励')
     .sidebar-list-items.clearfix
-      +sidebarItem('体验金', '1', '', 'icon-gold-bar')
-      +sidebarItem('全民淘金', '1', '', 'icon-tao-random')
+      +sidebarItem('体验金', '/accounts/gold/', '', 'icon-gold-bar')
+      +sidebarItem('全民淘金', '/accounts/gold-invite/', '', 'icon-tao-random')
       +sidebarItem('理财券', '1', '', 'icon-redpack-bar')
     .sidebar-items-line
 

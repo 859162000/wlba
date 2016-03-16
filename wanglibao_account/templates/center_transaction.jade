@@ -10,26 +10,26 @@ block sidebar
   include include/center_sidebar
   -endwith
 block main
-  .center-main-white.center-from-opeartion
-    .center-transaction-bar
+  .c-main-white.c-from-opeartion
+    .c-transaction-bar
       a(href='').active-bar 散标投资
       a(href='') 月利宝
 
-    .center-from-opeartion
+    .c-from-opeartion.c-layout
       .space-vertical-l
 
-      .center-transaction-filter.clearfix
-        .center-filter-checkbox.fl
+      .c-transaction-filter.clearfix
+        .c-filter-checkbox.fl
           ul
             li.active-on 全部
             li 投标中
             li 还款中
             li 已还款
         .fr
-          include include/center-filter-date
+          include include/center_filter_date
 
       .space-vertical-s
-      table.center-table
+      table.c-table
         thead
           tr
             th 投资时间
