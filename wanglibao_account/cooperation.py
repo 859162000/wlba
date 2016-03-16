@@ -152,9 +152,15 @@ class BaJinSheSession(CoopSessionProcessor):
 
     def save_to_session(self):
         super(BaJinSheSession, self).save_to_session()
-        channel_phone = self.request.REQUEST.get(self.external_channel_phone_key, None)
-        sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
-        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
+
+        if self.request.META.get('CONTENT_TYPE') == 'application/json':
+            req_data = json.loads(self.request.body)
+        else:
+            req_data = self.request.REQUEST
+
+        channel_phone = req_data.get(self.external_channel_phone_key, None)
+        sign = req_data.get(self.external_channel_sign_key, None)
+        client_id = req_data.get(self.external_channel_client_id_key, None)
 
         if channel_phone:
             self.request.session[self.internal_channel_phone_key] = channel_phone
