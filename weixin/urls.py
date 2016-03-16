@@ -81,11 +81,13 @@ urlpatterns = patterns(
     url(r'^award_index/$', login_required(TemplateView.as_view(template_name="sub_award.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
+    url(r'^sub_account_old/$', TemplateView.as_view(template_name="service_account_old.jade")),
 
     url(r'^sub_regist_first/$', login_required(TemplateView.as_view(template_name="service_registProcess_first.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_regist_second/$', login_required(views.WeixinRegisterBindCard.as_view(template_name="service_registProcess_second.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_regist_three/$', login_required(TemplateView.as_view(template_name="service_registProcess_three.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_account/$', login_required(main_views.AccountTemplate.as_view(template_name="service_account.jade"), login_url="/weixin/sub_login_redirect/"), name='sub_account'),
+    # url(r'^sub_account_old/$', login_required(TemplateView.as_view(template_name="service_account_old.jade"), login_url="/weixin/sub_login_redirect/")),
 
     url(r'^sub_recharge/$', login_required(main_views.RechargeTemplate.as_view(template_name="service_recharge.jade"), login_url="/weixin/sub_login_redirect/"), name="sub_recharge"),
     url(r'^sub_list/$', login_required(main_views.FwhP2PlistTemplate.as_view(template_name="service_list.jade"), login_url="/weixin/sub_login_redirect/")),
