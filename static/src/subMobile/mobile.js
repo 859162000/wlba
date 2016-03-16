@@ -2601,13 +2601,13 @@ org.checkIn = (function(org){
                     if(!result.sign_in.status){//签到
                         lib.checkIn();
                     }else{
-                        checkIn_detail.text("＋"+ lib.money +"体验金");
+                        checkIn_detail.text("＋"+ lib.money +"元体验金");
                     }
                     if(result.share.status){//分享
                         lib.isShare = true;
                         lib.shareAmount = result.share.amount;
                         checkShare.addClass("checkin-share-ok");
-                        checkShare.find(".op-detail-orange").text("＋"+ result.share.amount +"体验金");
+                        checkShare.find(".op-detail-orange").text("＋"+ result.share.amount +"元体验金");
                     }
                     for(var i=result.sign_in.start_day; i<=giftNum; i++){
                         if(i === nowDay && nowDay === giftNum){
