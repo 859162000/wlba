@@ -959,6 +959,7 @@ CKEDITOR_CONFIGS = {
             ['Smiley', 'SpecialChar'],
         ],
         'toolbar': 'custom',
+        'extraPlugins' : 'allMedias',
     },
     "mini":{
         'entities':False,
