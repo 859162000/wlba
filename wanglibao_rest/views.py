@@ -92,19 +92,25 @@ class AccessUserExistsApi(APIView):
                                         response_data = {
                                             'user_id': binding.bid,
                                             'code': 10000,
-                                            'msg': u'该号已注册'
+                                            'msg': u'该号已注册',
+                                            'invitation_code': binding.bid,
+                                            'ext': ''
                                         }
                                     elif not user:
                                         response_data = {
                                             'user_id': None,
                                             'code': 10001,
-                                            'msg': u'该号未注册'
+                                            'msg': u'该号未注册',
+                                            'invitation_code': None,
+                                            'ext': ''
                                         }
                                     else:
                                         response_data = {
                                             'user_id': None,
                                             'code': 10002,
-                                            'msg': u'该号已注册，非本渠道用户'
+                                            'msg': u'该号已注册，非本渠道用户',
+                                            'invitation_code': None,
+                                            'ext': ''
                                         }
 
                                     return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
@@ -112,37 +118,49 @@ class AccessUserExistsApi(APIView):
                                     response_data = {
                                         'user_id': None,
                                         'code': 10008,
-                                        'msg': u'无效签名'
+                                        'msg': u'无效签名',
+                                        'invitation_code': None,
+                                        'ext': ''
                                     }
                             else:
                                 response_data = {
                                     'user_id': None,
                                     'code': 10007,
-                                    'msg': u'手机号不存在'
+                                    'msg': u'手机号不存在',
+                                    'invitation_code': None,
+                                    'ext': ''
                                 }
                         else:
                             response_data = {
                                 'user_id': None,
                                 'code': 10006,
-                                'msg': u'无效客户端id不存在'
+                                'msg': u'无效客户端id不存在',
+                                'invitation_code': None,
+                                'ext': ''
                             }
                     else:
                         response_data = {
                             'user_id': None,
                             'code': 10005,
-                            'msg': u'客户端id参数不存在'
+                            'msg': u'客户端id参数不存在',
+                            'invitation_code': None,
+                            'ext': ''
                         }
                 else:
                     response_data = {
                         'user_id': None,
                         'code': 10004,
-                        'msg': u'签名参数不存在'
+                        'msg': u'签名参数不存在',
+                        'invitation_code': None,
+                        'ext': ''
                     }
             else:
                 response_data = {
                     'user_id': None,
                     'code': 10003,
-                    'msg': u'无效promo_token'
+                    'msg': u'无效promo_token',
+                    'invitation_code': None,
+                    'ext': ''
                 }
         else:
             return Http404(u'页面不存在')
