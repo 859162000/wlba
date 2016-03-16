@@ -888,6 +888,7 @@ class HasValidationAPIView(APIView):
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -932,6 +933,13 @@ class IdValidate(APIView):
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
 
+            profile = WanglibaoUserProfile.objects.filter(user=user).first()
+            if profile.id_is_valid:
+                return Response({
+                    "message": u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066",
+                    "error_number": ErrorNumber.try_too_many_times
+                })
+
             id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
             if id_verify_count >= 1:
                 return Response({
@@ -962,7 +970,7 @@ class IdValidate(APIView):
             # 处理第三方用户实名回调
             CoopRegister(self.request).process_for_validate(user)
 
-            return Response({ "validate": True }, status=200)
+            return Response({"validate": True}, status=200)
 
         else:
             return Response({
@@ -971,38 +979,38 @@ class IdValidate(APIView):
                             }, status=400)
 
 
-class AdminIdValidate(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request, *args, **kwargs):
-        # add by ChenWeiBin@2010105
-        if request.user.wanglibaouserprofile.utype == '3':
-            return Response({
-                "message": u"企业用户无法通过此方式认证",
-                "error_number": 30056,
-            }, status=400)
-
-        phone = request.DATA.get("phone", "")
-        name = request.DATA.get("name", "")
-        id_number = request.DATA.get("id_number", "")
-        verify_record, error = verify_id(name, id_number)
-
-        if error:
-            return Response({
-                                "message": u"验证失败",
-                                "error_number": ErrorNumber.unknown_error
-                            }, status=400)
-
-        user = User.objects.get(wanglibaouserprofile__phone=phone)
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.id_valid_time = timezone.now()
-        user.wanglibaouserprofile.save()
-
-        return Response({
-                            "validate": True
-                        }, status=200)
+# class AdminIdValidate(APIView):
+#     permission_classes = (IsAuthenticated,)
+#
+#     def post(self, request, *args, **kwargs):
+#         # add by ChenWeiBin@2010105
+#         if request.user.wanglibaouserprofile.utype == '3':
+#             return Response({
+#                 "message": u"企业用户无法通过此方式认证",
+#                 "error_number": 30056,
+#             }, status=400)
+#
+#         phone = request.DATA.get("phone", "")
+#         name = request.DATA.get("name", "")
+#         id_number = request.DATA.get("id_number", "")
+#         verify_record, error = verify_id(name, id_number)
+#
+#         if error:
+#             return Response({
+#                                 "message": u"验证失败",
+#                                 "error_number": ErrorNumber.unknown_error
+#                             }, status=400)
+#
+#         user = User.objects.get(wanglibaouserprofile__phone=phone)
+#         user.wanglibaouserprofile.id_number = id_number
+#         user.wanglibaouserprofile.name = name
+#         user.wanglibaouserprofile.id_is_valid = True
+#         user.wanglibaouserprofile.id_valid_time = timezone.now()
+#         user.wanglibaouserprofile.save()
+#
+#         return Response({
+#                             "validate": True
+#                         }, status=200)
 
 
 class LoginAPIView(DecryptParmsAPIView):
@@ -1650,51 +1658,6 @@ class BidHasBindingForChannel(APIView):
         return HttpResponse(json.dumps(response_data), content_type='application/json')
 
 
-class AccessUserExistsApi(APIView):
-    """第三方手机号注册及绑定状态检测接口"""
-
-    permission_classes = ()
-
-    def get(self, request, **kwargs):
-        channel_code = request.GET.get('promo_token', None)
-        if channel_code:
-            channel = get_channel_record(channel_code)
-            if channel:
-                phone = request.session.get('phone')
-                binding = get_coop_binding_for_phone(channel_code, phone)
-                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-                if binding and user:
-                    response_data = {
-                        'user_id': binding.bid,
-                        'ret_code': 10000,
-                        'message': u'该号已注册'
-                    }
-                elif not user:
-                    response_data = {
-                        'user_id': None,
-                        'ret_code': 10001,
-                        'message': u'该号未注册'
-                    }
-                else:
-                    response_data = {
-                        'user_id': None,
-                        'ret_code': 10002,
-                        'message': u'该号已注册，非本渠道用户'
-                    }
-
-                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-            else:
-                response_data = {
-                    'user_id': None,
-                    'ret_code': 10002,
-                    'message': u'无效promo_token'
-                }
-        else:
-            return Http404(u'页面不存在')
-
-        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
-
-
 class LandOpenApi(APIView):
     """
     渠道跳转页
@@ -1781,27 +1744,30 @@ class OauthUserRegisterApi(APIView):
                     if int(res_data['ret_code']) == 10000:
                         callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
                         callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
-                        response_data = {
-                            'Code': 101,
-                            'message': u'成功',
+                        data = {
                             'Cust_key': tid,
                             'Access_tokens': res_data['access_token'],
                             'Callback_url': callback_url,
                         }
+                        response_data = {
+                            'Code': 101,
+                            'Tip': u'成功',
+                            'Data': data,
+                        }
                     else:
                         response_data = {
                             'Code': res_data['ret_code'],
-                            'message': res_data['message'],
+                            'Tip': res_data['message'],
                         }
                 else:
                     response_data = {
                         'Code': 10009,
-                        'message': u'注册失败',
+                        'Tip': u'注册失败',
                     }
             else:
                 response_data = {
                     'Code': 10008,
-                    'message': u'签名错误',
+                    'Tip': u'签名错误',
                 }
         else:
             form_errors = form.errors
@@ -1809,7 +1775,7 @@ class OauthUserRegisterApi(APIView):
             form_error = form_errors[form_error_keys[0]][0]
             response_data = {
                 'Code': 10010,
-                'message': form_error,
+                'Tip': form_error,
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

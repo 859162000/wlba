@@ -40,7 +40,7 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView, AdminIdValidate,
+                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
@@ -49,7 +49,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, AccessUserExistsApi, LandOpenApi, CoopPvApi, OauthUserRegisterApi)
+                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -151,7 +151,7 @@ urlpatterns = patterns(
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^has_validate/', HasValidationAPIView.as_view()),
-    url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
+    # url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),
@@ -323,13 +323,6 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
-)
-
-
-# 判断手机号是否已经绑定渠道或被注册
-urlpatterns += patterns(
-    '',
-    url(r'^access_user/exists/$', AccessUserExistsApi.as_view()),
 )
 
 # 渠道着陆页中间跳转接口
