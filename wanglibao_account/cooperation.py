@@ -71,7 +71,7 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
-from .utils import xunleivip_generate_sign, generate_coop_base_data
+from .utils import xunleivip_generate_sign, generate_coop_base_data, str_to_dict
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
 from wanglibao_margin.models import MarginRecord
@@ -1649,7 +1649,7 @@ class BaJinSheRegister(CoopRegister):
 
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE') == 'application/json':
-            req_data = json.loads(self.request.body)
+            req_data = str_to_dict(self.request.body.strip())
         else:
             req_data = self.request.REQUEST
 
@@ -1856,6 +1856,38 @@ class RenRenLiRegister(BaJinSheRegister):
         self.request.session.pop(self.internal_channel_user_id_key, None)
 
 
+class BiSouYiRegister(BaJinSheRegister):
+    def __init__(self, request):
+        super(BiSouYiRegister, self).__init__(request)
+        self.c_code = 'bisouyi'
+        self.external_channel_client_id_key = 'cid'
+        self.external_channel_sign_key = 'sign'
+        self.internal_channel_sign_key = 'sign'
+
+    def save_to_session(self):
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.GET.get(self.external_channel_user_key, None)
+        client_id = self.request.GET.get(self.external_channel_client_id_key, None)
+        sign = self.request.GET.get(self.external_channel_sign_key, None)
+
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
+    def clear_session(self):
+        super(BiSouYiRegister, self).clear_session()
+        self.request.session.pop(self.internal_channel_client_id_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
@@ -1864,7 +1896,8 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
-                          RenRenLiRegister, XunleiMobileRegister, XingMeiRegister]
+                          RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
+                          BiSouYiRegister]
 
 
 # ######################第三方用户查询#####################
