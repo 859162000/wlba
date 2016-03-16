@@ -74,7 +74,7 @@ def bajinshe_callback(url, data):
 
 @app.task
 def renrenli_callback(url, data):
-    logger.info("enter renrenli callback with url[%s]" % url)
+    logger.info("enter renrenli callback with url[%s] data[%s]" % (url, data))
     headers = {
        'Content-Type': 'application/json',
     }
