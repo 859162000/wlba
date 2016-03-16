@@ -121,10 +121,16 @@ def assignment_buy(buyer_token=None, seller_token=None):
                 # status == 0 加钱, 其他减钱. 这直接对买家余额减钱, 卖家余额加钱
                 buyer_keeper = PhpMarginKeeper(assignment.buyer, )
                 seller_keeper = PhpMarginKeeper(assignment.seller, )
+
+                # 卖家流水
+                seller_keeper.margin_process(
+                    assignment.seller, 0, assignment.buy_price, description=u'', catalog=u"卖债转")
+                # 卖家流水增加一条, 先加买家的钱, 再减去平台手续费
+                seller_keeper.margin_process(
+                    assignment.seller, 1, assignment.fee, description=u'债转平台手续费', catalog=u"卖债转")
+                # 买家流水
                 buyer_keeper.margin_process(
                     assignment.buyer, 1, assignment.buy_price, description=u'', catalog=u"买债转")
-                seller_keeper.margin_process(
-                    assignment.seller, 0, assignment.sell_price, description=u'', catalog=u"卖债转")
 
                 # 如果加减钱成功后, 更新债转的表的状态为成功
                 assignment.trade_status = 'PAID'

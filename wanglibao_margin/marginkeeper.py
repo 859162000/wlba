@@ -67,7 +67,7 @@ class MarginKeeper(KeeperBaseMixin):
             uninvested_freeze = margin.uninvested_freeze - amount
             margin.uninvested_freeze = uninvested_freeze if uninvested_freeze >= 0 else Decimal('0.00')
             margin.save()
-            catalog = u'交易成功扣款'
+            catalog = u'月利宝交易成功扣款'
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 

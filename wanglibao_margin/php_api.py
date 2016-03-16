@@ -379,7 +379,7 @@ class YueLiBaoCheck(APIView):
                     user = product.user
                     product_id = product.product_id
                     buyer_keeper = PhpMarginKeeper(user, product_id)
-                    buyer_keeper.settle(product.amount, description='')
+                    buyer_keeper.settle(product.amount_source, description='')
 
                 # 进行全民淘金数据写入
                 calc_php_commission(product_id)
