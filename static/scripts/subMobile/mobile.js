@@ -2828,6 +2828,7 @@ org.checkIn = (function(org){
         shareFn: function(){//分享成功后，领取奖励
             var shareAmount = 0;
             lib.altDom.prop("class","check-in-alert-layout check-in-share");
+            $(".weixin-share-alt").hide();
             if(lib.isShare){
                 lib.altDom.find(".share-money").html("今日已分享！");
             }else{
