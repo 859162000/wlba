@@ -656,13 +656,14 @@ def preview_contract(request, id):
 
     return HttpResponse(generate_contract_preview(productAmortizations, product))
 
+
 def AuditEquityCreateContract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
     product = equity.product
     order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity_id, product_id=product.id)
 
     if not equity.latest_contract:
-        #create contract file
+        # create contract file
         EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity_id, savepoint=False)
 
     equity_new = P2PEquity.objects.filter(id=equity_id).first()
@@ -693,6 +694,7 @@ class AdminP2PList(TemplateView):
             'p2p_list': p2p_list
             }
 
+
 class AdminPrepayment(TemplateView):
     template_name = 'admin_prepayment.jade'
 
@@ -713,7 +715,6 @@ class AdminPrepayment(TemplateView):
             }
 
 
-
 class RepaymentAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -727,9 +728,9 @@ class RepaymentAPIView(APIView):
         else:
             penal_interest = Decimal(penal_interest)
 
-        id = request.POST.get('id')
+        p2p_id = request.POST.get('id')
 
-        p2p = P2PProduct.objects.filter(pk=id)
+        p2p = P2PProduct.objects.filter(pk=p2p_id)
         p2p = p2p[0]
 
         from dateutil import parser
@@ -743,19 +744,20 @@ class RepaymentAPIView(APIView):
                 record = payment.get_product_repayment(Decimal(0), repayment_type, flag_date)
 
             result = {
-                    'errno': 0,
-                    'principal': record.principal,
-                    'interest': record.interest,
-                    'penal_interest': record.penal_interest,
-                    'date': repayment_date
-                    }
+                'errno': 0,
+                'principal': record.principal,
+                'interest': record.interest,
+                'penal_interest': record.penal_interest,
+                'date': repayment_date
+            }
         except PrepaymentException:
             result = {
-                    'errno': 1,
-                    'errmessage': u'你的还款计划有问题'
-                    }
+                'errno': 1,
+                'errmessage': u'你的还款计划有问题'
+            }
 
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
 
 def check_invalid_new_user_product(p2p, user):
     """

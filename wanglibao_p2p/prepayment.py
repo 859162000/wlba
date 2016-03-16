@@ -21,7 +21,7 @@ from exceptions import PrepaymentException
 import pytz
 import json
 from datetime import datetime
-
+from wanglibao_redpack.models import RedPackRecord
 
 
 REPAYMENT_MONTHLY = 'monthly'
@@ -82,10 +82,16 @@ class PrepaymentHistory(object):
 
                 user_margin_keeper = MarginKeeper(user_record.user)
                 # 提前还款需要将加息金额还给用户(重新计算后的该用户所用加息券的加息金额)
-                user_margin_keeper.amortize(user_record.principal, user_record.interest, user_record.penal_interest,
-                                            user_record.coupon_interest, savepoint=False, description=self.description)
+                # 计算用户一共使用了多少钱的红包
+                redpack_amount_sum = RedPackRecord.objects.filter(user=self.user, product_id=self.product.id)\
+                    .aggregate(Sum('apply_amount'))['apply_amount__sum']
 
-                order_id = OrderHelper.place_order(user_record.user, order_type=self.catalog, product_id=self.product.id, status=u'新建').id
+                user_margin_keeper.amortize(user_record.principal, user_record.interest, user_record.penal_interest,
+                                            user_record.coupon_interest, redpack_amount=redpack_amount_sum,
+                                            savepoint=False, description=self.description)
+
+                order_id = OrderHelper.place_order(user_record.user, order_type=self.catalog,
+                                                   product_id=self.product.id, status=u'新建').id
 
                 user_record.order_id = order_id
                 user_record.amortization = amortization
@@ -113,19 +119,18 @@ class PrepaymentHistory(object):
                 })
                 try:
                     weixin_user = WeixinUser.objects.filter(user=user_amortization.user).first()
-        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
                     if weixin_user and weixin_user.subscribe:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
-                                        "kwargs":json.dumps({
-                                                        "openid": weixin_user.openid,
-                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                                        "keyword1": product.name,
-                                                        "keyword2": "%s 元"%str(amo_amount),
-                                                        "keyword3": now,
-                                                            })},
-                                                        queue='celery02')
+                            "kwargs": json.dumps({
+                                "openid": weixin_user.openid,
+                                "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                "keyword1": product.name,
+                                "keyword2": "%s 元" % str(amo_amount),
+                                "keyword3": now,
+                            })
+                        }, queue='celery02')
 
                 except Exception,e:
                     pass

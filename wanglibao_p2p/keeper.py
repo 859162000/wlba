@@ -192,7 +192,16 @@ class EquityKeeper(KeeperBaseMixin):
             description = u'用户份额确认(%d)' % equity.equity
             self.__tracer(catalog, equity.equity, description)
             user_margin_keeper = MarginKeeper(self.user)
-            user_margin_keeper.settle(equity.equity, savepoint=False)
+
+            # 查询用户使用的红包总额
+            redpack_amount_sum = RedPackRecord.objects.filter(user=self.user, product_id=self.product.id)\
+                .aggregate(Sum('apply_amount'))['apply_amount__sum']
+            if redpack_amount_sum > 0:
+                # 如果使用了红包,则拆分开确认
+                user_margin_keeper.settle(equity.equity - redpack_amount_sum, savepoint=False)
+                user_margin_keeper.settle_redpack(redpack_amount_sum, savepoint=False)
+            else:
+                user_margin_keeper.settle(equity.equity, savepoint=False)
 
     def generate_contract(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):

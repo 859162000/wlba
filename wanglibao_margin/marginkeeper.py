@@ -100,6 +100,20 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
+    def settle_redpack(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            if amount > margin.freeze:
+                logger.debug('user id: {}, amount:{}, freeze red pack:{} ========'.format(self.user.id, amount, margin.freeze))
+                raise MarginLack(u'202')
+            margin.freeze -= amount
+            margin.save()
+            catalog = u'红包交易成功扣款'
+            record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
+
     def amortize(self, principal, interest, penal_interest, coupon_interest, redpack_amount=0, description=u'', savepoint=True):
         check_amount(principal)
         check_amount(interest)
@@ -108,6 +122,7 @@ class MarginKeeper(KeeperBaseMixin):
         interest = Decimal(interest)
         penal_interest = Decimal(penal_interest)
         coupon_interest = Decimal(coupon_interest)
+        redpack_amount = Decimal(redpack_amount)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             # catalog = u'还款入账'
