@@ -903,8 +903,7 @@ org.detail = (function (org) {
                     link: shareLink,
                     imgUrl: shareImg,
                     success: function(){
-                        alert("好友");
-                        //alert(shareMainTit);
+                        //alert("好友");
                         success && success();
                     }
                 });
@@ -925,14 +924,13 @@ org.detail = (function (org) {
                     link : shareLink,
                     imgUrl: shareImg,
                     success: function(){
-                        alert("QQ");
+                        //alert("QQ");
                         success && success();
                     },
                     cancel: function(){
-                        alert("取消QQ");
+                        //alert("取消QQ");
                     }
                 });
-                hide = false;
                 if(hide){
                     wx.hideMenuItems({
                         menuList: ['menuItem:share:timeline','menuItem:favorite'],
