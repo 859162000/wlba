@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import renderers
+from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 
 from wanglibao_account.auth_backends import User
@@ -708,5 +709,30 @@ class SendRedPacks(APIView):
         else:
             ret = {'status': 0,
                    'msg': 'args error!'}
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class GetAPPUser(APIView):
+    """
+    http请求方式: post
+    http://xxxxxx.com/php/app/user/get/
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        token = self.request.REQUEST.get('token')
+
+        token = Token.objects.filter(key=token).first()
+        if token:
+            user_id = token.user.pk
+            ret = {'status': 1,
+                   'user_id': user_id}
+
+        else:
+            ret = {'status': 0,
+                   'msg': 'token error!'}
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
