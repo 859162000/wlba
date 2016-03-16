@@ -122,7 +122,7 @@ org.checin_in = (function () {
             for(var i= itemStart; i <= itemEnd;i++){
                 itemStatus = '';
 
-                if(i <= continueDay){
+                if(i <= currentDay){
                     //已签到的天数
                     itemStatus += " active-did "
                 }
@@ -137,7 +137,7 @@ org.checin_in = (function () {
                     itemStatus = giftStatus ?
                         "active-gift-open "
                         :
-                        itemEnd - continueDay === 0? 'active-gift-active ' :"active-gift ";
+                        itemEnd - currentDay === 0? 'active-gift-active ' :"active-gift ";
                 }
 
                 str += "<div data-continue='"+i+"' class='flag-items "+itemStatus+"'>";
@@ -158,21 +158,23 @@ org.checin_in = (function () {
             var _self = this, resultCopy = result.data.sign_in;
 
             //连续签到日
-            var continue_days = resultCopy.continue_days;
+            var current_day = resultCopy.current_day;
             var steriousGift_days = resultCopy.mysterious_day;
 
             //当日是否签到
             if(!resultCopy.status){
                 _self.checkInOpeartion('sign_in', function(data){
+                    //签到成功更新连续签到日
+                    current_day++;
+
                     if(data.data.status){
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
-                            triggerUI(data.data.continue_days)
+                            triggerUI(current_day)
                             _self.signIn(true, data.data.experience_amount)
                             _self.steriousGift(steriousGift_days - 1);
                         })
                     }
-                    //签到成功更新连续签到日
-                    continue_days = data.data.continue_days;
+
 
                     function triggerUI(count){
                         $.each($('.flag-items'), function(){
@@ -192,14 +194,14 @@ org.checin_in = (function () {
 
             var giftDay  = null;
             $('.active-gift, .active-gift-open, .active-gift-active').on('click', function(){
-                giftDay = resultCopy.nextDayNote - continue_days;
+                giftDay = resultCopy.nextDayNote - current_day;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
                         org.ui.alert('礼物已经领取过了！')
                     }else{
                         if(!_self.limit_click){
-                            _self.limit_click =true
-                            _self.fetchGift(continue_days)
+                            _self.limit_click =true;
+                            _self.fetchGift(current_day)
                         }
                     }
                 }else if(giftDay > 0){
@@ -275,7 +277,6 @@ org.checin_in = (function () {
             $target.show()
             $('.check-body-opeartion-btn').on('click',function(){
                 $target.hide()
-                console.log(callback)
                 callback && callback()
             })
         }
