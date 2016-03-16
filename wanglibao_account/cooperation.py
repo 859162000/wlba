@@ -1648,13 +1648,18 @@ class BaJinSheRegister(CoopRegister):
         return self.request.session.get(self.internal_channel_order_id_key, None)
 
     def save_to_session(self):
+        if self.request.META.get('CONTENT_TYPE') == 'application/json':
+            req_data = json.loads(self.request.body)
+        else:
+            req_data = self.request.REQUEST
+
         channel_code = self.get_channel_code_from_request()
-        channel_phone = self.request.REQUEST.get(self.external_channel_phone_key, None)
-        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
-        p_id = self.request.REQUEST.get(self.channel_product_id_key, None)
-        client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
-        access_token = self.request.REQUEST.get(self.channel_access_token_key, None)
-        channel_order_id = self.request.REQUEST.get(self.external_channel_order_id_key, None)
+        channel_phone = req_data.get(self.external_channel_phone_key, None)
+        channel_user = req_data.get(self.external_channel_user_key, None)
+        p_id = req_data.get(self.channel_product_id_key, None)
+        client_id = req_data.get(self.external_channel_client_id_key, None)
+        access_token = req_data.get(self.channel_access_token_key, None)
+        channel_order_id = req_data.get(self.external_channel_order_id_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
