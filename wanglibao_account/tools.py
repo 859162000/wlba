@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
+import urllib
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import Client
@@ -36,3 +37,22 @@ def get_client_with_channel_code(channel_code):
         client = None
 
     return client
+
+
+def str_to_dict(s):
+    """
+    将字符串转换成字典
+    ret=0&error=test' ==> {u'ret': u'0', u'error': u'test'}
+    :param s:
+    :return: result
+    """
+
+    result = {}
+    try:
+        for item in s.split('&'):
+            key, value = item.split('=')
+            result[urllib.unquote_plus(key)] = urllib.unquote_plus(value)
+    except:
+        pass
+
+    return result

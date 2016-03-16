@@ -20,6 +20,7 @@ from wanglibao_p2p.models import P2PRecord
 from wanglibao import settings
 from .tasks import bajinshe_callback, renrenli_callback
 from .utils import get_bajinshe_base_data, get_renrenli_base_data
+from .tools import str_to_dict
 
 
 logger = logging.getLogger('wanglibao_cooperation')
@@ -154,7 +155,7 @@ class BaJinSheSession(CoopSessionProcessor):
         super(BaJinSheSession, self).save_to_session()
 
         if self.request.META.get('CONTENT_TYPE') == 'application/json':
-            req_data = json.loads(self.request.body)
+            req_data = str_to_dict(self.request.body.strip())
         else:
             req_data = self.request.REQUEST
 

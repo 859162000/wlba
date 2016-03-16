@@ -91,58 +91,58 @@ class AccessUserExistsApi(APIView):
                                     if binding and user:
                                         response_data = {
                                             'user_id': binding.bid,
-                                            'ret_code': 10000,
-                                            'message': u'该号已注册'
+                                            'code': 10000,
+                                            'msg': u'该号已注册'
                                         }
                                     elif not user:
                                         response_data = {
                                             'user_id': None,
-                                            'ret_code': 10001,
-                                            'message': u'该号未注册'
+                                            'code': 10001,
+                                            'msg': u'该号未注册'
                                         }
                                     else:
                                         response_data = {
                                             'user_id': None,
-                                            'ret_code': 10002,
-                                            'message': u'该号已注册，非本渠道用户'
+                                            'code': 10002,
+                                            'msg': u'该号已注册，非本渠道用户'
                                         }
 
                                     return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
                                 else:
                                     response_data = {
                                         'user_id': None,
-                                        'ret_code': 10008,
-                                        'message': u'无效签名'
+                                        'code': 10008,
+                                        'msg': u'无效签名'
                                     }
                             else:
                                 response_data = {
                                     'user_id': None,
-                                    'ret_code': 10007,
-                                    'message': u'手机号不存在'
+                                    'code': 10007,
+                                    'msg': u'手机号不存在'
                                 }
                         else:
                             response_data = {
                                 'user_id': None,
-                                'ret_code': 10006,
-                                'message': u'无效客户端id不存在'
+                                'code': 10006,
+                                'msg': u'无效客户端id不存在'
                             }
                     else:
                         response_data = {
                             'user_id': None,
-                            'ret_code': 10005,
-                            'message': u'客户端id参数不存在'
+                            'code': 10005,
+                            'msg': u'客户端id参数不存在'
                         }
                 else:
                     response_data = {
                         'user_id': None,
-                        'ret_code': 10004,
-                        'message': u'签名参数不存在'
+                        'code': 10004,
+                        'msg': u'签名参数不存在'
                     }
             else:
                 response_data = {
                     'user_id': None,
-                    'ret_code': 10003,
-                    'message': u'无效promo_token'
+                    'code': 10003,
+                    'msg': u'无效promo_token'
                 }
         else:
             return Http404(u'页面不存在')
