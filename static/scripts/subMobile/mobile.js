@@ -2792,7 +2792,7 @@ org.checkIn = (function(org){
         getGift: function(){//领取礼物
             var giftOk = lib.giftOk;
             $("div.check-in-flag-lists").on("click",".active-gift",function(){
-                //lib.shareFn();
+                //lib.shareFn();return;
                 var giftDay = lib.giftPosition - lib.nowDay;
                 if(giftDay > 0){
                     org.ui.alert("还未达到礼品日");
@@ -2835,6 +2835,9 @@ org.checkIn = (function(org){
             $(".weixin-share-alt").hide();
             if(lib.isShare){
                 lib.altDom.find(".share-money").html("今日已分享！");
+                setTimeout(function(){
+                    lib.altDom.show();
+                },1);
             }else{
                 org.ajax({
                     url:"/weixin/daily_action/",
@@ -2845,11 +2848,13 @@ org.checkIn = (function(org){
                         lib.isShare = true;
                         shareAmount = res.data.experience_amount;
                         lib.altDom.find(".share-money").html("今日分享成功！获得"+ shareAmount +"元体验金");
+                        setTimeout(function(){
+                            lib.altDom.show();
+                        },1);
                         $(".checkin-op-share").addClass("checkin-share-ok").find(".op-detail-orange").text("＋"+ shareAmount +"体验金");
                     }
                 });
             }
-            lib.altDom.show();
         },
         shareOk: function(){
             var url = window.location.protocol +"//" + window.location.host;
