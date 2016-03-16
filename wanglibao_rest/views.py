@@ -940,8 +940,8 @@ class IdValidate(APIView):
                     "error_number": ErrorNumber.try_too_many_times
                 })
 
-            # id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-            if profile.id_number == id_number:
+            id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
+            if id_verify_count >= 1:
                 return Response({
                                     "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.id_verify_times_error
