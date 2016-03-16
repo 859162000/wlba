@@ -1,0 +1,17 @@
+extends center_base
+-load formatters
+
+
+block head
+  - with '站内信' as title
+  include global/g_head
+  -endwith
+
+block sidebar
+  - with '站内信' as activeItem
+  include include/center_sidebar
+  -endwith
+
+block main
+  .c-main-white.c-auto-height.c-layout
+

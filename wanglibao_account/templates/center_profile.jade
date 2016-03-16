@@ -1,0 +1,80 @@
+extends center_base
+-load formatters
+
+
+block head
+  - with '个人资料' as title
+  include global/g_head
+  -endwith
+
+
+block sidebar
+  - with '个人资料' as activeItem
+  include include/center_sidebar
+  -endwith
+
+
+block main
+  .c-main-white.c-auto-height.c-layout
+    .c-profile-means
+
+      .pro-means-head
+        .t-d10.font-m 认证资料
+
+      .pro-means-content.clearfix
+        .fl.pro-layout
+          .means-item
+            .means-title 真实姓名
+            .means-content 王**
+          .means-item
+            .means-title 手机号码
+            .means-content 185*******88
+          .means-item
+            .means-title 银行卡号
+            .means-content 中国工商银行 尾号449
+
+        .fl.pro-layout
+          .means-item
+            .means-title 邮箱地址
+            .means-content.means-blue 未绑定邮箱
+          .means-item
+            .means-title 身份证号
+            .means-content 37185*******88
+
+    .c-profile-info
+
+      .pro-means-head.clearfix
+        .t-d10.font-m.fl 认证资料
+        .add-info.fr.t-d20
+           i.iconfont.icon-greenRight
+            |添加
+
+      .pro-info-lists
+        mixin list()
+          .pro-list.clearfix
+            .fl.pro-list-left
+              .means-item
+                .means-title 收货人
+                .means-content 王223
+              .means-item
+                .means-title 联系电话
+                .means-content 185*******88
+              .means-item
+                .means-title 收货地址
+                .means-content 中国工商银行中国工商银行中国工商
+            .fr
+              .pro-info-add
+                .add-info.fr
+                  i.iconfont.icon-jiaoyimima03.font-s
+                  |删除
+                .add-info.fr
+                  i.iconfont.icon-greenRight.font-s
+                  |修改
+                .add-info.fr
+                  i.iconfont.icon-greenRight.font-s
+                  |默认
+        +list()
+        +list()
+        +list()
+
+

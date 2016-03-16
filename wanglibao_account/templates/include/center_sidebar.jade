@@ -37,13 +37,13 @@ mixin sidebarItem(name, link, target, iconName)
     .sidebar-list-items.clearfix
       +sidebarItem('体验金', '/accounts/gold/', '', 'icon-gold-bar')
       +sidebarItem('全民淘金', '/accounts/gold-invite/', '', 'icon-tao-random')
-      +sidebarItem('理财券', '1', '', 'icon-redpack-bar')
+      +sidebarItem('理财券', '/accounts/pack/', '', 'icon-redpack-bar')
     .sidebar-items-line
 
   .sidebar-list
     +sidebarTitle('会员信息')
     .sidebar-list-items.clearfix
-      +sidebarItem('安全认证', '1', '', 'icon-security')
-      +sidebarItem('个人资料', '1', '', 'icon-pfofile')
-      +sidebarItem('站内信', '1', '', 'icon-web-message')
+      +sidebarItem('安全认证', '/accounts/securitys/', '', 'icon-security')
+      +sidebarItem('个人资料', '/accounts/profile/', '', 'icon-pfofile')
+      +sidebarItem('站内信', '/accounts/web-message/', '', 'icon-web-message')
     .sidebar-items-line

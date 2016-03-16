@@ -1,4 +1,5 @@
 extends center_base
+
 -load formatters
 
 block head
@@ -13,4 +14,78 @@ block sidebar
   -endwith
 
 block main
-  .c-main-white 22
+  .c-main-white.c-auto-height.c-layout
+    .c-security-head
+      .sec-last-login.font-xs.t-d19 上次登录时间：2015-09-24 11:39:27
+
+    .c-security-lists
+
+      .c-sec-item
+        .sec-item-head 登陆密码
+        .sec-item-status
+          i.iconfont.icon-greenRight
+          span 已绑定
+        .sec-item-info
+          p 建议密码由8位以上数字、字母和特殊字符组成。
+        .sec-item-button-warp
+          a(href='').sec-item-button 修改
+
+
+      .c-sec-item
+        .sec-item-head 手机绑定
+        .sec-item-status
+          i.iconfont.icon-greenRight
+          span 已绑定
+        .sec-item-info
+          p 您绑定的手机号码：
+            span.t-d11 185****688
+          p 更改手机号，请联系客服人员。
+        .sec-item-button-warp
+          a(href='').sec-item-button 修改
+
+      .c-sec-item
+        .sec-item-head 实名认证
+        .sec-item-status
+          i.iconfont.icon-greenRight
+          span 已绑定
+        .sec-item-info
+          p 您绑定的身份证号码：370***7036
+        .sec-item-button-warp
+          a(href='').sec-item-button 修改
+
+
+      .c-sec-item
+        .sec-item-head 绑定银行卡
+        .sec-item-status
+          i.iconfont.icon-greenRight
+          span 已绑定
+        .sec-item-info
+          p 银行：
+            span.t-d11 中国工商银行（北京市光彩路支行）
+          p 账号：
+            span.t-d11 621***449
+            |姓名：
+            span.t-d11 戴**
+        .sec-item-button-warp
+          a(href='').sec-item-button 修改
+
+      .c-sec-item
+        .sec-item-head 交易密码
+        .sec-item-status.active
+          i.iconfont.icon-greenRight
+          span 已绑定
+        .sec-item-info
+          p 已设置交易密码
+        .sec-item-button-warp
+          a(href='').sec-item-button 修改
+          a(href='').sec-item-button.mg-l-s 找回
+
+      .c-sec-item
+        .sec-item-head 微信绑定
+        .sec-item-status
+          i.iconfont.icon-greenRight
+          span 已绑定
+        .sec-item-info
+          p 您未绑定微信
+        .sec-item-button-warp
+          a(href='').sec-item-button 绑定

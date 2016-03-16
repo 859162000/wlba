@@ -158,6 +158,9 @@ urlpatterns += patterns(
     url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
     url(r'^accrual/', TemplateView.as_view(template_name="center_redpack_accrual.jade")),
     url(r'^pack/', TemplateView.as_view(template_name="center_redpack_pack.jade")),
+    url(r'^securitys/', TemplateView.as_view(template_name="center_security.jade")),
+    url(r'^profile/', TemplateView.as_view(template_name="center_profile.jade")),
+    url(r'^web-message/', TemplateView.as_view(template_name="center_message.jade")),
 )
 
 if settings.DEBUG:
