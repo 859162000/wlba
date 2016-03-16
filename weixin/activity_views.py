@@ -189,10 +189,17 @@ class GetSignShareInfo(APIView):
         if length > 0:
             start_day = 1
             maxDayNote=activities[length-1].days
-            if sign_info['continue_days']/maxDayNote <= 0:
-                recycle_continue_days = sign_info['continue_days'] % (maxDayNote + 1)
+            if sign_info['continue_days'] < maxDayNote:
+                recycle_continue_days = sign_info['continue_days']
+            elif sign_info['continue_days'] % maxDayNote == 0:
+                recycle_continue_days = maxDayNote
             else:
                 recycle_continue_days = sign_info['continue_days'] % maxDayNote
+
+            # if float(sign_info['continue_days'])/maxDayNote <= 1:
+            #     recycle_continue_days = sign_info['continue_days'] % (maxDayNote + 1)
+            # else:
+            #     recycle_continue_days = sign_info['continue_days'] % maxDayNote
             sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
             for activity in activities:
                 if activity.days >= recycle_continue_days:
