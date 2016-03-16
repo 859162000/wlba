@@ -976,10 +976,12 @@ ACCESS_KEY = 'nwogz9MF5VjadUSsuDzDM0lKlTN4BN'
 if ENV == ENV_PRODUCTION:
     OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'
+    OSS_PUB_ACCESS_HOST = 'http://wanglifile.oss-cn-beijing.aliyuncs.com'
 
 else:
     OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
     OSS_BUCKET = 'wanglistaging'
+    OSS_PUB_ACCESS_HOST = 'http://wanglistaging.oss-cn-beijing.aliyuncs.com'
 
 #ISCJDAO = False
 #CJDAOKEY = '1234'
