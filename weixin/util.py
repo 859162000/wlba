@@ -3,19 +3,24 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
 from django.template.loader import get_template
-from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord, SceneRecord
+from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord, SceneRecord, UserDailyActionRecord
 from wechatpy import WeChatClient
 from wechatpy.exceptions import WeChatException
 from misc.models import Misc
+from experience_gold.backends import SendExperienceGold
+from experience_gold.models import ExperienceEvent
 from django.conf import settings
-
+from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+import datetime
+from django.db import transaction
 import logging
 import time
 import json
 import urllib
 import re
+import random
 
 
 logger = logging.getLogger("weixin")
@@ -118,6 +123,7 @@ def _process_record(w_user, user, type, describe):
     war.create_time = int(time.time())
     war.save()
 
+
 def _process_scene_record(w_user, scene_str):
     sr = SceneRecord()
     sr.openid = w_user.openid
@@ -214,3 +220,92 @@ def _generate_ajax_template(content, template_name=None):
         template = Template('<div></div>')
 
     return template.render(context)
+
+
+def process_user_daily_action(user, action_type=u'sign_in'):
+
+    if action_type not in [u'share', u'sign_in']:
+        return -1, False, None
+    today = datetime.date.today()
+    yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
+    daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=action_type).first()
+    if not daily_record:
+        daily_record = UserDailyActionRecord.objects.create(
+            user=user,
+            action_type=action_type
+        )
+    if daily_record.status:
+        return 1, False, daily_record
+    with transaction.atomic():
+        daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
+        seg = SendExperienceGold(user)
+        if action_type == u'share':
+            experience_event = getSignExperience_gold(give_mode=u"share")
+        else:
+            experience_event = getSignExperience_gold()
+        if experience_event:
+            experience_record_id, experience_event = seg.send(experience_event.id)
+            daily_record.experience_record_id = experience_record_id
+        daily_record.status=True
+        yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=action_type).first()
+        continue_days = 1
+        if yesterday_record:
+            continue_days += yesterday_record.continue_days
+        daily_record.continue_days=continue_days
+        daily_record.save()
+    return 0, True, daily_record
+
+
+def getSignExperience_gold(give_mode=u'weixin_sign_in'):
+    now = timezone.now()
+    query_object = ExperienceEvent.objects.filter(invalid=False, give_mode=give_mode,
+                                                      available_at__lt=now, unavailable_at__gt=now)
+    experience_events = query_object.order_by('amount').all()
+    length = len(experience_events)
+    if length > 1:
+        random_int = random.randint(0, length-1)
+        return experience_events[random_int]
+    return None
+
+from wanglibao_redpack.models import RedPackEvent
+def sendContinueRuleReward(activity_rule):
+    if activity_rule.gift_type == "redpack":
+        redpack_record_ids = ""
+        redpack_ids = activity_rule.redpack.split(',')
+        for redpack_id in redpack_ids:
+            redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+            if not redpack_event:
+                return Response({"ret_code":5,"message":'QMBanquetRewardAPI post redpack_event not exist'})
+            status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, redpack_event, device_type)
+            if not status:
+                return Response({"ret_code":6,"message":messege})
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                redpack_text = "%s%%百分比红包"%redpack_event.amount
+            if redpack_event.rtype == 'direct':
+                redpack_text = "%s元红包"%int(redpack_event.amount)
+            redpack_txts.append(redpack_text)
+            redpack_record_ids += (str(record.id) + ",")
+            events.append(redpack_event)
+            records.append(record)
+        gift_record.redpack_record_ids = redpack_record_ids
+    if activity_rule.gift_type == "experience_gold":
+        experience_record_ids = ""
+        experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+        if not experience_record_id:
+            return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
+        redpack_txts.append('%s元体验金'%int(experience_event.amount))
+        experience_record_ids += (str(experience_record_id) + ",")
+        gift_record.experience_record_ids = experience_record_ids
+    gift_record.activity_code = self.activity.code
+    gift_record.activity_code_time = timezone.now()
+    gift_record.save()
+
+def getMiscValue(key):
+    m = Misc.objects.filter(key=key).first()
+    info = {}
+    if m and m.value:
+        info = json.loads(m.value)
+    return info
