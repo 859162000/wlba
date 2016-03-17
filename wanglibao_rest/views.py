@@ -64,7 +64,7 @@ class AccessUserExistsApi(APIView):
     permission_classes = ()
 
     def check_sign(self, client_id, phone, key, sign):
-        local_sign = hashlib.md5(str(client_id) + key + str(phone)).hexdigest()
+        local_sign = hashlib.md5(str(client_id) + str(phone) + key).hexdigest()
         if local_sign == sign:
             sign_is_ok = True
         else:
