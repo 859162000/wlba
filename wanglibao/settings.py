@@ -990,6 +990,15 @@ else:
 #RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 #POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
 
+
+#往PHP数据中心发送数据接口生产地址和开关
+if ENV == ENV_PRODUCTION:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = True
+else:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = False
+
 # 天芒
 if ENV == ENV_PRODUCTION:
     TIANMANG_CALL_BACK_URL = "http://www.bangwoya.com/callback/callback.php"
