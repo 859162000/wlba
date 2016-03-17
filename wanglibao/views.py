@@ -11,7 +11,7 @@ from wanglibao_buy.models import FundHoldInfo
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
-from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
+from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew, get_announcement_list
 from wanglibao_p2p.models import P2PEquity
 from django.core.urlresolvers import reverse
 import re
@@ -182,7 +182,7 @@ class IndexView(TemplateView):
         ]
 
         # 公告 前7个
-        annos = AnnouncementHomepage()[:7]
+        annos = get_announcement_list(self.request)[:7]
 
         # 总资产
         p2p_total_asset = 0
