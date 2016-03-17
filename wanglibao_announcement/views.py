@@ -46,12 +46,15 @@ class AnnouncementDetailView(TemplateView):
     def get_context_data(self, id, **kwargs):
         context = super(AnnouncementDetailView, self).get_context_data(**kwargs)
 
-        is_mobile = utype_is_mobile(self.request)
-        if is_mobile:
-            device_type = 'mobile'
-            self.template_name = 'client_announcement_detail.jade'
-        else:
-            device_type = 'pc'
+        device_type = "pc"
+
+        device_list = ['android', 'iphone']
+        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                device_type = 'mobile'
+                self.template_name = 'client_announcement_detail.jade'
 
         try:
             announce = Announcement.objects.get(Q(pk=id, status=1) & (Q(device=device_type) | Q(device='pc&app')))
@@ -91,10 +94,12 @@ class AnnouncementHomeApi(APIView):
 
     def post(self, request):
         req_data = request.POST
+        device_type = req_data.get('device_type')
         page = int(req_data.get('page', 1))
         page_size = int(req_data.get('page_size', 10))
 
-        _announcements = get_announcement_list(self.request).order_by('-createtime', '-id')
+        _announcements = Announcement.objects.filter(Q(status=1, hideinlist=False,) & (Q(device=device_type) | Q(device='pc&app'))
+                                                    ).order_by('-createtime', '-id')
 
         announcements = _announcements.values('id', 'title', 'content', 'page_title')
         if announcements:
@@ -127,11 +132,13 @@ class AnnouncementHasNewestApi(APIView):
     permission_classes = ()
 
     def get(self, request, id):
-        is_mobile = utype_is_mobile(request)
-        if is_mobile:
-            device_type = 'mobile'
-        else:
-            device_type = 'pc'
+        device_type = 'pc'
+        device_list = ['android', 'iphone']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                device_type = 'mobile'
 
         announcements = Announcement.objects.filter(Q(pk__gt=id, status=1, hideinlist=False, device=device_type) |
                                                     Q(pk__gt=id, status=1, hideinlist=False, device='pc&app'))
