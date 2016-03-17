@@ -2573,7 +2573,7 @@ org.checkIn = (function(org){
                 success: function(res){
                     //checkDom.find(".op-dec-title").html("今日已签到");
                     //checkDom.find(".op-dec-detail").html("＋"+ res.data.experience_amount +"体验金");
-                    if(res.data.experience_amount){
+                    if(res.data.experience_amount != undefined){
                         lib.altDom.prop("class","check-in-alert-layout check-in-now");
                         lib.altDom.find(".share-money").html("今日签到成功！获得"+ res.data.experience_amount +"元体验金");
                         lib.altDom.show();
@@ -2695,7 +2695,7 @@ org.checkIn = (function(org){
                             data: {days:now},
                             dataType: "json",
                             success: function(data){
-                                if(data.mysterious_day){
+                                if(data.mysterious_day != undefined){
                                     self.addClass("active-gift-open");
                                     lib.altDom.find("#gift-msg").html(data.message);
                                     setTimeout(function(){
@@ -2730,11 +2730,15 @@ org.checkIn = (function(org){
                     success: function(res){
                         lib.isShare = true;
                         shareAmount = res.data.experience_amount;
-                        lib.altDom.find(".share-money").html("今日分享成功！获得"+ shareAmount +"元体验金");
-                        setTimeout(function(){
-                            lib.altDom.show();
-                        },1);
-                        $(".checkin-op-share").addClass("checkin-share-ok").find(".op-detail-orange").text("＋"+ shareAmount +"体验金");
+                        if(shareAmount != undefined){
+                            lib.altDom.find(".share-money").html("今日分享成功！获得"+ shareAmount +"元体验金");
+                            setTimeout(function(){
+                                lib.altDom.show();
+                            },1);
+                            $(".checkin-op-share").addClass("checkin-share-ok").find(".op-detail-orange").text("＋"+ shareAmount +"体验金");
+                        }else{
+                            org.ui.alert("分享失败");
+                        }
                     }
                 });
             }
