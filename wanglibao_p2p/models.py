@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class P2PProduct(models.Model):
     version = models.CharField(max_length=50)
     category = models.CharField(max_length=16, default=u'普通', verbose_name=u'产品类别*')
-    types = models.CharField(u"产品分类(新)", max_length=50, null=True)
+    types = models.CharField(u"产品分类(新)", max_length=50, null=True, blank=True)
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
     short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
     serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, blank=False, null=True)
