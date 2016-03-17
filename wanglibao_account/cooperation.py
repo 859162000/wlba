@@ -556,9 +556,8 @@ class RenRenLiCallback(CoopCallback):
 
     def get_purchase_data(self, p2p_record):
         bid = get_tid_for_coop(p2p_record.user_id)
-        data = get_renrenli_base_data(self.channel.code)
-        if bid and data:
-            act_data = {
+        if bid:
+            data = {
                 'User_name': self.coop_account_name,
                 'Order_no': p2p_record.order_id,
                 'Pro_name': p2p_record.product.name,
@@ -572,10 +571,8 @@ class RenRenLiCallback(CoopCallback):
                 'Cust_key': bid,
                 'Invest_full_scale_date': 0,
             }
-            data['Data'] = [act_data]
         else:
             data = dict()
-            logger.info("renrenli get_amotize_data failed with bid[%s] data[%s]" % (bid, data))
 
         return data
 
@@ -602,11 +599,16 @@ class RenRenLiCallback(CoopCallback):
                                               order_id=order_id,
                                               catalog=u'申购').select_related('product').first()
         if p2p_record:
-            data = self.get_purchase_data(p2p_record)
-            if data:
-                renrenli_callback.apply_async(
-                    kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
-
+            bid = get_tid_for_coop(p2p_record.user_id)
+            data = get_renrenli_base_data(self.channel.code)
+            if bid and data:
+                act_data = self.get_purchase_data(p2p_record)
+                if act_data:
+                    data['Data'] = json.dumps([act_data])
+                    renrenli_callback.apply_async(
+                        kwargs={'data': data, 'url': self.purchase_call_back_url})
+            else:
+                logger.info("renrenli get_amotize_data failed with bid[%s] data[%s]" % (bid, data))
 
 # 第三方回调通道
 coop_callback_processor = {

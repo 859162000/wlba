@@ -138,6 +138,14 @@ class AccessTokenBaseView(OAuthView, Mixin):
         """
         raise NotImplementedError
 
+    def create_coop_token(self, request, user, access_token, client):
+        """
+        Override to handle coop token creation.
+
+        :return: ``object`` - Refresh token
+        """
+        raise NotImplementedError
+
     def create_access_token(self, request, user, client):
         """
         Override to handle access token creation.
@@ -234,6 +242,20 @@ class AccessTokenBaseView(OAuthView, Mixin):
 
         return self.access_token_response(at, rt.user.id)
 
+    def push_coop_token(self, request, data, client, user):
+        """
+        Handle ``grant_type=authorization_code`` requests as defined in
+        :rfc:`4.1.3`.
+        """
+
+        if constants.SINGLE_ACCESS_TOKEN:
+            at = self.get_access_token(request, user, client)
+        else:
+            at = self.create_access_token(request, user, client)
+            rt = self.create_refresh_token(request, user, at, client)
+
+        return self.access_token_response(at, user.id)
+
     def get_handler(self, grant_type):
         """
         Return a function or method that is capable handling the ``grant_type``
@@ -244,6 +266,8 @@ class AccessTokenBaseView(OAuthView, Mixin):
             return self.access_token
         elif grant_type == 'refresh_token':
             return self.refresh_token
+        elif grant_type == 'push_coop_token':
+            return self.push_coop_token
         return None
 
     def get(self, request, grant_type):
