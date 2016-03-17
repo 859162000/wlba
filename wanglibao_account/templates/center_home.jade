@@ -1,0 +1,67 @@
+extends center_base
+-load formatters
+block head
+  - with '账户总览' as title
+  include global/g_head
+  -endwith
+block sidebar
+  - with '账户总览' as activeItem
+  include include/center_sidebar
+  -endwith
+block main
+  .c-main-white.c-auto-height.c-layout
+
+    .c-h-fund-head.clearfix
+      .span8.clearfix.balance-mod
+
+        .c-h-l.span8
+          .tc.inline-block
+            .c-h-balance.tc
+              .font-lll.t-d10.lh 20,534
+                span.font-xxl .25
+                .font-s.t-d24.mg-t-xs.mg-b-sm 账户余额(元)
+            .c-h-opeartion.clearfix.inline-block
+              .recharge-link.fl.mg-r-s
+                a(href='') 充值
+              .trade-link.fl
+                a(href='') 投资
+
+        .c-h-r.span4
+          .c-h-earning
+            .font-l.t-d11 +10.58
+            .font-s.t-d24 昨日到账收益(元)
+          .c-h-earning.mg-t-ssm
+            .font-l.t-d11 1900.58
+            .font-s.t-d24 累计收益(元)
+
+      .span4
+        .h-notice-mod
+          .h-notice-title.mg-b-s 通知中心
+            .notice-num 2
+          .h-notice-list
+            .h-notice-cont.t-d11 参与活动送红包
+            .h-notice-date 2015-06-17
+          .h-notice-list
+            .h-notice-cont.t-d24 参与活动送红包参与活动送红包
+            .h-notice-date 2015-06-17
+          .h-notice-list
+            .h-notice-cont.t-d24 参与活动送红包
+            .h-notice-date 2015-06-17
+          .h-notice-list
+            .h-notice-cont.t-d24 参与活动送红包
+            .h-notice-date 2015-06-17
+
+
+    .c-rockoning-fund
+      .span4.h-fund-item
+        .fund-amount 10,000
+          span.fund-point .00
+        .fund-explain 账户总资产(元)
+      .span4.h-fund-item
+        .fund-amount 500
+          span.fund-point .00
+        .fund-explain 待收本息(元)
+      .span4.h-fund-item
+        .fund-amount 95,000
+          span.fund-point .00
+        .fund-explain 暂冻结资金(元)

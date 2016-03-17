@@ -11,10 +11,36 @@ mixin sidebarItem(name, link, target, iconName)
     .sidebar-icon.tc
       i.iconfont.icon(class=iconName)
     .sidebar-item-name.t-d11.font-s=name
+if activeItem == '账户总览'
+  .sidebar-home
+    .sidebar-h-user.clearfix
+      img(src='/static/imgs/pc/center/user_img.jpg').h-user-img.fl
+      .h-user-info.fl.mg-t-ssm
+        .user-name.t-d11 185***688，上午好！
+        .company-bb 感谢您对网利宝的信任！
+
+    .sidebar-h-binding.clearfix
+      .binding-item.fl
+        i.iconfont.icon.icon-authentication.inline-block
+        .inline-block 已绑定
+      .binding-item.fl
+        i.iconfont.icon.icon-authentication.inline-block
+        .inline-block 已认证
+      .binding-item.fl
+        i.iconfont.icon.icon-authentication.inline-block
+        .inline-block 已绑定
+
+    .sidebar-h-level.low
+      span.le-info 安全级别：
+      span.le-type.mg-r-s 低
+      .inline-block.le-process-item
+        .process
+      a.le-link.mg-l-sm 提升
 
 
 .sidebar-warp.tc
-  .sidebar-title.font-m.t-d11 账户总览
+  if not activeItem == '账户总览'
+    a(href='/accounts/home-new/').sidebar-title.font-m.t-d11 账户总览
 
   .sidebar-list
     +sidebarTitle('投资管理')

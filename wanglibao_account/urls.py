@@ -163,6 +163,7 @@ urlpatterns += patterns(
     url(r'^web-message/', TemplateView.as_view(template_name="center_message.jade")),
     url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
     url(r'^bankcards/', TemplateView.as_view(template_name="center_bank.jade")),
+    url(r'^home-new/', TemplateView.as_view(template_name="center_home.jade")),
 )
 
 if settings.DEBUG:
