@@ -4,6 +4,8 @@ from collections import OrderedDict
 import datetime
 import collections
 
+from django.utils import timezone
+from django.utils.timezone import utc
 from django.db import models
 from django.contrib.auth.models import User
 
