@@ -61,12 +61,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # send_lottery.apply_async((user_id,))
     processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
     #往数据中心发送投资信息数据
-    if settings.ENV == settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
-        send_investment_data.apply_async(kwargs={
-            "user_id": user_id, "amount": amount, "device_type":device_type,
-            "order_id": order_id, "product_id": product_id,
-        })
-    if settings.ENV != settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
+    if settings.SEND_PHP_ON_OR_OFF:
         send_investment_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "device_type":device_type,
             "order_id": order_id, "product_id": product_id,
@@ -114,11 +109,7 @@ def register_ok(user_id, device):
         "user_id": user_id,
     })
     #往数据中心发送注册信息数据
-    if settings.ENV == settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
-        send_register_data.apply_async(kwargs={
-            "user_id": user_id, "device_type":device_type,
-        })
-    if settings.ENV != settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
+    if settings.SEND_PHP_ON_OR_OFF:
         send_register_data.apply_async(kwargs={
             "user_id": user_id, "device_type":device_type,
         })
@@ -135,12 +126,7 @@ def idvalidate_ok(user_id, device):
     except Exception:
         pass
     #往数据中心发送实名信息数据
-    if settings.ENV == settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
-        if user.wanglibaouserprofile.id_is_valid:
-            send_idvalidate_data.apply_async(kwargs={
-                "user_id": user_id, "device_type":device_type,
-            })
-    if settings.ENV != settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
+    if settings.SEND_PHP_ON_OR_OFF:
         if user.wanglibaouserprofile.id_is_valid:
             send_idvalidate_data.apply_async(kwargs={
                 "user_id": user_id, "device_type":device_type,
@@ -212,11 +198,7 @@ def deposit_ok(user_id, amount, device, order_id):
         logger.exception('=deposit_ok= Except: [%s]' % str(e))
 
     #往数据中心发送冲值信息数据
-    if settings.ENV == settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
-        send_deposit_data.apply_async(kwargs={
-            "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
-        })
-    if settings.ENV != settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
+    if settings.SEND_PHP_ON_OR_OFF:
         send_deposit_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
         })
@@ -273,13 +255,8 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
     except Exception:
         pass
     
-
     #往数据中心发送提现信息数据
-    if settings.ENV == settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
-        send_withdraw_data.apply_async(kwargs={
-            "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
-        })
-    if settings.ENV != settings.ENV_PRODUCTION and settings.SEND_PHP_ON_OR_OFF:
+    if settings.SEND_PHP_ON_OR_OFF:
         send_withdraw_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
         })
