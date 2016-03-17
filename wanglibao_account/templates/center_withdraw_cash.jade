@@ -15,45 +15,56 @@ block sidebar
 
 block main
   .c-main-white.c-auto-height.c-layout
-    .c-cash-head.t-d19.font-l 余额提现
+    .c-cash-layout
+      .c-cash-head.t-d19.font-l 余额提现
+      table.c-cash-table
+        tr
+          th 持卡人
+          td 带永明
+        tr
+          th 提现至银行卡
+          td
+        tr
+          th 可用余额(元)
+          td 300.00
+        tr
+          th 提现金额
+          td
+            .c-cash-amount
+              input(type='text', placeholder='金额').cash-input
+              .cash-amount-all 全部
+        tr
+          th 手续费(元)
+          td
+            .c-cash-fee
+              span.fee  0.00
+              span.c-cash-blue.mg-l-s 收费说明
+        tr
+          th 实际到帐金额(元)
+          td 0.00
+        tr
+          th 手机验证码
+          td
+            .c-cash-phone
+              input(type='text', placeholder='请输入验证码').cash-input
+              input(type='button', value='获取验证码').cash-phone-but
+        tr
+          th 交易密码
+          td
+            .c-cash-trade
+              input(type='text', placeholder='请输入六位交易密码').cash-input
+              a().c-cash-blue.mg-l-s 忘记交易密码
+        tr
+          th
+          td
+            .c-cash-submit
+              input(type='button', value='申请提现').cash-submit-but
+              .t-d19.mg-t-s 申请通过后 3 个工作日内到账（此为预估时间，具体实际到账为准）
 
-    table.c-cash-table
-      tr
-        th 持卡人
-        td 带永明
-      tr
-        th 提现至银行卡
-        td
-      tr
-        th 可用余额(元)
-        td 300.00
-      tr
-        th 提现金额
-        td
-      tr
-        th 手续费(元)
-        td
-          .c-cash-fee
-            span 0.00
-            span.c-cash-blue 收费说明
-      tr
-        th 实际到帐金额(元)
-        td 0.00
-      tr
-        th 手机验证码
-        td
-          .c-cash-phone
-            input(type='text', placeholder='请输入验证码')
-            input(type='button', value='获取验证码').cash-phone-but
-      tr
-        th 交易密码
-        td
-          .c-cash-trade
-            input(type='text', placeholder='请输入六位交易密码')
-            a().c-cash-blue 忘记交易密码
-      tr
-        th
-        td
-          .c-cash-submit
-            input(type='button', value='申请提现').cash-submit-but
+      .c-cash-rules
+        .cash-rules-title.mg-b-s 温馨提示:
+        .cash-rules-list 1. 提款申请提交后，您的提现金额将从可用金额中扣除，无法再进行出借。
+        .cash-rules-list 2. 为防止信用卡套现、洗钱等违法行为，网站将针对异常提款（包括提取无消费充值资金）进行严格审核，审核时间在 15 个工作日之后。
+        .cash-rules-list 3. 提现银行账号的开户名必须与银行卡名一致， 否则提现失败。
+
 

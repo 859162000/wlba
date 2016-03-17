@@ -1,0 +1,45 @@
+extends center_base
+-load formatters
+block head
+  - with '银行卡' as title
+  include global/g_head
+  -endwith
+block sidebar
+  - with '银行卡' as activeItem
+  include include/center_sidebar
+  -endwith
+block main
+  .c-main-white.c-auto-height.c-layout
+    .c-cash-layout
+      .c-cash-head.t-d19.font-l 绑定银行卡
+
+      .c-bank-list
+        .c-bank-item.c-bank-mod
+          .c-bank-head.clearfix
+            .c-bank-name.fl.t-d11.font-xl 招商银行
+            .c-bank-type.fr
+              span 储蓄卡
+
+          .c-bank-content
+            .bank-ct-id.mg-t-m
+              span.font-m.t-d19 账号：
+              span.t-d11.font-xl 6225 **** **** 4475
+            .bank-ct-opeartion.mg-t-sm.t-d19.tr
+              i.iconfont.icon-jiaoyimima03.mg-r-xs
+              |解绑
+
+
+        .c-add-card.c-bank-mod
+          i.iconfont.icon-time
+          .add-card-name 添加一张银行卡
+
+
+      .c-cash-rules
+        .cash-rules-title.mg-b-s 温馨提示:
+        .cash-rules-list 1. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+        .cash-rules-list 2. 绑卡成功后，将自动为您开通快捷支付功能，方便您通过APP进行充值提现。
+        .cash-rules-list 3. 绑卡成功后，您的提现资金将统一打到该银行卡。
+        .cash-rules-list 4. 如需
+          .gold-rules
+            a(href='') 取消绑卡或更换银行卡
+          |，请提交资料至邮箱：jiesuan@wanglibank.com

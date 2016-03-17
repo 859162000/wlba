@@ -36,7 +36,8 @@ require(['jquery'], function( $ ) {
             if($(this).hasClass('samll-nav-guide')){
                 window.location.href = '/qiye/register/'
             }else{
-                window.location.href = '/accounts/home/'
+                //window.location.href = '/accounts/home/'
+                window.location.href= '/accounts/transaction/'
             }
         }
     })

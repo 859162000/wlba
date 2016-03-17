@@ -1,10 +1,12 @@
 
 
-
+.c-cash-layout
+  padding: 30px 0 50px 0
 
 .c-cash-table
   width: 100%
   border-collapse: collapse
+  margin: 25px 0
   th,td
     font-size: 14px
     color: #999
@@ -12,17 +14,115 @@
     width: 20%
 
     text-align: right
-    padding: 24px 0
+    padding: 18px 0
   td
     color: #333
     height: 80%
-    padding: 24px 0 24px 24px
+    padding: 18px 0 18px 24px
   .c-cash-blue
     font-size: $font-xs
     color: #2294e5
     &:hover
       text-decoration: underline
+
+  .c-cash-amount
+    position: relative
+    width: 230px
+    .cash-amount-all
+      position: absolute
+      right: 1px
+      top: 1px
+      width: 50px
+      height: 38px
+      line-height: 40px
+      border-left: 1px solid #ccc
+      background: #f7f7f7
+      text-align: center
+      color: #999
+      cursor: pointer
+  .cash-input
+    width: 230px
+    height: 40px
+    line-height: 40px
+    padding: 4px 50px 4px 15px
+    font-size: 14px
+    border: 1px solid #cccccc
+    &:focus
+      border: 1px solid #4e7cda
+      box-shadow: 0 0 4px #4e7cda
+  .fee
+    color: #f0871d
   .cash-phone-but
     +c-blue-button(100, 40, 14, #fff, #f0871d, #eb7500, #fff)
+    border-radius: 4px
+    margin-left: 7px
+    &:disabled
+      +c-blue-button(100, 40, 14, #fff, #c7c7c7, #c7c7c7, #fff)
+
   .cash-submit-but
-    
+    +c-blue-button(230, 40)
+    border-radius: 4px
+
+
+
+.c-cash-rules
+  font-size: 12px
+  padding: 24px 40px
+  color: #999
+  background: #f5f5f5
+  .cash-rules-title
+    color: #666
+  .cash-rules-list
+    line-height: 25px
+
+
+.c-bank-list
+  +clearfix()
+  padding: 40px 10px 60px 10px
+  .c-bank-mod
+    float: left
+    width: 310px
+    height: 180px
+    background: #f5f5f5
+    border-radius: 10px
+
+  .c-bank-item
+    border: 1px solid #ebebeb
+    margin-right: 30px
+    background: #fff
+    overflow: hidden
+    .c-bank-head
+      line-height: 60px
+      background: #f5f5f5
+      border-bottom: 1px solid #ebebeb
+      padding: 0 30px
+    .c-bank-type
+      span
+        font-size: 12px
+        color: #fff
+        background: #98b4eb
+        border-radius: 10px 0 10px 0
+        padding: 3px 7px
+    .c-bank-content
+
+      background: #fff
+      padding: 0 30px
+    .bank-ct-opeartion
+      cursor: pointer
+      &:hover
+        color: $t-d2
+
+
+  .c-add-card
+    color: #4e7cda
+    text-align: center
+    border: 1px dashed #ebebeb
+    font-size: 16px
+    padding-top: 30px
+    cursor: pointer
+    i
+      font-size: 70px
+      line-height: 85px
+
+  .c-add-card-center
+    margin-left: 180px
