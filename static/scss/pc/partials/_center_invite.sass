@@ -1,4 +1,4 @@
-@mixin c-blue-button($width: 90, $height: 40, $font: 16, $color: #fff, $bf: #477ced, $bf-ac: #245EDA)
+@mixin c-blue-button($width: 90, $height: 40, $font: 16, $color: #fff, $bf: #477ced, $hoverBG: #245EDA, $hoverColor: #fff)
   width: $width + px
   height: $height + px
   color: $color
@@ -9,7 +9,8 @@
   border: 0
   background: $bf
   &:hover
-    background: $bf-ac
+    background: $hoverBG
+    color: $hoverColor
 
 .c-invite-table
   width: 100%

@@ -161,6 +161,7 @@ urlpatterns += patterns(
     url(r'^securitys/', TemplateView.as_view(template_name="center_security.jade")),
     url(r'^profile/', TemplateView.as_view(template_name="center_profile.jade")),
     url(r'^web-message/', TemplateView.as_view(template_name="center_message.jade")),
+    url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
 )
 
 if settings.DEBUG:

@@ -1,0 +1,59 @@
+extends center_base
+-load formatters
+
+block head
+
+  - with '提现' as title
+  include global/g_head
+  -endwith
+
+block sidebar
+
+  - with '提现' as activeItem
+  include include/center_sidebar
+  -endwith
+
+block main
+  .c-main-white.c-auto-height.c-layout
+    .c-cash-head.t-d19.font-l 余额提现
+
+    table.c-cash-table
+      tr
+        th 持卡人
+        td 带永明
+      tr
+        th 提现至银行卡
+        td
+      tr
+        th 可用余额(元)
+        td 300.00
+      tr
+        th 提现金额
+        td
+      tr
+        th 手续费(元)
+        td
+          .c-cash-fee
+            span 0.00
+            span.c-cash-blue 收费说明
+      tr
+        th 实际到帐金额(元)
+        td 0.00
+      tr
+        th 手机验证码
+        td
+          .c-cash-phone
+            input(type='text', placeholder='请输入验证码')
+            input(type='button', value='获取验证码').cash-phone-but
+      tr
+        th 交易密码
+        td
+          .c-cash-trade
+            input(type='text', placeholder='请输入六位交易密码')
+            a().c-cash-blue 忘记交易密码
+      tr
+        th
+        td
+          .c-cash-submit
+            input(type='button', value='申请提现').cash-submit-but
+

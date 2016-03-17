@@ -16,15 +16,13 @@
   +c-blue-button()
 
 .c-layout
-  .c-redpack-status
+  .c-redpack-status,.c-message-status
     padding: 40px 0 20px 0
     a
       display: inline-block
-      +c-blue-button(100, 30, 16, '#666', '#fff', '#fff')
-      &:hover
-        +c-blue-button(100, 30)
+      +c-blue-button(100, 30, 16, #666, #fff, #477ced, #fff)
     a.active
-      +c-blue-button(100, 30)
+      +c-blue-button(100, 30, 16, #fff, #477ced, #477ced, #fff)
 
 table.c-redpack-table
   width: 100%

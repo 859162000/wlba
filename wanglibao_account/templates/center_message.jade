@@ -14,4 +14,36 @@ block sidebar
 
 block main
   .c-main-white.c-auto-height.c-layout
+    .c-message-status
+      a(href='').active 全部
+      a(href='') 未读
+      a(href='') 已读
 
+
+    table.c-message-table
+      thead
+        tr
+          th 类型
+          th 标题
+          th 时间
+      tbody
+        mixin tr()
+          tr
+            td(width='20%') 加息奖励
+            td.msg-center(width='60%')
+              .msg-head 参与活动送红包
+              .msg-cont
+                | 亲爱的{{user | display_name}}您好：
+                br
+                |2222222
+            td(width='20%')
+              span 2015-8-21
+                i.iconfont.icon-greenRight
+
+        +tr()
+        +tr()
+        +tr()
+        +tr()
+
+    .c-message-pager
+      include include/center_pager
