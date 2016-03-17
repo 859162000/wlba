@@ -2,6 +2,7 @@
 # encoding:utf-8
 import logging
 
+import time
 from django.contrib import auth
 from django.db import transaction
 from django.db.models import Q
@@ -36,8 +37,11 @@ class GetUserInfo(APIView):
     permission_classes = ()
 
     def get(self, request):
+        t1 = time.time()
+        logger.debug('in user info !!! time = {}'.format(t1))
         session_id = self.request.REQUEST.get('session_id')
         user_ids = self.request.REQUEST.get('user_ids', None)
+        logger.debug('get user info with args !!! time = {}'.format(time.time() - t1))
 
         user_info = dict()
         if session_id and not user_ids:
@@ -63,6 +67,7 @@ class GetUserInfo(APIView):
             user_info.update(
                 status=0,
             )
+        logger.debug('get user finished !!! time = {}\n'.format(time.time() - t1))
 
         return HttpResponse(renderers.JSONRenderer().render(user_info, 'application/json'))
 
@@ -109,9 +114,13 @@ class GetUnreadMgsNum(APIView):
     permission_classes = ()
 
     def post(self, request):
+        t1 = time.time()
+        logger.debug('1111going to get unread msg number !!! time = {}'.format(t1))
         user_id = self.request.REQUEST.get('userId')
+        logger.debug('1111with arg userId !!! going to get api!!! time = {}'.format(time.time()-t1))
 
         ret = get_unread_msgs(user_id)
+        logger.debug('1111get unread msg finished!!! ret = {} time = {}\n'.format(ret, time.time()-t1))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -124,11 +133,14 @@ class GetUserUnreadMgsNum(APIView):
     :return:
     """
     permission_classes = ()
-
     def get(self, request):
+        t2 = time.time()
+        logger.debug('2222going to get unread msg number !!! time = {}'.format(t2))
         user_id = self.request.user.pk
+        logger.debug('2222with arg userId !!! going to get api!!! time = {}'.format(time.time()-t2))
 
         ret = get_unread_msgs(user_id)
+        logger.debug('2222get unread msg finished!!! ret = {} time = {}\n'.format(ret, time.time()-t2))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -218,7 +230,7 @@ class CheckTradePassword(APIView):
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
             ret = {'status': 0, 'message': str(e)}
-            logger.debug('CheckTradePassword with {}!'.format(str(e)))
+            logger.debug('CheckTradePassword with {}!\n'.format(str(e)))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -262,12 +274,12 @@ class YueLiBaoBuy(APIView):
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
                                                   'device_type': device['device_type']})
-            logger.info('buy month product success with product_id = {}, trade_id = {}, red_packet_id = {}'
+            logger.info('buy month product success with product_id = {}, trade_id = {}, red_packet_id = {}\n'
                         .format(product_id, trade_id, red_packet_id))
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
         except Exception, e:
-            logger.debug('buy month product failed with {}!'.format(str(e)))
+            logger.debug('buy month product failed with {}!\n'.format(str(e)))
             return HttpResponse(renderers.JSONRenderer().render(
                 {'status': '0', 'msg': 'args error! ' + str(e)}, 'application/json'))
 
@@ -314,7 +326,7 @@ class YueLiBaoBuyFail(APIView):
 
                     # 增加回退红包接口
                     php_redpack_restore(product.order_id, product_id, product.amount, user)
-                    logger.debug('purchase failed and restore red_pack. month_product_id = {},'.format(product_id))
+                    logger.debug('purchase failed and restore red_pack. month_product_id = {},\n'.format(product_id))
 
             ret.update(status=1,
                        msg='success')
@@ -427,7 +439,7 @@ class YueLiBaoCancel(APIView):
 
                     # 增加回退红包接口
                     php_redpack_restore(product.id, product_id, product.amount_source, user)
-                    logger.info(u'流标返回红包. month_product_id = {},'.format(product_id))
+                    logger.info(u'流标返回红包. month_product_id = {}\n'.format(product_id))
 
                     status = 1 if record else 0
                     msg_list.append({'token': product.token, 'status': status})
@@ -435,7 +447,7 @@ class YueLiBaoCancel(APIView):
             ret.update(status=1,
                        msg=msg_list)
         except Exception, e:
-            logger.info(u'流标失败: {}'.format(str(e)))
+            logger.info(u'流标失败: {}\n'.format(str(e)))
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
@@ -728,8 +740,10 @@ class GetAPPUser(APIView):
         token = Token.objects.filter(key=token).first()
         if token:
             user_id = token.user.pk
+            margin = token.user.margin.margin
             ret = {'status': 1,
-                   'user_id': user_id}
+                   'user_id': user_id,
+                   'margin': margin}
 
         else:
             ret = {'status': 0,
