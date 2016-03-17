@@ -204,7 +204,7 @@ class CoopDataDispatchApi(APIView):
                 }
                 logger.info(e)
         else:
-            response_data = self.parase_form_error(form.error)
+            response_data = self.parase_form_error(form.errors)
 
         return response_data
 
@@ -324,7 +324,7 @@ class CoopDataDispatchApi(APIView):
             }
             # FixMe,异步回调给第三方
         else:
-            response_data = self.parase_form_error(form.error)
+            response_data = self.parase_form_error(form.errors)
 
         return response_data
 
@@ -341,7 +341,7 @@ class CoopDataDispatchApi(APIView):
             }
             # FixMe,异步回调给第三方
         else:
-            response_data = self.parase_form_error(form.error)
+            response_data = self.parase_form_error(form.errors)
 
         return response_data
 
@@ -408,7 +408,7 @@ class CoopDataDispatchApi(APIView):
                         product_instance.save()
                 else:
                     message = product_form.errors.values()[0][0]
-                    logger.info("process_products_push invalid with form error: %s" % message)
+                    logger.info("process_products_push data[%s] invalid with form error: %s" % (product, message))
 
         logger.info("process_products_push done")
         response_data = {
