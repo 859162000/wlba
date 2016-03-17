@@ -1,14 +1,21 @@
 $(function(){
     var mySwiper = new Swiper ('#swiper-container1', {
       direction: 'vertical',
-      loop: true
+      loop: false,
+      onSlideChangeEnd:function(){
+        if(mySwiper.activeIndex == 6){
+             $('.page-next').hide()
+         }else{
+            $('.page-next').show()
+        }
+      }
    });
     var mySwiper2 = new Swiper ('#swiper-container2', {
       pagination: '.swiper-pagination',
       paginationClickable: true,
       spaceBetween: 30,
       effect:'fade',
-      loop: true,
+      loop: false,
       onTouchEnd: function(swiper){
          var parent = $('#swiper-container2').find('.swiper-slide')
          parent.css({'z-index':'0'})
@@ -19,12 +26,13 @@ $(function(){
             parent.eq(mySwiper2.previousIndex).find('img').css({'z-index':'11000'}).addClass('translate3d')
          }
           parent.eq(mySwiper2.activeIndex).css({'z-index':'10000'})
+          console.log(mySwiper2.activeIndex)
       }
    });
     window.onload = function() {
         window.setTimeout(function(){
             $(".page-loading").hide();
-            $("#swiper-container1").show()
+            $("#swiper-container1,.page-common").show()
         }, 1000);
     }
             var weiURL = '/weixin/api/jsapi_config/';
