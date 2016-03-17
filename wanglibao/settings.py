@@ -1196,6 +1196,10 @@ BAJINSHE_CHANNEL_CODE = 'bajinshe'
 RENRENLI_COOP_KEY = 'wanglibaorrl'
 RENRENLI_CHANNEL_CODE = 'renrenli'
 
+# 比搜益
+BISOUYI_AES_KEY = ''
+BISOUYI_SIGN_KEY = ''
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1276,9 +1280,11 @@ if ENV == ENV_PRODUCTION:
     OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
 else:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
     OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
