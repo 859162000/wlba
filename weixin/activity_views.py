@@ -233,7 +233,6 @@ class GetSignShareInfo(APIView):
             if share_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=share_record.experience_record_id)
                 share_info['amount']=experience_record.event.amount
-        print '============================data:::', data
         return Response({"ret_code": 0, "data": data})
 
 
