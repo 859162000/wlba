@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import patterns, url
-from views import AnnouncementHomeView, AnnouncementDetailView, AnnouncementPreviewView
+from views import (AnnouncementHomeView, AnnouncementDetailView, AnnouncementPreviewView, AnnouncementHomeApi,
+                   AnnouncementHasNewestApi)
 from django.views.generic import TemplateView
 
 urlpatterns = patterns(
@@ -10,6 +11,8 @@ urlpatterns = patterns(
     url(r'^$', AnnouncementHomeView.as_view(), name='announcement_home'),
     url(r'^detail/(?P<id>\w+)/$', AnnouncementDetailView.as_view(), name='announcement_detail'),
     url(r'^preview/(?P<id>\w+)/$', AnnouncementPreviewView.as_view(), name='announcement_preview'),
+    url(r'^list/$', AnnouncementHomeApi.as_view(), name='announcement_list'),
+    url(r'^has_newest/(?P<id>\d+)/$', AnnouncementHasNewestApi.as_view(), name='announcement_has_newest'),
 
     #app公告
 

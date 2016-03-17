@@ -12,7 +12,7 @@ from marketing.tops import Top
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
-from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
+from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew, get_announcement_homepage_list
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from decimal import *
 from wanglibao_account.models import Binding
@@ -24,7 +24,6 @@ from wanglibao_account.utils import detect_identifier_type
 
 class IndexView(TemplateView):
     template_name = 'mobile_home.jade'
-
 
     def get_context_data(self, **kwargs):
         p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
@@ -66,7 +65,7 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data,
             'getmore': getmore,
-            'announcements': AnnouncementHomepage,
+            'announcements': get_announcement_homepage_list(self.request),
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
             'day_tops': day_tops,
@@ -96,7 +95,8 @@ class HomeView(TemplateView):
         return {
             "p2p_products": p2p_products
         }
-        
+
+
 class DetailView(TemplateView):
     template_name = 'mobile_detail.jade'
 
@@ -112,6 +112,7 @@ class DetailView(TemplateView):
             else:
                 end_time = p2p.end_time
         except P2PProduct.DoesNotExist:
+            from django.http import Http404
             raise Http404(u'您查找的产品不存在')
 
         terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
@@ -142,8 +143,7 @@ class DetailView(TemplateView):
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
 
         site_data = SiteData.objects.all()[0]
-        #排行榜
-
+        # 排行榜
 
         context.update({
             'p2p': p2p,
@@ -198,7 +198,6 @@ WEIXIN_APP_SECRET = '2523d084edca65b6633dae215967a23f'
 
 # WEIXIN_APP_ID = 'wx22c7a048569d3e7e'
 # WEIXIN_APP_SECRET = '1340e746fb4c3719d405fdc27752bc6f'
-
 
 
 class WeixinFeeView(TemplateView):
