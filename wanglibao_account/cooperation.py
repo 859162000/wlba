@@ -71,7 +71,7 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
-from .utils import xunleivip_generate_sign, generate_coop_base_data, str_to_dict
+from .utils import xunleivip_generate_sign, generate_coop_base_data
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
 from wanglibao_margin.models import MarginRecord
@@ -1648,8 +1648,8 @@ class BaJinSheRegister(CoopRegister):
         return self.request.session.get(self.internal_channel_order_id_key, None)
 
     def save_to_session(self):
-        if self.request.META.get('CONTENT_TYPE') == 'application/json':
-            req_data = str_to_dict(self.request.body.strip())
+        if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+            req_data = json.loads(self.request.body.strip())
         else:
             req_data = self.request.REQUEST
 
@@ -1861,14 +1861,17 @@ class BiSouYiRegister(BaJinSheRegister):
         super(BiSouYiRegister, self).__init__(request)
         self.c_code = 'bisouyi'
         self.external_channel_client_id_key = 'cid'
-        self.external_channel_sign_key = 'sign'
-        self.internal_channel_sign_key = 'sign'
+        self.channel_sign_key = 'sign'
+        self.channel_content_key = 'content'
+        self.channel_access_token_key = 'token'
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
         channel_user = self.request.GET.get(self.external_channel_user_key, None)
         client_id = self.request.GET.get(self.external_channel_client_id_key, None)
-        sign = self.request.GET.get(self.external_channel_sign_key, None)
+        sign = self.request.GET.get(self.channel_sign_key, None)
+        content = self.request.GET.get(self.channel_content_key, None)
+        token = self.request.GET.get(self.channel_access_token_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1880,12 +1883,18 @@ class BiSouYiRegister(BaJinSheRegister):
             self.request.session[self.internal_channel_client_id_key] = client_id
 
         if sign:
-            self.request.session[self.internal_channel_sign_key] = sign
+            self.request.session[self.channel_sign_key] = sign
+
+        if content:
+            self.request.session[self.channel_content_key] = content
+
+        if token:
+            self.request.session[self.channel_access_token_key] = content
 
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
-        self.request.session.pop(self.internal_channel_client_id_key, None)
-        self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.channel_sign_key, None)
+        self.request.session.pop(self.channel_content_key, None)
 
 
 # 注册第三方通道

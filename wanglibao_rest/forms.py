@@ -1,6 +1,7 @@
 # encoding:utf-8
 
 
+import json
 import logging
 import hashlib
 from django import forms
@@ -8,6 +9,7 @@ from django.contrib.auth.models import User
 from wanglibao import settings
 from marketing.utils import get_channel_record
 from wanglibao_account.utils import detect_identifier_type
+from report.crypto import Aes
 
 logger = logging.getLogger(__name__)
 
@@ -116,3 +118,58 @@ class OauthUserRegisterForm(OAuthForm):
             return True
         else:
             return False
+
+
+class BiSouYiRegisterForm(forms.Form):
+    promo_token = forms.CharField(required=True)
+    client_id = forms.CharField(required=True)
+    sign = forms.CharField(required=True)
+    content = forms.CharField(required=True)
+
+    def clean_channel_code(self):
+        channel_code = self.cleaned_data['channel_code']
+        if channel_code == 'bisouyi':
+            return channel_code
+        else:
+            raise forms.ValidationError(u'无效渠道码')
+
+    def clean_content(self):
+        content = self.cleaned_data['content']
+        try:
+            ase = Aes()
+            decrypt_text = ase.decrypt(content, settings.BISOUYI_AES_KEY)
+            content_data = json.loads(decrypt_text)
+        except:
+            raise forms.ValidationError(u'content解析失败')
+        else:
+            if isinstance(content_data, dict):
+                if 'phone' in content_data:
+                    if detect_identifier_type(content_data['phone']) == 'phone':
+                        if 'token' in content_data:
+                            return content, content_data
+                        else:
+                            raise forms.ValidationError(u'content没有包含token')
+                    else:
+                        raise forms.ValidationError(u'无效手机号')
+                else:
+                    raise forms.ValidationError(u'content没有包含phone')
+            else:
+                raise forms.ValidationError(u'content不是期望的类型')
+
+    def get_phone(self):
+        content = self.cleaned_data['content']
+        return content['phone']
+
+    def get_token(self):
+        content = self.cleaned_data['content']
+        return content['token']
+
+    def check_sign(self):
+        client_id = self.cleaned_data['client_id']
+        sign = self.cleaned_data['sign']
+        content = self.cleaned_data['content'][0]
+        local_sign = hashlib.md5(str(client_id) + settings.BISOUYI_SIGN_KEY + content).hexdigest()
+        if sign != local_sign:
+            raise forms.ValidationError(u'无效签名')
+        else:
+            return True
