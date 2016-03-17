@@ -67,7 +67,7 @@ from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_account.cooperation import get_uid_for_coop
-from .forms import OauthUserRegisterForm
+from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1770,12 +1770,74 @@ class OauthUserRegisterApi(APIView):
                     'Tip': u'签名错误',
                 }
         else:
-            form_errors = form.errors
-            form_error_keys = form_errors.keys()
-            form_error = form_errors[form_error_keys[0]][0]
+            form_error = form.errors.values()[0][0]
             response_data = {
                 'Code': 10010,
                 'Tip': form_error,
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiRegisterApi(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        form = BiSouYiRegisterForm(self.request.session)
+        if form.is_valid() and form.check_sign():
+            phone = form.get_phone()
+            password = generate_random_password(6)
+            user = create_user(phone, password, "")
+            if user:
+                auth_user = authenticate(identifier=phone, password=password)
+                auth_login(request, auth_user)
+
+                send_messages.apply_async(kwargs={
+                    "phones": [phone, ],
+                    "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                })
+
+                client_id = form.cleaned_data['client_id']
+                channel_code = form.cleaned_data['channel_code']
+                content_data = form.cleaned_data['content'][1]
+                token = form.get_token()
+
+                # 处理第三方渠道的用户信息
+                CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                device = split_ua(request)
+                tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                tid = get_uid_for_coop(user.id)
+                res_data = get_coop_access_token(phone, client_id, tid, coop_key)
+
+                if int(res_data['ret_code']) == 10000:
+                    callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
+                    callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
+                    data = {
+                        'Cust_key': tid,
+                        'Access_tokens': res_data['access_token'],
+                        'Callback_url': callback_url,
+                    }
+                    message = 'success'
+                    register_ok = True
+
+                    response_data = {
+                        'Code': 101,
+                        'Tip': u'成功',
+                        'Data': data,
+                    }
+                else:
+                    pass
+        else:
+            register_ok = False
+            message = form.errors.values()[0][0]
+            logger.info("BiSouYiRegisterApi process data[%s]" % self.request.session)
+
+        if register_ok:
+            url = ''
+        else:
+            url = ''
+
+        logger.info("BiSouYiRegisterApi process result: %s" % message)
+        return HttpResponseRedirect(url)
