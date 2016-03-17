@@ -245,42 +245,42 @@
     top: 10%
   to
     opacity: 1
-    top: 7%
+    top: 6%
 @keyframes b-t1
   from
     opacity: 0
     top: 10%
   to
     opacity: 1
-    top: 7%
+    top: 6%
 @-webkit-keyframes b-t2
   from
     opacity: 0
-    top: 13%
+    top: 8%
   to
     opacity: 1
-    top: 10%
+    top: 5%
 @keyframes b-t2
   from
     opacity: 0
-    top: 13%
+    top: 8%
   to
     opacity: 1
-    top: 10%
+    top: 5%
 @-webkit-keyframes b-t3
   from
     opacity: 0
-    top: 15%
+    top: 10%
   to
     opacity: 1
-    top: 12%
+    top: 7%
 @keyframes b-t3
   from
     opacity: 0
-    top: 15%
+    top: 7%
   to
     opacity: 1
-    top: 12%
+    top: 10%
 @-webkit-keyframes r-l
   from
     opacity: 0
@@ -295,42 +295,20 @@
   to
     opacity: 1
     right: 0
-@-webkit-keyframes translate3ds
-  from
-    transform: translateX(0%)
+@-webkit-keyframes cascadingTeletext_hideToLeft
+  0%
     -webkit-transform: translateX(0%)
-    -moz-transform: translateX(0%)
-  to
-    transform: translateX(500%)
-    -webkit-transform: translateX(500%)
-    -moz-transform: translateX(500%)
-@keyframes translate3ds
-  from
-    transform: translateX(0%)
+  100%
+    -webkit-transform: translateX(-100%)
+    opacity: 0
+
+@-webkit-keyframes cascadingTeletext_hideToRight
+  0%
     -webkit-transform: translateX(0%)
-    -moz-transform: translateX(0%)
-  to
-    transform: translateX(500%)
-    -webkit-transform: translateX(500%)
-    -moz-transform: translateX(500%)
-@-webkit-keyframes translate3ds1
-  from
-    transform: translateX(0%)
-    -webkit-transform: translateX(0%)
-    -moz-transform: translateX(0%)
-  to
-    transform: translateX(-500%)
-    -webkit-transform: translateX(-500%)
-    -moz-transform: translateX(-500%)
-@keyframes translate3ds1
-  from
-    transform: translateX(0%)
-    -webkit-transform: translateX(0%)
-    -moz-transform: translateX(0%)
-  to
-    transform: translateX(-500%)
-    -webkit-transform: translateX(-500%)
-    -moz-transform: translateX(-500%)
+  100%
+    -webkit-transform: translateX(100%)
+    opacity: 0
+
 @mixin animate-fun($t:0s , $t1:0s)
   animation: myfirst $t ease-in-out $t1 both
   -webkit-animation: myfirst $t ease-in-out $t1 both
@@ -451,14 +429,14 @@
                 animation: yuan3 1s ease-in-out 2.3s both
                 bottom: 0
               .page1-fonts
-                font-size: .45rem
+                font-size: 18px
                 color: #ffffff
                 margin-top: 3%
                 position: relative
                 animation: b-t 1s ease-in-out 3.5s both
                 -webkit-animation: b-t 1s ease-in-out 3.5s both
                 span
-                  font-size: .56rem
+                  font-size: 20px
                   color: #faec03
             .page2-title
               text-align: center
@@ -470,7 +448,7 @@
                 margin-top: 22%
             .from-fonts
               color: #ae54fe
-              font-size: .45rem
+              font-size: 18px
               margin: 1.4% 1%
             .from-font1
               +animate-fun1(.5s,1s)
@@ -747,33 +725,27 @@
                 position: absolute
                 +animate-scale(1s,7s)
               .font-c
-                color: #aa5dee
-                font-size: .325rem
-                .title
-                  color: #fdb128
-                  font-size: .6rem
-                span
-                  font-size: .45rem
               .font-one
-                text-align: left
+                top: 6%
                 left: 14%
-                top: 7%
                 animation: b-t1 1s linear 1s both
                 -webkit-animation:  b-t1 1s linear 1s both
+                img
+                  width: 235.5px
               .font-two
-                text-align: right
-                top: 10%
-                right: 15%
-                animation: b-t1 1s linear 4s both
-                -webkit-animation:  b-t1 1s linear 4s both
-                @media (device-height: 480px)
-                  top: 6%
+                top: 6%
+                right: -26%
+                animation: b-t2 1s linear 4s both
+                -webkit-animation:  b-t2 1s linear 4s both
+                img
+                  width: 225.5px
               .font-three
-                text-align: left
+                top: 6%
                 left: 14%
-                top: 16%
                 animation: b-t3 1s linear 6s both
                 -webkit-animation:  b-t3 1s linear 6s both
+                img
+                  width: 255.5px
           .page6-font1
             text-align: center
             +animate-fun(1s)
@@ -859,7 +831,7 @@
   zoom: 1.5
 @media only screen and (min-device-width : 375px) and (max-device-width : 667px) and (orientation : portrait)
   .center-obj
-    zoom: 2.2
+    zoom: 1.8
 .page-common
   position: absolute
   top: 0
@@ -909,9 +881,45 @@
     position: absolute
     animation: myTwo 1s linear 0s infinite alternate both
     -webkit-animation: myTwo 1s linear 0s infinite alternate  both
-.translate3d
-  animation: translate3ds 1s ease-in-out 0s both
-  -webkit-animation: translate3ds 1s ease-in-out 0s both
-.translate3d1
-  animation: translate3ds1 1s ease-in-out 0s both
-  -webkit-animation: translate3ds1 1s ease-in-out 0s both
+
+
+.m-cascadingTeletext
+  width: 183px
+  list-style: none
+  padding: 0px
+  margin: 0px auto
+  position: relative
+  box-sizing: border-box
+  li
+    position: absolute
+    left: 0px
+    top: 0px
+    right: 0px
+    bottom: 0px
+    img
+      width: 183px
+      -webkit-transition: all 0.3s
+      position: absolute
+      left: 50%
+      top: 50%
+      right: 0px
+      bottom: 30px
+      margin-left: -91.5px
+      margin-top: -91.5px
+.m-cascadingTeletext li.z-hideToLeft img
+  -webkit-animation: cascadingTeletext_hideToLeft 0.3s linear
+
+.m-cascadingTeletext li.z-hideToRight img
+  -webkit-animation: cascadingTeletext_hideToRight 0.3s linear
+.dot-box
+  text-align: center
+  span
+    width: 8px
+    height: 8px
+    display: inline-block
+    background: #79579d
+    vertical-align: middle
+    margin: 1%
+    border-radius: 50%
+  span.active
+    background: #ff0e74
