@@ -288,7 +288,7 @@ class WeixinJoinView(View):
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":SIGN_IN_TEMPLATE_ID,
-                    "first":reply_msg%(u"恭喜您签到成功,", experience_amount),
+                    "first":reply_msg%(u"恭喜您签到成功", experience_amount),
                     "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                     "keyword2":"%s天" % daily_record.continue_days,
                     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()

@@ -190,11 +190,44 @@ def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
 
 
+def generate_coop_access_token_sign(client_id, phone, key):
+    sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
+    return sign
+
+
 def get_coop_access_token(phone, client_id, tid, coop_key):
     url = settings.COOP_ACCESS_TOKEN_URL
     logger.info('enter get_coop_access_token with url[%s]' % url)
 
-    sign = hashlib.md5(str(client_id) + str(phone) + coop_key).hexdigest()
+    sign = generate_coop_access_token_sign(client_id, phone, coop_key)
+    data = {
+        'usn': phone,
+        'client_id': client_id,
+        'signature': sign,
+        'p_user_id': tid,
+    }
+    try:
+        ret = requests.post(url, data=data)
+        response_data = ret.json()
+        response_data['ret_code'] = response_data['code']
+        response_data.pop('code')
+        logger.info('get_coop_access_token return: %s' % response_data)
+    except Exception, e:
+        response_data = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+        logger.info("get_coop_access_token failed to connect")
+        logger.info(e)
+
+    return response_data
+
+
+def push_coop_access_token(phone, client_id, tid, coop_key):
+    url = settings.COOP_ACCESS_TOKEN_PUSH_URL
+    logger.info('enter push_coop_access_token with url[%s]' % url)
+
+    sign = generate_coop_access_token_sign(client_id, phone, coop_key)
     data = {
         'usn': phone,
         'client_id': client_id,

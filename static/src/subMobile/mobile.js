@@ -2510,7 +2510,7 @@ org.received_detail = (function(){
         init: function(){
             var
                 _self = lib;
-            var product_id  = org.getQueryStringByName('productId')
+            var product_id  = org.getQueryStringByName('productId');
             _self.fetch(product_id);
         },
         init_style:function(data){
@@ -2573,9 +2573,13 @@ org.checkIn = (function(org){
                 success: function(res){
                     //checkDom.find(".op-dec-title").html("今日已签到");
                     //checkDom.find(".op-dec-detail").html("＋"+ res.data.experience_amount +"体验金");
-                    lib.altDom.prop("class","check-in-alert-layout check-in-now");
-                    lib.altDom.find(".share-money").html("今日签到成功！获得"+ res.data.experience_amount +"元体验金");
-                    lib.altDom.show();
+                    if(res.data.experience_amount != undefined){
+                        lib.altDom.prop("class","check-in-alert-layout check-in-now");
+                        lib.altDom.find(".share-money").html("今日签到成功！获得"+ res.data.experience_amount +"元体验金");
+                        lib.altDom.show();
+                    }else{
+                        org.ui.alert("签到失败");
+                    }
                 }
             });
         },
@@ -2691,12 +2695,16 @@ org.checkIn = (function(org){
                             data: {days:now},
                             dataType: "json",
                             success: function(data){
-                                self.addClass("active-gift-open");
-                                lib.altDom.find("#gift-msg").html(data.message);
-                                setTimeout(function(){
-                                    lib.altDom.show();
-                                },1);
-                                $("div.bar-content").html('距离神秘礼包还有<span id="giftDay">'+ data.mysterious_day +'</span>天');
+                                if(data.mysterious_day != undefined){
+                                    self.addClass("active-gift-open");
+                                    lib.altDom.find("#gift-msg").html(data.message);
+                                    setTimeout(function(){
+                                        lib.altDom.show();
+                                    },1);
+                                    $("div.bar-content").html('距离神秘礼包还有<span id="giftDay">'+ data.mysterious_day +'</span>天');
+                                }else{
+                                    org.ui.alert(data.message);
+                                }
                                 giftOk = true;
                             }
                         });
@@ -2722,11 +2730,15 @@ org.checkIn = (function(org){
                     success: function(res){
                         lib.isShare = true;
                         shareAmount = res.data.experience_amount;
-                        lib.altDom.find(".share-money").html("今日分享成功！获得"+ shareAmount +"元体验金");
-                        setTimeout(function(){
-                            lib.altDom.show();
-                        },1);
-                        $(".checkin-op-share").addClass("checkin-share-ok").find(".op-detail-orange").text("＋"+ shareAmount +"体验金");
+                        if(shareAmount != undefined){
+                            lib.altDom.find(".share-money").html("今日分享成功！获得"+ shareAmount +"元体验金");
+                            setTimeout(function(){
+                                lib.altDom.show();
+                            },1);
+                            $(".checkin-op-share").addClass("checkin-share-ok").find(".op-detail-orange").text("＋"+ shareAmount +"体验金");
+                        }else{
+                            org.ui.alert("分享失败");
+                        }
                     }
                 });
             }

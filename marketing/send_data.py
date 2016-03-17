@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from marketing.models import IntroducedBy,Channels
 from marketing.utils import get_user_channel_record
 from wanglibao_pay.models import PayInfo
+from django.conf import settings
 import requests
 import json
 import datetime
@@ -15,7 +16,7 @@ logger = logging.getLogger('marketing')
 
 def sendData(message,param):
     """往数据部门提供的接口发送实时数据"""
-    posturl = 'http://stat.wanglibao.com:10000/actual/dataindex'
+    posturl = settings.SEND_PHP_URL
     print json.dumps(message)
     try:
         res = requests.post(url = posturl, json=json.dumps(message))
