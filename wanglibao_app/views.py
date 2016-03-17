@@ -1042,7 +1042,14 @@ class AppPraiseAwardView(TemplateView):
 
         return super(AppPraiseAwardView, self).get(request, *args, **kwargs)
 
+class AppCheckInView(TemplateView):
+    """ Client 签到 """
+    template_name = 'client_checkIn.jade'
 
+    def get_context_data(self, **kwargs):
+        return {
+
+        }
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'

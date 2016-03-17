@@ -1,0 +1,35 @@
+-load formatters
+doctype html
+html(style='background: #FFE9D0')
+  head
+    meta(charset="utf-8")
+    meta(name="format-detection" content="telephone=no,email=no")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    meta(name="viewport", content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
+    link(href="/static/styles/app/webview.css?v=20160315", rel="stylesheet")
+
+  body
+    .checIn-share-warp
+      .checIn-share-body
+        img(src='/static/imgs/app/checkin/wx_erweima.png').checIn-share-erweima
+
+        .checIn-rules
+
+          img(src='/static/imgs/app/checkin/detail_rules.png').checkin-nav-title
+          .checIn-rules-warp
+            .checIn-rules-max-title  方式一
+            .checIn-rules-min-title 关注网利宝微信公众号
+            img(src='/static/imgs/app/checkin/weixin_gongzhong.png').checIn-rules-cont.gongzhong1
+            .checIn-rules-min-title 在[热门活动－每日签到]领取
+            img(src='/static/imgs/app/checkin/weixin_gongzhong2.jpg').checIn-rules-cont.gongzhong2
+
+          .checIn-rules-warp
+              .checIn-rules-max-title  方式二
+
+              .checIn-rules-min-title 网利宝App中［我的账户－签到］领取
+              img(src='/static/imgs/app/checkin/weixin_gongzhong3.jpg').checIn-rules-cont.gongzhong2
+
+
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(src='/static/scripts/app/check_in_share.js?v=202160315')
