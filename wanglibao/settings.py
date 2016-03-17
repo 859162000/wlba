@@ -737,7 +737,7 @@ if ENV == ENV_PRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
@@ -788,7 +788,7 @@ elif ENV == ENV_PREPRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
@@ -978,6 +978,15 @@ else:
 #RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 #RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 #POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
+
+
+#往PHP数据中心发送数据接口生产地址和开关
+if ENV == ENV_PRODUCTION:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = True
+else:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = False
 
 # 天芒
 if ENV == ENV_PRODUCTION:
