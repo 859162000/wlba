@@ -79,7 +79,7 @@ class AccessTokenView(AccessTokenBaseView):
         client_id = client.client_id
         client_secret = client.client_secret
 
-        local_sign = hashlib.md5(str(client_id)+str(usn)+str(client_secret)).hexdigest()
+        local_sign = hashlib.md5('-'.join([str(client_id), str(usn), str(client_secret)])).hexdigest()
         if sign == local_sign:
             return True
 
