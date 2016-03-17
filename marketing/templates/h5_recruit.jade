@@ -5,6 +5,7 @@ html.recruit-box
     head
         title 招聘
         include include/app_head
+        meta(content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=1.0, user-scalable=no" ,name="viewport")
     body.recruit-body
         .page-loading
             .loading-img
@@ -64,22 +65,41 @@ html.recruit-box
                             .page3-font2.animations 牛逼的成长速度
                             .page3-font3.animations
                                 img(src='/static/imgs/mobile_activity/recruit/page3-font2.png')
-                            .swiper-container.pic-box#swiper-container2
-                                .swiper-wrapper
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic1.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic2.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic3.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic4.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic5.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic6.png')
-                                .swiper-pagination.wiper-pagination-new
-                            .page-next
+                            //.swiper-container.pic-box#swiper-container2
+                            //    .swiper-wrapper
+                            //        .swiper-slide
+                            //            img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                            //        .swiper-slide
+                            //            img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                            //        .swiper-slide
+                            //            img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                            //        .swiper-slide
+                            //            img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                            //        .swiper-slide
+                            //            img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                            //        .swiper-slide
+                            //            img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                            //    .swiper-pagination.wiper-pagination-new
+                            .ul.m-cascadingTeletext.z-viewArea
+                                li.first.move-item.z-current
+                                    img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                                li.second.move-item
+                                    img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                                li.third.move-item
+                                    img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                                li.four.move-item
+                                    img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                                li.five.move-item
+                                    img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                                li.six.move-item
+                                    img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                            .dot-box
+                                span.active
+                                span
+                                span
+                                span
+                                span
+                                span
                     .swiper-slide
                         .center-obj
                             .page4-font1.animations
@@ -110,24 +130,12 @@ html.recruit-box
                                 img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu11.animationss
                                 img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu12.animationss
                                 .font-one.font-c.animations
-                                    p.title 福利一
-                                    p 领先完善薪酬水平，有吸引力的
-                                        span 年终奖
-                                    p 帅哥美女众多，各种球类活动
-                                    p 商业医疗保险全方位关怀你的身心
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli1.png').animationss
                                 .font-two.font-c.animations
-                                    p.title 福利二
-                                    p 水果、酸奶、下午茶总也管不住嘴
-                                    p
-                                        span 弹性工作、轻松开放
-                                        | 的团队氛围
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli2.png').animationss
                                 .font-three.font-c.animations
-                                    p.title 福利三
-                                    p 电影、桌游、团队聚餐、户外活动
-                                    p
-                                        span 每日、每月、每季度、每年
-                                        | 的企业
-                                    p 文化活动满足你不同需求
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli3.png').animationss
+
                     .swiper-slide
                         .center-obj
                             .page6-font1.animations
