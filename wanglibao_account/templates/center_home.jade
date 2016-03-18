@@ -68,7 +68,13 @@ block main
         .fund-explain 暂冻结资金(元)
 
     .font-m.t-d10 投资分布
-      
+    .c-h-echarts.clearfix
+      .c-spread-type.fl.echarts-list
+        #type(style="width: 160px;height:250px;")
+      .c-spread-limit.fl.echarts-list
+        #limit(style="width: 160px;height:250px;")
+      .c-spread-earning.fl.echarts-list.un-mg
+        #earning(style="width: 160px;height:250px;")
 
 
     .font-m.t-d10 回款计划
@@ -98,4 +104,5 @@ block main
         +tr()
     .c-h-pager
       include include/center_pager
-
+  script.
+    require(["/static/src/pc/transaction.js?v=2"])
