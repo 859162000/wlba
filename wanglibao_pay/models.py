@@ -29,6 +29,8 @@ class Bank(models.Model):
     # 提现限额:min_amount=50,max_amount=50000
     withdraw_limit = models.CharField(max_length=500, blank=True, verbose_name=u"银行提现限额", default="")
     have_company_channel = models.BooleanField(u"是否对公", default=False)
+    cards_info = models.TextField(max_length=10000, default='', blank=True, verbose_name=u'银行卡号识别码')
+
 
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
