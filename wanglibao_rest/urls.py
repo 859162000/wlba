@@ -83,8 +83,8 @@ router.register(r'products', ProductTypeViewSet)
 
 router.register(r'hot_trusts', HotTrustViewSet)
 router.register(r'hot_funds', HotFundViewSet)
-router.register(r'mobile_hot_trusts', MobileHotTrustViewSet)
-router.register(r'mobile_hot_funds', MobileHotFundViewSet)
+#router.register(r'mobile_hot_trusts', MobileHotTrustViewSet)
+#router.register(r'mobile_hot_funds', MobileHotFundViewSet)
 router.register(r'mobile_main', MobileMainPageViewSet)
 router.register(r'mobile_main_p2p', MobileMainPageP2PViewSet)
 
