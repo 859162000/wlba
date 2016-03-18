@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Sum, Q
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 from user_agents import parse
 
 from marketing.models import IntroducedBy
@@ -260,7 +261,7 @@ class PhpMarginKeeper(MarginKeeper):
             margin.save()
 
 
-def get_user_info(request, session_id):
+def get_user_info(request, session_id=None, token=None):
     """
     get user's base info to php server.
     :param request:
@@ -277,9 +278,15 @@ def get_user_info(request, session_id):
     print 'ua_string = ', ua_string
     print 'user agent = ', user_agent
 
-    if session_id == request.session.session_key:
-        user = request.user
+    user = None
 
+    if session_id and session_id == request.session.session_key:
+        user = request.user
+    if token:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+
+    if user:
         if not user.id:
             user_info.update(status=0,
                              message=u'session error.')

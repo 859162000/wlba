@@ -40,12 +40,15 @@ class GetUserInfo(APIView):
         t1 = time.time()
         logger.debug('in user info !!! time = {}'.format(t1))
         session_id = self.request.REQUEST.get('session_id')
+        token = self.request.REQUEST.get('token')
         user_ids = self.request.REQUEST.get('user_ids', None)
         logger.debug('get user info with args !!! time = {}'.format(time.time() - t1))
 
         user_info = dict()
         if session_id and not user_ids:
             user_info = get_user_info(request, session_id)
+        elif token and not user_ids:
+            user_info = get_user_info(request, None, token)
         elif user_ids:
             ids = user_ids.split(',')
             ids_list = [int(uid) for uid in ids]
