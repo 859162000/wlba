@@ -91,6 +91,7 @@ class CoopSessionProcessor(object):
         # 传递渠道oauth客户端ID时使用的变量名
         self.external_channel_client_id_key = settings.CLIENT_ID_QUERY_STRING
         self.internal_channel_client_id_key = 'client_id'
+        self.internal_channel_refresh_token_key = 'refresh_token'
 
     def get_channel_code_from_request(self):
         return self.request.GET.get(self.external_channel_key, None)
@@ -149,6 +150,7 @@ class BaJinSheSession(CoopSessionProcessor):
         self.external_channel_sign_key = 'signature'
         self.internal_channel_sign_key = 'sign'
         self.external_channel_user_key = 'p_user_id'
+        self.external_channel_refresh_token_key = 'refresh_token'
 
     def save_to_session(self):
         super(BaJinSheSession, self).save_to_session()
@@ -162,6 +164,7 @@ class BaJinSheSession(CoopSessionProcessor):
         sign = req_data.get(self.external_channel_sign_key, None)
         client_id = req_data.get(self.external_channel_client_id_key, None)
         channel_user = req_data.get(self.external_channel_user_key, None)
+        refresh_token = req_data.get(self.external_channel_refresh_token_key, None)
 
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
@@ -175,10 +178,14 @@ class BaJinSheSession(CoopSessionProcessor):
         if client_id:
             self.request.session[self.internal_channel_client_id_key] = client_id
 
+        if refresh_token:
+            self.request.session[self.internal_channel_refresh_token_key] = refresh_token
+
     def clear_session(self):
         super(BaJinSheSession, self).clear_session()
         self.request.session.pop(self.internal_channel_phone_key, None)
         self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_refresh_token_key, None)
 
 
 # 注册第三方通道
