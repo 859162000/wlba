@@ -5,19 +5,19 @@ import StringIO
 import traceback
 import logging
 from datetime import timedelta
-
+from django.conf import settings
+from django.utils import timezone
+from django.http import HttpResponse
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
 
+import constants
 from . import AccessTokenBaseView
 from .models import AccessToken, RefreshToken
 from .forms import RefreshTokenGrantForm, UserAndClientForm
 from .utils import now
 from .tools import get_current_utc_timestamp, generate_oauth2_sign
-import constants
-from django.conf import settings
-from django.utils import timezone
-from django.http import HttpResponse
+from wanglibao_account.cooperation import CoopSessionProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +120,7 @@ class AccessTokenView(AccessTokenBaseView):
                 'msg': form.errors.values()[0][0]
             }
 
+        CoopSessionProcessor(request).all_processors_for_session(1)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
