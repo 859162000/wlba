@@ -918,7 +918,7 @@ class IdValidate(APIView):
 
             if request.DATA.get("captcha_1"):
                 return Response({
-                                    "message": u"实名认证成功..",
+                                    "message": u"实名认证成功.",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
@@ -929,21 +929,21 @@ class IdValidate(APIView):
 
             if verify_counter.count >= 3:
                 return Response({
-                                    "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
+                                    "message": u"验证错误次数频繁，请联系客服 4008-588-066",
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
 
             profile = WanglibaoUserProfile.objects.filter(user=user).first()
             if profile.id_is_valid:
                 return Response({
-                    "message": u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066",
+                    "message": u"您已认证通过，无需再认证，请重新登录查看最新状态",
                     "error_number": ErrorNumber.try_too_many_times
                 })
 
             id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
             if id_verify_count >= 1:
                 return Response({
-                                    "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
+                                    "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=400)
 
@@ -954,7 +954,7 @@ class IdValidate(APIView):
 
             if error or not verify_record.is_valid:
                 return Response({
-                                    "message": u"验证失败，拨打客服电话进行人工验证",
+                                    "message": u"验证失败，请重试或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.unknown_error
                                 }, status=400)
 
