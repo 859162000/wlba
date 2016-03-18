@@ -320,7 +320,8 @@ def landpage_view(request):
                     if phone_has_register:
                         url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
                     else:
-                        url = reverse('auth_register') + "?promo_token=" + channel_code + '&next=' + url
+                        action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
+                        url = reverse(action_uri) + "?promo_token=" + channel_code + '&next=' + url
             elif action == 'register':
                 action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
                 url = reverse(action_uri) + "?promo_token=" + channel_code
