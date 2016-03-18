@@ -5,6 +5,7 @@ html.recruit-box
     head
         title 招聘
         include include/app_head
+        link(href="/static/styles/mobile_activity/swipe.css?v=20160202514", rel="stylesheet")
         meta(content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=1.0, user-scalable=no" ,name="viewport")
     body.recruit-body
         .page-loading
@@ -161,13 +162,13 @@ html.recruit-box
                         .center-obj
                             .page7-font1.animations
                                 img(src='/static/imgs/mobile_activity/recruit/page7_font1.png')
-                            .dyh-fuh
-                                .dyh.animations
-                                    p 订阅号
-                                    img(src='/static/imgs/mobile_activity/recruit/dyh.png')
-                                .fwh.animations
-                                    p 服务号
-                                    img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            //.dyh-fuh
+                            //    .fwh.animations
+                            //        p 服务号
+                            //        img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            p.fwh 服务号
+                            .erweima.animations
+                                img(src='/static/imgs/mobile_activity/recruit/fwh.png')
                             p.pop.animations 长按，极致工作，疯狂玩乐就等你！
         script(src="/static/src/mobile/lib/weixin/wx.js")
         script(src='/static/scripts/app/swiper/swiper.min.js?v=201512181')
