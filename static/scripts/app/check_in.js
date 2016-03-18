@@ -302,6 +302,7 @@ org.checin_in = (function () {
 
             try{
                 _self.appShare.shareStatus(function(result){
+                    if(!result.data.experience_amount) return org.ui.alert('分享失败')
                     _self.checkInAlert('share', '今日分享成功！获得'+result.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                         shareStaus = true;
                         shareInfo(shareStaus, result.data.experience_amount)
@@ -455,6 +456,7 @@ org.checin_in = (function () {
                 },
                 success: function(data){
                     if(data.ret_code ===0){
+
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
                             _self.steriousGift(data.mysterious_day)
                             $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
