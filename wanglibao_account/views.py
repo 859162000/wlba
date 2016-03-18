@@ -73,7 +73,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
 # import requests
 from wanglibao_margin.models import MarginRecord
-from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct, ExperienceEvent
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
@@ -1765,8 +1765,8 @@ class AdminSendMessageView(TemplateView):
             msg = msg_sms = ''
             # 发送理财券
             coupon_ids = request.POST.get("coupon_ids", "")
+            now = timezone.now()
             if coupon_ids:
-                now = timezone.now()
                 coupon_ids_list = coupon_ids.split(",")
                 coupon_ids_list = [cid for cid in coupon_ids_list if cid.strip() != ""]
                 if coupon_ids_list:
@@ -1789,6 +1789,25 @@ class AdminSendMessageView(TemplateView):
                                     msg += u'id:{},成功;'.format(coupon_id)
                                 else:
                                     msg += u'id:{},失败;'.format(coupon_id)
+                        else:
+                            msg += u'id:{},失败;'.format(coupon_id)
+
+            # 发送体验金
+            experience_ids = request.POST.get("experience_ids", "")
+            if experience_ids:
+                experience_ids_list = experience_ids.split(",")
+                experience_ids_list = [cid for cid in experience_ids_list if cid.strip() != ""]
+                if experience_ids_list:
+                    for experience_id in experience_ids_list:
+                        experience_event = ExperienceEvent.objects.filter(pk=experience_id, invalid=False)\
+                            .filter(available_at__lt=now, unavailable_at__gt=now).first()
+                        if experience_event:
+                            record = ExperienceEventRecord()
+                            record.user = user
+                            record.event = experience_event
+                            record.created_at = now
+                            record.save()
+                            msg += u'id:{},成功;'.format(coupon_id)
                         else:
                             msg += u'id:{},失败;'.format(coupon_id)
 
