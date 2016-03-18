@@ -2552,8 +2552,6 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
         from wanglibao_profile.models import WanglibaoUserProfile
 
         now = timezone.now()
-        today_start = local_to_utc(now, 'min')
-        today_end = local_to_utc(now, 'max')
         user = request.user
         password = self.params.get('password').strip()
 
@@ -2561,6 +2559,14 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
         # 错误大于6次, 密码错误频繁，为账户安全建议重置
         user_profile = WanglibaoUserProfile.objects.get(user=user)
         failed_count = user_profile.login_failed_count
+        last_failed_time = user_profile.login_failed_time
+
+        if last_failed_time:
+            today_start = local_to_utc(last_failed_time, 'min')
+            today_end = local_to_utc(last_failed_time, 'max')
+        else:
+            today_start = local_to_utc(now, 'min')
+            today_end = local_to_utc(now, 'max')
 
         if failed_count >= 6 and today_start < now <= today_end:
             msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
