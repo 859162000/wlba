@@ -295,6 +295,24 @@
   to
     opacity: 1
     right: 0
+@-webkit-keyframes opacityf
+  from
+    opacity: 0
+    transform: scale(0)
+    -webkit-transform: scale(0)
+  to
+    opacity: 1
+    transform: scale(1)
+    -webkit-transform: scale(1)
+@keyframes opacityf
+  from
+    opacity: 0
+    transform: scale(0)
+    -webkit-transform: scale(0)
+  to
+    opacity: 1
+    transform: scale(1)
+    -webkit-transform: scale(1)
 @-webkit-keyframes cascadingTeletext_hideToLeft
   0%
     -webkit-transform: translateX(0%)
@@ -574,26 +592,25 @@
               img
                 width: 315.5px
                 height: 23.5px
-            .pic-box
-              width: 100%
-              height: 220px
-              margin: 0 auto
-              position: relative
-              overflow: hidden
-              z-index: 1
-              .swiper-wrapper
+            .opt-box
+              animation: opacityf .5s ease-in-out 10s both
+              -webkit-animation: opacityf .5s ease-in-out 10s both
+              .pic-box
                 width: 100%
-                .swiper-slide
-                  background-position: center
-                  background-size: cover
-                  width: 155px
-                  height: 173px
-                  text-align: center
-                  img
-                    width: 100%
-                  .swiper-container-horizontal
-                    .swiper-pagination-new
-                      bottom: 0
+                height: 220px
+                margin: 0 auto
+                position: relative
+                overflow: hidden
+                .swiper-wrapper
+                  width: 100%
+                  .swiper-slide
+                    background-position: center
+                    background-size: cover
+                    width: 155px
+                    height: 173px
+                    text-align: center
+                    img
+                      width: 100%
             .page4-font1
               text-align: center
               +animate-fun(1s)
@@ -728,7 +745,6 @@
                 top: 53%
                 position: absolute
                 +animate-scale(1s,7s)
-              .font-c
               .font-one
                 top: 5%
                 left: 14%
@@ -803,10 +819,8 @@
           .fwh
             font-size: .8rem
             text-align: center
-            +animate-fun(1s,1s)
             color: #aa5dee
             padding-top: 5%
-            position: relative
           .pop
             color: #aa5dee
             font-size: .8rem
