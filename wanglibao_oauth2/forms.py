@@ -96,20 +96,21 @@ class RefreshTokenGrantForm(forms.Form):
     Checks and returns a refresh token.
     """
 
-    client = forms.CharField(required=True, error_messages={'required': u'客户端实例必须存在'})
+    client_id = forms.CharField(required=True, error_messages={'required': u'客户端id是必须的'})
     refresh_token = forms.CharField(required=True, error_messages={'required': u'刷新令牌必须存在'})
 
     def clean(self):
-        client = self.cleaned_data['client']
+        client_id = self.cleaned_data['client_id']
         token = self.cleaned_data['refresh_token']
+        if client_id and token:
+            try:
+                token = RefreshToken.objects.get(token=token, expired=False, client__client_id=client_id)
+            except RefreshToken.DoesNotExist:
+                raise forms.ValidationError(
+                    code=10110,
+                    message=u'无效刷新令牌'
+                )
+            else:
+                self.cleaned_data['refresh_token'] = token
 
-        try:
-            token = RefreshToken.objects.get(token=token, expired=False, client=client)
-        except RefreshToken.DoesNotExist:
-            raise forms.ValidationError(
-                code=10110,
-                message=u'无效刷新令牌'
-            )
-        else:
-            self.cleaned_data['refresh_token'] = token
-            return self.cleaned_data
+        return self.cleaned_data
