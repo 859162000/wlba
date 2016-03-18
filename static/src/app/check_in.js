@@ -163,12 +163,18 @@ org.checin_in = (function () {
 
             //当日是否签到
             if(!resultCopy.status){
+                var flag_explan = '';
                 _self.checkInOpeartion('sign_in', function(data){
                     //签到成功更新连续签到日
                     current_day++;
 
+                    if(data.data.experience_amount){
+                        flag_explan = '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看';
+                    }else{
+                        flag_explan = '分享失败';
+                    }
                     if(data.data.status){
-                        _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
+                        _self.checkInAlert('flag', flag_explan, function(){
                             triggerUI(current_day)
                             _self.signIn(true, data.data.experience_amount)
                             _self.steriousGift(steriousGift_days - 1);
