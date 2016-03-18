@@ -1027,8 +1027,8 @@ class LoginAPIView(DecryptParmsAPIView):
 
         # 登录成功后将用户的错误登录次数清零
         user_profile = WanglibaoUserProfile.objects.get(user=user)
-        # user_profile.login_failed_count = 0
-        # user_profile.login_failed_time = timezone.now()
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
         user_profile.save()
 
         push_user_id = request.DATA.get("user_id", "")

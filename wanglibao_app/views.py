@@ -858,8 +858,8 @@ class AppLogoutAPIView(APIView):
         from wanglibao_profile.models import WanglibaoUserProfile
 
         user_profile = WanglibaoUserProfile.objects.get(user=request.user)
-        # user_profile.login_failed_count = 0
-        # user_profile.login_failed_time = timezone.now()
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
         user_profile.save()
 
         auth.logout(request)

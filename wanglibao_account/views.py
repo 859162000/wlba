@@ -1269,8 +1269,8 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
         # 重置密码后将用户的错误登录次数清零
         from wanglibao_profile.models import WanglibaoUserProfile
         user_profile = WanglibaoUserProfile.objects.get(user=user)
-        # user_profile.login_failed_count = 0
-        # user_profile.login_failed_time = timezone.now()
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
         user_profile.save()
 
         return Response({'ret_code': 0, 'message': u'修改成功'})
@@ -2623,19 +2623,19 @@ class LoginCounterVerifyAPI(DecryptParmsAPIView):
             msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
         else:
             if user.check_password(password):
-                # user_profile.login_failed_count = 0
-                # user_profile.login_failed_time = now
+                user_profile.login_failed_count = 0
+                user_profile.login_failed_time = now
                 user_profile.save()
                 return Response({'ret_code': 0, 'message': 'ok'})
             else:
                 msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
 
-                # if today_start < now <= today_end:
-                #     user_profile.login_failed_count = failed_count + 1
-                #     user_profile.login_failed_time = now
-                # else:
-                #     user_profile.login_failed_count = 1
-                #     user_profile.login_failed_time = now
+                if today_start < now <= today_end:
+                    user_profile.login_failed_count = failed_count + 1
+                    user_profile.login_failed_time = now
+                else:
+                    user_profile.login_failed_count = 1
+                    user_profile.login_failed_time = now
 
                 user_profile.save()
 
