@@ -34,6 +34,7 @@ class Announcement(models.Model):
     status = models.SmallIntegerField(verbose_name=u'审核状态', help_text=u'审核状态', max_length=2, choices=STATUS, default=0)
     createtime = models.DateTimeField(auto_now=False, default=timezone.now, verbose_name=u'发布时间', help_text=u'发布时间')
     updatetime = models.DateTimeField(auto_now=True, verbose_name=u'更新时间', help_text=u'更新时间')
+    page_title = models.CharField(max_length=100, verbose_name=u'公告页面标题', blank=True, null=True, help_text=u'公告页面标题')
 
     class Meta:
         verbose_name_plural = u'公告'

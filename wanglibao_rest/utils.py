@@ -2,11 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import re
+import time
+import logging
 import hashlib
+import requests
 import datetime
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate
+from wanglibao_account.models import Binding
+from wanglibao_profile.models import WanglibaoUserProfile
+
+logger = logging.getLogger(__name__)
 
 
 def search(client, string):
@@ -121,3 +132,135 @@ def process_for_fuba_landpage(request, channel_code):
                 return
         else:
             redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
+
+
+def generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
+    sign = hashlib.md5(str(user_id) + client_id + str(utc_timestamp) + key).hexdigest()
+    return sign
+
+
+def get_current_utc_timestamp():
+    time_format = '%Y-%m-%d %H:%M:%S'
+    utc_time = timezone.now().strftime(time_format)
+    utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
+    return utc_timestamp
+
+
+def coop_token_login(request, phone, client_id, access_token):
+    if phone and client_id and access_token:
+        try:
+            user = authenticate(phone=phone, client_id=client_id, token=access_token)
+            if user:
+                auth_login(request, user)
+        except Exception, e:
+            logger.info('internal request oauth failed with error %s' % e)
+    else:
+        logger.info("coop_token_login failed with phone[%s] client_id[%s] access_token[%s]" % (phone,
+                                                                                               client_id,
+                                                                                               access_token))
+
+
+def generate_bajinshe_sign(client_id, phone, key):
+    sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
+    return sign
+
+
+def generate_coop_access_token_sign(client_id, phone, key):
+    sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
+    return sign
+
+
+def process_for_bajinshe_landpage(request, channel_code):
+    sign = request.session.get('sign', None)
+    phone = request.session.get('phone', None)
+    client_id = request.session.get('client_id', None)
+    access_token = request.session.get('access_token', None)
+
+    key = settings.BAJINSHE_COOP_KEY
+    if generate_bajinshe_sign(client_id, phone, key) == sign:
+        coop_token_login(request, phone, client_id, access_token)
+    else:
+        logger.info("process_for_bajinshe_landpage invalid signature with sign[%s] phone[%s] key[%s]" %
+                    (sign, phone, key))
+
+
+def process_for_renrenli_landpage(request, channel_code):
+    phone = request.GET.get('phone', None)
+    client_id = request.GET.get('client_id', None)
+    access_token = request.GET.get('access_token', None)
+    if not phone:
+        phone = request.session.get('phone', None)
+    if not client_id:
+        client_id = request.session.get('client_id', None)
+    if not access_token:
+        access_token = request.session.get('access_token', None)
+
+    coop_token_login(request, phone, client_id, access_token)
+
+
+def has_binding_for_bid(channel_code, bid):
+    return Binding.objects.filter(btype=channel_code, bid=bid).exists()
+
+
+def get_coop_binding_for_phone(channel_code, phone):
+    return Binding.objects.filter(btype=channel_code, user__wanglibaouserprofile__phone=phone).first()
+
+
+def has_register_for_phone(phone):
+    return WanglibaoUserProfile.objects.filter(phone=phone).exists()
+
+
+def get_coop_access_token(phone, client_id, tid, coop_key):
+    url = settings.COOP_ACCESS_TOKEN_URL
+    logger.info('enter get_coop_access_token with url[%s]' % url)
+
+    sign = generate_coop_access_token_sign(client_id, phone, coop_key)
+    data = {
+        'usn': phone,
+        'client_id': client_id,
+        'signature': sign,
+        'p_user_id': tid,
+    }
+    try:
+        ret = requests.post(url, data=data)
+        response_data = ret.json()
+        response_data['ret_code'] = response_data['code']
+        response_data.pop('code')
+        logger.info('get_coop_access_token return: %s' % response_data)
+    except Exception, e:
+        response_data = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+        logger.info("get_coop_access_token failed to connect")
+        logger.info(e)
+
+    return response_data
+
+
+def push_coop_access_token(phone, client_id, tid, coop_key):
+    url = settings.COOP_ACCESS_TOKEN_PUSH_URL
+    logger.info('enter push_coop_access_token with url[%s]' % url)
+
+    sign = generate_coop_access_token_sign(client_id, phone, coop_key)
+    data = {
+        'usn': phone,
+        'client_id': client_id,
+        'signature': sign,
+        'p_user_id': tid,
+    }
+    try:
+        ret = requests.post(url, data=data)
+        response_data = ret.json()
+        response_data['ret_code'] = response_data['code']
+        response_data.pop('code')
+        logger.info('get_coop_access_token return: %s' % response_data)
+    except Exception, e:
+        response_data = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+        logger.info("get_coop_access_token failed to connect")
+        logger.info(e)
+
+    return response_data

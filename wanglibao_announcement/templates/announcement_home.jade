@@ -1,33 +1,31 @@
 -load formatters
-
 doctype html
-- with '网利宝官网_p2p理财_p2p网贷_值得信赖的互联网金融服务公司平台_网利宝' as title
-include include/common_head
-- endwith
-meta(name="keywords", content="p2p理财公司,p2p网贷公司,网利宝")
-meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷公司平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
-body
-  include global/g_nav
-  .container.margin-bottom-xxl
-    .siderbar-div
-      - with '网站公告' as title
-      include include/about_sidebar
-      - endwith
-    .panel-padding.span9-omega
-      .row.announce-content-title
-        .span10
-          h2 网站公告
-      ul.announce-content-list
-        for announce in announcements
-          li
-            a.span10(href="/announcement/detail/{{announce.id}}/", target="_blank") &bull; {{announce.title}}
-            .span2-omega.align-center {{announce.createtime | date:'Y-m-d'}}
-      .space-vertical-l
-      .row
-        - with data=announcements uri='/announcement/'
-        include include/pager
+html
+    head
+        - with '网址公告' as title
+        include global/g_head
         - endwith
-
-
-  include global/g_footer
-  include include/tracking
+        meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+        meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    body
+        include global/g_nav
+        - with '网站公告' as title
+        include include/about_sidebar
+        - endwith
+        .section
+            .media_box.clearfix
+                .notice_list.clearfix
+                    ul.clearfix
+                        for announce in announcements
+                            li.notice_title
+                                a(href="/announcement/detail/{{announce.id}}/", target="_blank")
+                                    i
+                                    | {{announce.title}}
+                                span {{announce.createtime | date:'Y-m-d'}}
+                    .pager
+                        - with data=announcements uri='/announcement/'
+                        include include/pager
+                        - endwith
+        include global/g_footer
+        include include/tracking
+                 

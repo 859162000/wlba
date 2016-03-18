@@ -1,0 +1,153 @@
+-load formatters
+doctype html
+html
+  head
+    - with '关于我们' as title
+    include global/g_head
+    - endwith
+    meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+    meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    link(href="/static/styles/pc/video-js.min.css", rel="stylesheet", type="text/css")
+    link(href="/static/styles/pc/lightbox.css", rel="stylesheet", type="text/css")
+  body
+    include global/g_nav
+    - with '关于我们' as title
+    include include/about_sidebar
+    - endwith
+    .about_main
+        .section.wanglibao_about_banner.clearifx
+            .i_about_item
+                .c_left
+                    h3 认识网利宝
+                    .c_nav
+                        a(href="javascript:void(0)").right_border.active 商业模式
+                        a(href="javascript:void(0)").right_border 高管团队
+                        a(href="javascript:void(0)") 美好期望
+                    .c_content 网利宝凭借丰富的金融行业经验及强大的互联网优势，在业内独创“产业银行”的商业模式，联合国内领先的金融机构、产业龙头企业进行战略合作，在产业中下游的细分领域深耕，为投资用户提供多元化、高收益、安全透明、期限灵活的理财产品。
+                    .c_content(style='display:none') 网利宝的高管团队在互联网、金融领域具有多年管理经验，在世界顶级投行摩根士丹利、美银美林、高盛，全球最大的20家对冲基金之一“Fortress Investment Group”，淡马锡旗下风投机构祥峰投资，华夏基金，沃尔玛中国，中金(CICC)等知名公司担任过重要职位，他们把在金融和互联网行业的深刻认知、深厚经验带到了网利宝，使网利宝成为了业内金融属性最强、最具互联网特色的在线理财平台。
+                    .c_content(style='display:none') 网利宝相信，充满激情和战斗力的专业团队、敏锐的客户需求洞察力，是平台为用户不断提供优质服务与产品的基础，未来平台必将以国家政策为导向，以满足用户多元化理财需求为中心不断努力。
+                .c_right
+                    .i_video_warp
+                        video( id="really-cool-video", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="470", height="286", poster="/static/imgs/pc/guide/video_poster.jpg", data-setup='{"language":"zh"}' )
+                          source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_video.mp4", type='video/mp4')
+                          source(src='https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_video_ogg.ogg', type='video/ogg')
+                          p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,safari,ie9以上等)！
+        .section.wanglibao_introduction
+            .i_about_item
+                h3 使命
+                .introduction
+                    p 通过“产业银行”的商业模式，不断为优质的、有融资需求的中小企业解决资金困难，不断设计优质信贷产品，
+                    p 为投资用户带去多元化、高收益、安全透明、期限灵活的理财产品。
+                h3 愿景
+                .introduction 打造中国最富有竞争力的互联网金融平台
+                h3 Logo的由来
+                .introduction 标识传达了网利宝希望通过丰富的理财产品为用户带来丰富的投资体验。同时我们坚信，好收益，会开启多彩生活的每一天。
+        .section.i-mod-warp.i-guide-advantage.why_choose
+          .i-guide-item
+            .i-item-cont-warp
+              .why_choose_title 为什么选择网利宝
+              .guide-extension-table
+                mixin adItem(classname, icon, title, textArr, ismargin)
+                  if ismargin == 'true'
+                    exitem_mg = 'ex-item-mg'
+                  else
+                    exitem_mg = ''
+                  .ex_item_box
+                      .ex-item(class=exitem_mg)
+                        .ex-item-head(class=classname)
+                          i.icon.iconfont(class=icon)
+                        .ex-item-cont.font-m
+                          .ex-cont-tit.font-l=title
+                          for txt in textArr
+                            .ex-cont-small=txt
+                - var safe = ['阳光保险承保', 'IT数据风控系统把关', '合作机构全额担保', '四重身份认证']
+                +adItem('ex-blue', 'icon-safe', '安全保障', safe, 'true')
+
+                - var rocket = ['年化高达10-16%', '30余倍银行活期理财', '打通传统金融行业中间环节', '让利给投资者']
+                +adItem('ex-red', 'icon-rocket', '高收益', rocket, 'true')
+
+                - var authority = ['独创IT数据风控系统', '汇聚华尔街精英金融团队', '专注于垂直细分领域', '打造金融服务新蓝海']
+                +adItem('ex-orange', 'icon-authority', '专业', authority, 'true')
+
+                - var service = ['360度贴心服务', '理财需求快速反应', '客户问题即时解决', '优质产品精心推荐']
+                +adItem('ex-green', 'icon-service', '服务', service, 'false')
+        .section.i-mod-warp.i-guide-inver-us.wanglibao_investor
+          .i-guide-item
+            .i-item-cont-warp
+              .why_choose_title 谁投资了我们？
+              .guide-inver-us-cont
+                .inver-us-item
+                  .inver-us-logo.inver-us-idg
+                  .inver-us-explain 2014年2月，网利宝获得国际知名风投IDG资本A轮投资。自1992年开始，作为最早进入中国市场的国际投资机构之一，IDG资本已投资百度、腾讯、携程等200家优秀企业，并已有超过60家企业在美国、中国香港、中国A股证券市场上市，或通过M&A成功退出。
+                .inver-us-item
+                  .inver-us-logo.inver-us-hl
+                  .inver-us-explain 2015年5月5日，网利宝获市值百亿上市公司鸿利光电拟共4000万美元B轮融资。作为一家国家级高新技术企业，鸿利光电LED器件在显指、光效、稳定性等方面的指标均达到国内领先水平，是国内率先通过美国环保总署(EPA)认可的第三方IES LM-80测试的LED封装企业，是中国白光LED器件领军者，致力打造中国领先的LED+互联网金融+车联网的生态平台。
+        .section.wanglibao_leader_box
+            .i_about_item
+                .why_choose_title 核心团队
+                mixin leaderList(photo, names, title)
+                    .wanglibao_leader
+                        a(href="/team/", target="_blank")
+                            .leader_photo(class=photo)
+                        .leader_name=names
+                        .leader_title=title
+                .clearfix
+                    +leaderList('phone1', '赵润龙', '网利宝创始人兼CEO')
+                    +leaderList('phone2', '刘二飞', '网利宝联合创始人、董事')
+                    +leaderList('phone3', '李丰', '前IDG资本合伙人')
+                    +leaderList('phone4', '李国平', '鸿利光电董事长')
+                .clearfix.mt64
+                    +leaderList('phone5', '陆晓野', '网利宝总裁')
+                    +leaderList('phone6', '李培勤', '网利宝董事总经理')
+                    +leaderList('phone7', '蔡景钟', '网利宝董事总经理')
+                    +leaderList('phone8', '徐海通', '网利宝金融产品总监')
+                .leader_info_detail
+                    a(href="/team/", target="_blank") 查看详细
+        .section.wanglibao_style
+            .i_about_item.clearfix(onselectstart="return false")
+                .why_choose_title 网利宝风采
+                .staff_style_boxs
+                    .staff_photos.clearfix
+                        .staff_style_box.clearfix#staff_style_box
+                            a(rel="example_group",href="/static/imgs/pc/about/1.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/1.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/2.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/2.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/3.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/3.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/4.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/4.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/5.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/5.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/6.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/6.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/7.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/7.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/8.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/8.jpg')
+                        .staff_style_box.clearfix
+                            a(rel="example_group",href="/static/imgs/pc/about/9.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/9.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/10.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/10.jpg')
+                            a(rel="example_group",href="/static/imgs/pc/about/11.jpg",data-lightbox="example-set")
+                                .box-shadow
+                                img(src='/static/imgs/pc/about/11.jpg')
+                .pre_page
+                    i
+                .next_page
+                    i
+    include global/g_footer
+    script.
+        require(["/static/src/pc/about.js?v=2222"])
+    include include/tracking

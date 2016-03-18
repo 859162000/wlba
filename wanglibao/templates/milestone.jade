@@ -1,21 +1,39 @@
+-load formatters
 doctype html
-- with '网利宝是中国领先的互联网金融_p2p理财_p2p网贷平台_网利宝' as title
-include include/common_head
-- endwith
-meta(name="keywords", content="p2p理财,p2p网贷,网利宝")
-meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
-body
-  include global/g_nav
-  .container.margin-bottom-xxl
-    .siderbar-div
-      - with '网利宝大事记' as title
-      include include/about_sidebar
-      - endwith
-    .panel-padding.span9-omega
-      .well-s
-        h1.about-title {{about_us.title}}
-        |{{about_us.content|safe}}
-
-
-  include global/g_footer
-  include include/tracking
+html
+    head
+        - with '网利动态' as title
+        include global/g_head
+        - endwith
+        meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+        meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    body
+        include global/g_nav
+        - with '网利动态' as title
+        include include/about_sidebar
+        - endwith
+        .section
+            .media_box.clearfix
+                .media_list
+                    for info in data
+                        dl.milestone_dd.clearfix
+                            dd.media_title
+                                a(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.title}}
+                            content = len(info.content)
+                            if content > 70
+                                dd.media_content.postion_dd
+                                 a.contentA(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.content|safe}}
+                                    a.link(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
+                            else
+                                dd.media_content {{info.content|safe}}
+                                    a.link(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
+                            dd.media_time {{info.updated_time|date:"Y-m-d H:i"}} &nbsp;&nbsp;
+                    .pager
+                      - with data=data uri='/dynamic/'
+                      include include/pager
+                      - endwith
+        script.
+            require(["/static/src/pc/str.js?v=22"])
+        include global/g_footer
+        include include/tracking
+               

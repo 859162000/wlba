@@ -13,7 +13,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
                             AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI,
-                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode)
+                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode,
+                            CancelManualModifyPhoneAPI)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -39,7 +40,7 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView, AdminIdValidate,
+                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
@@ -48,7 +49,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                                  BidHasBindingForChannel, CoopPvApi)
+                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi)
+
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -149,7 +151,7 @@ urlpatterns = patterns(
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^has_validate/', HasValidationAPIView.as_view()),
-    url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
+    # url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),
@@ -238,6 +240,7 @@ urlpatterns = patterns(
     url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
     url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
     url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
+    url(r'^manual_modify/cancel/', CancelManualModifyPhoneAPI.as_view()),
     url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
     url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
 )
@@ -303,6 +306,7 @@ urlpatterns += patterns(
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
 
+
 # 理财金接口
 urlpatterns += patterns(
     '',
@@ -321,6 +325,12 @@ urlpatterns += patterns(
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
 )
 
+# 渠道着陆页中间跳转接口
+urlpatterns += patterns(
+    '',
+    url(r'^landpage/$', LandOpenApi.as_view()),
+)
+
 #
 urlpatterns += patterns(
     '',
@@ -337,4 +347,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
+)
+
+# oauth用户注册接口
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/register/$', OauthUserRegisterApi.as_view()),
 )

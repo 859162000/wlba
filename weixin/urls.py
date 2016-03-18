@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
+    url(r'^coop_regist/$', views.WeixinCoopRegister.as_view(), name="weixin_coop_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
     #url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
@@ -37,7 +38,9 @@ urlpatterns = patterns(
     url(r'^bind/$', login_required(views.WeixinBind.as_view(), login_url='/weixin/login/'), name='weixin_bind'),
 
     url(r'^trade-pwd/edit/$', TemplateView.as_view(template_name="weixin_tradepwd_edit.jade")),
-    url(r'^trade-pwd/back/$', TemplateView.as_view(template_name="weixin_tradepwd_back.jade")),
+    #url(r'^trade-pwd/back/$', TemplateView.as_view(template_name="weixin_tradepwd_back.jade")),
+    url(r'^trade-pwd/back/$', login_required(TemplateView.as_view(template_name="weixin_tradepwd_back.jade"), login_url='/weixin/login/')),
+
     url(r'^received/all/$', login_required(views.WeiXinReceivedAll.as_view(), login_url='/weixin/login/'), name='weixin_received_all'),
     url(r'^received/month/$', login_required(views.WeiXinReceivedMonth.as_view(), login_url='/weixin/login/'), name='weixin_received_month'),
     url(r'^received/detail/$', login_required(views.WeiXinReceivedDetail.as_view(), login_url='/weixin/login/'), name='weixin_received_detail'),
@@ -83,6 +86,7 @@ urlpatterns = patterns(
     url(r'^sub_regist_second/$', login_required(views.WeixinRegisterBindCard.as_view(template_name="service_registProcess_second.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_regist_three/$', login_required(TemplateView.as_view(template_name="service_registProcess_three.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_account/$', login_required(main_views.AccountTemplate.as_view(template_name="service_account.jade"), login_url="/weixin/sub_login_redirect/"), name='sub_account'),
+    url(r'^sub_account_old/$', login_required(main_views.AccountTemplate.as_view(template_name="service_account_old.jade"), login_url="/weixin/sub_login_redirect/")),
 
     url(r'^sub_recharge/$', login_required(main_views.RechargeTemplate.as_view(template_name="service_recharge.jade"), login_url="/weixin/sub_login_redirect/"), name="sub_recharge"),
     url(r'^sub_list/$', login_required(main_views.FwhP2PlistTemplate.as_view(template_name="service_list.jade"), login_url="/weixin/sub_login_redirect/")),
@@ -101,9 +105,18 @@ urlpatterns = patterns(
     #刮刮乐
     url(r'^activity_ggl/$', login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='activity_ggl'),
+    url(r'^sub_checkIn/$', login_required(WeixinGGLTemplate.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
+                                          ),name='sub_checkIn'),
+    url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
 
 )
-
+#活动api
+urlpatterns += patterns(
+    '',
+    url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
+    url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
+    url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
+)
 # 微信管理后台
 urlpatterns += patterns(
     '',

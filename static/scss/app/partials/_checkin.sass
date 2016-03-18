@@ -13,6 +13,8 @@
   -webkit-box-flex: 1
   display: -webkit-box
   -webkit-box-orient: horizontal
+  -webkit-transform: translate3d(0,0,0)
+  transform: translate3d(0,0,0)
 
 .checkin-op-status
   -webkit-box-pack: end
@@ -38,14 +40,18 @@
 .checkin-op-dec
   padding-top: .2rem
   text-align: right
+  min-width: rem(150)
   .op-dec-title
     font-size: .75rem
     color: #666
   .op-dec-detail
     color: #999
     font-size: .6rem
+  .op-detail-blue
+    color: #5DB5F2
   .op-detail-orange
     color: #f5a623
+
 
 .check-in-bar
   position: relative
@@ -122,12 +128,12 @@
     display: -webkit-box
     -webkit-box-align: center
     -webkit-box-pack: center
-    width: 1.6rem
+    width: 1.5rem
     height: 1.6rem
   .flag-items
     display: inline-block
     text-align: center
-    margin: 0 .2rem
+    margin: 0 .1rem
     @media screen and (min-device-width: 374px)
       margin: 0 .3rem
     @media screen and (min-device-width: 413px)
@@ -185,7 +191,18 @@
   .circle-item
     opacity: 0
 
-
+.active-gift-active
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/icon_gift_active.png") no-repeat center
+    background-size: 120%
+  .circle-item
+    opacity: 0
+.active-gift-open
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/icon_gift_open.png") no-repeat center
+    background-size: 93%
+  .circle-item
+    opacity: 0
 .check-in-rules-layout
   padding: 0 1rem
   font-size: .6rem
@@ -194,27 +211,31 @@
   .check-rules-title
     font-weight: bold
     line-height: 1.8
+    margin-bottom: .4rem
   .check-rules-detail
-    margin-bottom: 1rem
+    margin-bottom: .3rem
     line-height: 1.4
 
 
 
 .check-in-alert-layout
-  position: fixed
+  display: none
+  position: absolute
   top: 0
-  left: 0
   bottom: 0
   width: 100%
   height: 100%
-  z-index: 3
-  display: none
+  z-index: 1000
+  -webkit-transform: translate3d(0px, 0px, 0px)
+  transform: translate3d(0px, 0px, 0px)
   .check-alert-mask
+    position: relative
     display: -webkit-box
     -webkit-box-pack: center
     -webkit-box-align: center
     height: 100%
     background: rgba(0,0,0, .5)
+    z-index: 100
   .check-alert-body
     position: relative
     width: rem(590)
@@ -224,7 +245,8 @@
     border-radius: .2rem
     border: .1rem solid #FF5353
     padding: 1.5rem 0 .8rem 0
-  .check-body-overflow-icon
+
+  #check-body-overflow-icon
     position: absolute
     top: 0
     left: 50%
@@ -266,3 +288,116 @@
     background: #FF5353
     border-radius: .2rem
     margin-top: .6rem
+
+// share page style
+.checIn-share-warp
+  padding: 0 rem(14)
+.checIn-share-body
+  background: url("/static/imgs/app/checkin/share_banner.jpg") no-repeat top #FF512F
+  background-size: 100%
+  padding-top: 11rem
+  padding-bottom: 2rem
+.checIn-share-erweima
+  width: rem(300)
+  height: auto
+  display: block
+  margin: 0 auto rem(52) auto
+
+.checIn-rules
+  padding: 0 rem(66)
+.checkin-nav-title
+  width: rem(534)
+  display: block
+  margin: 0 auto 1rem auto
+
+.checIn-rules-warp
+
+  position: relative
+  font-size: .6rem
+  color: #FFF219
+  border: 1px dashed #FFF219
+  border-radius: .2rem
+  padding: 0 .5rem .5rem .5rem
+  margin-bottom: 1.5rem
+.checIn-rules-max-title
+  position: absolute
+  top: -10px
+  left: 10px
+  padding: 0 10px
+  background: #ff512f
+
+
+.checIn-rules-min-title
+  color: #fff
+  margin: .5rem 0 rem(15) 0
+.checIn-rules-cont
+  display: block
+  width: rem(470)
+  height: auto
+
+
+.active
+  .flipInX
+    animation-name: flipInX
+    -webkit-animation-name: flipInX
+    animation-duration: 1s
+    -webkit-animation-duration: 1s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+
+
+@-webkit-keyframes flipInX
+  from
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, 90deg)
+    -webkit-animation-timing-function: ease-in
+    animation-timing-function: ease-in
+    opacity: 0
+
+  40%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, -20deg)
+    -webkit-animation-timing-function: ease-in
+    animation-timing-function: ease-in
+
+  60%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, 10deg)
+    opacity: 1
+  80%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, -5deg)
+
+  to
+    -webkit-transform: perspective(400px)
+    transform: perspective(400px)
+
+@keyframes flipInX
+  from
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, 90deg)
+    -webkit-animation-timing-function: ease-in
+    animation-timing-function: ease-in
+    opacity: 0
+  40%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, -20deg)
+    -webkit-animation-timing-function: ease-in
+    animation-timing-function: ease-in
+
+  60%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, 10deg)
+    opacity: 1
+
+  80%
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg)
+    transform: perspective(400px) rotate3d(1, 0, 0, -5deg)
+
+  to
+    -webkit-transform: perspective(400px)
+    transform: perspective(400px)

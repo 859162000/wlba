@@ -206,8 +206,8 @@ def yiche_callback(url, params, channel):
     try:
         logger.info(params)
         ret = requests.post(url, data=params)
-        logger.info('%s callback url: %s'% (channel, ret.url))
-        logger.info('callback return: %s' % (ret.text))
+        logger.info('%s callback url: %s' % (channel, ret.url))
+        logger.info('callback return: %s' % ret.text)
     except Exception, e:
         logger.info(" {'%s callback':'failed to connect'} " % channel)
         logger.info(e)
@@ -297,3 +297,36 @@ def rongtu_post_task():
     if settings.ENV == settings.ENV_PRODUCTION:
         from wanglibao_account.cooperation import rongtu_post_data
         rongtu_post_data()
+
+
+@app.task
+def common_callback_for_post(url, params, channel):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    ret = None
+    try:
+        logger.info(params)
+        ret = requests.post(url, data=params)
+        logger.info('%s callback url: %s' % (channel, ret.url))
+        logger.info('callback return: %s' % ret.text)
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel)
+        logger.info(e)
+
+    if ret:
+        logger.info(ret.text)
+
+
+@app.task
+def coop_callback_for_post(url, params, channel):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    try:
+        logger.info(params)
+        ret = requests.post(url, data=params)
+        logger.info('%s callback url: %s' % (channel, ret.url))
+        if ret.status_code == 200:
+            logger.info('callback return: %s' % ret.json())
+        else:
+            logger.info('callback return: %s' % ret.text)
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel)
+        logger.info(e)

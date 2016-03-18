@@ -1,0 +1,59 @@
+-load formatters
+doctype html
+html(style='background: #FFE9D0')
+  head
+    title 签到
+    include include/service_head.jade
+  body
+
+    img(src='/static/imgs/sub_weixin/checkin/banner.png?v=201603').check-in-banner
+
+    section.check-in-operation
+      .checkin-op-status
+        i.checkin-op-icon.icon-status
+        .checkin-op-dec
+          .op-dec-title 今日已签到
+          .op-dec-detail.op-detail-orange
+
+      .checkin-op-share
+        i.checkin-op-icon.icon-share#js-share-alt
+        .checkin-op-dec.no-share
+          .op-dec-title 今日未分享
+          .op-dec-detail 分享再得
+        .checkin-op-dec.has-share
+          .op-dec-title 今日已分享
+          .op-dec-detail.op-detail-orange
+
+    section.check-in-bar
+      .bar-layout
+        .bar-content 距离神秘礼包还有<span id="giftDay"></span>天
+        .bar-before
+        .bar-after
+
+    section.check-in-process
+      .check-in-process-line
+      .check-in-flag-lists
+
+    section.check-in-rules-layout
+      .check-rules-title 详细规则:
+      .check-rules-detail  1.每天签到领体验金，金额随机
+      .check-rules-detail  2.分享后，可再得一份奖励
+      .check-rules-detail  3.连续签到每满7天，可拆一次体验金礼包
+      .check-rules-detail  4.连续签到每满28天，可拆一次神秘大礼包
+
+    section.check-in-alert-layout.check-in-now
+      .check-alert-mask
+        .check-alert-body
+          .check-body-overflow-icon.overflow-gift
+          img(src='/static/imgs/sub_weixin/checkin/alert_leo.png').check-body-leo
+          .check-body-gift-information.gift-txt#gift-msg 2%加息券一张
+          .check-body-where-information.gift-txt 微信信息中查看
+          .check-body-gift-information.share-txt.share-money 今日分享成功！获得0元体验金
+          .check-body-where-information.share-txt 在(我的体验金)中查看
+          .check-body-opeartion-btn.close-alert 我知道了
+
+    section.weixin-share-alt
+      img(src="/static/imgs/sub_weixin/checkin/share_sign.png"  style="width: 5rem;").share-sign
+    script(src='/static/src/subMobile/lib/weixin/jweixin-1.0.0.js')
+    script(data-init='checkIn', src="/static/scripts/subMobile/mobile.js?2016031701")
+

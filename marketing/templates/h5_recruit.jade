@@ -1,0 +1,176 @@
+-load formatters
+-load mathfilters
+doctype html
+html.recruit-box
+    head
+        title 招聘
+        include include/app_head
+        link(href="/static/styles/mobile_activity/swipe.css?v=20160202514", rel="stylesheet")
+        meta(content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=1.0, user-scalable=no" ,name="viewport")
+    body.recruit-body
+        .page-loading
+            .loading-img
+                img(src='/static/imgs/mobile_activity/recruit/loading.gif')
+            .lb
+                img(src='/static/imgs/mobile_activity/recruit/lb.png')
+            p.Loading-font Loading...
+        .page-common(style='display:none')
+            .recruit-icon.icon-right
+            .recruit-icon.icon-left
+            .recruit-icon.icon-middle
+            .recruit-icon.icon-bottom
+            .page-next
+        .page-box
+            .swiper-container.swiper-container1.swiper-container1
+                .swiper-wrapper
+                    .swiper-slide
+                        .center-obj
+                            .section
+                                img(src='/static/imgs/mobile_activity/recruit/page1_font1.png').job-play.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page1_font2.png').little-title.animations
+                                .crown-box
+                                    .crown-bg.animationss
+                                    img(src='/static/imgs/mobile_activity/recruit/hg.png').crown-bg-img.animationss
+                                .page1-fonts.animations 2016我们一起
+                                    span High
+                                    |，你来不来？
+                    .swiper-slide
+                        .center-obj
+                            .page2-title.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page2-font1.png')
+                            .from-fonts.from-font1.animations 我们有来自
+                            .from-imgs.from-img1
+                                img(src='/static/imgs/mobile_activity/recruit/form1.png').form1.animations
+                                img(src='/static/imgs/mobile_activity/recruit/form2.png').form2.animations
+                                img(src='/static/imgs/mobile_activity/recruit/form3.png').form3.animations
+                            .from-fonts.from-font2.animations 等知名金融机构的金融大佬
+                            .from-fonts.from-font3.animations 我们还有来自
+                            .from-imgs.from-img2
+                                img(src='/static/imgs/mobile_activity/recruit/form4.png').form4.animations
+                                img(src='/static/imgs/mobile_activity/recruit/form5.png').form5.animations
+                                img(src='/static/imgs/mobile_activity/recruit/form6.png').form6.animations
+                            .from-fonts.from-font4.animations 等一线互联网公司的技术大咖
+                            .hj-box.animations
+                                img(src='/static/imgs/mobile_activity/recruit/hj.png').hjA.animations
+                            .hj-fonts.animations 高逼格配置带你成长带你飞
+                    .swiper-slide
+                        .center-obj
+                            .page3-title.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page3-font1.png')
+                            .line-box
+                                .line.line1.animations
+                                .line.line2.animations
+                                .line.line3.animations
+                                .line-left.animations
+                                .line-right.animations
+                            .page3-font2.animations 牛逼的成长速度
+                            .page3-font3.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page3-font2.png')
+                            .opt-box
+                                .swiper-container.pic-box.swiper-container2
+                                    .swiper-wrapper
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                                    .swiper-pagination.wiper-pagination-new
+                            //.ul.m-cascadingTeletext.z-viewArea
+                            //    li.first.move-item.z-current
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                            //    li.second.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                            //    li.third.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                            //    li.four.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                            //    li.five.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                            //    li.six.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                            //.dot-box
+                            //    span.active
+                            //    span
+                            //    span
+                            //    span
+                            //    span
+                            //    span
+                    .swiper-slide
+                        .center-obj
+                            .page4-font1.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page4-font1.png')
+                            .page4-c
+                                img(src='/static/imgs/mobile_activity/recruit/yuan1.png').qiu1.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/yuan2.png').qiu2.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/fonts.png').qiu-fonts.animationss
+                            .page4-font3.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page4-font3.png')
+                            .page4-font4.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page4-font4.png')
+                    .swiper-slide
+                        .center-obj
+                            .page5-font1.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page5_font1.png')
+                            .page5-c
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu1.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu2.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu3.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu4.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu5.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu6.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu7.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu8.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu9.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu10.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu11.animationss
+                                img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu12.animationss
+                                .font-one.font-c.animations
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli1.png').animationss
+                                .font-two.font-c.animations
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli2.png').animationss
+                                .font-three.font-c.animations
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli3.png').animationss
+
+                    .swiper-slide
+                        .center-obj
+                            .page6-font1.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page6_font1.png')
+                            .page6-font2.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page6_font2.png')
+                            .kq.animations 虚位以待:
+                            .zw-list.zw-list1.animations
+                                img(src='/static/imgs/mobile_activity/recruit/job1.png')
+                            .zw-list.zw-list2.animations
+                                img(src='/static/imgs/mobile_activity/recruit/job2.png')
+                            .zw-list.zw-list3.animations
+                                img(src='/static/imgs/mobile_activity/recruit/job3.png')
+                            .erweima.animations
+                                img(src='/static/imgs/mobile_activity/recruit/erweima1.png')
+                            .erweima-font.animations 投递请长按二维码
+                            .recruit-icon.icon-right
+                            .recruit-icon.icon-left
+                            .recruit-icon.icon-middle
+                            .recruit-icon.icon-bottom
+                            .page-next
+                    .swiper-slide
+                        .center-obj
+                            .page7-font1.animations
+                                img(src='/static/imgs/mobile_activity/recruit/page7_font1.png')
+                            //.dyh-fuh
+                            //    .fwh.animations
+                            //        p 服务号
+                            //        img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            .erweima.animations
+                                p.fwh 服务号
+                                img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            p.pop.animations 长按，极致工作，疯狂玩乐就等你！
+        script(src="/static/src/mobile/lib/weixin/wx.js")
+        script(src='/static/scripts/app/swiper/swiper.min.js?v=201512181')
+        script(src='/static/scripts/mobile_activity/recruit.js?v=1111')
