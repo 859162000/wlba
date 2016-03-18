@@ -37,7 +37,7 @@ class AccessTokenView(AccessTokenBaseView):
         # 校验刷新令牌
         token = None
         form_errors = None
-        data['client'] = client
+        data['client_id'] = client.client_id
         form = RefreshTokenGrantForm(data)
         if form.is_valid():
             token = form.cleaned_data['refresh_token']
