@@ -302,6 +302,7 @@ org.checin_in = (function () {
 
             try{
                 _self.appShare.shareStatus(function(result){
+                    if(!result.data.experience_amount) return org.ui.alert('分享失败')
                     _self.checkInAlert('share', '今日分享成功！获得'+result.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                         shareStaus = true;
                         shareInfo(shareStaus, result.data.experience_amount)
@@ -382,18 +383,12 @@ org.checin_in = (function () {
 
             //当日是否签到
             if(!resultCopy.status){
-                var flag_explan = '';
                 _self.checkInOpeartion('sign_in', function(data){
                     //签到成功更新连续签到日
                     current_day++;
 
-                    if(data.data.experience_amount){
-                        flag_explan = '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看';
-                    }else{
-                        flag_explan = '分享失败';
-                    }
                     if(data.data.status){
-                        _self.checkInAlert('flag', flag_explan, function(){
+                        _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                             triggerUI(current_day)
                             _self.signIn(true, data.data.experience_amount)
                             _self.steriousGift(steriousGift_days - 1);
@@ -461,6 +456,7 @@ org.checin_in = (function () {
                 },
                 success: function(data){
                     if(data.ret_code ===0){
+
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
                             _self.steriousGift(data.mysterious_day)
                             $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
