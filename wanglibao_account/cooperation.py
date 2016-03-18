@@ -75,6 +75,7 @@ from .utils import xunleivip_generate_sign, generate_coop_base_data, str_to_dict
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
 from wanglibao_margin.models import MarginRecord
+from wanglibao_rest.utils import generate_bajinshe_sign
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1649,6 +1650,14 @@ class BaJinSheRegister(CoopRegister):
     def channel_order_id(self):
         return self.request.session.get(self.internal_channel_order_id_key, None)
 
+    def set_dont_enforce_csrf_checks(self, client_id, phone, sign):
+        key = settings.BAJINSHE_COOP_KEY
+        if client_id and phone and key and sign:
+            local_sign = generate_bajinshe_sign(client_id, phone, key)
+            if local_sign == sign:
+                if not hasattr(self.request, '_dont_enforce_csrf_checks'):
+                    setattr(self.request, '_dont_enforce_csrf_checks', True)
+
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
             req_data = json.loads(self.request.body.strip())
@@ -1696,6 +1705,8 @@ class BaJinSheRegister(CoopRegister):
 
         if sign:
             self.request.session[self.internal_channel_sign_key] = sign
+
+        self.set_dont_enforce_csrf_checks(client_id, channel_phone, sign)
 
     def clear_session(self):
         super(BaJinSheRegister, self).clear_session()
