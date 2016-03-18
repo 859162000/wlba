@@ -1705,6 +1705,7 @@ class WeixinActivityAPIView(APIView):
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
+        margin_record = MarginRecord.objects.filter(user=user, order_id=order_id).first()
         logger.debug('weixin_guaguaka counter:%s' % counter)
         when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
         for _index in xrange(3):
@@ -1723,7 +1724,7 @@ class WeixinActivityAPIView(APIView):
                             join_times=1,
                             channel='weixin',
                             has_sent=False,
-                            p2p_amount=value[1]
+                            p2p_amount=margin_record.amount
                         )
                         break
             else:
