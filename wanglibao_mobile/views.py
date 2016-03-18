@@ -12,7 +12,7 @@ from marketing.tops import Top
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
-from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
+from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew, get_announcement_homepage_list
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from decimal import *
 from wanglibao_account.models import Binding
@@ -66,7 +66,7 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data,
             'getmore': getmore,
-            'announcements': AnnouncementHomepage,
+            'announcements': get_announcement_homepage_list(self.request),
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
             'day_tops': day_tops,

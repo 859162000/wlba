@@ -86,10 +86,15 @@ class GetContinueActionReward(APIView):
 
         length = len(activities)
         maxDayNote=activities[length-1].days
-        recycle_continue_days = sign_record.continue_days % (maxDayNote + 1)
+        if sign_record.continue_days < maxDayNote:
+            recycle_continue_days = sign_record.continue_days
+        elif sign_record.continue_days % maxDayNote == 0:
+            recycle_continue_days = maxDayNote
+        else:
+            recycle_continue_days = sign_record.continue_days % maxDayNote
+        # recycle_continue_days = sign_record.continue_days % (maxDayNote + 1)
         if recycle_continue_days!=days:
             return Response({'ret_code':-1, 'message':u'不符合领取条件'})
-
         reward_record = ActivityRewardRecord.objects.filter(activity_code=current_activity.code, create_date=today, user=user).first()
         if not reward_record:
             reward_record = ActivityRewardRecord.objects.create(
