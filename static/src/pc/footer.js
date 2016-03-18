@@ -25,7 +25,8 @@ require(['jquery'], function( $ ) {
             if(result.ret_code != 20001){
                 window.location.href = '/qiye/info/'
             }else{
-                window.location.href = '/accounts/home/'    
+                window.location.href= '/accounts/transaction/'
+                //window.location.href = '/accounts/home/'
             }
         })
     }
