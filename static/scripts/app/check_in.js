@@ -278,7 +278,7 @@ org.checin_in = (function () {
                 if(amount){
                     $share.find('.op-dec-detail').addClass('op-detail-orange').text('+'+amount+'元体验金');
                 }else{
-                    $share.find('.op-dec-detail').text('点击得双倍')
+                    $share.find('.op-dec-detail').text('分享得双份')
                 }
 
             }
