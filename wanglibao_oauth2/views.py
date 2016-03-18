@@ -46,6 +46,9 @@ class AccessTokenView(AccessTokenBaseView):
 
         return token, form_errors
 
+    def create_access_token(self, request, user, client):
+        return create_access_token(user, client)
+
     def create_refresh_token(self, request, user, access_token, client):
         return RefreshToken.objects.create(
             user=user,
