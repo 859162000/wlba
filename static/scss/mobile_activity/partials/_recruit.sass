@@ -318,6 +318,12 @@
 @mixin animate-scale($t:0s , $t1:0s)
   animation: scale $t linear $t1 both
   -webkit-animation: scale $t linear $t1 both
+*
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
 .swiper-slide
   .animations
     display: none
@@ -368,7 +374,7 @@
           -webkit-animation:  scale 1.5s linear 0s backwards infinite
       .Loading-font
         text-align: center
-        font-size: .45rem
+        font-size: .9rem
         color: #1dadea
         position: absolute
         top: 56%
@@ -429,14 +435,14 @@
                 animation: yuan3 1s ease-in-out 2.3s both
                 bottom: 0
               .page1-fonts
-                font-size: 18px
+                font-size: .6rem
                 color: #ffffff
                 margin-top: 3%
                 position: relative
                 animation: b-t 1s ease-in-out 3.5s both
                 -webkit-animation: b-t 1s ease-in-out 3.5s both
                 span
-                  font-size: 20px
+                  font-size: .9rem
                   color: #faec03
             .page2-title
               text-align: center
@@ -448,7 +454,7 @@
                 margin-top: 22%
             .from-fonts
               color: #ae54fe
-              font-size: 18px
+              font-size: .9rem
               margin: 1.4% 1%
             .from-font1
               +animate-fun1(.5s,1s)
@@ -482,13 +488,13 @@
               +animate-fun1(.5s,5s)
             .hj-box
               text-align: center
-              padding-top: .5rem
+              padding-top: .2rem
               animation: myThree .5s ease-in-out 6.5s both
               -webkit-animation: myThree .5s ease-in-out 6.5s both
               opacity: 0
               img
-                width: 15%
-                margin-left: 40%
+                width: 13%
+                margin-left: 43%
                 animation: myTwo .5s linear 0s infinite alternate both
                 -webkit-animation: myTwo .5s linear 0s infinite alternate  both
             .hj-fonts
@@ -503,8 +509,8 @@
               +animate-fun(1s)
               img
                 width: 355px
-                height: 69.5px
-                margin-top: 18%
+                height: 89.5px
+                margin-top: 12%
             .line-box
               position: relative
               height: 23%
@@ -569,18 +575,20 @@
                 width: 315.5px
                 height: 23.5px
             .pic-box
-              width: 183px
+              width: 100%
               height: 220px
+              margin: 0 auto
+              position: relative
+              overflow: hidden
+              z-index: 1
               .swiper-wrapper
                 width: 100%
-                position: absolute
-                left: 100%
-                margin-left: -100%
-                height: 80%
                 .swiper-slide
+                  background-position: center
+                  background-size: cover
+                  width: 155px
+                  height: 173px
                   text-align: center
-                  width: 100%
-                  position: absolute
                   img
                     width: 100%
                   .swiper-container-horizontal
@@ -623,10 +631,6 @@
                 margin-top: -59px
                 animation: scale 1s linear 1.5s both
                 -webkit-animation: scale 1s linear 1.5s both
-                @media (device-height: 480px)
-                  width: 12%
-                  margin-left: -6%
-                  margin-top: -9%
             .page4-font3
               text-align: center
               +animate-fun(1s,2s)
@@ -761,7 +765,7 @@
               margin-top: 2%
           .kq
             color: #aa5dee
-            font-size: .45rem
+            font-size: .9rem
             margin-top: 2%
             padding-left: 5%
             +animate-fun1(.5s,1.2s)
@@ -782,40 +786,29 @@
             -webkit-animation: myThree .5s ease-in-out 3.3s both
             margin-top: 5%
             img
-              width: 25%
+              width: 30%
           .erweima-font
             text-align: center
             color: #aa5dee
-            font-size: .45rem
+            font-size: .9rem
             animation: myThree .5s ease-in-out 3.8s both
             -webkit-animation: myThree .5s ease-in-out 3.8s both
           .page7-font1
             text-align: center
             +animate-fun(1s)
             img
-              width: 94%
-              margin-top: 28%
-          .dyh-fuh
-            display: -webkit-box
-            margin-top: 15%
-            img
-              width: 90%
-          .dyh,.fwh
-            -webkit-box-flex: 1
-            text-align: center
-            margin: 0 2%
-            p
-              margin-bottom: 2%
-              color: #aa5dee
-              font-size: .45rem
-          .dyh
-            +animate-fun1(1s,1s)
+              width: 315.5px
+              margin-top: 40%
+              height: 32px
           .fwh
-            animation: r-l 1s ease-in-out 1s both
-            -webkit-animation: r-l 1s ease-in-out 1s both
+            font-size: .8rem
+            text-align: center
+            +animate-fun(1s,1s)
+            color: #aa5dee
+            margin-top: 5%
           .pop
             color: #aa5dee
-            font-size: .45rem
+            font-size: .8rem
             margin-top: 5%
             text-align: center
             animation: myThree 1s ease-in-out 2s both
@@ -831,7 +824,7 @@
   zoom: 1.5
 @media only screen and (min-device-width : 375px) and (max-device-width : 667px) and (orientation : portrait)
   .center-obj
-    zoom: 1.8
+    zoom: 2.2
 .page-common
   position: absolute
   top: 0
@@ -873,11 +866,11 @@
   .page-next
     background: url(/static/imgs/mobile_activity/recruit/next.png) no-repeat
     background-size: 100% 100%
-    width: 1.825rem
-    height: 1.325rem
+    width: 36.5px
+    height: 29.5px
     left: 50%
     bottom: .5rem
-    margin-left: -.9125rem
+    margin-left: -18.25px
     position: absolute
     animation: myTwo 1s linear 0s infinite alternate both
     -webkit-animation: myTwo 1s linear 0s infinite alternate  both
@@ -911,6 +904,13 @@
 
 .m-cascadingTeletext li.z-hideToRight img
   -webkit-animation: cascadingTeletext_hideToRight 0.3s linear
+.swiper-container2
+  .swiper-slide
+    -webkit-transition: all 0.3s
+    transition: all 0.3s
+  .z-hideToLeft
+    -webkit-animation: cascadingTeletext_hideToLeft 0.3s linear
+    animation: cascadingTeletext_hideToLeft 0.3s linear
 .dot-box
   text-align: center
   span
