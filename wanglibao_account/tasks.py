@@ -75,12 +75,9 @@ def bajinshe_callback(url, data):
 @app.task
 def renrenli_callback(url, data):
     logger.info("enter renrenli callback with url[%s] data[%s]" % (url, data))
-    headers = {
-       'Content-Type': 'application/json',
-    }
 
     try:
-        res = requests.post(url=url, data=data, headers=headers)
+        res = requests.post(url=url, data=data)
     except Exception, e:
         logger.info("renrenli callback connect failed with error: %s" % e)
     else:
