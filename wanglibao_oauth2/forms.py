@@ -45,7 +45,8 @@ class UserAndClientForm(forms.Form):
         channel_user = self.cleaned_data.get('channel_user')
         client_id = self.cleaned_data.get('client_id')
         phone = self.cleaned_data.get('phone')
-        if channel_user and client_id and phone:
+        sign = self.cleaned_data.get('sign')
+        if channel_user and client_id and phone and sign:
             try:
                 client = Client.objects.get(client_id=client_id)
             except Client.DoesNotExist:
@@ -65,9 +66,15 @@ class UserAndClientForm(forms.Form):
                             message=u'用户id和客户端id无法关联'
                         )
                     else:
-                        self.cleaned_data['user'] = oauth_user.user
-                        self.cleaned_data['client'] = client
-                        return self.cleaned_data
+                        if self.check_sign(client_id, phone, client.client_secret, sign):
+                            self.cleaned_data['user'] = oauth_user.user
+                            self.cleaned_data['client'] = client
+                            return self.cleaned_data
+                        else:
+                            raise forms.ValidationError(
+                                code=10107,
+                                message=u'无效签名',
+                            )
                 else:
                     raise forms.ValidationError(
                         code=10104,
@@ -76,22 +83,12 @@ class UserAndClientForm(forms.Form):
 
         return self.cleaned_data
 
-
-    def check_sign(self):
-        sign = self.cleaned_data['sign']
-        phone = self.cleaned_data['phone']
-        client = self.cleaned_data['client']
-        client_id = client.client_id
-        key = client.client_secret
-
+    def check_sign(self, client_id, phone, key, sign):
         local_sign = hashlib.md5('-'.join([client_id, phone, key])).hexdigest()
         if sign == local_sign:
             return True
         else:
-            raise forms.ValidationError(
-                code=10107,
-                message=u'无效签名',
-            )
+            return False
 
 
 class RefreshTokenGrantForm(forms.Form):

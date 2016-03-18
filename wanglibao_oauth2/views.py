@@ -94,7 +94,7 @@ class AccessTokenView(AccessTokenBaseView):
 
         req_data = request.session if request.GET.get('promo_token') else request.POST
         form = UserAndClientForm(req_data)
-        if form.is_valid() and form.check_sign():
+        if form.is_valid():
             user = form.cleaned_data['user']
             client = form.cleaned_data['client']
 
@@ -102,6 +102,8 @@ class AccessTokenView(AccessTokenBaseView):
 
             try:
                 response_data = handler(request, request.session, client, user)
+                response_data['msg'] = response_data['message']
+                response_data.pop('message')
             except:
                 # 创建内存文件对象
                 fp = StringIO.StringIO()
