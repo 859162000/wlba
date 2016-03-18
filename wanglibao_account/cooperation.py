@@ -97,7 +97,7 @@ class CoopSessionProcessor(object):
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
-        channel_user = self.request.GET.get(self.external_channel_user_key, None)
+        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -161,6 +161,10 @@ class BaJinSheSession(CoopSessionProcessor):
         channel_phone = req_data.get(self.external_channel_phone_key, None)
         sign = req_data.get(self.external_channel_sign_key, None)
         client_id = req_data.get(self.external_channel_client_id_key, None)
+        channel_user = req_data.get(self.external_channel_user_key, None)
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
 
         if channel_phone:
             self.request.session[self.internal_channel_phone_key] = channel_phone
