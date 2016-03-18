@@ -1200,6 +1200,10 @@ else:
 
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
+if ENV == ENV_PRODUCTION:
+    BAJINSHE_COOP_KEY = ''
+else:
+    BAJINSHE_COOP_KEY = '4762c2c53ed701597c1d6cf3b409ff87c3f04f98'
 
 # 人人利
 RENRENLI_COOP_KEY = 'wanglibaorrl'

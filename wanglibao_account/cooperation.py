@@ -1633,6 +1633,8 @@ class BaJinSheRegister(CoopRegister):
         self.external_channel_user_id_key = 'p_user_id'
         self.external_channel_order_id_key = 'orderNum'
         self.internal_channel_order_id_key = 'order_id'
+        self.external_channel_sign_key = 'signature'
+        self.internal_channel_sign_key = 'sign'
         self.call_back_url = settings.CHANNEL_CENTER_CALL_BACK_URL
 
     @property
@@ -1660,6 +1662,7 @@ class BaJinSheRegister(CoopRegister):
         client_id = req_data.get(self.external_channel_client_id_key, None)
         access_token = req_data.get(self.channel_access_token_key, None)
         channel_order_id = req_data.get(self.external_channel_order_id_key, None)
+        sign = req_data.get(self.external_channel_sign_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1682,6 +1685,9 @@ class BaJinSheRegister(CoopRegister):
         if channel_order_id:
             self.request.session[self.internal_channel_order_id_key] = channel_order_id
 
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
     def clear_session(self):
         super(BaJinSheRegister, self).clear_session()
         self.request.session.pop(self.channel_product_id_key, None)
@@ -1689,6 +1695,7 @@ class BaJinSheRegister(CoopRegister):
         self.request.session.pop(self.channel_access_token_key, None)
         self.request.session.pop(self.internal_channel_phone_key, None)
         self.request.session.pop(self.internal_channel_order_id_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
 
     def save_to_binding(self, user):
         """
