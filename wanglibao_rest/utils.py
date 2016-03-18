@@ -160,6 +160,11 @@ def coop_token_login(request, phone, client_id, access_token):
                                                                                                access_token))
 
 
+def generate_bajinshe_sign(client_id, phone, key):
+    sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
+    return sign
+
+
 def generate_coop_access_token_sign(client_id, phone, key):
     sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
     return sign
@@ -172,7 +177,7 @@ def process_for_bajinshe_landpage(request, channel_code):
     access_token = request.session.get('access_token', None)
 
     key = settings.BAJINSHE_COOP_KEY
-    if generate_coop_access_token_sign(client_id, phone, key) == sign:
+    if generate_bajinshe_sign(client_id, phone, key) == sign:
         coop_token_login(request, phone, client_id, access_token)
     else:
         logger.info("process_for_bajinshe_landpage invalid signature with sign[%s] phone[%s] key[%s]" %
