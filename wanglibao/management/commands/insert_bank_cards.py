@@ -1,5 +1,9 @@
 # encoding=utf-8
+<<<<<<< HEAD
 from wanglibao_pay.models import Bank, Card 
+=======
+from wanglibao_pay.models import Bank
+>>>>>>> 25c1a6e... feature: check bank card info for yee, finish data
 from django.core.management.base import BaseCommand
 
 bank_cards_info = """{
@@ -30,8 +34,13 @@ bank_cards_info = """{
 "交通银行": "4055,4910,5378,6014,49104,53783,405512,434910,458123,458124,520169,521899,522964,552853,601428,620013,620021,620521,621002,621069,621335,621436,622250,622251,622252,622253,622254,622255,622256,622257,622258,622259,622260,622261,622262,622284,622285,622656,623261,625028,625029,628216,628218,664055,664910,665378,666014,955590,955591,955592,955593",
 }"""
 
+<<<<<<< HEAD
 bank_cards = eval(bank_cards_info)
 def insert_bank_cards():
+=======
+def insert_bank_cards():
+    bank_cards = eval(bank_cards_info)
+>>>>>>> 25c1a6e... feature: check bank card info for yee, finish data
     for b, c in bank_cards.items():
         try:
             bank = Bank.objects.get(name=b)
@@ -41,6 +50,7 @@ def insert_bank_cards():
             print e
             print b, c
 
+<<<<<<< HEAD
 def check_card(card_no, bank_name):
     cards = bank_cards[bank_name].split(',')
     for card in cards:
@@ -61,3 +71,11 @@ def check_cards():
 class Command(BaseCommand):
     def handle(self, *args, **options):
         insert_bank_cards()
+=======
+class Command(BaseCommand):
+    def handle(self):
+        insert_bank_cards()
+
+if __name__ == '__main__':
+    insert_bank_cards()
+>>>>>>> 25c1a6e... feature: check bank card info for yee, finish data
