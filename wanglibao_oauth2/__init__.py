@@ -8,9 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import constants
 from .utils import now
 from .forms import RefreshTokenGrantForm
-from .forms import UserAuthForm
 from .models import RefreshToken, AccessToken
-from .backends import BasicClientBackend
 
 
 class OAuthError(Exception):
@@ -205,14 +203,12 @@ class AccessTokenBaseView(OAuthView, Mixin):
             rt = access_token.refresh_token
             response_data['refresh_token'] = rt.token
             response_data['code'] = '10000'
-            response_data['msg'] = 'success'
+            response_data['message'] = 'success'
         except ObjectDoesNotExist:
             response_data['code'] = '10001'
-            response_data['msg'] = u'refresh_token不存在'
+            response_data['message'] = u'refresh_token不存在'
 
-        return HttpResponse(
-            json.dumps(response_data), content_type='application/json'
-        )
+        return response_data
 
     def access_token(self, request, data, client, user):
         """
@@ -232,15 +228,21 @@ class AccessTokenBaseView(OAuthView, Mixin):
         """
         Handle ``grant_type=refresh_token`` requests as defined in :rfc:`6`.
         """
-        rt = self.get_refresh_token_grant(request, data, client)
-        # this must be called first in case we need to purge expired tokens
-        self.invalidate_refresh_token(rt)
-        self.invalidate_access_token(rt.access_token)
+        rt, form_errors = self.get_refresh_token_grant(request, data, client)
+        if rt:
+            # this must be called first in case we need to purge expired tokens
+            self.invalidate_refresh_token(rt)
+            self.invalidate_access_token(rt.access_token)
 
-        at = self.create_access_token(request, rt.user, client)
-        rt = self.create_refresh_token(request, at.user, at, client)
+            at = self.create_access_token(request, rt.user, client)
+            rt = self.create_refresh_token(request, at.user, at, client)
 
-        return self.access_token_response(at, rt.user.id)
+            return self.access_token_response(at, rt.user.id)
+        else:
+            return {
+                'code': 10201,
+                'message': form_errors.values()[0][0]
+            }
 
     def push_coop_token(self, request, data, client, user):
         """

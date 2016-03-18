@@ -1,19 +1,17 @@
 # encoding: utf-8
 
 import json
-import hashlib
+import StringIO
+import traceback
 import logging
 from datetime import timedelta
 
-from django.utils.translation import ugettext as _
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
 
-from . import OAuthError
-from . import BasicClientBackend
 from . import AccessTokenBaseView
 from .models import AccessToken, RefreshToken
-from .forms import RefreshTokenGrantForm, UserAuthForm
+from .forms import RefreshTokenGrantForm, UserAndClientForm
 from .utils import now
 from .tools import get_current_utc_timestamp, generate_oauth2_sign
 import constants
@@ -33,14 +31,27 @@ class AccessTokenView(AccessTokenBaseView):
     """
     Platform Open Api -- User Token View.
     """
-    authentication = (BasicClientBackend,)
+    authentication = ()
 
     def get_refresh_token_grant(self, request, data, client):
         # 校验刷新令牌
-        form = RefreshTokenGrantForm(data, client=client)
-        if not form.is_valid():
-            raise OAuthError(form.errors)
-        return form.cleaned_data.get('refresh_token')
+        token = None
+        form_errors = None
+        data['client'] = client
+        form = RefreshTokenGrantForm(data)
+        if form.is_valid():
+            token = form.cleaned_data['refresh_token']
+        else:
+            form_errors = form.errors
+
+        return token, form_errors
+
+    def create_refresh_token(self, request, user, access_token, client):
+        return RefreshToken.objects.create(
+            user=user,
+            access_token=access_token,
+            client=client
+        )
 
     def get_access_token(self, request, user, client):
         try:
@@ -51,15 +62,7 @@ class AccessTokenView(AccessTokenBaseView):
             at = create_access_token(user, client)
             self.create_refresh_token(request, user, at, client)
 
-            # raise OAuthError({'error': 'invalid_grant'})
         return at
-
-    def create_refresh_token(self, request, user, access_token, client):
-        return RefreshToken.objects.create(
-            user=user,
-            access_token=access_token,
-            client=client
-        )
 
     def invalidate_refresh_token(self, rt):
         if constants.DELETE_EXPIRED:
@@ -75,55 +78,47 @@ class AccessTokenView(AccessTokenBaseView):
             at.expires = now() - timedelta(days=1)
             at.save()
 
-    def _cleaned_sign(self, client, usn, sign):
-        client_id = client.client_id
-        client_secret = client.client_secret
-
-        local_sign = hashlib.md5('-'.join([str(client_id), str(usn), str(client_secret)])).hexdigest()
-        if sign == local_sign:
-            return True
-
     def post(self, request, grant_type):
         """
         As per :rfc:`3.2` the token endpoint *only* supports POST requests.
         """
 
+        logger.info("enter AccessTokenView with data[%s] grant_type[%s]" % (request.session, grant_type))
+
         if constants.ENFORCE_SECURE and not request.is_secure():
-            return self.error_response({
-                'code': '10100',
-                'message': _("A secure connection is required")
-            })
+            response_data = {
+                'code': 10100,
+                'msg': 'A secure connection is required'
+            }
+            return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
 
-        client, _error = self.authenticate(request)
-        if client is None:
-            return self.error_response({
-                'code': '10101',
-                'message': _('invalid client')})
+        req_data = request.session if request.GET.get('promo_token') else request.POST
+        form = UserAndClientForm(req_data)
+        if form.is_valid() and form.check_sign():
+            user = form.cleaned_data['user']
+            client = form.cleaned_data['client']
 
-        form = UserAuthForm(request.POST, client=client)
-        if not form.is_valid():
-            return self.error_response(form.errors)
+            handler = self.get_handler(grant_type)
 
-        user = form.cleaned_data['user']
-        usn = form.cleaned_data['usn']
-        sign = request.POST.get('signature', '').strip()
-        if not self._cleaned_sign(client, usn, sign):
-            return self.error_response({
-                'code': '10108',
-                'message': _('invalid signature')})
+            try:
+                response_data = handler(request, request.session, client, user)
+            except:
+                # 创建内存文件对象
+                fp = StringIO.StringIO()
+                traceback.print_exc(file=fp)
+                error_msg = fp.getvalue()
+                logger.info("AccessTokenView raise error: %s" % error_msg)
+                response_data = {
+                    'code': 50001,
+                    'msg': 'api error'
+                }
+        else:
+            response_data = {
+                'code': 30001,
+                'msg': form.errors.values()[0][0]
+            }
 
-        handler = self.get_handler(grant_type)
-
-        try:
-            return handler(request, request.POST, client, user)
-        except Exception, e:
-            logger.info("oauth2 access token failed with request_data[%s] client[%s] user[%s]" %
-                        (request.POST, client.id, user.id))
-            logger.info(e)
-            return self.error_response({
-                'code': '50001',
-                'message': _('api error')
-            })
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
 class AccessTokenOauthView(APIView):
