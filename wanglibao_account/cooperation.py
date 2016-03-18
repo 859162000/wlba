@@ -71,7 +71,7 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
-from .utils import xunleivip_generate_sign, generate_coop_base_data
+from .utils import xunleivip_generate_sign, generate_coop_base_data, str_to_dict
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
 from wanglibao_margin.models import MarginRecord
@@ -1652,6 +1652,15 @@ class BaJinSheRegister(CoopRegister):
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
             req_data = json.loads(self.request.body.strip())
+        elif self.request.META.get('CONTENT_TYPE', '').lower().find('application/x-www-form-urlencode') != -1:
+            if self.request.body.strip():
+                data = str_to_dict(self.request.body.strip())
+                if 'data' in data:
+                     req_data = json.loads(data['data']) or dict()
+                else:
+                    req_data = dict()
+            else:
+                req_data = dict()
         else:
             req_data = self.request.REQUEST
 
