@@ -5,6 +5,7 @@ html.recruit-box
     head
         title 招聘
         include include/app_head
+        link(href="/static/styles/mobile_activity/swipe.css?v=20160202514", rel="stylesheet")
         meta(content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=1.0, user-scalable=no" ,name="viewport")
     body.recruit-body
         .page-loading
@@ -13,14 +14,14 @@ html.recruit-box
             .lb
                 img(src='/static/imgs/mobile_activity/recruit/lb.png')
             p.Loading-font Loading...
-        .page-common
+        .page-common(style='display:none')
             .recruit-icon.icon-right
             .recruit-icon.icon-left
             .recruit-icon.icon-middle
             .recruit-icon.icon-bottom
             .page-next
         .page-box
-            .swiper-container.swiper-container1#swiper-container1
+            .swiper-container.swiper-container1.swiper-container1
                 .swiper-wrapper
                     .swiper-slide
                         .center-obj
@@ -65,41 +66,41 @@ html.recruit-box
                             .page3-font2.animations 牛逼的成长速度
                             .page3-font3.animations
                                 img(src='/static/imgs/mobile_activity/recruit/page3-font2.png')
-                            //.swiper-container.pic-box#swiper-container2
-                            //    .swiper-wrapper
-                            //        .swiper-slide
-                            //            img(src='/static/imgs/mobile_activity/recruit/pic1.png')
-                            //        .swiper-slide
-                            //            img(src='/static/imgs/mobile_activity/recruit/pic2.png')
-                            //        .swiper-slide
-                            //            img(src='/static/imgs/mobile_activity/recruit/pic3.png')
-                            //        .swiper-slide
-                            //            img(src='/static/imgs/mobile_activity/recruit/pic4.png')
-                            //        .swiper-slide
-                            //            img(src='/static/imgs/mobile_activity/recruit/pic5.png')
-                            //        .swiper-slide
-                            //            img(src='/static/imgs/mobile_activity/recruit/pic6.png')
-                            //    .swiper-pagination.wiper-pagination-new
-                            .ul.m-cascadingTeletext.z-viewArea
-                                li.first.move-item.z-current
-                                    img(src='/static/imgs/mobile_activity/recruit/pic1.png')
-                                li.second.move-item
-                                    img(src='/static/imgs/mobile_activity/recruit/pic2.png')
-                                li.third.move-item
-                                    img(src='/static/imgs/mobile_activity/recruit/pic3.png')
-                                li.four.move-item
-                                    img(src='/static/imgs/mobile_activity/recruit/pic4.png')
-                                li.five.move-item
-                                    img(src='/static/imgs/mobile_activity/recruit/pic5.png')
-                                li.six.move-item
-                                    img(src='/static/imgs/mobile_activity/recruit/pic6.png')
-                            .dot-box
-                                span.active
-                                span
-                                span
-                                span
-                                span
-                                span
+                            .swiper-container.pic-box.swiper-container2
+                                .swiper-wrapper
+                                    .swiper-slide
+                                        img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                                    .swiper-slide
+                                        img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                                    .swiper-slide
+                                        img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                                    .swiper-slide
+                                        img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                                    .swiper-slide
+                                        img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                                    .swiper-slide
+                                        img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                                .swiper-pagination.wiper-pagination-new
+                            //.ul.m-cascadingTeletext.z-viewArea
+                            //    li.first.move-item.z-current
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                            //    li.second.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                            //    li.third.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                            //    li.four.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                            //    li.five.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                            //    li.six.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                            //.dot-box
+                            //    span.active
+                            //    span
+                            //    span
+                            //    span
+                            //    span
+                            //    span
                     .swiper-slide
                         .center-obj
                             .page4-font1.animations
@@ -161,13 +162,13 @@ html.recruit-box
                         .center-obj
                             .page7-font1.animations
                                 img(src='/static/imgs/mobile_activity/recruit/page7_font1.png')
-                            .dyh-fuh
-                                .dyh.animations
-                                    p 订阅号
-                                    img(src='/static/imgs/mobile_activity/recruit/dyh.png')
-                                .fwh.animations
-                                    p 服务号
-                                    img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            //.dyh-fuh
+                            //    .fwh.animations
+                            //        p 服务号
+                            //        img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            p.fwh 服务号
+                            .erweima.animations
+                                img(src='/static/imgs/mobile_activity/recruit/fwh.png')
                             p.pop.animations 长按，极致工作，疯狂玩乐就等你！
         script(src="/static/src/mobile/lib/weixin/wx.js")
         script(src='/static/scripts/app/swiper/swiper.min.js?v=201512181')

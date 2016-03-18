@@ -78,6 +78,12 @@ head
                     .span9-omega
                       input#title(type='text', name='coupon_ids', placeholder='红包或加息券ID(不填则不发)', style="width:500px;")
                       p 填写符合条件的理财券id,多个id用英文逗号间隔
+                  .span6(style="margin-top:10px")
+                    .span3(style="line-height:40px")
+                      label 体验金活动ID
+                    .span9-omega
+                      input#title(type='text', name='experience_ids', placeholder='体验金活动ID(不填则不发)', style="width:500px;")
+                      p 填写符合条件的体验金活动id,多个id用英文逗号间隔
                 .span(style="clear:both")
                 input#btn_sub.button-primary(style="margin-top:20px", type="submit") 确认发送
           else
