@@ -162,11 +162,13 @@ class GetContinueActionReward(APIView):
                         end_date = timezone.localtime(reward.end_time).strftime("%Y年%m月%d日")
                         name = reward.type
                         context = Context({
+                            # 'mobile': safe_phone_str(user.wanglibaouserprofile.phone),
                             'reward': reward_content,
                             'end_date': end_date,
                             'name': name,
                         })
                         if has_reward_record:
+                            redpack_txts.append(name)
                             if rule.msg_template:
                                 msg = Template(rule.msg_template)
                                 content = msg.render(context)
