@@ -176,9 +176,10 @@ class ProductionIDVerifyV2BackEnd(object):
         record.is_valid = verify_result
         record.description = message
 
-        if verify_result and id_photo:
+        if verify_result:
             message = None
-            record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
+            if id_photo:
+                record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
 
         record.save()
 
