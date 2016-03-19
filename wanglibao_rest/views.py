@@ -520,6 +520,8 @@ class IdValidateAPIView(APIView):
 
         try:
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
         except:
             return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
 
@@ -960,6 +962,8 @@ class IdValidate(APIView):
                                 }, status=400)
 
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
 
             verify_counter.count = F('count') + 1
             verify_counter.save()

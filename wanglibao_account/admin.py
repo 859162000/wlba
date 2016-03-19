@@ -136,13 +136,14 @@ User.__unicode__ = user_unicode
 
 class IdVerificationAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
+    list_display = ('id', 'user', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
     search_fields = ('name', 'id_number')
     list_filter = ('is_valid', )
+    raw_id_fields = ('user', )
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_idverification'):
-            return ('name', 'id_number', 'is_valid', 'created_at',)
+            return ('user', 'name', 'id_number', 'is_valid', 'created_at',)
         return ()
 
     def has_delete_permission(self, request, obj=None):
