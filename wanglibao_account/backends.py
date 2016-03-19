@@ -95,6 +95,11 @@ class ProductionIDVerifyBackEnd(object):
 
     @classmethod
     def verify(cls, name, id_number):
+        records = IdVerification.objects.filter(id_number=id_number, name=name)
+        if records.exists():
+            record = records.first()
+            return record, None
+
         request = u"""<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:nci="http://www.nciic.com.cn" xmlns:fin="http://schemas.datacontract.org/2004/07/Finance.EPM">
                <soapenv:Header/>
@@ -168,6 +173,11 @@ class ProductionIDVerifyV2BackEnd(object):
 
     @classmethod
     def verify(cls, name, id_number):
+        records = IdVerification.objects.filter(id_number=id_number, name=name)
+        if records.exists():
+            record = records.first()
+            return record, None
+
         verify_result, id_photo, message = get_verify_result(id_number, name)
 
         record = IdVerification()
