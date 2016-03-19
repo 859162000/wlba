@@ -95,11 +95,6 @@ class ProductionIDVerifyBackEnd(object):
 
     @classmethod
     def verify(cls, name, id_number):
-        records = IdVerification.objects.filter(id_number=id_number, name=name)
-        if records.exists():
-            record = records.first()
-            return record, None
-
         request = u"""<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:nci="http://www.nciic.com.cn" xmlns:fin="http://schemas.datacontract.org/2004/07/Finance.EPM">
                <soapenv:Header/>
@@ -134,37 +129,38 @@ class ProductionIDVerifyBackEnd(object):
             "Content-Length": len(encoded_request),
         }
 
-        response = requests.post(url='http://service.sfxxrz.com/IdentifierService.svc',
-                                 headers=headers,
-                                 data=encoded_request,
-                                 verify=False)
-
-        if response.status_code != 200:
-            logger.error("Failed to send request: status: %d, ", response.status_code)
-            return None, "Failed to send request"
-
+        verify_result = False
         try:
-            verify_result = False
-            parsed_response = parse_id_verify_response(response.text)
-            if parsed_response['result'] == u'一致':
-                verify_result = True
-        except StopIteration:
-            pass
+            response = requests.post(url='http://service.sfxxrz.com/IdentifierService.svc',
+                                     headers=headers,
+                                     data=encoded_request,
+                                     verify=False)
+        except Exception, e:
+            logger.error("ProductionIDVerifyBackEnd connected failed with error: %s " % e)
+            message = u'连接错误'
+        else:
+            if response.status_code != 200:
+                logger.error("ProductionIDVerifyBackEnd connected failed with status code %s" % response.status_code)
+                message = u"异常响应状态（%s）" % response.status_code
+            else:
+                try:
+                    parsed_response = parse_id_verify_response(response.text)
+                    if parsed_response['result'] == u'一致':
+                        message = u'成功'
+                        verify_result = True
+                    else:
+                        message = parsed_response['result']
+                        logger.info("ProductionIDVerifyBackEnd Identity not consistent with data[%s]" % response.text)
+                except StopIteration:
+                    message = u'响应数据解析失败'
+                    logger.info("ProductionIDVerifyBackEnd parse reponse text failed with data[%s]" % response.text)
 
-        # result = bool(parsed_response['response_code'] == 100)
-        #
-        # if not result:
-        #     logger.error("Failed to validate: %s" % response.text)
-        #
-        # verify_result = True
-        # if parsed_response['result'] != u'一致':
-        #     verify_result = False
-        #     logger.info("Identity not consistent %s" % response.text)
-
-        record = IdVerification(id_number=id_number, name=name, is_valid=verify_result)
+        record = IdVerification(id_number=id_number, name=name, is_valid=verify_result, description=message)
         record.save()
 
-        return record, None
+        message = None if record.is_valid else message
+
+        return record, message
 
 
 class ProductionIDVerifyV2BackEnd(object):
@@ -172,11 +168,6 @@ class ProductionIDVerifyV2BackEnd(object):
 
     @classmethod
     def verify(cls, name, id_number):
-        records = IdVerification.objects.filter(id_number=id_number, name=name)
-        if records.exists():
-            record = records.first()
-            return record, None
-
         verify_result, id_photo, message = get_verify_result(id_number, name)
 
         record = IdVerification()
@@ -186,11 +177,12 @@ class ProductionIDVerifyV2BackEnd(object):
         record.description = message
 
         if verify_result and id_photo:
+            message = None
             record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
 
         record.save()
 
-        return record, None
+        return record, message
 
 
 def parse_id_verify_response_v2(text):
@@ -440,7 +432,7 @@ def get_verify_result(id_number, name):
     encode_request = request.encode('UTF-8')
 
     headers = {
-        "Host": "api.nciic.com.cn",
+        "Host": "ws.nciic.org.cn",
         "SOAPAction": "",
         "Content-Type": "text/xml; charset=UTF-8",
         "Content-Length": len(encode_request),
@@ -449,7 +441,7 @@ def get_verify_result(id_number, name):
     # 发送实名认证请求
     s = requests.Session()
     s.mount('https://', MyHttpsAdapter(max_retries=5))
-    response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
+    response = s.post(url='https://ws.nciic.org.cn/nciic_ws/services/NciicServices',
                       headers=headers,
                       data=encode_request,
                       verify=False)
