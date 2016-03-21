@@ -20,6 +20,9 @@ from wanglibao_redpack.backends import give_activity_redpack_for_hby, get_start_
 from wanglibao_redpack.backends import _send_message_for_hby
 from experience_gold.backends import SendExperienceGold
 from wanglibao_rest.utils import split_ua
+from marketing.models import IntroducedBy, Reward, RewardRecord
+from wanglibao_activity.backends import _keep_reward_record, _send_message_template
+from django.template import Template, Context
 
 logger = logging.getLogger("weixin")
 # https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
@@ -144,6 +147,33 @@ class GetContinueActionReward(APIView):
                     redpack_txts.append('%s元体验金'%int(experience_event.amount))
                     experience_record_ids += (str(experience_record_id) + ",")
                     reward_record.experience_record_ids = experience_record_ids
+                if rule.gift_type == "reward":
+                    now = timezone.now()
+                    reward = Reward.objects.filter(type=rule.reward,
+                                                   is_used=False,
+                                                   end_time__gte=now).first()
+                    if reward:
+                        reward.is_used = True
+                        reward.save()
+                        # 记录奖品发放流水
+                        description = '=>'.join([rule.rule_name, reward.type])
+                        has_reward_record = _keep_reward_record(user, reward, description)
+                        reward_content = reward.content
+                        end_date = timezone.localtime(reward.end_time).strftime("%Y年%m月%d日")
+                        name = reward.type
+                        context = Context({
+                            # 'mobile': safe_phone_str(user.wanglibaouserprofile.phone),
+                            'reward': reward_content,
+                            'end_date': end_date,
+                            'name': name,
+                        })
+                        if has_reward_record:
+                            redpack_txts.append(name)
+                            if rule.msg_template:
+                                msg = Template(rule.msg_template)
+                                content = msg.render(context)
+                                _send_message_template(user, rule.rule_name, content)
+
             reward_record.activity_code_time = timezone.now()
             reward_record.status = True
             reward_record.save()

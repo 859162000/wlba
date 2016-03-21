@@ -4,7 +4,15 @@ doctype html
 html.recruit-box
     head
         title 招聘
-        include include/app_head
+        meta(charset="utf-8")
+        meta(name="format-detection" content="telephone=no,email=no")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+
+        link(href="/static/styles/mobile_activity/app.css?v=20160202514", rel="stylesheet")
+
+        link(href="/static/styles/mobile_activity/swipe.css?v=20160202514", rel="stylesheet")
+        meta(content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.0, user-scalable=no" ,name="viewport")
     body.recruit-body
         .page-loading
             .loading-img
@@ -12,14 +20,14 @@ html.recruit-box
             .lb
                 img(src='/static/imgs/mobile_activity/recruit/lb.png')
             p.Loading-font Loading...
-        .page-common
+        .page-common(style='display:none')
             .recruit-icon.icon-right
             .recruit-icon.icon-left
             .recruit-icon.icon-middle
             .recruit-icon.icon-bottom
             .page-next
         .page-box
-            .swiper-container.swiper-container1#swiper-container1
+            .swiper-container.swiper-container1.swiper-container1
                 .swiper-wrapper
                     .swiper-slide
                         .center-obj
@@ -64,22 +72,42 @@ html.recruit-box
                             .page3-font2.animations 牛逼的成长速度
                             .page3-font3.animations
                                 img(src='/static/imgs/mobile_activity/recruit/page3-font2.png')
-                            .swiper-container.pic-box#swiper-container2
-                                .swiper-wrapper
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic1.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic2.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic3.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic4.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic5.png')
-                                    .swiper-slide
-                                        img(src='/static/imgs/mobile_activity/recruit/pic6.png')
-                                .swiper-pagination.wiper-pagination-new
-                            .page-next
+                            .opt-box
+                                .swiper-container.pic-box.swiper-container2
+                                    .swiper-wrapper
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                                        .swiper-slide
+                                            img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                                    .swiper-pagination.wiper-pagination-new
+                            //.ul.m-cascadingTeletext.z-viewArea
+                            //    li.first.move-item.z-current
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic1.png')
+                            //    li.second.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic2.png')
+                            //    li.third.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic3.png')
+                            //    li.four.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic4.png')
+                            //    li.five.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic5.png')
+                            //    li.six.move-item
+                            //        img(src='/static/imgs/mobile_activity/recruit/pic6.png')
+                            //.dot-box
+                            //    span.active
+                            //    span
+                            //    span
+                            //    span
+                            //    span
+                            //    span
                     .swiper-slide
                         .center-obj
                             .page4-font1.animations
@@ -110,24 +138,12 @@ html.recruit-box
                                 img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu11.animationss
                                 img(src='/static/imgs/mobile_activity/recruit/qiu1.png').qiu12.animationss
                                 .font-one.font-c.animations
-                                    p.title 福利一
-                                    p 领先完善薪酬水平，有吸引力的
-                                        span 年终奖
-                                    p 帅哥美女众多，各种球类活动
-                                    p 商业医疗保险全方位关怀你的身心
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli1.png').animationss
                                 .font-two.font-c.animations
-                                    p.title 福利二
-                                    p 水果、酸奶、下午茶总也管不住嘴
-                                    p
-                                        span 弹性工作、轻松开放
-                                        | 的团队氛围
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli2.png').animationss
                                 .font-three.font-c.animations
-                                    p.title 福利三
-                                    p 电影、桌游、团队聚餐、户外活动
-                                    p
-                                        span 每日、每月、每季度、每年
-                                        | 的企业
-                                    p 文化活动满足你不同需求
+                                    img(src='/static/imgs/mobile_activity/recruit/fuli3.png').animationss
+
                     .swiper-slide
                         .center-obj
                             .page6-font1.animations
@@ -153,13 +169,13 @@ html.recruit-box
                         .center-obj
                             .page7-font1.animations
                                 img(src='/static/imgs/mobile_activity/recruit/page7_font1.png')
-                            .dyh-fuh
-                                .dyh.animations
-                                    p 订阅号
-                                    img(src='/static/imgs/mobile_activity/recruit/dyh.png')
-                                .fwh.animations
-                                    p 服务号
-                                    img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            //.dyh-fuh
+                            //    .fwh.animations
+                            //        p 服务号
+                            //        img(src='/static/imgs/mobile_activity/recruit/fwh.png')
+                            .erweima.animations
+                                p.fwh 服务号
+                                img(src='/static/imgs/mobile_activity/recruit/fwh.png')
                             p.pop.animations 长按，极致工作，疯狂玩乐就等你！
         script(src="/static/src/mobile/lib/weixin/wx.js")
         script(src='/static/scripts/app/swiper/swiper.min.js?v=201512181')

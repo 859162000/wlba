@@ -71,10 +71,11 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
-from .utils import xunleivip_generate_sign, generate_coop_base_data
+from .utils import xunleivip_generate_sign, generate_coop_base_data, str_to_dict
 from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
 from wanglibao_margin.models import MarginRecord
+from wanglibao_rest.utils import generate_bajinshe_sign
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1633,6 +1634,8 @@ class BaJinSheRegister(CoopRegister):
         self.external_channel_user_id_key = 'p_user_id'
         self.external_channel_order_id_key = 'orderNum'
         self.internal_channel_order_id_key = 'order_id'
+        self.external_channel_sign_key = 'signature'
+        self.internal_channel_sign_key = 'sign'
         self.call_back_url = settings.CHANNEL_CENTER_CALL_BACK_URL
 
     @property
@@ -1647,9 +1650,26 @@ class BaJinSheRegister(CoopRegister):
     def channel_order_id(self):
         return self.request.session.get(self.internal_channel_order_id_key, None)
 
+    def set_dont_enforce_csrf_checks(self, client_id, phone, sign):
+        key = settings.BAJINSHE_COOP_KEY
+        if client_id and phone and key and sign:
+            local_sign = generate_bajinshe_sign(client_id, phone, key)
+            if local_sign == sign:
+                if not hasattr(self.request, '_dont_enforce_csrf_checks'):
+                    setattr(self.request, '_dont_enforce_csrf_checks', True)
+
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
             req_data = json.loads(self.request.body.strip())
+        elif self.request.META.get('CONTENT_TYPE', '').lower().find('application/x-www-form-urlencode') != -1:
+            if self.request.body.strip():
+                data = str_to_dict(self.request.body.strip())
+                if 'data' in data:
+                     req_data = json.loads(data['data']) or dict()
+                else:
+                    req_data = dict()
+            else:
+                req_data = dict()
         else:
             req_data = self.request.REQUEST
 
@@ -1660,6 +1680,7 @@ class BaJinSheRegister(CoopRegister):
         client_id = req_data.get(self.external_channel_client_id_key, None)
         access_token = req_data.get(self.channel_access_token_key, None)
         channel_order_id = req_data.get(self.external_channel_order_id_key, None)
+        sign = req_data.get(self.external_channel_sign_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1682,6 +1703,11 @@ class BaJinSheRegister(CoopRegister):
         if channel_order_id:
             self.request.session[self.internal_channel_order_id_key] = channel_order_id
 
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        self.set_dont_enforce_csrf_checks(client_id, channel_phone, sign)
+
     def clear_session(self):
         super(BaJinSheRegister, self).clear_session()
         self.request.session.pop(self.channel_product_id_key, None)
@@ -1689,6 +1715,7 @@ class BaJinSheRegister(CoopRegister):
         self.request.session.pop(self.channel_access_token_key, None)
         self.request.session.pop(self.internal_channel_phone_key, None)
         self.request.session.pop(self.internal_channel_order_id_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
 
     def save_to_binding(self, user):
         """

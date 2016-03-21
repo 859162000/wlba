@@ -416,7 +416,6 @@ webpackJsonp([12],[
 	        result = _validation$target$ty2[0];
 	        error = _validation$target$ty2[1];
 
-
 	        if (!result) return false;
 	    });
 
@@ -474,8 +473,8 @@ webpackJsonp([12],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^.{15,18}$/);
-	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
+	            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
 	        return [false, error];
@@ -493,6 +492,14 @@ webpackJsonp([12],[
 	            return [false, error];
 	        }
 	        return [true, ''];
+	    },
+	    isMoney: function isMoney(str) {
+	        var error = '请正确填写金额',
+	            int = str * 1;
+	        if (!isNaN(int) && int > 0) {
+	            return [true, ''];
+	        }
+	        return [false, error];
 	    }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -615,7 +622,6 @@ webpackJsonp([12],[
 	        var phone = $phone.val(),
 	            captcha_0 = $captcha_0.val(),
 	            captcha_1 = $captcha_1.val();
-
 	        chained(phone, captcha_0, captcha_1);
 	    });
 

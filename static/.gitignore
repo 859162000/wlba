@@ -2,3 +2,5 @@
 node_modules/
 Gruntfile.js
 *.map
+
+service.config.js

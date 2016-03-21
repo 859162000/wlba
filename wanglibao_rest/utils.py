@@ -154,14 +154,34 @@ def coop_token_login(request, phone, client_id, access_token):
                 auth_login(request, user)
         except Exception, e:
             logger.info('internal request oauth failed with error %s' % e)
+    else:
+        logger.info("coop_token_login failed with phone[%s] client_id[%s] access_token[%s]" % (phone,
+                                                                                               client_id,
+                                                                                               access_token))
+
+
+def generate_bajinshe_sign(client_id, phone, key):
+    sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
+    return sign
+
+
+def generate_coop_access_token_sign(client_id, phone, key):
+    sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
+    return sign
 
 
 def process_for_bajinshe_landpage(request, channel_code):
+    sign = request.session.get('sign', None)
     phone = request.session.get('phone', None)
     client_id = request.session.get('client_id', None)
     access_token = request.session.get('access_token', None)
 
-    coop_token_login(request, phone, client_id, access_token)
+    key = settings.BAJINSHE_COOP_KEY
+    if generate_bajinshe_sign(client_id, phone, key) == sign:
+        coop_token_login(request, phone, client_id, access_token)
+    else:
+        logger.info("process_for_bajinshe_landpage invalid signature with sign[%s] phone[%s] key[%s]" %
+                    (sign, phone, key))
 
 
 def process_for_renrenli_landpage(request, channel_code):
@@ -188,11 +208,6 @@ def get_coop_binding_for_phone(channel_code, phone):
 
 def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
-
-
-def generate_coop_access_token_sign(client_id, phone, key):
-    sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
-    return sign
 
 
 def get_coop_access_token(phone, client_id, tid, coop_key):
