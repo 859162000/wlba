@@ -336,12 +336,6 @@
 @mixin animate-scale($t:0s , $t1:0s)
   animation: scale $t linear $t1 both
   -webkit-animation: scale $t linear $t1 both
-*
-  -webkit-touch-callout: none
-  -webkit-user-select: none
-  -moz-user-select: none
-  -ms-user-select: none
-  user-select: none
 .swiper-slide
   .animations
     display: none
@@ -363,6 +357,7 @@
     position: relative
     width: 100%
     height: 100%
+    -webkit-user-select: none
     .page-loading
       width: 100%
       height: 100%
@@ -837,10 +832,10 @@
   left: 50%
   -webkit-transform: translate3d(-50%,-50%,0)
   transform: translate3d(-50%,-50%,0)
-  zoom: 2
-@media only screen and (min-device-width : 375px) and (max-device-width : 667px) and (orientation : portrait)
+  zoom: 1
+@media only screen and (max-device-height : 480px)
   .center-obj
-    zoom: 2
+    zoom: 0.7
 .page-common
   position: absolute
   top: 0

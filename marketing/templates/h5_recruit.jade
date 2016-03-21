@@ -4,9 +4,15 @@ doctype html
 html.recruit-box
     head
         title 招聘
-        include include/app_head
+        meta(charset="utf-8")
+        meta(name="format-detection" content="telephone=no,email=no")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+
+        link(href="/static/styles/mobile_activity/app.css?v=20160202514", rel="stylesheet")
+
         link(href="/static/styles/mobile_activity/swipe.css?v=20160202514", rel="stylesheet")
-        meta(content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=1.0, user-scalable=no" ,name="viewport")
+        meta(content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.0, user-scalable=no" ,name="viewport")
     body.recruit-body
         .page-loading
             .loading-img
