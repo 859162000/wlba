@@ -503,15 +503,15 @@ def msg_give_coupon(name, amount, end_time):
 
 
 def sms_alert_unbanding_xunlei(reward_dsct, url):
-    content = u"由于您之前没有完成迅雷帐号登录，无法关联，导致会员奖励无法到帐。" \
-              u"请先到以下页面完成迅雷帐号登录，即可获得{}奖励" \
+    content = u"由于您之前没有完成迅雷帐号登录，无法关联，导致会员奖励无法到帐。<br/>" \
+              u"请先到以下页面完成迅雷帐号登录，即可获得{}奖励。" \
               u"<br/>" \
               u"<a href='{}'>领取奖励>></a><br/>"
     return content.format(reward_dsct, url)
 
 
 @suffix
-def changed_mobile_success():
+def changed_mobile_success(user_name):
     """
     修改手机号成功短信
     """
@@ -520,7 +520,7 @@ def changed_mobile_success():
             redis = redis_backend()
             obj = redis._get('changed_mobile_success')
             content = cPickle.loads(obj)['content']
-            return content
+            return content.format(user_name)
         except Exception:
             return u"尊敬的网利宝用户，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。"
     else:
@@ -528,7 +528,7 @@ def changed_mobile_success():
 
 
 @suffix
-def changed_mobile_fail():
+def changed_mobile_fail(user_name):
     """
     修改手机号失败短信
     """
@@ -537,11 +537,11 @@ def changed_mobile_fail():
             redis = redis_backend()
             obj = redis._get('changed_mobile_fail')
             content = cPickle.loads(obj)['content']
-            return content
+            return content.format(user_name)
         except Exception:
-            return u"尊敬的网利宝用户，您更换手机号的申请未通过，请登录您的账户中进行查看，重新上传相关材料。"
+            return u"尊敬的网利宝用户，由于所上传的资料不符要求，您的修改手机号申请未通过，请按照要求上传资料文件或联系客服，感谢您的支持。"
     else:
-        return u"尊敬的网利宝用户，您更换手机号的申请未通过，请登录您的账户中进行查看，重新上传相关材料。"
+        return u"尊敬的网利宝用户，由于所上传的资料不符要求，您的修改手机号申请未通过，请按照要求上传资料文件或联系客服，感谢您的支持。"
 
 
 @suffix

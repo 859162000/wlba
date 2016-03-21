@@ -3,6 +3,15 @@
   margin-top: 15px
   display: inline-block
   width: 100%
+  .example_right_title
+    float: right
+    margin-right: 50px
+    font-size: 18px
+    color: #487ad8
+    background: url("/static/images/account_safe/example_ico.jpg") no-repeat left center
+    padding-left: 28px
+    line-height: 55px
+    cursor: pointer
   .margin_top_box
     margin-top: 50px
   .main_title_top
@@ -37,7 +46,7 @@
       top: -2.5px
       margin-left: 20px
 .phone_modify_main_wrap .form_wrap
-  padding-left: 168px
+  padding-left: 128px
   font-size: 0
   margin-bottom: 90px
   .title_top
@@ -50,14 +59,20 @@
     color: #666
     line-height: 26px
     font-size: 18px
-    padding: 8px 0 38px 50px
+    padding: 8px 0 38px 0px
+    .user_id
+      width: 0
+      height: 0
+      opacity: 0
+      position: absolute
+      z-index: -99
     .box
       width: 100%
       clear: both
       display: inline-block
       padding-bottom: 15px
       label
-        width: 118px
+        width: 208px
         float: left
         display: block
         height: 36px
@@ -99,6 +114,7 @@
             width: 88px
             height: 34px
             opacity: 0
+            cursor: pointer
         .input_phone
           width: 242px
           height: 38px
@@ -141,6 +157,13 @@
           font-size: 12px
           line-height: 18px
           padding: 10px 0 0
+          text-align: left
+          span.red
+            color: #e4371f
+        .title_true
+          color: #333
+          font-size: 12px
+          line-height: 18px
           text-align: left
         .submit
           width: 244px
@@ -190,7 +213,16 @@
           height: 18px
           position: relative
           top: 5px
-
+        .reject_text
+          float: left
+          line-height: 16px
+          color: #e4371f
+          font-size: 12px
+          padding-left: 3px
+          margin-left: 5px
+          width: auto
+          height: 34px
+          line-height: 34px
         .error_right_title
           float: left
           line-height: 16px
@@ -200,8 +232,25 @@
           padding-left: 13px
           position: relative
           top: 10px
-          left: 0
+          left: 0px
           margin-left: 5px
+          width: auto
+          height: 34px
+          display: none
+        .true_right_title
+          float: left
+          line-height: 16px
+          color: #e4371f
+          font-size: 12px
+          background: url("/static/images/account_safe/ico.png") no-repeat -58px 0px
+          padding-left: 13px
+          position: relative
+          top: 10px
+          left: 0px
+          margin-left: 5px
+          width: 16px
+          height: 16px
+
     .upload_img
       width: 158px
       display: none
@@ -222,5 +271,93 @@
       label
         text-align: left
         width: 50px
-
-
+.phone_modify_main_wrap .phone_example_popup
+  position: fixed
+  left: 0
+  top: 0
+  z-index: 999
+  width: 100%
+  height: 100%
+  display: none
+  .phone_example_main
+    position: absolute
+    width: 750px
+    left: 50%
+    top: 50%
+    margin: -310px 0 0 -375px
+    background: #fff
+    z-index: 3
+    .phone_example_title_box
+      width: 100%
+      height: 50px
+      border-bottom: 1px #e6e6e6 solid
+      background: #f5f5f5
+      text-align: center
+      line-height: 50px
+      font-size: 18px
+      color: #666
+      position: relative
+      .close_ico
+        background: url("/static/images/account_safe/close.png") no-repeat
+        width: 22px
+        height: 22px
+        display: block
+        position: absolute
+        right: 19px
+        top: 14px
+        z-index: 2
+        cursor: pointer
+    .phone_example_body_box
+      width: 100%
+      padding: 8px 24px 16px
+      background: #fff
+      display: inline-block
+      .example_img
+        width: 340px
+        height: 248px
+        position: relative
+        display: block
+        margin-top: 22px
+        img
+          width: 100%
+          display: block
+        .example_title
+          position: absolute
+          left: 117px
+          top: 140px
+          z-index: 2
+          width: 156px
+          height: 50px
+          border: 2px #ff0000 solid
+          border-radius: 5px
+          text-align: center
+          line-height: 50px
+          color: #ff0000
+          font-size: 14px
+        .example_title2
+          top: 115px
+        .example_title3
+          top: 60px
+          left: 178px
+          border: none
+          border-radius: 0px
+        .example_text
+          width: 100%
+          height: 32px
+          line-height: 32px
+          text-align: center
+          font-size: 14px
+          color: #b2b2b2
+      .example_img_left
+        float: left
+      .example_img_right
+        float: right
+  .phone_modify_bg
+    width: 100%
+    height: 100%
+    background: #000
+    opacity: 0.5
+    position: absolute
+    left: 0
+    top: 0
+    z-index: 2
