@@ -568,7 +568,7 @@ class RenRenLiQueryApi(APIView):
                                     end_time = dt.fromtimestamp(float(end_time[:10]))
                                 else:
                                     end_time = dt.now()
-                                p2p_records = P2PRecord.objects.filter(user__binding__channel__code='renrenl',
+                                p2p_records = P2PRecord.objects.filter(user__binding__channel__code='renrenli',
                                                                        create_time__gte=start_time,
                                                                        create_time__lte=end_time).select_related()
                                 if p2p_records:
