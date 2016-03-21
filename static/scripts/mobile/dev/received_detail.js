@@ -133,7 +133,7 @@ webpackJsonp([9],{
 	    slide += "<span class='received-left-center'>";
 	    slide += "<div class='data-name'>回款笔数</div>";
 	    if (data.term_date_count == 0) {
-	        slide += "<div class='data-value'>0.00</div>";
+	        slide += "<div class='data-value'>0</div>";
 	    } else {
 	        slide += "<div class='data-value'>" + data.term_date_count + "</div>";
 	    }

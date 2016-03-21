@@ -40,7 +40,7 @@ webpackJsonp([11],[
 	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
 	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $amount.val() }];
+	                var checklist = [{ type: 'isEmpty', value: $amount.val() }, { type: 'isMoney', value: $amount.val() }];
 	                return (0, _from_validation.check)(checklist);
 	            }
 
@@ -51,7 +51,9 @@ webpackJsonp([11],[
 	            var isThrough = _checkOperation2[0];
 	            var sign = _checkOperation2[1];
 
-	            if (isThrough) return resolve({ message: '验证成功', amount: $amount.val() });
+	            if (isThrough) {
+	                return resolve({ message: '验证成功', amount: $amount.val() });
+	            }
 
 	            (0, _ui.signModel)(sign);
 	            return console.log('验证失败');
@@ -541,7 +543,6 @@ webpackJsonp([11],[
 	        result = _validation$target$ty2[0];
 	        error = _validation$target$ty2[1];
 
-
 	        if (!result) return false;
 	    });
 
@@ -599,8 +600,8 @@ webpackJsonp([11],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^.{15,18}$/);
-	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
+	            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
 	        return [false, error];
@@ -618,6 +619,14 @@ webpackJsonp([11],[
 	            return [false, error];
 	        }
 	        return [true, ''];
+	    },
+	    isMoney: function isMoney(str) {
+	        var error = '请正确填写金额',
+	            int = str * 1;
+	        if (!isNaN(int) && int > 0) {
+	            return [true, ''];
+	        }
+	        return [false, error];
 	    }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))

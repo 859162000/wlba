@@ -66,15 +66,16 @@ html
           a(href="/weixin/regist/first/").authentication-sign-btn 去实名认证
 
     .sign-main
-        .sign-body
-          img(src="/static/imgs/mobile/sign/sign_icon.png")
-          p.sign-tit 恭喜您，充值成功！
-          p.balance-tit 本次充值金额：
-            em.balance-sign
-          a(href="/weixin/list/") 立即购买
+      .sign-body
+        img(src="/static/imgs/mobile/sign/sign_icon.png")
+        p.sign-tit 恭喜您，充值成功！
+        p.balance-tit 本次充值金额：
+          em.balance-sign
+        a(href="/weixin/list/") 立即购买
     section.recharge-bank
     include include/tran_password
     include include/ui_model/mobile_confirm
+    include include/ui_model/mobile_errorsign
     //script(data-init="recharge", src="/static/scripts/mobile/mobile.js?v=20151120")
     script(src='/static/scripts/mobile/pro/vendor.zepto.js')
     script(src='/static/scripts/mobile/pro/recharge.js')

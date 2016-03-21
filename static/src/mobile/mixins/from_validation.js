@@ -7,9 +7,7 @@ export const check = (checklist) => {
     let [result, error] = [null, null];
 
     $.each(checklist, (index,target) => {
-
         [result, error] = validation[target.type](target.value);
-
         if (!result) return false
     });
 
@@ -61,8 +59,8 @@ const validation = {
     },
     idCard(str){
         const error = '身份证号不正确',
-            re = new RegExp(/^.{15,18}$/);
-        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
+            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+        if (re.test($.trim(str))) {
             return [true, '']
         }
         return [false, error]
@@ -81,4 +79,12 @@ const validation = {
         }
         return [true, '']
     },
+    isMoney(str){
+        const error = '请正确填写金额',
+            int = str*1;
+        if(!isNaN(int) && int > 0){
+            return [true, ''];
+        }
+        return [false, error]
+    }
 };
