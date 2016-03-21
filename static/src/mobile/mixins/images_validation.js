@@ -91,7 +91,6 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
         const phone = $phone.val(),
             captcha_0 = $captcha_0.val(),
             captcha_1 = $captcha_1.val();
-
         chained(phone, captcha_0, captcha_1)
     });
 
@@ -103,11 +102,11 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
          */
         checkOperation(phone)
             .then(()=> {
-                console.log('验证成功')
+                console.log('验证成功');
                 return fetchValidation(phone, captcha_0, captcha_1)
             })
             .then((message)=> {
-                signModel(message)
+                signModel(message);
                 console.log('短信发送成功');
                 let count = 60;
                 return timerFunction(count)

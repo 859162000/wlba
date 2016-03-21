@@ -24,7 +24,7 @@ html
                             a(href="/news/detail/{{news.id}}", target="_blank") {{news.name}}
                         dd.media_content.postion_dd
                             a.description(href="/news/detail/{{news.id}}",target="_blank") {{news.description}}
-                            a.link(href="/news/detail/{{news.id}}",target="_blank") [详细介绍]
+                            a.link.link-p(href="/news/detail/{{news.id}}",target="_blank") [详细介绍]
                         dd.media_time {{news.created_at|date:"Y-m-d H:i"}}
 
             .pager
