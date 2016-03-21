@@ -182,7 +182,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
     }
 
 import sys
@@ -913,6 +913,10 @@ VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
 
 # 用户实名接口v1剩余可用次数 Modify by chenweibin on 2016-03-03
 VALID_V1_TOTAL = 8000
+
+# 用户实名接口v2域名, ws.nciic.org.cn(新), api.nciic.com.cn(旧)
+VERIFY_V2_DOMAIN = 'ws.nciic.org.cn'
+# VERIFY_V2_DOMAIN = 'api.nciic.com.cn'
 
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV1&V2AutoBackEnd'
 # ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'

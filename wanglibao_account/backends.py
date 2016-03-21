@@ -441,9 +441,9 @@ def get_verify_result(id_number, name):
                     </soap:Envelope>""" % (settings.ID_LICENSE, in_conditions)
 
     encode_request = request.encode('UTF-8')
-
+    domain = settings.VERIFY_V2_DOMAIN
     headers = {
-        "Host": "ws.nciic.org.cn",
+        "Host": domain,
         "SOAPAction": "",
         "Content-Type": "text/xml; charset=UTF-8",
         "Content-Length": len(encode_request),
@@ -452,7 +452,8 @@ def get_verify_result(id_number, name):
     # 发送实名认证请求
     s = requests.Session()
     s.mount('https://', MyHttpsAdapter(max_retries=5))
-    response = s.post(url='https://ws.nciic.org.cn/nciic_ws/services/NciicServices',
+    url = 'https://%s/nciic_ws/services/NciicServices' % domain
+    response = s.post(url=url,
                       headers=headers,
                       data=encode_request,
                       verify=False)
