@@ -146,7 +146,10 @@ class BiSouYiRegisterForm(forms.Form):
                 if 'phone' in content_data:
                     if detect_identifier_type(content_data['phone']) == 'phone':
                         if 'token' in content_data:
-                            return content, content_data
+                            if len(content_data['token']) <= 255:
+                                return content, content_data
+                            else:
+                                raise forms.ValidationError(u'token长度超出限制')
                         else:
                             raise forms.ValidationError(u'content没有包含token')
                     else:
@@ -157,12 +160,12 @@ class BiSouYiRegisterForm(forms.Form):
                 raise forms.ValidationError(u'content不是期望的类型')
 
     def get_phone(self):
-        content = self.cleaned_data['content']
-        return content['phone']
+        phone = self.cleaned_data['content'][1]['phone']
+        return phone
 
     def get_token(self):
-        content = self.cleaned_data['content']
-        return content['token']
+        token = self.cleaned_data['content'][1]['token']
+        return token
 
     def check_sign(self):
         client_id = self.cleaned_data['client_id']
@@ -170,6 +173,6 @@ class BiSouYiRegisterForm(forms.Form):
         content = self.cleaned_data['content'][0]
         local_sign = hashlib.md5(str(client_id) + settings.BISOUYI_SIGN_KEY + content).hexdigest()
         if sign != local_sign:
-            raise forms.ValidationError(u'无效签名')
+            return False
         else:
             return True

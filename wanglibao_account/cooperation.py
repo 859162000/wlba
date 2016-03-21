@@ -1890,7 +1890,6 @@ class BiSouYiRegister(BaJinSheRegister):
         self.external_channel_client_id_key = 'cid'
         self.channel_sign_key = 'sign'
         self.channel_content_key = 'content'
-        self.channel_access_token_key = 'token'
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
@@ -1898,7 +1897,6 @@ class BiSouYiRegister(BaJinSheRegister):
         client_id = self.request.GET.get(self.external_channel_client_id_key, None)
         sign = self.request.GET.get(self.channel_sign_key, None)
         content = self.request.GET.get(self.channel_content_key, None)
-        token = self.request.GET.get(self.channel_access_token_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1914,9 +1912,6 @@ class BiSouYiRegister(BaJinSheRegister):
 
         if content:
             self.request.session[self.channel_content_key] = content
-
-        if token:
-            self.request.session[self.channel_access_token_key] = content
 
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()

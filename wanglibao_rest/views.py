@@ -47,7 +47,7 @@ from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
-                                  get_coop_binding_for_phone, get_coop_access_token)
+                                  get_coop_access_token, push_coop_access_token)
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
@@ -1796,60 +1796,39 @@ class BiSouYiRegisterApi(APIView):
 
     def get(self, request):
         form = BiSouYiRegisterForm(self.request.session)
-        if form.is_valid() and form.check_sign():
-            phone = form.get_phone()
-            password = generate_random_password(6)
-            user = create_user(phone, password, "")
-            if user:
-                auth_user = authenticate(identifier=phone, password=password)
-                auth_login(request, auth_user)
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                if user:
+                    auth_user = authenticate(identifier=phone, password=password)
+                    auth_login(request, auth_user)
 
-                send_messages.apply_async(kwargs={
-                    "phones": [phone, ],
-                    "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
-                })
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
 
-                client_id = form.cleaned_data['client_id']
-                channel_code = form.cleaned_data['channel_code']
-                content_data = form.cleaned_data['content'][1]
-                token = form.get_token()
+                    client_id = form.cleaned_data['client_id']
+                    channel_code = form.cleaned_data['channel_code']
+                    token = form.get_token()
 
-                # 处理第三方渠道的用户信息
-                CoopRegister(request).all_processors_for_user_register(user, channel_code)
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
 
-                device = split_ua(request)
-                tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+                    device = split_ua(request)
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
-                tid = get_uid_for_coop(user.id)
-                res_data = get_coop_access_token(phone, client_id, tid, coop_key)
-
-                if int(res_data['ret_code']) == 10000:
-                    callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
-                    callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
-                    data = {
-                        'Cust_key': tid,
-                        'Access_tokens': res_data['access_token'],
-                        'Callback_url': callback_url,
-                    }
-                    message = 'success'
-                    register_ok = True
-
-                    response_data = {
-                        'Code': 101,
-                        'Tip': u'成功',
-                        'Data': data,
-                    }
+                    tid = get_uid_for_coop(user.id)
+                    ret_data = push_coop_access_token(phone, client_id, tid, settings.BISOUYI_COOP_KEY, token)
+                    message = ret_data['message']
                 else:
-                    pass
+                    message = u'用户创建失败'
+            else:
+                message = u'无效签名'
         else:
-            register_ok = False
             message = form.errors.values()[0][0]
-            logger.info("BiSouYiRegisterApi process data[%s]" % self.request.session)
-
-        if register_ok:
-            url = ''
-        else:
-            url = ''
 
         logger.info("BiSouYiRegisterApi process result: %s" % message)
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect('/')

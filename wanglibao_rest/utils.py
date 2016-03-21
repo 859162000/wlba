@@ -216,16 +216,18 @@ def get_coop_access_token(phone, client_id, tid, coop_key):
 
     sign = generate_coop_access_token_sign(client_id, phone, coop_key)
     data = {
-        'usn': phone,
+        'phone': phone,
         'client_id': client_id,
-        'signature': sign,
-        'p_user_id': tid,
+        'sign': sign,
+        'channel_user': tid,
     }
     try:
         ret = requests.post(url, data=data)
         response_data = ret.json()
         response_data['ret_code'] = response_data['code']
         response_data.pop('code')
+        response_data['message'] = response_data['msg']
+        response_data.pop('msg')
         logger.info('get_coop_access_token return: %s' % response_data)
     except Exception, e:
         response_data = {
@@ -238,29 +240,33 @@ def get_coop_access_token(phone, client_id, tid, coop_key):
     return response_data
 
 
-def push_coop_access_token(phone, client_id, tid, coop_key):
-    url = settings.COOP_ACCESS_TOKEN_PUSH_URL
+def push_coop_access_token(phone, client_id, tid, coop_key, token):
+    url = settings.PUSH_COOP_TOKEN_URL
     logger.info('enter push_coop_access_token with url[%s]' % url)
 
     sign = generate_coop_access_token_sign(client_id, phone, coop_key)
     data = {
-        'usn': phone,
+        'phone': phone,
         'client_id': client_id,
-        'signature': sign,
-        'p_user_id': tid,
+        'sign': sign,
+        'channel_user': tid,
+        'coop_token': token,
     }
+
     try:
         ret = requests.post(url, data=data)
         response_data = ret.json()
         response_data['ret_code'] = response_data['code']
         response_data.pop('code')
-        logger.info('get_coop_access_token return: %s' % response_data)
+        response_data['message'] = response_data['msg']
+        response_data.pop('msg')
+        logger.info('push_coop_access_token return: %s' % response_data)
     except Exception, e:
         response_data = {
             'ret_code': 50001,
             'message': 'api error'
         }
-        logger.info("get_coop_access_token failed to connect")
+        logger.info("push_coop_access_token failed to connect")
         logger.info(e)
 
     return response_data
