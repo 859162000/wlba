@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'AboutDynamic.description'
         db.add_column(u'wanglibao_banner_aboutdynamic', 'description',
-                      self.gf('django.db.models.fields.TextField')(default='', null=True),
+                      self.gf('django.db.models.fields.TextField')(default='', max_length=255),
                       keep_default=False)
 
 
@@ -24,7 +24,7 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['-created_at']", 'object_name': 'AboutDynamic'},
             'content': ('ckeditor.fields.RichTextField', [], {}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {'default': "''", 'null': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'max_length': '255'}),
             'end_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'hide_in_list': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
