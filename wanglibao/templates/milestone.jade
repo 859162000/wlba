@@ -19,14 +19,9 @@ html
                         dl.milestone_dd.clearfix
                             dd.media_title
                                 a(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.title}}
-                            content = len(info.content)
-                            if content > 70
-                                dd.media_content.postion_dd
-                                 a.contentA(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.content|safe}}
-                                    a.link.link-p(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
-                            else
-                                dd.media_content {{info.content|safe}}
-                                    a.link.link-p(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
+                            dd.media_content.postion_dd
+                                a.contentA(href="/dynamic/detail/{{info.id}}/", target="_blank") {{info.description|safe}}
+                                a.link(href="/dynamic/detail/{{info.id}}/",target="_blank") [详细介绍]
                             dd.media_time {{info.updated_time|date:"Y-m-d H:i"}} &nbsp;&nbsp;
                     .pager
                       - with data=data uri='/dynamic/'
