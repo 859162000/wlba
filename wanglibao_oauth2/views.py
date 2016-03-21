@@ -13,18 +13,13 @@ from rest_framework.views import APIView
 
 import constants
 from . import AccessTokenBaseView
-from .models import AccessToken, RefreshToken
+from .models import AccessToken, RefreshToken, CoopToken
 from .forms import RefreshTokenGrantForm, UserAndClientForm
 from .utils import now
 from .tools import get_current_utc_timestamp, generate_oauth2_sign
 from wanglibao_account.cooperation import CoopSessionProcessor
 
 logger = logging.getLogger(__name__)
-
-
-def create_access_token(user, client):
-    token = default_token_generator.make_token(user)
-    return AccessToken.objects.create(user=user, client=client, token=token)
 
 
 class AccessTokenView(AccessTokenBaseView):
@@ -47,7 +42,8 @@ class AccessTokenView(AccessTokenBaseView):
         return token, form_errors
 
     def create_access_token(self, request, user, client):
-        return create_access_token(user, client)
+        token = default_token_generator.make_token(user)
+        return AccessToken.objects.create(user=user, client=client, token=token)
 
     def create_refresh_token(self, request, user, access_token, client):
         return RefreshToken.objects.create(
@@ -56,13 +52,21 @@ class AccessTokenView(AccessTokenBaseView):
             client=client
         )
 
+    def create_coop_token(self, coop_token, user, access_token, client):
+        return CoopToken.objects.create(
+            user=user,
+            access_token=access_token,
+            client=client,
+            token=coop_token,
+        )
+
     def get_access_token(self, request, user, client):
         try:
             # Attempt to fetch an existing access token.
             at = AccessToken.objects.get(user=user, client=client, expires__gt=now())
         except AccessToken.DoesNotExist:
             # None found... make a new one!
-            at = create_access_token(user, client)
+            at = self.create_access_token(user, client)
             self.create_refresh_token(request, user, at, client)
 
         return at
