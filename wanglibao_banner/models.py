@@ -158,7 +158,7 @@ class AboutDynamic(models.Model):
     end_time = models.DateTimeField(u'展示结束时间', auto_now=False, blank=True, null=True)
     created_at = models.DateTimeField(u'发布时间', auto_now_add=True)
     updated_time = models.DateTimeField(u'更新时间', auto_now=True)
-    description = models.TextField(u'描述', null=True, default='')
+    description = models.TextField(u'描述', max_length=255)
 
     class Meta:
         verbose_name = u'动态'

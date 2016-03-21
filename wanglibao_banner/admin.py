@@ -26,7 +26,8 @@ class AppActivateAdmin(admin.ModelAdmin):
 
 
 class AboutDynamicAdmin(admin.ModelAdmin):
-    list_display = ('title', 'content', 'start_time', 'end_time', 'priority', 'hide_in_list', 'updated_time')
+    list_display = ('title', 'start_time', 'end_time', 'priority', 'hide_in_list', 'updated_time')
+    fields = ('title', 'description', 'content', 'priority', 'hide_in_list', 'start_time', 'end_time')
 
 
 admin.site.register(Banner, BannerAdmin)
