@@ -26,13 +26,6 @@ class WanglibaoUserProfile(models.Model):
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)
 
-    @property
-    def is_invested(self):
-        is_invested = False
-        if P2PRecord.objects.filter(user=self.user, catalog=u'申购').count():
-            is_invested = True
-        return is_invested
-
 
 def create_profile(sender, **kw):
     """
