@@ -38,8 +38,8 @@ urlpatterns = patterns(
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                                login_url='/accounts/login/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
-    url(r'^redpacket/(?P<status>\w+)/$', login_required(AccountRedPacket.as_view(), login_url='/accounts/login/')),
-    url(r'^coupon/(?P<status>\w+)/$', login_required(AccountCoupon.as_view(), login_url='/accounts/login/')),
+    #url(r'^redpacket/(?P<status>\w+)/$', login_required(AccountRedPacket.as_view(), login_url='/accounts/login/')),
+    #url(r'^coupon/(?P<status>\w+)/$', login_required(AccountCoupon.as_view(), login_url='/accounts/login/')),
 
     url(r'^repayment/$', login_required(AccountRepayment.as_view(), login_url='/accounts/login/')),
     url(r'^transaction/deposit/$', login_required(AccountTransactionDeposit.as_view(),
@@ -157,13 +157,22 @@ urlpatterns += patterns(
     url(r'^gold/', TemplateView.as_view(template_name="center_gold.jade")),
     url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
     url(r'^accrual/', TemplateView.as_view(template_name="center_redpack_accrual.jade")),
-    url(r'^pack/', TemplateView.as_view(template_name="center_redpack_pack.jade")),
+    url(r'^pack/', TemplateView.as_view(template_name="center_redpack_base.jade")),
     url(r'^securitys/', TemplateView.as_view(template_name="center_security.jade")),
-    url(r'^profile/', TemplateView.as_view(template_name="center_profile.jade")),
+
     url(r'^web-message/', TemplateView.as_view(template_name="center_message.jade")),
     url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
     url(r'^bankcards/', TemplateView.as_view(template_name="center_bank.jade")),
     url(r'^home-new/', TemplateView.as_view(template_name="center_home.jade")),
+    url(r'^password/modify/', TemplateView.as_view(template_name="center_password_modify.jade")),
+    url(r'^trade/modify/', TemplateView.as_view(template_name="center_trade_modify.jade")),
+
+    url(r'^redpacket/(?P<status>\w+)/$', login_required(AccountRedPacket.as_view(), login_url='/accounts/login/')),
+    url(r'^coupon/(?P<status>\w+)/$', login_required(AccountCoupon.as_view(), login_url='/accounts/login/')),
+
+    url(r'^profile/$', login_required(AddressView.as_view(), login_url='/accounts/login/')),
+
+    #url(r'^profile/', TemplateView.as_view(template_name="center_profile.jade")),
 )
 
 if settings.DEBUG:

@@ -16,6 +16,24 @@ block sidebar
 
 block main
   .c-main-white.c-auto-height.c-layout
+    .c-profile-mask
+      .c-profile-alert
+        .c-profile-alert-head
+          .alert-title 添加/修改收货信息
+        .c-profile-alert-form
+          form()
+            input(placeholder='收货人地址', type='text')
+            input(placeholder='收货人地址', type='text')
+            input(placeholder='收货人地址', type='text')
+
+        .c-profile-alert-submit
+          input(type='button', value='确认添加')
+        .c-alert-close
+
+
+
+
+
     .c-profile-means
 
       .pro-means-head
@@ -25,43 +43,47 @@ block main
         .fl.pro-layout
           .means-item
             .means-title 真实姓名
-            .means-content 王**
+            if user.wanglibaouserprofile.name
+              .means-content {{user.wanglibaouserprofile.name | safe_name}}
+            else
+              a(href='').means-content.means-blue 立即实名
           .means-item
             .means-title 手机号码
-            .means-content 185*******88
+            .means-content {{user | display_name}}
           .means-item
             .means-title 银行卡号
             .means-content 中国工商银行 尾号449
 
         .fl.pro-layout
           .means-item
-            .means-title 邮箱地址
-            .means-content.means-blue 未绑定邮箱
-          .means-item
             .means-title 身份证号
-            .means-content 37185*******88
+            if user.wanglibaouserprofile.id_number
+              .means-content {{user.wanglibaouserprofile.id_number | safe_id}}
+            else
+              a().means-content.means-blue 立即实名
+
 
     .c-profile-info
 
       .pro-means-head.clearfix
-        .t-d10.font-m.fl 认证资料
+        .t-d10.font-m.fl 收货信息
         .add-info.fr.t-d20
            i.iconfont.icon-greenRight
             |添加
 
       .pro-info-lists
-        mixin list()
+        for address in address_list
           .pro-list.clearfix
             .fl.pro-list-left
               .means-item
                 .means-title 收货人
-                .means-content 王223
+                .means-content {{address.name}}
               .means-item
                 .means-title 联系电话
-                .means-content 185*******88
+                .means-content {{address.phone_number}}
               .means-item
                 .means-title 收货地址
-                .means-content 中国工商银行中国工商银行中国工商
+                .means-content {{address.address}}
             .fr
               .pro-info-add
                 .add-info.fr
@@ -70,11 +92,13 @@ block main
                 .add-info.fr
                   i.iconfont.icon-greenRight.font-s
                   |修改
-                .add-info.fr
-                  i.iconfont.icon-greenRight.font-s
-                  |默认
-        +list()
-        +list()
-        +list()
+                if address.is_default == True
+                  .add-info.fr
+                    i.iconfont.icon-greenRight.font-s.t-d2
+                    |默认
+                else
+                  .add-info.fr
+                    i.iconfont.icon-greenRight.font-s
+                    |默认
 
 

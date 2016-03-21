@@ -1,5 +1,4 @@
 extends center_base
--load formatters
 
 block head
   - with '理财券' as title
@@ -17,8 +16,11 @@ block main
       .redpack-exchange-warp
         .redpack-head.font-m.t-d11.tl.mg-b-s 加息券/红包
         .redpack-body.clearfix
-          input(type='text', placeholder='请输入兑换码').redpack-input.fl.mg-r-s
+          input(type='text',name='token', placeholder='请输入兑换码').redpack-input.fl.mg-r-s
           .c-blue-button.fl 兑换
     .space-vertical-sm
-    .c-redpack-mod
+    .c-redpack-mod.padding-b-l
       block redpack
+
+  script.
+      require(['/static/src/pc/redpack.js?v=2'])
