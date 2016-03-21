@@ -531,9 +531,9 @@ class RenRenLiQueryApi(APIView):
                             binding = Binding.objects.filter(btype=client.channel.code, bid=bid).first()
                             if binding:
                                 if start_time:
-                                    start_time = dt.fromtimestamp(start_time)
+                                    start_time = dt.fromtimestamp(float(start_time))
                                     if end_time:
-                                        end_time = dt.fromtimestamp(end_time)
+                                        end_time = dt.fromtimestamp(float(end_time))
                                     else:
                                         end_time = dt.now()
                                     p2p_records = P2PRecord.objects.filter(user_id=binding.user.id,
@@ -562,9 +562,9 @@ class RenRenLiQueryApi(APIView):
                                 }
                         else:
                             if start_time:
-                                start_time = dt.fromtimestamp(start_time)
+                                start_time = dt.fromtimestamp(float(start_time))
                                 if end_time:
-                                    end_time = dt.fromtimestamp(end_time)
+                                    end_time = dt.fromtimestamp(float(end_time))
                                 else:
                                     end_time = dt.now()
                                 p2p_records = P2PRecord.objects.filter(user__binding__channel__code='renrenl',
