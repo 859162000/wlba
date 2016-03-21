@@ -8,16 +8,13 @@ views in :attr:`provider.views`.
 
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.contrib.auth.models import User
 from .utils import now, short_token, long_token
 from .utils import get_token_expiry, deserialize_instance
 from .managers import AccessTokenManager
 from marketing.models import Channels
 
-try:
-    from django.utils import timezone
-except ImportError:
-    timezone = None
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -159,6 +156,18 @@ class RefreshToken(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL)
     token = models.CharField(max_length=255, default=long_token)
     access_token = models.OneToOneField(AccessToken, related_name='refresh_token')
+    client = models.ForeignKey(Client)
+    expired = models.BooleanField(default=False)
+    created_time = models.DateTimeField(u'创建时间', auto_now=True)
+
+    def __unicode__(self):
+        return self.token
+
+
+class CoopToken(models.Model):
+    user = models.ForeignKey(AUTH_USER_MODEL)
+    access_token = models.OneToOneField(AccessToken, related_name='coop_token')
+    token = models.CharField(max_length=255, db_index=True)
     client = models.ForeignKey(Client)
     expired = models.BooleanField(default=False)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)

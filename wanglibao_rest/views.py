@@ -561,10 +561,31 @@ class RenRenLiQueryApi(APIView):
                                     'Data': u'无效用户绑定id',
                                 }
                         else:
-                            response_data = {
-                                'Code': 10017,
-                                'Data': u'订单号或用户绑定id必须存在',
-                            }
+                            if start_time:
+                                start_time = dt.fromtimestamp(start_time)
+                                if end_time:
+                                    end_time = dt.fromtimestamp(end_time)
+                                else:
+                                    end_time = dt.now()
+                                p2p_records = P2PRecord.objects.filter(user__binding__channel__code='renrenl',
+                                                                       create_time__gte=start_time,
+                                                                       create_time__lte=end_time).select_related()
+                                if p2p_records:
+                                    for p2p_record in p2p_records:
+                                        data = renrenli_callback.get_purchase_data(p2p_record)
+                                        if data:
+                                            data = self.get_amotize_data(data, p2p_record)
+                                            data_list.append(data)
+
+                                response_data = {
+                                    'Code': 101,
+                                    'Data': json.dumps(data_list),
+                                }
+                            else:
+                                response_data = {
+                                    'Code': 10016,
+                                    'Data': u'起始时间不存在',
+                                }
                     else:
                         response_data = {
                             'Code': 10013,

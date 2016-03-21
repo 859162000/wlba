@@ -114,3 +114,7 @@ class RefreshTokenGrantForm(forms.Form):
                 self.cleaned_data['refresh_token'] = token
 
         return self.cleaned_data
+
+
+class CoopTokenForm(forms.Form):
+    coop_token = forms.CharField(max_length=255, required=True, error_messages={'required': u'合作方令牌必须存在'})

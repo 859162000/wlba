@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView
 from django.core.exceptions import ObjectDoesNotExist
 import constants
 from .utils import now
-from .forms import RefreshTokenGrantForm
+from .forms import RefreshTokenGrantForm, CoopTokenForm
 from .models import RefreshToken, AccessToken
 
 
@@ -160,6 +160,14 @@ class AccessTokenBaseView(OAuthView, Mixin):
         """
         raise NotImplementedError
 
+    def create_coop_token(self, request, user, access_token, client):
+        """
+        Override to handle coop token creation.
+
+        :return: ``object`` - Coop token
+        """
+        raise NotImplementedError
+
     def invalidate_refresh_token(self, refresh_token):
         """
         Override to handle refresh token invalidation. When requesting a new
@@ -191,22 +199,22 @@ class AccessTokenBaseView(OAuthView, Mixin):
         as defined in :rfc:`5.1`.
         """
 
+        rt = access_token.refresh_token
+
         response_data = {
             'access_token': access_token.token,
             'expires_in': access_token.get_expire_delta(),
             'p2pUserId': user_id,
+            'refresh_token': rt.token,
+            'code': 10000,
+            'message': 'success',
         }
 
-        # Not all access_tokens are given a refresh_token
-        # (for example, public clients doing password auth)
         try:
-            rt = access_token.refresh_token
-            response_data['refresh_token'] = rt.token
-            response_data['code'] = '10000'
-            response_data['message'] = 'success'
+            ct = access_token.coop_token
+            response_data['coop_token'] = ct.token
         except ObjectDoesNotExist:
-            response_data['code'] = '10001'
-            response_data['message'] = u'refresh_token不存在'
+            pass
 
         return response_data
 
@@ -245,18 +253,23 @@ class AccessTokenBaseView(OAuthView, Mixin):
             }
 
     def push_coop_token(self, request, data, client, user):
-        """
-        Handle ``grant_type=authorization_code`` requests as defined in
-        :rfc:`4.1.3`.
-        """
+        form = CoopTokenForm(request.POST)
+        if form.is_valid():
+            if constants.SINGLE_ACCESS_TOKEN:
+                at = self.get_access_token(request, user, client)
+            else:
+                at = self.create_access_token(request, user, client)
+                rt = self.create_refresh_token(request, at.user, at, client)
 
-        if constants.SINGLE_ACCESS_TOKEN:
-            at = self.get_access_token(request, user, client)
+            coop_token = form.cleaned_data['coop_token']
+            ct = self.create_coop_token(coop_token, user, at, client)
+
+            return self.access_token_response(at, user.id)
         else:
-            at = self.create_access_token(request, user, client)
-            rt = self.create_refresh_token(request, user, at, client)
-
-        return self.access_token_response(at, user.id)
+            return {
+                'code': 10301,
+                'message': form.errors.values()[0][0],
+            }
 
     def get_handler(self, grant_type):
         """
