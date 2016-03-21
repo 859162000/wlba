@@ -55,8 +55,7 @@ class P2PRecord(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
     product_balance_after = models.IntegerField(u'标的后余额', help_text=u'该笔流水发生后标的剩余量', null=True)
 
-    user1 = models.ForeignKey(User, null=True)
-    user_id = models.IntegerField(u'用户id', max_length=50)
+    user = models.ForeignKey(User)
 
     create_time = models.DateTimeField(u'发生时间', auto_now_add=True)
 
