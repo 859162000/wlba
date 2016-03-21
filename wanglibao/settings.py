@@ -917,7 +917,8 @@ VALID_V1_TOTAL = 8000
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV1&V2AutoBackEnd'
 # ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+    # ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
     STATIC_FILE_HOST = ''
