@@ -3,7 +3,6 @@ import { ajax, getQueryStringByName } from './mixins/api'
 import { signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { validation } from './mixins/images_validation'
-import 'polyfill'
 
 (() => {
 

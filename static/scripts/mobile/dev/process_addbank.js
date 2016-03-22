@@ -542,7 +542,7 @@ webpackJsonp([6],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
 	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }

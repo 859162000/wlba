@@ -29,8 +29,7 @@ module.exports = {
         process_authentication: path.resolve(JS_PATH, 'process_authentication'),
         process_addbank: path.resolve(JS_PATH, 'process_addbank'),
 
-
-        vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto')]
+        vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto'),path.resolve(JS_PATH, 'lib/polyfill.min')]
     },
     output: {
         path: BUILD_PATH,
@@ -48,8 +47,7 @@ module.exports = {
         modulesDirectories: ['./src/mobile'],
         alias: {
             zepto: 'lib/zepto/zepto.js',
-            wx: 'lib/weixin/wx.js',
-            polyfill: '../../node_modules/babel-polyfill/dist/polyfill.js',
+            wx: 'lib/weixin/wx.js'
         },
         extensions: ['', '.js']
     },
