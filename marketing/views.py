@@ -1,5 +1,8 @@
 # encoding:utf-8
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
+from experience_gold.backends import SendExperienceGold
+from experience_gold.models import ExperienceEvent
+from wanglibao_reward.models import WanglibaoRewardJoinRecord
 import base64
 import hashlib
 import os
@@ -2687,6 +2690,70 @@ class RockFinanceQRCodeView(TemplateView):
         else:
             logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.request.user))
             return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
+
+class HappyMonkeyAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        self.token = 'happy_monkey'
+        rewards = {
+            (0, 5): 'happy_monkey_88',
+            (6, 10): 'happy_monkey_188',
+            (11, 15): 'happy_monkey_588',
+            (16, 100000000): 'happy_monkey_888'
+        }
+
+        # 是否是登录用户
+        if not request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        #今天用户已经玩过了
+        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=request.user).first()
+        if reward:
+            to_json_response = {
+                'ret_code': 1001,
+                'message': u'每一个用户,一天只能玩一次',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        #今天用户没有玩过
+        with transaction.atomic():
+            logger.debug('enter transaction atomic')
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code=self.token).first()
+            if not join_record:
+                join_record = WanglibaoRewardJoinRecord.objects.create(
+                    user=request.user,
+                    activity_code=self.token,
+                    remain_chance=1)
+
+            total = request.POST.get('total', None)
+            total=5
+            exp_name = ''
+            for key, value in rewards.items():
+                if total>=key[0] and total<=key[1]:
+                    exp_name = value
+
+            reward = ActivityReward.objects.create(
+                user=request.user,
+                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                channel=self.token,
+                create_at=today,
+                left_times=0,
+                join_times=1,)
+
+            SendExperienceGold(request.user).send(reward.experience.id)
+            join_record.remain_chance = 0
+            join_record.save()
+            to_json_response = {
+                'ret_code': 0,
+                'message': u'用户已经获得%s体验金' % reward.experience.amount,
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
 class RockFinanceForOldUserAPIView(APIView):

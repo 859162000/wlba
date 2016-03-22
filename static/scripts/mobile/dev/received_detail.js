@@ -7,7 +7,7 @@ webpackJsonp([9],{
 
 	__webpack_require__(2);
 
-	var _received_ui = __webpack_require__(11);
+	var _received_ui = __webpack_require__(13);
 
 	var _api = __webpack_require__(3);
 
@@ -107,7 +107,7 @@ webpackJsonp([9],{
 
 /***/ },
 
-/***/ 11:
+/***/ 13:
 /***/ function(module, exports) {
 
 	"use strict";
@@ -133,7 +133,7 @@ webpackJsonp([9],{
 	    slide += "<span class='received-left-center'>";
 	    slide += "<div class='data-name'>回款笔数</div>";
 	    if (data.term_date_count == 0) {
-	        slide += "<div class='data-value'>0.00</div>";
+	        slide += "<div class='data-value'>0</div>";
 	    } else {
 	        slide += "<div class='data-value'>" + data.term_date_count + "</div>";
 	    }

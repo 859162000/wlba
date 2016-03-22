@@ -70,59 +70,59 @@
 @-webkit-keyframes pageA2
   from
     opacity: 0
-    top : -45.5px
+    top : -200
   to
     opacity: 1
-    top : 45.5px
+    top :  37.2px
 @keyframes pageA2
   from
     opacity: 0
-    top : -45.5px
+    top : -200px
   to
     opacity: 1
-    top : 45.5px
+    top : 37.2px
 @-webkit-keyframes pageA3
   from
     opacity: 0
-    top : -46.5px
+    top : -200px
   to
     opacity: 1
-    top : 46.5px
+    top : 37.2px
 @keyframes pageA3
   from
     opacity: 0
-    top : -46.5px
+    top : -200px
   to
     opacity: 1
-    top : 46.5px
+    top : 37.2px
 @-webkit-keyframes pageA4
   from
     opacity: 0
     top : -200px
   to
     opacity: 1
-    top : 102px
+    top : 81px
 @keyframes pageA4
   from
     opacity: 0
     top : -200px
   to
     opacity: 1
-    top : 102px
+    top : 81px
 @-webkit-keyframes pageA5
   from
     opacity: 0
     top : -200px
   to
     opacity: 1
-    top : 103px
+    top : 80px
 @keyframes pageA5
   from
     opacity: 0
     top : -200px
   to
     opacity: 1
-    top : 103px
+    top : 80px
 @-webkit-keyframes yuan1
   from
     opacity: 0
@@ -336,12 +336,6 @@
 @mixin animate-scale($t:0s , $t1:0s)
   animation: scale $t linear $t1 both
   -webkit-animation: scale $t linear $t1 both
-*
-  -webkit-touch-callout: none
-  -webkit-user-select: none
-  -moz-user-select: none
-  -ms-user-select: none
-  user-select: none
 .swiper-slide
   .animations
     display: none
@@ -363,6 +357,7 @@
     position: relative
     width: 100%
     height: 100%
+    -webkit-user-select: none
     .page-loading
       width: 100%
       height: 100%
@@ -412,8 +407,8 @@
             .section
               text-align: center
               .job-play
-                width: 355px
-                height: 201px
+                width: 284px
+                height: 160px
                 position: relative
                 top: 0
                 +animate-fun(1.3s)
@@ -467,13 +462,14 @@
               position: relative
               +animate-fun(1s)
               img
-                width: 351px
-                height: 97.5px
+                width: 280px
+                height: 76.4px
                 margin-top: 22%
             .from-fonts
               color: #ae54fe
               font-size: .9rem
               margin: 1.4% 1%
+              padding-left: 9%
             .from-font1
               +animate-fun1(.5s,1s)
             .from-font2
@@ -483,15 +479,15 @@
             .from-font4
               +animate-fun1(.5s,6s)
             .from-imgs
-              padding: 0 1%
+              padding: 0 1% 0 9%
               width: 100%
               height: 41px
               margin: 1.4% 1%
               img
-                width: 109px
-                height: 40px
+                width: 87.2px
+                height: 32px
                 float: left
-                margin-right: 13px
+                margin-right: 6px
             .form1
               +animate-fun1(.5s,1.5s)
             .form2
@@ -525,10 +521,10 @@
             .page3-title
               text-align: center
               +animate-fun(1s)
+              margin-top: 25%
               img
-                width: 355px
-                height: 89.5px
-                margin-top: 12%
+                width: 284px
+                height: 71px
             .line-box
               position: relative
               height: 23%
@@ -541,14 +537,14 @@
                 background: url(/static/imgs/mobile_activity/recruit/line1.png) no-repeat
                 background-size: 100% 100%
                 width: 11px
-                height: 46.5px
+                height: 37.2px
                 animation: pageA1 .5s ease-in-out 1s both
                 -webkit-animation: pageA1 .5s ease-in-out 1s both
               .line2
                 background: url(/static/imgs/mobile_activity/recruit/line2.png) no-repeat
                 background-size: 100% 100%
                 width: 11px
-                height: 53.5px
+                height: 42.8px
                 top: 46.5px
                 animation: pageA3 .5s ease-in-out 2s both
                 -webkit-animation: pageA3 .5s ease-in-out 2s both
@@ -556,7 +552,7 @@
                 background: url(/static/imgs/mobile_activity/recruit/line3.png) no-repeat
                 background-size: 100% 100%
                 width: 11px
-                height: 56.5px
+                height: 42.2px
                 top: 103px
                 animation: pageA5 .5s ease-in-out 3s both
                 -webkit-animation: pageA5 .5s ease-in-out 3s both
@@ -564,20 +560,20 @@
                 position: absolute
                 background: url(/static/imgs/mobile_activity/recruit/left.png) no-repeat
                 background-size: 100% 100%
-                width: 171.5px
-                height: 39px
-                left: .5rem
-                top: 46.5px
+                width: 137px
+                height: 31px
+                left: 2rem
+                top: 37.2px
                 animation: pageA2 .5s ease-in-out 1.5s both
                 -webkit-animation: pageA2 .5s ease-in-out 1.5s both
               .line-right
                 position: absolute
                 background: url(/static/imgs/mobile_activity/recruit/right.png) no-repeat
                 background-size: 100% 100%
-                width: 159px
-                height: 39px
-                right: .5rem
-                top: 102px
+                width: 127px
+                height: 31px
+                right: 2rem
+                top: 81px
                 animation: pageA4 .5s ease-in-out 2.5s both
                 -webkit-animation: pageA4 .5s ease-in-out 2.5s both
             .page3-font2
@@ -597,7 +593,7 @@
               -webkit-animation: opacityf .5s ease-in-out 10s both
               .pic-box
                 width: 100%
-                height: 220px
+                height: 176px
                 margin: 0 auto
                 position: relative
                 overflow: hidden
@@ -606,8 +602,8 @@
                   .swiper-slide
                     background-position: center
                     background-size: cover
-                    width: 155px
-                    height: 173px
+                    width: 124px
+                    height: 138.4px
                     text-align: center
                     img
                       width: 100%
@@ -615,8 +611,8 @@
               text-align: center
               +animate-fun(1s)
               img
-                width: 354.5px
-                height: 81.5px
+                width: 283.6px
+                height: 62.5px
                 margin-top: 22%
             .page4-c
               height: 218.5px
@@ -668,7 +664,7 @@
               text-align: center
               +animate-fun(1s)
               img
-                width: 94%
+                width: 82%
                 margin-top: 25%
             .page5-c
               width: 100%
@@ -783,7 +779,7 @@
             color: #aa5dee
             font-size: .9rem
             margin-top: 2%
-            padding-left: 5%
+            padding-left: 9%
             +animate-fun1(.5s,1.2s)
           .zw-list
             text-align: center
@@ -830,16 +826,16 @@
             -webkit-animation: myThree 1s ease-in-out 2s both
 .center-obj
   width: 375px
-  height: 667px
+  height: 677px
   position: absolute
   top: 50%
   left: 50%
   -webkit-transform: translate3d(-50%,-50%,0)
   transform: translate3d(-50%,-50%,0)
-  zoom: 1.5
-@media only screen and (min-device-width : 375px) and (max-device-width : 667px) and (orientation : portrait)
+  zoom: 1
+@media only screen and (max-device-height : 480px)
   .center-obj
-    zoom: 2
+    zoom: 0.7
 .page-common
   position: absolute
   top: 0

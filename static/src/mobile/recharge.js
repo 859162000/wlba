@@ -4,6 +4,7 @@ import { signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
+
 (() => {
 
     const
@@ -33,12 +34,15 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
             function checkOperation() {
                 const checklist = [
                     {type: 'isEmpty', value: $amount.val()},
+                    {type: 'isMoney', value: $amount.val()}
                 ];
                 return check(checklist);
             }
 
             const [isThrough, sign]  = checkOperation();
-            if (isThrough) return resolve({message: '验证成功', amount: $amount.val()});
+            if (isThrough) {
+                return resolve({message: '验证成功', amount: $amount.val()});
+            }
 
             signModel(sign);
             return console.log('验证失败');

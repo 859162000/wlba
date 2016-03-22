@@ -21,7 +21,7 @@
     a.about_sidebar_a
       &:before
         content: ''
-        position: absolute
+        position: absolute  
         top: 50%
         right: -1px
         width: 1px
@@ -31,6 +31,13 @@
     a.active
       color: #d94a44
 .about_main
+  .vjs-poster
+    width: 465px
+    height: 277px
+  .video-js
+    .vjs-tech
+      width: 98%
+      left: 5px
   .wanglibao_about_banner
     background: url(/static/imgs/pc/about/about.jpg) center center no-repeat
     width: 100%
@@ -175,8 +182,8 @@
       .wanglibao_leader
         float: left
         text-align: center
-        width: 198px
-        margin: 0 38px
+        width: 160px
+        margin: 0 30px
         .leader_photo
           width: 130px
           transition: all 0.1s ease-in-out
@@ -190,15 +197,15 @@
             -moz-transform: scale(1.05)
             -o-transform: scale(1.05)
             -ms-transform: scale(1.05)
-      @for $i from 1 through 8
+      @for $i from 1 through 10
         .phone#{$i}
           @include about-sprite(leader#{$i})
         .leader_name
-          font-size: $font-l
+          font-size: $font-m
           color: $t-d6
         .leader_title
           color: #bec6d4
-          font-size: $font-m
+          font-size: $font-s
       .leader_info_detail
         text-align: center
         a
@@ -356,6 +363,10 @@
           background: #ffffff
           &:hover
             text-decoration: underline
+        a.link-p
+          position: absolute
+          right: 5px
+          top: 28px
       .media_time
         color: #999999
         font-size: $font-xs

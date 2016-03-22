@@ -6,7 +6,6 @@ import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
 
-
 (() => {
 
     const
@@ -264,6 +263,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
             function checkOperation() {
                 const checklist = [
                     {type: 'isEmpty', value: $inputCalculator.val()},
+                    {type: 'money100', value: $inputCalculator.val()}
                 ];
                 return check(checklist);
             }

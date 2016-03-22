@@ -1,14 +1,14 @@
 require(['jquery'], function( $ ) {
     $.each($('.description'),function(i,o){
-        var str = $(o).text()
-        if(str.length > 100){
-            $(o).text($(o).text().substring(0,100)+'...')
-        }
+        labelToStr($(o),95);
     })
     $.each($('.contentA'),function(i,o){
-        var str = $(o).text()
-        if(str.length > 100){
-            $(o).text($(o).text().substring(0,130)+'...')
-        }
+        labelToStr($(o),130)
     })
+    function labelToStr(obj,counts){
+        var str = obj.html();
+        if(str.length > counts){
+            obj.text($.trim(obj.text()).substring(0,counts)+'...')
+        }
+    }
 })
