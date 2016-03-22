@@ -401,6 +401,9 @@ class CoopDataDispatchApi(APIView):
                 if product_form.is_valid():
                     if product_instance:
                         if product_instance.status != product['status']:
+                            # 如果产品已经售完，则更新投资记录的售完时间
+                            if not product_instance.soldout_time and product['soldout_time']:
+                                P2PRecord.objects.filter(product=product_instance).update(invest_end_time=product['soldout_time'])
                             product_form.save()
                     else:
                         product_instance = P2PProduct()

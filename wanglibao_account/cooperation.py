@@ -599,8 +599,7 @@ class RenRenLiCallback(CoopCallback):
 
             P2PRecord.objects.filter(product=user_amo.product,
                                      user_id=user_amo.user_id
-                                     ).update(invest_end_time=p2p_record.invest_end_time,
-                                              back_last_date=user_amo.created_time,
+                                     ).update(back_last_date=user_amo.created_time,
                                               amotized_amount=amotized_amount)
 
     def purchase_call_back(self, user_id, order_id):
