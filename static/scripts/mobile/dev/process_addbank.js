@@ -100,7 +100,7 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('ban22k')) {
+	        if (localStorage.getItem('bank')) {
 	            var content = JSON.parse(localStorage.getItem('bank'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
@@ -626,6 +626,7 @@ webpackJsonp([6],[
 	        this.VALIDATION_URL = _ref2[1];
 	        this.callback = _ref2[2];
 
+	        console.log("target", target, this.target);
 	        this.post_data = null;
 	        this.check_list = null;
 	        this.intervalId = null;
@@ -652,7 +653,6 @@ webpackJsonp([6],[
 	            return new Promise(function (resolve, reject) {
 	                function validation_operation() {
 	                    var form_list = checklist;
-	                    console.log("form_list", form_list);
 	                    return (0, _from_validation.check)(form_list);
 	                }
 
@@ -663,7 +663,6 @@ webpackJsonp([6],[
 	                var isThrough = _validation_operation2[0];
 	                var sign = _validation_operation2[1];
 
-	                console.log(isThrough, sign);
 	                if (isThrough) return resolve('验证成功');
 
 	                return reject(sign);
