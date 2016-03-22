@@ -66,7 +66,7 @@ urlpatterns = patterns(
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/login/')),
     #url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
-    url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
+
     url(r'^frozen/$', TemplateView.as_view(template_name="frozen.jade"), name='accounts_frozen'),
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
@@ -99,7 +99,7 @@ urlpatterns = patterns(
     url(r'^register/wap/$', RedirectView.as_view(url='/weixin/regist/', permanent=True), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 
-    url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
+    #url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
     url(r'^message/list/$', MessageListAPIView.as_view(), name='message_list_view'),
     url(r'^message/count/$', MessageCountAPIView.as_view(), name='message_count_view'),
     url(r'^message/(?P<message_id>\d+)/$', MessageDetailAPIView.as_view(), name='message_detail_view'),
@@ -155,7 +155,7 @@ urlpatterns += patterns(
     url(r'^recharge/yipay/', TemplateView.as_view(template_name="center_recharge_yipay.jade")),
     url(r'^recharge/kuaijie/', TemplateView.as_view(template_name="center_recharge_kuaijie.jade")),
     url(r'^gold/', TemplateView.as_view(template_name="center_gold.jade")),
-    url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
+    #url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
     url(r'^accrual/', TemplateView.as_view(template_name="center_redpack_accrual.jade")),
     url(r'^pack/', TemplateView.as_view(template_name="center_redpack_base.jade")),
     url(r'^securitys/', TemplateView.as_view(template_name="center_security.jade")),
@@ -173,8 +173,8 @@ urlpatterns += patterns(
     url(r'^profile/$', login_required(AddressView.as_view(), login_url='/accounts/login/')),
 
     url(r'^id_verify/', TemplateView.as_view(template_name="center_id_verify.jade")),
-
-    #url(r'^profile/', TemplateView.as_view(template_name="center_profile.jade")),
+    url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
+    url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
 )
 
 if settings.DEBUG:

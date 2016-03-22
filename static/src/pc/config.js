@@ -5,10 +5,12 @@ require.config({
         'jquery.modal': 'lib/jquery.modal.min',
         'tools': 'lib/modal.tools',
         'csrf' : 'model/csrf',
-        'jquery.validate': 'lib/jquery.validate.min'
+        'jquery.validate': 'lib/jquery.validate.min',
+        'jquery.zclip': 'lib/jquery.zclip.min'
     },
     shim: {
         'jquery.modal': ['jquery'],
-        'jquery.validate': ['jquery']
+        'jquery.validate': ['jquery'],
+        'jquery.zclip': ['jquery']
     }
 });

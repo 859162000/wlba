@@ -23,19 +23,19 @@ block main
           .alert-title 添加/修改收货信息
         .c-profile-alert-form
           .form-row
-            input(placeholder='收货人姓名', type='text',name='address_name')
+            input(placeholder='收货人姓名', type='text',name='address_name').input-type-text
             .form-row-error
           .form-row
-            input(placeholder='联系电话', type='text', name='phone_number')
+            input(placeholder='联系电话', type='text', name='phone_number').input-type-text
             .form-row-error
           .form-row
-            input(placeholder='收货地址', type='text', name='address_address')
+            input(placeholder='收货地址', type='text', name='address_address').input-type-text
             .form-row-error
-
+          .form-row
+              input#default-checkbox(type='checkbox', checked="checked", name="default_checkbox")
+              设为默认地址
         .c-profile-alert-submit
           input(type='submit', value='确认添加').alert-submit
-
-
 
 
 
@@ -91,10 +91,10 @@ block main
                 .means-content {{address.address}}
             .fr
               .pro-info-add
-                .add-info.fr
+                .add-info.fr.delete-add(data-id='{{address.id}}')
                   i.iconfont.icon-jiaoyimima03.font-s
                   |删除
-                .add-info.fr.edit-address
+                a(href='#c-profile-alert').add-info.fr.edit-address(data-id='{{address.id}}',data-name='{{address.name}}', data-phone='{{address.phone_number}}', data-address='{{address.address}}', data-default='{{address.is_default}}')
                   i.iconfont.icon-edit.font-s
                   |修改
                 if address.is_default == True

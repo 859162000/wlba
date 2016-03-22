@@ -15,9 +15,20 @@ block sidebar
 block main
   .c-main-white.c-auto-height.c-layout
     .c-message-status
-      a(href='').active 全部
-      a(href='') 未读
-      a(href='') 已读
+      if list_type == 'all' or not list_type
+        a(href="/accounts/message/?listtype=all").active 全部
+      else
+        a(href="/accounts/message/?listtype=all") 全部
+
+      if list_type == 'unread'
+        a(href='/accounts/message/?listtype=unread').active 未读
+      else
+        a(href='/accounts/message/?listtype=unread') 未读
+
+      if list_type == 'read'
+        a(href='/accounts/message/?listtype=read').active 已读
+      else
+        a(href='/accounts/message/?listtype=read') 已读
 
 
     table.c-message-table
@@ -27,23 +38,28 @@ block main
           th 标题
           th 时间
       tbody
-        mixin tr()
-          tr
-            td(width='20%') 加息奖励
+        for msg in messageList
+          if msg.read_status == True
+            readStatue = 'read-active'
+          else
+            readStatue = ''
+          tr(class=readStatue ,id="msg_{{msg.id}}", data-read-status="{{msg.read_status}}", data-show="False", data-msg-id="{{msg.id}}")
+            td(width='20%') {{ msg.message_text.display_mtype }}
             td.msg-center(width='60%')
-              .msg-head 参与活动送红包
+              .msg-head {{ msg.message_text.title }}
               .msg-cont
-                | 亲爱的nihao您好：
+                | 亲爱的{{user | display_name}}您好：
                 br
-                |2222222
+                | {{ msg.message_text.content | safe }}
             td(width='20%')
-              span 2015-8-21
-                i.iconfont.icon-greenRight
+              span {{ msg.message_text.format_time | date:'Y-m-d' }}
+                i.iconfont.icon-circle-add.icon-opeartion
 
-        +tr()
-        +tr()
-        +tr()
-        +tr()
 
     .c-message-pager
+      - var uri = '/accounts/message/?listtype=' + list_type
+      - with data=messageList uri=uri
       include include/center_pager
+      - endwith
+  script.
+      require(['/static/src/pc/message.js?v=2'])
