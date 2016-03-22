@@ -492,10 +492,14 @@ class RenRenLiQueryApi(APIView):
 
     def get_amotize_data(self, data, p2p_record):
         if p2p_record.product.soldout_time:
-            data['Invest_full_scale_date'] = utc_to_local_timestamp(p2p_record.product.soldout_time)
-            data['Back_money'] = float(p2p_record.amotized_amount) or 0
-            data['Invest_end_date'] = utc_to_local_timestamp(p2p_record.invest_end_time)
-            data['Back_last_date'] = utc_to_local_timestamp(p2p_record.back_last_date)
+            soldout_time = p2p_record.product.soldout_time or 0
+            amotized_amount = p2p_record.amotized_amount or 0
+            invest_end_time = p2p_record.invest_end_time or 0
+            back_last_date = p2p_record.back_last_date or 0
+            data['Invest_full_scale_date'] = utc_to_local_timestamp(soldout_time) if soldout_time else soldout_time
+            data['Back_money'] = float(amotized_amount) if amotized_amount else amotized_amount
+            data['Invest_end_date'] = utc_to_local_timestamp(invest_end_time) if invest_end_time else invest_end_time
+            data['Back_last_date'] = utc_to_local_timestamp(back_last_date) if back_last_date else back_last_date
 
         return data
 
