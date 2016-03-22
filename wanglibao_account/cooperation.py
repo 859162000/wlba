@@ -1447,11 +1447,30 @@ class XunleiVipRegister(CoopRegister):
     def register_call_back(self, user):
         # 判断用户是否绑定
         binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
+        bid = binding.bid if binding else 0
+        data = {
+            'coop': 'wanglibao',
+            'xluserid': bid,
+            'regtime': int(time.mktime(user.date_joined.date().timetuple()))
+        }
+
+        sign = xunleivip_generate_sign(data, self.coop_register_key)
+        params = dict({'sign': sign}, **data)
+
+        # 异步回调
+        common_callback.apply_async(
+            kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
+
+    def binding_card_call_back(self, user):
+        logger.info("%s Enter binding_card_call_back with user[%s]" % (self.c_code, user.id))
+        # 判断用户是否绑定
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding and not binding.extra:
+            first_bind_card_time = timezone.now()
             data = {
                 'coop': 'wanglibao',
                 'xluserid': binding.bid,
-                'regtime': int(time.mktime(user.date_joined.date().timetuple()))
+                'time': int(time.mktime(timezone.localtime(first_bind_card_time).timetuple()))
             }
 
             sign = xunleivip_generate_sign(data, self.coop_register_key)
@@ -1460,6 +1479,18 @@ class XunleiVipRegister(CoopRegister):
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
+
+            binding.extra = first_bind_card_time
+            binding.save()
+        else:
+            # FixMe, 修改站内信内容
+            message_content = sms_alert_unbanding_xunlei(u"7天白金会员", XUNLEIVIP_LOGIN_URL)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"首次充值送7天迅雷白金会员",
+                "content": message_content,
+                "mtype": "activity"
+            })
 
     def recharge_call_back(self, user, order_id):
         channel = get_user_channel_record(user)
