@@ -707,6 +707,7 @@ webpackJsonp([6],[
 	    }, {
 	        key: 'timerFunction',
 	        value: function timerFunction(count) {
+	            console.log("time-target", this.target);
 	            var timerInside = function timerInside() {
 	                if (count > 1) {
 	                    count--;
