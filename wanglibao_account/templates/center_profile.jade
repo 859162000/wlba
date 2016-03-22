@@ -16,19 +16,24 @@ block sidebar
 
 block main
   .c-main-white.c-auto-height.c-layout
-    .c-profile-mask
-      .c-profile-alert
+    .c-profile-alert#c-profile-alert
+      form#add-address-form
+        input#address_id(type="hidden", name="address_id")
         .c-profile-alert-head
           .alert-title 添加/修改收货信息
         .c-profile-alert-form
-          form()
-            input(placeholder='收货人地址', type='text')
-            input(placeholder='收货人地址', type='text')
-            input(placeholder='收货人地址', type='text')
+          .form-row
+            input(placeholder='收货人姓名', type='text',name='address_name')
+            .form-row-error
+          .form-row
+            input(placeholder='联系电话', type='text', name='phone_number')
+            .form-row-error
+          .form-row
+            input(placeholder='收货地址', type='text', name='address_address')
+            .form-row-error
 
         .c-profile-alert-submit
-          input(type='button', value='确认添加')
-        .c-alert-close
+          input(type='submit', value='确认添加').alert-submit
 
 
 
@@ -67,9 +72,9 @@ block main
 
       .pro-means-head.clearfix
         .t-d10.font-m.fl 收货信息
-        .add-info.fr.t-d20
-           i.iconfont.icon-greenRight
-            |添加
+        a(href='#c-profile-alert').add-info.fr.add-address
+          i.iconfont.icon-circle-add
+          |添加
 
       .pro-info-lists
         for address in address_list
@@ -89,16 +94,17 @@ block main
                 .add-info.fr
                   i.iconfont.icon-jiaoyimima03.font-s
                   |删除
-                .add-info.fr
-                  i.iconfont.icon-greenRight.font-s
+                .add-info.fr.edit-address
+                  i.iconfont.icon-edit.font-s
                   |修改
                 if address.is_default == True
                   .add-info.fr
-                    i.iconfont.icon-greenRight.font-s.t-d2
+                    i.iconfont.icon-greenRight.font-s.moren
                     |默认
                 else
                   .add-info.fr
                     i.iconfont.icon-greenRight.font-s
                     |默认
 
-
+  script.
+      require(['/static/src/pc/address.js?v=2'])

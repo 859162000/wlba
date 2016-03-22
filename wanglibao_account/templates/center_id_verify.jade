@@ -1,0 +1,18 @@
+extends center_base
+-load formatters
+block head
+  - with '实名认证' as title
+  include global/g_head
+  -endwith
+block sidebar
+  - with '安全认证' as activeItem
+  include include/center_sidebar
+  -endwith
+block main
+  .c-main-white.c-auto-height.c-layout
+
+    .c-cash-rules
+      .cash-rules-list 根据法律，网上投资必须进行实名认证。
+      .cash-rules-list 请花15秒钟完成免费的实名认证，以方便日后投资理财。
+
+

@@ -172,6 +172,8 @@ urlpatterns += patterns(
 
     url(r'^profile/$', login_required(AddressView.as_view(), login_url='/accounts/login/')),
 
+    url(r'^id_verify/', TemplateView.as_view(template_name="center_id_verify.jade")),
+
     #url(r'^profile/', TemplateView.as_view(template_name="center_profile.jade")),
 )
 
