@@ -20,6 +20,18 @@ from wanglibao_profile.models import WanglibaoUserProfile
 logger = logging.getLogger(__name__)
 
 
+def get_uid_for_coop(user_id):
+    """
+    返回给渠道的用户ID
+    :param user_id:
+    :return:
+    """
+    m = hashlib.md5()
+    m.update('wlb' + str(user_id))
+    uid = m.hexdigest()
+    return uid
+
+
 def search(client, string):
     pattern = re.compile(client)
     return re.search(pattern, string)
@@ -268,5 +280,46 @@ def push_coop_access_token(phone, client_id, tid, coop_key, token):
         }
         logger.info("push_coop_access_token failed to connect")
         logger.info(e)
+
+    return response_data
+
+
+def process_renrenli_register(request, user, phone, client_id, channel_code):
+    tid = get_uid_for_coop(user.id)
+    res_data = get_coop_access_token(phone, client_id, tid, settings.RENRENLI_COOP_KEY)
+
+    if int(res_data['ret_code']) == 10000:
+        callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
+        callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
+        data = {
+            'Cust_key': tid,
+            'Access_tokens': res_data['access_token'],
+            'Callback_url': callback_url,
+        }
+        response_data = {
+            'ret_code': 101,
+            'message': u'成功',
+            'Data': data,
+        }
+    else:
+        response_data = {
+            'ret_code': res_data['ret_code'],
+            'message': res_data['message'],
+        }
+
+    return response_data
+
+
+def process_bajinshe_register(request, user, phone, client_id, channel_code):
+    tid = get_uid_for_coop(user.id)
+
+    response_data = {
+        'ret_code': 10000,
+        'message': u'成功',
+        'usn': phone,
+        'user_id': tid,
+        'invitation_code': channel_code,
+        'ext': '',
+    }
 
     return response_data

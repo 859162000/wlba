@@ -48,6 +48,7 @@ from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
                                   get_coop_access_token, push_coop_access_token)
+from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
@@ -1722,71 +1723,77 @@ class OauthUserRegisterApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        data = request.session
-        form = OauthUserRegisterForm(data)
-        if form.is_valid():
-            channel_code = form.cleaned_data['channel_code']
-            coop_key_str = '%s_COOP_KEY' % channel_code.upper()
-            coop_key = getattr(settings, coop_key_str, None)
-            if form.check_sign(coop_key):
-                phone = form.cleaned_data['phone']
-                password = generate_random_password(6)
-                user = create_user(phone, password, "")
-                if user:
-                    client_id = form.cleaned_data['client_id']
-                    channel_code = form.cleaned_data['channel_code']
-                    device = split_ua(request)
-                    # if device['device_type'] == "pc":
-                    #     auth_user = authenticate(identifier=phone, password=password)
-                    #     auth_login(request, auth_user)
+        channel_code = request.GET.get('promo_token')
+        if channel_code:
+            data = request.session
+            form = OauthUserRegisterForm(data)
+            if form.is_valid():
+                channel_code = form.cleaned_data['channel_code']
+                coop_key_str = '%s_COOP_KEY' % channel_code.upper()
+                coop_key = getattr(settings, coop_key_str, None)
+                coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
+                if coop_sign_check(coop_key):
+                    phone = form.cleaned_data['phone']
+                    password = generate_random_password(6)
+                    user = create_user(phone, password, "")
+                    if user:
+                        client_id = form.cleaned_data['client_id']
+                        channel_code = form.cleaned_data['channel_code']
+                        device = split_ua(request)
+                        # if device['device_type'] == "pc":
+                        #     auth_user = authenticate(identifier=phone, password=password)
+                        #     auth_login(request, auth_user)
 
-                    send_messages.apply_async(kwargs={
-                        "phones": [phone, ],
-                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
-                    })
+                        send_messages.apply_async(kwargs={
+                            "phones": [phone, ],
+                            "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                        })
 
-                    # 处理第三方渠道的用户信息
-                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+                        # 处理第三方渠道的用户信息
+                        CoopRegister(request).all_processors_for_user_register(user, channel_code)
 
-                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+                        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
-                    tid = get_uid_for_coop(user.id)
-                    res_data = get_coop_access_token(phone, client_id, tid, coop_key)
-
-                    if int(res_data['ret_code']) == 10000:
-                        callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
-                        callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
-                        data = {
-                            'Cust_key': tid,
-                            'Access_tokens': res_data['access_token'],
-                            'Callback_url': callback_url,
-                        }
-                        response_data = {
-                            'Code': 101,
-                            'Tip': u'成功',
-                            'Data': data,
-                        }
+                        coop_register_processor = getattr(rest_utils, 'process_%s_register' % channel_code.lower(), None)
+                        if coop_register_processor:
+                            response_data = coop_register_processor(request, user, phone, client_id, channel_code)
+                        else:
+                            response_data = {
+                                'ret_code': 50001,
+                                'message': 'api error',
+                            }
                     else:
                         response_data = {
-                            'Code': res_data['ret_code'],
-                            'Tip': res_data['message'],
+                            'ret_code': 10009,
+                            'message': u'注册失败',
                         }
                 else:
                     response_data = {
-                        'Code': 10009,
-                        'Tip': u'注册失败',
+                        'ret_code': 10008,
+                        'message': u'签名错误',
                     }
             else:
+                form_error = form.errors.values()[0][0]
                 response_data = {
-                    'Code': 10008,
-                    'Tip': u'签名错误',
+                    'ret_code': 10010,
+                    'message': form_error,
                 }
         else:
-            form_error = form.errors.values()[0][0]
             response_data = {
-                'Code': 10010,
-                'Tip': form_error,
+                'ret_code': 50002,
+                'message': u'非法请求',
             }
+
+        if channel_code == 'renrenli':
+            response_data['Code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['Tip'] = response_data['message']
+            response_data.pop('message')
+        elif channel_code == 'bajinshe':
+            response_data['code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['message']
+            response_data.pop('message')
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 

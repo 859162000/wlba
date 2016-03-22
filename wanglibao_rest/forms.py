@@ -10,6 +10,7 @@ from wanglibao import settings
 from marketing.utils import get_channel_record
 from wanglibao_account.utils import detect_identifier_type
 from report.crypto import Aes
+from wanglibao_rest.utils import generate_bajinshe_sign
 
 logger = logging.getLogger(__name__)
 
@@ -109,11 +110,21 @@ class OauthUserRegisterForm(OAuthForm):
 
         return phone
 
-    def check_sign(self, coop_key):
+    def renrenli_sign_check(self, coop_key):
         client_id = self.cleaned_data['client_id']
         phone = self.cleaned_data['phone']
         sign = self.cleaned_data['sign']
         local_sign = hashlib.md5(str(client_id)+str(phone)+str(coop_key)).hexdigest()
+        if sign == local_sign:
+            return True
+        else:
+            return False
+
+    def bajinshe_sign_check(self, coop_key):
+        client_id = self.cleaned_data['client_id']
+        phone = self.cleaned_data['phone']
+        sign = self.cleaned_data['sign']
+        local_sign = generate_bajinshe_sign(client_id, phone, coop_key)
         if sign == local_sign:
             return True
         else:

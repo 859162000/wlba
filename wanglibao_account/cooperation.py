@@ -1661,17 +1661,12 @@ class BaJinSheRegister(CoopRegister):
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
             req_data = json.loads(self.request.body.strip())
-        elif self.request.META.get('CONTENT_TYPE', '').lower().find('application/x-www-form-urlencode') != -1:
-            if self.request.body.strip():
-                data = str_to_dict(self.request.body.strip())
-                if 'data' in data:
-                     req_data = json.loads(data['data']) or dict()
-                else:
-                    req_data = dict()
-            else:
-                req_data = dict()
         else:
-            req_data = self.request.REQUEST
+            data = self.request.REQUEST.get('data')
+            if data:
+                req_data = json.loads(data) or dict()
+            else:
+                req_data = self.request.REQUEST
 
         channel_code = self.get_channel_code_from_request()
         channel_phone = req_data.get(self.external_channel_phone_key, None)
