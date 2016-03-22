@@ -58,6 +58,8 @@ from wanglibao.templatetags.formatters import convert_to_10k
 from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 from wanglibao_redis.backend import redis_backend
+from weixin.util import getMiscValue
+
 logger = logging.getLogger('wanglibao_reward')
 
 class WeixinShareDetailView(TemplateView):
@@ -2808,23 +2810,42 @@ class FetchAirportServiceReward(APIView):
             if not is_new or not user_ib.channel or user_ib.channel.code != activity.channel:
                 return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
         if is_new:
-            first_buy = P2PRecord.objects.filter(user=user,
-                                                 create_time__gt=activity.start_at
-                                                 ).order_by('create_time').first()
-            float(first_buy.amount) >= 10000
+            return Response({"ret_code": -1, "message": ""})
+        airport_service_reward_limit = getMiscValue("airport_service_reward")
+        min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
+
+        first_buy = P2PRecord.objects.filter(user=user,
+                                             create_time__gt=activity.start_at
+                                             ).order_by('create_time').first()
+        if not first_buy or float(first_buy.amount) < min_amount:
+            return Response({"ret_code": -1, "message": "抱歉，您还不符合奖励条件哦~"})
 
 
-            old_reward = Reward.objects.filter(pk=reward.reward.id).first()
-            if old_reward and old_reward.is_used:
-                new_reward = Reward.objects.filter(type=old_reward.type, is_used=False).order_by('-id').first()
-                reward.reward = new_reward
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": request.user.id,
-                "title": reward.reward.type,
-                "content": reward.reward.content,
-                "mtype": "activity"
-            })
-            reward.reward.is_used = True
-            reward.reward.save()
-            reward_name = reward.reward.type
+        reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
+        if not reward_record:
+            reward_record = ActivityRewardRecord.objects.create(
+                activity_code=activity.code,
+                user=user
+            )
+        if reward_record.status:
+            return Response({"ret_code": -1, "message": "您已领取奖励"})
+
+        with transaction.atomic():
+            reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=activity.code, user=request.user).first()
+
+            reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+            if not reward:
+                Response({"ret_code": -1, "message": "该奖品已经发完了"})
+            reward.is_used = True
+            reward.save()
+            reward_record.activity_desc = u"领取了%s,reward_id:%s"%(reward.type, reward.id)
+            reward_record.status = True
+            reward_record.save()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": request.user.id,
+            "title": reward.reward.type,
+            "content": reward.reward.content,
+            "mtype": "activity"
+        })
+        return Response({"ret_code": 0, "message": "奖品领取成功"})
 
