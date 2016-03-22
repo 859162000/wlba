@@ -13,8 +13,9 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf,
-                   JrjiaAutoRegisterView, ManualModifyPhoneTemplate, IdentityInformationTemplate, ValidateAccountInfoTemplate,
-                SMSModifyPhoneValidateTemplate, SMSModifyPhoneTemplate)
+                   JrjiaAutoRegisterView, ManualModifyPhoneTemplate, IdentityInformationTemplate,
+                   ValidateAccountInfoTemplate, SMSModifyPhoneValidateTemplate, SMSModifyPhoneTemplate,
+                   AccountHomeNew, )
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
@@ -145,7 +146,7 @@ urlpatterns = patterns(
 )
 
 
-#新版个人中心
+# 新版个人中心
 urlpatterns += patterns(
     '',
     url(r'^test/', TemplateView.as_view(template_name="center_security.jade")),
@@ -163,7 +164,7 @@ urlpatterns += patterns(
     url(r'^web-message/', TemplateView.as_view(template_name="center_message.jade")),
     url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
     url(r'^bankcards/', TemplateView.as_view(template_name="center_bank.jade")),
-    url(r'^home-new/', TemplateView.as_view(template_name="center_home.jade")),
+    url(r'^home-new/', login_required(AccountHomeNew.as_view(), login_url='/accounts/login/')),  # 账户中心首页
     url(r'^password/modify/', TemplateView.as_view(template_name="center_password_modify.jade")),
     url(r'^trade/modify/', TemplateView.as_view(template_name="center_trade_modify.jade")),
 

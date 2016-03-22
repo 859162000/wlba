@@ -1,4 +1,4 @@
-
+-load formatters
 mixin sidebarTitle(title)
   .sidebar-list-title.font-m.tl=title
 
@@ -16,7 +16,7 @@ if activeItem == '账户总览'
     .sidebar-h-user.clearfix
       img(src='/static/imgs/pc/center/user_img.jpg').h-user-img.fl
       .h-user-info.fl.mg-t-ssm
-        .user-name.t-d11 185***688，上午好！
+        .user-name.t-d11 {{user | display_name}}，上午好！
         .company-bb 感谢您对网利宝的信任！
 
     .sidebar-h-binding.clearfix

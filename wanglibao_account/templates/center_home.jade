@@ -17,8 +17,8 @@ block main
         .c-h-l.span8
           .tc.inline-block
             .c-h-balance.tc
-              .font-lll.t-d10.lh 20,534
-                span.font-xxl .25
+              .font-lll.t-d10.lh {{user.margin.margin | money_format}}
+                span.font-xxl
                 .font-s.t-d24.mg-t-xs.mg-b-sm 账户余额(元)
             .c-h-opeartion.clearfix.inline-block
               .recharge-link.fl.mg-r-s
@@ -28,43 +28,36 @@ block main
 
         .c-h-r.span4
           .c-h-earning
-            .font-l.t-d11 +10.58
+            .font-l.t-d11 +{{p2p_income_yesterday | money_format}}
             .font-s.t-d24 昨日到账收益(元)
           .c-h-earning.mg-t-ssm
-            .font-l.t-d11 1900.58
+            .font-l.t-d11 {{p2p_total_paid_interest | money_format}}
             .font-s.t-d24 累计收益(元)
 
       .span4
         .h-notice-mod
           .h-notice-title.mg-b-s 通知中心
-            .notice-num 2
-          .h-notice-list
-            a().h-notice-cont.t-d11 参与活动送红包
-            .h-notice-date 2015-06-17
-          .h-notice-list
-            a().h-notice-cont.t-d24 参与活动送红包参与活动送红包
-            .h-notice-date 2015-06-17
-          .h-notice-list
-            a().h-notice-cont.t-d24 参与活动送红包
-            .h-notice-date 2015-06-17
-          .h-notice-list
-            a().h-notice-cont.t-d24 参与活动送红包
-            .h-notice-date 2015-06-17
-
+            .notice-num {{messages_count}}
+          for msg in messages
+            .h-notice-list
+              a().h-notice-cont.t-d11 {{ msg.content }}
+              .h-notice-date {{ msg.message_text.format_time | date:'Y-m-d' }}
 
     .c-h-fund
       .h-fund-item.fl
-        .fund-amount 10,000
-          span.fund-point .00
+        .fund-amount {{p2p_total_asset|money_format}}
+          span.fund-point
         .fund-explain 账户总资产(元)
 
       .h-fund-item.fl
-        .fund-amount 500
-          span.fund-point .00
+        .fund-amount {{total_unpaid_principal_interest | money_format}}
+          span.fund-point
         .fund-explain 待收本息(元)
       .h-fund-item.fl.h-fund-item-unmagin
-        .fund-amount 95,000
-          span.fund-point .00
+        // 冻结金额 = 投资冻结 + 提现冻结
+        freeze_amount = margin_withdrawing + margin_freeze
+        .fund-amount {{freeze_amount | money_format}}
+          span.fund-point
         .fund-explain 暂冻结资金(元)
 
     .font-m.t-d10 投资分布
