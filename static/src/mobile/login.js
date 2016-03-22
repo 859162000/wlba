@@ -2,6 +2,7 @@ import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
 import { signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
+import 'polyfill'
 
 (() => {
 
@@ -28,6 +29,7 @@ import { check } from './mixins/from_validation'
     //验证表单
     const checkOperation = () => {
         return new Promise((resolve, reject) => {
+            alert("check");
             function checkOperation() {
                 const checklist = [
                     {type: 'phone', value: $identifier.val()},
@@ -43,7 +45,6 @@ import { check } from './mixins/from_validation'
             return console.log('验证失败');
         })
     }
-
     //登录
     function login(url) {
         return new Promise((resolve, reject) => {
@@ -71,9 +72,11 @@ import { check } from './mixins/from_validation'
     }
 
     $submit.on('click', () => {
+        alert(3);
         checkOperation()
             .then((result)=> {
                 console.log(result); //check success
+                alert(result);
                 return login('/weixin/api/login/');
             })
             .then((result)=> {
@@ -83,7 +86,7 @@ import { check } from './mixins/from_validation'
             })
             .catch((res) => {
                 if (res['status'] == 403) {
-                    signModel('请勿重复提交')
+                    signModel('请勿重复提交');
                     return false;
                 }
                 let data = JSON.parse(res.responseText);

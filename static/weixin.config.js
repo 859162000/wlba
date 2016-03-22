@@ -48,7 +48,8 @@ module.exports = {
         modulesDirectories: ['./src/mobile'],
         alias: {
             zepto: 'lib/zepto/zepto.js',
-            wx: 'lib/weixin/wx.js'
+            wx: 'lib/weixin/wx.js',
+            polyfill: '../../node_modules/babel-polyfill/dist/polyfill.js',
         },
         extensions: ['', '.js']
     },

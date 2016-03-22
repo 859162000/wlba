@@ -2,6 +2,7 @@ import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
 import { signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
+import 'polyfill'
 
 (() => {
 
