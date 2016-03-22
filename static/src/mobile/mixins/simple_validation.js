@@ -13,6 +13,7 @@ import { check } from './from_validation'
 export class Simple_validation {
     constructor({target = null,  VALIDATION_URL= null,  callback=null }= {}) {
         [this.target, this.VALIDATION_URL, this.callback ] = [target, VALIDATION_URL, callback];
+        console.log("target", target, this.target);
         this.post_data = null;
         this.check_list = null;
         this.intervalId = null;
@@ -35,12 +36,10 @@ export class Simple_validation {
         return new Promise((resolve, reject) => {
             function validation_operation() {
                 let form_list = checklist;
-                console.log("form_list", form_list);
                 return check(form_list);
             }
 
             const [isThrough, sign]  = validation_operation();
-            console.log(isThrough, sign);
             if (isThrough) return resolve('验证成功');
 
             return reject(sign);
