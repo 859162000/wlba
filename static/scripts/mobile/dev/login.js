@@ -34,6 +34,7 @@ webpackJsonp([5],[
 	    //验证表单
 	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
+	            alert("check");
 	            function checkOperation() {
 	                var checklist = [{ type: 'phone', value: $identifier.val() }, { type: 'password', value: $password.val() }];
 	                return (0, _from_validation.check)(checklist);
@@ -52,7 +53,6 @@ webpackJsonp([5],[
 	            return console.log('验证失败');
 	        });
 	    };
-
 	    //登录
 	    function login(url) {
 	        return new Promise(function (resolve, reject) {
@@ -80,8 +80,10 @@ webpackJsonp([5],[
 	    }
 
 	    $submit.on('click', function () {
+	        alert(3);
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
+	            alert(result);
 	            return login('/weixin/api/login/');
 	        }).then(function (result) {
 	            console.log('login success');
@@ -423,7 +425,7 @@ webpackJsonp([5],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
 	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
