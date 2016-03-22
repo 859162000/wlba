@@ -707,14 +707,15 @@ webpackJsonp([6],[
 	    }, {
 	        key: 'timerFunction',
 	        value: function timerFunction(count) {
-	            console.log("time-target", this.target);
+	            var $target = this.target;
+	            console.log("time-target", this.target, $target);
 	            var timerInside = function timerInside() {
 	                if (count > 1) {
 	                    count--;
-	                    return this.target.text(count + '秒后可重发');
+	                    return $target.text(count + '秒后可重发');
 	                } else {
 	                    clearInterval(this.intervalId);
-	                    this.target.text('重新获取').removeAttr('disabled');
+	                    $target.text('重新获取').removeAttr('disabled');
 	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
 	                }
 	            };

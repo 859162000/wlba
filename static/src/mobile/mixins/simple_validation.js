@@ -84,14 +84,15 @@ export class Simple_validation {
     }
 
     timerFunction(count) {
-        console.log("time-target", this.target);
+        const $target = this.target;
+        console.log("time-target", this.target, $target);
         var timerInside = function () {
             if (count > 1) {
                 count--;
-                return this.target.text(`${count}秒后可重发`);
+                return $target.text(`${count}秒后可重发`);
             } else {
                 clearInterval(this.intervalId);
-                this.target.text('重新获取').removeAttr('disabled');
+                $target.text('重新获取').removeAttr('disabled');
                 return signModel('倒计时失效，请重新获取')
             }
         };
