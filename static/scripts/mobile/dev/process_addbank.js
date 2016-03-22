@@ -148,7 +148,7 @@ webpackJsonp([6],[
 	            card_no: $bankcard.val(),
 	            gate_id: $bank.val(),
 	            phone: $bankphone.val(),
-	            amount: 0.01
+	            amount: $money.val() ? $money.val() : 0.01
 	        });
 	        simple_validation.start();
 	    });
@@ -167,7 +167,7 @@ webpackJsonp([6],[
 	    });
 
 	    function recharge(check) {
-	        org.ajax({
+	        (0, _api.ajax)({
 	            type: 'POST',
 	            url: '/api/pay/cnp/dynnum_new/',
 	            data: {
