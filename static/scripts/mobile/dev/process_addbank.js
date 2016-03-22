@@ -626,7 +626,6 @@ webpackJsonp([6],[
 	        this.VALIDATION_URL = _ref2[1];
 	        this.callback = _ref2[2];
 
-	        console.log("target", target, this.target);
 	        this.post_data = null;
 	        this.check_list = null;
 	        this.intervalId = null;
@@ -708,7 +707,6 @@ webpackJsonp([6],[
 	        key: 'timerFunction',
 	        value: function timerFunction(count) {
 	            var $target = this.target;
-	            console.log("time-target", this.target, $target);
 	            var timerInside = function timerInside() {
 	                if (count > 1) {
 	                    count--;
@@ -731,11 +729,9 @@ webpackJsonp([6],[
 	                console.log('验证通过');
 	                return _this.execute_request();
 	            }).then(function (result) {
-	                console.log(result, "12");
 	                (0, _ui.signModel)(result);
 	                _this.timerFunction(60);
 	            }).catch(function (result) {
-	                console.log(result, "catch");
 	                return (0, _ui.signModel)(result);
 	            });
 	        }

@@ -13,7 +13,6 @@ import { check } from './from_validation'
 export class Simple_validation {
     constructor({target = null,  VALIDATION_URL= null,  callback=null }= {}) {
         [this.target, this.VALIDATION_URL, this.callback ] = [target, VALIDATION_URL, callback];
-        console.log("target", target, this.target);
         this.post_data = null;
         this.check_list = null;
         this.intervalId = null;
@@ -85,7 +84,6 @@ export class Simple_validation {
 
     timerFunction(count) {
         const $target = this.target;
-        console.log("time-target", this.target, $target);
         var timerInside = function () {
             if (count > 1) {
                 count--;
@@ -103,16 +101,14 @@ export class Simple_validation {
     start() {
         this.before_validation()
             .then(result => {
-                console.log('验证通过')
-                return this.execute_request()
+                console.log('验证通过');
+                return this.execute_request();
             })
             .then(result => {
-                console.log(result,"12");
                 signModel(result);
-                this.timerFunction(60)
+                this.timerFunction(60);
             })
             .catch(result => {
-                console.log(result,"catch");
                 return signModel(result)
             })
     }
