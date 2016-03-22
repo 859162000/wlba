@@ -34,6 +34,7 @@ webpackJsonp([5],[
 	    //验证表单
 	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
+	            alert("check");
 	            function checkOperation() {
 	                var checklist = [{ type: 'phone', value: $identifier.val() }, { type: 'password', value: $password.val() }];
 	                return (0, _from_validation.check)(checklist);
@@ -52,7 +53,6 @@ webpackJsonp([5],[
 	            return console.log('验证失败');
 	        });
 	    };
-
 	    //登录
 	    function login(url) {
 	        return new Promise(function (resolve, reject) {
@@ -80,6 +80,7 @@ webpackJsonp([5],[
 	    }
 
 	    $submit.on('click', function () {
+	        alert(3);
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
 	            return login('/weixin/api/login/');
@@ -366,7 +367,6 @@ webpackJsonp([5],[
 	        result = _validation$target$ty2[0];
 	        error = _validation$target$ty2[1];
 
-
 	        if (!result) return false;
 	    });
 
@@ -424,8 +424,8 @@ webpackJsonp([5],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^.{15,18}$/);
-	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
+	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
 	        return [false, error];
@@ -443,6 +443,14 @@ webpackJsonp([5],[
 	            return [false, error];
 	        }
 	        return [true, ''];
+	    },
+	    isMoney: function isMoney(str) {
+	        var error = '请正确填写金额',
+	            int = str * 1;
+	        if (!isNaN(int) && int > 0) {
+	            return [true, ''];
+	        }
+	        return [false, error];
 	    }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))

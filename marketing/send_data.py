@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from marketing.models import IntroducedBy,Channels
 from marketing.utils import get_user_channel_record
 from wanglibao_pay.models import PayInfo
+from django.conf import settings
+from django.utils import timezone
 import requests
 import json
 import datetime
@@ -15,7 +17,7 @@ logger = logging.getLogger('marketing')
 
 def sendData(message,param):
     """往数据部门提供的接口发送实时数据"""
-    posturl = 'http://stat.wanglibao.com:10000/actual/dataindex'
+    posturl = settings.SEND_PHP_URL
     print json.dumps(message)
     try:
         res = requests.post(url = posturl, json=json.dumps(message))
@@ -40,14 +42,14 @@ def send_register_data(user_id, device_type):
     #tel = user.wanglibaouserprofile.phone
     #message['tel'] = tel.replace(tel[3:-2], '*'*6)
     message['tel'] = user.wanglibaouserprofile.phone
-    message['zc_time'] = user.date_joined.strftime('%Y-%m-%d %H:%M:%S')
+    message['zc_time'] = timezone.localtime(user.date_joined).strftime('%Y-%m-%d %H:%M:%S')
     message['zc_from_userid'] = introduce.id if introduce else 0
     message['channel_id'] = channel.id if channel else 0
     message['channel_code'] = channel.code if channel else ''
     message['channel_image'] = channel.image.name if channel else ''
     message['channel_name'] = channel.name if channel else ''
     message['channel_description'] = channel.description if channel else ''
-    message['channel_created_at'] = channel.created_at.strftime('%Y-%m-%d %H:%M:%S') if channel else ''
+    message['channel_created_at'] = timezone.localtime(channel.created_at).strftime('%Y-%m-%d %H:%M:%S') if channel else ''
     data = {'act':1}
     data['data'] = message
     sendData(data,'register')
@@ -65,7 +67,7 @@ def send_idvalidate_data(user_id, device_type):
         message['id_number'] = id_number.replace(id_number[4:-4], '*'*10)
     else:
         message['id_number'] = id_number.replace(id_number[4:-3], '*'*8)
-    message['sm_time'] = user.wanglibaouserprofile.id_valid_time.strftime('%Y-%m-%d %H:%M:%S')
+    message['sm_time'] = timezone.localtime(user.wanglibaouserprofile.id_valid_time).strftime('%Y-%m-%d %H:%M:%S')
     data = {'act':2}
     data['data'] = message
     sendData(data,'idvalidate')
@@ -84,7 +86,7 @@ def send_deposit_data(user_id, amount, device_type, order_id):
     card_no = pay_info.card_no if pay_info.card_no else '0'
     if len(card_no)>1:
         message['card_num'] = card_no.replace(card_no[4:-3], '*' * len(card_no[4:-3]))
-    message['time'] = pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S')
+    message['time'] = timezone.localtime(pay_info.create_time).strftime('%Y-%m-%d %H:%M:%S')
     data = {'act':4}
     data['data'] = message
     sendData(data,'deposit')
@@ -117,7 +119,7 @@ def send_withdraw_data(user_id, amount, order_id, device_type):
     card_no = pay_info.card_no if pay_info.card_no else '0'
     if len(card_no)>1:
         message['card_num'] = card_no.replace(card_no[4:-3], '*' * len(card_no[4:-3]))
-    message['time'] = pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S')
+    message['time'] = timezone.localtime(pay_info.create_time).strftime('%Y-%m-%d %H:%M:%S')
     data = {'act':6}
     data['data'] = message
     sendData(data,'withdraw')

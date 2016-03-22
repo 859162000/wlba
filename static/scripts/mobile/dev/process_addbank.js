@@ -16,9 +16,9 @@ webpackJsonp([6],[
 
 	var _api = __webpack_require__(3);
 
-	var _simple_validation = __webpack_require__(9);
+	var _simple_validation = __webpack_require__(11);
 
-	var _bank_limit = __webpack_require__(10);
+	var _bank_limit = __webpack_require__(12);
 
 	(function () {
 
@@ -485,7 +485,6 @@ webpackJsonp([6],[
 	        result = _validation$target$ty2[0];
 	        error = _validation$target$ty2[1];
 
-
 	        if (!result) return false;
 	    });
 
@@ -543,8 +542,8 @@ webpackJsonp([6],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^.{15,18}$/);
-	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
+	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
 	        return [false, error];
@@ -562,6 +561,14 @@ webpackJsonp([6],[
 	            return [false, error];
 	        }
 	        return [true, ''];
+	    },
+	    isMoney: function isMoney(str) {
+	        var error = '请正确填写金额',
+	            int = str * 1;
+	        if (!isNaN(int) && int > 0) {
+	            return [true, ''];
+	        }
+	        return [false, error];
 	    }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
@@ -569,7 +576,9 @@ webpackJsonp([6],[
 /***/ },
 /* 7 */,
 /* 8 */,
-/* 9 */
+/* 9 */,
+/* 10 */,
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -732,7 +741,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";

@@ -914,10 +914,15 @@ VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
 # 用户实名接口v1剩余可用次数 Modify by chenweibin on 2016-03-03
 VALID_V1_TOTAL = 8000
 
+# 用户实名接口v2域名, ws.nciic.org.cn(新), api.nciic.com.cn(旧)
+VERIFY_V2_DOMAIN = 'ws.nciic.org.cn'
+# VERIFY_V2_DOMAIN = 'api.nciic.com.cn'
+
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV1&V2AutoBackEnd'
 # ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+    # ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
     STATIC_FILE_HOST = ''
@@ -955,10 +960,11 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
             ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
             ['TextColor', 'BGColor'], ['Link', 'Unlink', 'Anchor'],
-            ['Image', 'Flash', 'Table', 'HorizontalRule'],
+            ['Image', 'Flash', 'allMedias', 'Table', 'HorizontalRule'],
             ['Smiley', 'SpecialChar'],
         ],
         'toolbar': 'custom',
+        'extraPlugins' : 'allMedias',
     },
     "mini":{
         'entities':False,
@@ -976,16 +982,27 @@ ACCESS_KEY = 'nwogz9MF5VjadUSsuDzDM0lKlTN4BN'
 if ENV == ENV_PRODUCTION:
     OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'
+    OSS_PUB_ACCESS_HOST = 'http://wanglifile.oss-cn-beijing.aliyuncs.com'
 
 else:
     OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
     OSS_BUCKET = 'wanglistaging'
+    OSS_PUB_ACCESS_HOST = 'http://wanglistaging.oss-cn-beijing.aliyuncs.com'
 
 #ISCJDAO = False
 #CJDAOKEY = '1234'
 #RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 #RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 #POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
+
+
+#往PHP数据中心发送数据接口生产地址和开关
+if ENV == ENV_PRODUCTION:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = True
+else:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = False
 
 # 天芒
 if ENV == ENV_PRODUCTION:
@@ -1188,10 +1205,18 @@ else:
 
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
+if ENV == ENV_PRODUCTION:
+    BAJINSHE_COOP_KEY = ''
+else:
+    BAJINSHE_COOP_KEY = '4762c2c53ed701597c1d6cf3b409ff87c3f04f98'
 
 # 人人利
 RENRENLI_COOP_KEY = 'wanglibaorrl'
 RENRENLI_CHANNEL_CODE = 'renrenli'
+
+# 比搜益
+BISOUYI_AES_KEY = ''
+BISOUYI_SIGN_KEY = ''
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
@@ -1273,9 +1298,11 @@ if ENV == ENV_PRODUCTION:
     OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
 else:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
     OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'

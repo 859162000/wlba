@@ -9,16 +9,17 @@ from rest_framework.response import Response
 from wanglibao_announcement.models import Announcement
 from django.utils import timezone
 import re
+from marketing.utils import utype_is_mobile
 import json
+from .utility import get_announcement_list
 
 
 class AnnouncementHomeView(TemplateView):
     template_name = 'announcement_home.jade'
 
     def get_context_data(self, **kwargs):
-        announcements = Announcement.objects.filter(Q(status=1, hideinlist=False) &
-                                                                           (Q(device='pc') |
-                                                                            Q(device='pc&app'))).order_by('-createtime')
+
+        announcements = get_announcement_list(self.request).order_by('-createtime')
 
         announcements_list = []
         announcements_list.extend(announcements)

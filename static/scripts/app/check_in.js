@@ -255,6 +255,7 @@ org.ui = (function () {
 org.checin_in = (function () {
     var lib = {
         appShare: null,
+        limit_gift: false,
         init: function(mixins){
             lib.appShare = mixins
             lib.fetch();
@@ -277,7 +278,7 @@ org.checin_in = (function () {
                 if(amount){
                     $share.find('.op-dec-detail').addClass('op-detail-orange').text('+'+amount+'元体验金');
                 }else{
-                    $share.find('.op-dec-detail').text('点击得双倍')
+                    $share.find('.op-dec-detail').text('分享得双份')
                 }
 
             }
@@ -301,6 +302,7 @@ org.checin_in = (function () {
 
             try{
                 _self.appShare.shareStatus(function(result){
+                    if(!result.data.experience_amount) return org.ui.alert('分享失败')
                     _self.checkInAlert('share', '今日分享成功！获得'+result.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
                         shareStaus = true;
                         shareInfo(shareStaus, result.data.experience_amount)
@@ -321,6 +323,7 @@ org.checin_in = (function () {
             $checkIn.find('.op-dec-detail').text('+'+amount+'元体验金');
         },
         steriousGift:function(acount){
+            if(acount ===0) return  $('.bar-content').text('请领取神秘礼物')
             $('.bar-content').text('距离神秘礼包还有'+acount+'天')
         },
         process: function(result){
@@ -339,7 +342,7 @@ org.checin_in = (function () {
             for(var i= itemStart; i <= itemEnd;i++){
                 itemStatus = '';
 
-                if(i <= continueDay){
+                if(i <= currentDay){
                     //已签到的天数
                     itemStatus += " active-did "
                 }
@@ -354,7 +357,7 @@ org.checin_in = (function () {
                     itemStatus = giftStatus ?
                         "active-gift-open "
                         :
-                        itemEnd - continueDay === 0? 'active-gift-active ' :"active-gift ";
+                        itemEnd - currentDay === 0? 'active-gift-active ' :"active-gift ";
                 }
 
                 str += "<div data-continue='"+i+"' class='flag-items "+itemStatus+"'>";
@@ -375,25 +378,29 @@ org.checin_in = (function () {
             var _self = this, resultCopy = result.data.sign_in;
 
             //连续签到日
-            var continue_days = resultCopy.continue_days;
+            var current_day = resultCopy.current_day;
+            var steriousGift_days = resultCopy.mysterious_day;
 
             //当日是否签到
             if(!resultCopy.status){
                 _self.checkInOpeartion('sign_in', function(data){
+                    //签到成功更新连续签到日
+                    current_day++;
+
                     if(data.data.status){
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
-                            triggerUI(data.data.continue_days)
+                            triggerUI(current_day)
                             _self.signIn(true, data.data.experience_amount)
+                            _self.steriousGift(steriousGift_days - 1);
                         })
                     }
-                    //签到成功更新连续签到日
-                    continue_days = data.data.continue_days;
+
 
                     function triggerUI(count){
                         $.each($('.flag-items'), function(){
                             if($(this).attr('data-continue') * 1 == count){
                                 if($(this).hasClass('active-gift')){
-                                    $(this).addClass('active-gift-active').removeClass('active-gift');
+                                    $(this).addClass('active-gift-active').removeClass('active-gift').siblings('.flag-items').removeClass('active-doing');
                                 }else{
                                     $(this).addClass('active-did active-doing').siblings('.flag-items').removeClass('active-doing')
                                 }
@@ -407,12 +414,15 @@ org.checin_in = (function () {
 
             var giftDay  = null;
             $('.active-gift, .active-gift-open, .active-gift-active').on('click', function(){
-                giftDay = resultCopy.nextDayNote - continue_days;
+                giftDay = resultCopy.nextDayNote - current_day;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
                         org.ui.alert('礼物已经领取过了！')
                     }else{
-                        _self.fetchGift(continue_days)
+                        if(!_self.limit_click){
+                            _self.limit_click =true;
+                            _self.fetchGift(current_day)
+                        }
                     }
                 }else if(giftDay > 0){
                     console.log(giftDay)
@@ -446,13 +456,18 @@ org.checin_in = (function () {
                 },
                 success: function(data){
                     if(data.ret_code ===0){
-                        _self.checkInAlert('gift', data.message, '在(我的账户)中查看');
-                        _self.steriousGift(data.mysterious_day)
-                        $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
+
+                        _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
+                            _self.steriousGift(data.mysterious_day)
+                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
+                        });
                     }
                     if(data.ret_code < 0){
                         org.ui.alert(data.message)
                     }
+                },
+                complete: function(){
+                    _self.limit_click = false
                 }
             })
         },
