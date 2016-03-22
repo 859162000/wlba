@@ -2766,7 +2766,65 @@ class FetchMarchAwardAPI(APIView):
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
 
+class FetchAirportServiceReward(APIView):
+    authentication_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        activity = Activity.objects.filter(code='').first()
+        if activity.is_stopped:
+            return Response({"ret_code":-1, "message":"活动已经截止"})
+        now = timezone.now()
+        if activity.start_at > now:
+            return Response({"ret_code":-1, "message":"活动还未开始"})
+        if activity.end_at < now:
+            return Response({"ret_code":-1, "message":"活动已经结束"})
+        user = request.user
+        # reward_name = request.DATA.get('reward_name', "").strip()
+        # if not reward_name:
+        #     return Response({"ret_code":-1, "message":""})
+        rule_id = request.DATA.get('rule_id', "").strip()
+        if not rule_id or not rule_id.isdigit():
+            return Response({"ret_code":-1, "message":""})
+        rule_id = int(rule_id)
+        activity_rules = ActivityRule.objects.filter(activity=activity).all()
+        activity_rule = None
+        for a_rule in activity_rules:
+            if a_rule.id == rule_id:
+                activity_rule = a_rule
+                break
+
+        if not activity_rule or activity_rule.gift_type!=u"reward" or not activity_rule.reward or not activity_rule.is_used:
+            return Response({"ret_code": -1, "message": ""})
+
+        reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+        if not reward:
+            return Response({"ret_code": -1, "message": ""})
+        user_ib = IntroducedBy.objects.filter(user=user, created_at__gt=activity.start_at).first()
+        is_new = True
+        if not user_ib:
+            is_new = False
+
+        if activity_rule.is_invite_in_date:
+            if not is_new or not user_ib.channel or user_ib.channel.code != activity.channel:
+                return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+        if is_new:
+            first_buy = P2PRecord.objects.filter(user=user,
+                                                 create_time__gt=activity.start_at
+                                                 ).order_by('create_time').first()
+            float(first_buy.amount) >= 10000
 
 
-
+            old_reward = Reward.objects.filter(pk=reward.reward.id).first()
+            if old_reward and old_reward.is_used:
+                new_reward = Reward.objects.filter(type=old_reward.type, is_used=False).order_by('-id').first()
+                reward.reward = new_reward
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": reward.reward.type,
+                "content": reward.reward.content,
+                "mtype": "activity"
+            })
+            reward.reward.is_used = True
+            reward.reward.save()
+            reward_name = reward.reward.type
 
