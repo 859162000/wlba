@@ -722,7 +722,8 @@ class AccountHomeAPIView(APIView):
 
 
 class AccountInviteView(TemplateView):
-    template_name = 'invite.jade'
+    #template_name = 'invite.jade'
+    template_name = 'center_invite.jade'
 
     def get_context_data(self, **kwargs):
 
@@ -1320,7 +1321,8 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
 
 
 class MessageView(TemplateView):
-    template_name = 'message.jade'
+    #template_name = 'message.jade'
+    template_name = 'center_message.jade'
 
     def get_context_data(self, **kwargs):
         listtype = self.request.GET.get("listtype")
@@ -1351,6 +1353,7 @@ class MessageView(TemplateView):
         except Exception:
             messages_list = paginator.page(paginator.num_pages)
 
+        print listtype, '======='
         return {
             'messageList': messages_list,
             'list_type': listtype

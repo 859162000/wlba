@@ -160,18 +160,22 @@ $c-border: #ebebeb
     +clearfix()
   li
     float: left
-    width: 25px
-    height: 25px
-    line-height: 25px
+
     text-align: center
     border: 1px solid #bebebe
     color: #bebebe
     border-radius: 50%
     margin-right: 10px
-    cursor: pointer
     &:hover
       border: 1px solid $t-d16
       color: $t-d16
+    a
+      +unstyled-link
+      display: block
+      width: 25px
+      height: 25px
+      line-height: 26px
+
     i
       font-size: 12px
   li.active
