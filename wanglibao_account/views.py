@@ -1034,7 +1034,7 @@ class AccountTransactionP2P(TemplateView):
 
 
 class AccountRedPacket(TemplateView):
-    template_name = 'redpacket_available.jade'
+    template_name = 'center_redpack_redpack.jade'
 
     def get_context_data(self, **kwargs):
 
@@ -1049,12 +1049,12 @@ class AccountRedPacket(TemplateView):
 
         return {
             "red_packets": red_packets,
-            "status": status
+            "type": status
         }
 
 
 class AccountCoupon(TemplateView):
-    template_name = 'coupon_available.jade'
+    template_name = 'center_redpack_coupons.jade'
 
     def get_context_data(self, **kwargs):
 
@@ -1069,7 +1069,7 @@ class AccountCoupon(TemplateView):
 
         return {
             "coupons": coupons,
-            "status": status
+            "type": status
         }
 
 
@@ -1863,7 +1863,7 @@ class AdminSendMessageView(TemplateView):
 
 
 class AddressView(TemplateView):
-    template_name = 'account_address.jade'
+    template_name = 'center_profile.jade'
 
     def get_context_data(self, **kwargs):
 

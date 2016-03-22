@@ -1,0 +1,71 @@
+extends center_redpack_base
+-load formatters
+block redpack
+  .c-transaction-bar
+    a(href="/accounts/coupon/unused").active-bar
+      span
+        i.iconfont.icon-gold-bar.icon.inline-block
+        span.inline-block 加息券
+
+    a(href="/accounts/redpacket/unused")
+      span
+        i.iconfont.icon-gold-bar.icon.inline-block
+        span.inline-block 红包
+
+  .c-layout
+    .c-redpack-status
+      if type == 'unused'
+        a(href='/accounts/coupon/unused').active 可使用
+      else
+        a(href='/accounts/coupon/unused') 可使用
+
+      if type == 'used'
+        a(href='/accounts/coupon/used/').active 已使用
+      else
+        a(href='/accounts/coupon/used/') 已使用
+
+      if type == 'expires'
+        a(href='/accounts/coupon/expires/').active 已过期
+      else
+        a(href='/accounts/coupon/expires/') 已过期
+    table.c-redpack-table
+      thead
+        tr
+          th 加息券名称
+          th 加息利率
+          if type == 'used'
+            th 使用详情
+            th 使用时间
+          if not type == 'used'
+            th 投资门槛
+            th 使用范围/期限
+            th 有效期
+      tbody
+        each coupon in coupons
+          tr
+            td
+              .redpack-name {{coupon.name}}
+            td
+              .t-d2 +{{coupon.amount | percentage_number_two}}%
+
+            if type == 'used'
+              td {{coupon.p2p_types_name}}产品名称
+              td {{coupon.apply_at |milldate_format}}
+
+            if not type == 'used'
+              if coupon.invest_amount == 0
+                td 无
+              else
+                td {{coupon.invest_amount}}元
+
+              td
+                if coupon.p2p_types_name
+                  | {{coupon.p2p_types_name}}
+                if coupon.p2p_types_name and coupon.period
+                  |  /
+                if not coupon.p2p_types_name and not coupon.period
+                  | 无
+                if coupon.period
+                  | {{coupon.period}}{{coupon.period_type | period_format}}
+              td {{coupon.unavailable_at | milldate_format}}前
+

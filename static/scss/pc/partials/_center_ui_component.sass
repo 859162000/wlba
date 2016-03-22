@@ -1,6 +1,19 @@
 $c-border: #ebebeb
 
-
+@mixin c-blue-button($width: 90, $height: 40, $font: 16, $color: #fff, $bf: #477ced, $hoverBG: #245EDA, $hoverColor: #fff)
+  width: $width + px
+  height: $height + px
+  color: $color
+  font-size: $font + px
+  text-align: center
+  line-height: $height + px
+  padding: 0
+  border: 0
+  background: $bf
+  &:hover
+    background: $hoverBG
+    color: $hoverColor
+    
 .mod-center
   .c-aside
     float: left

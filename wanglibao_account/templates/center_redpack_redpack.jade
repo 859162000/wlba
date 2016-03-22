@@ -1,0 +1,83 @@
+extends center_redpack_base
+
+-load formatters
+block redpack
+  .c-transaction-bar
+    a(href="/accounts/coupon/unused")
+      span
+        i.iconfont.icon-gold-bar.icon.inline-block
+        span.inline-block 加息券
+    a(href="/accounts/redpacket/unused").active-bar
+      span
+        i.iconfont.icon-gold-bar.icon.inline-block
+        span.inline-block 红包
+  .c-layout
+    .c-redpack-status
+      if type == 'unused'
+        a(href='/accounts/redpacket/unused').active 可使用
+      else
+        a(href='/accounts/redpacket/unused') 可使用
+
+      if type == 'used'
+        a(href='/accounts/redpacket/used/').active 已使用
+      else
+        a(href='/accounts/redpacket/used/') 已使用
+
+      if type == 'expires'
+        a(href='/accounts/redpacket/expires/').active 已过期
+      else
+        a(href='/accounts/redpacket/expires/') 已过期
+    table.c-redpack-table
+      thead
+        tr
+          th 红包名称
+          th 金额(元)
+          if type == 'used'
+            th 使用详情
+            th 使用时间
+          if not type == 'used'
+            th 使用限额(元)
+            th 使用门槛(元)
+            th 使用范围/期限
+            th 有效期
+      tbody
+        each red_packet in red_packets
+          tr
+            td
+              .redpack-name {{red_packet.name}}
+
+            if red_packet.method == '-'
+              td
+                .t-d2 {{red_packet.amount}}
+            else
+              td
+                .t-d2 {{red_packet.highest_amount}}
+
+            if type == 'used'
+              td {{red_packet.p2p_types_name}}产品名称
+              td {{red_packet.apply_at |milldate_format}}
+            if not type == 'used'
+              if red_packet.method == '-'
+                td {{red_packet.amount}}元
+              else
+                td 投资额{{red_packet.amount | percentage_number_two}}%
+
+              if red_packet.invest_amount == 0
+                td
+                  .t-d11 无
+              else
+                td
+                  .t-d11 {{red_packet.invest_amount}}
+
+              td
+                .t-d11
+                  if red_packet.p2p_types_name
+                    | {{red_packet.p2p_types_name}}
+                  if red_packet.p2p_types_name and red_packet.period
+                    |  /
+                  if not red_packet.p2p_types_name and not red_packet.period
+                    | 无
+                  if red_packet.period
+                    | {{red_packet.period}}{{red_packet.period_type | period_format}}
+
+              td {{red_packet.unavailable_at | milldate_format}}前
