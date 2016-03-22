@@ -10,6 +10,7 @@ from wanglibao import settings
 from marketing.utils import get_channel_record
 from wanglibao_account.utils import detect_identifier_type
 from report.crypto import Aes
+from wanglibao_rest.utils import generate_bajinshe_sign
 
 logger = logging.getLogger(__name__)
 
@@ -109,11 +110,21 @@ class OauthUserRegisterForm(OAuthForm):
 
         return phone
 
-    def check_sign(self, coop_key):
+    def renrenli_sign_check(self, coop_key):
         client_id = self.cleaned_data['client_id']
         phone = self.cleaned_data['phone']
         sign = self.cleaned_data['sign']
         local_sign = hashlib.md5(str(client_id)+str(phone)+str(coop_key)).hexdigest()
+        if sign == local_sign:
+            return True
+        else:
+            return False
+
+    def bajinshe_sign_check(self, coop_key):
+        client_id = self.cleaned_data['client_id']
+        phone = self.cleaned_data['phone']
+        sign = self.cleaned_data['sign']
+        local_sign = generate_bajinshe_sign(client_id, phone, coop_key)
         if sign == local_sign:
             return True
         else:
@@ -146,7 +157,10 @@ class BiSouYiRegisterForm(forms.Form):
                 if 'phone' in content_data:
                     if detect_identifier_type(content_data['phone']) == 'phone':
                         if 'token' in content_data:
-                            return content, content_data
+                            if len(content_data['token']) <= 255:
+                                return content, content_data
+                            else:
+                                raise forms.ValidationError(u'token长度超出限制')
                         else:
                             raise forms.ValidationError(u'content没有包含token')
                     else:
@@ -157,12 +171,12 @@ class BiSouYiRegisterForm(forms.Form):
                 raise forms.ValidationError(u'content不是期望的类型')
 
     def get_phone(self):
-        content = self.cleaned_data['content']
-        return content['phone']
+        phone = self.cleaned_data['content'][1]['phone']
+        return phone
 
     def get_token(self):
-        content = self.cleaned_data['content']
-        return content['token']
+        token = self.cleaned_data['content'][1]['token']
+        return token
 
     def check_sign(self):
         client_id = self.cleaned_data['client_id']
@@ -170,6 +184,6 @@ class BiSouYiRegisterForm(forms.Form):
         content = self.cleaned_data['content'][0]
         local_sign = hashlib.md5(str(client_id) + settings.BISOUYI_SIGN_KEY + content).hexdigest()
         if sign != local_sign:
-            raise forms.ValidationError(u'无效签名')
+            return False
         else:
             return True
