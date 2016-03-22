@@ -96,7 +96,7 @@ import { limit} from './mixins/bank_limit.js'
 
     //获取银行卡
     const fetch_banklist = (callback) => {
-        if(localStorage.getItem('bank')){
+        if(localStorage.getItem('ban22k')){
             const content = JSON.parse(localStorage.getItem('bank'));
             $bank.append(appendBanks(content));
             return callback && callback(content)
@@ -152,7 +152,7 @@ import { limit} from './mixins/bank_limit.js'
             card_no: $bankcard.val(),
             gate_id: $bank.val(),
             phone: $bankphone.val(),
-            amount: $money.val() ? $money.val() : 0.01
+            amount: $money.length > 0 ? $money.val() : 0.01
         });
         simple_validation.start()
 

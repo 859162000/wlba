@@ -35,10 +35,12 @@ export class Simple_validation {
         return new Promise((resolve, reject) => {
             function validation_operation() {
                 let form_list = checklist;
+                console.log("form_list", form_list);
                 return check(form_list);
             }
 
             const [isThrough, sign]  = validation_operation();
+            console.log(isThrough, sign);
             if (isThrough) return resolve('验证成功');
 
             return reject(sign);
@@ -104,10 +106,12 @@ export class Simple_validation {
                 return this.execute_request()
             })
             .then(result => {
-                signModel(result)
+                console.log(result,"12");
+                signModel(result);
                 this.timerFunction(60)
             })
             .catch(result => {
+                console.log(result,"catch");
                 return signModel(result)
             })
     }
