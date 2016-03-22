@@ -1,0 +1,144 @@
+@keyframes anLeo
+  0%,100%
+    transform: translate(0, rem(-10))
+  50%
+    transform: translate(0, 0)
+@-webkit-keyframes anLeo
+  0%,100%
+    -webkit-transform: translate(0, rem(-10))
+  50%
+    -webkit-transform: translate(0, 0)
+.account-new
+  position: relative
+  height: rem(410)
+  background: url("/static/imgs/sub_weixin/account/ac_banner.jpg") center bottom no-repeat
+  background-size: cover
+  .account-leo
+    width: rem(179)
+    height: rem(188)
+    background: url("/static/imgs/sub_weixin/account/account_leo.png") center top no-repeat
+    background-size: contain
+    position: absolute
+    left: rem(-180)
+    bottom: 0.5rem
+    animation: anLeo 1.5s linear infinite
+    -webkit-animation: anLeo 1.5s linear infinite
+
+  .account-rechange
+    position: absolute
+    top: 1.8rem
+    right: 1.5rem
+    width: rem(86)
+    height: rem(86)
+    line-height: rem(86)
+    text-align: center
+    background: url("/static/imgs/sub_weixin/account/button_account_jinbi.png") center center no-repeat
+    background-size: contain
+    color: #ed5031
+    font-size: rem(26)
+    a
+      display: block
+  .account-main
+    color: #ed5031
+    width: rem(380)
+    height: rem(240)
+    position: absolute
+    bottom: rem(20)
+    left: 50%
+    margin-left: rem(-190)
+  .tit
+    text-align: center
+    font-size: rem(20)
+    line-height: rem(20)
+  .total-money
+    text-align: center
+    height: rem(72)
+    line-height: rem(72)
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+  .l-money
+    margin-top: rem(12)
+    font-size: rem(36)
+    line-height: rem(36)
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+  .account-detail
+    margin-top: 1rem
+    .item
+      width: 50%
+      float: left
+      text-align: center
+
+.account-body-main
+  position: relative
+  z-index: 9
+  margin-top: rem(-60)
+  background: url("/static/imgs/sub_weixin/account/ac_background.png") center top no-repeat
+  background-size: 100% 100%
+  padding: 0.5rem 0
+  .repack-box
+    height: 10rem
+    padding: rem(115) 0
+  .redpace-item
+    margin: 0 rem(20)
+    height: rem(176)
+    background: url("/static/imgs/sub_weixin/account/icon_account_quan.png") center center no-repeat
+    background-size: 100% 100%
+    color: #fff
+    .item-tit
+      font-size: rem(30)
+      display: -webkit-box
+      -webkit-box-align: center
+      -webkit-box-pack: center
+      width: 15%
+      height: 100%
+      float: left
+      span
+        display: block
+        width: rem(40)
+        text-align: center
+    .item-main
+      font-size: rem(20)
+      width: 58%
+      padding: 0 1rem
+      float: left
+      height: 100%
+      display: -webkit-box
+      -webkit-box-align: center
+      a
+        display: inline-block
+        line-height: rem(28)
+    .font72
+      font-size: rem(72)
+    .item-go
+      float: left
+      width: 27%
+      height: 100%
+      text-align: center
+      display: -webkit-box
+      -webkit-box-align: center
+      a
+        display: block
+        width: 100%
+        text-align: center
+.account-btm
+  position: relative
+  z-index: 10
+  background: #464646
+  padding: 0 0.5rem 0.5rem
+  .arr-box
+    position: absolute
+    width: 0
+    height: 0
+    border: 0.5rem dashed transparent
+    border-bottom: 0.5rem solid #464646
+    top: -1rem
+    right: 1.5rem
+  .ad-banner
+    display: block
+    padding-top: 0.5rem
+    img
+      width: 100%
+      vertical-align: middle
