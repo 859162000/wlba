@@ -83,7 +83,6 @@ webpackJsonp([5],[
 	        alert(3);
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
-	            alert(result);
 	            return login('/weixin/api/login/');
 	        }).then(function (result) {
 	            console.log('login success');

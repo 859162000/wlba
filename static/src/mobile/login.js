@@ -75,7 +75,6 @@ import { check } from './mixins/from_validation'
         checkOperation()
             .then((result)=> {
                 console.log(result); //check success
-                alert(result);
                 return login('/weixin/api/login/');
             })
             .then((result)=> {
