@@ -2,7 +2,6 @@
 # encoding:utf-8
 import logging
 
-import time
 from django.contrib import auth
 from django.db import transaction
 from django.db.models import Q
@@ -37,12 +36,10 @@ class GetUserInfo(APIView):
     permission_classes = ()
 
     def get(self, request):
-        t1 = time.time()
-        logger.debug('in user info !!! time = {}'.format(t1))
+
         session_id = self.request.REQUEST.get('session_id')
         token = self.request.REQUEST.get('token')
         user_ids = self.request.REQUEST.get('user_ids', None)
-        logger.debug('get user info with args !!! time = {}'.format(time.time() - t1))
 
         user_info = dict()
         if session_id and not user_ids:
@@ -70,7 +67,6 @@ class GetUserInfo(APIView):
             user_info.update(
                 status=0,
             )
-        logger.debug('get user finished !!! time = {}\n'.format(time.time() - t1))
 
         return HttpResponse(renderers.JSONRenderer().render(user_info, 'application/json'))
 
@@ -100,8 +96,8 @@ class GetMarginInfo(APIView):
     permission_classes = ()
 
     def get(self, request):
-        user_id = self.request.REQUEST.get('userId')
 
+        user_id = self.request.REQUEST.get('userId')
         margin = get_margin_info(user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(margin, 'application/json'))
@@ -117,13 +113,9 @@ class GetUnreadMgsNum(APIView):
     permission_classes = ()
 
     def post(self, request):
-        t1 = time.time()
-        logger.debug('1111going to get unread msg number !!! time = {}'.format(t1))
-        user_id = self.request.REQUEST.get('userId')
-        logger.debug('1111with arg userId !!! going to get api!!! time = {}'.format(time.time()-t1))
 
+        user_id = self.request.REQUEST.get('userId')
         ret = get_unread_msgs(user_id)
-        logger.debug('1111get unread msg finished!!! ret = {} time = {}\n'.format(ret, time.time()-t1))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -136,14 +128,11 @@ class GetUserUnreadMgsNum(APIView):
     :return:
     """
     permission_classes = ()
-    def get(self, request):
-        t2 = time.time()
-        logger.debug('2222going to get unread msg number !!! time = {}'.format(t2))
-        user_id = self.request.user.pk
-        logger.debug('2222with arg userId !!! going to get api!!! time = {}'.format(time.time()-t2))
 
+    def get(self, request):
+
+        user_id = self.request.user.pk
         ret = get_unread_msgs(user_id)
-        logger.debug('2222get unread msg finished!!! ret = {} time = {}\n'.format(ret, time.time()-t2))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -320,7 +309,8 @@ class YueLiBaoBuyFail(APIView):
             with transaction.atomic(savepoint=True):
                 product_id = product.product_id
                 buyer_keeper = PhpMarginKeeper(user, product_id)
-                record = buyer_keeper.yue_cancel(user, product.amount)
+                record = buyer_keeper.yue_cancel(user, product.amount_source)
+                logger.info('phone = {} cancel, source amount = {}'.format(user.pk, product.amount_source))
 
                 if record:
                     # 状态置为已退款, 这个记录丢弃
@@ -433,7 +423,7 @@ class YueLiBaoCancel(APIView):
                     user = product.user
                     product_id = product.product_id
                     buyer_keeper = PhpMarginKeeper(user, product_id)
-                    record = buyer_keeper.unfreeze(product.amount, description=u'月利宝流标')
+                    record = buyer_keeper.unfreeze(product.amount_source, description=u'月利宝流标')
 
                     # 状态置为已退款, 这个记录丢弃
                     product.cancel_status = True
