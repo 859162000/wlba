@@ -100,7 +100,7 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank')) {
+	        if (localStorage.getItem('ban22k')) {
 	            var content = JSON.parse(localStorage.getItem('bank'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
@@ -148,7 +148,7 @@ webpackJsonp([6],[
 	            card_no: $bankcard.val(),
 	            gate_id: $bank.val(),
 	            phone: $bankphone.val(),
-	            amount: 0.01
+	            amount: $money.length > 0 ? $money.val() : 0.01
 	        });
 	        simple_validation.start();
 	    });
@@ -167,7 +167,7 @@ webpackJsonp([6],[
 	    });
 
 	    function recharge(check) {
-	        org.ajax({
+	        (0, _api.ajax)({
 	            type: 'POST',
 	            url: '/api/pay/cnp/dynnum_new/',
 	            data: {
@@ -652,6 +652,7 @@ webpackJsonp([6],[
 	            return new Promise(function (resolve, reject) {
 	                function validation_operation() {
 	                    var form_list = checklist;
+	                    console.log("form_list", form_list);
 	                    return (0, _from_validation.check)(form_list);
 	                }
 
@@ -662,6 +663,7 @@ webpackJsonp([6],[
 	                var isThrough = _validation_operation2[0];
 	                var sign = _validation_operation2[1];
 
+	                console.log(isThrough, sign);
 	                if (isThrough) return resolve('验证成功');
 
 	                return reject(sign);
@@ -728,9 +730,11 @@ webpackJsonp([6],[
 	                console.log('验证通过');
 	                return _this.execute_request();
 	            }).then(function (result) {
+	                console.log(result, "12");
 	                (0, _ui.signModel)(result);
 	                _this.timerFunction(60);
 	            }).catch(function (result) {
+	                console.log(result, "catch");
 	                return (0, _ui.signModel)(result);
 	            });
 	        }
