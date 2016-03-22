@@ -84,6 +84,7 @@ export class Simple_validation {
     }
 
     timerFunction(count) {
+        console.log("time-target", this.target);
         var timerInside = function () {
             if (count > 1) {
                 count--;
