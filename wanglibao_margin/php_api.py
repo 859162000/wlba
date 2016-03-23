@@ -105,7 +105,7 @@ class GetMarginInfo(APIView):
 
 class GetUnreadMgsNum(APIView):
     """
-    http请求方式: GET  根据用户ID 得到用户可用余额。
+    http请求方式: GET  根据用户ID 得到用户未读站内信数量。
     http://xxxxxx.com/php/margin/?user_id=11111
     返回数据格式：json
     :return:
@@ -122,8 +122,7 @@ class GetUnreadMgsNum(APIView):
 
 class GetUserUnreadMgsNum(APIView):
     """
-    http请求方式: GET  根据用户ID 得到用户可用余额。
-    http://xxxxxx.com/php/margin/?user_id=11111
+    http请求方式: GET  自己的未读数, 不需要参数。
     返回数据格式：json
     :return:
     """
@@ -318,7 +317,7 @@ class YueLiBaoBuyFail(APIView):
                     product.save()
 
                     # 增加回退红包接口
-                    php_redpack_restore(product.order_id, product_id, product.amount, user)
+                    php_redpack_restore(product.id, product_id, product.amount, user)
                     logger.debug('purchase failed and restore red_pack. month_product_id = {},\n'.format(product_id))
 
             ret.update(status=1,
@@ -428,11 +427,14 @@ class YueLiBaoCancel(APIView):
                     # 状态置为已退款, 这个记录丢弃
                     product.cancel_status = True
                     product.save()
-                    logger.info('cancel_status saved as true!')
+                    logger.info('cancel_status saved as true! month_product_id = {}'.format(product_id))
 
                     # 增加回退红包接口
-                    php_redpack_restore(product.id, product_id, product.amount_source, user)
+                    result = php_redpack_restore(product.id, product_id, product.amount_source, user)
                     logger.info(u'流标返回红包. month_product_id = {}\n'.format(product_id))
+                    # 用户红包金额退回
+                    buyer_keeper.redpack_return(result['deduct'],
+                                                description=u"月利宝id=%s流标 红包退回%s元" % (product_id, result['deduct']))
 
                     status = 1 if record else 0
                     msg_list.append({'token': product.token, 'status': status})
@@ -440,7 +442,7 @@ class YueLiBaoCancel(APIView):
             ret.update(status=1,
                        msg=msg_list)
         except Exception, e:
-            logger.info(u'流标失败: {}\n'.format(str(e)))
+            logger.info(u'month_product_id = {}, 流标失败: {}\n'.format(product_id, str(e)))
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

@@ -564,7 +564,7 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
 
 def php_redpack_consume(redpack, amount, user, order_id, device_type, product_id):
     """
-
+    优惠券使用
     :param redpack:
     :param amount:  投资的金额
     :param user:
@@ -608,11 +608,20 @@ def php_redpack_consume(redpack, amount, user, order_id, device_type, product_id
     record.apply_amount = deduct
     record.apply_at = timezone.now()
     record.save()
+    logger.info(u"user : %s,  %s--%s 使用加息券 %s" % (user, event.name, record.id, timezone.now()))
 
     return {"ret_code": 0, "message": u"ok", "deduct": deduct, "rtype": event.rtype}
 
 
 def php_redpack_restore(order_id, product_id, amount, user):
+    """
+    从红包记录获取到使用红包信息
+    :param order_id:
+    :param product_id:
+    :param amount:
+    :param user:
+    :return:
+    """
     if type(amount) != decimal.Decimal:
         amount = fmt_two_amount(amount)
     record = RedPackRecord.objects.filter(is_month_product=True, user=user,
@@ -631,12 +640,11 @@ def php_redpack_restore(order_id, product_id, amount, user):
     rule_value = event.amount
     # deduct = event.amount
     deduct = _calc_deduct(amount, rtype, rule_value, event)
-    from wanglibao_redpack.backends import logger
     if rtype == "interest_coupon":
-        logger.info(u"%s--%s 退回加息券 %s" % (event.name, record.id, timezone.now()))
+        logger.info(u"user : %s,  %s--%s 退回加息券 %s" % (user, event.name, record.id, timezone.now()))
         return {"ret_code": 1, "deduct": deduct}
     else:
-        logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
+        logger.info(u"user : %s,  %s--%s 退回账户 %s" % (user, event.name, record.id, timezone.now()))
         return {"ret_code": 0, "deduct": deduct}
 
 
