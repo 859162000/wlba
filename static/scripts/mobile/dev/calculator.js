@@ -27,7 +27,7 @@ webpackJsonp([2],[
 	        amount = $countInput.val();
 	        amount_profit = $("#expected_income").text();
 	        if (amount % 100 !== 0 || amount == '') {
-	            return (0, _ui.signModel)("请输入100的整数倍???？");
+	            return (0, _ui.signModel)("请输入100的整数倍");
 	        } else {
 	            window.location.href = '/weixin/view/buy/' + productId + '/?amount=' + amount;
 	        }
