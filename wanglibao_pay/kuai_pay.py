@@ -848,6 +848,7 @@ class KuaiShortPay:
         headers = self.headers
         headers['Content-Length'] = str(len(data))
         res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
+        logger.error('kuai_pay:%s|%s|%s' % (url, data, res))
         return res
 
     def _find_in_xml(self, byte_content, key):
@@ -872,7 +873,7 @@ class KuaiShortPay:
         data = self._sp_bind_xml(request.user.id)
         res = self._request(data, self.QUERY_URL)
 
-        logger.critical(res.content)
+        # logger.critical(res.content)
 
         if res.status_code != 200:
             return {"ret_code":-1, "message":"fetch error"}
@@ -945,7 +946,7 @@ class KuaiShortPay:
         if res.status_code != 200 or "errorCode" in res.content:
             return False
 
-        logger.critical(res.content)
+        # logger.critical(res.content)
 
         dic = self._result2dict(res.content)
         res_code = ''
@@ -1048,8 +1049,8 @@ class KuaiShortPay:
 
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
-        logger.critical(data)
-        logger.critical(res.content)
+        # logger.critical(data)
+        # logger.critical(res.content)
 
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code":20101, "message":"解除绑定失败"}
@@ -1065,8 +1066,8 @@ class KuaiShortPay:
                 card_short_no}
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
-        logger.critical(data)
-        logger.critical(res.content)
+        # logger.critical(data)
+        # logger.critical(res.content)
 
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code": 20101, "message": "解除绑定失败"}
@@ -1216,20 +1217,20 @@ class KuaiShortPay:
 
                 self._request_dict = dic
                 data = self._sp_qpay_xml(dic)
-                logger.critical("second pay info")
-                logger.critical(u"%s"%data)
+                # logger.critical("second pay info")
+                # logger.critical(u"%s"%data)
                 url = self.PAY_URL
             else:
                 self._request_dict = dic
                 data = self._sp_dynnum_xml(dic)
-                logger.critical("first pay info")
-                logger.critical(u"%s" % data)
+                # logger.critical("first pay info")
+                # logger.critical(u"%s" % data)
 
                 url = self.DYNNUM_URL
 
             res = self._request(data, url)
-            logger.critical("kuai pay request result")
-            logger.critical(res.content)
+            # logger.critical("kuai pay request result")
+            # logger.critical(res.content)
             if len(card_no) == 10:
                 result = self.handle_pay_result(res.content)
                 if not result:
@@ -1282,10 +1283,10 @@ class KuaiShortPay:
                     "card_no":pay_info.card_no, "token":token, "bank_id":pay_info.bank.kuai_code}
             self._request_dict = dic
             data = self._sp_bindpay_xml(dic)
-            logger.critical("#" * 50)
-            logger.critical(data)
+            # logger.critical("#" * 50)
+            # logger.critical(data)
             res = self._request(data, self.PAY_URL)
-            logger.critical(res.content)
+            # logger.critical(res.content)
             if res.status_code != 200 or "errorCode" in res.content:
                 if "B.MGW.0120" in res.content:
                     pay_info.error_message = '银行与银行卡不匹配'
@@ -1334,12 +1335,12 @@ class KuaiShortPay:
         if pay_info.amount != amount:
             pay_info.status = PayInfo.FAIL
             pay_info.error_message += u' 金额不匹配'
-            logger.critical("orderId:%s amount:%s, response amount:%s" % (order_id, pay_info.amount, amount))
+            # logger.critical("orderId:%s amount:%s, response amount:%s" % (order_id, pay_info.amount, amount))
             rs = {"ret_code":20132, "message":PayResult.EXCEPTION}
         elif pay_info.user_id != user_id:
             pay_info.status = PayInfo.FAIL
             pay_info.error_message += u"用户不匹配"
-            logger.critical("orderId:%s 充值用户ID不匹配" % order_id)
+            # logger.critical("orderId:%s 充值用户ID不匹配" % order_id)
             rs = {"ret_code":20133, "message":PayResult.EXCEPTION}
         else:
             pay_info.fee = self.FEE
@@ -1347,7 +1348,7 @@ class KuaiShortPay:
             margin_record = keeper.deposit(amount)
             pay_info.margin_record = margin_record
             pay_info.status = PayInfo.SUCCESS
-            logger.critical("orderId:%s success" % order_id)
+            # logger.critical("orderId:%s success" % order_id)
             rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current,
                   "order_id": order_id}
 
