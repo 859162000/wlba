@@ -126,7 +126,11 @@ webpackJsonp([11],[
 	                header: '设置交易密码',
 	                explain: '请设置6位数字作为交易密码',
 	                done: function done(result) {
+	                    var re = /^\d{6}$/;
 	                    set_trade_data.password_1 = result.password;
+	                    if (!re.test(result.password)) {
+	                        return (0, _ui.signModel)("请设置6位数字作为交易密码");
+	                    }
 	                    set_operation_1.destroy();
 	                    set_operation_1.layoutHide();
 	                    set_operation_2();
