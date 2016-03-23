@@ -19,8 +19,9 @@ from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
-from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
-    ResponsibilityView, ContactView, AgreementView, DirectorateView, AgreementAutoView
+from wanglibao_banner.views import (HiringView, AboutView, CompanyView, TeamView, MilestoneView,
+                                    ResponsibilityView, ContactView, AgreementView, DirectorateView,
+                                    AgreementAutoView, DynamicHomeView, DynamicDetailView)
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
@@ -73,6 +74,8 @@ urlpatterns = patterns(
 
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', HiringView.as_view(), name="hiring"),
+    url(r'^dynamic/$', DynamicHomeView.as_view(), name="dynamic"),
+    url(r'^dynamic/detail/(?P<id>\d+)/$', DynamicDetailView.as_view(), name="dynamic_detail"),
     url(r'^about/', AboutView.as_view(), name='about'),
     url(r'^company/', CompanyView.as_view(), name="company"),
     url(r'^team/', TeamView.as_view(), name="team"),
