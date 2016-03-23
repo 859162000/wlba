@@ -15,7 +15,8 @@ import { validation } from './mixins/images_validation'
         $password = $('input[name=password]'),
         $invite_code = $('input[name=invite_code]'),
         $agreement = $('input[name=agreement]'),
-        $captcha = $('#captcha');
+        $captcha = $('#captcha'),
+        $token = $('#token');
 
 //---------------初始化操作start---------
     const autolist = [
@@ -88,6 +89,7 @@ import { validation } from './mixins/images_validation'
 
     //注册
     function register(url) {
+        let invite_val = $.trim($invite_code.val());
         return new Promise((resolve, reject) => {
             ajax({
                 url: url,
@@ -98,7 +100,7 @@ import { validation } from './mixins/images_validation'
                     'captcha_0': $captcha_0.val(),
                     'captcha_1': $captcha_1.val(),
                     'validate_code': $validate_code.val(),
-                    'invite_code': 'weixin',
+                    'invite_code': invite_val === "" ? $token.val() : invite_val,
                     'invite_phone': ''
                 },
                 beforeSend(){

@@ -96,7 +96,7 @@ import { limit} from './mixins/bank_limit.js'
 
     //获取银行卡
     const fetch_banklist = (callback) => {
-        if(localStorage.getItem('bank')){
+        if(localStorage.getItem('bank1')){
             const content = JSON.parse(localStorage.getItem('bank'));
             $bank.append(appendBanks(content));
             return callback && callback(content)
@@ -202,6 +202,7 @@ import { limit} from './mixins/bank_limit.js'
                     }else{
                         const next_url = getQueryStringByName('next'),
                             next = next_url == '' ? '/weixin/list/' : next_url;
+                        
                         return alert('绑卡成功！', ()=>{
                             window.location.href = next
                         });
