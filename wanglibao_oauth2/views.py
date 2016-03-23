@@ -66,7 +66,7 @@ class AccessTokenView(AccessTokenBaseView):
             at = AccessToken.objects.get(user=user, client=client, expires__gt=now())
         except AccessToken.DoesNotExist:
             # None found... make a new one!
-            at = self.create_access_token(user, client)
+            at = self.create_access_token(request, user, client)
             self.create_refresh_token(request, user, at, client)
 
         return at
