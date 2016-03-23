@@ -33,7 +33,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
-    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,ManualModifyPhoneForm
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm, ManualModifyPhoneForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
@@ -79,6 +79,8 @@ from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha
+
+
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
 
@@ -541,7 +543,83 @@ class AccountHome(TemplateView):
         }
 
 
+class AccountHomeNew(TemplateView):
+    template_name = 'center_home.jade'
+
+    @register.filter(name="lookup")
+    def get_item(dictionary, key):
+        return dictionary.get(key)
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+
+        start_utc = local_to_utc(datetime.datetime.now(), 'min')
+        yesterday_start = start_utc - datetime.timedelta(days=1)
+        yesterday_end = yesterday_start + datetime.timedelta(hours=23, minutes=59, seconds=59)
+
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+        ]).select_related('product')
+
+        unpayed_principle = 0
+        p2p_total_paid_interest = 0
+        p2p_total_unpaid_interest = 0
+        p2p_total_interest = 0
+        p2p_activity_interest = 0
+        p2p_total_coupon_interest = 0
+        p2p_total_paid_coupon_interest = 0
+        p2p_total_unpaid_coupon_interest = 0
+        p2p_income_yesterday = 0
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal  # P2P待收本金
+                p2p_total_paid_interest += equity.pre_paid_interest  # P2P已收收益
+                p2p_total_unpaid_interest += equity.unpaid_interest  # P2P待收收益
+                p2p_total_interest += equity.pre_total_interest  # P2P总收益
+                p2p_total_coupon_interest += equity.pre_total_coupon_interest  # 加息券总收益
+                p2p_total_paid_coupon_interest += equity.pre_paid_coupon_interest  # 加息券已收总收益
+                p2p_total_unpaid_coupon_interest += equity.unpaid_coupon_interest  # 加息券待收总收益
+                p2p_activity_interest += equity.activity_interest  # 活动收益
+
+        # 总资产
+        p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
+
+        # 待收本息(P2P)
+        total_unpaid_principal_interest = unpayed_principle + p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest
+
+        # 总收益 = p2p已收收益 + 活动收益 + 已收加息收益
+        p2p_total_paid_interest = p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest
+
+        # 计算昨日收益
+        # 利息入账, 罚息入账, 活动赠送, 邀请赠送, 加息存入, 佣金存入, 全民淘金, 体验金利息入账
+        p2p_income_yesterday_other = MarginRecord.objects.filter(user=user) \
+            .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end) \
+            .filter(catalog__in=[u'利息入账', u'罚息入账', u'加息存入', u'佣金存入', u'全民淘金', u'体验金利息入账']) \
+            .aggregate(Sum('amount'))
+
+        if p2p_income_yesterday_other.get('amount__sum'):
+            p2p_income_yesterday += p2p_income_yesterday_other.get('amount__sum')
+
+        # 站内信消息
+        messages_count = Message.objects.filter(target_user=user, read_status=False, notice=True)\
+            .order_by('-message_text__created_at').count()
+        messages_list = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[:4]
+
+        return {
+            'p2p_unpay_principle': unpayed_principle,
+            'margin_withdrawing': user.margin.withdrawing,
+            'margin_freeze': user.margin.freeze,
+            'p2p_total_asset': p2p_total_asset,
+            'total_unpaid_principal_interest': total_unpaid_principal_interest,
+            'p2p_income_yesterday': p2p_income_yesterday,
+            'p2p_total_paid_interest': p2p_total_paid_interest,
+            'messages_count': messages_count,
+            'messages_list': messages_list,
+        }
+
+
 class AccountHomeAPIView(APIView):
+    """APP账户首页接口"""
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):
@@ -581,10 +659,11 @@ class AccountHomeAPIView(APIView):
                 #     p2p_income_today += equity.pre_paid_coupon_interest
                 #     p2p_income_today += equity.activity_interest
 
-        # 利息入账, 罚息入账, 活动赠送, 邀请赠送, 加息存入, 佣佣金存入, 全民淘金
+        # 利息入账, 罚息入账, 活动赠送, 邀请赠送, 加息存入, 佣金存入, 全民淘金, 体验金利息入账
         p2p_income_yesterday_other = MarginRecord.objects.filter(user=user)\
             .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
-            .filter(catalog__in=[u'利息入账', u'罚息入账', u'加息存入', u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
+            .filter(catalog__in=[u'利息入账', u'罚息入账', u'加息存入', u'佣金存入', u'全民淘金', u'体验金利息入账'])\
+            .aggregate(Sum('amount'))
 
         if p2p_income_yesterday_other.get('amount__sum'):
             p2p_income_yesterday += p2p_income_yesterday_other.get('amount__sum')
