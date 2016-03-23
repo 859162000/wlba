@@ -16,9 +16,9 @@ webpackJsonp([6],[
 
 	var _api = __webpack_require__(3);
 
-	var _simple_validation = __webpack_require__(11);
+	var _simple_validation = __webpack_require__(9);
 
-	var _bank_limit = __webpack_require__(12);
+	var _bank_limit = __webpack_require__(10);
 
 	(function () {
 
@@ -100,7 +100,7 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank')) {
+	        if (localStorage.getItem('bank1')) {
 	            var content = JSON.parse(localStorage.getItem('bank'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
@@ -576,9 +576,7 @@ webpackJsonp([6],[
 /***/ },
 /* 7 */,
 /* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -712,6 +710,7 @@ webpackJsonp([6],[
 	                    count--;
 	                    return $target.text(count + '秒后可重发');
 	                } else {
+	                    console.log(this.intervalId);
 	                    clearInterval(this.intervalId);
 	                    $target.text('重新获取').removeAttr('disabled');
 	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
@@ -742,7 +741,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";
