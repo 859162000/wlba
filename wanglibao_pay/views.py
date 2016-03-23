@@ -279,7 +279,8 @@ class YeeProxyPayCompleteView(TemplateView):
 
 
 class WithdrawView(TemplateView):
-    template_name = 'withdraw.jade'
+    #template_name = 'withdraw.jade'
+    template_name = 'center_withdraw_cash.jade'
 
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).order_by("-is_default").select_related()
@@ -289,6 +290,8 @@ class WithdrawView(TemplateView):
         fee_misc = WithdrawFee()
         fee_config = fee_misc.get_withdraw_fee_config()
         withdraw_count = fee_misc.get_withdraw_count(user=self.request.user)
+
+        print self.request.user.wanglibaouserprofile, '=========='
         return {
             'cards': cards,
             'banks': banks,

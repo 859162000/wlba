@@ -54,43 +54,17 @@
             },
         });
 
-        var userStatus = function () {
-            if ($('#id-is-valid').attr('data-type') === 'qiye') {
-                if ($('#id-is-valid').val() === 'False') {
-                    $.get( '/qiye/profile/exists/')
-                        .done(function (data) {
-                            if (data.ret_code === 10000) {
-                                return $.get('/qiye/profile/get/')
-                                           .done(function (data) {
-                                               if (data.data.status !== '审核通过') {
-                                                   rechargeAlert('/qiye/profile/edit/');
-                                               }
-                                           });
-                            }else{
-                                rechargeAlert('/qiye/info/');
-                            }
-                        })
-                        .fail(function (data) {
-                            rechargeAlert('/accounts/id_verify/')
-                        });
-                }
-
-            }else{
-                if ($('#id-is-valid').val() === 'False') rechargeAlert('/accounts/id_verify/')
-            }
-        };
-        userStatus()
-
-        function rechargeAlert(url){
+        if ($('#id-is-valid').val() === 'False'){
             tool.modalAlert({
                 title: '温馨提示',
                 msg: '为保证您的资金安全，请先进行实名认证',
                 btnText: "去实名认证",
                 callback_ok: function(){
-                    window.location.href= url;
+                    window.location.href= '/accounts/id_verify/';
                 }
             })
         }
+
     });
 
 }).call(this);

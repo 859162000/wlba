@@ -24,10 +24,7 @@ block main
     form#payform(action="/pay/deposit/", method='post', target='_blank')
       - csrf_token
 
-      if user.wanglibaouserprofile.utype == '3'
-            input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}',data-type='qiye')
-      else
-          input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
+      input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
       .c-racharge-warp.c-layout
         .racharge-head.clearfix.mg-b-sm.padding-t-l
           .racharge-head-title.t-d10.font-l.fl 网银充值

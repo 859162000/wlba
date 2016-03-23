@@ -160,7 +160,7 @@ urlpatterns += patterns(
     url(r'^securitys/', TemplateView.as_view(template_name="center_security.jade")),
 
     url(r'^web-message/', TemplateView.as_view(template_name="center_message.jade")),
-    url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
+    #url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
     url(r'^bankcards/', TemplateView.as_view(template_name="center_bank.jade")),
     url(r'^home-new/', TemplateView.as_view(template_name="center_home.jade")),
     url(r'^password/modify/', TemplateView.as_view(template_name="center_password_modify.jade")),
