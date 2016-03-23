@@ -1597,15 +1597,6 @@ class XunleiVipRegister(CoopRegister):
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.attain_amount_call_back_url, 'params': params, 'channel': self.c_code})
-        else:
-            # FixMe, 修改站内信内容
-            message_content = sms_alert_unbanding_xunlei(u"1年白金会员", XUNLEIVIP_LOGIN_URL)
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": user.id,
-                "title": u"首次投资送1年迅雷白金会员",
-                "content": message_content,
-                "mtype": "activity"
-            })
 
 
 class XunleiMobileRegister(XunleiVipRegister):
