@@ -619,6 +619,7 @@ class AccountHomeNew(TemplateView):
 
 
 class AccountHomeAPIView(APIView):
+    """APP账户首页接口"""
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None):

@@ -59,6 +59,7 @@ from wanglibao_rest.utils import split_ua
 
 logger = logging.getLogger(__name__)
 
+
 class AppActivateScoreImageAPIView(APIView):
     """
     app端查询启动评分活动图片
@@ -279,7 +280,6 @@ class AppRepaymentPlanMonthAPIView(APIView):
         # current_month = '{}-{}'.format(now.year, now.month)
         current_month = now.strftime('%Y-%m')
 
-
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
         if int(month) == 12:
             end = local_to_utc(datetime(int(year) + 1, 1, 1) - timedelta(days=1), 'max')
@@ -338,6 +338,67 @@ class AppRepaymentPlanMonthAPIView(APIView):
                          'month_group': month_group,
                          'current_month': current_month,
                          })
+
+
+class PCRepaymentPlanAPIView(APIView):
+    """ PC端 用户月份还款计划接口 """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        start_submit = request.DATA.get('start_submit', '')
+        end_submit = request.DATA.get('end_submit', '')
+
+        page = request.DATA.get('page', 1)
+        pagesize = request.DATA.get('pagesize', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        start_date = end_date = None
+        if start_submit and end_submit:
+            try:
+                start_date = datetime.strptime(start_submit, '%Y-%m-%d')
+                end_date = datetime.strptime(end_submit, '%Y-%m-%d')
+            except:
+                pass
+
+        if start_date and end_date:
+            start_date = local_to_utc(datetime(start_date.year, start_date.month, start_date.day), 'min')
+            end_date = local_to_utc(datetime(end_date.year, end_date.month, end_date.day), 'max')
+
+            # 还款计划
+            user_amortizations = UserAmortization.objects.filter(user=user)\
+                .filter(term_date__gt=start_date, term_date__lte=end_date)\
+                .select_related('product_amortization').select_related('product_amortization__product')\
+                .order_by('term_date')
+        else:
+            # 还款计划
+            user_amortizations = UserAmortization.objects.filter(user=user)\
+                .select_related('product_amortization').select_related('product_amortization__product')\
+                .order_by('term_date')
+
+        paginator = Paginator(user_amortizations, pagesize)
+
+        try:
+            amo_list = paginator.page(page)
+        except PageNotAnInteger:
+            amo_list = paginator.page(1)
+        except Exception:
+            amo_list = paginator.page(paginator.num_pages)
+
+        amo_list = _user_amortization_list(amo_list)
+
+        html_data = _generate_ajax_template(amo_list, 'include/center_ajax_repayment_list.jade')
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'pagesize': pagesize,
+            'pagenumber': paginator.count,
+            'start_submit': start_submit,
+            'end_submit': end_submit,
+        })
 
 
 def _user_amortization_list(user_amortizations):
