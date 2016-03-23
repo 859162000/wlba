@@ -848,7 +848,8 @@ class KuaiShortPay:
         headers = self.headers
         headers['Content-Length'] = str(len(data))
         res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
-        logger.error('kuai_pay:%s|%s|%s' % (url, data, res))
+        if url not in [self.QUERY_URL,]:
+            logger.error('kuai_pay:%s|%s|%s' % (url, data, res))
         return res
 
     def _find_in_xml(self, byte_content, key):
