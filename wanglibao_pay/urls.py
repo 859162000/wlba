@@ -3,13 +3,12 @@
 
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
-# from wanglibao_account.decorators import login_required
-from wanglibao_pay.views import BankListView, PayCallback, WithdrawCompleteView, WithdrawCallback, PayView, WithdrawView, \
-    PayCompleteView, WithdrawTransactions, WithdrawRedirectView,\
+from wanglibao_pay.views import BankListView, PayCallback, WithdrawCompleteView, WithdrawCallback, \
+    PayView, WithdrawView, PayCompleteView, WithdrawTransactions, WithdrawRedirectView,\
     YeeProxyPayCompleteView, BankListForRegisterView, CardConfigTemplateView
 
-urlpatterns = patterns('',
-    # tmplate view
+urlpatterns = patterns(
+    '',
     url(r'^banks/$', login_required(BankListView.as_view()), name='pay-banks'),
     url(r'^banks_for_register/$', login_required(BankListForRegisterView.as_view())),
     url(r'^withdraw/$', login_required(WithdrawView.as_view(), login_url='/accounts/login/'), name='withdraw'),

@@ -279,11 +279,14 @@ class YeeProxyPayCompleteView(TemplateView):
 
 
 class WithdrawView(TemplateView):
-    #template_name = 'withdraw.jade'
+    # template_name = 'withdraw.jade'
     template_name = 'center_withdraw_cash.jade'
 
     def get_context_data(self, **kwargs):
-        cards = Card.objects.filter(user=self.request.user).order_by("-is_default").select_related()
+        try:
+            cards = Card.objects.get(user=self.request.user, is_the_one_card=True)
+        except Card.DoesNotExist:
+            cards = None
         banks = Bank.get_withdraw_banks()
 
         # 提现管理费费率
@@ -291,16 +294,17 @@ class WithdrawView(TemplateView):
         fee_config = fee_misc.get_withdraw_fee_config()
         withdraw_count = fee_misc.get_withdraw_count(user=self.request.user)
 
-        print self.request.user.wanglibaouserprofile, '=========='
+        print self.request.user.wanglibaouserprofile.trade_pwd, '=========='
         return {
             'cards': cards,
             'banks': banks,
-            'user_profile': self.request.user.wanglibaouserprofile,
+            'user_name': self.request.user.wanglibaouserprofile.name,
+            'has_trade_pwd': True if self.request.user.wanglibaouserprofile.trade_pwd else False,
             'margin': self.request.user.margin.margin,
             'uninvested': self.request.user.margin.uninvested,
             'withdraw_count': withdraw_count,
             'fee': fee_config,
-            'announcements': AnnouncementAccounts
+            # 'announcements': AnnouncementAccounts
         }
 
     def dispatch(self, request, *args, **kwargs):
