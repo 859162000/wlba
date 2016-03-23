@@ -236,25 +236,25 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
           element.attr('disabled', 'disabled').removeClass('getCodeBtn');
           $('#order_id').val(xhr.order_id);
           $('#token').val(xhr.token);
+          intervalId;
+          count = 60;
+          $(element).attr('disabled', 'disabled');
+          timerFunction = function() {
+            if (count >= 1) {
+              count--;
+              return $(element).text('重新获取(' + count + ')');
+            } else {
+              clearInterval(intervalId);
+              $(element).text('重新获取').removeAttr('disabled').addClass('go-get-code');
+            }
+          };
+          timerFunction();
+          return intervalId = setInterval(timerFunction, 1000);
         } else {
           clearInterval(intervalId);
           $(element).text('重新获取').removeAttr('disabled').addClass('getCodeBtn');
           $('.error-box').text(xhr.message)
         }
       });
-      intervalId;
-      count = 60;
-      $(element).attr('disabled', 'disabled');
-      timerFunction = function() {
-        if (count >= 1) {
-          count--;
-          return $(element).text('重新获取(' + count + ')');
-        } else {
-          clearInterval(intervalId);
-          $(element).text('重新获取').removeAttr('disabled').addClass('go-get-code');
-        }
-      };
-      timerFunction();
-      return intervalId = setInterval(timerFunction, 1000);
     });
 });
