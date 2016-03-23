@@ -245,7 +245,7 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
               return $(element).text('重新获取(' + count + ')');
             } else {
               clearInterval(intervalId);
-              $(element).text('重新获取').removeAttr('disabled').addClass('go-get-code');
+              $(element).text('重新获取').removeAttr('disabled').addClass('getCodeBtn');
             }
           };
           timerFunction();
