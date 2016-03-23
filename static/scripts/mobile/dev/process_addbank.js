@@ -194,6 +194,7 @@ webpackJsonp([6],[
 	                        var _ret = function () {
 	                            var next_url = (0, _api.getQueryStringByName)('next'),
 	                                next = next_url == '' ? '/weixin/list/' : next_url;
+
 	                            return {
 	                                v: alert('绑卡成功！', function () {
 	                                    window.location.href = next;
@@ -705,19 +706,21 @@ webpackJsonp([6],[
 	        key: 'timerFunction',
 	        value: function timerFunction(count) {
 	            var $target = this.target;
+	            var intervalId = void 0;
 	            var timerInside = function timerInside() {
 	                if (count > 1) {
 	                    count--;
 	                    return $target.text(count + '秒后可重发');
 	                } else {
-	                    console.log(this.intervalId);
-	                    clearInterval(this.intervalId);
+	                    console.log(intervalId, this, this.intervalId);
+	                    clearInterval(intervalId);
 	                    $target.text('重新获取').removeAttr('disabled');
 	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
 	                }
 	            };
 	            timerInside();
-	            return this.intervalId = setInterval(timerInside, 1000);
+	            intervalId = setInterval(timerInside, 1000);
+	            return this.intervalId = intervalId;
 	        }
 	    }, {
 	        key: 'start',

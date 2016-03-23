@@ -202,6 +202,7 @@ import { limit} from './mixins/bank_limit.js'
                     }else{
                         const next_url = getQueryStringByName('next'),
                             next = next_url == '' ? '/weixin/list/' : next_url;
+                        
                         return alert('绑卡成功！', ()=>{
                             window.location.href = next
                         });
