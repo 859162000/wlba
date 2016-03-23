@@ -449,10 +449,12 @@ class YeeShortPay:
         return {"data": data, "encryptkey": encryptkey, "merchantaccount": self.MER_ID}
 
     def _request_yee(self, url, data):
-        logger.error("request yee_pay: %s" % data)
+        # logger.error("request yee_pay: %s" % data)
         post = self._format_post(data)
         res = requests.post(url, post)
-        return self._response_data_change(res=json.loads(res.text))
+        res_dict = self._response_data_change(res=json.loads(res.text))
+        logger.error("yee_pay: %s | %s | %s" % (url, data, res_dict))
+        return res_dict 
 
     def _request_yee_get(self, url, data):
         post = self._format_post(data)
@@ -462,24 +464,24 @@ class YeeShortPay:
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
         if 'error_code' in res:
-            logger.error(res)
+            # logger.error(res)
             return {'ret_code': res['error_code'], 'message': res['error_msg']}
 
         if 'data' not in res:
-            logger.error(res)
+            # logger.error(res)
             return {'ret_code': 20012, 'message': '易宝数据有误'}
 
         flag, data = self._response_decode(res=res)
 
         if 'error_code' in data:
-            logger.error(data)
+            # logger.error(data)
             return {'ret_code': data['error_code'], 'message': data['error_msg'], 'data': data}
 
         if not flag:
-            logger.error(data)
+            # logger.error(data)
             return {'ret_code': 20011, 'message': '签名验证失败', 'data': data}
 
-        logger.error("yee_pay response: %s" % data)
+        # logger.error("yee_pay response: %s" % data)
         return {'ret_code': 0, 'message': 'ok', 'data': data}
 
     def _response_decode(self, res):
@@ -669,7 +671,7 @@ class YeeShortPay:
                         self.sync_bind_card(user)
                         return {'ret_code': '20119', 'message': '银行卡已绑定，请返回使用快捷充值'}
                     else:
-                        logger.error(res)
+                        # logger.error(res)
                         return res
             except Exception, e:
                 logger.error(e.message)
@@ -702,7 +704,7 @@ class YeeShortPay:
                 # 直接支付交易，已经绑定了银行卡，直接进行支付操作
                 res = self._pay_request(request, order.id, card, pay_info)
                 if res['ret_code'] != 0:
-                    logger.error(res)
+                    # logger.error(res)
                     pay_info.error_code = res['ret_code']
                     pay_info.error_message = res['message']
                     if 'data' in res:
@@ -751,7 +753,7 @@ class YeeShortPay:
 
         res = self._bind_check_sms(request_id, vcode)
         if res['ret_code'] != 0:
-            logger.error(res)
+            # logger.error(res)
             pay_info.error_code = res['ret_code']
             pay_info.error_message = res['message']
             if 'data' in res:
@@ -762,7 +764,7 @@ class YeeShortPay:
 
         res = self._pay_request(request, order_id, card, pay_info)
         if res['ret_code'] != 0:
-            logger.error(res)
+            # logger.error(res)
             pay_info.error_code = res['ret_code']
             pay_info.error_message = res['message']
             if 'data' in res:

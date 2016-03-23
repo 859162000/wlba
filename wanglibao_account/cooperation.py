@@ -1661,17 +1661,12 @@ class BaJinSheRegister(CoopRegister):
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
             req_data = json.loads(self.request.body.strip())
-        elif self.request.META.get('CONTENT_TYPE', '').lower().find('application/x-www-form-urlencode') != -1:
-            if self.request.body.strip():
-                data = str_to_dict(self.request.body.strip())
-                if 'data' in data:
-                     req_data = json.loads(data['data']) or dict()
-                else:
-                    req_data = dict()
-            else:
-                req_data = dict()
         else:
-            req_data = self.request.REQUEST
+            data = self.request.REQUEST.get('data')
+            if data:
+                req_data = json.loads(data) or dict()
+            else:
+                req_data = self.request.REQUEST
 
         channel_code = self.get_channel_code_from_request()
         channel_phone = req_data.get(self.external_channel_phone_key, None)
@@ -1890,7 +1885,6 @@ class BiSouYiRegister(BaJinSheRegister):
         self.external_channel_client_id_key = 'cid'
         self.channel_sign_key = 'sign'
         self.channel_content_key = 'content'
-        self.channel_access_token_key = 'token'
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
@@ -1898,7 +1892,6 @@ class BiSouYiRegister(BaJinSheRegister):
         client_id = self.request.GET.get(self.external_channel_client_id_key, None)
         sign = self.request.GET.get(self.channel_sign_key, None)
         content = self.request.GET.get(self.channel_content_key, None)
-        token = self.request.GET.get(self.channel_access_token_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1914,9 +1907,6 @@ class BiSouYiRegister(BaJinSheRegister):
 
         if content:
             self.request.session[self.channel_content_key] = content
-
-        if token:
-            self.request.session[self.channel_access_token_key] = content
 
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()

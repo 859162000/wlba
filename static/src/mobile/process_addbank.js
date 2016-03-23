@@ -152,7 +152,7 @@ import { limit} from './mixins/bank_limit.js'
             card_no: $bankcard.val(),
             gate_id: $bank.val(),
             phone: $bankphone.val(),
-            amount: 0.01
+            amount: $money.length > 0 ? $money.val() : 0.01
         });
         simple_validation.start()
 
@@ -175,7 +175,7 @@ import { limit} from './mixins/bank_limit.js'
     })
 
     function recharge(check){
-        org.ajax({
+        ajax({
             type: 'POST',
             url: '/api/pay/cnp/dynnum_new/',
             data: {
@@ -185,7 +185,7 @@ import { limit} from './mixins/bank_limit.js'
                 token: $('input[name=token]').val(),
                 set_the_one_card: true
             },
-            beforeSend: function () {
+            beforeSend () {
                 if(check.firstRecharge){
                     $submit.attr('disabled', 'disabled').text('充值中...');
                 }else{
@@ -193,7 +193,7 @@ import { limit} from './mixins/bank_limit.js'
                 }
 
             },
-            success: function (data) {
+            success (data) {
                 if (data.ret_code > 0) {
                     return alert(data.message);
                 } else {
@@ -209,11 +209,11 @@ import { limit} from './mixins/bank_limit.js'
 
                 }
             },
-            error: function(result){
+            error (result){
                 var data = JSON.parse(result.responseText);
                 return alert(data.detail);
             },
-            complete: function () {
+            complete () {
                 if(check.firstRecharge){
                     $submit.removeAttr('disabled').text('绑卡并充值');
                 }else{

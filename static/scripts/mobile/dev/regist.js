@@ -14,7 +14,7 @@ webpackJsonp([12],[
 
 	var _from_validation = __webpack_require__(6);
 
-	var _images_validation = __webpack_require__(12);
+	var _images_validation = __webpack_require__(14);
 
 	(function () {
 
@@ -473,7 +473,7 @@ webpackJsonp([12],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
 	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
@@ -510,7 +510,9 @@ webpackJsonp([12],[
 /* 9 */,
 /* 10 */,
 /* 11 */,
-/* 12 */
+/* 12 */,
+/* 13 */,
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';

@@ -16,9 +16,9 @@ webpackJsonp([6],[
 
 	var _api = __webpack_require__(3);
 
-	var _simple_validation = __webpack_require__(9);
+	var _simple_validation = __webpack_require__(11);
 
-	var _bank_limit = __webpack_require__(10);
+	var _bank_limit = __webpack_require__(12);
 
 	(function () {
 
@@ -148,7 +148,7 @@ webpackJsonp([6],[
 	            card_no: $bankcard.val(),
 	            gate_id: $bank.val(),
 	            phone: $bankphone.val(),
-	            amount: 0.01
+	            amount: $money.length > 0 ? $money.val() : 0.01
 	        });
 	        simple_validation.start();
 	    });
@@ -167,7 +167,7 @@ webpackJsonp([6],[
 	    });
 
 	    function recharge(check) {
-	        org.ajax({
+	        (0, _api.ajax)({
 	            type: 'POST',
 	            url: '/api/pay/cnp/dynnum_new/',
 	            data: {
@@ -542,7 +542,7 @@ webpackJsonp([6],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
 	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
@@ -576,7 +576,9 @@ webpackJsonp([6],[
 /***/ },
 /* 7 */,
 /* 8 */,
-/* 9 */
+/* 9 */,
+/* 10 */,
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -704,13 +706,14 @@ webpackJsonp([6],[
 	    }, {
 	        key: 'timerFunction',
 	        value: function timerFunction(count) {
+	            var $target = this.target;
 	            var timerInside = function timerInside() {
 	                if (count > 1) {
 	                    count--;
-	                    return this.target.text(count + '秒后可重发');
+	                    return $target.text(count + '秒后可重发');
 	                } else {
 	                    clearInterval(this.intervalId);
-	                    this.target.text('重新获取').removeAttr('disabled');
+	                    $target.text('重新获取').removeAttr('disabled');
 	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
 	                }
 	            };
@@ -739,7 +742,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
