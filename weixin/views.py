@@ -123,14 +123,12 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
-        logger.debug("entering get =============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
 
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
-        logger.debug("entering post=============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
@@ -399,7 +397,7 @@ class WeixinJoinView(View):
         if not reply:
             if not user:
                 txt = self.getBindTxt(fromUserName)
-                txt += u"\n网利宝自2014年8月上线以来，注册用户已突破119万人，投资额超过47亿元，目前已完成B轮融资！"
+                txt += u"\n网利宝自2014年8月上线以来，注册用户已突破130万人，投资额超过50亿元，目前已完成B轮融资！"
             else:
                 txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)
