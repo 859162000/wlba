@@ -2702,18 +2702,23 @@ class HappyMonkeyAPIView(APIView):
             (11, 15): 'happy_monkey_588',
             (16, 100000000): 'happy_monkey_888'
         }
-
+        phone = request.POST.get('phone', None)
+        user = WanglibaoUserProfile.objects.filter(phone=phone).first()
         # 是否是登录用户
         if not request.user.is_authenticated():
-            to_json_response = {
-                'ret_code': 1000,
-                'message': u'用户没有登录',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+            if phone and user:
+                pass
+            else:
+                to_json_response = {
+                    'ret_code': 1000,
+                    'message': u'用户没有登录',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         today = time.strftime("%Y-%m-%d", time.localtime())
+        user = user if user else request.user
         #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=request.user).first()
+        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).first()
         if reward:
             to_json_response = {
                 'ret_code': 1001,
@@ -2724,10 +2729,10 @@ class HappyMonkeyAPIView(APIView):
         #今天用户没有玩过
         with transaction.atomic():
             logger.debug('enter transaction atomic')
-            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code=self.token).first()
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.token).first()
             if not join_record:
                 join_record = WanglibaoRewardJoinRecord.objects.create(
-                    user=request.user,
+                    user=user,
                     activity_code=self.token,
                     remain_chance=1)
 
@@ -2739,7 +2744,7 @@ class HappyMonkeyAPIView(APIView):
                     exp_name = value
 
             reward = ActivityReward.objects.create(
-                user=request.user,
+                user=user,
                 experience=ExperienceEvent.objects.filter(name=exp_name).first(),
                 channel=self.token,
                 create_at=today,
