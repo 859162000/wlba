@@ -835,7 +835,7 @@ class KuaiShortPay:
         headers['Content-Length'] = str(len(data))
         res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
         if url not in [self.QUERY_URL,]:
-            logger.error('kuai_pay:%s|%s|%s' % (url, data, res))
+            logger.error('kuai_pay:%s|%s|%s' % (url, data, res.text))
         return res
 
     def _result2dict(self, content):
