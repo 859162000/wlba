@@ -38,9 +38,9 @@ block main
         .h-notice-mod
           .h-notice-title.mg-b-s 通知中心
             .notice-num {{messages_count}}
-          for msg in messages
+          for msg in messages_list
             .h-notice-list
-              a().h-notice-cont.t-d11 {{ msg.content }}
+              a(id="msg_{{msg.id}}").h-notice-cont.t-d11 {{ msg.message_text.title }}
               .h-notice-date {{ msg.message_text.format_time | date:'Y-m-d' }}
 
     .c-h-fund

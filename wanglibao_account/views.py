@@ -603,7 +603,7 @@ class AccountHomeNew(TemplateView):
         # 站内信消息
         messages_count = Message.objects.filter(target_user=user, read_status=False, notice=True)\
             .order_by('-message_text__created_at').count()
-        messages = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[:4]
+        messages_list = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[:4]
 
         return {
             'p2p_unpay_principle': unpayed_principle,
@@ -614,7 +614,7 @@ class AccountHomeNew(TemplateView):
             'p2p_income_yesterday': p2p_income_yesterday,
             'p2p_total_paid_interest': p2p_total_paid_interest,
             'messages_count': messages_count,
-            'messages': messages,
+            'messages_list': messages_list,
         }
 
 
