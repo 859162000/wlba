@@ -72,7 +72,8 @@ class BankListView(TemplateView):
     """
     pc端使用的银行列表页
     """
-    template_name = 'pay_banks.jade'
+    #template_name = 'pay_banks.jade'
+    template_name = 'center_recharge.jade'
 
     def get_context_data(self, **kwargs):
         context = super(BankListView, self).get_context_data(**kwargs)

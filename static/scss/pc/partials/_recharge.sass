@@ -1,6 +1,6 @@
 
 
-.racharge-bank-limit
+.recharge-bank-limit
   color: #999
   font-size: 12px
   text-decoration: underline
@@ -60,6 +60,8 @@ $withdraw-input-height: 40px
     text-align: right
     font-size: 16px
     color: #666
+    vertical-align: top
+    padding-top: 20px
   .withdraw-input
     width: $withdraw-input-width
     height: $withdraw-input-height
@@ -71,6 +73,8 @@ $withdraw-input-height: 40px
     &:focus
       border: 1px solid #4e7cda
       box-shadow: 0 0 4px #4e7cda
+  .form-row-error
+    margin-top: 5px
 
 .withdraw-submit
   width: $withdraw-input-width
@@ -106,3 +110,13 @@ $withdraw-input-height: 40px
     display: inline-block
     .bank-name
       line-height: 1.2
+
+#c-bank-limit
+  width: 540px
+  height: 630px
+  overflow: auto
+  .c-bank-limit-content
+    padding: 0 20px
+  .bank-layout
+    padding: 10px 0 10px 50px
+    border-bottom: 1px dashed #ebebeb

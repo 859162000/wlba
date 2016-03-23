@@ -16,11 +16,10 @@ block sidebar
 
 block main
   .c-main-white.c-auto-height.c-layout
-    .c-profile-alert#c-profile-alert
+    .modal.c-profile-alert#c-profile-alert
       form#add-address-form
         input#address_id(type="hidden", name="address_id")
-        .c-profile-alert-head
-          .alert-title 添加/修改收货信息
+        .modal-header 添加/修改收货信息
         .c-profile-alert-form
           .form-row
             input(placeholder='收货人姓名', type='text',name='address_name').input-type-text
@@ -38,9 +37,7 @@ block main
           input(type='submit', value='确认添加').alert-submit
 
 
-
     .c-profile-means
-
       .pro-means-head
         .t-d10.font-m 认证资料
 
@@ -105,6 +102,6 @@ block main
                   .add-info.fr
                     i.iconfont.icon-greenRight.font-s
                     |默认
-
+block script
   script.
       require(['/static/src/pc/address.js?v=2'])

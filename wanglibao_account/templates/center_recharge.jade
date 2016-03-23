@@ -1,0 +1,77 @@
+extends center_base
+-load formatters
+
+block head
+  - with '充值' as title
+  include global/g_head
+  -endwith
+
+block sidebar
+  - with '充值' as activeItem
+  include include/center_sidebar
+  -endwith
+block main
+  .modal#c-bank-limit
+    .modal-header  网银充值限额
+    .c-bank-limit-content
+      .bank-layout.clearfix
+        img(src='/static/imgs/pc/center/bank_default.png').inline-block.mg-r-xs
+        .bank-content.inline-block
+          .banek-name.t-d10.font-m 中国工商银行
+          .banek-limit.t-d11.font-s 首次限额5万 / 单笔限额5万 / 日限额5万
+
+  .c-main-white.c-auto-height
+    form#payform(action="/pay/deposit/", method='post', target='_blank')
+      - csrf_token
+
+      if user.wanglibaouserprofile.utype == '3'
+            input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}',data-type='qiye')
+      else
+          input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
+      .c-racharge-warp.c-layout
+        .racharge-head.clearfix.mg-b-sm.padding-t-l
+          .racharge-head-title.t-d10.font-l.fl 网银充值
+          a(href='#c-bank-limit').recharge-bank-limit.fr 银行限额提示
+
+        .racharge-bank-list
+          if default_bank
+            input#gate_id(type='hidden', name='gate_id', placeholder='银行', value='{{default_bank.gate_id}}')
+          else
+            input#gate_id(type='hidden', name='gate_id', placeholder='银行')
+
+          ul
+            banksEn =enumerate(banks)
+            for idx, bank in banksEn
+              values = (idx + 1) % 4
+              active = default_bank and bank.id == default_bank.id
+              if values == 0
+                if active
+                  li(style='background: url({{bank.logo.url}})', data-gate-id="{{bank.gate_id}}", title="{{bank.name}}",).active.un-margin-right
+                else
+                  li(style='background: url({{bank.logo.url}})', data-gate-id="{{bank.gate_id}}", title="{{bank.name}}",).un-margin-right
+              else
+                if active
+                  li(style='background: url({{bank.logo.url}})', data-gate-id="{{bank.gate_id}}", title="{{bank.name}}",).active
+                else
+                  li(style='background: url({{bank.logo.url}})', data-gate-id="{{bank.gate_id}}", title="{{bank.name}}",)
+
+
+        table.withdraw-table
+          tbody
+            tr
+              th 充值金额:
+              td
+                .space
+                  input(type='text', placeholder='请输入充值金额',name='amount', autofocus).withdraw-input
+                  span.t-d19.font-m.mg-l-s 元
+                .form-row-error
+            tr
+              th
+              td
+                input(type='submit', value='立即充值').withdraw-submit
+
+
+
+block script
+  script.
+    require(['/static/src/pc/recharge.js?v=2'])
