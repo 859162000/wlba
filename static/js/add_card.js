@@ -128,7 +128,7 @@
         code.parent().find('span').html('<i class="dui"></i>');
         bankId = $('.bankId').text().replace(/[ ]/g, "");
         $('#bindingBtn').addClass('bunsNo');
-        return $.ajax
+        return $.ajax({
           url: '/api/pay/cnp/dynnum_new/',
           data: {
             Storable_no: bankId.substr(0, 4) + bankId.substr(bankId.length - 4),
