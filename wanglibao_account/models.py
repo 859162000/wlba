@@ -240,6 +240,7 @@ class ManualModifyPhoneRecord(models.Model):
         (u"待复审",   u"待复审"),
         (u"复审通过", u"复审通过"),
         (u"复审驳回", u"复审驳回"),
+        (u"取消申请", u"取消申请"),
     )
     # 待初审　初审待定　初审驳回　待复审　复审通过 复审驳回
     user = models.ForeignKey(User)
@@ -247,7 +248,12 @@ class ManualModifyPhoneRecord(models.Model):
     id_front_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'身份证正面照片', help_text=u'身份证正面照片')
     id_back_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'身份证反面照片', help_text=u'身份证反面照片')
     id_user_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, verbose_name=u'手持身份证照片', help_text=u'手持身份证照片')
+    card_user_image = models.ImageField(upload_to='modify_phone/id_card', storage=AliOSSStorageForCover(), blank=True, default="", verbose_name=u'手持银行卡照片', help_text=u'手持银行卡照片')
     new_phone = models.CharField(max_length=64, blank=True, help_text=u'新的手机号码')
+    id_front_image_status = models.BooleanField(default=False, verbose_name=u"身份证正面照片是否通过", help_text=u'身份证正面照片是否通过')
+    id_back_image_status = models.BooleanField(default=False, verbose_name=u"身份证反面照片是否通过", help_text=u'身份证反面照片是否通过')
+    id_user_image_status = models.BooleanField(default=False, verbose_name=u"手持身份证照片是否通过", help_text=u'手持身份证照片是否通过')
+    card_user_image_status = models.BooleanField(default=False, verbose_name=u"手持银行卡照片是否通过", help_text=u'手持银行卡照片是否通过')
     status = models.CharField(max_length=16, default=u'初审中', db_index=True,
                               choices=STATUS_CHOICES,
                               verbose_name=u'申请状态')

@@ -13,7 +13,8 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
                             AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI,
-                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode)
+                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode,
+                            CancelManualModifyPhoneAPI)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -83,8 +84,8 @@ router.register(r'products', ProductTypeViewSet)
 
 router.register(r'hot_trusts', HotTrustViewSet)
 router.register(r'hot_funds', HotFundViewSet)
-#router.register(r'mobile_hot_trusts', MobileHotTrustViewSet)
-#router.register(r'mobile_hot_funds', MobileHotFundViewSet)
+router.register(r'mobile_hot_trusts', MobileHotTrustViewSet)
+router.register(r'mobile_hot_funds', MobileHotFundViewSet)
 router.register(r'mobile_main', MobileMainPageViewSet)
 router.register(r'mobile_main_p2p', MobileMainPageP2PViewSet)
 
@@ -238,6 +239,7 @@ urlpatterns = patterns(
     url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
     url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
     url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
+    url(r'^manual_modify/cancel/', CancelManualModifyPhoneAPI.as_view()),
     url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
     url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
 )

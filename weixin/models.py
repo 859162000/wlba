@@ -4,18 +4,19 @@ from collections import OrderedDict
 import datetime
 import collections
 
-from django.utils import timezone
-from django.utils.timezone import utc
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.utils import timezone
+from django.utils.timezone import utc
 
+from wanglibao.fields import JSONFieldUtf8
 from .common.wechat import gen_token
 from wechatpy.client import WeChatClient
 from wechatpy.client.api.qrcode import WeChatQRCode
 import logging
-from django.core.exceptions import ValidationError
-from django.conf import settings
-from wanglibao.fields import JSONFieldUtf8
+
 
 
 logger = logging.getLogger("weixin")
