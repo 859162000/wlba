@@ -36,6 +36,7 @@ from weixin.models import WeixinUser
 from weixin.constant import PRODUCT_INVEST_SUCCESS_TEMPLATE_ID
 from weixin.tasks import sentTemplate
 
+
 logger = logging.getLogger('wanglibao_account')
 
 class P2PTrader(object):
@@ -172,13 +173,13 @@ class P2PTrader(object):
         try:
             weixin_user = WeixinUser.objects.filter(user=self.user).first()
             now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
-    #         投标成功通知
-    #         您好，您已投标成功。
-    #         标的编号：10023
-    #         投标金额：￥3000.00
-    #         投标时间：2015-09-12
-    #         投标成功,可在投标记录里查看.
-    # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
+            #         投标成功通知
+            #         您好，您已投标成功。
+            #         标的编号：10023
+            #         投标金额：￥3000.00
+            #         投标时间：2015-09-12
+            #         投标成功,可在投标记录里查看.
+            # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
             if weixin_user:
                 sentTemplate.apply_async(kwargs={
                                 "kwargs":json.dumps({
@@ -188,10 +189,13 @@ class P2PTrader(object):
                                                 "keyword2": "%s 元"%str(amount),
                                                 "keyword3": now,
                                                 "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % (self.order_id),
+                                                "remark": u'恭喜您获得3次刮奖机会，速来戳"详情"拼运气!'
                                                     })},
                                                 queue='celery02')
+
         except Exception, e:
             logger.debug("=====sentTemplate=================%s"%e.message)
+
 
         return product_record, margin_record, equity
 

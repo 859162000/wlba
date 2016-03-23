@@ -62,9 +62,8 @@
         var id_front_image,id_back_image,id_user_image,id_bank_image,new_phone;
         var docObj,imgObjPreview;
 
-        var file_1 = document.getElementById("id_front_image").value;
-        var file_2 = document.getElementById("id_back_image").value;
-        var file_3 = document.getElementById("id_user_image").value;
+        var file_1,file_2,file_3,file_4
+
         var phone_true = false;
         var code_num = $('.input_code').val();
 
@@ -77,6 +76,9 @@
         var id_user_image_input = document.getElementById("id_user_image");
         var file_img_3 = document.getElementById("file_img_3");
         var input_parent_3 = $('.input_box_3');
+        var id_bank_image_input = document.getElementById("id_bank_image");
+        var file_img_4 = document.getElementById("file_img_4");
+        var input_parent_4 = $('.input_box_4');
 
         $('#id_front_image').bind('change',function(){
             select_img(id_front_image_input,file_img_1,input_parent_1);
@@ -90,6 +92,10 @@
             select_img(id_user_image_input,file_img_3,input_parent_3);
         })
 
+        $('#id_bank_image').bind('change',function(){
+            select_img(id_bank_image_input,file_img_4,input_parent_4);
+        })
+
         var error_file_status;
         function select_img(docObj,file_img,input_parent){
             var filename = docObj.value;
@@ -97,7 +103,7 @@
             //alert(mime);
             var file_size = docObj.files[0].size;
             //alert(file_size);
-            if((mime==".jpg"||mime==".png"||mime==".bmp")&&file_size<'2097152'){
+            if((mime==".jpg"||mime==".png")&&file_size<'2097152'){
 
                 setImagePreview(docObj,file_img);
             }else{
@@ -109,15 +115,23 @@
                 }
                 if(input_parent.hasClass('input_box_1')){
                     $('#user_img_1').hide();
+                    $('.reject_text_1').hide();
                     $('.error_right_file_1').text(error_file_status).show();
                 }
                 if(input_parent.hasClass('input_box_2')){
                     $('#user_img_2').hide();
+                    $('.reject_text_2').hide();
                     $('.error_right_file_2').text(error_file_status).show();
                 }
                 if(input_parent.hasClass('input_box_3')){
                     $('#user_img_3').hide();
+                    $('.reject_text_3').hide();
                     $('.error_right_file_3').text(error_file_status).show();
+                }
+                if(input_parent.hasClass('input_box_4')){
+                    $('#user_img_4').hide();
+                    $('.reject_text_4').hide();
+                    $('.error_right_file_4').text(error_file_status).show();
                 }
                 //return false;
             }
@@ -174,6 +188,10 @@
                     id_user_image = img_url;
                     $('#user_img_3').show();
                     $('.error_right_file_3').hide();
+                }else if(docObj.id=='id_bank_image'){
+                    id_bank_image = img_url;
+                    $('#user_img_4').show();
+                    $('.error_right_file_4').hide();
                 }
                 return true;
             }
@@ -248,13 +266,39 @@
 
 
         $('.button').click(function(){
+
+            if($('#id_front_image').length==1){
+                file_1 = document.getElementById("id_front_image").value;
+            }else{
+                file_1 = true;
+            }
+
+            if($('#id_back_image').length==1){
+                file_2 = document.getElementById("id_back_image").value;
+            }else{
+                file_2 = true;
+            }
+
+            if($('#id_user_image').length==1){
+                file_3 = document.getElementById("id_user_image").value;
+            }else{
+                file_3 = true;
+            }
+
+            if($('#id_bank_image').length==1){
+                file_4 = document.getElementById("id_bank_image").value;
+            }else{
+                file_4 = true;
+            }
+
             $('.error_form').hide();
-            file_1 = document.getElementById("id_front_image").value;
-            file_2 = document.getElementById("id_back_image").value;
-            file_3 = document.getElementById("id_user_image").value;
+            //file_1 = document.getElementById("id_front_image").value;
+            //file_2 = document.getElementById("id_back_image").value;
+            //file_3 = document.getElementById("id_user_image").value;
+            //file_4 = document.getElementById("id_bank_image").value;
             code_num = $('.input_code').val();
 
-            if(file_1&&file_2&&file_3&&phone_true&&code_num){
+            if(file_1&&file_2&&file_3&&file_4&&phone_true&&code_num){
                 var form =$("#form");
                 var formData = new FormData($( "#form" )[0]);
                 //alert(formData);
@@ -290,8 +334,13 @@
 
         });
 
+        $('.phone_example_popup .close_ico').click(function(){
+            $('.phone_example_popup').hide();
+        });
 
-
+        $('.example_right_title').click(function(){
+            $('.phone_example_popup').show();
+        })
     })
 
 }).call(this);

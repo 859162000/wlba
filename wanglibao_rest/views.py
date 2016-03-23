@@ -46,15 +46,16 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua, get_client_ip
-from django.http import HttpResponseRedirect
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
+                                  get_coop_access_token, push_coop_access_token)
+from wanglibao_rest import utils as rest_utils
+from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, get_channel_record
 from django.conf import settings
-from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from wanglibao_margin.models import MarginRecord
@@ -64,10 +65,26 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
+from wanglibao.views import landpage_view
 import urllib
+from wanglibao_account.cooperation import get_uid_for_coop
+from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
 
 
 logger = logging.getLogger('wanglibao_rest')
+
+
+def generate_random_password(length):
+    if length < 0:
+        raise Exception(u"生成随机密码的长度有误")
+
+    random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    password = ""
+    index = 0
+    while index < length:
+            password += str(random_list[randint(0,len(random_list)-1)])
+            index += 1
+    return password
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -219,18 +236,6 @@ class WeixinSendRegisterValidationCodeView(APIView):
 class RegisterAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
-    def generate_random_password(self, length):
-        if length < 0:
-            raise Exception("生成随机密码的长度有误")
-
-        random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = ""
-        index = 0
-        while index < length:
-                password += str(random_list[randint(0,len(random_list)-1)])
-                index += 1
-        return password
-
     def post(self, request, *args, **kwargs):
         """ 
             modified by: Yihen@20150812
@@ -248,7 +253,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         password = password.strip()
         validate_code = validate_code.strip()
         if request.DATA.get('IGNORE_PWD', '') and not password:
-            password = self.generate_random_password(6)
+            password = generate_random_password(6)
             logger.debug('系统为用户 %s 生成的随机密码是：%s' % (identifier, password))
 
         if not identifier or not password or not validate_code:
@@ -483,6 +488,9 @@ class PushTestView(APIView):
 
 
 class IdValidateAPIView(APIView):
+    """
+    APP端实名认证接口
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -500,27 +508,29 @@ class IdValidateAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({"ret_code": 30055, "message": u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066"})
+            return Response({"ret_code": 30055, "message": u"您已认证通过，无需再认证，请重新登录查看最新状态"})
 
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
         if verify_counter.count >= 3:
-            return Response({"ret_code": 30052, "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066"})
+            return Response({"ret_code": 30052, "message": u"验证错误次数频繁，请联系客服 4008-588-066"})
 
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         if id_verify_count >= 1:
-            return Response({"ret_code": 30053, "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066"})
+            return Response({"ret_code": 30053, "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066"})
 
         try:
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
         except:
-            return Response({"ret_code": 30054, "message": u"验证失败，拨打客服电话进行人工验证"})
+            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
 
         verify_counter.count = F('count') + 1
         verify_counter.save()
 
         if error or not verify_record.is_valid:
-            return Response({"ret_code": 30054, "message": u"验证失败，拨打客服电话进行人工验证"})
+            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
 
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
@@ -716,6 +726,7 @@ class ShareUrlAPIView(APIView):
             body = {}
         return Response({"ret_code": 0, "message": "ok", "data": body})
 
+
 class DepositGateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -741,6 +752,7 @@ class DepositGateAPIView(APIView):
        #             return Response({"ret_code":0, "gate":"yee", "notice":""})
        # else:
        #     return Response({"ret_code":0, "gate":"kuai"})
+
 
 class TopsOfDayView(APIView):
     """
@@ -786,6 +798,7 @@ class TopsOfWeekView(APIView):
 import random
 import operator
 
+
 class TopsOfEaringView(APIView):
     """
         得到全民淘金前十
@@ -822,6 +835,7 @@ class TopsOfEaringView(APIView):
             return Response({"ret_code": -1, "records": list()})
         return Response({"ret_code": 0, "records": records})
 
+
 class TopsOfMonthView(APIView):
     """
     得到某一月的排行榜
@@ -830,6 +844,7 @@ class TopsOfMonthView(APIView):
 
     def post(self, request):
         return Response({"ret_code": 0, "message":"ok"})
+
 
 class UserExisting(APIView):
     permission_classes = ()
@@ -873,6 +888,7 @@ class UserHasLoginAPI(APIView):
         else:
             return Response({"login": True})
 
+
 class HasValidationAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -884,7 +900,11 @@ class HasValidationAPIView(APIView):
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
+
 class IdValidate(APIView):
+    """
+    PC端实名认证接口
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
@@ -913,7 +933,7 @@ class IdValidate(APIView):
 
             if request.DATA.get("captcha_1"):
                 return Response({
-                                    "message": u"实名认证成功..",
+                                    "message": u"实名认证成功.",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
@@ -924,25 +944,34 @@ class IdValidate(APIView):
 
             if verify_counter.count >= 3:
                 return Response({
-                                    "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
+                                    "message": u"验证错误次数频繁，请联系客服 4008-588-066",
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
+
+            profile = WanglibaoUserProfile.objects.filter(user=user).first()
+            if profile.id_is_valid:
+                return Response({
+                    "message": u"您已认证通过，无需再认证，请重新登录查看最新状态",
+                    "error_number": ErrorNumber.try_too_many_times
+                })
 
             id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
             if id_verify_count >= 1:
                 return Response({
-                                    "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
+                                    "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=400)
 
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
 
             verify_counter.count = F('count') + 1
             verify_counter.save()
 
             if error or not verify_record.is_valid:
                 return Response({
-                                    "message": u"验证失败，拨打客服电话进行人工验证",
+                                    "message": u"验证失败，请重试或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.unknown_error
                                 }, status=400)
 
@@ -958,7 +987,7 @@ class IdValidate(APIView):
             # 处理第三方用户实名回调
             CoopRegister(self.request).process_for_validate(user)
 
-            return Response({ "validate": True }, status=200)
+            return Response({"validate": True}, status=200)
 
         else:
             return Response({
@@ -967,39 +996,39 @@ class IdValidate(APIView):
                             }, status=400)
 
 
-class AdminIdValidate(APIView):
-    permission_classes = (IsAuthenticated,)
+# class AdminIdValidate(APIView):
+#     permission_classes = (IsAuthenticated,)
+#
+#     def post(self, request, *args, **kwargs):
+#         # add by ChenWeiBin@2010105
+#         if request.user.wanglibaouserprofile.utype == '3':
+#             return Response({
+#                 "message": u"企业用户无法通过此方式认证",
+#                 "error_number": 30056,
+#             }, status=400)
+#
+#         phone = request.DATA.get("phone", "")
+#         name = request.DATA.get("name", "")
+#         id_number = request.DATA.get("id_number", "")
+#         verify_record, error = verify_id(name, id_number)
+#
+#         if error:
+#             return Response({
+#                                 "message": u"验证失败",
+#                                 "error_number": ErrorNumber.unknown_error
+#                             }, status=400)
+#
+#         user = User.objects.get(wanglibaouserprofile__phone=phone)
+#         user.wanglibaouserprofile.id_number = id_number
+#         user.wanglibaouserprofile.name = name
+#         user.wanglibaouserprofile.id_is_valid = True
+#         user.wanglibaouserprofile.id_valid_time = timezone.now()
+#         user.wanglibaouserprofile.save()
+#
+#         return Response({
+#                             "validate": True
+#                         }, status=200)
 
-    def post(self, request, *args, **kwargs):
-        # add by ChenWeiBin@2010105
-        if request.user.wanglibaouserprofile.utype == '3':
-            return Response({
-                "message": u"企业用户无法通过此方式认证",
-                "error_number": 30056,
-            }, status=400)
-
-        phone = request.DATA.get("phone", "")
-        name = request.DATA.get("name", "")
-        id_number = request.DATA.get("id_number", "")
-        verify_record, error = verify_id(name, id_number)
-
-        if error:
-            return Response({
-                                "message": u"验证失败",
-                                "error_number": ErrorNumber.unknown_error
-                            }, status=400)
-
-        #user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
-        user = User.objects.get(wanglibaouserprofile__phone=phone)
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.id_valid_time = timezone.now()
-        user.wanglibaouserprofile.save()
-
-        return Response({
-                            "validate": True
-                        }, status=200)
 
 class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
@@ -1019,11 +1048,17 @@ class LoginAPIView(DecryptParmsAPIView):
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+            return Response({"token": "false", "message": u"用户名或密码错误"}, status=400)
         if not user.is_active:
-            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+            return Response({"token": "false", "message": u"用户已被关闭"}, status=400)
         if user.wanglibaouserprofile.frozen:
-            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+            return Response({"token": "false", "message": u"用户已被冻结"}, status=400)
+
+        # 登录成功后将用户的错误登录次数清零
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
 
         push_user_id = request.DATA.get("user_id", "")
         push_channel_id = request.DATA.get("channel_id", "")
@@ -1049,6 +1084,7 @@ class LoginAPIView(DecryptParmsAPIView):
         #     token.delete()
         #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
+
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
     permission_classes = ()
@@ -1084,6 +1120,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             if device_type == "ios":
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': "false"}, status=status.HTTP_200_OK)
+
 
 def get_public_statistics():
     today = datetime.now()
@@ -1623,8 +1660,8 @@ class BidHasBindingForChannel(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code, bid):
-        binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
-        if binding:
+        has_binding = has_binding_for_bid(channel_code, bid)
+        if has_binding:
             response_data = {
                 'ret_code': 10001,
                 'message': u'该bid已经绑定'
@@ -1636,6 +1673,17 @@ class BidHasBindingForChannel(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class LandOpenApi(APIView):
+    """
+    渠道跳转页
+    """
+
+    permission_classes = ()
+
+    def post(self, request):
+        return landpage_view(request)
 
 
 class CoopPvApi(APIView):
@@ -1684,3 +1732,125 @@ class CoopPvApi(APIView):
 
             logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
             return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class OauthUserRegisterApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        channel_code = request.GET.get('promo_token')
+        if channel_code:
+            data = request.session
+            form = OauthUserRegisterForm(data)
+            if form.is_valid():
+                channel_code = form.cleaned_data['channel_code']
+                coop_key_str = '%s_COOP_KEY' % channel_code.upper()
+                coop_key = getattr(settings, coop_key_str, None)
+                coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
+                if coop_sign_check(coop_key):
+                    phone = form.cleaned_data['phone']
+                    password = generate_random_password(6)
+                    user = create_user(phone, password, "")
+                    if user:
+                        client_id = form.cleaned_data['client_id']
+                        channel_code = form.cleaned_data['channel_code']
+                        device = split_ua(request)
+                        # if device['device_type'] == "pc":
+                        #     auth_user = authenticate(identifier=phone, password=password)
+                        #     auth_login(request, auth_user)
+
+                        send_messages.apply_async(kwargs={
+                            "phones": [phone, ],
+                            "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                        })
+
+                        # 处理第三方渠道的用户信息
+                        CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                        coop_register_processor = getattr(rest_utils, 'process_%s_register' % channel_code.lower(), None)
+                        if coop_register_processor:
+                            response_data = coop_register_processor(request, user, phone, client_id, channel_code)
+                        else:
+                            response_data = {
+                                'ret_code': 50001,
+                                'message': 'api error',
+                            }
+                    else:
+                        response_data = {
+                            'ret_code': 10009,
+                            'message': u'注册失败',
+                        }
+                else:
+                    response_data = {
+                        'ret_code': 10008,
+                        'message': u'签名错误',
+                    }
+            else:
+                form_error = form.errors.values()[0][0]
+                response_data = {
+                    'ret_code': 10010,
+                    'message': form_error,
+                }
+        else:
+            response_data = {
+                'ret_code': 50002,
+                'message': u'非法请求',
+            }
+
+        if channel_code == 'renrenli':
+            response_data['Code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['Tip'] = response_data['message']
+            response_data.pop('message')
+        elif channel_code == 'bajinshe':
+            response_data['code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['message']
+            response_data.pop('message')
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiRegisterApi(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        form = BiSouYiRegisterForm(self.request.session)
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                if user:
+                    auth_user = authenticate(identifier=phone, password=password)
+                    auth_login(request, auth_user)
+
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
+
+                    client_id = form.cleaned_data['client_id']
+                    channel_code = form.cleaned_data['channel_code']
+                    token = form.get_token()
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                    device = split_ua(request)
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    tid = get_uid_for_coop(user.id)
+                    ret_data = push_coop_access_token(phone, client_id, tid, settings.BISOUYI_COOP_KEY, token)
+                    message = ret_data['message']
+                else:
+                    message = u'用户创建失败'
+            else:
+                message = u'无效签名'
+        else:
+            message = form.errors.values()[0][0]
+
+        logger.info("BiSouYiRegisterApi process result: %s" % message)
+        return HttpResponseRedirect('/')

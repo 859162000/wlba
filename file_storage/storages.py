@@ -9,7 +9,7 @@ from django.core.files.storage import Storage
 from django.db import IntegrityError
 from django.middleware.transaction import transaction
 from file_storage.models import File
-from file_storage.oss_util import oss_save, oss_open, oss_delete
+from file_storage.oss_util import oss_save, oss_open, oss_delete, oss_save_with_acl
 from wanglibao.settings import MEDIA_URL
 
 
@@ -77,6 +77,14 @@ class AliOSSStorage(Storage):
                 return name
 
     def save(self, name, content):
+        # Modify by hb on 2016-03-16 for save .mp4 file in 'public' path with 'public-read' acl
+        try :
+            ext = os.path.splitext(name)[1]
+            if ext and ext.lower()=='.mp4' :
+                return self.save_pub(name, content)
+        except:
+            pass
+
         name = self._get_availble_name(name)
         size = oss_save(name, content.file)
         #如果上传重名则覆盖
@@ -84,6 +92,22 @@ class AliOSSStorage(Storage):
         f.size = size
         f.save()
         return name
+
+    # Add by hb on 2016-03-16 save file in 'public' path with 'public-read' acl
+    def save_pub(self, name, content):
+        name = 'public/' + name
+        name = self._get_availble_name(name)
+
+        size = oss_save_with_acl(name, content.file, 'public-read')
+
+        #如果上传重名则覆盖
+        f = File.objects.get_or_create(path=name)[0]
+        f.size = size
+        f.save()
+
+        access_url = settings.OSS_PUB_ACCESS_HOST + '/' + name
+
+        return access_url
 
     def open(self, name, mode='rb'):
         File.objects.get(path=name)

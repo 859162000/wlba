@@ -3,7 +3,7 @@
 
 from django.conf import settings
 from django.conf.urls import patterns, url, include
-# from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, RedirectView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
@@ -21,7 +21,7 @@ from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, Jrji
     JrjiaUsStatusView
 from wanglibao_account.views import FirstPayResultView
 from wanglibao_lottery.views import LotteryListTemplateView
-from wanglibao_account.decorators import login_required
+# from wanglibao_account.decorators import login_required
 
 urlpatterns = patterns(
     '',
@@ -106,7 +106,7 @@ urlpatterns = patterns(
     url(r'^email/sent/$', EmailSentView.as_view(), name='email_sent'),
 
     url(r'^password/change/$', "wanglibao_account.views.password_change", name='password_change'),
-    url(r'^password/change/done/', TemplateView.as_view(template_name='html/password_change_done.html'),
+    url(r'^password/change/done/$', TemplateView.as_view(template_name='html/password_change_done.html'),
         name='password_change_done'),
     url(r'^activate/complete/$',
         TemplateView.as_view(template_name='activation_complete.jade'),
@@ -115,14 +115,15 @@ urlpatterns = patterns(
         ActivationView.as_view(template_name="activate.jade"),
         name='registration_activate'),
 
-    url(r'^password/reset/identifier/', PasswordResetGetIdentifierView.as_view(), name="password_reset"),
-    url(r'^password/reset/validate/', PasswordResetGetIdentifierView.as_view(), name="password_reset_validate"),
-    url(r'^password/reset/send_mail/', "wanglibao_account.views.send_validation_mail", name="send_validation_mail"),
-    url(r'^password/reset/send_validate_code/', "wanglibao_account.views.send_validation_phone_code",
+    url(r'^password/reset/$', PasswordResetGetIdentifierView.as_view(), name="password_reset_url"),
+    url(r'^password/reset/identifier/$', PasswordResetGetIdentifierView.as_view(), name="password_reset"),
+    url(r'^password/reset/validate/$', PasswordResetGetIdentifierView.as_view(), name="password_reset_validate"),
+    url(r'^password/reset/send_mail/$', "wanglibao_account.views.send_validation_mail", name="send_validation_mail"),
+    url(r'^password/reset/send_validate_code/$', "wanglibao_account.views.send_validation_phone_code",
         name="send_validation_phone_code"),
-    url(r'^password/reset/validate_phone_code/', "wanglibao_account.views.validate_phone_code"),
-    url(r'^password/reset/set_password/', ResetPassword.as_view(), name="password_reset_set_password"),
-    url(r'^password/reset/done/', TemplateView.as_view(template_name="password_reset_done.jade"),
+    url(r'^password/reset/validate_phone_code/$', "wanglibao_account.views.validate_phone_code"),
+    url(r'^password/reset/set_password/$', ResetPassword.as_view(), name="password_reset_set_password"),
+    url(r'^password/reset/done/$', TemplateView.as_view(template_name="password_reset_done.jade"),
         name="password_reset_done"),
     url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
         auth_views.password_reset_confirm,
@@ -139,7 +140,7 @@ urlpatterns = patterns(
 
     url(r'^security/$', login_required(IdentityInformationTemplate.as_view(template_name='account_safe.jade'), login_url='/accounts/login/')),
     url(r'^manual_modify/vali_acc_info/$', login_required(ValidateAccountInfoTemplate.as_view(template_name="manual_audit.jade"), login_url='/accounts/login/')),
-    url(r'^manual_modify/phone/$', ManualModifyPhoneTemplate.as_view()),
+    url(r'^manual_modify/phone/$', login_required(ManualModifyPhoneTemplate.as_view(), login_url='/accounts/login/')),
     url(r'^sms_modify/vali_acc_info/$', login_required(SMSModifyPhoneValidateTemplate.as_view(template_name="sms_vali_phone.jade"), login_url='/accounts/login/')),
     url(r'^sms_modify/phone/$', login_required(SMSModifyPhoneTemplate.as_view(template_name="sms_modify_phone.jade"), login_url='/accounts/login/'))
 )

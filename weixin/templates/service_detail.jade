@@ -113,41 +113,41 @@ html
       p.redpack-for-amount * 请输入投资金额
     if user.is_authenticated and p2p.category == '新手标' and user.wanglibaouserprofile.is_invested
       .buy-snap-up.new-user
-        button(disabled="true").snap-up 立即投资
+        button(type="submit",name="submit",disabled="true").snap-up 立即投资
       .is_invested-sign 只有未进行投资的用户才可以购买
     else
       .buy-snap-up
-        button(disabled="true").snap-up 立即投资
+        button(type="submit",name="submit",disabled="true").snap-up 立即投资
 
-    .page-alt#page-pwd(style="display:none")
-      .account-pwd
-        .pwd-tit 设置交易密码
-        .pwd-close.page-close &times;
-        .pwd-promote 为了您账户资金安全，请设置交易密码
-        .pwd-inps.js-pwd-inps
-          .inp-item
-          .inp-item
-          .inp-item
-          .inp-item
-          .inp-item
-          .inp-item
-          input(type="password",maxlength=6).pwd-input
-    .page-alt#page-error(style="display:none")
-      .account-pwd
-        .pwd-tit 设置交易密码
-        .pwd-close.page-close &times;
-        .pwd-img
-          img(src="/static/imgs/sub_weixin/recharge/pwd-error.png")
-        .pwd-promote 两次交易密码输入不正确，请重新输入
-        .page-btn.page-close 知道了
-    .page-alt#page-net(style="display:none")
-      .account-pwd
-        .pwd-tit 设置交易密码
-        .pwd-close.page-close &times;
-        .pwd-img
-          img(src="/static/imgs/sub_weixin/recharge/pwd-net.png")
-        .pwd-promote 您的网络已断开连接，请稍后再试！
-        .page-btn.page-close 知道了
+    //.page-alt#page-pwd(style="display:none")
+    //  .account-pwd
+    //    .pwd-tit 设置交易密码
+    //    .pwd-close.page-close &times;
+    //    .pwd-promote 为了您账户资金安全，请设置交易密码
+    //    .pwd-inps.js-pwd-inps
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      input(type="password",maxlength=6).pwd-input
+    //.page-alt#page-error(style="display:none")
+    //  .account-pwd
+    //    .pwd-tit 设置交易密码
+    //    .pwd-close.page-close &times;
+    //    .pwd-img
+    //      img(src="/static/imgs/sub_weixin/recharge/pwd-error.png")
+    //    .pwd-promote 两次交易密码输入不正确，请重新输入
+    //    .page-btn.page-close 知道了
+    //.page-alt#page-net(style="display:none")
+    //  .account-pwd
+    //    .pwd-tit 设置交易密码
+    //    .pwd-close.page-close &times;
+    //    .pwd-img
+    //      img(src="/static/imgs/sub_weixin/recharge/pwd-net.png")
+    //    .pwd-promote 您的网络已断开连接，请稍后再试！
+    //    .page-btn.page-close 知道了
     .page-alt#page-ok(style="display:none")
       .account-pwd
         .recharge-ok-img
@@ -162,21 +162,31 @@ html
         .recharge-ok-tit 余额不足
         .page-btn
           a(href="javascript:;").page-close 关闭
-          a(href="/weixin/sub_recharge/?rechargeNext=/weixin/view/buy/{{p2p.id}}/") 立即充值
+          a(href="/weixin/sub_recharge/?rechargeNext=/weixin/sub_detail/detail/{{p2p.id}}/") 立即充值
     id_is_valid = id_is_valid[0]
     if id_is_valid
       //.page-alt.page-errorAlt#page-onRegister(style="display:none")
-      if card_is_bind
+      if is_one
         .page-alt.page-errorAlt#page-onRegister(style="display:none")
       else
-        .page-alt.page-errorAlt#page-onRegister
-          .account-pwd
-            .recharge-ok-img
-              img(src="/static/imgs/sub_weixin/recharge/alt-error.png")
-            .recharge-ok-tit 对不起，您尚未绑卡
-            .total-money 请先完成绑卡充值，才可以投资哦
-            .page-btn
-              a(href="/weixin/sub_regist_second/") 去绑卡充值
+        if is_bind
+          .page-alt.page-errorAlt#page-onRegister
+            .account-pwd
+              .recharge-ok-img
+                img(src="/static/imgs/sub_weixin/recharge/alt-error.png")
+              .recharge-ok-tit 对不起，您尚未同卡
+              .total-money 请进入银行卡管理页面，选择唯一银行卡
+              .page-btn
+                a(href="/weixin/sub_bankcards/?next=/weixin/sub_detail/detail/{{p2p.id}}/") 去同卡
+        else
+          .page-alt.page-errorAlt#page-onRegister
+            .account-pwd
+              .recharge-ok-img
+                img(src="/static/imgs/sub_weixin/recharge/alt-error.png")
+              .recharge-ok-tit 对不起，您尚未绑卡
+              .total-money 请先完成绑卡充值，才可以投资哦
+              .page-btn
+                a(href="/weixin/sub_regist_second/?next=/weixin/sub_detail/detail/{{p2p.id}}/") 去绑卡充值
     else
       .page-alt.page-errorAlt#page-onRegister
         .account-pwd
@@ -186,6 +196,7 @@ html
           .total-money 请先完成实名认证，才可以投资哦
           .page-btn
             a(href="/weixin/sub_regist_first/") 去实名认证
+    include include/service_tran_password
     include include/confirm
     include include/tracking
-    script(data-init='buy', src="/static/scripts/subMobile/mobile.js?20160105")
+    script(data-init='buy', src="/static/scripts/subMobile/mobile.js?20160226")

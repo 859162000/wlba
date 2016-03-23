@@ -1,6 +1,36 @@
 from django.db.models import Q
 from django.utils import timezone
 from wanglibao_announcement.models import Announcement
+from marketing.utils import utype_is_mobile
+
+
+def get_announcement_list(request):
+    is_mobile = utype_is_mobile(request)
+    if is_mobile:
+        device_type = 'mobile'
+    else:
+        device_type = 'pc'
+
+    annonces = Announcement.objects.filter(Q(status=1, hideinlist=False) &
+                                           (Q(device=device_type) | Q(device='pc&app')))
+    return annonces
+
+
+def get_announcement_homepage_list(request):
+    is_mobile = utype_is_mobile(request)
+    if is_mobile:
+        device_type = 'mobile'
+    else:
+        device_type = 'pc'
+
+    annonces = Announcement.objects.filter(Q(starttime__lte=timezone.now(),
+                                             endtime__gte=timezone.now(),
+                                             status=1,
+                                             hideinlist=False) &
+                                           (Q(type='all') | Q(type='homepage') &
+                                            (Q(device=device_type) |
+                                             Q(device='pc&app')))).order_by('-priority', '-createtime')
+    return annonces
 
 
 def AnnouncementHomepage(*args):

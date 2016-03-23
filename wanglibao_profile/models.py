@@ -48,7 +48,10 @@ class WanglibaoUserProfile(models.Model):
 
     trade_pwd = models.CharField(u'交易密码', max_length=128, default='', blank=True)
     trade_pwd_failed_count = models.IntegerField(help_text=u'交易密码连续输入错误次数', default=0)
-    trade_pwd_last_failed_time = models.IntegerField(help_text=u'交易密码最后一次输入失败的时间',default=0)
+    trade_pwd_last_failed_time = models.IntegerField(help_text=u'交易密码最后一次输入失败的时间', default=0)
+
+    login_failed_count = models.IntegerField(u"登录失败次数", default=0)
+    login_failed_time = models.DateTimeField(u'登录错误时间', auto_now_add=True, null=True)
 
     first_bind_time = models.IntegerField(u'第一次绑定微信时间', default=0)
 

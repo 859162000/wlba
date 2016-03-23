@@ -134,7 +134,6 @@ class InterestHike(models.Model):
 
 
 # 佣金,加息等
-# todo: move p2p earning to here
 class Income(models.Model):
     user = models.ForeignKey(User, verbose_name=u"用户", related_name="user")
     invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="invite")

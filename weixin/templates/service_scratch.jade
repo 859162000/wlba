@@ -30,10 +30,15 @@ html(style="background: #f5f5f5").sub-body
           li 绑定网利宝服务号用户投资、提现成功均有3次刮奖机会，刮奖用户将获得不同额度的加息券；
           li 抽奖奖励系统会自动添加到您的网利宝账户；
           li 加息券奖励为刮奖之日起7天有效，请在有效期内投资使用；
-          li 网利宝在法律允许范围内对此次活动有最终解释权
+          li 网利宝在法律允许范围内对此次活动有最终解释权。
+          li#ios-show(style="display:none") 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 网利宝对此活动享有最终解释权。
         .btn-box
           .red-btn.close-alt 我知道了
 
     script(src='/static/src/subMobile/lib/weixin/wx.js')
     script(src='/static/scripts/subMobile/mobile.js?201511065')
-    script(src="/static/scripts/subMobile/scratch.js?201601151")
+    script(src="/static/scripts/subMobile/scratch.js?20160302")
+    script.
+      ;(function(){
+        isIphone("ios-show");
+      })();

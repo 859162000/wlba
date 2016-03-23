@@ -83,7 +83,7 @@ class Activity(models.Model):
     is_lottery = models.BooleanField(u'是否为抽奖活动', default=False, editable=False)
     chances = models.IntegerField(u'抽奖次数', default=0, blank=True, null=True, editable=False)
     rewards = models.IntegerField(u'获奖次数', default=0, blank=True, null=True, editable=False)
-    channel = models.CharField(u'渠道名称', max_length=800, blank=True,
+    channel = models.CharField(u'渠道名称', max_length=1000, blank=True,
                                help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao-other，多个渠道用英文逗号间隔')
     is_all_channel = models.BooleanField(u'所有渠道', default=False, help_text=u'如果勾选“所有渠道”，则系统不再限定渠道')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")

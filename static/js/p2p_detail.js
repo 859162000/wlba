@@ -12,7 +12,8 @@
     shims: {
       "jquery.validate": ['jquery'],
       "ddslick": ['jquery']
-    }
+    },
+    urlArgs: 'v=20160310'
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
@@ -288,9 +289,9 @@
         redpack: redpack_id
       }).done(function(data) {
         return tool.modalAlert({
-          height: '364px',
+          height: '200px',
           title: '温馨提示',
-          msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功',
+          msg: '份额认购成功',
           callback_ok: function() {
             if (data.category === '酒仙众筹标') {
               return window.location.href = "/accounts/home/jiuxian/";

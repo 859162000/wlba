@@ -6,7 +6,7 @@ html
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/stylesheets/noviceDecember.css?v=201512311")
+        link(rel="stylesheet",href="/static/stylesheets/noviceDecember.css?v=2016031001")
         - csrf_token
     body(style="background:#fff2d5")
         include global/g_nav
@@ -25,14 +25,14 @@ html
                  .box.box_2
                     .num 2
                     dl
-                     dt 实名充值
-                     dd 送120元红包
+                     dt 首次充值
+                     dd 送80元红包
                  img(src="/static/imgs/pc_activity/noviceDecember/step_title_ico.png")
                  .box.box_3
                     .num 3
                     dl
                      dt 首投
-                     dd 最高送180元红包
+                     dd 最高送220元红包
                  img(src="/static/imgs/pc_activity/noviceDecember/step_title_ico.png")
                  .box.box_4
                     .num 4
@@ -47,17 +47,13 @@ html
                 .button.take_red 立即领取
                 .line
                 .box_wrap
-                    .box.box_2
-                      .title 2.实名认证
-                      p 完成实名认证送20元红包
-                      img(src="/static/imgs/pc_activity/noviceDecember/step_img_2.png")
                     .box.box_3
-                      .title 3.首次充值
-                      p 新手首次完成充值送100元红包
+                      .title 2.首次充值
+                      p 新手首次完成充值送80元红包
                       img(src="/static/imgs/pc_activity/noviceDecember/step_img_3.png")
                     .box.box_4
-                      .title 4.首次投资
-                      p 首次投资，最高送再送180元红包
+                      .title 3.首次投资
+                      p 首次投资，最高再送220元红包
                       img(src="/static/imgs/pc_activity/noviceDecember/step_img_4.png")
                 .button.take_first_red 领取红包
               .strategy_wrap
@@ -65,24 +61,17 @@ html
                 .main
                     .act_rule
                         p.text!='<span class="num">1.</span>活动期间新用户注册即送28888元体验金，专享1天10%年化收益，我出本金，收益全归你！'
-                        p.text!='<span class="num">2.</span>活动期间注册后实名认证，即可获得20元红包。'
-                        p.text!='<span class="num">3.</span>活动期间注册后首次充值（充值金额≥100元）成功即获得100元红包。'
-                        p.text!='<span class="num">4.</span>注册后首次投资满额即可获得红包奖励，规则如下（三选一）：'
-                        p.text!='<span class="num"> </span>a. 1000元≤首次投资＜5000元，送50元直抵红包'
+                        p.text!='<span class="num">2.</span>注册后首次充值（充值金额≥100元）成功即获得80元红包。'
+                        p.text!='<span class="num">3.</span>注册后首次投资满额即可获得红包奖励，规则如下（三选一）：'
+                        p.text!='<span class="num"> </span>a. 1000元≤首次投资＜5000元，送20元直抵红包'
                         p.text!='<span class="num"> </span>b. 5000元≤首次投资＜10000元，送100元直抵红包'
-                        p.text!='<span class="num"> </span>c. 10000元≤首次投资，送180元直抵红包'
+                        p.text!='<span class="num"> </span>c. 10000元≤首次投资，送220元直抵红包'
                         p.text!=' 备注：首次投资所赠红包适用范围限投3月标(含）以上。<span class="click_rule">点击立即查看新手红包规则>></span>'
                     img.logo_img(src="/static/imgs/pc_activity/noviceDecember/strategy_img.png")
                     .rule_red
                         .title 【新手红包使用规则】
-                        p.text!='<span class="num">1.</span>实名认证所赠20元红包单笔投资满1000元可直抵使用，有效期自领取日起3天内有效；'
-                        p.text!='<span class="num">2.</span>充值所赠100元红包单笔投资满5000元可直抵使用，有效期自领取日起7天内有效；'
-                        p.text!='<span class="num">3.</span>首投所赠50元红包单笔投资满5000元可直抵使用、100元红包单笔投资满8000元可直抵使用、180元红包单笔投资满12000元可<br><span class="num"></span>直抵使用。有效期自领取日起15天内有效。'
-                    .max_red
-                        .title 【如何投资让红包收益最大化？】
-                        p.text!='<span class="num">1.</span>充值5000元立得20元红包和100元红包各1个，选择1月标首次投资5000元，勾选使用100元红包，实际投资额4900元。投资完<br><span class="num"></span>成后立得100元直抵红包。'
-                        p.text!='<span class="num">2.</span>随后相继使用100元直抵红包投3月标8000元、使用20元红包投1月标1000元。这样自己投14000即可立得220红包，赚了！'
-                    .small_title!='<span>投资小贴士</span>想要拿满新手300元红包，充值后务必首次投资满1万哦！'
+                        p.text!='<span class="num">1.</span>首次充值所赠80元红包单笔投资满5000元可直抵使用，有效期自领取日起7天内有效；'
+                        p.text!='<span class="num">2.</span>首投所赠20元红包单笔投资满2500元可直抵使用、100元红包单笔投资满10000元可直抵使用、220元红包单笔投资满20000元可<br><span class="num"></span>直抵使用。有效期自领取日起15天内有效。'
               .recommend_send_red
                 .title_bg 推荐投资送红包
                 .main
@@ -98,9 +87,9 @@ html
                         ul.second
                             li.first 新用户奖励
                             li.second 新手首投奖励红包
-                            li 50元
+                            li 20元
                             li 100元
-                            li 180元
+                            li 220元
                         ul
                             li.first 老用户奖励
                             li.second 邀请人所得推荐奖励红包
@@ -120,10 +109,10 @@ html
                   img.step_img(src="/static/imgs/pc_activity/noviceDecember/how_use_img.jpg")
                   .title 【红包使用规则】
                   .red_rule
-                        p.text!='<span class="num">1.</span>活动时间：2016年2月2日0:00开始，活动结束时间以网站公告为准；'
+                        p.text!='<span class="num">1.</span>活动时间：2016年3月12日0:00开始，活动结束时间以网站公告为准；'
                         p.text!='<span class="num">2.</span>所有所得红包均为直抵红包，投资时可选择使用红包，直抵现金使用；'
                         p.text!='<span class="num">3.</span>红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；'
-                        p.text!='<span class="num">4.</span>实名认证、首次充值所得120元红包不限标期。首次投资满额所得红包限投3月标以上；'
+                        p.text!='<span class="num">4.</span>首次充值所得80元红包不限标期。首次投资满额所得红包限投3月标以上；'
                         p.text!='<span class="num">5.</span>手机号为网利宝唯一账户，通过网利宝电脑端官网、手机客户端、官方微信号、部分渠道主动新注册用户均可享受活动红包福利，部<br><span class="num"></span>分合作渠道无标示新手活动的来源用户无法享受此活动奖励。'
                         p.small 网利宝对此活动享有最终解释权。
           .code_wrap
