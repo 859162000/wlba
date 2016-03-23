@@ -39,7 +39,7 @@ html
                   //百分比有个最高抵扣金额highest_amount
                   if redpacks
                     select(name="redpack", type='select', data-redpack='true')#gifts-package.balance-middle-select-select
-                      option(value = '')  不使用理财券
+                      option(value = '', selected = true)  不使用理财券
                       redpack_num = len(redpacks)
                       each redpack in redpacks
                         if redpack.method == "-"
