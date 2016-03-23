@@ -188,13 +188,13 @@ webpackJsonp([6],[
 	                if (data.ret_code > 0) {
 	                    return alert(data.message);
 	                } else {
+	                    $(".error-sign").remove();
 	                    if (check.firstRecharge) {
 	                        $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
 	                    } else {
 	                        var _ret = function () {
 	                            var next_url = (0, _api.getQueryStringByName)('next'),
 	                                next = next_url == '' ? '/weixin/list/' : next_url;
-	                            $(".error-sign").remove();
 	                            return {
 	                                v: alert('绑卡成功！', function () {
 	                                    window.location.href = next;
