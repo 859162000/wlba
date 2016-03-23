@@ -229,16 +229,16 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
         }
       }).fail(function(xhr) {
         clearInterval(intervalId);
-        $(element).text('重新获取').removeAttr('disabled').addClass('go-get-code');
+        $(element).text('重新获取').removeAttr('disabled').removeClass('getCodeBtn');
         $('.error-box').text(xhr.message)
       }).success(function(xhr) {
         if (xhr.ret_code === 0) {
-          element.attr('disabled', 'disabled').removeClass('go-get-code');
+          element.attr('disabled', 'disabled').addClass('getCodeBtn');
           $('#order_id').val(xhr.order_id);
           $('#token').val(xhr.token);
         } else {
           clearInterval(intervalId);
-          $(element).text('重新获取').removeAttr('disabled').addClass('go-get-code');
+          $(element).text('重新获取').removeAttr('disabled').removeClass('getCodeBtn');
           $('.error-box').text(xhr.message)
         }
       });
