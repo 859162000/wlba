@@ -15,7 +15,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf,
                    JrjiaAutoRegisterView, ManualModifyPhoneTemplate, IdentityInformationTemplate,
                    ValidateAccountInfoTemplate, SMSModifyPhoneValidateTemplate, SMSModifyPhoneTemplate,
-                   AccountHomeNew, )
+                   AccountHomeNew, AccountExperienceGold, )
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
@@ -154,7 +154,7 @@ urlpatterns += patterns(
     url(r'^recharge/', TemplateView.as_view(template_name="center_recharge.jade")),
     url(r'^recharge/yipay/', TemplateView.as_view(template_name="center_recharge_yipay.jade")),
     url(r'^recharge/kuaijie/', TemplateView.as_view(template_name="center_recharge_kuaijie.jade")),
-    url(r'^gold/', TemplateView.as_view(template_name="center_gold.jade")),
+    url(r'^gold/', login_required(AccountExperienceGold.as_view(), login_url='/accounts/login/')),
     #url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
     url(r'^accrual/', TemplateView.as_view(template_name="center_redpack_accrual.jade")),
     url(r'^pack/', TemplateView.as_view(template_name="center_redpack_base.jade")),

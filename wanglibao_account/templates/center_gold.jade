@@ -19,47 +19,69 @@ block main
       .c-gold-title.t-d19.font-l.fl 体验金专区
       .font-xs.fr.mg-t-xs
         i.iconfont.icon-center-invest.font-xs.t-d16
-        a(href='/').open-gold-ac 查看体验金活动
+        a(href='/activity/experience/gold/', target="_blank").open-gold-ac 查看体验金活动
 
     .c-gold-rockoning-warp
       .c-gold-rockoning.tc.clearfix
         .span3
-          .t-d10.font-ll 10,02200.22
+          .t-d10.font-ll {{experience_account.total_experience_amount | money_format}}
           .t-d11.font-xs 体验金总资产(元)
         .span3
-          .t-d10.font-ll 12500.22
+          .t-d10.font-ll {{experience_account.experience_amount | money_format}}
           .t-d11.font-xs 体验金余额(元)
         .span3
-          .t-d2.font-ll 20.22
+          .t-d2.font-ll {{experience_account.paid_interest | money_format}}
           .t-d11.font-xs 到帐收益(元)
         .span3
-          .t-d10.font-ll 95,000.22
+          .t-d10.font-ll {{experience_account.unpaid_interest | money_format}}
           .t-d11.font-xs 待收收益(元)
       .c-gold-explain
         .inline-block.t-d19.font-xs 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除，
         .gold-rules
           a(href='') 体验金领取及使用说明。
-
-    table.c-gold-p2p
-        thead
-          tr
-            th(colspan='4')
-              .t-d11.font-m 体验理财标
-        tbody
-          mixin tr()
+    if experience_account.experience_amount != 0
+      table.c-gold-p2p
+          thead
+            tr
+              th(colspan='4')
+                .t-d11.font-m {{experience_account.product.name}}
+          tbody
             tr
               td
-                .t-d11.font-ll 1228.0元
+                .t-d11.font-ll {{experience_account.experience_amount}}元
                 .t-d19.font-s 体验金
               td
-                .t-d11.font-ll 10.0%
+                .t-d11.font-ll {{experience_account.product.expected_earning_rate}}%
                 .t-d19.font-s 年华收益
               td
-                .t-d11.font-ll 一天
+                .t-d11.font-ll {{experience_account.product.period}}天
                 .t-d19.font-s 投资期限
               td
                 .gold-submit 立即投资
-          +tr()
-          +tr()
-
-    .golg-history.t-d11.font-s.tc.mg-t-xxxlll 查看历史投资项目
+    if experience_amortization
+      .golg-history.t-d11.font-s.tc.mg-t-xxxlll 查看历史投资项目
+        table.table.tableNew
+          thead
+            tr
+              th 投标时间
+              th 产品名称
+              th 投资金额
+              th 年化收益
+              th 项目期限
+              th 已收益／预期收益
+          tbody
+            if experience_amortization
+              for amo in experience_amortization
+                tr
+                  td {{amo.created_time}}
+                  td {{amo.product.name}}
+                  td {{amo.principal}}
+                  td {{amo.product.expected_earning_rate}}%
+                  td {{amo.product.period}}天
+                  if amo.settled
+                    td {{amo.interest | money_format}}/{{amo.interest | money_format}}（（元）
+                  else
+                    td 0.00/{{amo.interest | money_format}}（元）
+            else
+              tr
+                td 暂无记录
