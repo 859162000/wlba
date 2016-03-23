@@ -10,10 +10,11 @@ html
         include global/g_nav
         - csrf_token
         .register
+            .login-href 已有网利宝账号？请
+                a(href='/accounts/login/') 登录
             .register_nav_min.register_nav_min2
             .register_box.clearfix
                 #registerForm.login-form
-                    .h5.register_welfare 实名认证
                     .registerFormDiv
                         ul.registerForm
                             li.clearfix
@@ -24,22 +25,25 @@ html
                                 label 身份证号：
                                 input#nameId.placeholderInput(type="text", name="idcard", placeholder="请输您的身份证号", autocomplete='off', title="请输您的身份证号")
                                 span.error_span
-                        .loginError
+                        .error-box
                         .form_bottom
-                            .submitFormStyle#realName 实名认证
+                            .rz-btn#realName
                 .register_info
-                    .go_next_welfare 下一步奖励：
-                    .red_packets.clearfix
-                        i
-                        label 首次充值送80元红包
-                    .info_middle.clearfix
-                        .welfare_ed 已获得的奖励：
-                        .welfare_ed_list
-                            i
-                            | 新手注册即送28888元体验金
-                    .info_ewm.clearfix
-                        i
-                        label 关注网利宝官方微信
+                   h3 新手大礼包，你来我就送！
+                    .reward-box
+                        .reward-left
+                            p
+                                span 28888
+                                | 元
+                            p 注册即送
+                        .reward-right 体验金
+                    .reward-box
+                        .reward-left
+                            p
+                                span 80
+                                | 元
+                            p 首次充值送现金红包
+                        .reward-right 红包
     include global/g_footer
     script.
       require(["/static/src/pc/register_next.js?v=20151202"])
