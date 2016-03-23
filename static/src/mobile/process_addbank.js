@@ -197,14 +197,14 @@ import { limit} from './mixins/bank_limit.js'
                 if (data.ret_code > 0) {
                     return alert(data.message);
                 } else {
+                    $(".error-sign").remove();
                     if(check.firstRecharge){
                         $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
                     }else{
                         const next_url = getQueryStringByName('next'),
                             next = next_url == '' ? '/weixin/list/' : next_url;
-                        $(".error-sign").remove();
                         return alert('绑卡成功！', ()=>{
-                            window.location.href = next
+                            window.location.href = next;
                         });
                     }
 
