@@ -96,7 +96,7 @@ import { limit} from './mixins/bank_limit.js'
 
     //获取银行卡
     const fetch_banklist = (callback) => {
-        if(localStorage.getItem('ban22k')){
+        if(localStorage.getItem('bank')){
             const content = JSON.parse(localStorage.getItem('bank'));
             $bank.append(appendBanks(content));
             return callback && callback(content)

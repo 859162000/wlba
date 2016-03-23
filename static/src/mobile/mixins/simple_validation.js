@@ -35,12 +35,10 @@ export class Simple_validation {
         return new Promise((resolve, reject) => {
             function validation_operation() {
                 let form_list = checklist;
-                console.log("form_list", form_list);
                 return check(form_list);
             }
 
             const [isThrough, sign]  = validation_operation();
-            console.log(isThrough, sign);
             if (isThrough) return resolve('验证成功');
 
             return reject(sign);
@@ -85,13 +83,14 @@ export class Simple_validation {
     }
 
     timerFunction(count) {
+        const $target = this.target;
         var timerInside = function () {
             if (count > 1) {
                 count--;
-                return this.target.text(`${count}秒后可重发`);
+                return $target.text(`${count}秒后可重发`);
             } else {
                 clearInterval(this.intervalId);
-                this.target.text('重新获取').removeAttr('disabled');
+                $target.text('重新获取').removeAttr('disabled');
                 return signModel('倒计时失效，请重新获取')
             }
         };
@@ -102,16 +101,14 @@ export class Simple_validation {
     start() {
         this.before_validation()
             .then(result => {
-                console.log('验证通过')
-                return this.execute_request()
+                console.log('验证通过');
+                return this.execute_request();
             })
             .then(result => {
-                console.log(result,"12");
                 signModel(result);
-                this.timerFunction(60)
+                this.timerFunction(60);
             })
             .catch(result => {
-                console.log(result,"catch");
                 return signModel(result)
             })
     }
