@@ -1,7 +1,7 @@
     define(['jquery'], function ($) {
         var list = '', num_pages, number_minus, number_add, ellipsis;
-        var pager = function(pager){
-            list += "<ul class='pager-target' data-active-page="+pager.page+">";
+        var render = function(pager){
+            list += "<div class='c-pager'><ul class='pager-target' data-active-page="+pager.page+">";
             if(pager.page > 1){
                 list += "<li data-index='prev' class='pager-prev'><a href='javascript:void(0)'><i class='iconfont icon icon-flip-left'></i></a></li>";
             }
@@ -65,25 +65,18 @@
                 list += "<li data-index='next' class='pager-next'><a href='javascript:void(0)'><i class='iconfont icon icon-flip-right'></i></a></li>";
             }
 
-            list += '</ul>';
+            list += '</div></ul>';
 
             $('.c-h-pager').html(list);
         }
 
-        var render = function(pager, callback){
-            var pagerHTML = pager(pager)
-
+        var pager = function(data, callback){
+            render(data)
             $('.pager-target li').off('click').on('click', '.c-h-pager', function(){
-                var page = $(this).data('index')
-
-                pager({
-
-                })
+                callback && callback(page);
             })
 
         };
 
-        return {
-            pager: render
-        }
+        return pager
     });

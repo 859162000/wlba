@@ -19,7 +19,7 @@
             $startDate = $('#start-date'),
             $endDate = $('#end-date');
 
-        $startDate.attr('value', year + '-' + initMonth(month - 1) + '-'+ day)
+        $startDate.attr('value', 2015 + '-' + initMonth(month - 1) + '-'+ day)
         $endDate.attr('value', year + '-' + initMonth(month) + '-'+ day)
         function initMonth(month){
 

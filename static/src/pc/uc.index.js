@@ -39,7 +39,8 @@ require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'],
                 if(result.html_data == ''){
                     $('.center-from-home').html("<div class='tc'>null data</div>")
                 }else{
-                    $('.center-from-home').html(result.html_data)
+                    $('.center-from-home').html(result.html_data);
+
                     pager({
                         page: result.page,
                         pagenumber: result.pagenumber,
@@ -53,11 +54,6 @@ require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'],
             })
     }
 
-    filterDate({
-        start_submit: start_picker__value.get(),
-        end_submit: end_picker__value.get(),
-        page: 1
-    });
 
     $('.filter-submit').on('click', function(){
         filterDate({
@@ -66,6 +62,8 @@ require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'],
             page: 1
         })
     });
+
+    $('.filter-submit').trigger('click');
 
     var type = echarts.init(document.getElementById('type'));
     var limit = echarts.init(document.getElementById('limit'));
