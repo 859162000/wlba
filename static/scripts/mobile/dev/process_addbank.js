@@ -188,13 +188,13 @@ webpackJsonp([6],[
 	                if (data.ret_code > 0) {
 	                    return alert(data.message);
 	                } else {
+	                    $(".error-sign").remove();
 	                    if (check.firstRecharge) {
 	                        $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
 	                    } else {
 	                        var _ret = function () {
 	                            var next_url = (0, _api.getQueryStringByName)('next'),
 	                                next = next_url == '' ? '/weixin/list/' : next_url;
-
 	                            return {
 	                                v: alert('绑卡成功！', function () {
 	                                    window.location.href = next;
@@ -368,7 +368,7 @@ webpackJsonp([6],[
 	            var _self = this;
 	            var status = null;
 	            this.checklist.forEach(function (dom) {
-	                dom.target.on('input', function () {
+	                dom.target.on('input change', function () {
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
 	                    _self.callback && _self.callback(status);
@@ -712,7 +712,6 @@ webpackJsonp([6],[
 	                    count--;
 	                    return $target.text(count + '秒后可重发');
 	                } else {
-	                    console.log(intervalId, this, this.intervalId);
 	                    clearInterval(intervalId);
 	                    $target.text('重新获取').removeAttr('disabled');
 	                    return (0, _ui.signModel)('倒计时失效，请重新获取');

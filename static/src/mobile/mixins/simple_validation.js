@@ -90,7 +90,6 @@ export class Simple_validation {
                 count--;
                 return $target.text(`${count}秒后可重发`);
             } else {
-                console.log(intervalId, this, this.intervalId);
                 clearInterval(intervalId);
                 $target.text('重新获取').removeAttr('disabled');
                 return signModel('倒计时失效，请重新获取')

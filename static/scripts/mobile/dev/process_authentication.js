@@ -250,7 +250,7 @@ webpackJsonp([7],[
 	            var _self = this;
 	            var status = null;
 	            this.checklist.forEach(function (dom) {
-	                dom.target.on('input', function () {
+	                dom.target.on('input change', function () {
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
 	                    _self.callback && _self.callback(status);
