@@ -83,7 +83,6 @@ Y_TXT = '5'
 def stamp(dt):
     return long(time.mktime(dt.timetuple()))
 
-redis = redis_backend()
 def checkBindDeco(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
@@ -196,6 +195,7 @@ class WeixinJoinView(View):
 
     def process_user_operate(self, operate):
         try:
+            redis = redis_backend()
             redis.redis.hset(self.msg._data['FromUserName'], "operate", operate)
             redis.redis.hset(self.msg._data['FromUserName'], "time", int(time.time()))
 
@@ -205,6 +205,7 @@ class WeixinJoinView(View):
 
     def process_customer_transfer(self, weixin_account, w_user, user):
         try:
+            redis = redis_backend()
             last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
             last_time = int(redis.redis.hget(self.msg._data['FromUserName'], "time"))
             # print "operate:%s; last_time:%s"%(last_operate, last_time)
