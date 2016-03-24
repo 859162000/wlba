@@ -11,13 +11,14 @@ if data
 
       if data.paginator.num_pages <= 10
         num_pages = data.paginator.num_pages + 1
-        - for index in 1|get_range:num_pages
-          if data.number == index
-            li.pager-page-number.active
-              a(href='{{uri}}&page={{index}}') {{index}}
-          else
-            li.pager-page-number
-              a(href='{{uri}}&page={{index}}') {{index}}
+        if data.paginator.num_pages > 1
+          - for index in 1|get_range:num_pages
+            if data.number == index
+              li.pager-page-number.active
+                a(href='{{uri}}&page={{index}}') {{index}}
+            else
+              li.pager-page-number
+                a(href='{{uri}}&page={{index}}') {{index}}
 
       else
         if data.number == 1

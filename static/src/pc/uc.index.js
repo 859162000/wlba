@@ -1,12 +1,13 @@
 
-require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'], function ($, echarts, tools, pager) {
+require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'], function ($, echarts, tools, pager, initDate) {
 
 
 
 
 
     var $startDate = $('#start-date'), $endDate = $('#end-date');
-
+    //initDate
+    initDate.defaultDate($startDate, $endDate)
     var startPicker= $startDate.pickadate({
         hiddenPrefix: 'start'
     })

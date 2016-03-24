@@ -12,20 +12,24 @@
             close: '关闭',
         });
 
-        var filterDate = new Date(),
-            year = filterDate.getFullYear(),
-            month = filterDate.getMonth() + 1,
-            day = filterDate.getDate(),
-            $startDate = $('#start-date'),
-            $endDate = $('#end-date');
+        function defaultDate(startTarget, endTarget ){
+            var
+                filterDate = new Date(),
+                year = filterDate.getFullYear(),
+                month = filterDate.getMonth() + 1,
+                day = filterDate.getDate();
 
-        $startDate.attr('value', 2015 + '-' + initMonth(month - 1) + '-'+ day)
-        $endDate.attr('value', year + '-' + initMonth(month) + '-'+ day)
-        function initMonth(month){
+            startTarget.attr('value', (year-1) + '-' + month + '-'+ day)
+            endTarget.attr('value', year + '-' + month + '-'+ day)
+        }
+        function definedDate(startTarget, endTarget, startDate, endDate){
+            startTarget.attr('value', startDate)
+            endTarget.attr('value', endDate)
+        }
 
-            if(month && month < 10){
-                return '0'+ month
-            }
-            return month
+
+        return {
+            defaultDate: defaultDate,
+            definedDate: definedDate
         }
     });

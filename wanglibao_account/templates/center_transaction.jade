@@ -20,6 +20,9 @@ block main
 
       .c-transaction-filter.clearfix
         .c-filter-checkbox.fl
+          input(type='hidden', name='p2p_status', value="{{p2p_status}}")
+          input(type='hidden', name='startDate', value="{{start_date}}")
+          input(type='hidden', name='endDate', value="{{end_date}}")
           ul
             if p2p_status == '' or p2p_status == 'all'
               li.active-on
@@ -96,7 +99,7 @@ block main
 
   .c-transaction-bill
   script.
-    require(["/static/src/pc/transaction.js?v=2"])
+    require(["/static/src/pc/uc.transaction.js?v=2"])
 
 
 

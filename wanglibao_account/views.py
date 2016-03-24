@@ -1145,12 +1145,12 @@ class AccountTransactionP2P(TemplateView):
     def get_context_data(self, **kwargs):
         status_list = ['all', 'purchase', 'repayment', 'finish']
         page = self.request.GET.get('page', 1)
-        pagesize = self.request.GET.get('pagesize', 20)
+        pagesize = self.request.GET.get('pagesize', 10)
         page = int(page)
         pagesize = int(pagesize)
         p2p_status = self.request.GET.get('p2p_status', '')
-        start_submit = self.request.GET.get('start_submit', '')
-        end_submit = self.request.GET.get('end_submit', '')
+        start_submit = self.request.GET.get('start_date', '')
+        end_submit = self.request.GET.get('end_date', '')
 
         # if not status or status not in status_list:
         #     status = 'all'
@@ -1164,7 +1164,8 @@ class AccountTransactionP2P(TemplateView):
             p2p_equities = p2p_equities.filter(product__status=u'还款中')
         elif p2p_status == 'finish':
             p2p_equities = p2p_equities.filter(product__status=u'已完成')
-
+        elif p2p_status == '':
+            p2p_status = 'all'
         if start_submit and end_submit:
             try:
                 start_date = datetime.datetime.strptime(start_submit, '%Y-%m-%d')
