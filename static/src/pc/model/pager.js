@@ -1,9 +1,11 @@
     define(['jquery'], function ($) {
-        var list = '', num_pages, number_minus, number_add, ellipsis;
+        var num_pages, number_minus, number_add, ellipsis;
         var render = function(pager){
+            var list = '';
             list += "<div class='c-pager'><ul class='pager-target' data-active-page="+pager.page+">";
             if(pager.page > 1){
-                list += "<li data-index='prev' class='pager-prev'><a href='javascript:void(0)'><i class='iconfont icon icon-flip-left'></i></a></li>";
+                var prevIndex = pager.page -1
+                list += "<li data-index="+prevIndex+" class='pager-prev pager-page-number'><a href='javascript:void(0)'><i class='iconfont icon icon-flip-left'></i></a></li>";
             }
 
             if( pager.pagenumber <= 10){
@@ -23,8 +25,8 @@
                     list += "<li data-index='1' class='pager-page-number'><a href='javascript:void(0)'>1</a></li>"
                 }
 
-                if(pager.page >= 5){
-                    list += "<li data-index='...' class='pager-page-ellipsis'><a href='javascript:void(0)'>...</a></li>"
+                if(pager.pagenumber >= 5){
+                    list += "<li data-index='...' class='pager-page-ellipsis pager-page-number'><a href='javascript:void(0)'>...</a></li>"
                 }
                 number_minus = pager.page - 2
                 number_add = pager.page + 3
@@ -50,7 +52,7 @@
                 ellipsis = pager.pagenumber - pager.page
 
                 if(ellipsis >= 4){
-                    list += "<li data-index='...' class='pager-page-ellipsis'><a href='javascript:void(0)'>...</a></li>"
+                    list += "<li data-index='...' class='pager-page-ellipsis pager-page-number'><a href='javascript:void(0)'>...</a></li>"
                 }
 
                 if(pager.page == pager.pagenumber){
@@ -62,7 +64,8 @@
             }
 
             if(pager.page < pager.pagenumber){
-                list += "<li data-index='next' class='pager-next'><a href='javascript:void(0)'><i class='iconfont icon icon-flip-right'></i></a></li>";
+                var nextIndex = pager.page +1
+                list += "<li data-index="+nextIndex+" class='pager-next pager-page-number'><a href='javascript:void(0)'><i class='iconfont icon icon-flip-right'></i></a></li>";
             }
 
             list += '</div></ul>';
@@ -70,10 +73,12 @@
             $('.c-h-pager').html(list);
         }
 
-        var pager = function(data, callback){
+        var pager = function(data){
             render(data)
-            $('.pager-target li').off('click').on('click', '.c-h-pager', function(){
-                callback && callback(page);
+            $('.c-pager ul').on('click', '.pager-page-number', function(e){
+                var page = $(this).data('index');
+                console.log(page)
+                data.callback && data.callback(page);
             })
 
         };
