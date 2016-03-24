@@ -134,6 +134,7 @@ class WeixinJoinView(View):
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
+        logger.debug("entering post=============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
@@ -189,7 +190,7 @@ class WeixinJoinView(View):
                 # if not reply:
                 #     # 多客服转接
                 #     reply = TransferCustomerServiceReply(message=msg)
-        if reply == -1:
+        if reply == -1 or not reply:
             return HttpResponse("")
         return HttpResponse(reply.render())
 
