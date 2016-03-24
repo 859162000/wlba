@@ -83,7 +83,6 @@ Y_TXT = '5'
 def stamp(dt):
     return long(time.mktime(dt.timetuple()))
 
-redis = redis_backend()
 def checkBindDeco(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
@@ -139,13 +138,12 @@ class WeixinJoinView(View):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
-        logger.debug(self.msg)
         msg = self.msg
         reply = None
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
-
+        logger.debug("entering post=============================/weixin/join/%s"%fromUserName)
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
         w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
         user = w_user.user
@@ -190,24 +188,28 @@ class WeixinJoinView(View):
                 # if not reply:
                 #     # 多客服转接
                 #     reply = TransferCustomerServiceReply(message=msg)
-        if reply == -1:
+        if reply == -1 or not reply:
             return HttpResponse("")
         return HttpResponse(reply.render())
 
     def process_user_operate(self, operate):
         try:
+            redis = redis_backend()
             redis.redis.hset(self.msg._data['FromUserName'], "operate", operate)
             redis.redis.hset(self.msg._data['FromUserName'], "time", int(time.time()))
 
         except Exception,e:
-            logger.debug(traceback.format_exc())
+            logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
 
 
     def process_customer_transfer(self, weixin_account, w_user, user):
         try:
+            redis = redis_backend()
             last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
-            last_time = int(redis.redis.hget(self.msg._data['FromUserName'], "time"))
-            print "operate:%s; last_time:%s"%(last_operate, last_time)
+            last_time = redis.redis.hget(self.msg._data['FromUserName'], "time")
+            if last_time:
+                last_time = int(last_time)
+            # print "operate:%s; last_time:%s"%(last_operate, last_time)
             reply = None
             txt = None
             is_customer_time = self.checkCsTime()
@@ -249,7 +251,7 @@ class WeixinJoinView(View):
             reply = self.check_service_subscribe(w_user=w_user, user=user)
             if not reply:
                 reply = TransferCustomerServiceReply(message=self.msg)
-            logger.debug(traceback.format_exc())
+            logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
         return reply
 
 
