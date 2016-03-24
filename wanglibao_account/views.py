@@ -17,8 +17,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
-from django.core.paginator import Paginator
-from django.core.paginator import PageNotAnInteger
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url, render_to_response
@@ -1137,24 +1136,65 @@ class AccountTransaction(TemplateView):
 
 
 class AccountTransactionP2P(TemplateView):
-    template_name = 'account_transaction_p2p.jade'
+    """
+    P2P投资记录
+    """
+    # template_name = 'account_transaction_p2p.jade'
+    template_name = 'center_transaction.jade'
 
     def get_context_data(self, **kwargs):
-        trade_records = P2PRecord.objects.filter(user=self.request.user)
-        pager = Paginator(trade_records, 20)
-        page = self.request.GET.get('page')
-        if not page:
-            page = 1
-        trade_records = pager.page(page)
-        for t in trade_records:
-            status = Order.objects.filter(id=t.order_id).first().status
-            if status == "":
-                t.status = "异常"
-            else:
-                t.status = status
+        status_list = ['all', 'purchase', 'repayment', 'finish']
+        page = self.request.GET.get('page', 1)
+        pagesize = self.request.GET.get('pagesize', 20)
+        page = int(page)
+        pagesize = int(pagesize)
+        p2p_status = self.request.GET.get('p2p_status', '')
+        start_submit = self.request.GET.get('start_submit', '')
+        end_submit = self.request.GET.get('end_submit', '')
+
+        # if not status or status not in status_list:
+        #     status = 'all'
+
+        p2p_equities = P2PEquity.objects.filter(user=self.request.user).select_related('product')
+
+        if p2p_status == 'purchase':
+            p2p_equities = p2p_equities.filter(product__status__in=[
+                u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'])
+        elif p2p_status == 'repayment':
+            p2p_equities = p2p_equities.filter(product__status=u'还款中')
+        elif p2p_status == 'finish':
+            p2p_equities = p2p_equities.filter(product__status=u'已完成')
+
+        if start_submit and end_submit:
+            try:
+                start_date = datetime.datetime.strptime(start_submit, '%Y-%m-%d')
+                end_date = datetime.datetime.strptime(end_submit, '%Y-%m-%d')
+
+                start_date = local_to_utc(datetime.datetime(start_date.year, start_date.month, start_date.day), 'min')
+                end_date = local_to_utc(datetime.datetime(end_date.year, end_date.month, end_date.day), 'max')
+
+                p2p_equities = p2p_equities.filter(created_at__gte=start_date, created_at__lt=end_date)
+            except Exception:
+                pass
+
+        paginator = Paginator(p2p_equities, pagesize)
+
+        try:
+            p2p_equities = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_equities = paginator.page(1)
+        except EmptyPage:
+            p2p_equities = []
+        except Exception:
+            p2p_equities = paginator.page(paginator.num_pages)
+
         return {
-            "trade_records": trade_records,
-            'announcements': AnnouncementAccounts
+            "p2p_equities": p2p_equities,
+            "page": page,
+            "pagesize": pagesize,
+            "p2p_status": p2p_status,
+            "start_date": start_submit,
+            "end_date": end_submit,
         }
 
 

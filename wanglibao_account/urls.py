@@ -149,19 +149,19 @@ urlpatterns = patterns(
 urlpatterns += patterns(
     '',
     url(r'^test/', TemplateView.as_view(template_name="center_security.jade")),
-    url(r'^transaction/', TemplateView.as_view(template_name="center_transaction.jade")),
+    url(r'^transaction/', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
     url(r'^rockoning/', TemplateView.as_view(template_name="center_rockoning.jade")),
     url(r'^recharge/', TemplateView.as_view(template_name="center_recharge.jade")),
     url(r'^recharge/yipay/', TemplateView.as_view(template_name="center_recharge_yipay.jade")),
     url(r'^recharge/kuaijie/', TemplateView.as_view(template_name="center_recharge_kuaijie.jade")),
     url(r'^gold/', login_required(AccountExperienceGold.as_view(), login_url='/accounts/login/')),
-    #url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
+    # url(r'^gold-invite/', TemplateView.as_view(template_name="center_invite.jade")),
     url(r'^accrual/', TemplateView.as_view(template_name="center_redpack_accrual.jade")),
     url(r'^pack/', TemplateView.as_view(template_name="center_redpack_base.jade")),
     url(r'^securitys/', TemplateView.as_view(template_name="center_security.jade")),
 
     url(r'^web-message/', TemplateView.as_view(template_name="center_message.jade")),
-    #url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
+    # url(r'^withdraw/', TemplateView.as_view(template_name="center_withdraw_cash.jade")),
     url(r'^bankcards/', TemplateView.as_view(template_name="center_bank.jade")),
     url(r'^home-new/', login_required(AccountHomeNew.as_view(), login_url='/accounts/login/')),  # 账户中心首页
     url(r'^password/modify/', TemplateView.as_view(template_name="center_password_modify.jade")),
