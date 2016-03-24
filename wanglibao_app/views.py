@@ -378,6 +378,7 @@ class PCRepaymentPlanAPIView(APIView):
                 .select_related('product_amortization').select_related('product_amortization__product')\
                 .order_by('term_date')
 
+
         paginator = Paginator(user_amortizations, pagesize)
 
         try:
@@ -389,13 +390,14 @@ class PCRepaymentPlanAPIView(APIView):
 
         amo_list = _user_amortization_list(amo_list)
 
-        html_data = _generate_ajax_template(amo_list, 'include/center_ajax_repayment_list.jade')
-
+        html_data = _generate_ajax_template(amo_list, 'ajax/center_home_form.jade')
         return Response({
             'html_data': html_data,
-            'page': page,
-            'pagesize': pagesize,
-            'pagenumber': paginator.count,
+            'pager': {
+                'page': page,
+                'pagesize': pagesize,
+                'pagenumber': paginator.count,
+            },
             'start_submit': start_submit,
             'end_submit': end_submit,
         })

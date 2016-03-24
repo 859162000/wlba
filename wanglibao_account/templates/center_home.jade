@@ -74,28 +74,14 @@ block main
     .c-h-filter-warp.clearfix.mg-b-sm.mg-t-s
       .fr
         include  include/center_filter_date
-    table.c-h-table.c-table
-      thead
-        tr
-          th 回款时间
-          th 项目名称
-          th 汇款期数
-          th 应收本息(元)
-          th 回款状态
-      tbody
-        mixin tr()
-          tr
-            td 2015-10-30 14:00
-            td ZWS-APP推荐标测试短名称
-            td 1/2
-            td 5,867.00
-            td 回款中
-        +tr()
-        +tr()
-        +tr()
-        +tr()
-        +tr()
+
+    .center-from-home
+      include ajax/center_home_form
+
     .c-h-pager
       include include/center_pager
+
+
+block script
   script.
-    require(["/static/src/pc/transaction.js?v=2"])
+    require(["/static/src/pc/uc.index.js?v=2"])

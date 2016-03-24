@@ -1,0 +1,18 @@
+-load formatters
+if results
+  table.c-h-table.c-table
+      thead
+        tr
+          th 回款时间
+          th 项目名称
+          th 回款期数
+          th 应收本息(元)
+          th 回款状态
+      tbody
+        each amo in results
+          tr
+            td {{amo.term_date}}
+            td {{amo.product_name}}
+            td {{amo.term}}/{{amo.term_total}}
+            td {{amo.total_interest}}
+            td {{amo.settlement_status}}
