@@ -173,7 +173,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         .voiceValidate
           color: #4e7cda
       .selectEdLi
-        border: 1px solid #e6e6e6
+        border: 1px solid #a40035
     .xieyi
       margin-top: $space-s
     .registerForm
@@ -210,6 +210,144 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     font-size: $font-l
     color: #e02d4b
 
-
-
-
+.login-box-bg
+  background: url(/static/imgs/pc/loginRegister/login_bg.jpg) no-repeat center center
+  width: 100%
+  height: 530px
+  .login-form
+    width: 357px
+    background: #ffffff
+    border: 1px solid #c7c7c7
+    float: right
+    margin-top: 46px
+    padding: 7px 0 20px
+    h3
+      line-height: 59px
+      border-bottom: 1px solid #e8e8e8
+      padding: 0 24px
+      span
+        float: left
+        font-size: 18px
+        color: #db493f
+      label
+        float: right
+        font-size: 14px
+        color: #666666
+        a
+          color: #db493f
+          text-decoration: underline
+    .loginForm
+      li
+        width: 306px
+        +line-height(46)
+        border: 1px solid #c7c7c7
+        border-radius: 5px
+        margin: 23px 24px 0
+        i
+          color: #ccc
+          font-size: 20px
+          margin-left: 15px
+        input
+          border: 0 none
+          height: 42px
+          line-height: 42px
+          vertical-align: top
+          margin-left: 10px
+          width: 250px
+          font-size: 16px
+      li.baoxian
+        width: 100%
+        margin: 23px 0 0
+        border: 0 none
+        background: #fffdd5
+        text-indent: 59px
+        em
+          @include loginRegister-sprite(bao)
+          width: 24px
+          height: 29px
+          display: inline-block
+          vertical-align: middle
+          margin-right: 7px
+        span
+          font-size: 16px
+          color: #666666
+      li.login-submit
+        border: 0 none
+        .submitFormStyle
+          width: 308px
+          background: #db493f
+          +border-radius(5px)
+          font-size: 22px
+          color: #ffffff
+          text-align: center
+          cursor: pointer
+          &:hover
+            background: #c7362c
+        .loginError
+          text-align: center
+      li.find-pwd-remember
+        border: 0 none
+        font-size: 14px
+        color: #999999
+        label
+          +line-height(46)
+          display: inline-block
+          input
+            width: auto
+            vertical-align: middle
+        a.findPwd
+          float: right
+          font-size: 14px
+          color: #999999
+  .wanglibao-partner
+    float: left
+    width: 700px
+    .partner-box
+      width: 315px
+      margin: 127px 0 0 315px
+      p
+        text-align: center
+        color: #ffd17a
+        font-size: 18px
+    .partner-detail
+      p
+        font-size: 14px
+        color: #ffd17a
+        text-align: left
+      dl
+        float: left
+        margin-top: 23px
+        .login-icon1
+          @include loginRegister-sprite(login_icon1)
+          width: 29px
+          height: 29px
+          display: inline-block
+          float: left
+          margin-top: 5px
+        .login-icon2
+          @include loginRegister-sprite(login_icon2)
+          width: 21px
+          height: 30px
+          display: inline-block
+          float: left
+          margin-top: 5px
+        .login-icon3
+          @include loginRegister-sprite(login_icon3)
+          width: 27px
+          height: 29px
+          display: inline-block
+          float: left
+          margin-top: 5px
+        .login-icon4
+          @include loginRegister-sprite(login_icon4)
+          width: 27px
+          height: 29px
+          display: inline-block
+          float: left
+          margin-top: 5px
+        dd
+          float: left
+          text-align: left
+          margin-left: 13px
+      dl.w175
+        width: 175px

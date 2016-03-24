@@ -36,7 +36,7 @@ from wanglibao_sms.utils import send_validation_code, validate_validation_code, 
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_profile.models import WanglibaoUserProfile, ActivityUserInfo
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
@@ -69,6 +69,7 @@ from wanglibao.views import landpage_view
 import urllib
 from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
+from wanglibao_profile.forms import ActivityUserInfoForm
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1705,22 +1706,33 @@ class CoopPvApi(APIView):
                     'ext2': ext2,
                 }
                 data = urllib.urlencode(data)
-                res = requests.get(url=coop_pv_url, params=data)
-                res_status_code = res.status_code
-                if res_status_code != 200:
-                    logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
-                else:
+                try:
+                    res = requests.get(url=coop_pv_url, params=data)
+                    res_status_code = res.status_code
+                    if res_status_code != 200:
+                        response_data = {
+                            'ret_code': 10001,
+                            'message': 'failed',
+                        }
+                        logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
+                    else:
+                        response_data = {
+                            'ret_code': 10000,
+                            'message': 'ok',
+                        }
+                except Exception, e:
                     response_data = {
-                        'ret_code': 10000,
-                        'message': 'ok',
+                        'ret_code': 50001,
+                        'message': 'api error',
                     }
-                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+            else:
+                response_data = {
+                    'ret_code': 50002,
+                    'message': '非法请求',
+                }
 
-        response_data = {
-            'ret_code': 50001,
-            'message': 'failed',
-        }
-        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+            logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
+            return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
 class OauthUserRegisterApi(APIView):
@@ -1845,6 +1857,7 @@ class BiSouYiRegisterApi(APIView):
         return HttpResponseRedirect('/')
 
 
+<<<<<<< HEAD
 from geetest import GeetestLib
 
 class GeetestAPIView(APIView):
@@ -1880,3 +1893,28 @@ class GeetestAPIView(APIView):
             result = gt.fail_validate(challenge, validate, seccode)
         result = "sucess" if result else "fail"
         return result
+=======
+class ActivityUserInfoUploadApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        form = ActivityUserInfoForm(request.POST)
+        if form.is_valid():
+            user_info = ActivityUserInfo()
+            user_info.name = form.cleaned_data['name']
+            user_info.phone = form.cleaned_data['phone']
+            user_info.address = form.cleaned_data['address']
+            user_info.is_wlb_phone = form.check_wlb_phone()
+            user_info.save()
+            response_data = {
+                'ret_code': 10000,
+                'message': 'success',
+            }
+        else:
+            response_data = {
+                'ret_code': 10001,
+                'message': form.errors
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+>>>>>>> e5f2f07021518f6e9c5ce1bb05efd212e700292a

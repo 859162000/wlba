@@ -49,7 +49,12 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
+<<<<<<< HEAD
                             BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, GeetestAPIView)
+=======
+                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi,
+                            ActivityUserInfoUploadApi)
+>>>>>>> e5f2f07021518f6e9c5ce1bb05efd212e700292a
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -355,4 +360,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^access_user/register/$', OauthUserRegisterApi.as_view()),
+)
+
+# 网利宝开放日活动用户信息上报接口
+urlpatterns += patterns(
+    '',
+    url(r'^activity_user_info/upload/$', ActivityUserInfoUploadApi.as_view()),
 )
