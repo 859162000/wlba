@@ -49,12 +49,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-<<<<<<< HEAD
-                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, GeetestAPIView)
-=======
-                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi,
-                            ActivityUserInfoUploadApi)
->>>>>>> e5f2f07021518f6e9c5ce1bb05efd212e700292a
+                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, GeetestAPIView, ActivityUserInfoUploadApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)

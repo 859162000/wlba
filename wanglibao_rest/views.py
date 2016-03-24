@@ -67,6 +67,7 @@ from weixin.models import WeixinUser
 from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
+from geetest import GeetestLib
 from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
@@ -1857,9 +1858,6 @@ class BiSouYiRegisterApi(APIView):
         return HttpResponseRedirect('/')
 
 
-<<<<<<< HEAD
-from geetest import GeetestLib
-
 class GeetestAPIView(APIView):
     permission_classes = ()
 
@@ -1893,7 +1891,8 @@ class GeetestAPIView(APIView):
             result = gt.fail_validate(challenge, validate, seccode)
         result = "sucess" if result else "fail"
         return result
-=======
+
+
 class ActivityUserInfoUploadApi(APIView):
     permission_classes = ()
 
@@ -1917,4 +1916,4 @@ class ActivityUserInfoUploadApi(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
->>>>>>> e5f2f07021518f6e9c5ce1bb05efd212e700292a
+
