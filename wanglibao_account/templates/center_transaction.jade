@@ -12,7 +12,7 @@ block sidebar
 block main
   .c-main-white.c-from-opeartion.c-auto-height
     .c-transaction-bar
-      a(href='').active-bar 散标投资
+      a(href='/accounts/transaction/').active-bar 散标投资
       a(href='') 月利宝
 
     .c-from-opeartion.c-layout
@@ -21,10 +21,30 @@ block main
       .c-transaction-filter.clearfix
         .c-filter-checkbox.fl
           ul
-            li.active-on 全部
-            li 投标中
-            li 还款中
-            li 已还款
+            if p2p_status == '' or p2p_status == 'all'
+              li.active-on
+                a(href="/accounts/transaction/?start_date={{start_date}}&end_date={{end_date}}") 全部
+            else
+              li
+                a(href="/accounts/transaction/?start_date={{start_date}}&end_date={{end_date}}") 全部
+            if p2p_status == 'purchase'
+              li.active-on
+                a(href="/accounts/transaction/?p2p_status=purchase&start_date={{start_date}}&end_date={{end_date}}") 投标中
+            else
+              li
+                a(href="/accounts/transaction/?p2p_status=purchase&start_date={{start_date}}&end_date={{end_date}}") 投标中
+            if p2p_status == 'repayment'
+              li.active-on
+                a(href="/accounts/transaction/?p2p_status=repayment&start_date={{start_date}}&end_date={{end_date}}") 还款中
+            else
+              li
+                a(href="/accounts/transaction/?p2p_status=repayment&start_date={{start_date}}&end_date={{end_date}}") 还款中
+            if p2p_status == 'finish'
+              li.active-on
+                a(href="/accounts/transaction/?p2p_status=finish&start_date={{start_date}}&end_date={{end_date}}") 已还款
+            else
+              li
+                a(href="/accounts/transaction/?p2p_status=finish&start_date={{start_date}}&end_date={{end_date}}") 已还款
         .fr
           include include/center_filter_date
 
@@ -40,32 +60,39 @@ block main
             th 汇款账单
             th 借款合同
         tbody
-          mixin tr()
+          for equity in p2p_equities
             tr
               td
-                span.table-date 2015-10-30
-                .t-d19  14:00:28
+                span.table-date {{equity.created_at | date:'Y-m-d'}}
+                .t-d19  {{equity.created_at | date:'H:i:s'}}
               td
                 .tl.padding-l-sm
-                  .table-product-name 企业生产资金生产资金生产资金企业生产资金生产资金生产资金
-                  .t-d19 年化收益:12.5%
-                  .t-d19 投资期限:10个月
+                  .table-product-name {{equity.product.short_name}}
+                  .t-d19 年化收益:{{equity.product.expected_earning_rate}}%
+                  .t-d19 投资期限:{{equity.product.period}}{{equity.product.pay_method | period_unit}}
               td
-                span 5,800.00
+                span {{equity.equity | money_format}}
               td
-                span 5,7878.00
+                if equity.product.display_status == '还款中' or equity.product.display_status == '已完成'
+                  total_principal_interest = equity.equity + equity.total_interest + equity.total_coupon_interest
+                  span {{total_principal_interest | money_format}}
+                else
+                  span -
               td
-                span 未满标
-              td
-                span.t-d20 账单
-              td
-                .t-d20
-                  a(href='/') 合同
-          +tr()
-          +tr()
-          +tr()
-          +tr()
+                span {{equity.product.display_status}}
+              if equity.product.display_status == '还款中' or equity.product.display_status == '已完成'
+                td
+                  span.t-d20 账单
+                td
+                  .t-d20
+                    a(href="/accounts/p2p/contract/{{equity.product.id}}/", target="_blank") 合同
+              else
+                td -
+                td -
+    url_params = "/accounts/transaction/?p2p_status=" + p2p_status + "&start_date=" + start_date + "&end_date=" + end_date
+    - with data=p2p_equities uri=url_params
     include include/center_pager
+    - endwith
 
   .c-transaction-bill
   script.

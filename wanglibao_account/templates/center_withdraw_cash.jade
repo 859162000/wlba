@@ -25,16 +25,21 @@ block main
   .c-main-white.c-auto-height.c-layout
     form#withdraw-form
       - csrf_token
-      input(type="hidden",name="card_id")
       .c-cash-layout
         .c-cash-head.t-d19.font-l 余额提现
         table.c-cash-table
           tr
             th 持卡人
-            td {{user_profile.name}}
+            td {{user_name}}
           tr
             th 提现至银行卡
-            td {{cards}}
+            td
+              if cards
+                span {{cards.bank.name}} &nbsp;&nbsp; {{cards.no | bank_card}}
+                input(type="hidden", name="card_id", value="{{cards.id}}")
+              else
+                span 您尚未绑卡，无法提现。请
+                a(href='/accounts/bankcard/') 绑定银行卡
           tr
             th 可用余额(元)
             td {{margin | money_format}}
