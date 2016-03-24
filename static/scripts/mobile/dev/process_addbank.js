@@ -16,9 +16,9 @@ webpackJsonp([6],[
 
 	var _api = __webpack_require__(3);
 
-	var _simple_validation = __webpack_require__(11);
+	var _simple_validation = __webpack_require__(9);
 
-	var _bank_limit = __webpack_require__(12);
+	var _bank_limit = __webpack_require__(10);
 
 	(function () {
 
@@ -100,7 +100,7 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank')) {
+	        if (localStorage.getItem('bank1')) {
 	            var content = JSON.parse(localStorage.getItem('bank'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
@@ -188,6 +188,7 @@ webpackJsonp([6],[
 	                if (data.ret_code > 0) {
 	                    return alert(data.message);
 	                } else {
+	                    $(".error-sign").remove();
 	                    if (check.firstRecharge) {
 	                        $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
 	                    } else {
@@ -367,7 +368,7 @@ webpackJsonp([6],[
 	            var _self = this;
 	            var status = null;
 	            this.checklist.forEach(function (dom) {
-	                dom.target.on('input', function () {
+	                dom.target.on('input change', function () {
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
 	                    _self.callback && _self.callback(status);
@@ -576,9 +577,7 @@ webpackJsonp([6],[
 /***/ },
 /* 7 */,
 /* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -707,18 +706,20 @@ webpackJsonp([6],[
 	        key: 'timerFunction',
 	        value: function timerFunction(count) {
 	            var $target = this.target;
+	            var intervalId = void 0;
 	            var timerInside = function timerInside() {
 	                if (count > 1) {
 	                    count--;
 	                    return $target.text(count + '秒后可重发');
 	                } else {
-	                    clearInterval(this.intervalId);
+	                    clearInterval(intervalId);
 	                    $target.text('重新获取').removeAttr('disabled');
 	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
 	                }
 	            };
 	            timerInside();
-	            return this.intervalId = setInterval(timerInside, 1000);
+	            intervalId = setInterval(timerInside, 1000);
+	            return this.intervalId = intervalId;
 	        }
 	    }, {
 	        key: 'start',
@@ -742,7 +743,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";

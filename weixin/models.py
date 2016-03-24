@@ -284,9 +284,7 @@ class WeixinAccounts(object):
     host_url = None
 
     def __init__(self, account_key=None):
-        print '----------------------------1'
         if not self.data:
-            print '-------------------------2'
             self.append_account()
         if account_key:
             data = self.data.get(account_key)
