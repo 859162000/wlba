@@ -14,7 +14,7 @@ webpackJsonp([12],[
 
 	var _from_validation = __webpack_require__(6);
 
-	var _images_validation = __webpack_require__(14);
+	var _images_validation = __webpack_require__(12);
 
 	(function () {
 
@@ -26,7 +26,8 @@ webpackJsonp([12],[
 	        $password = $('input[name=password]'),
 	        $invite_code = $('input[name=invite_code]'),
 	        $agreement = $('input[name=agreement]'),
-	        $captcha = $('#captcha');
+	        $captcha = $('#captcha'),
+	        $token = $('#token');
 
 	    //---------------初始化操作start---------
 	    var autolist = [{ target: $identifier, required: true }, { target: $captcha_1, required: true }, { target: $validate_code, required: true }, { target: $password, required: true }, { target: $invite_code, required: false }];
@@ -93,6 +94,7 @@ webpackJsonp([12],[
 
 	    //注册
 	    function register(url) {
+	        var invite_val = $.trim($invite_code.val());
 	        return new Promise(function (resolve, reject) {
 	            (0, _api.ajax)({
 	                url: url,
@@ -103,7 +105,7 @@ webpackJsonp([12],[
 	                    'captcha_0': $captcha_0.val(),
 	                    'captcha_1': $captcha_1.val(),
 	                    'validate_code': $validate_code.val(),
-	                    'invite_code': 'weixin',
+	                    'invite_code': invite_val === "" ? $token.val() : invite_val,
 	                    'invite_phone': ''
 	                },
 	                beforeSend: function beforeSend() {
@@ -298,7 +300,7 @@ webpackJsonp([12],[
 	            var _self = this;
 	            var status = null;
 	            this.checklist.forEach(function (dom) {
-	                dom.target.on('input', function () {
+	                dom.target.on('input change', function () {
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
 	                    _self.callback && _self.callback(status);
@@ -510,9 +512,7 @@ webpackJsonp([12],[
 /* 9 */,
 /* 10 */,
 /* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';

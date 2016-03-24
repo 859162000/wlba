@@ -76,8 +76,8 @@ org.checin_in = (function () {
                 _self.appShare.touchShare({
                     title: '网利宝天天送我钱，连拿7天还送大礼包!',
                     content: '速来抢钱',
-                    image: 'https://staging.wanglibao.com/static/imgs/app/checkin/share_img_check.png',
-                    shareUrl: 'https://staging.wanglibao.com/api/m/check-in-share/'
+                    image: 'https://www.wanglibao.com/static/imgs/app/checkin/share_img_check.png',
+                    shareUrl: 'https://www.wanglibao.com/api/m/check-in-share/'
                 })
             });
 
@@ -302,7 +302,7 @@ wlb.ready({
                 },
                 success: function (data) {
                     org.checin_in.init(mixins)
-                }
+                } 
             })
         }
 
@@ -317,8 +317,8 @@ wlb.ready({
 
     },
     other: function () {
-        org.checin_in.init()
-        //alert('guy ! open in app!')
+        //org.checin_in.init()
+        alert('guy ! open in app!')
     }
 })
 

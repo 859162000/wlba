@@ -1807,9 +1807,9 @@ class AdminSendMessageView(TemplateView):
                             record.event = experience_event
                             record.created_at = now
                             record.save()
-                            msg += u'id:{},成功;'.format(coupon_id)
+                            msg += u'id:{},成功;'.format(experience_id)
                         else:
-                            msg += u'id:{},失败;'.format(coupon_id)
+                            msg += u'id:{},失败;'.format(experience_id)
 
             # 发送短信
             content_sms = request.POST.get("content_sms", "")

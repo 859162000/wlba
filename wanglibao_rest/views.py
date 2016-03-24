@@ -36,7 +36,7 @@ from wanglibao_sms.utils import send_validation_code, validate_validation_code, 
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_profile.models import WanglibaoUserProfile, ActivityUserInfo
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
@@ -69,6 +69,7 @@ from wanglibao.views import landpage_view
 import urllib
 from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
+from wanglibao_profile.forms import ActivityUserInfoForm
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1854,3 +1855,28 @@ class BiSouYiRegisterApi(APIView):
 
         logger.info("BiSouYiRegisterApi process result: %s" % message)
         return HttpResponseRedirect('/')
+
+
+class ActivityUserInfoUploadApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        form = ActivityUserInfoForm(request.POST)
+        if form.is_valid():
+            user_info = ActivityUserInfo()
+            user_info.name = form.cleaned_data['name']
+            user_info.phone = form.cleaned_data['phone']
+            user_info.address = form.cleaned_data['address']
+            user_info.is_wlb_phone = form.check_wlb_phone()
+            user_info.save()
+            response_data = {
+                'ret_code': 10000,
+                'message': 'success',
+            }
+        else:
+            response_data = {
+                'ret_code': 10001,
+                'message': form.errors
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
