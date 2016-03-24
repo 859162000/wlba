@@ -218,6 +218,7 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
         return;
       }
       phoneNumber = $('.mobileCode').val();
+      element.attr('disabled', 'disabled').removeClass('getCodeBtn');
       $.ajax({
         url: "/api/pay/deposit_new/",
         type: "POST",
@@ -234,7 +235,6 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
         $('.error-box').text(xhr.message)
       }).success(function(xhr) {
         if (xhr.ret_code === 0) {
-          element.attr('disabled', 'disabled').removeClass('getCodeBtn');
           $('#order_id').val(xhr.order_id);
           $('#token').val(xhr.token);
           intervalId;
