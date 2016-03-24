@@ -141,6 +141,7 @@
             width: 300px
             height: 34px
             border-bottom: 1px solid #988c89
+            position: relative
             span
                 width: 20px
                 height: 25px
@@ -156,11 +157,19 @@
             input
                 width: 250px
                 height: 25px
+                border: none
                 margin-left: 20px
                 margin-top: 2px
-                border: none
                 color: #ffffff
                 background: transparent
+            a
+                width: 150px
+                height: 25px
+                position: absolute
+                right: -155px
+                top: 0
+                color: red
+                line-height: 34px
     .login_btn
         width: 162px
         height: 31px
@@ -218,7 +227,41 @@
     line-height: 58px
     font-size: 16px
     margin-top: 22px
-
+.mesg
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background: #000000
+    opacity: .5
+    z-index: 9
+    display: none
+.dialog
+    width: 400px
+    height: 200px
+    background: #ffffff
+    position: fixed
+    left: 50%
+    top: 50%
+    margin-left: -200px
+    margin-top: -100px
+    z-index: 99
+    display: none
+    p
+        margin: 40px 20px
+        font-size: 14px
+        text-align: center
+    a
+        width: 150px
+        height: 30px
+        background: red
+        color: #ffffff
+        text-align: center
+        line-height: 30px
+        margin: 0 auto
+        display: block
+        font-size: 14px
 
 
 

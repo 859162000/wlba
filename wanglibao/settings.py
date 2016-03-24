@@ -519,9 +519,6 @@ LOGGING = {
     }
 }
 
-from logging.config import dictConfig
-dictConfig(LOGGING)
-
 
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
@@ -1183,11 +1180,15 @@ WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_QUERY_URL = 'http://dynamic.vip.xunlei.com/xljinku/checkOrder'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
+XUNLEIVIP_BIND_CARD_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_bind.php'
+XUNLEIVIP_PURCHASE_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_invest.php'
+XUNLEIVIP_TASK_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_task.php'
 XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
+XUNLEI_TASK_AMOUNT = 10000
 
 # 脉脉
 WLB_FOR_MAIMAI1_KEY = '2004'

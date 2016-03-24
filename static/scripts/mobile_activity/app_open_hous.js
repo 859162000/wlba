@@ -217,116 +217,56 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;org.ui = (function(){
-    var lib = {
-        _alert: function(txt, callback,difference){
-            var alertFram = '';
-            if(document.getElementById("alert-cont")){
-                document.getElementById("alert-cont").innerHTML = '';
-                document.getElementById("popubMask").style.display = "block";
-                document.getElementById("alert-cont").style.display = "block";
-                alertFram = document.getElementById("alert-cont");
-                shield = document.getElementById("popubMask");
+;(function(org){
+    var reg = /^1[3|5|8]\d{9}$/;
+        var isphone = function(date){
+            if(date.ret_code == 10000){
+                $(".mesg,.dialog").show();
             }else{
-                var shield = document.createElement("DIV");
-                shield.id = "popubMask";
-                shield.style.cssText="position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;height:100%";
-                alertFram = document.createElement("DIV");
-                alertFram.id="alert-cont";
-            }
-            if(difference == 2){
-                strHtml = "<div id='alertTxt' class='popub-txt investWin'><p><img src='/static/imgs/mobile_activity/app_experience/right.png'/></p>";
-                strHtml+="<p class='successFonts'>恭喜您投资成功！</p><p>到期后体验金自动收回</p><p>收益自动发放</p></div>";
-            }else if(difference == 4){
-                strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
-            }
-            alertFram.innerHTML = strHtml;
-            document.body.appendChild(alertFram);
-            document.body.appendChild(shield);
-
-            $('.close_btn').on('click',function(){
-                alertFram.style.display = "none";
-                shield.style.display = "none";
-                callback && callback();
-            })
-            document.body.onselectstart = function(){return false;};
-        }
-    }
-
-    return {
-        alert : lib._alert
-    }
-})();
-var login = false;
-wlb.ready({
-    app: function (mixins) {
-        function connect(data) {
-            org.ajax({
-                url: '/accounts/token/login/ajax/',
-                type: 'post',
-                data: {
-                    token: data.tk,
-                    secret_key: data.secretToken,
-                    ts: data.ts
-                },
-                success: function (data) {
-                    var url = location.href;
-                    var times = url.split("?");
-                    if(times[1] != 1){
-                        url += "?1";
-                        self.location.replace(url);
-                    }
-                    org.experience.init()
+                if(date.message.name){
+                    $(".lg_name").text(date.message.name[0]);
                 }
-            })
-        }
-        mixins.sendUserInfo(function (data) {
-            if (data.ph == '') {
-                login = false;
-                mixins.loginApp({refresh:1, url:''});
-            } else {
-                login = true;
-                connect(data)
-            }
-        })
+                if(date.message.address){
+                    $(".lg_address").text(date.message.address[0]);
+                }
+                if(date.message.phone){
+                    $(".lg_phone").text(date.message.phone[0]);
+                }
 
-    },
-    other: function(){
-        org.experience.init()
-    }
-})
-org.experience = (function (org) {
-    var lib = {
-        init: function () {
-            lib._goInvest()
-        },
-        _goInvest: function () {
-            /*投资*/
-            $('.accountInvestBtn').on('click', function () {
-                org.ajax({
-                    url: '/api/experience/buy/',
-                    type: 'POST',
-                    data: {},
-                    success: function (data) {
-                        if (data.ret_code > 0) {
-                            org.ui.alert(data.message, '', '4')
-                        } else {
-                            org.ui.alert('', '', '2')
-                            setTimeout(function () {
-                                $('#alert-cont,#popubMask').hide();
-                                location.reload();
-                            }, 2000)
-                        }
-                    },
-                    error: function (data) {
-                        org.ui.alert(data.message, '', '4')
-                    }
-                });
-            })
-        }
-    }
-    return {
-        init: lib.init
-    }
-})(org);
+            }
+        };
+        var ajaxFn = function(url,option){
+            org.ajax({
+               type : "post",
+               url : url,
+               data : option,
+               async : false,
+               success : function(date){
+                   isphone(date);
+               },
+               error : function(){
+                    alert("网络出错，稍后再试");
+               }
+           })
+        };
+        var Event = function(){
+            var phone = $("#phone").val(),
+                name = $("#username").val(),
+                address = $("#address").val();
+            var opt = {"phone": phone, "name": name, "address": address};
+            if(!reg.test(phone)){
+                $(".lg_phone").text("*手机号输入错误");
+            }else{
+                ajaxFn("/api/activity_user_info/upload/",opt);
+            }
+        };
+
+        $("#login_btn").on("click",Event);
+        $("#lg_uls").on("keyup","input",function(){
+            $(this).next().text("");
+        })
+        $("#dia_btn").on("click",function(){
+            $(".mesg,.dialog").hide();
+            location.reload();
+        })
+})(org)
