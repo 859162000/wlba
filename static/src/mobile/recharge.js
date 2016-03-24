@@ -4,6 +4,7 @@ import { signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
+
 (() => {
 
     const
@@ -114,8 +115,12 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                     header: '设置交易密码',
                     explain: '请设置6位数字作为交易密码',
                     done: function (result) {
-                        set_trade_data.password_1 = result.password
-                        set_operation_1.destroy()
+                        let re = /^\d{6}$/;
+                        set_trade_data.password_1 = result.password;
+                        if(!re.test(result.password)){
+                            return signModel("请设置6位数字作为交易密码");
+                        }
+                        set_operation_1.destroy();
                         set_operation_1.layoutHide();
                         set_operation_2();
                     }
@@ -127,10 +132,10 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                         header: '设置交易密码',
                         explain: '请再次确认交易密码',
                         done: function (result) {
-                            set_trade_data.password_2 = result.password
+                            set_trade_data.password_2 = result.password;
                             if(set_trade_data.password_2 != set_trade_data.password_1){
-                                set_operation_2.destroy()
-                                set_operation_2.layoutHide()
+                                set_operation_2.destroy();
+                                set_operation_2.layoutHide();
                                 return Deal_ui.show_alert('error', function(){
                                     set_trade()
                                 })

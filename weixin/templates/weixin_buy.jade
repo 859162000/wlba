@@ -39,7 +39,7 @@ html
                   //百分比有个最高抵扣金额highest_amount
                   if redpacks
                     select(name="redpack", type='select', data-redpack='true')#gifts-package.balance-middle-select-select
-                      option(value = '')  不使用理财券
+                      option(value = '', selected = true)  不使用理财券
                       redpack_num = len(redpacks)
                       each redpack in redpacks
                         if redpack.method == "-"
@@ -92,6 +92,6 @@ html
         include include/ui_model/mobile_alert
         include include/tracking
         //script(data-init="buy", src="/static/scripts/mobile/mobile.js?v=20151202")
-        script(src='/static/scripts/mobile/pro/vendor.zepto.js')
-        script(src='/static/scripts/mobile/pro/buy.js?20160321')
+        script(src='/static/scripts/mobile/pro/vendor.zepto.js?20160322')
+        script(src='/static/scripts/mobile/pro/buy.js?2016032303')
 

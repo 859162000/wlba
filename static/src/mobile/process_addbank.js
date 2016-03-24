@@ -96,7 +96,7 @@ import { limit} from './mixins/bank_limit.js'
 
     //获取银行卡
     const fetch_banklist = (callback) => {
-        if(localStorage.getItem('bank')){
+        if(localStorage.getItem('bank1')){
             const content = JSON.parse(localStorage.getItem('bank'));
             $bank.append(appendBanks(content));
             return callback && callback(content)
@@ -152,7 +152,7 @@ import { limit} from './mixins/bank_limit.js'
             card_no: $bankcard.val(),
             gate_id: $bank.val(),
             phone: $bankphone.val(),
-            amount: 0.01
+            amount: $money.length > 0 ? $money.val() : 0.01
         });
         simple_validation.start()
 
@@ -175,7 +175,7 @@ import { limit} from './mixins/bank_limit.js'
     })
 
     function recharge(check){
-        org.ajax({
+        ajax({
             type: 'POST',
             url: '/api/pay/cnp/dynnum_new/',
             data: {
@@ -185,7 +185,7 @@ import { limit} from './mixins/bank_limit.js'
                 token: $('input[name=token]').val(),
                 set_the_one_card: true
             },
-            beforeSend: function () {
+            beforeSend () {
                 if(check.firstRecharge){
                     $submit.attr('disabled', 'disabled').text('充值中...');
                 }else{
@@ -193,27 +193,28 @@ import { limit} from './mixins/bank_limit.js'
                 }
 
             },
-            success: function (data) {
+            success (data) {
                 if (data.ret_code > 0) {
                     return alert(data.message);
                 } else {
+                    $(".error-sign").remove();
                     if(check.firstRecharge){
                         $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
                     }else{
                         const next_url = getQueryStringByName('next'),
                             next = next_url == '' ? '/weixin/list/' : next_url;
                         return alert('绑卡成功！', ()=>{
-                            window.location.href = next
+                            window.location.href = next;
                         });
                     }
 
                 }
             },
-            error: function(result){
+            error (result){
                 var data = JSON.parse(result.responseText);
                 return alert(data.detail);
             },
-            complete: function () {
+            complete () {
                 if(check.firstRecharge){
                     $submit.removeAttr('disabled').text('绑卡并充值');
                 }else{

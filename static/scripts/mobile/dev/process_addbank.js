@@ -100,7 +100,7 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank')) {
+	        if (localStorage.getItem('bank1')) {
 	            var content = JSON.parse(localStorage.getItem('bank'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
@@ -148,7 +148,7 @@ webpackJsonp([6],[
 	            card_no: $bankcard.val(),
 	            gate_id: $bank.val(),
 	            phone: $bankphone.val(),
-	            amount: 0.01
+	            amount: $money.length > 0 ? $money.val() : 0.01
 	        });
 	        simple_validation.start();
 	    });
@@ -167,7 +167,7 @@ webpackJsonp([6],[
 	    });
 
 	    function recharge(check) {
-	        org.ajax({
+	        (0, _api.ajax)({
 	            type: 'POST',
 	            url: '/api/pay/cnp/dynnum_new/',
 	            data: {
@@ -188,6 +188,7 @@ webpackJsonp([6],[
 	                if (data.ret_code > 0) {
 	                    return alert(data.message);
 	                } else {
+	                    $(".error-sign").remove();
 	                    if (check.firstRecharge) {
 	                        $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
 	                    } else {
@@ -367,7 +368,7 @@ webpackJsonp([6],[
 	            var _self = this;
 	            var status = null;
 	            this.checklist.forEach(function (dom) {
-	                dom.target.on('input', function () {
+	                dom.target.on('input change', function () {
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
 	                    _self.callback && _self.callback(status);
@@ -542,7 +543,7 @@ webpackJsonp([6],[
 	    },
 	    idCard: function idCard(str) {
 	        var error = '身份证号不正确',
-	            re = new RegExp(/^([0-9]{17}[0-9X]{1})|([0-9]{15})$/);
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
 	        if (re.test($.trim(str))) {
 	            return [true, ''];
 	        }
@@ -704,18 +705,21 @@ webpackJsonp([6],[
 	    }, {
 	        key: 'timerFunction',
 	        value: function timerFunction(count) {
+	            var $target = this.target;
+	            var intervalId = void 0;
 	            var timerInside = function timerInside() {
 	                if (count > 1) {
 	                    count--;
-	                    return this.target.text(count + '秒后可重发');
+	                    return $target.text(count + '秒后可重发');
 	                } else {
-	                    clearInterval(this.intervalId);
-	                    this.target.text('重新获取').removeAttr('disabled');
+	                    clearInterval(intervalId);
+	                    $target.text('重新获取').removeAttr('disabled');
 	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
 	                }
 	            };
 	            timerInside();
-	            return this.intervalId = setInterval(timerInside, 1000);
+	            intervalId = setInterval(timerInside, 1000);
+	            return this.intervalId = intervalId;
 	        }
 	    }, {
 	        key: 'start',

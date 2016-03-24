@@ -762,52 +762,47 @@ class FUBARegister(CoopRegister):
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time')
-        if binding and p2p_record_set.exists():
-            # 判断是否首次投资
-            if p2p_record_set.first().order_id == order_id:
-                p2p_record = p2p_record_set.first()
-                goodmark = '1'
-                order_act = u'首单'
-            else:
-                p2p_record = p2p_record_set.last()
-                goodmark = '2'
-                order_act = u'复投'
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+        if binding and p2p_record.order_id == int(order_id):
+            # 根据支付方式判定周期是否为1月以上标的
+            pay_method = p2p_record.product.pay_method
+            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                # 如果首次投资金额大于或等于5000则回调
+                if p2p_record.amount >= 5000:
+                    # 如果结算时间过期了则不执行回调
+                    earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
+                    if earliest_settlement_time:
+                        earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                        current_time = datetime.datetime.now()
+                        # 如果上次访问的时间是在30天前则不更新访问时间
+                        if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                            return
 
-            # 如果结算时间过期了则不执行回调
-            earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-            if earliest_settlement_time:
-                earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                current_time = datetime.datetime.now()
-                # 如果上次访问的时间是在30天前则不更新访问时间
-                if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                    return
-
-            order_id = p2p_record.id
-            goodsprice = int(p2p_record.amount)
-            # goodsname 提供固定值，固定值自定义，但不能为空
-            goodsname = u"名称:网利宝,类型:产品标,周期:1月"
-            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-            status = u"%s【%s元：已付款】" % (order_act, goodsprice)
-            params = {
-                'action': 'create',
-                'planid': self.coop_id,
-                'order': order_id,
-                'goodsmark': goodmark,
-                'goodsprice': goodsprice,
-                'goodsname': goodsname,
-                'sig': sig,
-                'status': status,
-                'uid': binding.bid,
-            }
-            common_callback.apply_async(
-                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-            # 记录开始结算时间
-            if not binding.extra:
-                # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
-                if earliest_settlement_time:
-                    binding.extra = earliest_settlement_time
-                    binding.save()
+                    order_id = p2p_record.order_id
+                    goodsprice = 100
+                    # goodsname 提供固定值，固定值自定义，但不能为空
+                    goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+                    sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+                    status = u"首单【%s元：已付款】" % p2p_record.amount
+                    params = {
+                        'action': 'create',
+                        'planid': self.coop_id,
+                        'order': order_id,
+                        'goodsmark': '1',
+                        'goodsprice': goodsprice,
+                        'goodsname': goodsname,
+                        'sig': sig,
+                        'status': status,
+                        'uid': binding.bid,
+                    }
+                    common_callback.apply_async(
+                        kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+                    # 记录开始结算时间
+                    if not binding.extra:
+                        # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                        if earliest_settlement_time:
+                            binding.extra = earliest_settlement_time
+                            binding.save()
 
 
 class YunDuanRegister(CoopRegister):
@@ -1661,17 +1656,12 @@ class BaJinSheRegister(CoopRegister):
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
             req_data = json.loads(self.request.body.strip())
-        elif self.request.META.get('CONTENT_TYPE', '').lower().find('application/x-www-form-urlencode') != -1:
-            if self.request.body.strip():
-                data = str_to_dict(self.request.body.strip())
-                if 'data' in data:
-                     req_data = json.loads(data['data']) or dict()
-                else:
-                    req_data = dict()
-            else:
-                req_data = dict()
         else:
-            req_data = self.request.REQUEST
+            data = self.request.REQUEST.get('data')
+            if data:
+                req_data = json.loads(data) or dict()
+            else:
+                req_data = self.request.REQUEST
 
         channel_code = self.get_channel_code_from_request()
         channel_phone = req_data.get(self.external_channel_phone_key, None)
@@ -1890,7 +1880,6 @@ class BiSouYiRegister(BaJinSheRegister):
         self.external_channel_client_id_key = 'cid'
         self.channel_sign_key = 'sign'
         self.channel_content_key = 'content'
-        self.channel_access_token_key = 'token'
 
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
@@ -1898,7 +1887,6 @@ class BiSouYiRegister(BaJinSheRegister):
         client_id = self.request.GET.get(self.external_channel_client_id_key, None)
         sign = self.request.GET.get(self.channel_sign_key, None)
         content = self.request.GET.get(self.channel_content_key, None)
-        token = self.request.GET.get(self.channel_access_token_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1914,9 +1902,6 @@ class BiSouYiRegister(BaJinSheRegister):
 
         if content:
             self.request.session[self.channel_content_key] = content
-
-        if token:
-            self.request.session[self.channel_access_token_key] = content
 
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
