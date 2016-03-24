@@ -135,7 +135,6 @@ class WeixinJoinView(View):
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
-        # print '*************************************',request.session.get('last_operate', -1)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
@@ -147,7 +146,6 @@ class WeixinJoinView(View):
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
 
-        # print '*************************************', redis._get(fromUserName)
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
         w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
         user = w_user.user
@@ -202,13 +200,13 @@ class WeixinJoinView(View):
             redis.redis.hset(self.msg._data['FromUserName'], "time", int(time.time()))
 
         except Exception,e:
-            logger.log(traceback.format_exc())
+            logger.debug(traceback.format_exc())
 
 
     def process_customer_transfer(self, weixin_account, w_user, user):
         try:
             last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
-            last_time = redis.redis.hget(self.msg._data['FromUserName'], "time")
+            last_time = int(redis.redis.hget(self.msg._data['FromUserName'], "time"))
             print "operate:%s; last_time:%s"%(last_operate, last_time)
             reply = None
             txt = None
@@ -251,7 +249,7 @@ class WeixinJoinView(View):
             reply = self.check_service_subscribe(w_user=w_user, user=user)
             if not reply:
                 reply = TransferCustomerServiceReply(message=self.msg)
-            logger.log(traceback.format_exc())
+            logger.debug(traceback.format_exc())
         return reply
 
 
@@ -267,7 +265,7 @@ class WeixinJoinView(View):
     def checkCsTime(self):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
-        if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
+        if now.hour<=18 and now.hour>=9 and weekday>=1 and weekday<=5:
             return True
         return False
 
@@ -425,8 +423,10 @@ class WeixinJoinView(View):
                 sub_service_record.save()
                 txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
         else:
-            txt = u'请回复正确的数字订阅项目'
-        reply = create_reply(txt, self.msg)
+            if content.isdigit():
+                txt = u'请回复正确的数字订阅项目'
+        if txt:
+            reply = create_reply(txt, self.msg)
         return reply
 
 
