@@ -445,7 +445,7 @@ class YeeProxyPay(object):
             if card_to_bank:
                 pass
             else:
-                return {"message": "银行卡与银行不匹配", "form": ""}
+                return {"message": "银行卡与银行不匹配", "form": {'url':'', 'post':''}}
             
             post_data = self._post(order_id, amount, gate_id)
             PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
