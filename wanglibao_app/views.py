@@ -395,7 +395,8 @@ class PCRepaymentPlanAPIView(APIView):
             'html_data': html_data,
             'page': page,
             'pagesize': pagesize,
-            'pagenumber': paginator.count,
+            'pagenumber': paginator.num_pages,
+            'pagecount': paginator.count,
             'start_submit': start_submit,
             'end_submit': end_submit,
         })

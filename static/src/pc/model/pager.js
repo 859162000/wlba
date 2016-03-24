@@ -10,11 +10,13 @@
 
             if( pager.pagenumber <= 10){
                 num_pages = pager.pagenumber + 1
-                for(var i =1 ; i< num_pages; i++){
-                    if(pager.page == i){
-                        list += "<li data-index="+i+" class='pager-page-number active'><a href='javascript:void(0)'>"+i+"</a></li>"
-                    }else{
-                        list += "<li data-index="+i+" class='pager-page-number'><a href='javascript:void(0)'>"+i+"</a></li>"
+                if(pager.pagenumber > 1){
+                    for(var i =1 ; i< num_pages; i++){
+                        if(pager.page == i){
+                            list += "<li data-index="+i+" class='pager-page-number active'><a href='javascript:void(0)'>"+i+"</a></li>"
+                        }else{
+                            list += "<li data-index="+i+" class='pager-page-number'><a href='javascript:void(0)'>"+i+"</a></li>"
+                        }
                     }
                 }
             }else{
@@ -77,7 +79,6 @@
             render(data)
             $('.c-pager ul').on('click', '.pager-page-number', function(e){
                 var page = $(this).data('index');
-                console.log(page)
                 data.callback && data.callback(page);
             })
 

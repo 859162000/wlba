@@ -40,7 +40,6 @@ require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'],
                     $('.center-from-home').html("<div class='tc'>null data</div>")
                 }else{
                     $('.center-from-home').html(result.html_data);
-
                     pager({
                         page: result.page,
                         pagenumber: result.pagenumber,
@@ -53,7 +52,6 @@ require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'],
 
             })
     }
-
 
     $('.filter-submit').on('click', function(){
         filterDate({
