@@ -67,7 +67,6 @@ from weixin.models import WeixinUser
 from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
-from geetest import GeetestLib
 from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
@@ -1856,41 +1855,6 @@ class BiSouYiRegisterApi(APIView):
 
         logger.info("BiSouYiRegisterApi process result: %s" % message)
         return HttpResponseRedirect('/')
-
-
-class GeetestAPIView(APIView):
-    permission_classes = ()
-
-    def __init__(self):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
-    def post(self, request):
-        self.type = request.POST.get('type', None)
-        if self.type == 'get':
-            return self.get_captcha(request)
-        if self.type == 'validate':
-            return self.validate_capthca(request)
-
-    def get_captcha(self, request):
-        gt = GeetestLib(self.id, self.key)
-        status = gt.pre_process()
-        request.session[gt.GT_STATUS_SESSION_KEY] = status
-        response_str = gt.get_response_str()
-        return response_str
-
-    def validate_capthca(self, request):
-        gt = GeetestLib(self.id, self.key)
-        status = request.session[gt.GT_STATUS_SESSION_KEY]
-        challenge = request.form[gt.FN_CHALLENGE]
-        validate = request.form[gt.FN_VALIDATE]
-        seccode = request.form[gt.FN_SECCODE]
-        if status:
-            result = gt.success_validate(challenge, validate, seccode)
-        else:
-            result = gt.fail_validate(challenge, validate, seccode)
-        result = "sucess" if result else "fail"
-        return result
 
 
 class ActivityUserInfoUploadApi(APIView):
