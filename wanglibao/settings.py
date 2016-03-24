@@ -519,9 +519,6 @@ LOGGING = {
     }
 }
 
-from logging.config import dictConfig
-dictConfig(LOGGING)
-
 
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
