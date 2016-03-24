@@ -70,7 +70,8 @@ block main
                 .t-d19  {{equity.created_at | date:'H:i:s'}}
               td
                 .tl.padding-l-sm
-                  .table-product-name {{equity.product.short_name}}
+                  .table-product-name
+                    a(href="/p2p/detail/{{equity.product.id}}/", target="_blank") {{equity.product.short_name}}
                   .t-d19 年化收益:{{equity.product.expected_earning_rate}}%
                   .t-d19 投资期限:{{equity.product.period}}{{equity.product.pay_method | period_unit}}
               td
