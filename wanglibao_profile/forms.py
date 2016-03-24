@@ -5,7 +5,7 @@ from wanglibao_profile.models import WanglibaoUserProfile, ActivityUserInfo
 
 
 class ActivityUserInfoForm(forms.ModelForm):
-    phone = forms.CharField(label=u'手机号', error_messages={'required': u'请输入手机号'})
+    phone = forms.IntegerField(label=u'手机号', error_messages={'required': u'请输入手机号'})
     name = forms.CharField(label=u'姓名', error_messages={'required': u'请输入姓名'})
     address = forms.CharField(label=u'地址', error_messages={'required': u'请输入地址'})
 
