@@ -139,7 +139,6 @@ class WeixinJoinView(View):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
-        logger.debug(self.msg)
         msg = self.msg
         reply = None
         toUserName = msg._data['ToUserName']
@@ -208,7 +207,9 @@ class WeixinJoinView(View):
         try:
             redis = redis_backend()
             last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
-            last_time = int(redis.redis.hget(self.msg._data['FromUserName'], "time"))
+            last_time = redis.redis.hget(self.msg._data['FromUserName'], "time")
+            if last_time:
+                last_time = int(last_time)
             # print "operate:%s; last_time:%s"%(last_operate, last_time)
             reply = None
             txt = None
