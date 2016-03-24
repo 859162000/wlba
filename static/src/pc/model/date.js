@@ -16,11 +16,11 @@
             year = filterDate.getFullYear(),
             month = filterDate.getMonth() + 1,
             day = filterDate.getDate(),
-            $startDate = $('.start-date'),
-            $endDate = $('.end-date');
+            $startDate = $('#start-date'),
+            $endDate = $('#end-date');
 
-        $startDate.attr('data-value', year + '-' + initMonth(month - 1) + '-'+ day)
-        $endDate.attr('data-value', year + '-' + initMonth(month) + '-'+ day)
+        $startDate.attr('value', year + '-' + initMonth(month - 1) + '-'+ day)
+        $endDate.attr('value', year + '-' + initMonth(month) + '-'+ day)
         function initMonth(month){
 
             if(month && month < 10){

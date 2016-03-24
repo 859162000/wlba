@@ -1,27 +1,71 @@
 
-require(['jquery', 'echarts', './model/pager', './model/date', 'csrf'], function ($, echarts) {
-
-     $.post('/api/uc/repayment_plan/', {start_submit: '2015-1-1', end_submit: '2016-1-1',page: 1, pagesize: 10  })
-        .done(function(result){
-            console.log(result)
-            $('.center-from-home').html(result.html_data)
-        })
-
-        .fail(function(){
-
-        })
+require(['jquery', 'echarts', 'tools', './model/pager', './model/date', 'csrf'], function ($, echarts, tools, pager) {
 
 
 
-    var $startDate = $('.start-date'),
-            $endDate = $('.end-date');
 
-    $startDate.pickadate({
+
+    var $startDate = $('#start-date'), $endDate = $('#end-date');
+
+    var startPicker= $startDate.pickadate({
         hiddenPrefix: 'start'
     })
-    $endDate.pickadate({
+    var start_picker__value = startPicker.pickadate( 'picker' )
+
+    var endPicker =  $endDate.pickadate({
         hiddenPrefix: 'end'
     })
+    var end_picker__value = endPicker.pickadate( 'picker' )
+
+    var pagerListen = function(page){
+        var filterData = {
+            start_submit: start_picker__value.get(),
+            end_submit: end_picker__value.get(),
+            page: page,
+        }
+
+        filterDate(filterData)
+    };
+
+    var filterDate = function(data){
+        $.post('/api/uc/repayment_plan/',
+            {
+                start_submit: data.start_submit,
+                end_submit: data.end_submit,
+                page: data.page,
+                pagesize: 10
+            })
+            .done(function(result){
+                if(result.html_data == ''){
+                    $('.center-from-home').html("<div class='tc'>null data</div>")
+                }else{
+                    $('.center-from-home').html(result.html_data)
+                    pager({
+                        page: result.page,
+                        pagenumber: result.pagenumber,
+                        callback: pagerListen
+                    })
+                }
+
+            })
+            .fail(function(){
+
+            })
+    }
+
+    filterDate({
+        start_submit: start_picker__value.get(),
+        end_submit: end_picker__value.get(),
+        page: 1
+    });
+
+    $('.filter-submit').on('click', function(){
+        filterDate({
+            start_submit: start_picker__value.get('value'),
+            end_submit: end_picker__value.get('value'),
+            page: 1
+        })
+    });
 
     var type = echarts.init(document.getElementById('type'));
     var limit = echarts.init(document.getElementById('limit'));

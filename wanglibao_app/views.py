@@ -393,11 +393,9 @@ class PCRepaymentPlanAPIView(APIView):
         html_data = _generate_ajax_template(amo_list, 'ajax/center_home_form.jade')
         return Response({
             'html_data': html_data,
-            'pager': {
-                'page': page,
-                'pagesize': pagesize,
-                'pagenumber': paginator.count,
-            },
+            'page': page,
+            'pagesize': pagesize,
+            'pagenumber': paginator.count,
             'start_submit': start_submit,
             'end_submit': end_submit,
         })
