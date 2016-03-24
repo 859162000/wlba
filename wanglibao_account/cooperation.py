@@ -1417,7 +1417,7 @@ class XunleiVipRegister(CoopRegister):
                 binding.bid = channel_user
                 binding.save()
                 # logger.debug('save user %s to binding'%user)
-                return True
+                return binding
 
             logger.info("%s binding faild with user[%s], channel_user[%s]" %
                         (channel_name, user.id, channel_user))
@@ -1433,29 +1433,29 @@ class XunleiVipRegister(CoopRegister):
         channel = get_user_channel_record(user.id)
         if self.is_xunlei_user and channel and channel.code == self.c_code:
             binding = Binding.objects.filter(user_id=user.id).first()
-            if not binding and self.save_to_binding(user):
-                # 处理渠道用户注册回调
-                self.register_call_back(user)
+            if not binding:
+                binding = self.save_to_binding(user)
+                if binding:
+                    # 处理渠道用户充值回调补发
+                    penny = Decimal(0.01).quantize(Decimal('.01'))
+                    pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                                      status=PayInfo.SUCCESS).order_by('create_time').first()
+                    if pay_info and int(pay_info.amount) >= 100:
+                        self.recharge_call_back(user, pay_info.order_id)
 
-                # 处理渠道用户充值回调补发
-                penny = Decimal(0.01).quantize(Decimal('.01'))
-                pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                                  status=PayInfo.SUCCESS).order_by('create_time').first()
-                if pay_info and int(pay_info.amount) >= 100:
-                    self.recharge_call_back(user, pay_info.order_id)
+                    # 处理渠道用户投资回调补发
+                    p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time')
+                    first_p2p_record = p2p_records.first()
+                    if first_p2p_record and int(first_p2p_record.amount) >= 1000:
+                        self.purchase_call_back(user, first_p2p_record.order_id)
 
-                # 处理渠道用户投资回调补发
-                p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-                first_p2p_record = p2p_records.order_by('create_time').first()
-                if first_p2p_record and int(first_p2p_record.amount) >= 1000:
-                    self.purchase_call_back(user, first_p2p_record.order_id)
+                    # 处理渠道用户每次投资上报回调补发
+                    for p2p_record in p2p_records:
+                        if p2p_record.id != first_p2p_record.id:
+                            self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
-                # 处理渠道用户每次投资上报回调补发
-                for p2p_record in p2p_records:
-                    self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
-
-                # 处理渠道用户绑卡回调补发
-                self.binding_card_call_back(user)
+                    # 处理渠道用户绑卡回调补发
+                    self.binding_card_call_back(user)
 
         self.clear_session()
 
