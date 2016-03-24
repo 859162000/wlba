@@ -284,7 +284,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             var token = getQueryStringByName('promo_token')
             $('#take').click(function() {
                 if(token == 'hexunjd' || token == 'hexunht'){
-                    window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
+                    window.location.href = '/weixin/regist/?next=/activity/app_noviceDecember_h5/';
                 }else{
                     window.location.href = '/activity/experience/mobile/';
                 }
@@ -293,7 +293,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
             $('#register').click(function() {
                 if(token == 'hexunjd' || token == 'hexunht'){
-                    window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
+                    window.location.href = '/weixin/regist/?next=/activity/app_noviceDecember_h5/';
                 }else{
                     window.location.href = '/activity/experience/mobile/';
                 }
