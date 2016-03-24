@@ -10,9 +10,9 @@ class ActivityUserInfoForm(forms.ModelForm):
     address = forms.CharField(label=u'地址', error_messages={'required': u'请输入地址'})
 
     def clean_phone(self):
-        phone = self.cleaned_data['phone'].strip()
+        phone = self.cleaned_data['phone']
 
-        if len(phone) == 11:
+        if len(str(phone)) == 11:
             user_infos = ActivityUserInfo.objects.filter(phone=phone)
             if user_infos.exists():
                 raise forms.ValidationError(
