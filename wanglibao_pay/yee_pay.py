@@ -452,13 +452,13 @@ class YeeShortPay:
         # logger.error("request yee_pay: %s" % data)
         post = self._format_post(data)
         res = requests.post(url, post)
-        logger.error("yee_pay: %s | %s | %s" % (url, data, res.text))
-        return self._response_data_change(res=json.loads(res.text))
+        res_dict = self._response_data_change(res=json.loads(res.text))
+        logger.error("yee_pay: %s | %s | %s" % (url, data, res_dict))
+        return res_dict 
 
     def _request_yee_get(self, url, data):
         post = self._format_post(data)
         res = requests.get(url, params=post)
-        logger.error("yee_pay: %s | %s | %s" % (url, data, res.text))
         return self._response_data_change(res=json.loads(res.text))
 
     def _response_data_change(self, res):
