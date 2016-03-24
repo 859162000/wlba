@@ -157,6 +157,7 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
                             order_id: $('#order_id').val(),
                             token: $('#token').val(),
                             phone: $('.mobileCode').val(),
+                            set_the_one_card: true,
                             device_id: ''
                         },
                         type: 'post'
