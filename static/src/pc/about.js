@@ -42,7 +42,6 @@ require(['jquery', 'lightbox'], function( $ , lightbox){
         if(!self.hasClass('onClick')){
             var left = Math.round(box.position().left);
             self.addClass('onClick');
-            console.log(left+'ddddddd'+(widths-item.width()))
             left == -(widths-item.width()) ? (box.stop().animate({'left' : 0},500,function(){self.removeClass('onClick')})) : (box.stop().animate({'left' : left - item.width()},500,function(){self.removeClass('onClick')}))
         }
     })
