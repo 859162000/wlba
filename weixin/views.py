@@ -207,7 +207,7 @@ class WeixinJoinView(View):
         try:
             last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
             last_time = int(redis.redis.hget(self.msg._data['FromUserName'], "time"))
-            print "operate:%s; last_time:%s"%(last_operate, last_time)
+            # print "operate:%s; last_time:%s"%(last_operate, last_time)
             reply = None
             txt = None
             is_customer_time = self.checkCsTime()
