@@ -20,20 +20,32 @@ class Command(BaseCommand):
         self.user = WanglibaoUserProfile.objects.get(phone=self.phone).user     
         self.gate_id = Card.objects.get(no=self.card_no).bank.gate_id
 
-    def test_no_vcode(self):
+    def test_bind_pay(self):
+        print self.kuai_short_pay.pre_pay(self.user, 0.01, self.card_no,
+                                          self.phone, self.gate_id, '', '', '')
+        order_id = raw_input('order_id: ').strip()
+        token = raw_input('token: ').strip() 
+        vcode = raw_input('vcode: ').strip()
+        print self.kuai_short_pay.dynnum_bind_pay(self.user, vcode, order_id, token, 
+                                                  '', '', '', '')
+    def test_qpay_no_vcode(self):
         print self.kuai_short_pay.pre_pay(self.user, 0.01, self.short_card_no,
                                           self.phone, self.gate_id, '', '', '',)
 
-    def test_with_vcode(self):
-        print self.kuai_short_pay.pre_pay(self.user, 0.01, self.card_no,
-                                          self.phone, self.gate_id, '', '', '')
-        token = raw_input('token: ').strip() 
-        vcode = raw_input('vcode: ').strip()
+    def test_qpay_with_vcode(self):
         print self.kuai_short_pay.pre_pay(self.user, 0.01, self.short_card_no,
                                           self.phone, self.gate_id, '', '', '',
-                                          vcode=vcode, token=token)
+                                          mode='vcode_for_qpay')
+        order_id = raw_input('order_id: ').strip()
+        token = raw_input('token: ').strip() 
+        vcode = raw_input('vcode: ').strip()
+        print self.kuai_short_pay.dynnum_bind_pay(self.user, vcode, order_id, token, 
+                                                  '', '', '', '', mode='qpay_with_sms')
 
     def handle(self, *args, **options):
         self.setUp()
-        self.test_no_vcode()
-        self.test_with_vcode()
+        # self.test_bind_pay()
+        # raw_input('continue/kill')
+        self.test_qpay_no_vcode()
+        raw_input('continue/kill')
+        self.test_qpay_with_vcode()
