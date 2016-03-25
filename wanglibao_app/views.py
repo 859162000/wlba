@@ -53,7 +53,7 @@ from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 import re
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from wanglibao_rest.utils import split_ua
 
@@ -984,7 +984,7 @@ class AppMemorabiliaView(APIView):
 
         memorabilias = AppMemorabilia.objects.filter(hide_link=False,
                                                      start_time__lte=timezone.now()
-                                                     ).order_by('-priority')
+                                                     ).order_by('-priority', '-updated_time')
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 5)
@@ -1051,26 +1051,27 @@ class AppCheckInView(TemplateView):
 
         }
 
-# class AppMemorabiliaDetailView(TemplateView):
-#     template_name = 'memorabilia_detail.jade'
-#
-#     def get_context_data(self, id, **kwargs):
-#         context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
-#
-#         try:
-#             memorabilia = (AppMemorabilia.objects.get(pk=id,
-#                                                       hide_link=False,
-#                                                       start_time__lte=timezone.now()))
-#
-#         except AppMemorabilia.DoesNotExist:
-#             raise Http404(u'您查找的大事记不存在')
-#
-#         context.update({
-#             'memorabilia': memorabilia,
-#
-#         })
-#
-#         return context
+
+class AppMemorabiliaDetailView(TemplateView):
+    template_name = 'memorabilia_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
+
+        try:
+            memorabilia = (AppMemorabilia.objects.get(pk=id,
+                                                      hide_link=False,
+                                                      start_time__lte=timezone.now()))
+
+        except AppMemorabilia.DoesNotExist:
+            raise Http404(u'您查找的大事记不存在')
+
+        context.update({
+            'data': memorabilia,
+
+        })
+
+        return context
 
 
 # class AppMemorabiliaPreviewView(TemplateView):
