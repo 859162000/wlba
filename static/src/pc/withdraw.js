@@ -1,20 +1,6 @@
 (function () {
 
-    require(['jquery', 'tools', 'jquery.validate', 'csrf'], function ($, tool, validate) {
-
-
-        var $amount = $('input[name=amount]');
-        var $fee = $('input[name=fee]');
-
-        $('.fees-alert').on('click', function () {
-            $(this).modal()
-        })
-
-        var margin = $('.withdraw-margin').data('margin');
-        $('.cash-amount-all').on('click', function () {
-            $amount.trigger('focus').val(margin)
-        })
-
+    require(['jquery', 'tools', 'jquery.validate', './model/debounce', 'csrf'], function ($, tool, validate, debounce) {
         $.validator.addMethod("balance", function (value, element) {
             var balance = $(element).attr('data-balance')
             return (value - balance).toFixed(2) <= 0
@@ -41,6 +27,23 @@
             return false;
         });
 
+
+        var $amount = $('input[name=amount]');
+        var $fee = $('input[name=fee]');
+        var margin = $('.withdraw-margin').data('margin');
+
+        $('.fees-alert').on('click', function () {
+            $(this).modal()
+        })
+
+        $('.cash-amount-all').on('click', function () {
+            $amount.trigger('focus').val(margin)
+        });
+
+        $amount.on('input', debounce(function () {
+            checkInput($(this))
+        }, 300));
+
         var max_amount = parseInt($fee.attr('data-max_amount')),
             min_amount = parseInt($fee.attr('data-min_amount'));
 
@@ -51,7 +54,7 @@
                     money: true,
                     balance: false,
                     huge: false,
-                    small: false
+                    small: false,
                 },
                 validate_code: {
                     required: true
@@ -90,6 +93,30 @@
 
             }
         })
+
+
+        var checkInput = function (target) {
+            var amount = target.val();
+            var cardID = target.data('card-id');
+
+            $.post("/api/fee/", { card_id: cardID, amount: amount})
+                .done(function (xhr) {
+                    var strs;
+                    if (xhr.ret_code > 0) {
+                        target.parents('td').find('.form-row-error').html(xhr.message);
+                    } else {
+                        if ((xhr.fee === 0) && (xhr.management_fee === 0 || xhr.management_fee === '0')) {
+                            strs = 0;
+                        } else if (xhr.fee !== 0 && (xhr.management_fee === 0 || xhr.management_fee === '0')) {
+                            strs = xhr.fee;
+                        } else {
+                            strs = xhr.fee + '+' + xhr.management_fee;
+                        }
+                        $('#poundage').html(parseFloat(strs));
+                        return $('#actual-amount').text(xhr.actual_amount);
+                    }
+                });
+        };
 
     });
 
