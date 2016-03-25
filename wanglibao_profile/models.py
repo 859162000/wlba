@@ -10,13 +10,13 @@ class WanglibaoUserProfile(models.Model):
     # user = models.OneToOneField(get_user_model(), primary_key=True)
     user = models.OneToOneField(User, primary_key=True)
 
-    nick_name = models.CharField(max_length=32, blank=True, help_text=u'昵称')
+    nick_name = models.CharField(u'昵称', max_length=32, blank=True)
 
-    phone = models.CharField(max_length=64, blank=True, help_text=u'手机号码')
-    phone_verified = models.BooleanField(default=False, help_text=u'手机号码是否已验证')
+    phone = models.CharField(u'手机号码', max_length=64, blank=True)
+    phone_verified = models.BooleanField(u'手机号码是否已验证', default=False)
 
-    id_is_valid = models.BooleanField(help_text=u'身份证是否通过验证', default=False)
-    id_valid_time = models.DateTimeField(blank=True, null=True, verbose_name=u"实名认证时间")
+    id_is_valid = models.BooleanField(u'身份证是否通过验证', default=False)
+    id_valid_time = models.DateTimeField(u"实名认证时间", blank=True, null=True)
 
     utype = models.CharField(u'用户类型', max_length=10, default='0')
 
