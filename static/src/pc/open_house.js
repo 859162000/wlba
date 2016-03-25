@@ -41,23 +41,43 @@
                }
            })
         };
+
         var Event = function(){
             var phone = $("#phone").val(),
                 name = $("#username").val(),
                 address = $("#address").val();
+            console.log(name.length)
             var opt = {"phone": phone, "name": name, "address": address};
             if(!reg.test(phone)){
                 $(".lg_phone").text("*手机号输入错误");
+            }else if(strlen(name)>20){
+                $(".lg_name").text("*姓名输入错误");
+            }else if(strlen(address)>20){
+                $(".lg_address").text("*地址输入错误");
             }else{
                 ajaxFn("/api/activity_user_info/upload/",opt);
             }
-            fnSaveForm();
+            //fnSaveForm();
         };
+        function strlen(str){
+            var len = 0;
+            for (var i=0; i<str.length; i++) {
+             var c = str.charCodeAt(i);
+             //单字节加1
+             if ((c >= 0x0001 && c <= 0x007e) || (0xff60<=c && c<=0xff9f)) {
+               len++;
+             }
+             else {
+              len+=2;
+             }
+            }
+            return len;
+        }
          function   fnSaveForm(){
              window.external.AutoCompleteSaveForm(oForm);
              oForm.input_one.value="";
              oForm.input_two.value="";
-         }
+         };
         $("#login_btn").on("click",Event);
         $("#lg_uls").on("keyup","input",function(){
             $(this).next().text("");
