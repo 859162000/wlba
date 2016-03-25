@@ -483,6 +483,9 @@ class PushTestView(APIView):
 
 
 class IdValidateAPIView(APIView):
+    """
+    APP端实名认证接口
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -500,27 +503,29 @@ class IdValidateAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({"ret_code": 30055, "message": u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066"})
+            return Response({"ret_code": 30055, "message": u"您已认证通过，无需再认证，请重新登录查看最新状态"})
 
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
         if verify_counter.count >= 3:
-            return Response({"ret_code": 30052, "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066"})
+            return Response({"ret_code": 30052, "message": u"验证错误次数频繁，请联系客服 4008-588-066"})
 
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         if id_verify_count >= 1:
-            return Response({"ret_code": 30053, "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066"})
+            return Response({"ret_code": 30053, "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066"})
 
         try:
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
         except:
-            return Response({"ret_code": 30054, "message": u"验证失败，拨打客服电话进行人工验证"})
+            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
 
         verify_counter.count = F('count') + 1
         verify_counter.save()
 
         if error or not verify_record.is_valid:
-            return Response({"ret_code": 30054, "message": u"验证失败，拨打客服电话进行人工验证"})
+            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
 
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
@@ -716,6 +721,7 @@ class ShareUrlAPIView(APIView):
             body = {}
         return Response({"ret_code": 0, "message": "ok", "data": body})
 
+
 class DepositGateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -741,6 +747,7 @@ class DepositGateAPIView(APIView):
        #             return Response({"ret_code":0, "gate":"yee", "notice":""})
        # else:
        #     return Response({"ret_code":0, "gate":"kuai"})
+
 
 class TopsOfDayView(APIView):
     """
@@ -786,6 +793,7 @@ class TopsOfWeekView(APIView):
 import random
 import operator
 
+
 class TopsOfEaringView(APIView):
     """
         得到全民淘金前十
@@ -822,6 +830,7 @@ class TopsOfEaringView(APIView):
             return Response({"ret_code": -1, "records": list()})
         return Response({"ret_code": 0, "records": records})
 
+
 class TopsOfMonthView(APIView):
     """
     得到某一月的排行榜
@@ -830,6 +839,7 @@ class TopsOfMonthView(APIView):
 
     def post(self, request):
         return Response({"ret_code": 0, "message":"ok"})
+
 
 class UserExisting(APIView):
     permission_classes = ()
@@ -887,6 +897,9 @@ class HasValidationAPIView(APIView):
 
 
 class IdValidate(APIView):
+    """
+    PC端实名认证接口
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
@@ -915,7 +928,7 @@ class IdValidate(APIView):
 
             if request.DATA.get("captcha_1"):
                 return Response({
-                                    "message": u"实名认证成功..",
+                                    "message": u"实名认证成功.",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
@@ -926,32 +939,34 @@ class IdValidate(APIView):
 
             if verify_counter.count >= 3:
                 return Response({
-                                    "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
+                                    "message": u"验证错误次数频繁，请联系客服 4008-588-066",
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
 
             profile = WanglibaoUserProfile.objects.filter(user=user).first()
             if profile.id_is_valid:
                 return Response({
-                    "message": u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066",
+                    "message": u"您已认证通过，无需再认证，请重新登录查看最新状态",
                     "error_number": ErrorNumber.try_too_many_times
                 })
 
             id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
             if id_verify_count >= 1:
                 return Response({
-                                    "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
+                                    "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=400)
 
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
 
             verify_counter.count = F('count') + 1
             verify_counter.save()
 
             if error or not verify_record.is_valid:
                 return Response({
-                                    "message": u"验证失败，拨打客服电话进行人工验证",
+                                    "message": u"验证失败，请重试或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.unknown_error
                                 }, status=400)
 
@@ -1674,16 +1689,33 @@ class CoopPvApi(APIView):
                     'ext2': ext2,
                 }
                 data = urllib.urlencode(data)
-                res = requests.get(url=coop_pv_url, params=data)
-                res_status_code = res.status_code
-                if res_status_code != 200:
-                    logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
-                else:
+                try:
+                    res = requests.get(url=coop_pv_url, params=data)
+                    res_status_code = res.status_code
+                    if res_status_code != 200:
+                        response_data = {
+                            'ret_code': 10001,
+                            'message': 'failed',
+                        }
+                        logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
+                    else:
+                        response_data = {
+                            'ret_code': 10000,
+                            'message': 'ok',
+                        }
+                except Exception, e:
                     response_data = {
-                        'ret_code': 10000,
-                        'message': 'ok',
+                        'ret_code': 50001,
+                        'message': 'api error',
                     }
-                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+            else:
+                response_data = {
+                    'ret_code': 50002,
+                    'message': '非法请求',
+                }
+
+            logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
+            return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
         response_data = {
             'ret_code': 50001,
