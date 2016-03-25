@@ -100,14 +100,12 @@ class GetContinueActionReward(APIView):
         # recycle_continue_days = sign_record.continue_days % (maxDayNote + 1)
         if recycle_continue_days!=days:
             return Response({'ret_code':-1, 'message':u'不符合领取条件'})
-        reward_record = ActivityRewardRecord.objects.filter(activity_code=current_activity.code, create_date=today, user=user).first()
-        if not reward_record:
-            reward_record = ActivityRewardRecord.objects.create(
-                activity_code=current_activity.code,
-                create_date=today,
-                user=user,
-                activity_desc=u'用户领取连续%s天签到奖励'%days
-            )
+
+        reward_record, create = ActivityRewardRecord.objects.get_or_create(
+                    activity_code=current_activity.code,
+                    create_date=today,
+                    user=user
+                    )
         if reward_record.status:
            return Response({'ret_code':-1, 'message':u'奖励已经领取过了'})
         device = split_ua(self.request)
@@ -117,6 +115,8 @@ class GetContinueActionReward(APIView):
         redpack_txts = []
         with transaction.atomic():
             reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=current_activity.code, create_date=today, user=user).first()
+            if reward_record.status:
+                return Response({'ret_code':-1, 'message':u'奖励已经领取过了'})
             rules = SeriesActionActivityRule.objects.filter(activity=current_activity, is_used=True)
             for rule in rules:
                 if rule.gift_type == "redpack":
@@ -178,6 +178,7 @@ class GetContinueActionReward(APIView):
 
             reward_record.activity_code_time = timezone.now()
             reward_record.status = True
+            reward_record.activity_desc=u'用户领取连续%s天签到奖励'%days
             reward_record.save()
         try:
             for idx, event in enumerate(events):
