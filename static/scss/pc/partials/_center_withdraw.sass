@@ -24,6 +24,8 @@
     color: #2294e5
     &:hover
       text-decoration: underline
+  .form-row-error
+    color: #e7350d
 
   .c-cash-amount
     position: relative
@@ -58,6 +60,11 @@
     margin-left: 7px
     &:disabled
       +c-blue-button(100, 40, 14, #fff, #c7c7c7, #c7c7c7, #fff)
+  .captcha-imgs
+    width: 100px
+    height: 40px
+    background: url("/static/imgs/pc/loading/preloader_32.gif") no-repeat center
+
 
   .cash-submit-but
     +c-blue-button(230, 40)

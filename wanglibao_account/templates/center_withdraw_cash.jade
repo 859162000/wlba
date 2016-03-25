@@ -29,7 +29,7 @@ block main
       p 2、额外手续费。充值未投资的资金如需要提现，将额外收取提现金额的0.3%，此部分手续费不包含免费范围内。
   .c-main-white.c-auto-height.c-layout
     form#withdraw-form
-      - csrf_token
+      -csrf_token
       .c-cash-layout
         .c-cash-head.t-d19.font-l 余额提现
         table.c-cash-table.c-withdraw-table
@@ -73,16 +73,21 @@ block main
           tr
             th 图形验证码
             td
-              .c-cash-phone
-                input(type='text',name='captcha_1', placeholder='请输入计算结果').cash-input
-                img()
+              .c-cash-phone.clearfix
+                input(type='text',name='captcha_1', placeholder='请输入计算结果').cash-input.fl
+                input(type='hidden',name='captcha_0', placeholder='请输入计算结果')
+                img.captcha-imgs.fl.mg-l-s
+
               .form-row-error
           tr
             th 手机验证码
             td
               .c-cash-phone
                 input(type='text', name='validate_code', placeholder='请输入验证码').cash-input
-                input(type='button', value='获取验证码').cash-phone-but
+                input(type='button', value='获取验证码', data-phone="{{user.wanglibaouserprofile.phone}}").cash-phone-but
+              .c-cash-phone.voice-validate.font-xs(style='display:none')
+                | 没有收到验证码？请尝试
+                a(href='javascript:void(0)').voice.c-cash-blue 语音验证
               .form-row-error
           tr
             th 交易密码
