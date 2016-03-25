@@ -11,7 +11,7 @@
         }
     });
     require(['jquery',"tools"], function($,tool) {
-        var reg = /^1[3|5|8]\d{9}$/;
+        var reg = /^1\d{10}$/;
         var isphone = function(date){
             if(date.ret_code == 10000){
                 $(".mesg,.dialog").show();
@@ -51,8 +51,13 @@
             }else{
                 ajaxFn("/api/activity_user_info/upload/",opt);
             }
+            fnSaveForm();
         };
-
+         function   fnSaveForm(){
+             window.external.AutoCompleteSaveForm(oForm);
+             oForm.input_one.value="";
+             oForm.input_two.value="";
+         }
         $("#login_btn").on("click",Event);
         $("#lg_uls").on("keyup","input",function(){
             $(this).next().text("");
