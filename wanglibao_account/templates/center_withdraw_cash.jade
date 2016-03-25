@@ -18,19 +18,29 @@ block sidebar
 block main
 
   .c-withdraw-fees.modal#c-withdraw-fees
-    .modal-head 收费说明
-
-
-
+    .modal-header 收费说明
+    .c-withdraw-fees-content
+      p 客户在网利宝提现，将收取一定比例的手续费，具体收取规则如下：
+      p.bold 提现手续费=基本手续费 + 额外手续费
+      p 1、基本手续费。每个月前2次提现免收基本手续费，超过2次后的提现基本手续费如下：
+      p 提现金额小于等于1万：2元/笔
+      p 提现金额大于1万，小于等于5万：3元/笔
+      p 提现金额大于5万，5元/笔
+      p 2、额外手续费。充值未投资的资金如需要提现，将额外收取提现金额的0.3%，此部分手续费不包含免费范围内。
   .c-main-white.c-auto-height.c-layout
     form#withdraw-form
       - csrf_token
       .c-cash-layout
         .c-cash-head.t-d19.font-l 余额提现
-        table.c-cash-table
+        table.c-cash-table.c-withdraw-table
           tr
             th 持卡人
-            td {{user_name}}
+
+            td
+              if user.wanglibaouserprofile.id_is_valid
+                |{{user_name}}
+              else
+                a(href='').c-cash-blue 请先实名认证
           tr
             th 提现至银行卡
             td
@@ -38,43 +48,59 @@ block main
                 span {{cards.bank.name}} &nbsp;&nbsp; {{cards.no | bank_card}}
                 input(type="hidden", name="card_id", value="{{cards.id}}")
               else
-                span 您尚未绑卡，无法提现。请
-                a(href='/accounts/bankcard/') 绑定银行卡
+                span.font-xs 您尚未绑卡，无法提现。请
+                a(href='/accounts/bankcards/').c-cash-blue 绑定银行卡
           tr
             th 可用余额(元)
-            td {{margin | money_format}}
+            td(data-margin="{{margin}}").withdraw-margin {{margin | money_format}}
           tr
             th 提现金额
             td
               .c-cash-amount
-                input(type='text', placeholder='金额').cash-input
+                input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount',data-count='{{fee.fee.free_times_per_month}}',data-interval='{{fee.fee.amount_interval}}',data-switch='{{fee.switch}}',data-poundage='#poundage').cash-input
                 .cash-amount-all 全部
+              .form-row-error
           tr
             th 手续费(元)
             td
               .c-cash-fee
                 span.fee  0.00
-                span.c-cash-blue.mg-l-s 收费说明
+                a(href='#c-withdraw-fees').c-cash-blue.mg-l-s.fees-alert 收费说明
+
           tr
             th 实际到帐金额(元)
             td 0.00
           tr
+            th 图形验证码
+            td
+              .c-cash-phone
+                input(type='text',name='captcha_1', placeholder='请输入计算结果').cash-input
+                img()
+              .form-row-error
+          tr
             th 手机验证码
             td
               .c-cash-phone
-                input(type='text', placeholder='请输入验证码').cash-input
+                input(type='text', name='validate_code', placeholder='请输入验证码').cash-input
                 input(type='button', value='获取验证码').cash-phone-but
+              .form-row-error
           tr
             th 交易密码
             td
-              .c-cash-trade
-                input(type='text', placeholder='请输入六位交易密码').cash-input
-                a().c-cash-blue.mg-l-s 忘记交易密码
+              if cards
+                if has_trade_pwd
+                  .c-cash-trade
+                    input(type='text', name='trade_pwd', placeholder='请输入六位交易密码').cash-input
+
+                    a().c-cash-blue.mg-l-s 忘记交易密码
+                  .form-row-error
+              else
+                a(href='/accounts/bankcards/').c-cash-blue 绑定银行卡
           tr
             th
             td
               .c-cash-submit
-                input(type='button', value='申请提现').cash-submit-but
+                input(type='submit', value='申请提现').cash-submit-but
                 .t-d19.mg-t-s 申请通过后 3 个工作日内到账（此为预估时间，具体实际到账为准）
 
         .c-cash-rules

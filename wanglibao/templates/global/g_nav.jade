@@ -53,7 +53,7 @@
       .g-user
         if activeItem == "我的账户"
           myacount = 'highlight'
-        a(href="javascript:void(0)", class='{{myacount}}')#checkUserType.user-nav
+        a(href="/accounts/home-new/", class='{{myacount}}')#checkUserType.user-nav
           if user.is_authenticated
             i.user-icon-img-active
           else
