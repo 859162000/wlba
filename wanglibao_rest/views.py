@@ -1880,3 +1880,4 @@ class ActivityUserInfoUploadApi(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+

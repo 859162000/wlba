@@ -7,7 +7,8 @@ html
         include global/g_head
         - endwith
         link(rel="stylesheet",href="/static/styles/pc_activity/open_house.css?v=20160322")
-    body
+    body(style="background:#fff")
+        include global/g_nav
         .banner
         mixin title(cls, text, pcls)
           .hd_intro
@@ -109,8 +110,8 @@ html
             dd
               h6 2015年12月
               p 网利宝用户突破百万
-        span.triangle
-        .footer *网利宝保留此次活动解释权，如果您在过程中有任何意见和建议，欢迎致电垂询：4008-588-066
+        span.triangle.triangle3
+        include global/g_footer
         .mesg
         .dialog
           p 恭喜您，报名成功，报名截至后我们回抽取10名投资人组成“参观团”，并致电联系。
