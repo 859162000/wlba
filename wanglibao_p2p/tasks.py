@@ -37,6 +37,8 @@ def bajinshe_product_push():
                     pay_method_code = 1
                 elif pay_method == u'日计息一次性还本付息':
                     pay_method_code = 2
+                elif pay_method == u'到期还本付息':
+                    pay_method_code = 2
                 else:
                     pay_method_code = 11
 
