@@ -456,7 +456,7 @@ class BaJinSheCallback(CoopCallback):
             data['tran'] = [act_data]
             # 异步回调
             bajinshe_callback.apply_async(
-                kwargs={'data': data, 'url': self.purchase_call_back_url})
+                kwargs={'data': json.dumps(data), 'url': self.register_call_back_url})
 
     def recharge_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).recharge_call_back(user_id, order_id)
@@ -482,7 +482,7 @@ class BaJinSheCallback(CoopCallback):
                 data['tran'] = [act_data]
                 # 异步回调
                 bajinshe_callback.apply_async(
-                    kwargs={'data': data, 'url': self.transaction_call_back_url})
+                    kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
 
     def purchase_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).purchase_call_back(user_id, order_id)
@@ -555,7 +555,7 @@ class BaJinSheCallback(CoopCallback):
             data['tran'] = [act_data]
             # 异步回调
             bajinshe_callback.apply_async(
-                kwargs={'data': data, 'url': self.purchase_call_back_url})
+                kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
 
 
 class RenRenLiCallback(CoopCallback):
