@@ -51,8 +51,13 @@
             }else{
                 ajaxFn("/api/activity_user_info/upload/",opt);
             }
+            fnSaveForm();
         };
-
+         function   fnSaveForm(){
+             window.external.AutoCompleteSaveForm(oForm);
+             oForm.input_one.value="";
+             oForm.input_two.value="";
+         }
         $("#login_btn").on("click",Event);
         $("#lg_uls").on("keyup","input",function(){
             $(this).next().text("");
