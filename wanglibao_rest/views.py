@@ -36,7 +36,7 @@ from wanglibao_sms.utils import send_validation_code, validate_validation_code, 
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_profile.models import WanglibaoUserProfile, ActivityUserInfo
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
@@ -50,7 +50,7 @@ from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
                                   get_coop_access_token, push_coop_access_token)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
-from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
+from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1, safe_id
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
@@ -69,6 +69,7 @@ from wanglibao.views import landpage_view
 import urllib
 from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
+from wanglibao_profile.forms import ActivityUserInfoForm
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -896,7 +897,13 @@ class HasValidationAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({"ret_code": 0, "message": u"您已认证通过"})
+            return Response({
+                "ret_code": 0,
+                "message": u"您已认证通过",
+                "name": profile.name,
+                "id_number": "%s************%s" % (profile.id_number[:3], profile.id_number[-3:]),
+                "id_valid_time": profile.id_valid_time if not profile.id_valid_time else redpack_backends.local_transform_str(profile.id_valid_time)
+            })
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
@@ -1705,22 +1712,33 @@ class CoopPvApi(APIView):
                     'ext2': ext2,
                 }
                 data = urllib.urlencode(data)
-                res = requests.get(url=coop_pv_url, params=data)
-                res_status_code = res.status_code
-                if res_status_code != 200:
-                    logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
-                else:
+                try:
+                    res = requests.get(url=coop_pv_url, params=data)
+                    res_status_code = res.status_code
+                    if res_status_code != 200:
+                        response_data = {
+                            'ret_code': 10001,
+                            'message': 'failed',
+                        }
+                        logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
+                    else:
+                        response_data = {
+                            'ret_code': 10000,
+                            'message': 'ok',
+                        }
+                except Exception, e:
                     response_data = {
-                        'ret_code': 10000,
-                        'message': 'ok',
+                        'ret_code': 50001,
+                        'message': 'api error',
                     }
-                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+            else:
+                response_data = {
+                    'ret_code': 50002,
+                    'message': '非法请求',
+                }
 
-        response_data = {
-            'ret_code': 50001,
-            'message': 'failed',
-        }
-        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+            logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
+            return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
 class OauthUserRegisterApi(APIView):
@@ -1843,3 +1861,29 @@ class BiSouYiRegisterApi(APIView):
 
         logger.info("BiSouYiRegisterApi process result: %s" % message)
         return HttpResponseRedirect('/')
+
+
+class ActivityUserInfoUploadApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        form = ActivityUserInfoForm(request.POST)
+        if form.is_valid():
+            user_info = ActivityUserInfo()
+            user_info.name = form.cleaned_data['name']
+            user_info.phone = form.cleaned_data['phone']
+            user_info.address = form.cleaned_data['address']
+            user_info.is_wlb_phone = form.check_wlb_phone()
+            user_info.save()
+            response_data = {
+                'ret_code': 10000,
+                'message': 'success',
+            }
+        else:
+            response_data = {
+                'ret_code': 10001,
+                'message': form.errors
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+

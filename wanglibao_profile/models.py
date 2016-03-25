@@ -138,3 +138,17 @@ class Account2015(models.Model):
             return json.dumps(d)
         else:
             return d
+
+
+class ActivityUserInfo(models.Model):
+    name = models.CharField(u'姓名', max_length=32)
+    phone = models.CharField(u'手机号', max_length=11)
+    address = models.TextField(u'地址', max_length=255)
+    is_wlb_phone = models.BooleanField(u'是否网利宝手机号', default=False)
+    extra = models.CharField(max_length=200, default="", blank=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    updated_at = models.DateTimeField(u'更新时间', auto_now=True)
+
+    class Meta:
+        verbose_name = u'活动用户信息'
+        verbose_name_plural = u'活动用户信息'

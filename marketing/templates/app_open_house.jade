@@ -1,0 +1,41 @@
+doctype html
+html(style="width: 100%;height: auto;position: relative")
+  head
+    title 网利宝开放日
+    include include/app_head
+    link(rel="stylesheet", href="/static/styles/mobile_activity/app_open_house.css")
+  body(style="background:#f0f0f0;")
+    .banner
+      img(src="/static/imgs/mobile_activity/app_open_house/banner.jpg")
+    .open_title
+      img(src="/static/imgs/mobile_activity/app_open_house/title.jpg")
+      p The Registration Window
+      span
+    ul#lg_uls.open_list
+      li
+        span.open_span1
+          img(src="/static/imgs/mobile_activity/app_open_house/hd_name.png")
+        input#username(type="text", placeholder="请输入真实姓名")
+        a.lg_name
+      li
+        span.open_span2
+          img(src="/static/imgs/mobile_activity/app_open_house/hd_phone.png")
+        input#phone(type="text", placeholder="请输入网利宝注册手机号")
+        a.lg_phone
+      li
+        span.open_span3
+          img(src="/static/imgs/mobile_activity/app_open_house/hd_address.png")
+        input#address(type="text", placeholder="请填写所在城市（如：北京）")
+        a.lg_address
+    a#login_btn.open_btn 提交报名信息
+    p.open_text 注：报名截止到2016年4月7日，工作人员将从报名者中选择10人组成“观察团”，并将通过预留的电话与您取得联系！具体活动安排，我们将在电话沟通时告知。
+    .open_footers
+      p *网利宝保留此次活动解释权，如果您在过程中有任何意见和建议，欢迎致电垂询：4008-588-066
+    .mesg
+    .dialog
+      p 恭喜您，报名成功，报名截至后我们回抽取10名投资人组成“参观团”，并致电联系。
+      a#dia_btn 确定
+    script(src="/static/scripts/mobile_activity/app_open_hous.js")
+
+
+

@@ -74,8 +74,7 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
     })
     /*实名认证*/
     $('#realName').on('click',function(){
-        var userName = $('#userName');
-        var nameId = $('#nameId');
+        var userName = $('#userName'),nameId = $('#nameId');
         if($.trim(userName.val()) == ''){
             userName.next().html('<i></i>请输入姓名');
             return false;
@@ -120,35 +119,143 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
             }
         })
     })
-    /*充值*/
-    $('#recharge').on('click',function(){
-        var amount = $('#amount');
-        var cardSelect = $('#card-select');
-        if($.trim(amount.val()) == ''){
-            amount.next().html('<i></i>请输入充值金额');
-            return false;
-        }else{
-            if($.trim(amount.val()) >= 0.01){
-                amount.next().html('');
-            }else{
-                amount.next().html('<i></i>充值金额不正确');
-                amount.val('');
-                return false;
+
+    /*下拉框*/
+    $('.select_bank').focus(function(){
+        $(this).addClass('selected');
+    })
+    $('.select_bank').blur(function(){
+        if($(this).val() == ''){
+            $(this).removeClass('selected');
+        }
+    })
+
+    /*绑卡*/
+    $('#tieOnCard').on('click',function(){
+        if(!$(this).hasClass('bunsNo')) {
+            var checkStatus = true;
+            $.each($('.checkCodeStatus'), function (i, o) {
+                if ($(o).val() == '') {
+                    $('.error-box').text($(o).attr('placeholder'));
+                    checkStatus = false;
+                    return false;
+                }
+            })
+            if ((checkStatus) && ($('.error-box').text() == '')) {
+                if ($('#order_id').val() === '') {
+                    $('.error-box').text('请发送验证码');
+                } else {
+                    var bankId = $('.cardId').val(),
+                        self = $(this);
+                    self.addClass('bunsNo');
+                    $.ajax({
+                        url: '/api/pay/cnp/dynnum_new/',
+                        data: {
+                            Storable_no: bankId.substr(0, 4) + bankId.substr(bankId.length - 4),
+                            card_no: bankId,
+                            vcode: $('.checkSEMCode').val(),
+                            order_id: $('#order_id').val(),
+                            token: $('#token').val(),
+                            phone: $('.mobileCode').val(),
+                            set_the_one_card: true,
+                            device_id: ''
+                        },
+                        type: 'post'
+                    }).done(function (xhr) {
+                        if (xhr.ret_code === 0 || xhr.ret_code === 22000) {
+                            window.location.href = '/accounts/register/three/';
+                        } else {
+                            $('.error-box').text(xhr.message);
+                            self.removeClass('bunsNo');
+                        }
+                    }).fail(function (xhr) {
+                        $('.error-box').text(xhr.message);
+                        self.removeClass('bunsNo');
+                    });
+                }
             }
         }
-        if(cardSelect.val() == ''){
-            cardSelect.next().html('<i></i>请选择银行');
-            return false;
+    })
+    /*输入框*/
+    $('.checkCodeStatus').on('keyup change blur',function(){
+        var checkStatus = true,error = $('.error-box');
+        $.each($('.checkCodeStatus'),function(i,o){
+            if($(o).val() == ''){
+                $('.get-code-btn').removeClass('getCodeBtn');
+                if(!$(o).hasClass('checkSEMCode')){
+                    checkStatus = false;
+                }
+            }
+            if($(o).hasClass('cardId')){
+                var re = /^\d{11,20}$/;
+                if (!re.test($(o).val().replace(/[ ]/g, ""))) {
+                  $(o).val() == '' ?  error.text('请输入银行卡号') : error.text('输入的卡号有误');
+                  checkStatus = false;
+                }else{
+                    error.text('');
+                    var re = /^1\d{10}$/;
+                    if (!re.test($('.mobileCode').val().replace(/[ ]/g, ""))) {
+                      $('.mobileCode').val() == '' ?  error.text('请输入银行预留手机号') : error.text('输入的手机号有误');
+                      checkStatus = false;
+                    }else{
+                      error.text('');
+                    }
+                }
+            }
+            if( checkStatus){
+                $('.get-code-btn').addClass('getCodeBtn');
+            }
+        });
+        $(this).attr('placeholder') == $('.error-box').text() ? $('.error-box').text('') : '';
+    })
+
+
+    /*短信验证码 */
+    $('.codeParent').delegate('.getCodeBtn','click', function() {
+      var count, element, intervalId, phoneNumber, timerFunction;
+      element = $('.getCodeBtn');
+      if ($(element).attr('disabled')) {
+        return;
+      }
+      phoneNumber = $('.mobileCode').val();
+      element.attr('disabled', 'disabled').removeClass('getCodeBtn');
+      $.ajax({
+        url: "/api/pay/deposit_new/",
+        type: "POST",
+        data: {
+          card_no: $('.cardId').val(),
+          phone: phoneNumber,
+          amount: 0.01,
+          gate_id: $('.select_bank').val(),
+          device_id: ''
         }
-        $('#rechargeAlert').modal();
-    })
-    /*下拉框*/
-    $('#card-select').focus(function(){
-        $('#card-select').addClass('selected');
-    })
-    $('#card-select').blur(function(){
-        if($(this).val() == ''){
-            $('#card-select').removeClass('selected');
+      }).fail(function(xhr) {
+        clearInterval(intervalId);
+        $(element).text('重新获取').removeAttr('disabled').addClass('getCodeBtn');
+        $('.error-box').text(xhr.message)
+      }).success(function(xhr) {
+        if (xhr.ret_code === 0) {
+          $('#order_id').val(xhr.order_id);
+          $('#token').val(xhr.token);
+          intervalId;
+          count = 60;
+          $(element).attr('disabled', 'disabled');
+          timerFunction = function() {
+            if (count >= 1) {
+              count--;
+              return $(element).text('重新获取(' + count + ')');
+            } else {
+              clearInterval(intervalId);
+              $(element).text('重新获取').removeAttr('disabled').addClass('getCodeBtn');
+            }
+          };
+          timerFunction();
+          return intervalId = setInterval(timerFunction, 1000);
+        } else {
+          clearInterval(intervalId);
+          $(element).text('重新获取').removeAttr('disabled').addClass('getCodeBtn');
+          $('.error-box').text(xhr.message)
         }
-    })
+      });
+    });
 });

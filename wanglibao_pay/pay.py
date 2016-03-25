@@ -434,6 +434,20 @@ class YeeProxyPay(object):
     def proxy_pay(self, user, amount,  gate_id,  request_ip, device_type):
         try:
             order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device_type)
+            
+            #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
+            pay_info = PayInfo.objects.filter(order_id=order_id).first()
+            cards_info = pay_info.bank.cards_info.split(',')
+            card_to_bank = False
+            if pay_info.card_no:
+                for no in cards_info:
+                    if pay_info.card_no.startswith(no):
+                        card_to_bank = True
+                if card_to_bank:
+                    pass
+                else:
+                    return {"message": "银行卡与银行不匹配", "form": {'url':'' ,'post':''}}
+            
             post_data = self._post(order_id, amount, gate_id)
             PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
             # message为空前段页面会判定为支付成功
