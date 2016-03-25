@@ -57,7 +57,11 @@ class DailyActionAPIView(APIView):
         action_type = unicode(request.POST.get('action_type', '').strip())
         if not action_type or action_type not in [u'share', u'sign_in']:
             return Response({'ret_code':-1, 'message':'系统错误'})
-        ret_code, status, daily_record = process_user_daily_action(user, action_type=action_type)
+        device = split_ua(request)
+        user_agent = request.META['HTTP_USER_AGENT']
+        print '------------------------------user_agent:::', user_agent
+        device_type = device['device_type']
+        ret_code, status, daily_record = process_user_daily_action(user, platform="app", action_type=action_type)
         if ret_code == 2:
             return Response({'ret_code': -1, 'message':'系统忙，请重试'})
         data = {'status': status, 'continue_days': daily_record.continue_days}
