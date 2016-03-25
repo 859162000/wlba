@@ -369,11 +369,18 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
+        #'file': {
+            #'level': 'DEBUG',
+            #'class': 'logging.FileHandler',
+            #'filename': '/var/log/wanglibao/mysite.log',
+            #'formatter': 'verbose'
+        #},
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': '/var/log/wanglibao/mysite.log',
-            'formatter': 'verbose'
+            'formatter': 'simple',
+            'when': 'd'
         },
         'wanglibao_anti': {
             'level': 'DEBUG',
