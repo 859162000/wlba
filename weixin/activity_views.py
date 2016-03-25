@@ -104,11 +104,8 @@ class GetContinueActionReward(APIView):
         reward_record, create = ActivityRewardRecord.objects.get_or_create(
                     activity_code=current_activity.code,
                     create_date=today,
-                    user=user,
+                    user=user
                     )
-        if create:
-            reward_record.activity_desc=u'用户领取连续%s天签到奖励'%days
-            reward_record.save()
         if reward_record.status:
            return Response({'ret_code':-1, 'message':u'奖励已经领取过了'})
         device = split_ua(self.request)
@@ -181,6 +178,7 @@ class GetContinueActionReward(APIView):
 
             reward_record.activity_code_time = timezone.now()
             reward_record.status = True
+            reward_record.activity_desc=u'用户领取连续%s天签到奖励'%days
             reward_record.save()
         try:
             for idx, event in enumerate(events):
