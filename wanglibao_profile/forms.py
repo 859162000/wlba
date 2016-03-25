@@ -28,11 +28,23 @@ class ActivityUserInfoForm(forms.ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data['name'].strip()
-        return name
+        if len(name) <= 8:
+            return name
+        else:
+            raise forms.ValidationError(
+                code=10003,
+                message=u'长度超出限制',
+            )
 
     def clean_address(self):
         address = self.cleaned_data['address'].strip()
-        return address
+        if len(address) <= 10:
+            return address
+        else:
+            raise forms.ValidationError(
+                code=10003,
+                message=u'长度超出限制',
+            )
 
     def check_wlb_phone(self):
         phone = self.cleaned_data['phone']
