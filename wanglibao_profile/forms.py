@@ -17,7 +17,7 @@ class ActivityUserInfoForm(forms.ModelForm):
             if user_infos.exists():
                 raise forms.ValidationError(
                     code=10003,
-                    message=u'该手机号已经上报过')
+                    message=u'请勿重复上报')
             else:
                 return phone
         else:
