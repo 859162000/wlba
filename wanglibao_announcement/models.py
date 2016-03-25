@@ -68,8 +68,8 @@ class AppMemorabilia(models.Model):
     priority = models.IntegerField(blank=True, default=0, verbose_name=u'优先级', help_text=u'越大越优先')
     status = models.SmallIntegerField(verbose_name=u'当前状态', max_length=2, choices=STATUS, default=0)
     hide_link = models.BooleanField(verbose_name=u'是否隐藏（大事记页面）', default=False)
-    created_time = models.DateTimeField(u'发布时间', auto_now_add=True)
-    updated_time = models.DateTimeField(u'更新时间', auto_now=True)
+    created_time = models.DateTimeField(u'发布时间', auto_now_add=True, default=timezone.now())
+    updated_time = models.DateTimeField(u'更新时间', auto_now=True, default=timezone.now())
 
     class Meta:
         verbose_name = u"APP-大事记"
@@ -83,4 +83,4 @@ class AppMemorabilia(models.Model):
         if self.detail_link:
             return self.detail_link
         else:
-            return '/announcement/memorabilia/detail/%s' % self.id
+            return '/app/memorabilia/detail/%s/' % self.id
