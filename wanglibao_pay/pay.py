@@ -437,13 +437,14 @@ class YeeProxyPay(object):
             pay_info = PayInfo.objects.filter(order_id=order_id).first()
             cards_info = pay_info.bank.cards_info.split(',')
             card_to_bank = False
-            for no in cards_info:
-                if pay_info.card_no.startswith(no):
-                    card_to_bank = True
-            if card_to_bank:
-                pass
-            else:
-                return {"message": "银行卡与银行不匹配", "form": ""}
+            if pay_info.card_no:
+                for no in cards_info:
+                    if pay_info.card_no.startswith(no):
+                        card_to_bank = True
+                if card_to_bank:
+                    pass
+                else:
+                    return {"message": "银行卡与银行不匹配", "form": {'url':'' ,'post':''}}
                 
             post_data = self._post(order_id, amount, gate_id)
             PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
