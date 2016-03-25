@@ -166,7 +166,7 @@ class DynamicHomeView(TemplateView):
     template_name = 'milestone.jade'
 
     def get_context_data(self, **kwargs):
-        about_dynamics = AboutDynamic.objects.filter(hide_in_list=False).order_by('-updated_time')
+        about_dynamics = AboutDynamic.objects.filter(hide_in_list=False).order_by('-priority', '-updated_time')
 
         about_dynamic_list = []
         about_dynamic_list.extend(about_dynamics)

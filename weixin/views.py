@@ -367,7 +367,8 @@ class WeixinJoinView(View):
         # 连续签到：{{keyword2.DATA}}
         # 累计签到：{{keyword3.DATA}}
 
-            if ret_code != 0:
+            if ret_code == 1:
+                reply = -1
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":SIGN_IN_TEMPLATE_ID,
@@ -377,7 +378,8 @@ class WeixinJoinView(View):
                     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
                 })},
                                                 queue='celery02')
-            else:
+            elif ret_code == 0:
+                reply = -1
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":SIGN_IN_TEMPLATE_ID,
@@ -387,9 +389,11 @@ class WeixinJoinView(View):
                     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
                 })},
                                                 queue='celery02')
+            else:
+                reply = create_reply("签到失败", self.msg)
 
-            reply = -1
         except Exception,e:
+            reply = create_reply("签到失败", self.msg)
             logger.debug(traceback.format_exc())
         return reply
 

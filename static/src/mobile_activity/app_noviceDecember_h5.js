@@ -65,7 +65,7 @@
             var token = getQueryStringByName('promo_token')
             $('#take').click(function() {
                 if(token == 'hexunjd' || token == 'hexunht'){
-                    window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
+                    window.location.href = '/weixin/regist/';
                 }else{
                     window.location.href = '/activity/experience/mobile/';
                 }
@@ -74,7 +74,7 @@
 
             $('#register').click(function() {
                 if(token == 'hexunjd' || token == 'hexunht'){
-                    window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
+                    window.location.href = '/weixin/regist/';
                 }else{
                     window.location.href = '/activity/experience/mobile/';
                 }

@@ -12,7 +12,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
                                  AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppAreaView,
                                  AppAreaApiView, AppMemorabiliaView, AppDataModuleView, AppActivateScoreImageAPIView,
-                                 AppFinanceView, AppPraiseAwardView, AppCheckInView)
+                                 AppFinanceView, AppPraiseAwardView, AppCheckInView, AppMemorabiliaDetailView)
 from wanglibao_account.views import MarginRecordsAPIView
 router = DefaultRouter()
 
@@ -50,6 +50,7 @@ urlpatterns = patterns(
     url(r'^area/$', AppAreaView.as_view()),
     url(r'^area/fetch/$', AppAreaApiView.as_view()),
     url(r'^app_memorabilia/$', AppMemorabiliaView.as_view(), name='app_memorabilia'),
+    url(r'^memorabilia/detail/(?P<id>\d+)/$', AppMemorabiliaDetailView.as_view()),
 
     url(r'^data_cube/$', AppDataModuleView.as_view()),#数据魔方
     url(r'^finance/$', AppFinanceView.as_view()),

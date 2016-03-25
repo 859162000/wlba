@@ -21,7 +21,7 @@ from exceptions import PrepaymentException
 import pytz
 import json
 from datetime import datetime
-
+from wanglibao_activity import backends as activity_backends
 
 
 REPAYMENT_MONTHLY = 'monthly'
@@ -113,22 +113,30 @@ class PrepaymentHistory(object):
                 })
                 try:
                     weixin_user = WeixinUser.objects.filter(user=user_amortization.user).first()
-        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
                     if weixin_user and weixin_user.subscribe:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
-                                        "kwargs":json.dumps({
-                                                        "openid": weixin_user.openid,
-                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                                        "keyword1": product.name,
-                                                        "keyword2": "%s 元"%str(amo_amount),
-                                                        "keyword3": now,
-                                                            })},
-                                                        queue='celery02')
+                            "kwargs": json.dumps({
+                                "openid": weixin_user.openid,
+                                "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                "keyword1": product.name,
+                                "keyword2": "%s 元" % str(amo_amount),
+                                "keyword3": now,
+                            })
+                        }, queue='celery02')
 
-                except Exception,e:
+                except Exception, e:
                     pass
+
+                # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
+                try:
+                    if user_record.principal > 0:
+                        activity_backends.check_activity(user_amortization.user, 'repaid', 'pc', user_record.principal, product.id)
+                except Exception:
+                    logger.debug("提前还款, user: {}, principal: {}, product_id: {}".format(
+                        user_amortization.user, user_record.principal, product.id
+                    ))
 
             amortization_records.append(product_record)
 
