@@ -113,40 +113,15 @@ class GetContinueActionReward(APIView):
         events = []
         records = []
         redpack_txts = []
+        redpack_record_ids = ""
+        experience_record_ids = ""
         with transaction.atomic():
             reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=current_activity.code, create_date=today, user=user).first()
             rules = SeriesActionActivityRule.objects.filter(activity=current_activity, is_used=True)
             for rule in rules:
-                if rule.gift_type == "redpack":
-                    redpack_record_ids = ""
-                    redpack_ids = rule.redpack.split(',')
-                    for redpack_id in redpack_ids:
-                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
-                        if not redpack_event:
-                            return Response({"ret_code":-1,"message":'系统错误'})
-                        status, messege, record = give_activity_redpack_for_hby(request.user, redpack_event, device_type)
-                        if not status:
-                            return Response({"ret_code":-1,"message":messege})
-                        redpack_text = "None"
-                        if redpack_event.rtype == 'interest_coupon':
-                            redpack_text = "%s%%加息券"%redpack_event.amount
-                        if redpack_event.rtype == 'percent':
-                            redpack_text = "%s%%百分比红包"%redpack_event.amount
-                        if redpack_event.rtype == 'direct':
-                            redpack_text = "%s元红包"%int(redpack_event.amount)
-                        redpack_txts.append(redpack_text)
-                        redpack_record_ids += (str(record.id) + ",")
-                        events.append(redpack_event)
-                        records.append(record)
-                    reward_record.redpack_record_ids = redpack_record_ids
-                if rule.gift_type == "experience_gold":
-                    experience_record_ids = ""
-                    experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=rule.redpack)
-                    if not experience_record_id:
-                        return Response({"ret_code":-1, "message":'体验金发放失败'})
-                    redpack_txts.append('%s元体验金'%int(experience_event.amount))
-                    experience_record_ids += (str(experience_record_id) + ",")
-                    reward_record.experience_record_ids = experience_record_ids
+                sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, records, reward_record,redpack_txts, device_type)
+                redpack_record_ids += sub_redpack_record_ids
+                experience_record_ids += sub_experience_record_ids
                 if rule.gift_type == "reward":
                     now = timezone.now()
                     reward = Reward.objects.filter(type=rule.reward,
@@ -173,7 +148,13 @@ class GetContinueActionReward(APIView):
                                 msg = Template(rule.msg_template)
                                 content = msg.render(context)
                                 _send_message_template(user, rule.rule_name, content)
+                    else:
+                        sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, records, reward_record,redpack_txts, device_type, is_addition=True)
+                        redpack_record_ids += sub_redpack_record_ids
+                        experience_record_ids += sub_experience_record_ids
 
+            reward_record.redpack_record_ids = redpack_record_ids
+            reward_record.experience_record_ids = experience_record_ids
             reward_record.activity_code_time = timezone.now()
             reward_record.status = True
             reward_record.save()
@@ -191,6 +172,58 @@ class GetContinueActionReward(APIView):
         if maxDayNote == recycle_continue_days:
             mysterious_day = maxDayNote
         return Response({"ret_code":0, "message":result_msg, "mysterious_day":mysterious_day})
+
+    def giveReward(self, user, rule, events, records, redpack_txts, device_type, is_addition=False):
+        redpack_ids = None
+        experience_record_ids = ""
+        redpack_record_ids = ""
+        if not is_addition:
+            if rule.gift_type == "redpack":
+                redpack_ids = rule.redpack.split(',')
+
+            if rule.gift_type == "experience_gold":
+                self.give_experience(user, redpack_txts, rule.redpack)
+        else:
+            if rule.addition_gift_type == "redpack":
+                redpack_ids = rule.addition_redpack.split(',')
+
+            if rule.gift_type == "experience_gold":
+                experience_record_ids = self.give_experience(user, redpack_txts, rule.redpack)
+        if redpack_ids:
+            redpack_record_ids = self.give_redpack(user, events, records, redpack_txts, redpack_ids, device_type)
+        return redpack_record_ids, experience_record_ids
+
+    def give_redpack(self, user, events, records, redpack_txts, redpack_ids, device_type):
+        redpack_record_ids = ""
+        # redpack_ids = rule.redpack.split(',')
+        for redpack_id in redpack_ids:
+            redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+            if not redpack_event:
+                return Response({"ret_code":-1,"message":'系统错误'})
+            status, messege, record = give_activity_redpack_for_hby(user, redpack_event, device_type)
+            if not status:
+                return Response({"ret_code":-1,"message":messege})
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                redpack_text = "%s%%百分比红包"%redpack_event.amount
+            if redpack_event.rtype == 'direct':
+                redpack_text = "%s元红包"%int(redpack_event.amount)
+            redpack_txts.append(redpack_text)
+            redpack_record_ids += (str(record.id) + ",")
+            events.append(redpack_event)
+            records.append(record)
+        return redpack_record_ids
+
+    def give_experience(self, user, redpack_txts, experience_event_id):
+        experience_record_ids = ""
+        experience_record_id, experience_event = SendExperienceGold(user).send(pk=experience_event_id)
+        if not experience_record_id:
+            return Response({"ret_code":-1, "message":'体验金发放失败'})
+        redpack_txts.append('%s元体验金'%int(experience_event.amount))
+        experience_record_ids += (str(experience_record_id) + ",")
+        return experience_record_ids
 
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
