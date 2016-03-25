@@ -470,7 +470,7 @@ class BaJinSheCallback(CoopCallback):
                 act_data = {
                     'bingdingUid': bid,
                     'usn': get_user_phone_for_coop(user_id),
-                    'businessName': margin_record.description,
+                    'businessName': u'充值',
                     'businessType': 0,
                     'businessBid': order_id,
                     'money': float(margin_record.amount),
@@ -496,7 +496,7 @@ class BaJinSheCallback(CoopCallback):
                 act_data = {
                     'bingdingUid': bid,
                     'usn': get_user_phone_for_coop(user_id),
-                    'businessName': margin_record.description,
+                    'businessName': u'投资',
                     'businessType': 3,
                     'businessBid': order_id,
                     'money': float(margin_record.amount),
