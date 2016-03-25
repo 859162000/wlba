@@ -72,6 +72,27 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
         self.attr('placeholder', zhi);
         self.parent().removeClass('selectEdLi')
     })
+
+    /*获取银行列表*/
+    $.ajax({
+        type: 'POST',
+        url : '/api/bank/list_new/',
+        data : {
+        },
+        success:function(data){
+            var html = '',str='';
+            $.each(data.banks,function(i,o){
+               html+='<option value='+ o.gate_id +'>'+ o.name +'</option>'
+               str+='<p tag='+ o.gate_id +'>首次限额'+ o.first_one +'/单笔限额'+ o.second_one +'/日限额'+ o.second_day +'</p>'
+            })
+            $('.bankPop').append(str);
+            $('.select_bank').append(html);
+        },
+        error:function(xhr){
+        }
+    })
+
+
     /*实名认证*/
     $('#realName').on('click',function(){
         var userName = $('#userName'),nameId = $('#nameId');
@@ -176,6 +197,8 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
             }
         }
     })
+
+
     /*输入框*/
     $('.checkCodeStatus').on('keyup change blur',function(){
         var checkStatus = true,error = $('.error-box');
@@ -185,6 +208,11 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
                 if(!$(o).hasClass('checkSEMCode')){
                     checkStatus = false;
                 }
+            }
+            if($(o).hasClass('select_bank')){
+                tag = $(o).val();
+                $('.bankPop').find('p').hide();
+                $('.bankPop').find('p[tag="'+ tag +'"]').show();
             }
             if($(o).hasClass('cardId')){
                 var re = /^\d{11,20}$/;
