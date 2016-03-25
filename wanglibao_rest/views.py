@@ -50,7 +50,7 @@ from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
                                   get_coop_access_token, push_coop_access_token)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
-from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
+from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1, safe_id
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
@@ -897,7 +897,13 @@ class HasValidationAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({"ret_code": 0, "message": u"您已认证通过"})
+            return Response({
+                "ret_code": 0,
+                "message": u"您已认证通过",
+                "name": profile.name,
+                "id_number": safe_id(profile.id_number),
+                "id_valid_time": profile.id_valid_time
+            })
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
