@@ -789,6 +789,7 @@ webpackJsonp([6],[
 	        _createClass(Limit, [{
 	            key: "_style",
 	            value: function _style(limit_data) {
+	                limit_data = JSON.parse(limit_data);
 	                var string_list = '';
 	                for (var i = 0; i < limit_data.length; i++) {
 	                    string_list += "<div class='limit-bank-list'>";

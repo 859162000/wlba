@@ -50,7 +50,7 @@ from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
                                   get_coop_access_token, push_coop_access_token)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
-from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
+from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1, safe_id
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
@@ -67,7 +67,6 @@ from weixin.models import WeixinUser
 from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
-from geetest import GeetestLib
 from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
@@ -898,7 +897,13 @@ class HasValidationAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({"ret_code": 0, "message": u"您已认证通过"})
+            return Response({
+                "ret_code": 0,
+                "message": u"您已认证通过",
+                "name": profile.name,
+                "id_number": "%s************%s" % (profile.id_number[:3], profile.id_number[-3:]),
+                "id_valid_time": profile.id_valid_time if not profile.id_valid_time else redpack_backends.local_transform_str(profile.id_valid_time)
+            })
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
@@ -1856,41 +1861,6 @@ class BiSouYiRegisterApi(APIView):
 
         logger.info("BiSouYiRegisterApi process result: %s" % message)
         return HttpResponseRedirect('/')
-
-
-class GeetestAPIView(APIView):
-    permission_classes = ()
-
-    def __init__(self):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
-    def post(self, request):
-        self.type = request.POST.get('type', None)
-        if self.type == 'get':
-            return self.get_captcha(request)
-        if self.type == 'validate':
-            return self.validate_capthca(request)
-
-    def get_captcha(self, request):
-        gt = GeetestLib(self.id, self.key)
-        status = gt.pre_process()
-        request.session[gt.GT_STATUS_SESSION_KEY] = status
-        response_str = gt.get_response_str()
-        return response_str
-
-    def validate_capthca(self, request):
-        gt = GeetestLib(self.id, self.key)
-        status = request.session[gt.GT_STATUS_SESSION_KEY]
-        challenge = request.form[gt.FN_CHALLENGE]
-        validate = request.form[gt.FN_VALIDATE]
-        seccode = request.form[gt.FN_SECCODE]
-        if status:
-            result = gt.success_validate(challenge, validate, seccode)
-        else:
-            result = gt.fail_validate(challenge, validate, seccode)
-        result = "sucess" if result else "fail"
-        return result
 
 
 class ActivityUserInfoUploadApi(APIView):

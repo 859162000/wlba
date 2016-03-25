@@ -27,10 +27,10 @@ class AnnouncementAdmin(admin.ModelAdmin):
 
 
 class AppMemorabiliaAdmin(admin.ModelAdmin):
-    list_display = ('title', 'status', 'detail_link', 'done_date', 'priority')
+    list_display = ('title', 'status', 'content', 'detail_link', 'done_date', 'priority', 'updated_time')
     search_fields = ('title',)
-    fields = ('title', 'banner', 'detail_link', 'done_date', 'priority', 'hide_link',
-              'start_time')
+    fields = ('title', 'banner', 'content', 'detail_link', 'done_date', 'priority', 'hide_link',
+              'start_time', 'end_time')
 
     def save_model(self, request, obj, form, change):
         if obj.hide_link is True:
