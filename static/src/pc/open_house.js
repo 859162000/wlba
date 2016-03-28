@@ -46,7 +46,6 @@
             var phone = $("#phone").val(),
                 name = $("#username").val(),
                 address = $("#address").val();
-            console.log(name.length)
             var opt = {"phone": phone, "name": name, "address": address};
             if(!reg.test(phone)){
                 $(".lg_phone").text("*手机号输入错误");
@@ -57,7 +56,6 @@
             }else{
                 ajaxFn("/api/activity_user_info/upload/",opt);
             }
-            //fnSaveForm();
         };
         function strlen(str){
             var len = 0;
@@ -73,11 +71,6 @@
             }
             return len;
         }
-         function   fnSaveForm(){
-             window.external.AutoCompleteSaveForm(oForm);
-             oForm.input_one.value="";
-             oForm.input_two.value="";
-         };
         $("#login_btn").on("click",Event);
         $("#lg_uls").on("keyup","input",function(){
             $(this).next().text("");
