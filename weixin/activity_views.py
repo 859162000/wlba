@@ -57,11 +57,12 @@ class DailyActionAPIView(APIView):
         action_type = unicode(request.POST.get('action_type', '').strip())
         if not action_type or action_type not in [u'share', u'sign_in']:
             return Response({'ret_code':-1, 'message':'系统错误'})
-        device = split_ua(request)
         user_agent = request.META['HTTP_USER_AGENT']
-        print '------------------------------user_agent:::', user_agent
-        device_type = device['device_type']
-        ret_code, status, daily_record = process_user_daily_action(user, platform="app", action_type=action_type)
+        platform = u"app"
+        if "MicroMessenger" in user_agent:
+            platform = u"weixin"
+
+        ret_code, status, daily_record = process_user_daily_action(user, platform=platform, action_type=action_type)
         if ret_code == 2:
             return Response({'ret_code': -1, 'message':'系统忙，请重试'})
         data = {'status': status, 'continue_days': daily_record.continue_days}
@@ -118,7 +119,9 @@ class GetContinueActionReward(APIView):
            return Response({'ret_code':-1, 'message':u'奖励已经领取过了'})
         device = split_ua(self.request)
         user_agent = request.META['HTTP_USER_AGENT']
-        print '------------------------------user_agent:::', user_agent
+        is_weixin = False
+        if "MicroMessenger" in user_agent:
+            is_weixin = True
         device_type = device['device_type']
         events = []
         records = []
@@ -181,20 +184,20 @@ class GetContinueActionReward(APIView):
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           record.created_at, event.available_at, event.unavailable_at)
                 _send_message_for_hby(request.user, event, end_time)
-                if w_user:
+                if is_weixin and w_user:
                     sentCustomerMsg.apply_async(kwargs={
                             "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日 %H:%M:%S')), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
-            if w_user:
+            if is_weixin and w_user:
                 for reward in rewards:
                     sentCustomerMsg.apply_async(kwargs={
                             "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n兑换码:%s"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
-            if w_user:
+            if is_weixin and w_user:
                 for experience_event in experience_events:
                     sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":w_user.openid,

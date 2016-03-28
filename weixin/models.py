@@ -653,7 +653,6 @@ class UserDailyActionRecord(models.Model):
     experience_record_id = models.IntegerField(default=0, verbose_name=u'体验金发放流水ID')
     status = models.BooleanField(default=False, verbose_name=u'是否成功')
     platform = models.CharField(u'操作平台', default=u"", choices=PLATFORMS, max_length=32)
-    device_type = models.CharField(u'操作设备', default=u"", max_length=32)
     class Meta:
         unique_together = (("user", "action_type", "create_date"), )
 

@@ -23,11 +23,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default=u'', max_length=32),
                       keep_default=False)
 
-        # Adding field 'UserDailyActionRecord.device_type'
-        db.add_column(u'weixin_userdailyactionrecord', 'device_type',
-                      self.gf('django.db.models.fields.CharField')(default=u'', max_length=32),
-                      keep_default=False)
-
 
     def backwards(self, orm):
         # Deleting field 'SeriesActionActivityRule.addition_gift_type'
@@ -38,9 +33,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'UserDailyActionRecord.platform'
         db.delete_column(u'weixin_userdailyactionrecord', 'platform')
-
-        # Deleting field 'UserDailyActionRecord.device_type'
-        db.delete_column(u'weixin_userdailyactionrecord', 'device_type')
 
 
     models = {
@@ -96,7 +88,7 @@ class Migration(SchemaMigration):
             'oauth_access_token_expires_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'oauth_refresh_token': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
             'original_id': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '32', 'blank': 'True'}),
-            'token': ('django.db.models.fields.CharField', [], {'default': "u'gEJStbYR'", 'max_length': '32'})
+            'token': ('django.db.models.fields.CharField', [], {'default': "u'lATmZ6vg'", 'max_length': '32'})
         },
         u'weixin.authorizeinfo': {
             'Meta': {'object_name': 'AuthorizeInfo'},
@@ -238,7 +230,6 @@ class Migration(SchemaMigration):
             'continue_days': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'create_date': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'device_type': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '32'}),
             'experience_record_id': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'extra_data': ('wanglibao.fields.JSONFieldUtf8', [], {'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
