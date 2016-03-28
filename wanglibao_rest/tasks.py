@@ -28,10 +28,10 @@ def process_amortize(amortizations, product_id):
         if amo_id:
             amo_instance = UserAmortization.objects.filter(pk=amo_id).first()
             if amo_instance:
+                amo['settlement_time'] = dt.strptime(amo['settlement_time'], '%Y-%m-%d %H:%M:%S')
                 user_amo_form = UserAmortizationForm(amo, instance=amo_instance)
             else:
                 amo['product'] = p2p_product
-                amo['settlement_time'] = dt.strptime(amo['settlement_time'], '%Y-%m-%d %H:%M:%S')
                 amo['term_date'] = dt.strptime(amo['term_date'], '%Y-%m-%d %H:%M:%S')
                 user_amo_form = UserAmortizationForm(amo)
 
