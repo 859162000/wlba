@@ -283,7 +283,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
 
         $("#login_btn").on("click",Event);
-        $("#lg_uls").on("keyup","input",function(){
+        $("#lg_uls").on("input","input",function(){
             $(this).next().text("");
         })
         $("#dia_btn").on("click",function(){
