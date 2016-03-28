@@ -277,8 +277,6 @@ wlb.ready({
                 })
             } else {
                 login = true;
-                $('.down_load_wlb').hide();
-                $('.wlb_t').text('aaaaaaaaaa')
                 org.experience.init()
             }
         })
@@ -290,6 +288,10 @@ wlb.ready({
 
 
 org.experience = (function (org) {
+    if(login){
+        $('.down_load_wlb').hide();
+        $('.wlb_t').text('aaaaaaaaaa')
+    }
     var lib = {
         init: function () {
             lib._lookMore()
