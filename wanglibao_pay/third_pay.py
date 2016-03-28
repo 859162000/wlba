@@ -465,6 +465,18 @@ def bind_pay_deposit(request):
 
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
+    
+    #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
+    card_to_bank = False
+    if card_no and bank:
+        cards_info = bank.cards_info.split(',')
+        for no in cards_info:
+            if card_no.startswith(no):
+                card_to_bank = True
+        if card_to_bank:
+            pass
+        else:
+            return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
 
     amount = request.DATA.get('amount', '').strip()
     try:
