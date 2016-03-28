@@ -477,37 +477,22 @@ def bind_pay_deposit(request):
     if bank.channel == 'huifu':
         result = HuifuShortPay().pre_pay(request)
 
-        # if result['ret_code'] == 0:
-        #     try:
-        #         # 处理第三方用户充值回调
-        #         CoopRegister(request).process_for_recharge(request.user)
-        #     except Exception, e:
-        #         logger.error(e)
-
         return result
 
     elif bank.channel == 'yeepay':
         result = YeeShortPay().pre_pay(request)
 
-        # if result['ret_code'] == 0:
-            # try:
-            #     # 处理第三方用户充值回调
-            #     CoopRegister(request).process_for_recharge(request.user)
-            # except Exception, e:
-            #     logger.error(e)
-
         return result
 
     elif bank.channel == 'kuaipay':
+        stop_no_sms_channel = Misc.objects.filter(
+                key='kuai_qpay_stop_no_sms_channel').first()  
+        if stop_no_sms_channel and stop_no_sms_channel.value == '1' and \
+                len(card_no) == 10 and not request.post.get('vcode_for_qpay'): 
+            return {'ret_code': 20022,
+                    'message': u'部分银行支付安全升级，需更新到最新版本才能使用，快去更新吧'}
         result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, 
                                         device_type, ip, request, mode=mode)
-
-        # if result['ret_code'] == 0:
-        #     try:
-        #         # 处理第三方用户充值回调
-        #         CoopRegister(request).process_for_recharge(request.user)
-        #     except Exception, e:
-        #         logger.error(e)
 
         return result
 
