@@ -1,14 +1,21 @@
 .register
   background: #ffffff
-  padding: 37px 91px 86px
+  padding: 19px 26px 86px
   width: 1097px
   margin: 30px auto 80px
   border: 1px solid #e3e3e3
+  .login-href
+    text-align: right
+    font-size: $font-l
+    color: $t-d10
+    a
+      color: #db493f
+      margin-left: 7px
   .register_nav_min
     background: url(/static/imgs/pc/loginRegister/min_nav_1.jpg) center center no-repeat
     width: 915px
     height: 77px
-    margin-bottom: 77px
+    margin: 19px 65px 40px
   .register_nav_min2
     background: url(/static/imgs/pc/loginRegister/min_nav_2.jpg) center center no-repeat
   .register_nav_min3
@@ -16,6 +23,7 @@
   .register_nav_min4
     background: url(/static/imgs/pc/loginRegister/min_nav_4.jpg) center center no-repeat
   .register_box
+    padding: 0 65px
     .login-form
       float: left
       width: 458px
@@ -24,15 +32,16 @@
         font-size: 18px
       .registerForm
         li
-          padding-top: 28px
+          height: 62px
           label
             width: 75px
             display: inline-block
-            color: #333333
+            color: $t-d10
             font-size: 14px
             float: left
             height: 32px
             line-height: 32px
+            text-align: left
           input
             float: left
             width: 261px
@@ -43,19 +52,18 @@
           input.w115
             width: 115px
             margin-right: 17px
-          .captchaRefresh
-            margin-left: 17px
-            cursor: pointer
           .captchaImg
-            width: 95px
+            width: 126px
             height: 30px
-          .getCodeBtn
+          .getCodeBtn,.get-code-btn
             width: 100px
             height: 32px
             border: 0 none
             border-radius: 3px
-            color: #ffffff
-            background: #477ced
+            color: #ffffff  
+            background: #d9d9d9
+          .getCodeBtn
+            background: #db493f
           .buttonGray
             background: #d9d9d9
           .pop
@@ -74,9 +82,11 @@
               height: 9px
               display: inline-block
               margin:  0 5px
+          &:last-child
+            height: 32px
         .selectEdLi
           input
-            border: 1px solid #288dcb
+            border: 1px solid #a40035
         .select_style
           select
             width: 261px
@@ -87,121 +97,93 @@
             font-size: 14px
             color: #b6b6b6
           .selected
-            color: #333333
+            color: $t-d10
+          .bankPop
+            padding-left: 85px
+            color: #666
+            p
+              margin-top: 5px
+              display: none
+      .tie-on-card
+        li
+          label
+            width: 85px
+            text-align: right
+        .error-box
+          margin: 20px 85px 0
+          font-size: 14px
+          color: red
       .form_bottom
-        padding: 56px 0 0 75px
+        padding: 0 0 0 75px
         .checkboxDiv
-          margin-bottom: 35px
+          margin-bottom: 25px
           input
             vertical-align: -2px
           a
             font-size: 14px
             color: #666666
-        .submitFormStyle
+        .submitFormStyle,.rz-btn,.tie-on-card-btn
           @include loginRegister-sprite(register_btn)
           width: 124px
           height: 35px
-          line-height: 35px
-          color: #fefefe
-          font-size: 18px
-          text-align: center
           float: left
           cursor: pointer
           border: 0 none
-        .go_login
-          float: left
-          height: 35px
-          line-height: 35px
-          color: #333333
-          font-size: 14px
-          margin-left: 21px
-          a
-            color: #db493f
-            margin-left: 5px
+        .rz-btn
+          @include loginRegister-sprite(rz_bg)
+          margin-top: 28px
+        .tie-on-card-btn
+          @include loginRegister-sprite(bk_btn)
+          margin: 0 0 0 10px
+          text-indent: 99999px
       .loginError
-        margin: 10px 75px
-    .register_info
-      float: left
-      padding-left: 70px
-      border-left: 2px dashed #eaeaea
-      .go_next_welfare
-        padding-left: 30px
-        color: #333333
-        font-size: 18px
-      .red_packets
-        padding-left: 30px
-        margin-top: 15px
-        label
-          color: #666666
-          font-size: 14px
-          float: left
-          margin-top: 5px
-        i
-          @include loginRegister-sprite(red_packets)
-          width: 23px
-          height: 23px
-          display: inline-block
-          margin-right: 14px
-          float: left
-      .info_middle
-        border-top: 1px dashed #ebebeb
-        border-bottom: 1px dashed #ebebeb
-        padding: 23px 30px 100px
-        margin: 30px 0 27px
-        .welfare_ed
-          color: #333333
-          font-size: 18px
-        .nothing
-          font-size: 24px
-          color: #cbcbcb
-          margin-top: 34px
-        .go_finish
-          font-size: 14px
-          color: #cbcbcb
-      .info_ewm
-        color: #333333
+        margin: 0 75px
         font-size: 14px
-        padding-left: 30px
-        i
-          @include loginRegister-sprite(erweima)
-          width: 153px
-          height: 154px
-          display: inline-block
-          margin-right: 29px
-          float: left
-        label
-          float: left
-          margin-top: 130px
-      .welfare_ed_list
-        color: #666666
-        font-size: 16px
-        margin-top: 22px
-        i
-          @include loginRegister-sprite(right)
-          width: 28px
-          height: 27px
-          display: inline-block
-          margin-right: 9px
-          vertical-align: middle
-      .my_reward
-        text-align: right
+        color: red
+    .register_info
+      width: 455px
+      float: left
+      border-left: 2px dotted #eaeaea
+      padding-left: 100px
+      min-height: 388px
+      h3
+        color: $t-d10
+        font-size: $font-l
+    .register-success
+      text-align: center
+      .max-text
+        font-size: $font-ll
+        line-height: 38px
+      .min-text
+        font-size: $font-l
+        line-height: 38px
+      .go-i-r
+        margin: 10px 0 5px
         a
-          font-size: 14px
-          color: #666666
-          i
-            @include loginRegister-sprite(more)
-            width: 15px
-            height: 12px
-            display: inline-block
-            margin-left: 9px
-    .last_page
-      height: 500px
-      .info_middle
-        margin: 0
-        padding: 0 0 15px
-        border-top: 0 none
-      .welfare_ed_list
-        width: 380px
+          color: #db493f
+          margin-left: 5px
+.reward-box
+  @include loginRegister-sprite(reward_bg)
+  height: 73px
+  color: $t-d6
+  margin-top: 15px
+  width: 277px
+  display: inline-block
+  .reward-left
+    width: 158px
+    float: left
+    padding: 21px 0 17px 34px
+    font-size: $font-xs
+    line-height: 20px
+    span
+      font-size: $font-xxl
+      margin-right: 5px
+  .reward-right
+    width: 119px
+    float: left
+    font-size: $font-xl
+    line-height: 73px
+    text-align: center
 .modal-containerNew
   border: 1px solid #666666
   border-radius: 5px
@@ -247,7 +229,7 @@
     color: #3f3f41
     font-size: 18px
     i
-      @include loginRegister-sprite(alert)
+      @include loginRegister-sprite(alert)  
       width: 38px
       height: 37px
       display: inline-block
@@ -283,33 +265,6 @@
     top: 16px
     right: 13px
     text-indent: 9999px
-.txt_s
-  font-size: 22px
-  color: #3f3f41
-  text-align: center
-  padding-bottom: 5px
-.erweima_max
-  text-align: center
-  span
-    width: 258px
-    height: 258px
-    display: inline-block
-    @include loginRegister-sprite(erweima_max)
-    margin: 40px 0
-.go_p2p
-  text-align: center
-  a
-    width: 312px
-    height: 52px
-    line-height: 52px
-    background: #fb7c00
-    font-size: 22px
-    color: #ffffff
-    display: inline-block
-    text-align: center
-    border-radius: 20px
-.last_page
-  .info_middle
-    margin: 0
-    padding: 0
-    border-top: 0 none
+
+
+
