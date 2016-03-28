@@ -1143,7 +1143,7 @@ class AccountTransactionP2P(TemplateView):
     template_name = 'center_transaction.jade'
 
     def get_context_data(self, **kwargs):
-        status_list = ['all', 'purchase', 'repayment', 'finish']
+        # status_list = ['all', 'purchase', 'repayment', 'finish']
         page = self.request.GET.get('page', 1)
         pagesize = self.request.GET.get('pagesize', 10)
         page = int(page)
@@ -1152,11 +1152,40 @@ class AccountTransactionP2P(TemplateView):
         start_submit = self.request.GET.get('start_date', '')
         end_submit = self.request.GET.get('end_date', '')
 
-        # if not status or status not in status_list:
-        #     status = 'all'
+        p2p_equities = self._p2p_equities(p2p_status, start_submit, end_submit, page, pagesize)
 
+        return {
+            "p2p_equities": p2p_equities,
+            "page": page,
+            "pagesize": pagesize,
+            "p2p_status": p2p_status,
+            "start_date": start_submit,
+            "end_date": end_submit,
+        }
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        page = self.request.POST.get('page', 1)
+        pagesize = self.request.POST.get('pagesize', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+        p2p_status = self.request.POST.get('p2p_status', '')
+        start_submit = self.request.POST.get('start_date', '')
+        end_submit = self.request.POST.get('end_date', '')
+
+        p2p_equities = self._p2p_equities(p2p_status, start_submit, end_submit, page, pagesize)
+
+        context["p2p_equities"] = p2p_equities
+        context["page"] = page
+        context["pagesize"] = pagesize
+        context["p2p_status"] = p2p_status
+        context["start_date"] = start_submit
+        context["end_date"] = end_submit
+
+        return super(AccountTransactionP2P, self).render_to_response(context)
+
+    def _p2p_equities(self, p2p_status, start_submit, end_submit, page, pagesize):
         p2p_equities = P2PEquity.objects.filter(user=self.request.user).select_related('product')
-
         if p2p_status == 'purchase':
             p2p_equities = p2p_equities.filter(product__status__in=[
                 u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'])
@@ -1177,7 +1206,6 @@ class AccountTransactionP2P(TemplateView):
                 p2p_equities = p2p_equities.filter(created_at__gte=start_date, created_at__lt=end_date)
             except Exception:
                 pass
-
         paginator = Paginator(p2p_equities, pagesize)
 
         try:
@@ -1189,14 +1217,7 @@ class AccountTransactionP2P(TemplateView):
         except Exception:
             p2p_equities = paginator.page(paginator.num_pages)
 
-        return {
-            "p2p_equities": p2p_equities,
-            "page": page,
-            "pagesize": pagesize,
-            "p2p_status": p2p_status,
-            "start_date": start_submit,
-            "end_date": end_submit,
-        }
+        return p2p_equities
 
 
 class AccountRedPacket(TemplateView):
