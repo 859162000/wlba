@@ -302,9 +302,10 @@ wlb.ready({
                 },
                 success: function (data) {
                     org.checin_in.init(mixins)
-                } 
+                }
             })
         }
+
 
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
