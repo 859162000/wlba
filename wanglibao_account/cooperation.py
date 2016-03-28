@@ -1409,14 +1409,10 @@ class XunleiVipRegister(CoopRegister):
             if not binding:
                 binding = self.save_to_binding(user)
                 if binding:
-                    activity_start_time = '2016-03-28 17:30:00'
-                    activity_start_time = datetime.datetime.strptime(activity_start_time, "%Y-%m-%d %H:%M:%S")
-
                     # 处理渠道用户充值回调补发
                     penny = Decimal(0.01).quantize(Decimal('.01'))
                     pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                                      status=PayInfo.SUCCESS,
-                                                      create_time__gte=activity_start_time).order_by('create_time').first()
+                                                      status=PayInfo.SUCCESS).order_by('create_time').first()
                     if pay_info and int(pay_info.amount) >= 100:
                         self.recharge_call_back(user, pay_info.order_id)
 
@@ -1427,6 +1423,8 @@ class XunleiVipRegister(CoopRegister):
                         self.purchase_call_back(user, first_p2p_record.order_id)
 
                     # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
+                    activity_start_time = '2016-03-28 17:30:00'
+                    activity_start_time = datetime.datetime.strptime(activity_start_time, "%Y-%m-%d %H:%M:%S")
                     p2p_records = p2p_records.filter(create_time__gte=activity_start_time)
                     for p2p_record in p2p_records:
                         if p2p_record.id != first_p2p_record.id:
