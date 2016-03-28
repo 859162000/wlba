@@ -716,7 +716,7 @@ class YeeShortPay:
                 if card_to_bank:
                     pass
                 else:
-                    return {"ret_code":20075, "message": "银行卡与银行不匹配"}
+                    return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
 
             pay_info.request = ""
             pay_info.status = PayInfo.PROCESSING
