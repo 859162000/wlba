@@ -387,6 +387,29 @@ class AmortizationKeeper(KeeperBaseMixin):
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
+        # 推送用户还款计划到渠道中心 add by chenweibin@20160328
+        settled_sub_amos = list()
+        for product_amortization in product_amortizations:
+            sub_amortizations = product_amortization.subs.all()
+            for sub_amo in sub_amortizations:
+                settled_sub_amos.append({
+                    'id': sub_amo.id,
+                    'product_id': product.id,
+                    'user_id': sub_amo.user.id,
+                    'term': sub_amo.term,
+                    'settlement_time': sub_amo.settlement_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'principal': float(sub_amo.principal),
+                    'interest': float(sub_amo.interest),
+                    'penal_interest': float(sub_amo.penal_interest),
+                    'coupon_interest': float(sub_amo.coupon_interest),
+                    'description': sub_amo.description,
+                })
+
+            if settled_sub_amos:
+                from .tasks import coop_amortizations_push
+                coop_amortizations_push.apply_async(
+                    kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
+
     # def __generate_useramortization(self, equities):
     #     """
     #     :param equities: 批量生成用户还款计划提高数据库存储性能
