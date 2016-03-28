@@ -177,7 +177,7 @@ def updateRedisTopRank():
     try:
         top_ranks = getTodayTop10Ranks()
         redis = redis_backend()
-        len = redis._lpush('top_ranks', top_ranks)
+        len = redis._lpush('top_ranks', json.dumps(top_ranks))
         if len > 1:
             redis.redis.rpop("top_ranks")
     except Exception,e:
