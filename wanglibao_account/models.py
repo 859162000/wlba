@@ -33,5 +33,5 @@ class Binding(models.Model):
     detect_callback = models.BooleanField(u"回调检测", default=False)
 
     class Meta:
-        verbose_namel = u'渠道用户绑定关系'
+        verbose_name = u'渠道用户绑定关系'
         verbose_name_plural = u'渠道用户绑定关系'
