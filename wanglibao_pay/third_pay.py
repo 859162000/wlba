@@ -465,6 +465,18 @@ def bind_pay_deposit(request):
 
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
+    
+    #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
+    card_to_bank = False
+    if card_no and bank:
+        cards_info = bank.cards_info.split(',')
+        for no in cards_info:
+            if card_no.startswith(no):
+                card_to_bank = True
+        if card_to_bank:
+            pass
+        else:
+            return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
 
     amount = request.DATA.get('amount', '').strip()
     try:
@@ -478,37 +490,23 @@ def bind_pay_deposit(request):
     if bank.channel == 'huifu':
         result = HuifuShortPay().pre_pay(request)
 
-        # if result['ret_code'] == 0:
-        #     try:
-        #         # 处理第三方用户充值回调
-        #         CoopRegister(request).process_for_recharge(request.user)
-        #     except Exception, e:
-        #         logger.error(e)
-
         return result
 
     elif bank.channel == 'yeepay':
         result = YeeShortPay().pre_pay(request)
 
-        # if result['ret_code'] == 0:
-            # try:
-            #     # 处理第三方用户充值回调
-            #     CoopRegister(request).process_for_recharge(request.user)
-            # except Exception, e:
-            #     logger.error(e)
-
         return result
 
     elif bank.channel == 'kuaipay':
+        stop_no_sms_channel = Misc.objects.filter(
+                key='kuai_qpay_stop_no_sms_channel').first()  
+        if stop_no_sms_channel and stop_no_sms_channel.value == '1' and \
+                len(card_no) == 10 and not request.post.get('mode'): 
+                    # mode != vcode_for_qpay
+            return {'ret_code': 20022,
+                    'message': u'部分银行支付安全升级，需更新到最新版本才能使用，快去更新吧'}
         result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, 
                                         device_type, ip, request, mode=mode)
-
-        # if result['ret_code'] == 0:
-        #     try:
-        #         # 处理第三方用户充值回调
-        #         CoopRegister(request).process_for_recharge(request.user)
-        #     except Exception, e:
-        #         logger.error(e)
 
         return result
 

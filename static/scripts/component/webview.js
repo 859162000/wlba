@@ -13,7 +13,7 @@ var wlb = (function () {
 
     Mixin.isAPP= function(){
         var u = navigator.userAgent;
-        if(u.indexOf('wlbapp') > -1){
+        if(u.indexOf('wlbAPP') > -1){
             return true
         }
         return false
@@ -25,7 +25,7 @@ var wlb = (function () {
             toString = Object.prototype.toString,
             newJSON = target;
 
-        if(u.indexOf('Android') > -1 && newJSON == '[object String]'){
+        if(u.indexOf('Android') > -1 && toString.call(newJSON) == '[object String]'){
             try{
                 newJSON = eval("(" + target + ")");
             }catch(e){
@@ -188,12 +188,13 @@ var wlb = (function () {
          */
         function listen(){
             if(Mixin.isAPP()){
+
                 if(window.WebViewJavascriptBridge){
                     run({callback: 'app', data: WebViewJavascriptBridge});
                 }else{
                     document.addEventListener('WebViewJavascriptBridgeReady', function () {
                         run({callback: 'app', data: WebViewJavascriptBridge})
-                    }, false) 
+                    }, false)
                 }
             }else{
                 run({callback: 'other', data: null})
@@ -204,6 +205,7 @@ var wlb = (function () {
 
         function run(target) {
             var mixins;
+
             if (target.callback && target.callback == 'app') {
                 mixins = getMixin(target.data);
                 mixins._init();
