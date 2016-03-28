@@ -512,50 +512,51 @@ class BaJinSheCallback(CoopCallback):
 
     def amortization_push(self, user_amo):
         super(BaJinSheCallback, self).amortization_push(user_amo)
-        utc_timestamp = get_utc_timestamp()
-        order_id = '%s_%s' % (utc_timestamp, '0005')
-        data = get_bajinshe_base_data(order_id)
-        bid = get_tid_for_coop(user_amo.user_id)
-        if data and bid:
-            period = user_amo.product.period
-            pay_method = user_amo.product.pay_method
-            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-                period_type = 1
-            else:
-                period_type = 2
+        if user_amo.settled:
+            utc_timestamp = get_utc_timestamp()
+            order_id = '%s_%s' % (utc_timestamp, '0005')
+            data = get_bajinshe_base_data(order_id)
+            bid = get_tid_for_coop(user_amo.user_id)
+            if data and bid:
+                period = user_amo.product.period
+                pay_method = user_amo.product.pay_method
+                if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                    period_type = 1
+                else:
+                    period_type = 2
 
-            if pay_method == u'等额本息':
-                profit_methods = 3
-            elif pay_method == u'按月付息':
-                profit_methods = 1
-            elif pay_method == u'到期还本付息':
-                profit_methods = 2
-            else:
-                profit_methods = 11
+                if pay_method == u'等额本息':
+                    profit_methods = 3
+                elif pay_method == u'按月付息':
+                    profit_methods = 1
+                elif pay_method == u'到期还本付息':
+                    profit_methods = 2
+                else:
+                    profit_methods = 11
 
-            act_data = {
-                'calendar': timezone.localtime(user_amo.settlement_time).strftime('%Y%m%d%H%M%S'),
-                'income': user_amo.interest,
-                'principal': user_amo.principal,
-                'incomeState': 2,
-                'investmentPid': user_amo.id,
-                'bingdingUid': bid,
-                'usn': get_user_phone_for_coop(user_amo.user_id),
-                'money': user_amo.equity_amount,
-                'period': period,
-                'periodType': period_type,
-                'productPid': user_amo.product.id,
-                'productName': user_amo.product.name,
-                'productType': 2,
-                'profitMethods': profit_methods,
-                'apr': user_amo.product.expected_earning_rate,
-                'state': 1,
-                'purchases': timezone.localtime(user_amo.equity_confirm_at).strftime('%Y%m%d%H%M%S'),
-            }
-            data['tran'] = [act_data]
-            # 异步回调
-            bajinshe_callback.apply_async(
-                kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
+                act_data = {
+                    'calendar': timezone.localtime(user_amo.settlement_time).strftime('%Y%m%d%H%M%S'),
+                    'income': user_amo.interest,
+                    'principal': user_amo.principal,
+                    'incomeState': 2,
+                    'investmentPid': user_amo.id,
+                    'bingdingUid': bid,
+                    'usn': get_user_phone_for_coop(user_amo.user_id),
+                    'money': user_amo.equity_amount,
+                    'period': period,
+                    'periodType': period_type,
+                    'productPid': user_amo.product.id,
+                    'productName': user_amo.product.name,
+                    'productType': 2,
+                    'profitMethods': profit_methods,
+                    'apr': user_amo.product.expected_earning_rate,
+                    'state': 1,
+                    'purchases': timezone.localtime(user_amo.equity_confirm_at).strftime('%Y%m%d%H%M%S'),
+                }
+                data['tran'] = [act_data]
+                # 异步回调
+                bajinshe_callback.apply_async(
+                    kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
 
 
 class RenRenLiCallback(CoopCallback):
@@ -594,15 +595,21 @@ class RenRenLiCallback(CoopCallback):
                                               user_id=user_amo.user_id
                                               ).order_by('create_time').last()
         if p2p_record:
-            if p2p_record.amotized_amount:
-                amotized_amount = p2p_record.amotized_amount + user_amo.get_total_amount()
-            else:
-                amotized_amount = user_amo.get_total_amount()
+            if user_amo.settled:
+                if p2p_record.amotized_amount:
+                    amotized_amount = p2p_record.amotized_amount + user_amo.get_total_amount()
+                else:
+                    amotized_amount = user_amo.get_total_amount()
 
-            P2PRecord.objects.filter(product=user_amo.product,
-                                     user_id=user_amo.user_id
-                                     ).update(back_last_date=user_amo.created_time,
-                                              amotized_amount=amotized_amount)
+                P2PRecord.objects.filter(product=user_amo.product,
+                                         user_id=user_amo.user_id
+                                         ).update(back_last_date=user_amo.term_date,
+                                                  amotized_amount=amotized_amount)
+            else:
+                if user_amo.term == user_amo.terms:
+                    P2PRecord.objects.filter(product=user_amo.product,
+                                             user_id=user_amo.user_id
+                                             ).update(invest_end_time=user_amo.term_date)
 
     def purchase_call_back(self, user_id, order_id):
         super(RenRenLiCallback, self).purchase_call_back(user_id, order_id)
