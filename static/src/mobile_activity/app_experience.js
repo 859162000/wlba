@@ -51,6 +51,7 @@ var login = false;
 wlb.ready({
     app: function (mixins) {
         mixins.sendUserInfo(function (data) {
+            $('.wlb_t').text(data.ph)
             if (data.ph == '') {
                 login = false;
                 $('.receive_box').on('click', function(){
@@ -69,7 +70,6 @@ wlb.ready({
 
 
 org.experience = (function (org) {
-    $('.wlb_t').text(login)
     if(login){
         $('.down_load_wlb').hide();
         $('.wlb_t').text('aaaaaaaaaa')
