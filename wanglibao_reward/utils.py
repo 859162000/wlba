@@ -17,6 +17,7 @@ from wanglibao_account.auth_backends import User
 from wanglibao_redis.backend import redis_backend
 from misc.models import Misc
 import logging
+import pickle
 
 
 logger = logging.getLogger('wanglibao_reward')
@@ -177,9 +178,7 @@ def updateRedisTopRank():
     try:
         top_ranks = getTodayTop10Ranks()
         redis = redis_backend()
-        len = redis._lpush('top_ranks', json.dumps(top_ranks))
-        if len > 1:
-            redis.redis.rpop("top_ranks")
+        redis._set('top_ranks', pickle.dumps(top_ranks))
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
     return top_ranks
