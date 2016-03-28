@@ -2661,9 +2661,9 @@ class MarchAwardTemplate(TemplateView):
             try:
                 ranks = pickle.loads(redis_backend()._get('top_ranks'))
             except:
-                pass
-            # if not ranks:
-            #     ranks = updateRedisTopRank()
+                logger.debug("-------------------------------redis read ranks error")
+            if not ranks:
+                ranks = updateRedisTopRank()
             if user.is_authenticated():
                 chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
 
