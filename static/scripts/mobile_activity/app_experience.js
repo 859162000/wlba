@@ -275,7 +275,6 @@ wlb.ready({
                 $('.receive_box').on('click', function(){
                     mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/redirect/'});
                 })
-                $('.down_load_wlb').hide();
             } else {
                 login = true;
                 $('.down_load_wlb').hide();
