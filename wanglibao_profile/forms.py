@@ -45,7 +45,7 @@ class ActivityUserInfoForm(forms.ModelForm):
         name = self.cleaned_data['name'].strip()
         name_len = self.get_unicode_len(name)
 
-        if name_len <= 10:
+        if name_len <= 20:
             return name
         else:
             raise forms.ValidationError(
@@ -57,7 +57,7 @@ class ActivityUserInfoForm(forms.ModelForm):
         address = self.cleaned_data['address'].strip()
         address_len = self.get_unicode_len(address)
 
-        if address_len <= 10:
+        if address_len <= 20:
             return address
         else:
             raise forms.ValidationError(
