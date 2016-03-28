@@ -1,5 +1,5 @@
 (function(org){
-    var reg = /^1\d{10$/;
+    var reg = /^1\d{10}$/;
         var isphone = function(date){
             if(date.ret_code == 10000){
                 $(".mesg,.dialog").show();
@@ -64,7 +64,7 @@
         }
 
         $("#login_btn").on("click",Event);
-        $("#lg_uls").on("keyup","input",function(){
+        $("#lg_uls").on("input","input",function(){
             $(this).next().text("");
         })
         $("#dia_btn").on("click",function(){

@@ -241,7 +241,7 @@ def require_trade_pwd(view_func):
             #为了获取验证码
             if request.path == reverse('deposit-new') and \
                     (len(request.POST.get('card_no', '')) != 10 or
-                     request.POST.get('vcode_for_qpay')):
+                     request.POST.get('mode') == 'vcode_for_qpay'):
                 no_need_trade_pwd = True
             #为了绑卡进行的绑卡充值
             if _is_just_bind_card(request):
