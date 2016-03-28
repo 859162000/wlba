@@ -50,6 +50,7 @@ org.ui = (function(){
 var login = false;
 wlb.ready({
     app: function (mixins) {
+        $('.wlb_t').text('aaaaa')
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
@@ -64,11 +65,16 @@ wlb.ready({
     },
     other: function(){
         org.experience.init()
+        $('.wlb_t').text('bbbbbbb')
     }
 })
 
 
 org.experience = (function (org) {
+    //if(login){
+    //    $('.down_load_wlb').hide();
+    //    $('.wlb_t').text('aaaaaaaaaa')
+    //}
     var lib = {
         init: function () {
             lib._lookMore()
