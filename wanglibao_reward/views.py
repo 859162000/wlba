@@ -2689,7 +2689,7 @@ class MarchAwardTemplate(TemplateView):
             idx = 0
 
             for rank in ranks:
-                print rank
+                # print rank
                 rank['amount__sum'] = float(rank['amount__sum'])
                 event = redpack_events[rank_awards[idx]]
                 rank['coupon'] = event.amount
