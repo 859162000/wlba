@@ -289,6 +289,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_oauth2.log',
             'formatter': 'verbose'
         },
+        'wanglibao_p2p': {  # add by chenweibin@20160328
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_p2p.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -305,7 +311,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_p2p': {
-            'handlers': ['file', 'console'],
+            'handlers': ['wanglibao_p2p'],
             'level': 'DEBUG',
         },
         'wanglibao_account': {

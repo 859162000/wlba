@@ -13,34 +13,37 @@ logger = logging.getLogger(__name__)
 
 class P2PProduct(models.Model):
     version = models.CharField(max_length=50)
-    category = models.CharField(max_length=16, default=u'普通', verbose_name=u'产品类别*')
+    category = models.CharField(u'产品类别*', max_length=16, default=u'普通')
     types = models.CharField(u"产品分类(新)", max_length=50, null=True, blank=True)
-    name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
-    short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
-    serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, blank=False, null=True)
+    name = models.CharField(u'名字*', max_length=256, blank=False)
+    short_name = models.CharField(u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
+    serial_number = models.CharField(u'产品编号*', max_length=100, blank=False, null=True)
     status = models.CharField(u'产品状态*', max_length=16, default=u'录标', db_index=True)
-    period = models.IntegerField(default=0, verbose_name=u'产品期限(月/天)*', blank=False)
-    brief = models.TextField(blank=True, verbose_name=u'产品备注')
-    expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
-    excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
+    period = models.IntegerField(u'产品期限(月/天)*', default=0, blank=False)
+    brief = models.TextField(u'产品备注', blank=True)
+    expected_earning_rate = models.FloatField(u'预期收益(%)*', default=0, blank=False)
+    excess_earning_rate = models.FloatField(u'超额收益(%)*', default=0)
     excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
 
     pay_method = models.CharField(u'还款方式*', max_length=32, blank=False, default=u'等额本息')
     amortization_count = models.IntegerField(u'还款期数', default=0)
-    repaying_source = models.TextField(verbose_name=u'还款资金来源(合同用)', blank=True)
+    repaying_source = models.TextField(u'还款资金来源(合同用)', blank=True)
 
-    total_amount = models.BigIntegerField(default=1, verbose_name=u'借款总额*', blank=False)
-    ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额*')
+    total_amount = models.BigIntegerField(u'借款总额*', default=1, blank=False)
+    ordered_amount = models.BigIntegerField(u'已募集金额*', default=0)
 
-    publish_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=10), verbose_name=u'发布时间*', blank=False, db_index=True)
-    end_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=20), verbose_name=u'终止时间*', blank=False)
+    publish_time = models.DateTimeField(u'发布时间*', default=lambda: timezone.now() + timezone.timedelta(days=10),
+                                        blank=False, db_index=True)
+    end_time = models.DateTimeField(u'终止时间*', default=lambda: timezone.now() + timezone.timedelta(days=20),
+                                    blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True, db_index=True)
 
     make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)
 
-    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)*', default=1)
+    limit_per_user = models.FloatField(u'单用户购买限额(0-1的系数)*', default=1)
 
     class Meta:
+        verbose_name = u'P2P产品'
         verbose_name_plural = u'P2P产品'
 
     def __unicode__(self):
@@ -71,6 +74,7 @@ class P2PRecord(models.Model):
 
     class Meta:
         ordering = ['-create_time']
+        verbose_name = u'产品流水'
         verbose_name_plural = u'产品流水'
 
     def __unicode__(self):
@@ -79,7 +83,7 @@ class P2PRecord(models.Model):
 
 class UserAmortization(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
-    user_id = models.IntegerField(u'用户id', max_length=50)
+    user_id = models.IntegerField(u'用户id', max_length=50, db_index=True)
     term = models.IntegerField(u'还款期数')
     terms = models.IntegerField(u'还款总期数')
 
@@ -96,6 +100,7 @@ class UserAmortization(models.Model):
     equity_confirm_at = models.DateTimeField(u'持仓确认时间', auto_now_add=True)
 
     class Meta:
+        verbose_name = u'用户还款计划'
         verbose_name_plural = u'用户还款计划'
         ordering = ['user_id', 'term']
 

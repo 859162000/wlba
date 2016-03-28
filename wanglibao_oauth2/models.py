@@ -37,13 +37,13 @@ class Client(models.Model):
     client_secret = models.CharField(u'客户端密钥', max_length=255, default=long_token)
     channel = models.ForeignKey(Channels, verbose_name=u'渠道', help_text=u'渠道', blank=True, null=True)
     client_name = models.CharField(u'客户端名称', max_length=20)
-    # reg_return_token = models.BooleanField(u'注册返回Token', default=False)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
 
     def __unicode__(self):
         return self.client_name
 
     class Meta:
+        verbose_name = u'Oauth2客户端'
         verbose_name_plural = u'Oauth2客户端'
 
     def get_default_token_expiry(self):
@@ -81,6 +81,7 @@ class OauthUser(models.Model):
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
 
     class Meta:
+        verbose_name = u'Oauth2用户'
         verbose_name_plural = u'Oauth2用户'
 
 

@@ -566,6 +566,8 @@ class RenRenLiCallback(CoopCallback):
 
     def get_purchase_data(self, p2p_record):
         bid = get_tid_for_coop(p2p_record.user_id)
+        first_p2p_record = P2PRecord.objects.filter(user_id=p2p_record.user_id,
+                                                    catalog=u'申购').order_by('create_time').first()
         if bid:
             data = {
                 'User_name': self.coop_account_name,
@@ -574,7 +576,7 @@ class RenRenLiCallback(CoopCallback):
                 'Pro_id': p2p_record.product.id,
                 'Invest_money': float(p2p_record.amount),
                 'Rate': p2p_record.product.expected_earning_rate,
-                'Invest_start_date': utc_to_local_timestamp(p2p_record.create_time),
+                'Invest_start_date': utc_to_local_timestamp(first_p2p_record.create_time),
                 'Invest_end_date': 0,
                 'Back_money': 0,
                 'Back_last_date': 0,
