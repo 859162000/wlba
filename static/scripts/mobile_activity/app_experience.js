@@ -269,8 +269,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 var login = false;
 wlb.ready({
     app: function (mixins) {
+        $('.wlb_t').text('aaaaa')
         mixins.sendUserInfo(function (data) {
-            $('.wlb_t').text(data.ph)
             if (data.ph == '') {
                 login = false;
                 $('.receive_box').on('click', function(){
@@ -284,15 +284,16 @@ wlb.ready({
     },
     other: function(){
         org.experience.init()
+        $('.wlb_t').text('bbbbbbb')
     }
 })
 
 
 org.experience = (function (org) {
-    if(login){
-        $('.down_load_wlb').hide();
-        $('.wlb_t').text('aaaaaaaaaa')
-    }
+    //if(login){
+    //    $('.down_load_wlb').hide();
+    //    $('.wlb_t').text('aaaaaaaaaa')
+    //}
     var lib = {
         init: function () {
             lib._lookMore()
