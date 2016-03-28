@@ -239,7 +239,9 @@ def require_trade_pwd(view_func):
             # logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
             no_need_trade_pwd = False
             #为了获取验证码
-            if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
+            if request.path == reverse('deposit-new') and \
+                    (len(request.POST.get('card_no', '')) != 10 or
+                     request.POST.get('vcode_for_qpay')):
                 no_need_trade_pwd = True
             #为了绑卡进行的绑卡充值
             if _is_just_bind_card(request):
