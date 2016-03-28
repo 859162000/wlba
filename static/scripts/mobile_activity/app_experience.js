@@ -278,6 +278,7 @@ wlb.ready({
             } else {
                 login = true;
                 $('.down_load_wlb').hide();
+                $('.wlb_t').text('aaaaaaaaaa')
                 org.experience.init()
             }
         })
