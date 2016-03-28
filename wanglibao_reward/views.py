@@ -41,6 +41,7 @@ from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
+import pickle
 from urllib import urlencode,quote
 from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote, WanglibaoRewardJoinRecord
 from wanglibao_margin.models import MarginRecord
@@ -58,6 +59,8 @@ from wanglibao.templatetags.formatters import convert_to_10k
 from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 from wanglibao_redis.backend import redis_backend
+from weixin.util import getMiscValue
+
 logger = logging.getLogger('wanglibao_reward')
 
 class WeixinShareDetailView(TemplateView):
@@ -2656,9 +2659,9 @@ class MarchAwardTemplate(TemplateView):
 
         if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
-                ranks = redis_backend()._lrange('top_ranks', 0, -1)
+                ranks = pickle.loads(redis_backend()._get('top_ranks'))
             except:
-                pass
+                logger.debug("-------------------------------redis read ranks error")
             if not ranks:
                 ranks = updateRedisTopRank()
             if user.is_authenticated():
@@ -2686,7 +2689,7 @@ class MarchAwardTemplate(TemplateView):
             idx = 0
 
             for rank in ranks:
-                print rank
+                # print rank
                 rank['amount__sum'] = float(rank['amount__sum'])
                 event = redpack_events[rank_awards[idx]]
                 rank['coupon'] = event.amount
@@ -2766,7 +2769,84 @@ class FetchMarchAwardAPI(APIView):
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
 
+class FetchAirportServiceReward(APIView):
+    authentication_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        activity = Activity.objects.filter(code='').first()
+        if activity.is_stopped:
+            return Response({"ret_code":-1, "message":"活动已经截止"})
+        now = timezone.now()
+        if activity.start_at > now:
+            return Response({"ret_code":-1, "message":"活动还未开始"})
+        if activity.end_at < now:
+            return Response({"ret_code":-1, "message":"活动已经结束"})
+        user = request.user
+        # reward_name = request.DATA.get('reward_name', "").strip()
+        # if not reward_name:
+        #     return Response({"ret_code":-1, "message":""})
+        rule_id = request.DATA.get('rule_id', "").strip()
+        if not rule_id or not rule_id.isdigit():
+            return Response({"ret_code":-1, "message":""})
+        rule_id = int(rule_id)
+        activity_rules = ActivityRule.objects.filter(activity=activity).all()
+        activity_rule = None
+        for a_rule in activity_rules:
+            if a_rule.id == rule_id:
+                activity_rule = a_rule
+                break
+
+        if not activity_rule or activity_rule.gift_type!=u"reward" or not activity_rule.reward or not activity_rule.is_used:
+            return Response({"ret_code": -1, "message": ""})
+
+        reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+        if not reward:
+            return Response({"ret_code": -1, "message": ""})
+        user_ib = IntroducedBy.objects.filter(user=user, created_at__gt=activity.start_at).first()
+        is_new = True
+        if not user_ib:
+            is_new = False
+
+        if activity_rule.is_invite_in_date:
+            if not is_new or not user_ib.channel or user_ib.channel.code != activity.channel:
+                return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+        if is_new:
+            return Response({"ret_code": -1, "message": ""})
+        airport_service_reward_limit = getMiscValue("airport_service_reward")
+        min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
+
+        first_buy = P2PRecord.objects.filter(user=user,
+                                             create_time__gt=activity.start_at
+                                             ).order_by('create_time').first()
+        if not first_buy or float(first_buy.amount) < min_amount:
+            return Response({"ret_code": -1, "message": "抱歉，您还不符合奖励条件哦~"})
 
 
+        reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
+        if not reward_record:
+            reward_record = ActivityRewardRecord.objects.create(
+                activity_code=activity.code,
+                user=user
+            )
+        if reward_record.status:
+            return Response({"ret_code": -1, "message": "您已领取奖励"})
 
+        with transaction.atomic():
+            reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=activity.code, user=request.user).first()
+
+            reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+            if not reward:
+                Response({"ret_code": -1, "message": "该奖品已经发完了"})
+            reward.is_used = True
+            reward.save()
+            reward_record.activity_desc = u"领取了%s,reward_id:%s"%(reward.type, reward.id)
+            reward_record.status = True
+            reward_record.save()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": request.user.id,
+            "title": reward.reward.type,
+            "content": reward.reward.content,
+            "mtype": "activity"
+        })
+        return Response({"ret_code": 0, "message": "奖品领取成功"})
 

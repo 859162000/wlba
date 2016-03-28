@@ -74,7 +74,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         //Enter事件
         $(this).keydown(function(event){
             if(event.keyCode == '13'){
-                if($('.minNavLeft').hasClass('curr')){
+                if($('.i-mod-content').hasClass('curr')){
                     $('#loginSubmit').click();
                 }else{
                     $('#registerSubmit').click();
@@ -324,8 +324,12 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             $('#registerForm').find('input[name="password"]').val(val)
         })
         //注册手机号验证
-        $('#registerMobile').on('blur',function() {
-            checkMobileFun('registerForm');
+        $('#registerMobile').on('keyup',function() {
+            if(checkMobileFun('registerForm')){
+                $('#registerCode').val() != '' ? $('.getCodeBtn').removeClass('buttonGray').addClass('getCodeBtnTrue') : $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+            }else{
+                $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+            }
         })
         //注册密码验证
         $('.registerPwd').on('blur',function() {
@@ -335,8 +339,10 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         $('#registerCode').on('keyup',function() {
             var getCodeBtn = $('.getCodeBtn');
             if($('#registerCode').val() != ''){
-                checkMobileFun('registerForm');
-                getCodeBtn.removeClass('buttonGray').addClass('getCodeBtnTrue');
+                if(checkMobileFun('registerForm'))
+                {
+                    getCodeBtn.removeClass('buttonGray').addClass('getCodeBtnTrue');
+                }
             }else{
                 getCodeBtn.removeClass('getCodeBtnTrue').addClass('buttonGray');
             }
@@ -457,5 +463,5 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             });
         }
     }
-    $('.minNavLeft').hasClass('curr') ? loginInitFun() : registerInitFun();
+    $('.i-mod-content').hasClass('curr') ? loginInitFun() : registerInitFun();
 });

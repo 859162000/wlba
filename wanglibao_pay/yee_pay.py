@@ -199,6 +199,18 @@ class YeePay:
                     return {"ret_code":20075, 'message':'选择的银行卡不存在'}
                 pay_info.bank = card.bank
                 pay_info.card_no = card.no
+                
+            #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
+            cards_info = pay_info.bank.cards_info.split(',')
+            card_to_bank = False
+            if pay_info.card_no:
+                for no in cards_info:
+                    if pay_info.card_no.startswith(no):
+                        card_to_bank = True
+                if card_to_bank:
+                    pass
+                else:
+                    return {"ret_code":20075, "message": "银行卡与银行不匹配"}
 
             pay_info.request_ip = util.get_client_ip(request)
             order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
@@ -452,13 +464,13 @@ class YeeShortPay:
         # logger.error("request yee_pay: %s" % data)
         post = self._format_post(data)
         res = requests.post(url, post)
-        logger.error("yee_pay: %s | %s | %s" % (url, data, res.text))
-        return self._response_data_change(res=json.loads(res.text))
+        res_dict = self._response_data_change(res=json.loads(res.text))
+        logger.error("yee_pay: %s | %s | %s" % (url, data, res_dict))
+        return res_dict 
 
     def _request_yee_get(self, url, data):
         post = self._format_post(data)
         res = requests.get(url, params=post)
-        logger.error("yee_pay: %s | %s | %s" % (url, data, res.text))
         return self._response_data_change(res=json.loads(res.text))
 
     def _response_data_change(self, res):
@@ -693,6 +705,18 @@ class YeeShortPay:
 
             pay_info.bank = card.bank
             pay_info.card_no = card.no
+            
+            #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
+            cards_info = pay_info.bank.cards_info.split(',')
+            card_to_bank = False
+            if pay_info.card_no:
+                for no in cards_info:
+                    if pay_info.card_no.startswith(no):
+                        card_to_bank = True
+                if card_to_bank:
+                    pass
+                else:
+                    return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
 
             pay_info.request = ""
             pay_info.status = PayInfo.PROCESSING

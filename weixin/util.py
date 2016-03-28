@@ -13,6 +13,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
 import datetime
 from django.db import transaction
 import logging
@@ -21,6 +22,7 @@ import json
 import urllib
 import re
 import random
+
 
 
 logger = logging.getLogger("weixin")
@@ -50,7 +52,7 @@ def get_fwh_login_url(next=None):
 
 
 if not FWH_LOGIN_URL:
-   get_fwh_login_url()
+    get_fwh_login_url()
 
 
 def redirectToJumpPage(message, next=None):
@@ -229,30 +231,35 @@ def process_user_daily_action(user, action_type=u'sign_in'):
     today = datetime.date.today()
     yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
     daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=action_type).first()
-    if not daily_record:
-        daily_record = UserDailyActionRecord.objects.create(
-            user=user,
-            action_type=action_type
-        )
-    if daily_record.status:
-        return 1, False, daily_record
-    with transaction.atomic():
-        daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
-        seg = SendExperienceGold(user)
-        if action_type == u'share':
-            experience_event = getSignExperience_gold(give_mode=u"share")
-        else:
-            experience_event = getSignExperience_gold()
-        if experience_event:
-            experience_record_id, experience_event = seg.send(experience_event.id)
-            daily_record.experience_record_id = experience_record_id
-        daily_record.status=True
-        yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=action_type).first()
-        continue_days = 1
-        if yesterday_record:
-            continue_days += yesterday_record.continue_days
-        daily_record.continue_days=continue_days
-        daily_record.save()
+    try:
+        if not daily_record:
+            daily_record = UserDailyActionRecord.objects.create(
+                user=user,
+                action_type=action_type
+            )
+        if daily_record.status:
+            return 1, False, daily_record
+        with transaction.atomic():
+            daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
+            if daily_record.status:
+                return 1, False, daily_record
+            seg = SendExperienceGold(user)
+            if action_type == u'share':
+                experience_event = getSignExperience_gold(give_mode=u"share")
+            else:
+                experience_event = getSignExperience_gold()
+            if experience_event:
+                experience_record_id, experience_event = seg.send(experience_event.id)
+                daily_record.experience_record_id = experience_record_id
+            daily_record.status=True
+            yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=action_type).first()
+            continue_days = 1
+            if yesterday_record:
+                continue_days += yesterday_record.continue_days
+            daily_record.continue_days=continue_days
+            daily_record.save()
+    except IntegrityError, e:
+        return 2, False, daily_record
     return 0, True, daily_record
 
 

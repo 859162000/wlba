@@ -83,29 +83,32 @@ export class Simple_validation {
     }
 
     timerFunction(count) {
+        const $target = this.target;
+        let intervalId;
         var timerInside = function () {
             if (count > 1) {
                 count--;
-                return this.target.text(`${count}秒后可重发`);
+                return $target.text(`${count}秒后可重发`);
             } else {
-                clearInterval(this.intervalId);
-                this.target.text('重新获取').removeAttr('disabled');
+                clearInterval(intervalId);
+                $target.text('重新获取').removeAttr('disabled');
                 return signModel('倒计时失效，请重新获取')
             }
         };
         timerInside();
-        return this.intervalId = setInterval(timerInside, 1000);
+        intervalId = setInterval(timerInside, 1000);
+        return this.intervalId = intervalId
     }
 
     start() {
         this.before_validation()
             .then(result => {
-                console.log('验证通过')
-                return this.execute_request()
+                console.log('验证通过');
+                return this.execute_request();
             })
             .then(result => {
-                signModel(result)
-                this.timerFunction(60)
+                signModel(result);
+                this.timerFunction(60);
             })
             .catch(result => {
                 return signModel(result)

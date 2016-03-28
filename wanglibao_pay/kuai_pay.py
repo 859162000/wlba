@@ -1,8 +1,8 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # encoding:utf-8
-from wanglibao import settings
-from base64 import b64decode 
-import logging 
+from base64 import b64decode
+
+import logging
 import traceback
 from M2Crypto import X509
 from django.contrib.auth.models import User
@@ -31,6 +31,8 @@ class KuaiPay:
     FEE = 0
 
     def __init__(self):
+        self.MER_ID = settings.KUAI_MER_ID
+        self.MER_PASS = settings.KUAI_MER_PASS
         #self.PAY_URL = settings.KUAI_PAY_URL
         #self.QUERY_URL = settings.KUAI_QUERY_URL
         #self.DEL_URL = settings.KUAI_DEL_URL
@@ -663,7 +665,6 @@ class KuaiShortPay:
         self.QUERY_URL = settings.KUAI_PAY_URL + "/cnp/pci_query"
         self.DEL_URL = settings.KUAI_PAY_URL + "/cnp/pci_del"
         self.DYNNUM_URL = settings.KUAI_PAY_URL + "/cnp/getDynNum"
-        self.QUERY_TRANSACTION_URL = settings.KUAI_PAY_URL + '/cnp/query_txn'
 
         self.PAY_BACK_RETURN_URL = settings.KUAI_PAY_BACK_RETURN_URL
         self.PAY_TR3_SIGNATURE = settings.KUAI_PAY_TR3_SIGNATURE
@@ -673,7 +674,6 @@ class KuaiShortPay:
                         "Content-Type":"application/x-www-form-urlencoded"}
         self.xmlheader = '<?xml version="1.0" encoding="UTF-8"?>\n'
         self.pem = settings.KUAI_PEM_PATH
-        self.test_ca_pem = settings.KUAI_TEST_CA_PEM_PATH
         self.signature_pem = settings.KUAI_SIGNATURE_PEM_PATH
         self.auth = (self.MER_ID, self.MER_PASS)
         self.ERR_CODE_WAITING = '222222'
@@ -744,7 +744,31 @@ class KuaiShortPay:
                 dic['name'], dic['id_number']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
+    def _sp_dynnum_xml_for_qpay(self, dic):
+        """
+        已绑卡用户获取验证码 
+        """
+        xml = etree.XML("""
+            <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
+                <version>1.0</version>
+                <GetDynNumContent>
+                    <merchantId>%s</merchantId>
+                    <customerId>%s</customerId>
+                    <externalRefNumber>%s</externalRefNumber>
+                    <storablePan>%s</storablePan>
+                    <bankId>%s</bankId>
+                    <amount>%s<%amount>
+                </GetDynNumContent>
+            </MasMessage>
+        """ % (self.MER_ID, dic['user_id'], dic['order_id'],
+                 dic['card_no'], dic['bank_id'], dic['amount']))
+        return self.xmlheader + etree.tostring(xml, encoding="utf-8")
+
+
     def _sp_bindpay_xml(self, dic):
+        """
+        获取验证码后，绑卡，支付
+        """
         xml = etree.XML("""
             <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
                 <version>1.0</version>
@@ -778,7 +802,41 @@ class KuaiShortPay:
                 dic['phone'], dic['vcode'], dic['token']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
+    def _sp_qpay_with_sms_xml(self, dic):
+        """
+        绑卡后使用短信验证码直接支付
+        """
+        xml = etree.XML("""
+            <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
+                <version>1.0</version>
+                <TxnMsgContent>
+                    <interactiveStatus>TR1</interactiveStatus>
+                    <txnType>PUR</txnType>
+                    <merchantId>%s</merchantId>
+                    <terminalId>%s</terminalId>
+                    <tr3Url>%s</tr3Url>
+                    <entryTime>%s</entryTime>
+                    <storableCardNo>%s</storableCardNo>
+                    <amount>%s</amount>
+                    <externalRefNumber>%s</externalRefNumber>
+                    <customerId>%s</customerId>
+                    <spFlag>QuickPay</spFlag>
+                    <extMap>
+                        <extDate><key>validCode</key><value>%s</value></extDate>
+                        <extDate><key>savePciFlag</key><value>1</value></extDate>
+                        <extDate><key>token</key><value>%s</value></extDate>
+                        <extDate><key>payBatch</key><value>2</value></extDate>
+                    </extMap>
+                </TxnMsgContent>
+            </MasMessage>
+        """ % (self.MER_ID, self.TERM_ID, self.PAY_BACK_RETURN_URL, dic['time'], dic['card_no'], 
+            dic['amount'], dic['order_id'], dic['user_id'], dic['vcode'], dic['token']))
+        return self.xmlheader + etree.tostring(xml, encoding="utf-8")
+
     def _sp_qpay_xml(self, dic):
+        """
+        绑卡后不使用验证码，直接支付
+        """
         xml = etree.XML("""
             <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
                 <version>1.0</version>
@@ -829,34 +887,14 @@ class KuaiShortPay:
         """ % (self.MER_ID, self.TERM_ID, ref_number))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
-    def _sp_query_xml(self, order_id):
-        xml = etree.XML("""
-            <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
-                <version>1.0</version>
-                <QryTxnMsgContent>
-                    <txnType>PUR</txnType>
-                    <merchantId>%s</merchantId>
-                    <terminalId>%s</terminalId>
-                    <externalRefNumber>%s</externalRefNumber>
-                </QryTxnMsgContent>
-            </MasMessage>
-        """ % (self.MER_ID, self.TERM_ID, order_id))
-        return self.xmlheader + etree.tostring(xml, encoding="utf-8")
-
 
     def _request(self, data, url):
         headers = self.headers
         headers['Content-Length'] = str(len(data))
         res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
+        if url not in [self.QUERY_URL,]:
+            logger.error('kuai_pay:%s|%s|%s' % (url, data, res.text))
         return res
-
-    def _find_in_xml(self, byte_content, key):
-        doc = etree.fromstring(byte_content)
-        namespace = doc.nsmap.get(None)
-        try:
-            return doc.find('.//{%s}%s' % (namespace, key)).text
-        except:
-            return None
 
     def _result2dict(self, content):
         xml = etree.XML(content)
@@ -872,7 +910,7 @@ class KuaiShortPay:
         data = self._sp_bind_xml(request.user.id)
         res = self._request(data, self.QUERY_URL)
 
-        logger.critical(res.content)
+        # logger.critical(res.content)
 
         if res.status_code != 200:
             return {"ret_code":-1, "message":"fetch error"}
@@ -945,7 +983,7 @@ class KuaiShortPay:
         if res.status_code != 200 or "errorCode" in res.content:
             return False
 
-        logger.critical(res.content)
+        # logger.critical(res.content)
 
         dic = self._result2dict(res.content)
         res_code = ''
@@ -1048,8 +1086,8 @@ class KuaiShortPay:
 
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
-        logger.critical(data)
-        logger.critical(res.content)
+        # logger.critical(data)
+        # logger.critical(res.content)
 
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code":20101, "message":"解除绑定失败"}
@@ -1065,8 +1103,8 @@ class KuaiShortPay:
                 card_short_no}
         data = self._sp_delbind_xml(dic)
         res = self._request(data, self.DEL_URL)
-        logger.critical(data)
-        logger.critical(res.content)
+        # logger.critical(data)
+        # logger.critical(res.content)
 
         if res.status_code != 200 or "errorCode" in res.content:
             return {"ret_code": 20101, "message": "解除绑定失败"}
@@ -1118,35 +1156,11 @@ class KuaiShortPay:
             return {"ret_code": pay_info.error_code, "message": pay_info.error_message,
                     'order_id':order_id, 'pay_info_id':payinfo_id}
 
-    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device_type, ip, request, exit_for_test=False):
-        # if not user.wanglibaouserprofile.id_is_valid:
-        #     return {"ret_code":20111, "message":"请先进行实名认证"}
-
-        # amount = request.DATA.get("amount", "").strip()
-        # card_no = request.DATA.get("card_no", "").strip()
-        # input_phone = request.DATA.get("phone", "").strip()
-        # gate_id = request.DATA.get("gate_id","").strip()
-
-        # if not amount or not card_no:
-        #     return {"ret_code":20112, 'message':'信息输入不完整'}
-        # if len(card_no) > 10 and (not input_phone or not gate_id):
-        #     return {"ret_code":20112, 'message':'信息输入不完整'}
-
-        #if card_no[0] in ("3", "4", "5"):
-        #    return {"ret_code":20113, "message":"不能使用信用卡"}
-
-        # try:
-        #     float(amount)
-        # except:
-        #     return {"ret_code":20114, 'message':'金额格式错误'}
-
-        # amount = util.fmt_two_amount(amount)
-        #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
-        #if amount < 10 or amount % 1 != 0 or len(str(amount)) > 20:
-        # if amount < 10 or len(str(amount)) > 20:
-        #     return {"ret_code":20115, 'message':'充值须大于等于10元'}
-
-        # user = request.user
+    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device_type, ip, request, 
+                mode='default', exit_for_test=False):
+        """
+        mode为vcode_for_qpay:即使前段使用短卡号，也强制获取验证码
+        """
         profile = user.wanglibaouserprofile
         card = None
         bank = None
@@ -1209,28 +1223,31 @@ class KuaiShortPay:
                     "phone":input_phone, "name":profile.name, "amount":amount,
                     "card_no":pay_info.card_no}
 
-            if len(card_no) == 10:
+            if len(card_no) == 10 and mode != 'vcode_for_qpay':
                 dic['storable_no'] = card_no
                 dic['bank_id'] = card.bank.kuai_code
                 dic['time'] = timezone.now().strftime("%Y%m%d%H%M%S")
 
                 self._request_dict = dic
                 data = self._sp_qpay_xml(dic)
-                logger.critical("second pay info")
-                logger.critical(u"%s"%data)
+                # logger.critical("second pay info")
+                # logger.critical(u"%s"%data)
                 url = self.PAY_URL
             else:
                 self._request_dict = dic
-                data = self._sp_dynnum_xml(dic)
-                logger.critical("first pay info")
-                logger.critical(u"%s" % data)
+                if mode == 'vcode_for_sms':
+                    data = self._sp_dynnum_xml_for_qpay(dic)
+                else:
+                    data = self._sp_dynnum_xml(dic)
+                # logger.critical("first pay info")
+                # logger.critical(u"%s" % data)
 
                 url = self.DYNNUM_URL
 
             res = self._request(data, url)
-            logger.critical("kuai pay request result")
-            logger.critical(res.content)
-            if len(card_no) == 10:
+            # logger.critical("kuai pay request result")
+            # logger.critical(res.content)
+            if len(card_no) == 10  and  mode != 'vcode_for_qpay':
                 result = self.handle_pay_result(res.content)
                 if not result:
                     raise ThirdPayError(201171, '信息不匹配')
@@ -1260,14 +1277,12 @@ class KuaiShortPay:
         except Exception, e:
             return self._handle_third_pay_error(e, user.id, pay_info.id, order.id)
 
-    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, device_type, ip, request):
-        # vcode = request.DATA.get("vcode", "").strip()
-        # order_id = request.DATA.get("order_id", "").strip()
-        # token = request.DATA.get("token", "").strip()
-        # input_phone = request.DATA.get("phone", "").strip()
-
-        # if not order_id.isdigit():
-        #     return {"ret_code":20125, "message":"订单号错误"}
+    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, 
+                        device_type, ip, request, mode='default'):
+        """
+        mode为qpay_with_sms:使用短信验证码进行绑卡后的快捷支付
+            为default:进行首次的绑卡,支付
+        """
 
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info or pay_info.status == PayInfo.SUCCESS:
@@ -1281,11 +1296,15 @@ class KuaiShortPay:
                     "time":pay_info.create_time.strftime("%Y%m%d%H%M%S"), "vcode":vcode,
                     "card_no":pay_info.card_no, "token":token, "bank_id":pay_info.bank.kuai_code}
             self._request_dict = dic
-            data = self._sp_bindpay_xml(dic)
-            logger.critical("#" * 50)
-            logger.critical(data)
+            if mode == 'qpay_with_sms':
+                dic['card_no'] = dic['card_no'][:6] + dic['card_no'][-4:]
+                data = self._sp_qpay_with_sms_xml(dic)
+            else:
+                data = self._sp_bindpay_xml(dic)
+            # logger.critical("#" * 50)
+            # logger.critical(data)
             res = self._request(data, self.PAY_URL)
-            logger.critical(res.content)
+            # logger.critical(res.content)
             if res.status_code != 200 or "errorCode" in res.content:
                 if "B.MGW.0120" in res.content:
                     pay_info.error_message = '银行与银行卡不匹配'
@@ -1334,12 +1353,12 @@ class KuaiShortPay:
         if pay_info.amount != amount:
             pay_info.status = PayInfo.FAIL
             pay_info.error_message += u' 金额不匹配'
-            logger.critical("orderId:%s amount:%s, response amount:%s" % (order_id, pay_info.amount, amount))
+            # logger.critical("orderId:%s amount:%s, response amount:%s" % (order_id, pay_info.amount, amount))
             rs = {"ret_code":20132, "message":PayResult.EXCEPTION}
         elif pay_info.user_id != user_id:
             pay_info.status = PayInfo.FAIL
             pay_info.error_message += u"用户不匹配"
-            logger.critical("orderId:%s 充值用户ID不匹配" % order_id)
+            # logger.critical("orderId:%s 充值用户ID不匹配" % order_id)
             rs = {"ret_code":20133, "message":PayResult.EXCEPTION}
         else:
             pay_info.fee = self.FEE
@@ -1347,7 +1366,7 @@ class KuaiShortPay:
             margin_record = keeper.deposit(amount)
             pay_info.margin_record = margin_record
             pay_info.status = PayInfo.SUCCESS
-            logger.critical("orderId:%s success" % order_id)
+            # logger.critical("orderId:%s success" % order_id)
             rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current,
                   "order_id": order_id}
 
@@ -1456,22 +1475,6 @@ class KuaiShortPay:
         self._request_dict = dict(user_id=user_id, order_id=order_id, amount=amount)
         return self._sp_pay_tr4_xml(ref_number)
         # return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
-
-    def query_trx_result(self, order_id):
-        """
-        去第三方查询交易结果
-        """
-        trx_data  = self._sp_query_xml(order_id)
-        res = self._request(trx_data, self.QUERY_TRANSACTION_URL)
-        logger.info('kuai_pay_result_for_trx_result:'+res.text)
-        try:
-            last_card_no = self._find_in_xml(res.content, 'storableCardNo')[-4:]
-        except:
-            last_card_no = None
-        return {'code': self._find_in_xml(res.content, 'responseCode'),
-                'message': self._find_in_xml(res.content, 'responseTextMessage'),
-                'last_card_no': last_card_no, 
-                'amount': self._find_in_xml(res.content, 'amount')}
 
     def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """

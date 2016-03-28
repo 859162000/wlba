@@ -166,7 +166,7 @@ class DynamicHomeView(TemplateView):
     template_name = 'milestone.jade'
 
     def get_context_data(self, **kwargs):
-        about_dynamics = AboutDynamic.objects.filter(hide_in_list=False).order_by('-updated_time')
+        about_dynamics = AboutDynamic.objects.filter(hide_in_list=False).order_by('-priority', '-updated_time')
 
         about_dynamic_list = []
         about_dynamic_list.extend(about_dynamics)
@@ -174,21 +174,15 @@ class DynamicHomeView(TemplateView):
         limit = 10
         page = self.request.GET.get('page', 1)
 
-        if about_dynamic_list:
-            paginator = Paginator(about_dynamic_list, limit)
-            try:
-                about_dynamic_list = paginator.page(page)
-            except PageNotAnInteger:
-                about_dynamic_list = paginator.page(1)
-            except EmptyPage:
-                about_dynamic_list = []
-            except Exception:
-                about_dynamic_list = paginator.page(paginator.num_pages)
+        paginator = Paginator(about_dynamic_list, limit)
+        try:
+            about_dynamic_list = paginator.page(page)
+        except PageNotAnInteger:
+            about_dynamic_list = paginator.page(1)
+        except Exception:
+            about_dynamic_list = paginator.page(paginator.num_pages)
 
-            count = paginator.num_pages
-        else:
-            about_dynamic_list = []
-            count = 0
+        count = paginator.num_pages
 
         return {
             'data': about_dynamic_list,

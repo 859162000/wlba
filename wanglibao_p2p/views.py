@@ -656,6 +656,7 @@ def preview_contract(request, id):
 
     return HttpResponse(generate_contract_preview(productAmortizations, product))
 
+
 def AuditEquityCreateContract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
     product = equity.product
@@ -693,13 +694,15 @@ class AdminP2PList(TemplateView):
             'p2p_list': p2p_list
             }
 
+
 class AdminPrepayment(TemplateView):
+    """提前还款页面"""
     template_name = 'admin_prepayment.jade'
 
     def get_context_data(self, **kwargs):
-        id = kwargs['id']
-        if id:
-            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations')
+        pid = kwargs['id']
+        if pid:
+            p2p = P2PProduct.objects.filter(pk=pid).select_related('amortizations')
         if p2p[0].status != u'还款中':
             return {
                     'p2p': None,
@@ -713,8 +716,8 @@ class AdminPrepayment(TemplateView):
             }
 
 
-
 class RepaymentAPIView(APIView):
+    """提前还款"""
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
@@ -756,6 +759,7 @@ class RepaymentAPIView(APIView):
                     }
 
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
 
 def check_invalid_new_user_product(p2p, user):
     """

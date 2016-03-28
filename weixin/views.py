@@ -68,15 +68,20 @@ from weixin.tasks import detect_product_biding, sentTemplate
 from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record, process_user_daily_action
 from weixin.util import FWH_UNBIND_URL, filter_emoji
 from rest_framework.permissions import IsAuthenticated
-
+from wanglibao_redis.backend import redis_backend
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
 from util import FWH_LOGIN_URL
 
+CUSTOMER_SERVICE = '1'
+SERVICE_SUBSCRIBE = '2'
+OTHER_MENU = '3'
+OTHER_TXT = '4'
+Y_TXT = '5'
+
 def stamp(dt):
     return long(time.mktime(dt.timetuple()))
-
 
 def checkBindDeco(func):
     @functools.wraps(func)
@@ -123,24 +128,22 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
-        logger.debug("entering get =============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
 
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
-        logger.debug("entering post=============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
-        logger.debug(self.msg)
         msg = self.msg
         reply = None
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
+        logger.debug("entering post=============================/weixin/join/%s"%fromUserName)
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
         w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
         user = w_user.user
@@ -148,11 +151,14 @@ class WeixinJoinView(View):
         self.w_user = w_user
 
         if isinstance(msg, BaseEvent):
+            # request.session['last_operate'] = OTHER_MENU
             if isinstance(msg, ClickEvent):
                 reply = self.process_click_event(weixin_account, w_user=w_user, user=user)
             elif isinstance(msg, SubscribeEvent):
+                self.process_user_operate(OTHER_MENU)
                 reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, UnsubscribeEvent):
+                self.process_user_operate(OTHER_MENU)
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
                 w_user.unsubscribe_time = int(time.time())
@@ -160,15 +166,17 @@ class WeixinJoinView(View):
                     unbindUser(w_user, user)
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
+                self.process_user_operate(OTHER_MENU)
                 reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, ScanEvent):
+                self.process_user_operate(OTHER_MENU)
                 #如果eventkey为用户id则进行绑定
                 reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, TemplateSendJobFinishEvent):
                 reply = -1
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
-                reply = self.check_service_subscribe(w_user=w_user, user=user)
+                reply = self.process_customer_transfer(weixin_account, w_user, user)
                 # 自动回复  5000次／天
                 # if not reply:
                 #     if msg.content=='test':
@@ -177,13 +185,91 @@ class WeixinJoinView(View):
                 #         checkAndSendProductTemplate(product)
                 # if not reply:
                 #     reply = tuling(msg)
-                if not reply:
-                    # 多客服转接
-                    reply = TransferCustomerServiceReply(message=msg)
+                # if not reply:
+                #     # 多客服转接
+                #     reply = TransferCustomerServiceReply(message=msg)
         if reply == -1 or not reply:
             return HttpResponse("")
         return HttpResponse(reply.render())
 
+    def process_user_operate(self, operate):
+        try:
+            redis = redis_backend()
+            redis.redis.hset(self.msg._data['FromUserName'], "operate", operate)
+            redis.redis.hset(self.msg._data['FromUserName'], "time", int(time.time()))
+
+        except Exception,e:
+            logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
+
+
+    def process_customer_transfer(self, weixin_account, w_user, user):
+        try:
+            redis = redis_backend()
+            last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
+            last_time = redis.redis.hget(self.msg._data['FromUserName'], "time")
+            if last_time:
+                last_time = int(last_time)
+            # print "operate:%s; last_time:%s"%(last_operate, last_time)
+            reply = None
+            txt = None
+            is_customer_time = self.checkCsTime()
+            if last_operate:
+                if last_operate == SERVICE_SUBSCRIBE:
+                    reply = self.check_service_subscribe(w_user=w_user, user=user)
+                    self.process_user_operate(OTHER_TXT)
+                elif last_operate == Y_TXT:
+                    if time.time() - last_time <= 30*60*60:
+                        reply = TransferCustomerServiceReply(message=self.msg)
+                        self.process_user_operate(Y_TXT)
+                if last_operate == CUSTOMER_SERVICE:
+                    if is_customer_time:
+                        if self.msg.content.lower() == "y":
+                            txt = "想问什么放马过来吧，简单描述下你想说的问题。"
+                            self.process_user_operate(Y_TXT)
+                        else:
+                            txt = "如需联系人工客服请回复字母“Y”！聊什么听你的，但是网利君在线时间为工作日9：00~18：00。"
+                    else:
+                        txt = self.getCSReply()
+            if not reply:
+                if not txt:
+                    self.process_user_operate(OTHER_TXT)
+                    if is_customer_time:
+                        txt = "客官，想和网利君天南海北的聊天还是正经的咨询？点击在线客服，与网利君联系吧！网利君在线时间为工作日9：00~18：00。"
+                    else:
+                        txt = self.getCSReply()
+                client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+                client.message._send_custom_message({
+                                            "touser":self.msg._data['FromUserName'],
+                                            "msgtype":"text",
+                                            "text":
+                                            {
+                                                 "content":txt
+                                            }
+                                        }, account="007@wanglibao400")
+                reply = -1
+        except Exception,e:
+            reply = self.check_service_subscribe(w_user=w_user, user=user)
+            if not reply:
+                reply = TransferCustomerServiceReply(message=self.msg)
+            logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
+        return reply
+
+
+    def getCSReply(self):
+        is_customer_time = self.checkCsTime()
+        if is_customer_time:
+            txt = u"如需联系人工客服请回复字母“Y”！聊什么听你的，但是网利君在线时间为工作日9：00~18：00。"
+        else:
+            txt = u"客官，网利君在线时间为\n"\
+                    + u"【周一至周五9：00~18：00】，请在工作时间与我们联系哦~"
+        return txt
+
+    def checkCsTime(self):
+        now = datetime.datetime.now()
+        weekday = now.weekday() + 1
+        if now.hour<=18 and now.hour>=9 and weekday>=1 and weekday<=5:
+            return True
+        return False
 
     @checkBindDeco
     def process_click_event(self, weixin_account, w_user=None, user=None):
@@ -231,6 +317,7 @@ class WeixinJoinView(View):
             sendTemplate(w_user, a)
             reply = -1
         if self.msg.key == 'customer_service':
+            # self.request.session['last_operate'] = CUSTOMER_SERVICE
             txt = self.getCSReply()
             try:
                 client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
@@ -259,7 +346,12 @@ class WeixinJoinView(View):
             txt = u"您的帐号：%s\n" \
                   u"体验金金额：%s元"%(user.wanglibaouserprofile.phone, amount)
             reply = create_reply(txt, self.msg)
-
+        if self.msg.key == "customer_service":
+            self.process_user_operate(CUSTOMER_SERVICE)
+        elif self.msg.key == "subscribe_service":
+            self.process_user_operate(SERVICE_SUBSCRIBE)
+        else:
+            self.process_user_operate(OTHER_MENU)
         return reply
 
     def process_sign_in(self, weixin_user, user):
@@ -275,7 +367,8 @@ class WeixinJoinView(View):
         # 连续签到：{{keyword2.DATA}}
         # 累计签到：{{keyword3.DATA}}
 
-            if ret_code != 0:
+            if ret_code == 1:
+                reply = -1
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":SIGN_IN_TEMPLATE_ID,
@@ -285,7 +378,8 @@ class WeixinJoinView(View):
                     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
                 })},
                                                 queue='celery02')
-            else:
+            elif ret_code == 0:
+                reply = -1
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":SIGN_IN_TEMPLATE_ID,
@@ -295,45 +389,13 @@ class WeixinJoinView(View):
                     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
                 })},
                                                 queue='celery02')
+            else:
+                reply = create_reply("签到失败", self.msg)
 
-            reply = -1
         except Exception,e:
+            reply = create_reply("签到失败", self.msg)
             logger.debug(traceback.format_exc())
         return reply
-
-    # def process_sign_in(self, openid):
-    #     reply = -1
-    #     try:
-    #         with transaction.atomic():
-    #             w_user = WeixinUser.objects.select_for_update().filter(openid=openid).first()
-    #             now = datetime.datetime.now()
-    #             start = datetime.datetime(now.year,now.month, now.day)
-    #             end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
-    #             war = WeiXinUserActionRecord.objects.filter(user_id=w_user.user.id, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
-    #             if not war:
-    #                 _process_record(w_user, w_user.user, 'sign_in', u"用户签到")
-    #                 seg = SendExperienceGold(w_user.user)
-    #                 experience_event = self.getSignExperience_gold()
-    #                 if experience_event:
-    #                     seg.send(experience_event.id)
-    #                     txt = u"恭喜您，签到成功！\n" \
-    #                           u"奖励金额：%s元体验金\n" \
-    #                           u"体验期限：1天\n" \
-    #                           u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
-    #                     reply = create_reply(txt, self.msg)
-    #                 else:
-    #                     reply = create_reply(u'恭喜您，签到成功！', self.msg)
-    #                     logger.debug(u'用户[%s]签到没有领到体验金'%w_user.openid)
-    #             else:
-    #                 txt = u"今日已经签到，明日再来"
-    #                 reply = create_reply(txt, self.msg)
-    #     except Exception,e:
-    #         logger.debug(traceback.format_exc())
-    #     return reply
-
-        # except Exception, e:
-        #     reply = -1
-        #     logger.debug(u"用户签到领体验金抛出异常")
 
 
     @checkBindDeco
@@ -366,8 +428,11 @@ class WeixinJoinView(View):
                 sub_service_record.subscribe_time=int(time.time())
                 sub_service_record.save()
                 txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
-            if txt:
-                reply = create_reply(txt, self.msg)
+        else:
+            if content.isdigit():
+                txt = u'请回复正确的数字订阅项目'
+        if txt:
+            reply = create_reply(txt, self.msg)
         return reply
 
 
@@ -399,7 +464,7 @@ class WeixinJoinView(View):
         if not reply:
             if not user:
                 txt = self.getBindTxt(fromUserName)
-                txt += u"\n网利宝自2014年8月上线以来，注册用户已突破119万人，投资额超过47亿元，目前已完成B轮融资！"
+                txt += u"\n网利宝自2014年8月上线以来，注册用户已突破130万人，投资额超过50亿元，目前已完成B轮融资！"
             else:
                 txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)
@@ -432,21 +497,6 @@ class WeixinJoinView(View):
     def getUnBindTxt(self, fromUserName, userPhone):
         txt = u"您的微信绑定帐号为：%s\n"%userPhone\
             +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%FWH_UNBIND_URL
-        return txt
-
-    def getCSReply(self):
-        now = datetime.datetime.now()
-        weekday = now.weekday() + 1
-        if now.year==2016 and now.month==2 and (now.day>=5 and now.day<=13):
-            txt = u"2月5日至2月13日新年期间微信客服休息，由此给您带来的不便敬请谅解，谢谢您的支持，祝新年愉快~"
-            return txt
-
-        if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
-            txt = u"客官，想和网利君天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利君在线时间为\n" \
-                  u"【周一至周五9：00~18：00】"
-        else:
-            txt = u"客官，网利君在线时间为\n"\
-                    + u"【周一至周五9：00~18：00】，请在工作时间与我们联系哦~"
         return txt
 
     def getSignExperience_gold(self):
