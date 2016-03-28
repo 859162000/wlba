@@ -69,6 +69,7 @@ wlb.ready({
 
 
 org.experience = (function (org) {
+    $('.wlb_t').text(login)
     if(login){
         $('.down_load_wlb').hide();
         $('.wlb_t').text('aaaaaaaaaa')
