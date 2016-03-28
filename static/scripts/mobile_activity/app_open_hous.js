@@ -256,7 +256,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 name = $("#username").val(),
                 address = $("#address").val();
             var opt = {"phone": phone, "name": name, "address": address};
-            if(!reg.test(phone)){
+            if(phone == ""){
+                $(".lg_phone").text("*请输入手机号");
+            }else if(!reg.test(phone)){
                 $(".lg_phone").text("*手机号输入错误");
             }else if(strlen(name)>20){
                 $(".lg_name").text("*姓名输入错误");
