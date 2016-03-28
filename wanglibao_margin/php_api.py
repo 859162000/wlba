@@ -221,7 +221,28 @@ class CheckTradePassword(APIView):
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
             ret = {'status': 0, 'message': str(e)}
-            logger.debug('CheckTradePassword with {}!\n'.format(str(e)))
+            logger.debug('CheckTradePassword error with {}!\n'.format(str(e)))
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class CheckAppTradePassword(APIView):
+    """
+    http请求方式: POST  检查交易密码。
+    http://xxxxxx.com/php/trade_password/
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        user_id = request.user
+        trade_password = self.request.POST.get('password')
+        try:
+            ret = trade_pwd_check(user_id, trade_password)
+        except Exception, e:
+            ret = {'status': 0, 'message': str(e)}
+            logger.debug('CheckTradePassword error with {}!\n'.format(str(e)))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -262,11 +283,11 @@ class YueLiBaoBuy(APIView):
                 red_packet_type=red_packet_type,
             )
             device = utils.split_ua(self.request)
+
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
                                                   'device_type': device['device_type']})
-            logger.info('buy month product success with product_id = {}, trade_id = {}, red_packet_id = {}\n'
-                        .format(product_id, trade_id, red_packet_id))
+
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
         except Exception, e:
@@ -277,7 +298,7 @@ class YueLiBaoBuy(APIView):
 
 class YueLiBaoBuyFail(APIView):
     """
-    http请求方式: POST  当主站扣款成功, 新平台没接收到, 调用该接口说明购买失败
+    http请求方式: POST  当主站扣款成功(或者未扣款), 新平台没接收到返回也查不到状态, 调用该接口说明购买失败
     http://xxxxxx.com/php/yue/fail/
     :return: status = 1  成功, status = 0 失败 .
     """
@@ -297,11 +318,19 @@ class YueLiBaoBuyFail(APIView):
         # if user != request.user:
         #     ret.update(status=0, msg='user authenticate error')
         #     return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        # 不存在的订单显示成功
         if not product:
             ret.update(status=2, msg='success')
             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
         if product.cancel_status:
-            ret.update(status=1, msg='success')
+            ret.update(status=1, msg='already canceled!')
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+        # 未扣款成功的订单, 直接返回成功
+        if product.trade_status == 'NEW':
+            product.cancel_status = True
+            product.save()
+            ret.update(status=1, msg='not paid!')
             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
         try:
@@ -309,7 +338,6 @@ class YueLiBaoBuyFail(APIView):
                 product_id = product.product_id
                 buyer_keeper = PhpMarginKeeper(user, product_id)
                 record = buyer_keeper.yue_cancel(user, product.amount_source)
-                logger.info('phone = {} cancel, source amount = {}'.format(user.pk, product.amount_source))
 
                 if record:
                     # 状态置为已退款, 这个记录丢弃
@@ -318,11 +346,12 @@ class YueLiBaoBuyFail(APIView):
 
                     # 增加回退红包接口
                     php_redpack_restore(product.id, product_id, product.amount, user)
-                    logger.debug('purchase failed and restore red_pack. month_product_id = {},\n'.format(product_id))
+                    logger.info('purchase failed and restore red_pack. month_product_id = {},\n'.format(product_id))
 
             ret.update(status=1,
                        msg='success')
         except Exception, e:
+            logger.debug('call fail API failed with : {}\n'.format(str(e)))
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
@@ -354,6 +383,7 @@ class YueLiBaoBuyStatus(APIView):
         else:
             ret.update(status=0,
                        msg='pay failed!')
+        logger.info('check yuelibao bought status: {}\n'.format(ret['msg']))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -391,6 +421,7 @@ class YueLiBaoCheck(APIView):
                 ret.update(status=1,
                            msg='success')
         except Exception, e:
+            logger.debug()
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

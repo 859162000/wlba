@@ -284,12 +284,15 @@ def get_user_info(request, session_id=None, token=None):
         user = request.user
     if token:
         token = Token.objects.filter(key=token).first()
-        user = token.user
+        if token:
+            user = token.user
+        else:
+            user = None
 
     if user:
         if not user.id:
             user_info.update(status=0,
-                             message=u'session error.')
+                             message=u'get user error.')
             return user_info
 
         margin_info = get_margin_info(user.id)
@@ -315,7 +318,7 @@ def get_user_info(request, session_id=None, token=None):
         redis_obj.redis.expire('python_{}_{}'.format(user.id, session_id), 1440)
     else:
         user_info.update(status=0,
-                         message=u'session error.')
+                         message=u'get user error.')
 
     return user_info
 

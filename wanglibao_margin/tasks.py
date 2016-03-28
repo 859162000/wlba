@@ -47,38 +47,40 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                    token=product.token,
                    msg='already saved!')
     else:
-        # 状态成功, 对买家扣款, 加入冻结资金
-        try:
-            with transaction.atomic(savepoint=True):
-                buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
-                buyer_keeper.freeze(amount_source, description=u'月利宝购买冻结')
-                product.trade_status = 'PAID'
+        # 未被取消的订单才可以扣款
+        if not product.cancel_status:
+            # 状态成功, 对买家扣款, 加入冻结资金
+            try:
+                with transaction.atomic(savepoint=True):
+                    buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
+                    buyer_keeper.freeze(amount_source, description=u'月利宝购买冻结')
+                    product.trade_status = 'PAID'
+                    product.save()
+                    ret.update(status=1,
+                               token=token,
+                               msg='success')
+
+                    # 如果使用红包的话, 增加红包使用记录
+                    if red_packet_id and int(red_packet_id) > 0:
+                        logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
+                        redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
+                        user = User.objects.filter(pk=user).first()
+                        redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
+                                                                   product_id=product.product_id, status=u'新建').id
+                        result = php_redpack_consume(red_packet_id, amount_source, user, product.id, device_type, product.product_id)
+                        if result['ret_code'] != 0:
+                            raise Exception, result['message']
+                        if result['rtype'] != 'interest_coupon':
+                            red_record = buyer_keeper.redpack_deposit(result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
+                                                                      order_id=redpack_order_id, savepoint=False)
+
+            except Exception, e:
+                logger.debug('buy month product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
+                product.trade_status = 'FAILED'
                 product.save()
-                ret.update(status=1,
-                           token=token,
-                           msg='success')
-
-                # 如果使用红包的话, 增加红包使用记录
-                if red_packet_id and int(red_packet_id) > 0:
-                    logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
-                    redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
-                    user = User.objects.filter(pk=user).first()
-                    redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
-                                                               product_id=product.product_id, status=u'新建').id
-                    result = php_redpack_consume(red_packet_id, amount_source, user, product.id, device_type, product.product_id)
-                    if result['ret_code'] != 0:
-                        raise Exception, result['message']
-                    if result['rtype'] != 'interest_coupon':
-                        red_record = buyer_keeper.redpack_deposit(result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
-                                                                  order_id=redpack_order_id, savepoint=False)
-
-        except Exception, e:
-            logger.debug('buy month product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
-            product.trade_status = 'FAILED'
-            product.save()
-            ret.update(status=0,
-                       token=product.token,
-                       msg='pay failed!' + str(e))
+                ret.update(status=0,
+                           token=product.token,
+                           msg='pay failed!' + str(e))
 
     # 写入 sqs
     args_data = dict()
