@@ -36,7 +36,7 @@ from wanglibao_sms.utils import send_validation_code, validate_validation_code, 
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_profile.models import WanglibaoUserProfile, ActivityUserInfo
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
@@ -52,7 +52,7 @@ from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, get_channel_record
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
@@ -65,6 +65,7 @@ import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
 import urllib
+from wanglibao_profile.forms import ActivityUserInfoForm
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1717,8 +1718,28 @@ class CoopPvApi(APIView):
             logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
             return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
-        response_data = {
-            'ret_code': 50001,
-            'message': 'failed',
-        }
-        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+
+class ActivityUserInfoUploadApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        form = ActivityUserInfoForm(request.POST)
+        if form.is_valid():
+            user_info = ActivityUserInfo()
+            user_info.name = form.cleaned_data['name']
+            user_info.phone = form.cleaned_data['phone']
+            user_info.address = form.cleaned_data['address']
+            user_info.is_wlb_phone = form.check_wlb_phone()
+            user_info.save()
+            response_data = {
+                'ret_code': 10000,
+                'message': 'success',
+            }
+        else:
+            response_data = {
+                'ret_code': 10001,
+                'message': form.errors
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
