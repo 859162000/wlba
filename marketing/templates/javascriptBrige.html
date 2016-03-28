@@ -58,7 +58,7 @@
             <a class="btn" href="wanglibao://view?url=http://www.baidu.com">跳转到活动详情</a>
         </div>
 
-        <script src="/static/scripts/component/webview.js?v=22222"></script>
+        <script src="/static/scripts/component/webview.js?v=222222"></script>
 
 
         <script>
@@ -68,13 +68,11 @@
 
              wlb.ready({
                  app: function(mixins){
-
                      $('webView').style.display = 'block';
 
                      mixins.firstLoadWebView({name: 'activity_test'})
 
                      mixins.shareData({title: 'briger-test', content: 'briger-test', shareUrl:'22222', image:'https://staging.wanglibao.com/static/imgs/app/checkin/share_img_c22heck.png'})
-
                      $('login').onclick=function(){
                          mixins.loginApp({refresh:1})
                      }
@@ -95,13 +93,9 @@
                          })
                      }
 
-                     //取消操作
-                     mixins.cancel({}, function(data){
-                         $('log').innerHTML = JSON.stringify(data)
-                     })
-
 
                      $('islogin').onclick=function(){
+
                          mixins.authenticated(function(data){
                             $('log').innerHTML = JSON.stringify(data)
                         })
@@ -115,6 +109,7 @@
 
                  },
                  other: function(){
+                     $('webView').style.display = 'block';
                     $('link-url').style.display = 'block';
                  }
              })

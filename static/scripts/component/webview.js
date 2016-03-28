@@ -13,7 +13,7 @@ var wlb = (function () {
 
     Mixin.isAPP= function(){
         var u = navigator.userAgent;
-        if(u.indexOf('wlbapp') > -1){
+        if(u.indexOf('wlbAPP') > -1){
             return true
         }
         return false
@@ -193,7 +193,7 @@ var wlb = (function () {
                 }else{
                     document.addEventListener('WebViewJavascriptBridgeReady', function () {
                         run({callback: 'app', data: WebViewJavascriptBridge})
-                    }, false) 
+                    }, false)
                 }
             }else{
                 run({callback: 'other', data: null})
