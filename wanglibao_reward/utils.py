@@ -178,10 +178,7 @@ def updateRedisTopRank():
     try:
         top_ranks = getTodayTop10Ranks()
         redis = redis_backend()
-        length = redis._lpush('top_ranks', pickle.dumps(top_ranks))
-        logger.debug("=================================length:",length)
-        if length > 1:
-            redis.redis.rpop("top_ranks")
+        redis._set('top_ranks', pickle.dumps(top_ranks))
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
     return top_ranks

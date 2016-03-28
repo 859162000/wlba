@@ -2659,7 +2659,7 @@ class MarchAwardTemplate(TemplateView):
 
         if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
-                ranks = pickle.loads(redis_backend()._lrange('top_ranks', 0, 0))
+                ranks = pickle.loads(redis_backend()._get('top_ranks'))
             except:
                 pass
             if not ranks:
