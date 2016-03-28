@@ -21,9 +21,9 @@ html
                                 label 银行卡：
                                 select.select_bank.checkCodeStatus(name='gate_id',placeholder="请选择银行")
                                   option(value='') 请选择银行
-                                  for bank in banks
-                                    option(value='{{bank.gate_id}}',data-id='{{bank.id}}') {{bank.name}}
-                                span.error_span
+                                  //for bank in banks
+                                  //  option(value='{{bank.gate_id}}',data-id='{{bank.id}}') {{bank.name}}
+                                .bankPop
                             li.clearfix
                                 label 卡号：
                                 input.placeholderInput.checkCodeStatus.cardId(type="text", name="", placeholder="请输入银行卡号", autocomplete='off', title="请输入银行卡号")
