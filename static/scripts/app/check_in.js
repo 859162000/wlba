@@ -538,7 +538,7 @@ wlb.ready({
     },
     other: function () {
         //org.checin_in.init()
-        console.log(' open in app!')
+        alert('guy ! open in app!')
     }
 })
 

@@ -89,7 +89,7 @@ html(style="background: #fff2d5")
                     p 邀请所赠30元红包单笔投资满1000元可直抵使用、50元红包单笔投资满2000元可直抵使用、100元红包单笔投资满3000元可直抵使用。有效期自领取日起15天内有效。
         .how_recommend
             .title 【如何邀请】
-            p &nbsp;&nbsp;&nbsp;&nbsp;好友使用你的邀请码或邀请链接注册，并完成首投（100元起投），即算成功邀请，你可获30元红包。<br>&nbsp;&nbsp;&nbsp;&nbsp;受邀好友首投金额越高，赠送红包金额越高，邀请每个好友最高送100元。<br>&nbsp;&nbsp;&nbsp;&nbsp;所以邀请好友多多投资吧！多邀多送，上不封顶！TA好我也好！<br>&nbsp;&nbsp;&nbsp;&nbsp;登录后，在“我的账户 > 全民淘金”可查看专属邀请码。使用手机移动端，邀请更轻松！
+            p &nbsp;&nbsp;&nbsp;&nbsp;好友使用你的邀请码或邀请链接注册，并完成首投（1000元起投），即算成功邀请，你可获30元红包。<br>&nbsp;&nbsp;&nbsp;&nbsp;受邀好友首投金额越高，赠送红包金额越高，邀请每个好友最高送100元。<br>&nbsp;&nbsp;&nbsp;&nbsp;所以邀请好友多多投资吧！多邀多送，上不封顶！TA好我也好！<br>&nbsp;&nbsp;&nbsp;&nbsp;登录后，在“我的账户 > 全民淘金”可查看专属邀请码。使用手机移动端，邀请更轻松！
             .button#go_user 立即前往
             .title 【投资流程】
             img.step_img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/how_use_img.png")
@@ -110,21 +110,23 @@ html(style="background: #fff2d5")
                   dl(style="display:none")#ios-show
                     dt 5.
                     dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
-                  p.small 网利宝对此活动享有最终解释权。
+                  p.small.hexunht(style='display:none;') 此页面收益仅供参考
+                  p.small 网利宝对此活动享有最终解释权
         .code_wrap(style="display: none")
           img.bg(src="/static/imgs/mobile_activity/app_noviceDecember_h5/code_wrap_bg.jpg")
           img.img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/code_img.jpg")
           img.text(src="/static/imgs/mobile_activity/app_noviceDecember_h5/code_text.png")
         .register_wrap
             .button#register 立即注册
+        .hexunht(style='width: 100%;background: #fffcf4;padding: 0.5rem 0;font-size:.6rem;color: #8a4b3d;text-align:center;display:none;') 北京网利科技有限公司 京ICP备14014548号-1
         .title_wrap
             .title_main
                 .close
                 .text 您已注册过，立即去投资吧！
                 .button 我知道了
         script(src='/static/src/mobile/lib/weixin/wx.js')
-        script(src="/static/scripts/component/webview.js?v=20151215")
-        script(src="/static/scripts/mobile_activity/dist/app_noviceDecember_h5.js?v=2016032401")
+        script(src="/static/scripts/component/webview.js?v=20160328")
+        script(src="/static/scripts/mobile_activity/dist/app_noviceDecember_h5.js?v=20126032401")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,

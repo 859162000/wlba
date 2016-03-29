@@ -41,6 +41,7 @@ from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
+import pickle
 from urllib import urlencode,quote
 from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote, WanglibaoRewardJoinRecord
 from wanglibao_margin.models import MarginRecord
@@ -2656,11 +2657,11 @@ class MarchAwardTemplate(TemplateView):
         yesterday_end = local_to_utc(yesterday_end, "")
         # yesterday_start = local_to_utc(yesterday, 'min')
 
-        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
+        if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
-                ranks = redis_backend()._lrange('top_ranks', 0, -1)
+                ranks = pickle.loads(redis_backend()._get('top_ranks'))
             except:
-                pass
+                logger.debug("-------------------------------redis read ranks error")
             if not ranks:
                 ranks = updateRedisTopRank()
             if user.is_authenticated():
@@ -2688,7 +2689,7 @@ class MarchAwardTemplate(TemplateView):
             idx = 0
 
             for rank in ranks:
-                print rank
+                # print rank
                 rank['amount__sum'] = float(rank['amount__sum'])
                 event = redpack_events[rank_awards[idx]]
                 rank['coupon'] = event.amount
@@ -2707,11 +2708,8 @@ class FetchMarchAwardAPI(APIView):
 
     def post(self, request):
         rank_activity = Activity.objects.filter(code='march_awards').first()
-        # utc_now = timezone.now()
-        yesterday = datetime.datetime.now()-datetime.timedelta(1)
-        yesterday_end = local_to_utc(yesterday, 'max')
-        yesterday_start = local_to_utc(yesterday, 'min')
-        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
+        utc_now = timezone.now()
+        if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<=utc_now and rank_activity.end_at>=utc_now:
             user = request.user
                 # {u'highest': 50000,
                 #  u'invest_amounts': [5000, 10000, 20000, 30000, 40000, 50000],
