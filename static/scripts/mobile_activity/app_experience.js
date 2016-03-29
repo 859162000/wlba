@@ -416,6 +416,7 @@ org.experience = (function (org) {
             })
         },
         other: function(){
+            $('.down_load_wlb').show();
             org.experience.init()
         }
     })
