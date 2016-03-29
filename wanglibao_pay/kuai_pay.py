@@ -1235,7 +1235,7 @@ class KuaiShortPay:
                 url = self.PAY_URL
             else:
                 self._request_dict = dic
-                if mode == 'vcode_for_sms':
+                if mode == 'vcode_for_qpay':
                     data = self._sp_dynnum_xml_for_qpay(dic)
                 else:
                     data = self._sp_dynnum_xml(dic)

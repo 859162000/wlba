@@ -292,7 +292,7 @@ def landpage_view(request):
         # 判断是否属于交易操作
         if action:
             is_mobile = utype_is_mobile(request)
-            if action in ['purchase', 'deposit', 'withdraw']:
+            if action in ['purchase', 'deposit', 'withdraw', 'account_home']:
                 if action == 'purchase':
                     product_id = request.session.get('product_id', '')
                     if product_id:
@@ -305,6 +305,9 @@ def landpage_view(request):
                     url = reverse(action_uri)
                 elif action == 'withdraw':
                     action_uri = 'weixin_recharge_first' if is_mobile else 'withdraw'
+                    url = reverse(action_uri)
+                else:
+                    action_uri = 'weixin_account' if is_mobile else 'account_home'
                     url = reverse(action_uri)
 
                 # 判断用户是否为登录状态
