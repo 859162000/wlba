@@ -1,37 +1,25 @@
-/**
- * author wangxiaoqing
- * last update 2016-3-27
- */
-
+// author wangxiaoqing
+// last update 2015-11-20
 var wlb = (function () {
-
-    var unique;
 
     function Mixin(bridge) {
         this.bridge = bridge;  //WebViewJavascriptBridge对象
     }
 
-    Mixin.isAPP= function(){
-        var u = navigator.userAgent;
-        if(u.indexOf('wlbAPP') > -1){
-            return true
-        }
-        return false
-    };
-
     Mixin.filterJSON = function(target){
         var
             u = navigator.userAgent,
-            toString = Object.prototype.toString,
             newJSON = target;
 
-        if(u.indexOf('Android') > -1 && toString.call(newJSON) == '[object String]'){
+        if(u.indexOf('Android')){
             try{
                 newJSON = eval("(" + target + ")");
             }catch(e){
-                return newJSON
+
             }
+
         }
+
         return newJSON;
     }
 
@@ -151,9 +139,14 @@ var wlb = (function () {
                 options.callback && options.callback(responseData);
             });
         },
+        /**
+         * 分享状态
+         * @param callback
+         */
         shareStatus: function(callback){
             this.bridge.registerHandler('shareStatus', function (backdata, responseCallback) {
-                callback && callback(backdata)
+                var responseData  = Mixin.filterJSON(backdata);
+                callback && callback(responseData)
             });
         },
         /**
@@ -172,48 +165,40 @@ var wlb = (function () {
         }
     }
 
-    function getMixin(bridge){
-        if( unique === undefined ){
-            unique = new Mixin(bridge);
-        }
-        return unique;
-    }
 
     function ready(dics) {
         /**
-         * 处理webview初始化问题
-         * Mixin为单例模式
-         * 检查user-agent： 如果是app就保持侦听
-         *
+         * 临时处理webview初始化问题
          */
-        function listen(){
-            if(Mixin.isAPP()){
+        window.onload = function(){
+            setTimeout(function(){
+                listen();
+            },200);
+        }
 
-                if(window.WebViewJavascriptBridge){
-                    run({callback: 'app', data: WebViewJavascriptBridge});
-                }else{
-                    document.addEventListener('WebViewJavascriptBridgeReady', function () {
-                        run({callback: 'app', data: WebViewJavascriptBridge})
-                    }, false)
-                }
-            }else{
+        function listen(){
+            if (window.WebViewJavascriptBridge) {
+                run({callback: 'app', data: WebViewJavascriptBridge});
+            } else {
+                document.addEventListener('WebViewJavascriptBridgeReady', function () {
+                    run({callback: 'app', data: WebViewJavascriptBridge})
+                }, false)
                 run({callback: 'other', data: null})
             }
         }
 
-        listen();
 
         function run(target) {
             var mixins;
-
             if (target.callback && target.callback == 'app') {
-                mixins = getMixin(target.data);
+                mixins = new Mixin(target.data);
                 mixins._init();
             }
+
             try {
                 dics[target.callback](mixins);
             } catch (e) {
-                console.log('请传入正确的参数格式如{app: function(){}, other: function(){}}, 目前缺少 ' + target.callback);
+                console.log('请传入正确的参数格式如{app: function(){}, other: function(){}}, 目前却少 ' + target.callback);
             }
 
         }
@@ -227,15 +212,15 @@ var wlb = (function () {
 
  //wlb.ready({
  //    app: function(mixins){
- //        回调参数是app接口实例对象.
- //        console.log('app场景')
+ //        //mixins.loginApp()
+ //        ///document.getElementById('refresh').onclick= function(){
+ //        //    window.location.href=window.location.href;
+ //        //}
+ //       mixins.sendUserInfo(function(data){
+ //           document.getElementById('log').innerHTML = JSON.stringify(data)
+ //       })
  //    },
  //    other: function(){
  //       console.log('其他场景的业务逻辑')
  //    }
  //})
-
-
-
-
-

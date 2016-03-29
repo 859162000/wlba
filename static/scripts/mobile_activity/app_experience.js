@@ -416,8 +416,10 @@ org.experience = (function (org) {
             })
         },
         other: function(){
-            $('.down_load_wlb').show();
-            org.experience.init()
+             if(typeof (WeixinJSBridge) != 'undefined') {
+                 $('.down_load_wlb').show();
+             }
+            org.experience.init();
         }
     })
 

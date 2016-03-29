@@ -24,11 +24,12 @@ html
                                 else
                                   input#registerMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
                             li.clearfix
-                                label 计算结果 ：
-                                input(type="hidden", name="captcha_0", autocomplete="off")
-                                input#registerCode.w115.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入计算结果", autocomplete='off', title="请输入验证码")
-                                img.captchaImg.fl(alt="captcha", src="")#registerRefresh
+                                label 图片验证 ：
+                                //input(type="hidden", name="captcha_0", autocomplete="off")
+                                //input#registerCode.w115.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入计算结果", autocomplete='off', title="请输入验证码")
+                                //img.captchaImg.fl(alt="captcha", src="")#registerRefresh
                                 //i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
+                                #captcha-box.fl
                             li#passWordInput.pwdLi.clearfix
                                 label 输入密码 ：
                                 input.registerPwd.placeholderInput.checkPwd(type="text",onfocus="this.type='password'",name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
@@ -62,11 +63,13 @@ html
                     .reward-box
                         .reward-left
                             p
-                                span 80
+                                span 50
                                 | 元
-                            p 首次充值送现金红包
+                            p 首次投资送现金红包
                         .reward-right 红包
     include global/g_footer
     script.
       require(["/static/src/pc/login.js?v=20151202"])
+
+
 
