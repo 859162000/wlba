@@ -484,6 +484,9 @@ class BaJinSheCallback(CoopCallback):
                 bajinshe_callback.apply_async(
                     kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
 
+                # 推送账户数据
+                self.register_call_back(user_id, order_id)
+
     def purchase_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).purchase_call_back(user_id, order_id)
         utc_timestamp = get_utc_timestamp()
@@ -509,6 +512,9 @@ class BaJinSheCallback(CoopCallback):
                 # 异步回调
                 bajinshe_callback.apply_async(
                     kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
+
+                # 推送账户数据
+                self.register_call_back(user_id, order_id)
 
     def amortization_push(self, user_amo):
         super(BaJinSheCallback, self).amortization_push(user_amo)
