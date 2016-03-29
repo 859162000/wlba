@@ -36,8 +36,12 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
             redPackDikouCopy = 0;  //抵扣金额全局
 
 
-        $redpackSign.hide()
-        $redpackInvestamount.hide()
+        $redpackSign.hide();
+        $redpackInvestamount.hide();
+
+        if(isNaN(redPackInvestamount)){
+            $inputCalculator.attr('activity-jiaxi', 0);
+        }
 
         if (inputTargetAmount < redPackInvestamount) {
             return $redpackInvestamount.show();//未达到红包使用门槛

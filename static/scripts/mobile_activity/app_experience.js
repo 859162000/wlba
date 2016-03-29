@@ -266,34 +266,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         alert : lib._alert
     }
 })();
-var login = false;
-wlb.ready({
-    app: function (mixins) {
-        $('.wlb_t').text('aaaaa')
-        mixins.sendUserInfo(function (data) {
-            if (data.ph == '') {
-                login = false;
-                $('.receive_box').on('click', function(){
-                    mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/redirect/'});
-                })
-            } else {
-                login = true;
-                org.experience.init()
-            }
-        })
-    },
-    other: function(){
-        org.experience.init()
-        $('.wlb_t').text('bbbbbbb')
-    }
-})
-
-
 org.experience = (function (org) {
-    //if(login){
-    //    $('.down_load_wlb').hide();
-    //    $('.wlb_t').text('aaaaaaaaaa')
-    //}
     var lib = {
         init: function () {
             lib._lookMore()
@@ -406,6 +379,52 @@ org.experience = (function (org) {
     }
 })(org);
 ;(function(org){
+    var login = false;
+    wlb.ready({
+        app: function (mixins) {
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
+                        org.experience.init()
+                    }
+                })
+            }
+            mixins.sendUserInfo(function (data) {
+                $('.down_load_wlb').hide();
+                if (data.ph == '') {
+                    login = false;
+                    $('.receive_box').on('click', function(){
+                        mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/mobile/'});
+                    })
+                } else {
+                    login = true;
+                    connect(data)
+                }
+            })
+        },
+        other: function(){
+            $('.down_load_wlb').show();
+            org.experience.init()
+        }
+    })
+
+    $('.load_right').delegate('span', 'click', function () {
+        $('.down_load_wlb').hide();
+    })
+
     $.extend($.fn, {
         scrollTo: function(m){
             var n = 0, timer = null, that = this;
@@ -455,3 +474,5 @@ org.experience = (function (org) {
         }
     });
 })(org);
+
+
