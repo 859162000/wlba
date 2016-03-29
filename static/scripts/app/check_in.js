@@ -521,9 +521,10 @@ wlb.ready({
                 },
                 success: function (data) {
                     org.checin_in.init(mixins)
-                } 
+                }
             })
         }
+
 
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
@@ -536,8 +537,8 @@ wlb.ready({
 
     },
     other: function () {
-        //org.checin_in.init()
-        alert('guy ! open in app!')
+        org.checin_in.init()
+        //alert('guy ! open in app!')
     }
 })
 
