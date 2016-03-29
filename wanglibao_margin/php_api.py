@@ -421,7 +421,7 @@ class YueLiBaoCheck(APIView):
                 ret.update(status=1,
                            msg='success')
         except Exception, e:
-            logger.debug()
+            logger.debug(u'月利宝id: {} 满标审核失败: {}\n'.format(product_id, str(e)))
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
