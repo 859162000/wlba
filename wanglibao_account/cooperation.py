@@ -10,13 +10,14 @@ import json
 import hashlib
 import logging
 from django.utils import timezone
+from django.db.models import Sum
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client
 from wanglibao_rest.utils import get_utc_timestamp, utc_to_local_timestamp
 from wanglibao_margin.models import MarginRecord
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord, UserAmortization
 from wanglibao import settings
 from .tasks import bajinshe_callback, renrenli_callback
 from .utils import get_bajinshe_base_data, get_renrenli_base_data
@@ -439,19 +440,22 @@ class BaJinSheCallback(CoopCallback):
         self.register_call_back_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
         self.transaction_call_back_url = settings.BAJINSHE_TRANSACTION_PUSH_URL
 
-    def register_call_back(self, user_id, order_id):
+    def register_call_back(self, user_id, order_id, margin_account=0, avaliable_balance=0):
         super(BaJinSheCallback, self).register_call_back(user_id, order_id)
         utc_timestamp = get_utc_timestamp()
         query_id = '%s_%s' % (utc_timestamp, '0001')
         data = get_bajinshe_base_data(query_id)
         bid = get_tid_for_coop(user_id)
         if data and bid:
+            pre_total_interest = UserAmortization.objects.filter(user_id=user_id,
+                                                                 settled=True
+                                                                 ).aggregate(Sum('interest'))['interest__sum'] or 0
             act_data = {
                 'bingdingUid': bid,
                 'usn': get_user_phone_for_coop(user_id),
-                'sumIncome': 0,
-                'totalBalance': 0,
-                'availableBalance': 0,
+                'sumIncome': float(pre_total_interest),
+                'totalBalance': margin_account,
+                'availableBalance': avaliable_balance,
             }
             data['tran'] = [act_data]
             # 异步回调
@@ -485,7 +489,7 @@ class BaJinSheCallback(CoopCallback):
                     kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
 
                 # 推送账户数据
-                self.register_call_back(user_id, order_id)
+                self.register_call_back(user_id, order_id, margin_record.margin_current, margin_record.margin_current)
 
     def purchase_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).purchase_call_back(user_id, order_id)
@@ -514,7 +518,7 @@ class BaJinSheCallback(CoopCallback):
                     kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
 
                 # 推送账户数据
-                self.register_call_back(user_id, order_id)
+                self.register_call_back(user_id, order_id, margin_record.margin_current, margin_record.margin_current)
 
     def amortization_push(self, user_amo):
         super(BaJinSheCallback, self).amortization_push(user_amo)
