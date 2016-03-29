@@ -2772,12 +2772,12 @@ class FetchAirportServiceReward(APIView):
     def post(self, request):
         activity = Activity.objects.filter(code='').first()
         if activity.is_stopped:
-            return Response({"ret_code":-1, "message":"活动已经截止"})
+            return Response({"ret_code": -1, "message":"活动已经截止"})
         now = timezone.now()
         if activity.start_at > now:
-            return Response({"ret_code":-1, "message":"活动还未开始"})
+            return Response({"ret_code": -1, "message":"活动还未开始"})
         if activity.end_at < now:
-            return Response({"ret_code":-1, "message":"活动已经结束"})
+            return Response({"ret_code": -1, "message":"活动已经结束"})
         user = request.user
         # reward_name = request.DATA.get('reward_name', "").strip()
         # if not reward_name:
@@ -2799,51 +2799,56 @@ class FetchAirportServiceReward(APIView):
         reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
         if not reward:
             return Response({"ret_code": -1, "message": ""})
-        user_ib = IntroducedBy.objects.filter(user=user, created_at__gt=activity.start_at).first()
-        is_new = True
-        if not user_ib:
-            is_new = False
 
-        if activity_rule.is_invite_in_date:
-            if not is_new or not user_ib.channel or user_ib.channel.code != activity.channel:
-                return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
-        if is_new:
-            return Response({"ret_code": -1, "message": ""})
         airport_service_reward_limit = getMiscValue("airport_service_reward")
-        min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
-
-        first_buy = P2PRecord.objects.filter(user=user,
-                                             create_time__gt=activity.start_at
-                                             ).order_by('create_time').first()
-        if not first_buy or float(first_buy.amount) < min_amount:
-            return Response({"ret_code": -1, "message": "抱歉，您还不符合奖励条件哦~"})
-
+        old_min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
+        new_min_amount = int(airport_service_reward_limit['new'][str(rule_id)])
+        user_ib = IntroducedBy.objects.filter(user=user).first() #created_at__gt=activity.start_at,
+        user_channel = user_ib.channel
+        is_new = False
+        if user_ib and user_channel.code==activity.channel:
+            is_new = True
 
         reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
-        if not reward_record:
-            reward_record = ActivityRewardRecord.objects.create(
-                activity_code=activity.code,
-                user=user
-            )
-        if reward_record.status:
-            return Response({"ret_code": -1, "message": "您已领取奖励"})
+        if reward_record and reward_record.status:
+            return Response({"ret_code": -1, "message": "您已领取奖励过~"})
+        if is_new:
+            if not user_ib.bought_at:
+                return Response({"ret_code": -1, "message": "您还没有投资，快去投资吧~"})
+            first_buy = P2PRecord.objects.filter(user=user).order_by('create_time').first()
+            if first_buy.amount <new_min_amount:
+                return Response({"ret_code": -1, "message": "首次投资不足金额~"})
+        else:
+            if activity_rule.is_invite_in_date:
+                return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+            p2precord = P2PRecord.objects.filter(user=user,
+                                             create_time__gte=activity.start_at,
+                                             amount__gte=old_min_amount,
+                                             ).order_by('create_time').first()
+            if not p2precord:
+                return Response({"ret_code": -1, "message": "抱歉，您还不符合奖励条件哦~"})
 
-        with transaction.atomic():
-            reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=activity.code, user=request.user).first()
-
-            reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
-            if not reward:
-                Response({"ret_code": -1, "message": "该奖品已经发完了"})
-            reward.is_used = True
-            reward.save()
-            reward_record.activity_desc = u"领取了%s,reward_id:%s"%(reward.type, reward.id)
-            reward_record.status = True
-            reward_record.save()
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": request.user.id,
-            "title": reward.reward.type,
-            "content": reward.reward.content,
-            "mtype": "activity"
-        })
-        return Response({"ret_code": 0, "message": "奖品领取成功"})
+            ActivityRewardRecord.objects.get_or_create(
+                    activity_code=activity.code,
+                    user=user
+                )
+            with transaction.atomic():
+                reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=activity.code, user=request.user).first()
+                if reward_record.status:
+                    return Response({"ret_code": -1, "message": "您已领取奖励"})
+                reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+                if not reward:
+                    Response({"ret_code": -1, "message": "该奖品已经发完了"})
+                reward.is_used = True
+                reward.save()
+                reward_record.activity_desc = u"领取了%s,reward_id:%s"%(reward.type, reward.id)
+                reward_record.status = True
+                reward_record.save()
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": reward.reward.type,
+                "content": reward.reward.content,
+                "mtype": "activity"
+            })
+            return Response({"ret_code": 0, "message": "奖品领取成功"})
 
