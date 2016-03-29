@@ -136,7 +136,7 @@ class GetContinueActionReward(APIView):
                 return Response({'ret_code':-1, 'message':u'奖励已经领取过了'})
             rules = SeriesActionActivityRule.objects.filter(activity=current_activity, is_used=True)
             for rule in rules:
-                sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, experience_events, records, reward_record,redpack_txts, device_type)
+                sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, experience_events, records, redpack_txts, device_type)
                 redpack_record_ids += sub_redpack_record_ids
                 experience_record_ids += sub_experience_record_ids
                 if rule.gift_type == "reward":
@@ -167,7 +167,7 @@ class GetContinueActionReward(APIView):
                                 content = msg.render(context)
                                 _send_message_template(user, rule.rule_name, content)
                     else:
-                        sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, experience_events, records, reward_record,redpack_txts, device_type, is_addition=True)
+                        sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, experience_events, records,redpack_txts, device_type, is_addition=True)
                         redpack_record_ids += sub_redpack_record_ids
                         experience_record_ids += sub_experience_record_ids
 
