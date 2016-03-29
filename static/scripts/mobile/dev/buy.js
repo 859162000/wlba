@@ -517,7 +517,6 @@ webpackJsonp([1],[
 	            this.checklist.forEach(function (dom) {
 	                var _event = dom.target.attr("type") === 'select' ? 'change' : 'input';
 	                dom.target.on(_event, function () {
-	                    console.log(1);
 	                    _self.style(dom.target);
 	                    status = _self.canSubmit();
 	                    _self.callback && _self.callback(status);
