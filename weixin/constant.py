@@ -49,7 +49,7 @@ else:
 #     DEPOSIT_SUCCESS_TEMPLATE_ID = "LuwpMH6CdEP2IeEsB7h6uewLhZdrnQPb0vmjDlqWh70"     #充值到账通知
 #     PRODUCT_AMORTIZATION_TEMPLATE_ID = "wDHmjettSpgHys4HMXdcndUfkloiQNu2j9LXTa_qkO4"#项目还款通知
 #     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "JgSYj3TqABs9UbmA33QfkZ2ZGjHL436oBBvOMpyWGh8"#投标成功通知
-#     SIGN_IN_TEMPLATE_ID = "kE8xpyj2o1vc1toTjdNPyMqWLO6cxMRZCwBR92ZYCd8"
+#     SIGN_IN_TEMPLATE_ID = "MsYoJHQg5E4GRyYwFDGJ1wfy_CQpFVe5YVzjbP08HQs"
 # else:#玉姣's
 #     BIND_SUCCESS_TEMPLATE_ID = "XFyiciGriKwniC2SFGwh476H5kjQcnVzRCinWQpuDU8"#绑定通知
 #     UNBIND_SUCCESS_TEMPLATE_ID = "TjTDJSN5G02O0A6lBl16hDDMWa_QQ_W_msFiJJMB1hk"#解绑通知
@@ -117,7 +117,7 @@ Message_template = {
                    "color":"#173177"
                }
         },
-        "url": settings.CALLBACK_HOST + "/weixin/sub_checkIn/",
+        "url": "http://402edd70.ngrok.io" + "/weixin/sub_checkIn/",
     },
     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',

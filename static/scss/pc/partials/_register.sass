@@ -154,11 +154,9 @@
       .max-text
         font-size: $font-ll
         line-height: 38px
-      .min-text
-        font-size: $font-l
-        line-height: 38px
       .go-i-r
-        margin: 10px 0 5px
+        margin: 10px 0
+        font-size: 18px
         a
           color: #db493f
           margin-left: 5px
@@ -184,6 +182,14 @@
     font-size: $font-xl
     line-height: 73px
     text-align: center
+.reward-box-s
+  width: 277px
+  float: left
+  .min-text
+    font-size: $font-m
+    line-height: 38px
+.mls20
+  margin-left: 20px
 .modal-containerNew
   border: 1px solid #666666
   border-radius: 5px
@@ -215,3 +221,53 @@
     position: absolute
     top: 0
     right: 10px
+.recharge_alert
+  border: 1px solid #666666
+  border-radius: 20px
+  width: 520px
+  background: #ffffff
+  padding-bottom: 50px
+  position: relative
+  .alert_title
+    height: 62px
+    line-height: 62px
+    border-bottom: 1px solid #e3e3e3
+    color: #3f3f41
+    font-size: 18px
+    i
+      @include loginRegister-sprite(alert)
+      width: 38px
+      height: 37px
+      display: inline-block
+      margin: 0 12px 0 17px
+      vertical-align: middle
+  .alert_content
+    padding: 40px 0 55px
+    text-align: center
+    color: #3f3f41
+    font-size: 22px
+    line-height: 48px
+  .alert_btns
+    text-align: center
+    a
+      width: 196px
+      height: 48px
+      line-height: 48px
+      display: inline-block
+      border-radius: 20px
+      color: #ffffff
+      font-size: 22px
+    .go_help
+      background: #85a5e9
+    .finished_btn
+      background: #fb7c00
+      margin-left: 50px
+  .close-modal
+    position: absolute
+    width: 29px
+    height: 29px
+    display: inline-block
+    @include loginRegister-sprite(close)
+    top: 16px
+    right: 13px
+    text-indent: 9999px
