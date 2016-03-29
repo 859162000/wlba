@@ -454,8 +454,8 @@ class BaJinSheCallback(CoopCallback):
                 'bingdingUid': bid,
                 'usn': get_user_phone_for_coop(user_id),
                 'sumIncome': float(pre_total_interest),
-                'totalBalance': margin_account,
-                'availableBalance': avaliable_balance,
+                'totalBalance': float(margin_account),
+                'availableBalance': float(avaliable_balance),
             }
             data['tran'] = [act_data]
             # 异步回调
