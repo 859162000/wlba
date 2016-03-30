@@ -754,14 +754,13 @@ class KuaiShortPay:
                 <GetDynNumContent>
                     <merchantId>%s</merchantId>
                     <customerId>%s</customerId>
-                    <phoneNO>%s</phoneNO>
                     <externalRefNumber>%s</externalRefNumber>
                     <storablePan>%s</storablePan>
                     <bankId>%s</bankId>
                     <amount>%s</amount>
                 </GetDynNumContent>
             </MasMessage>
-         """ % (self.MER_ID, dic['user_id'], dic['phone'], dic['order_id'],
+         """ % (self.MER_ID, dic['user_id'], dic['order_id'],
                  dic['storable_no'], dic['bank_id'], dic['amount']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
