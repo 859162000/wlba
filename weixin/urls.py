@@ -50,6 +50,7 @@ urlpatterns = patterns(
 
     #bsy
     url(r'^login_bsy/$', TemplateView.as_view(template_name="weixin_login_bsy.jade")),
+    url(r'^list_bsy/$', views.P2PListView.as_view(template_name='weixin_list_bsy.jade'), name='weixin_p2p_list_bsy'),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
