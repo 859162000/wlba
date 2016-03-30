@@ -48,7 +48,8 @@ urlpatterns = patterns(
     url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
-
+    #bsy
+    url(r'^login_bsy/$', TemplateView.as_view(template_name="weixin_login_bsy.jade")),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),

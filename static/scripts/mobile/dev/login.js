@@ -34,7 +34,6 @@ webpackJsonp([5],[
 	    //验证表单
 	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
-	            alert("check");
 	            function checkOperation() {
 	                var checklist = [{ type: 'phone', value: $identifier.val() }, { type: 'password', value: $password.val() }];
 	                return (0, _from_validation.check)(checklist);
@@ -80,7 +79,6 @@ webpackJsonp([5],[
 	    }
 
 	    $submit.on('click', function () {
-	        alert(3);
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
 	            return login('/weixin/api/login/');
