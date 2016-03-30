@@ -117,7 +117,7 @@ Message_template = {
                    "color":"#173177"
                }
         },
-        "url": "http://402edd70.ngrok.io" + "/weixin/sub_checkIn/",
+        "url": settings.CALLBACK_HOST + "/weixin/sub_checkIn/",
     },
     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',

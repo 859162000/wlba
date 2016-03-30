@@ -416,8 +416,11 @@ org.experience = (function (org) {
             })
         },
         other: function(){
-            $('.down_load_wlb').show();
-            org.experience.init()
+             var ua = navigator.userAgent.toLowerCase();
+             if(ua.match(/MicroMessenger/i)=="micromessenger") {
+                 $('.down_load_wlb').show();
+             }
+            org.experience.init();
         }
     })
 
