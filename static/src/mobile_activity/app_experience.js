@@ -197,7 +197,8 @@ org.experience = (function (org) {
             })
         },
         other: function(){
-             if(typeof (WeixinJSBridge) != 'undefined') {
+             var ua = navigator.userAgent.toLowerCase();
+             if(ua.match(/MicroMessenger/i)=="micromessenger") {
                  $('.down_load_wlb').show();
              }
             org.experience.init();
