@@ -98,6 +98,31 @@ class PhpRedisBackend(object):
 
 class PhpMarginKeeper(MarginKeeper):
 
+    def php_freeze(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+
+            freeze_before = margin.freeze
+            margin_before = margin.margin
+
+            if amount > margin.margin:
+                # TODO, check why 201? Magic number sucks, unless its famous, like 404 or 500
+                raise MarginLack(u'201')
+            margin.margin -= amount
+            margin.freeze += amount
+            # 交易时从充值未投资中扣除投资金额, 同时将投资金额放入冻结金额中, 当充值未投资金额小于零时为置为 0
+            margin_uninvested = margin.uninvested  # 初始未投资余额
+            uninvested = margin.uninvested - amount  # 未投资金额 - 投资金额 = 未投资余额计算结果
+            margin.uninvested = uninvested if uninvested >= 0 else Decimal('0.00')  # 未投资余额计算结果<0时,结果置0
+            margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested  # 未投资余额计算结果<0时,未投资冻结金额等于+初始未投资余额
+            margin.save()
+            catalog = u'交易冻结'
+            record = self.tracer(catalog, amount, margin.margin, description,
+                                 freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
+            return record
+
     def margin_process(self, user, status, amount, description=u'', catalog=u'', savepoint=True):
         """
         # 这是直接对用户余额进行加减. 适用于债权转让的处理.
@@ -113,7 +138,10 @@ class PhpMarginKeeper(MarginKeeper):
         with transaction.atomic(savepoint=savepoint):
             amount = Decimal(amount)
             check_amount(amount)
+
             margin = Margin.objects.get(user=user)
+            margin_before = margin.margin
+
             if status == 0:
                 margin.margin += amount
             else:
@@ -123,7 +151,7 @@ class PhpMarginKeeper(MarginKeeper):
                 margin.uninvested = uninvested if uninvested >= 0 else Decimal('0.00')  # 未投资余额计算结果<0时,结果置0
                 margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested  # 未投资余额计算结果<0时,未投资冻结金额等于+初始未投资余额
             margin.save()
-            record = self.tracer(catalog, amount, margin.margin, description)
+            record = self.tracer(catalog, amount, margin.margin, description, margin_before=margin_before)
             return record
 
     def yue_cancel(self, user, amount, description=u'月利宝购买失败', catalog=u'月利宝购买失败回滚', savepoint=True):
@@ -140,6 +168,10 @@ class PhpMarginKeeper(MarginKeeper):
             amount = Decimal(amount)
             check_amount(amount)
             margin = Margin.objects.select_for_update().filter(user=user).first()
+
+            freeze_before = margin.freeze
+            margin_before = margin.margin
+
             if amount > margin.freeze:
                 raise MarginLack(u'202')
 
@@ -147,31 +179,94 @@ class PhpMarginKeeper(MarginKeeper):
             margin.freeze -= amount
 
             margin.save()
-            record = self.tracer(catalog, amount, margin.margin, description)
+            record = self.tracer(catalog, amount, margin.margin, description,
+                                 freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
             return record
 
-    def deposit(self, amount, description=u'', savepoint=True, catalog=u"现金存入"):
+    def deposit(self, amount, description=u'月利宝存入', savepoint=True, catalog=u"现金存入"):
         amount = Decimal(amount)
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
+
+            margin_before = margin.margin
             margin.margin += amount
+
             if catalog == u'现金存入':
                 margin.uninvested += amount  # 充值未投资金融
             margin.save()
             catalog = catalog
-            record = self.tracer(catalog, amount, margin.margin, description)
+            record = self.tracer(catalog, amount, margin.margin, description, margin_before=margin_before)
             return record
 
-    def tracer(self, catalog, amount, margin_current, description=u'', order_id=None):
+    def tracer(self, catalog, amount, margin_current, description=u'月利宝操作', order_id=None,
+               freeze_before=None, freeze_after=None, margin_before=None):
+        """
+        :param catalog:         操作分类
+        :param amount:          操作金额
+        :param margin_current:  当前可用金额
+        :param description:     描述
+        :param order_id:        订单id
+        :param freeze_before    操作前冻结金额
+        :param freeze_after     操作后冻结金额
+        :param margin_before    操作前的可以金额
+        :return:
+        """
         if not order_id:
             order_id = self.order_id
         trace = MarginRecord(catalog=catalog, amount=amount, margin_current=margin_current, description=description,
-                             order_id=order_id, user=self.user)
+                             order_id=order_id, user=self.user, freeze_before=freeze_before, freeze_after=freeze_after,
+                             margin_before=margin_before)
         trace.save()
         return trace
 
-    def php_amortize(self, refund_id, user, catalog, amount, description, savepoint=True):
+    def php_unfreeze(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+
+            freeze_before = margin.freeze
+            margin_before = margin.margin
+
+            if amount > margin.freeze:
+                raise MarginLack(u'202')
+            margin.freeze -= amount
+            margin.margin += amount
+            # 金额解冻时需要同时处理未投资冻结中的金额
+            margin_uninvested_freeze = margin.uninvested_freeze
+            uninvested_freeze = margin.uninvested_freeze - amount
+            margin.uninvested_freeze = uninvested_freeze if uninvested_freeze >= 0 else Decimal('0.00')
+            margin.uninvested += amount if uninvested_freeze >= 0 else margin_uninvested_freeze
+
+            margin.save()
+            catalog = u'交易解冻'
+            record = self.tracer(catalog, amount, margin.margin, description,
+                                 freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
+            return record
+
+    def php_settle(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            freeze_before = margin.freeze
+            margin_before = margin.margin
+
+            if amount > margin.freeze:
+                logger.info('user id: {}, amount:{}, freeze:{} ========'.format(self.user.id, amount, margin.freeze))
+                raise MarginLack(u'202')
+            margin.freeze -= amount
+            uninvested_freeze = margin.uninvested_freeze - amount
+            margin.uninvested_freeze = uninvested_freeze if uninvested_freeze >= 0 else Decimal('0.00')
+            margin.save()
+            catalog = u'月利宝交易成功扣款'
+            record = self.tracer(catalog, amount, margin.margin, description,
+                                 freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
+            return record
+
+    def php_amortize(self, refund_id, user, catalog, amount, description,
+                     savepoint=True):
         """
         月利宝到期回款, 用户只加总额, 操作后写流水日志. 详细写在description里.
         :param refund_id:       唯一回款ID, 不可重复.
@@ -188,12 +283,15 @@ class PhpMarginKeeper(MarginKeeper):
         with transaction.atomic(savepoint=savepoint):
             if not PhpRefundRecord.objects.filter(refund_id=refund_id).first():
                 margin = Margin.objects.select_for_update().filter(user=self.user).first()
+
+                margin_before = margin.margin
                 margin.margin += amount
+
                 margin.save()
                 try:
                     PhpRefundRecord.objects.get_or_create(
-                        refund_id=refund_id, user=user, catalog=catalog,
-                        amount=amount, margin_current=margin.margin, description=description)
+                        refund_id=refund_id, user=user, catalog=catalog, amount=amount,
+                        margin_before=margin_before, margin_current=margin.margin, description=description)
                     return 1
                 except Exception, e:
                     print e
@@ -224,40 +322,60 @@ class PhpMarginKeeper(MarginKeeper):
         with transaction.atomic(savepoint=savepoint):
 
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            margin_before = margin.margin
 
             if str(category) == '0':
                 margin.margin += principal
-                self.tracer(u'月利宝本金入账', principal, margin.margin, u'月利宝本金入账', refund_id)
+                self.tracer(u'月利宝本金入账', principal, margin.margin,
+                            u'月利宝本金入账', refund_id, margin_before=margin_before)
+                margin_before = margin.margin
                 margin.margin += interest
-                self.tracer(u'月利宝利息入账', interest, margin.margin, u'月利宝利息入账', refund_id)
+                self.tracer(u'月利宝利息入账', interest, margin.margin,
+                            u'月利宝利息入账', refund_id, margin_before=margin_before)
                 if penal_interest > 0:
+                    margin_before = margin.margin
                     margin.margin += penal_interest
-                    self.tracer(u'月利宝罚息入账', penal_interest, margin.margin, u'月利宝罚息入账', refund_id)
+                    self.tracer(u'月利宝罚息入账', penal_interest, margin.margin,
+                                u'月利宝罚息入账', refund_id, margin_before=margin_before)
                 if platform_interest > 0:
+                    margin_before = margin.margin
                     margin.margin += platform_interest
-                    self.tracer(u'月利宝平台加息入账', platform_interest, margin.margin, u'月利宝平台加息入账', refund_id)
+                    self.tracer(u'月利宝平台加息入账', platform_interest, margin.margin,
+                                u'月利宝平台加息入账', refund_id, margin_before=margin_before)
                 if coupon_interest > 0:
+                    margin_before = margin.margin
                     margin.margin += coupon_interest
                     description = u"月利宝加息存入{}元".format(coupon_interest)
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
-                    self.tracer(u"月利宝加息存入", coupon_interest, margin.margin, description, refund_id)
+                    self.tracer(u"月利宝加息存入", coupon_interest, margin.margin,
+                                description, refund_id, margin_before=margin_before)
 
             if str(category) == '1':
+                margin_before = margin.margin
                 margin.margin += principal
-                self.tracer(u'债转本金入账', principal, margin.margin, u'债转本金入账', refund_id)
+                self.tracer(u'债转本金入账', principal, margin.margin,
+                            u'债转本金入账', refund_id, margin_before=margin_before)
+                margin_before = margin.margin
                 margin.margin += interest
-                self.tracer(u'债转利息入账', interest, margin.margin, u'债转利息入账', refund_id)
+                self.tracer(u'债转利息入账', interest, margin.margin,
+                            u'债转利息入账', refund_id, margin_before=margin_before)
                 if penal_interest > 0:
+                    margin_before = margin.margin
                     margin.margin += penal_interest
-                    self.tracer(u'债转罚息入账', penal_interest, margin.margin, u'债转罚息入账', refund_id)
+                    self.tracer(u'债转罚息入账', penal_interest, margin.margin,
+                                u'债转罚息入账', refund_id, margin_before=margin_before)
                 if platform_interest > 0:
+                    margin_before = margin.margin
                     margin.margin += platform_interest
-                    self.tracer(u'债转平台加息入账', platform_interest, margin.margin, u'债转平台加息入账', refund_id)
+                    self.tracer(u'债转平台加息入账', platform_interest, margin.margin,
+                                u'债转平台加息入账', refund_id, margin_before=margin_before)
                 if coupon_interest > 0:
+                    margin_before = margin.margin
                     margin.margin += coupon_interest
                     description = u"债转加息存入{}元".format(coupon_interest)
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
-                    self.tracer(u"债转加息存入", coupon_interest, margin.margin, description, refund_id)
+                    self.tracer(u"债转加息存入", coupon_interest, margin.margin,
+                                description, refund_id, margin_before=margin_before)
             margin.save()
 
 
@@ -266,7 +384,8 @@ def get_user_info(request, session_id=None, token=None):
     get user's base info to php server.
     :param request:
     :param session_id:
-    :return:
+    :param session_id:
+    :return: token:
     from_channel, 登录渠道 . 如 :PC
     isAdmin
     """

@@ -230,6 +230,7 @@ class CheckAppTradePassword(APIView):
     """
     http请求方式: POST  检查交易密码。
     http://xxxxxx.com/php/trade_password/
+    arg:   password = {"param":"{\\"trade_pwd\\":6}","trade_pwd":"hSna2VQhpYzDmSoZElNlLg=="}
     返回数据格式：json
     :return:
     """
@@ -419,7 +420,7 @@ class YueLiBaoCheck(APIView):
                     user = product.user
                     product_id = product.product_id
                     buyer_keeper = PhpMarginKeeper(user, product_id)
-                    buyer_keeper.settle(product.amount_source, description='')
+                    buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
                 calc_php_commission(product_id)
@@ -461,7 +462,7 @@ class YueLiBaoCancel(APIView):
                     user = product.user
                     product_id = product.product_id
                     buyer_keeper = PhpMarginKeeper(user, product_id)
-                    record = buyer_keeper.unfreeze(product.amount_source, description=u'月利宝流标')
+                    record = buyer_keeper.php_unfreeze(product.amount_source, description=u'月利宝流标')
 
                     # 状态置为已退款, 这个记录丢弃
                     product.cancel_status = True

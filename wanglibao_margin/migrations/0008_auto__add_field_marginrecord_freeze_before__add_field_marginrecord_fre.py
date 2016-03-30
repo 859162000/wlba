@@ -8,21 +8,47 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding unique constraint on 'MarginRecord', fields ['catalog', 'order_id', 'user']
-        db.create_unique(u'wanglibao_margin_marginrecord', ['catalog', 'order_id', 'user_id'])
+        # Adding field 'MarginRecord.freeze_before'
+        db.add_column(u'wanglibao_margin_marginrecord', 'freeze_before',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=20, decimal_places=2),
+                      keep_default=False)
+
+        # Adding field 'MarginRecord.freeze_after'
+        db.add_column(u'wanglibao_margin_marginrecord', 'freeze_after',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=20, decimal_places=2),
+                      keep_default=False)
+
+        # Adding field 'MarginRecord.margin_before'
+        db.add_column(u'wanglibao_margin_marginrecord', 'margin_before',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=20, decimal_places=2),
+                      keep_default=False)
 
         # Adding field 'MonthProduct.settle_status'
         db.add_column(u'wanglibao_margin_monthproduct', 'settle_status',
                       self.gf('django.db.models.fields.BooleanField')(default=False),
                       keep_default=False)
 
+        # Adding field 'PhpRefundRecord.margin_before'
+        db.add_column(u'wanglibao_margin_phprefundrecord', 'margin_before',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=20, decimal_places=2, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        # Removing unique constraint on 'MarginRecord', fields ['catalog', 'order_id', 'user']
-        db.delete_unique(u'wanglibao_margin_marginrecord', ['catalog', 'order_id', 'user_id'])
+        # Deleting field 'MarginRecord.freeze_before'
+        db.delete_column(u'wanglibao_margin_marginrecord', 'freeze_before')
+
+        # Deleting field 'MarginRecord.freeze_after'
+        db.delete_column(u'wanglibao_margin_marginrecord', 'freeze_after')
+
+        # Deleting field 'MarginRecord.margin_before'
+        db.delete_column(u'wanglibao_margin_marginrecord', 'margin_before')
 
         # Deleting field 'MonthProduct.settle_status'
         db.delete_column(u'wanglibao_margin_monthproduct', 'settle_status')
+
+        # Deleting field 'PhpRefundRecord.margin_before'
+        db.delete_column(u'wanglibao_margin_phprefundrecord', 'margin_before')
 
 
     models = {
@@ -94,12 +120,15 @@ class Migration(SchemaMigration):
             'withdrawing': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'})
         },
         u'wanglibao_margin.marginrecord': {
-            'Meta': {'ordering': "['-create_time']", 'unique_together': "(('catalog', 'order_id', 'user'),)", 'object_name': 'MarginRecord'},
+            'Meta': {'ordering': "['-create_time']", 'object_name': 'MarginRecord'},
             'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'catalog': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000'}),
+            'freeze_after': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '20', 'decimal_places': '2'}),
+            'freeze_before': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '20', 'decimal_places': '2'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'margin_before': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '20', 'decimal_places': '2'}),
             'margin_current': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
@@ -127,6 +156,7 @@ class Migration(SchemaMigration):
             'create_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'margin_before': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '20', 'decimal_places': '2', 'blank': 'True'}),
             'margin_current': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'refund_id': ('django.db.models.fields.IntegerField', [], {'unique': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})

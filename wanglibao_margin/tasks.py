@@ -53,7 +53,7 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
             try:
                 with transaction.atomic(savepoint=True):
                     buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
-                    buyer_keeper.freeze(amount_source, description=u'月利宝购买冻结')
+                    buyer_keeper.php_freeze(amount_source, description=u'月利宝购买冻结')
                     product.trade_status = 'PAID'
                     product.save()
                     ret.update(status=1,

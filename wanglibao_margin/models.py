@@ -37,7 +37,11 @@ class MarginRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     create_time = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
 
+    freeze_before = models.DecimalField(verbose_name=u'操作前冻结金额', max_digits=20, decimal_places=2, null=True)
+    freeze_after = models.DecimalField(verbose_name=u'操作后冻结金额', max_digits=20, decimal_places=2, null=True)
+
     amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
+    margin_before = models.DecimalField(verbose_name=u'操作前用户后余额', max_digits=20, decimal_places=2, null=True)
     margin_current = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
@@ -46,7 +50,6 @@ class MarginRecord(models.Model):
 
     class Meta:
         ordering = ['-create_time']
-        unique_together = ('catalog', 'order_id', 'user')
 
 
 class PhpRefundRecord(models.Model):
@@ -62,6 +65,7 @@ class PhpRefundRecord(models.Model):
     catalog = models.CharField(db_index=True, verbose_name=u'购买类型',
                                choices=CATALOG, default='0', max_length=32)
     amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
+    margin_before = models.DecimalField(verbose_name=u'流水前金额', max_digits=20, decimal_places=2, null=True, blank=True)
     margin_current = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
