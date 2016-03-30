@@ -14,6 +14,7 @@ class Margin(models.Model):
     invest = models.DecimalField(u'已投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     uninvested = models.DecimalField(u'充值未投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     uninvested_freeze = models.DecimalField(u'充值未投资冻结金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    # updated_time = models.DateTimeField(u'更新时间', auto_now=True)
 
     def __unicode__(self):
         return u'%s margin: %s, freeze: %s' % (self.user, self.margin, self.freeze)

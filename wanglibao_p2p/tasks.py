@@ -44,7 +44,7 @@ def bajinshe_product_push():
 
                 if product_status == u'正在招标':
                     product_status_code = 1
-                elif product_status == u'已完成':
+                elif product_status in (u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'):
                     product_status_code = 2
                 elif product_status in (u'录标', u'录标完成', u'待审核'):
                     product_status_code = 3

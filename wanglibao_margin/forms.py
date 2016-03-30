@@ -1,7 +1,19 @@
 # coding=utf-8
 
 import django.forms as forms
-from .models import MarginRecord
+from .models import Margin, MarginRecord
+
+
+class MarginForm(forms.ModelForm):
+    margin = forms.CharField(label=u'用户余额', error_messages={'required': u'请输入用户余额'})
+    freeze = forms.CharField(label=u'冻结金额', error_messages={'required': u'请输入冻结金额'})
+    withdrawing = forms.CharField(label=u'提款中金额', error_messages={'required': u'请输入提款中金额'})
+    invest = forms.CharField(label=u'已投资金额', error_messages={'required': u'请输入已投资金额'})
+    uninvested = forms.CharField(label=u'充值未投资金额', error_messages={'required': u'请输入充值未投资金额'})
+    uninvested_freeze = forms.CharField(label=u'充值未投资冻结金额', error_messages={'required': u'请输入充值未投资冻结金额'})
+
+    class Meta:
+        model = Margin
 
 
 class MarginRecordForm(forms.ModelForm):
