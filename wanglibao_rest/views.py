@@ -18,10 +18,11 @@ from marketing.models import Channels
 from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.utils import create_user
-from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
+from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_p2p.forms import P2PProductForm, P2PRecordForm
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
+from wanglibao_margin.utils import save_to_margin
 from .forms import CoopDataDispatchForm
 from .tasks import coop_common_callback, process_amortize
 from marketing.forms import ChannelForm
@@ -244,28 +245,24 @@ class CoopDataDispatchApi(APIView):
         return response_data
 
     def process_recharge(self, req_data):
-        pay_info = req_data.get("pay_info")
-        margin_record = req_data.get("margin_record")
+        pay_info = req_data.get("pay_info", '')
+        margin_record = req_data.get("margin_record", '')
+
         if pay_info and margin_record:
-            margin_record = json.loads(margin_record) if margin_record else None
+            margin_record = json.loads(margin_record)
             margin_record["create_time"] = dt.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
             margin_record_form = MarginRecordForm(margin_record)
             if margin_record_form.is_valid():
-                pay_info = json.loads(pay_info) if pay_info else None
+                pay_info = json.loads(pay_info)
                 margin_record = margin_record_form.save()
                 pay_info["margin_record"] = margin_record.id
                 pay_info["create_time"] = dt.strptime(pay_info["create_time"], '%Y-%m-%d %H:%M:%S')
                 pay_info_form = PayInfoForm(pay_info)
                 if pay_info_form.is_valid():
                     pay_info = pay_info_form.save()
-
+                    response_data = save_to_margin(req_data)
                     coop_common_callback.apply_async(
                         kwargs={'user_id': pay_info.user_id, 'act': 'recharge', 'order_id': pay_info.order_id})
-
-                    response_data = {
-                        'ret_code': 10000,
-                        'message': 'success',
-                    }
                 else:
                     response_data = self.parase_form_error(pay_info_form.errors)
             else:
@@ -275,6 +272,7 @@ class CoopDataDispatchApi(APIView):
                 'ret_code': 10111,
                 'message': u'缺少业务参数',
             }
+
         return response_data
 
     def process_purchase(self, req_data):
@@ -293,14 +291,9 @@ class CoopDataDispatchApi(APIView):
                 p2p_record_form = P2PRecordForm(p2p_record)
                 if p2p_record_form.is_valid():
                     p2p_record = p2p_record_form.save()
-
+                    response_data = save_to_margin(req_data)
                     coop_common_callback.apply_async(
                         kwargs={'user_id': p2p_record.user_id, 'act': 'purchase', 'order_id': p2p_record.order_id})
-
-                    response_data = {
-                        'ret_code': 10000,
-                        'message': 'success',
-                    }
                 else:
                     response_data = self.parase_form_error(p2p_record_form.errors)
             else:
@@ -347,7 +340,7 @@ class CoopDataDispatchApi(APIView):
         return response_data
 
     def process_withdraw(self, req_data):
-        pass
+        return
 
     def process_amortizations_push(self, req_data):
         product_id = req_data.get('product_id')

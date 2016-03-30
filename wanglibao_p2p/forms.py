@@ -2,7 +2,7 @@
 import django.forms as forms
 from django.contrib.auth.models import User
 from django.utils import timezone
-from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
+from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord, P2PEquity
 
 
 class PurchaseForm(forms.Form):
@@ -98,3 +98,13 @@ class P2PRecordForm(forms.ModelForm):
 
     class Meta:
         model = P2PRecord
+
+
+class P2PEquityForm(forms.ModelForm):
+    equity = forms.CharField(label=u'用户所持份额', error_messages={'required': u'请输入用户所持份额'})
+    confirm = forms.CharField(label=u'确认成功', error_messages={'required': u'请输入确认成功'})
+    confirm_at = forms.CharField(label=u'份额确认时间', error_messages={'required': u'请输入份额确认时间'})
+    created_at = forms.CharField(label=u'创建时间', error_messages={'required': u'请输入创建时间'})
+
+    class Meta:
+        model = P2PEquity

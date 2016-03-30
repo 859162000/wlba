@@ -98,8 +98,6 @@ class UserAmortization(models.Model):
 
     description = models.CharField(u'摘要', max_length=500, blank=True)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    equity_amount = models.DecimalField(u'总持仓金额', max_digits=20, decimal_places=2)
-    equity_confirm_at = models.DateTimeField(u'持仓确认时间', auto_now_add=True)
 
     class Meta:
         verbose_name = u'用户还款计划'
@@ -111,3 +109,17 @@ class UserAmortization(models.Model):
 
     def get_total_amount(self):
         return float(self.principal + self.interest + self.penal_interest + self.coupon_interest)
+
+
+class P2PEquity(models.Model):
+    user = models.ForeignKey(User, related_name='equities')
+    product = models.ForeignKey(P2PProduct, help_text=u'产品', related_name='equities')
+    equity = models.BigIntegerField(u'用户所持份额', default=0)
+    confirm = models.BooleanField(u'确认成功', default=False)
+    confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
+
+    class Meta:
+        unique_together = (('user', 'product'),)
+        verbose_name_plural = u'用户持仓'
+        ordering = ('-created_at',)

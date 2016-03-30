@@ -8,6 +8,8 @@ from marketing.utils import get_user_channel_record
 from wanglibao_account.cooperation import CoopCallback
 from wanglibao_p2p.models import P2PProduct, UserAmortization
 from wanglibao_p2p.forms import UserAmortizationForm
+from wanglibao_margin.utils import save_to_margin
+from wanglibao_p2p.utils import save_to_p2p_equity
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +46,9 @@ def process_amortize(amortizations, product_id):
                         setattr(user_amo, k, v)
                     user_amo.save()
                 user_amo_list.append(user_amo)
+                save_to_margin(amo)
+                if not user_amo.settled and user_amo.term == 1:
+                    response_data = save_to_p2p_equity(amo)
             else:
                 logger.info("process_amortizations_push data[%s] invalid" % user_amo_form.errors)
 
