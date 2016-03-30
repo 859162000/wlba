@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
 from wanglibao_reward.models import WanglibaoActivityReward
 from experience_gold.models import ExperienceEvent
+from experience_gold.backends import SendExperienceGold
 from weixin.models import WeixinAccounts
 import qrcode
 import hashlib
@@ -1312,6 +1313,38 @@ class JuChengRegister(CoopRegister):
                     "mtype": "activity"
                 })
 
+class HappyMonkeyRegister(CoopRegister):
+    def __init__(self, request):
+        super(HappyMonkeyRegister, self).__init__(request)
+        self.c_code = 'fwhyx'
+        self.invite_code = 'fwhyx'
+        self.token = 'happy_monkey'
+        self.request = request
+
+    def register_call_back(self, user):
+        rewards = {
+            (0, 5): 'happy_monkey_66',
+            (6, 10): 'happy_monkey_166',
+            (11, 15): 'happy_monkey_566',
+            (16, 100000000): 'happy_monkey_666'
+        }
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        total = self.request.POST.get('total', None)
+        exp_name = ''
+        for key, value in rewards.items():
+            if total>=key[0] and total<=key[1]:
+                exp_name = value
+
+        reward = ActivityReward.objects.create(
+                user=user,
+                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                channel=self.token,
+                create_at=today,
+                left_times=0,
+                join_times=1,)
+
+        SendExperienceGold(self.request.user).send(reward.experience.id)
+
 
 class WeixinRedpackRegister(CoopRegister):
     def __init__(self, request):
@@ -2000,7 +2033,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
-                          BiSouYiRegister]
+                          BiSouYiRegister, HappyMonkeyRegister]
 
 
 # ######################第三方用户查询#####################
