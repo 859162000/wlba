@@ -258,7 +258,7 @@ org.checin_in = (function () {
         limit_gift: false,
         init: function(mixins){
             lib.appShare = mixins;
-            lib.appShare.firstLoadWebView({name: 'signIn'});
+
             lib.fetch();
         },
         share: function(result){
@@ -526,7 +526,7 @@ wlb.ready({
             })
         }
 
-
+        mixins.firstLoadWebView({name: 'signIn'});
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 mixins.loginApp({refresh: 1, url: ''})
