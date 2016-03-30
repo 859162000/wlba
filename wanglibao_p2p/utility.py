@@ -153,15 +153,13 @@ def get_user_margin(user_id):
     margins = Margin.objects.filter(user_id=user_id)
 
     if margins.exists():
-        margin = margins.values('id',
-                                'user',
+        margin = margins.values('user',
                                 'margin',
                                 'freeze',
                                 'withdrawing',
                                 'invest',
                                 'uninvested',
                                 'uninvested_freeze').first()
-        margin['user'] = margin['user_id']
         margin['margin'] = float(margin['margin'])
         margin['freeze'] = float(margin['freeze'])
         margin['withdrawing'] = float(margin['withdrawing'])
@@ -187,8 +185,6 @@ def get_p2p_equity(user_id, product_id):
                                 'confirm',
                                 'confirm_at',
                                 'created_at').first()
-        equity['user'] = equity['user_id']
-        equity['product'] = equity['product_id']
         equity['confirm_at'] = equity['confirm_at'].strftime('%Y-%m-%d %H:%M:%S')
         equity['created_at'] = equity['created_at'].strftime('%Y-%m-%d %H:%M:%S')
     else:
