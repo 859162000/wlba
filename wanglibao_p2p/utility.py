@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from amortization_plan import MatchingPrincipalAndInterest, MonthlyInterest, QuarterlyInterest, \
         DisposablePayOff, DailyInterest, DailyInterestMonthly
+from wanglibao_margin.models import Margin
 
 
 def checksum(hash_list):
@@ -145,3 +146,52 @@ class AmortizationCalculator():
         """ 日计息月付息到期还本 """
         return DailyInterestMonthly.generate(self.amount, self.year_rate, timezone.now(), period=self.period,
                                              coupon_year_rate=self.coupon_year_rate)
+
+
+def get_user_margin(user_id):
+    # 获取用户账户资金记录
+    margins = Margin.objects.filter(user_id=user_id)
+
+    if margins.exists():
+        margin = margins.values('id',
+                                'user',
+                                'margin',
+                                'freeze',
+                                'withdrawing',
+                                'invest',
+                                'uninvested',
+                                'uninvested_freeze').first()
+        margin['user'] = margin['user_id']
+        margin['margin'] = float(margin['margin'])
+        margin['freeze'] = float(margin['freeze'])
+        margin['withdrawing'] = float(margin['withdrawing'])
+        margin['invest'] = float(margin['invest'])
+        margin['uninvested'] = float(margin['uninvested'])
+        margin['uninvested_freeze'] = float(margin['uninvested_freeze'])
+    else:
+        margin = None
+
+    return margin
+
+
+def get_p2p_equity(user_id, product_id):
+    # 获取用户持仓
+    from wanglibao_p2p.models import P2PEquity
+
+    equitys = P2PEquity.objects.filter(user_id=user_id, product_id=product_id)
+    if equitys.exists():
+        equity = equitys.values('id',
+                                'user',
+                                'product',
+                                'equity',
+                                'confirm',
+                                'confirm_at',
+                                'created_at').first()
+        equity['user'] = equity['user_id']
+        equity['product'] = equity['product_id']
+        equity['confirm_at'] = equity['confirm_at'].strftime('%Y-%m-%d %H:%M:%S')
+        equity['created_at'] = equity['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        equity = None
+
+    return equity

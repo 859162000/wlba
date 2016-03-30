@@ -76,6 +76,7 @@ from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest.utils import generate_bajinshe_sign
+from wanglibao_p2p.utility import get_p2p_equity, get_user_margin
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1866,6 +1867,7 @@ class BaJinSheRegister(CoopRegister):
             act_data = {
                 'p2p_record': json.dumps(p2p_record),
                 'margin_record': json.dumps(margin_record),
+                'margin': json.dumps(get_user_margin(user.id)),
             }
             data = dict(base_data, **act_data)
 
@@ -1908,6 +1910,7 @@ class BaJinSheRegister(CoopRegister):
             act_data = {
                 'pay_info': json.dumps(pay_info_data),
                 'margin_record': json.dumps(margin_record_data),
+                'margin': json.dumps(get_user_margin(user.id)),
             }
             data = dict(base_data, **act_data)
 
