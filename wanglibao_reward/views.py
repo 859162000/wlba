@@ -2777,7 +2777,16 @@ class FetchAirportServiceReward(APIView):
     authentication_classes = (IsAuthenticated, )
 
     def post(self, request):
-        activity = Activity.objects.filter(code='').first()
+        # airport_service_reward = {"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
+        rule_id = request.DATA.get('rule_id', "").strip()
+        if not rule_id or not rule_id.isdigit():
+            return Response({"ret_code":-1, "message":""})
+        rule_id = int(rule_id)
+        airport_service_reward_limit = getMiscValue("airport_service_reward")
+        old_min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
+        new_min_amount = int(airport_service_reward_limit['new'][str(rule_id)])
+        activity_code = airport_service_reward_limit['activity_code']
+        activity = Activity.objects.filter(code=activity_code).first()
         if activity.is_stopped:
             return Response({"ret_code": -1, "message":"活动已经截止"})
         now = timezone.now()
@@ -2789,10 +2798,7 @@ class FetchAirportServiceReward(APIView):
         # reward_name = request.DATA.get('reward_name', "").strip()
         # if not reward_name:
         #     return Response({"ret_code":-1, "message":""})
-        rule_id = request.DATA.get('rule_id', "").strip()
-        if not rule_id or not rule_id.isdigit():
-            return Response({"ret_code":-1, "message":""})
-        rule_id = int(rule_id)
+
         activity_rules = ActivityRule.objects.filter(activity=activity).all()
         activity_rule = None
         for a_rule in activity_rules:
@@ -2803,9 +2809,6 @@ class FetchAirportServiceReward(APIView):
         if not activity_rule or activity_rule.gift_type!=u"reward" or not activity_rule.reward or not activity_rule.is_used:
             return Response({"ret_code": -1, "message": "系统错误"})
 
-        airport_service_reward_limit = getMiscValue("airport_service_reward")
-        old_min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
-        new_min_amount = int(airport_service_reward_limit['new'][str(rule_id)])
         user_ib = IntroducedBy.objects.filter(user=user).first() #created_at__gt=activity.start_at,
         user_channel = user_ib.channel
         is_new = False
