@@ -27,6 +27,7 @@ from wanglibao_account.utils import generate_coop_base_data
 from wanglibao_account.tasks import common_callback_for_post
 from marketing.utils import get_user_channel_record
 from django.conf import settings
+from wanglibao_p2p.utility import get_user_margin, get_p2p_equity
 
 logger = get_task_logger(__name__)
 
@@ -264,9 +265,8 @@ def coop_amortizations_push(amortizations, product_id):
         channel = get_user_channel_record(amo["user_id"])
         if channel:
             amo['terms'] = amo_terms
-            equity_record = EquityRecord.objects.filter(catalog=u'申购确认', product_id=product_id, user_id=amo["user_id"]).first()
-            amo['equity_confirm_at'] = equity_record.create_time.strftime('%Y-%m-%d %H:%M:%S')
-            amo['equity_amount'] = float(equity_record.amount)
+            amo['margin'] = json.dumps(get_user_margin(amo["user_id"]))
+            amo['equity'] = json.dumps(get_p2p_equity(amo["user_id"], product_id))
             amortization_list.append(amo)
 
     if amortization_list:
