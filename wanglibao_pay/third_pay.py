@@ -482,18 +482,13 @@ def bind_pay_deposit(request):
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
     
-    #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
-    card_to_bank = False
-    if card_no and bank:
-        cards_info = bank.cards_info.split(',')
-        for no in cards_info:
-            if card_no.startswith(no):
-                card_to_bank = True
-        if card_to_bank:
-            pass
-        else:
-            return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
-
+    #验证银行卡和银行匹配
+    if len(card_no) == 10 and bank.cards_info:
+        cardinfo = check_bank_carkinfo(card_no,bank)
+        #返回ret_code为20075的话表示银行卡和银行不匹配
+        if cardinfo['ret_code'] == 20075:
+            return cardinfo
+        
     amount = request.DATA.get('amount', '').strip()
     try:
         amount = float(amount)
@@ -542,6 +537,21 @@ def bind_pay_deposit(request):
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
 
+#----------------------------------------------------------------------
+def check_bank_carkinfo(card_no,bank):
+    """根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息"""
+    card_to_bank = False
+    cards_info = bank.cards_info.split(',')
+    for no in cards_info:
+        if card_no.startswith(no):
+            card_to_bank = True
+    if card_to_bank:
+        pass
+    else:
+        return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
+    #银行卡号和银行匹配正确
+    return {"ret_code":0}
+    
 
 def bind_pay_dynnum(request):
     """ 根据银行设置的支付渠道进行支付渠道的支付

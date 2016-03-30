@@ -681,18 +681,6 @@ class YeeShortPay:
 
             pay_info.bank = card.bank
             pay_info.card_no = card.no
-            
-            #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
-            cards_info = pay_info.bank.cards_info.split(',')
-            card_to_bank = False
-            if pay_info.card_no:
-                for no in cards_info:
-                    if pay_info.card_no.startswith(no):
-                        card_to_bank = True
-                if card_to_bank:
-                    pass
-                else:
-                    return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
 
             pay_info.request = ""
             pay_info.status = PayInfo.PROCESSING
