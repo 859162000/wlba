@@ -61,7 +61,8 @@ class AppMemorabilia(models.Model):
     title = models.CharField(max_length=100, blank=False, null=False, verbose_name=u'名称')
     banner = models.ImageField(upload_to='announcement', blank=False, null=False, verbose_name=u'Banner')
     content = RichTextField()
-    detail_link = models.CharField(max_length=255, blank=False, null=False, verbose_name=u'详情页链接')
+    detail_link = models.CharField(u'是否指定详情页链接', max_length=255, blank=True, null=True,
+                                   help_text=u'如：https://www.wanglibao.com')
     done_date = models.DateField(auto_now=False, default=timezone.now, verbose_name=u'完成日期')
     start_time = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示开始时间')
     end_time = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示结束时间')
@@ -70,6 +71,7 @@ class AppMemorabilia(models.Model):
     hide_link = models.BooleanField(verbose_name=u'是否隐藏（大事记页面）', default=False)
     created_time = models.DateTimeField(u'发布时间', auto_now_add=True, default=timezone.now())
     updated_time = models.DateTimeField(u'更新时间', auto_now=True, default=timezone.now())
+    page_title = models.CharField(max_length=100, verbose_name=u'大事记页面标题', blank=True, null=True)
 
     class Meta:
         verbose_name = u"APP-大事记"
