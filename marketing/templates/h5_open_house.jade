@@ -1,0 +1,130 @@
+doctype html
+html(style="width: 100%;height: auto;position: relative")
+  head
+    title 网利宝开放日
+    include include/app_head
+    link(rel="stylesheet", href="/static/styles/mobile_activity/h5_open_house.css")
+  body(style="background:#fff;")
+    .banner
+      img(src="/static/imgs/mobile_activity/h5_open_house/banner.jpg")
+    mixin title(cls, url, pcls, text)
+      .open_title(class=cls)
+        img(src=url)
+        p(class=pcls)=text
+        span
+    +title("", "/static/imgs/mobile_activity/h5_open_house/js_title.png", "", "Activity Introduction")
+    .h5_house_text 为了更好地与投资人建立透明、公开的沟通平台，让投资人对我们有更具体的认知，对品牌有进一步的认识，网利宝特别策划开放日系列活动。
+    .introbox
+      dl.intro_dls1
+        dt
+          img(src="/static/imgs/mobile_activity/h5_open_house/js_tu1.png")
+        dd 活动将邀请投资人组成“观察团”,参观网利宝公司
+      span
+        img(src="/static/imgs/mobile_activity/h5_open_house/wlb_jt1.png")
+      dl.intro_dls2
+        dt
+          img(src="/static/imgs/mobile_activity/h5_open_house/js_tu2.png")
+        dd 就公司运营状况、风险控制、业务模式等话题与网利宝高层进行交流探讨
+      span
+        img(src="/static/imgs/mobile_activity/h5_open_house/wlb_jt1.png")
+      dl.intro_dls3
+        dt
+          img(src="/static/imgs/mobile_activity/h5_open_house/js_tu3.png")
+        dd 参观借款企业质押物所在的仓储
+    dl.intro_dls
+      dt
+        img(src="/static/imgs/mobile_activity/h5_open_house/js_tu4.png")
+      dd 此外，观察团成员还将获得网利宝精心准备的小礼品一份
+    span.triangle
+    .h_arrange
+      +title("", "/static/imgs/mobile_activity/h5_open_house/ap_title.png", "", "Activity Arrangements")
+      ul.h_arrange_ul
+        li
+          a 活动时间：
+          span 2016年4月9日（周六）
+        li
+          a 活动地点：
+          span 网利宝总部（北京市朝阳区海南航空大厦A座7层）
+          span.span2 红木仓储（河北廊坊）
+        li
+          a 活动费用：
+          span 活动期间餐费、北京-廊坊的往返交通费用网利宝承担。
+        li
+          a 招募对象：
+          span 网利宝投资用户
+        li
+          a 招募人数：
+          span ≤10人
+      span.triangle.triangle2
+    .h_house_login
+      +title("open_title2", "/static/imgs/mobile_activity/h5_open_house/ck_title.png", "open_p1", "The Registration Window")
+      ul#lg_uls.open_list
+        li
+          span.open_span1
+            img(src="/static/imgs/mobile_activity/h5_open_house/text_name.png")
+          input#username(type="text", placeholder="请输入真实姓名")
+          a.lg_name
+        li
+            span.open_span2
+              img(src="/static/imgs/mobile_activity/h5_open_house/text_phone.png")
+            input#phone(type="text", placeholder="请输入网利宝注册手机号")
+            a.lg_phone
+        li
+            span.open_span3
+              img(src="/static/imgs/mobile_activity/h5_open_house/text_address.png")
+            input#address(type="text", placeholder="请填写所在城市（如：北京）")
+            a.lg_address
+        a#login_btn.open_btn 提交报名信息
+        p.zhuxiao_text 注：报名截止到2016年4月7日，工作人员将从报名者中选择10人组成“观察团”，并将通过预留的电话与您取得联系！具体活动安排，我们将在电话沟通时告知。
+    +title("", "/static/imgs/mobile_activity/h5_open_house/wlb_title.png", "", "Wang li bao Introduction")
+    p.wlb_text 网利宝专注打造中国第一家产业银行，独创“产业银行”的商业模式，在产业细分领域深耕，联合国内领先的金融机构、产业龙头进行战略合作，为投资用户提供安全优质的理财产品，不断解决优质中小企业的融资需求、助力实体经济发展。
+    p.wlb_text 网利宝的高管团队在互联网、金融领域具有多年管理经验，互联网团队成员主要来自全球最大的中文搜索引擎“百度”、世界第二大网络公司“阿里巴巴”和中国领先的互联网安全软件与互联网服务公司“奇虎360”，金融团队成员在世界顶级投行摩根士丹利、美银美林、高盛、全球最大的20家对冲基金之一“Fortress Investment Group”、淡马锡旗下风投机构祥峰投资、华夏基金、沃尔玛中国、中金(CICC)等知名公司担任过重要职位，他们把在金融和互联网行业的深刻认知、深厚经验带到了网利宝，使网利宝成为了业内金融属性最强、最具互联网特色的在线理财平台。
+    .wlb_box
+      dl.wlb_dls1
+        dt
+          img(src="/static/imgs/mobile_activity/h5_open_house/wlb_tu1.png")
+        dd
+          h6 2014年2月
+          p IDG资本千万美元A轮投资
+      span
+        img(src="/static/imgs/mobile_activity/h5_open_house/wlb_jt1.png")
+      dl.wlb_dls2
+        dt
+          img(src="/static/imgs/mobile_activity/h5_open_house/wlb_tu2.png")
+        dd
+          h6 2014年8月
+          p 网利宝平台上线
+    .wlb_xian
+       img(src="/static/imgs/mobile_activity/h5_open_house/wlb_jt2.png")
+    .wlb_box
+      dl.wlb_dls1
+        dt
+          img(src="/static/imgs/mobile_activity/h5_open_house/wlb_tu3.png")
+        dd
+          h6 2014年2月
+          p IDG资本千万美元A轮投资
+      span
+        img(src="/static/imgs/mobile_activity/h5_open_house/wlb_jt1.png")
+      dl.wlb_dls2
+        dt
+          img(src="/static/imgs/mobile_activity/h5_open_house/wlb_tu4.png")
+        dd
+          h6 2014年8月
+          p 网利宝平台上线
+    .open_footers
+      p *网利宝保留此次活动解释权，如果您在过程中有任何意见和建议，欢迎致电垂询：4008-588-066
+    .mesg
+    .dialog
+      p 恭喜您，报名成功，报名截至后我们回抽取10名投资人组成“参观团”，并致电联系。
+      a#dia_btn 确定
+    script(src="/static/scripts/mobile_activity/app_open_hous.js")
+
+
+
+
+
+
+
+
+
+
