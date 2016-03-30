@@ -2765,6 +2765,13 @@ class FetchMarchAwardAPI(APIView):
             return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}, 'chances':chances})
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
+class AirportServiceRewardTemplate(TemplateView):
+    def get_context_data(self, **kwargs):
+        airport_service_reward = getMiscValue("airport_service_reward")
+        rule_ids = airport_service_reward['rule_ids']
+        return {
+
+            }
 
 class FetchAirportServiceReward(APIView):
     authentication_classes = (IsAuthenticated, )
@@ -2794,11 +2801,7 @@ class FetchAirportServiceReward(APIView):
                 break
 
         if not activity_rule or activity_rule.gift_type!=u"reward" or not activity_rule.reward or not activity_rule.is_used:
-            return Response({"ret_code": -1, "message": ""})
-
-        reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
-        if not reward:
-            return Response({"ret_code": -1, "message": ""})
+            return Response({"ret_code": -1, "message": "系统错误"})
 
         airport_service_reward_limit = getMiscValue("airport_service_reward")
         old_min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
