@@ -354,10 +354,10 @@ class WeixinJoinView(View):
             self.process_user_operate(OTHER_MENU)
         return reply
 
-    def process_sign_in(self, weixin_user, user):
+    def process_sign_in(self, weixin_user, user, platform=u"weixin"):
         reply = -1
         try:
-            ret_code, status, daily_record = process_user_daily_action(user, action_type=u'sign_in')
+            ret_code, status, daily_record = process_user_daily_action(user, platform, action_type=u'sign_in')
             experience_amount = 0
             if daily_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)

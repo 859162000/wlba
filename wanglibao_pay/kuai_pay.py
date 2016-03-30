@@ -757,11 +757,11 @@ class KuaiShortPay:
                     <externalRefNumber>%s</externalRefNumber>
                     <storablePan>%s</storablePan>
                     <bankId>%s</bankId>
-                    <amount>%s<%amount>
+                    <amount>%s</amount>
                 </GetDynNumContent>
             </MasMessage>
-        """ % (self.MER_ID, dic['user_id'], dic['order_id'],
-                 dic['card_no'], dic['bank_id'], dic['amount']))
+         """ % (self.MER_ID, dic['user_id'], dic['order_id'],
+                 dic['storable_no'], dic['bank_id'], dic['amount']))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
 
@@ -823,7 +823,7 @@ class KuaiShortPay:
                     <spFlag>QuickPay</spFlag>
                     <extMap>
                         <extDate><key>validCode</key><value>%s</value></extDate>
-                        <extDate><key>savePciFlag</key><value>1</value></extDate>
+                        <extDate><key>savePciFlag</key><value>0</value></extDate>
                         <extDate><key>token</key><value>%s</value></extDate>
                         <extDate><key>payBatch</key><value>2</value></extDate>
                     </extMap>
@@ -1221,13 +1221,11 @@ class KuaiShortPay:
         try:
             dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number.upper(),
                     "phone":input_phone, "name":profile.name, "amount":amount,
-                    "card_no":pay_info.card_no}
+                    "card_no":pay_info.card_no, 'storable_no': card_no, 
+                    'bank_id': card.bank.kuai_code,
+                    'time': timezone.now().strftime("%Y%m%d%H%M%S") }
 
             if len(card_no) == 10 and mode != 'vcode_for_qpay':
-                dic['storable_no'] = card_no
-                dic['bank_id'] = card.bank.kuai_code
-                dic['time'] = timezone.now().strftime("%Y%m%d%H%M%S")
-
                 self._request_dict = dic
                 data = self._sp_qpay_xml(dic)
                 # logger.critical("second pay info")
@@ -1235,7 +1233,7 @@ class KuaiShortPay:
                 url = self.PAY_URL
             else:
                 self._request_dict = dic
-                if mode == 'vcode_for_sms':
+                if mode == 'vcode_for_qpay':
                     data = self._sp_dynnum_xml_for_qpay(dic)
                 else:
                     data = self._sp_dynnum_xml(dic)

@@ -224,7 +224,7 @@ def _generate_ajax_template(content, template_name=None):
     return template.render(context)
 
 
-def process_user_daily_action(user, action_type=u'sign_in'):
+def process_user_daily_action(user, platform="app", action_type=u'sign_in'):
 
     if action_type not in [u'share', u'sign_in']:
         return -1, False, None
@@ -257,6 +257,7 @@ def process_user_daily_action(user, action_type=u'sign_in'):
             if yesterday_record:
                 continue_days += yesterday_record.continue_days
             daily_record.continue_days=continue_days
+            daily_record.platform = platform
             daily_record.save()
     except IntegrityError, e:
         return 2, False, daily_record

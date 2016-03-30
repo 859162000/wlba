@@ -15,27 +15,31 @@ html
                 .register-success
                     .max-text 恭喜您，
                     .max-text 成功获得新手大礼包！
-                    .clearfix
-                        .reward-box
+                    mixin reward(counts, title, pop, class1)
+                        .reward-box(class=class1)
                             .reward-left
                                 p
-                                    span 28888
+                                    span=counts
                                     | 元
-                                p 注册即送
-                            .reward-right 体验金
+                                p=pop
+                            .reward-right=title
+                    .clearfix
+                        +reward('28888', '体验金', '注册即送', '')
+                        +reward('50', '红包', '注册即送', 'mls20')
                     .min-text.go-i-r 您可以
                         a(href='/activity/experience/gold/') 投资体验金
                         | ，或者
                         a(href='/p2p/list/') 投资使用红包
-                    .max-text 首次充值还有红包赠送！
+                    .max-text 首次投资还有红包赠送！
                     .clearfix
-                        .reward-box
-                            .reward-left
-                                p
-                                    span 80
-                                    | 元
-                                p 首次充值送现金红包
-                            .reward-right 红包
-                    .min-text 投资金额≥100元即可获得
+                        .reward-box-s
+                            +reward('100', '红包', '首次投资送现金红包', '')
+                            .min-text 1000≤首投金额<5000元即可获得
+                        .reward-box-s.mls20
+                            +reward('150', '红包', '首次投资送现金红包', '')
+                            .min-text 5000≤首投金额<10000元即可获得
+                        .reward-box-s.mls20
+                            +reward('250', '红包', '首次投资送现金红包', '')
+                            .min-text 10000≤首投金额 即可获得
     include global/g_footer
 

@@ -153,7 +153,8 @@ var wlb = (function () {
         },
         shareStatus: function(callback){
             this.bridge.registerHandler('shareStatus', function (backdata, responseCallback) {
-                callback && callback(backdata)
+                var responseData  = Mixin.filterJSON(backdata);
+                callback && callback(responseData)
             });
         },
         /**
@@ -234,8 +235,3 @@ var wlb = (function () {
  //       console.log('其他场景的业务逻辑')
  //    }
  //})
-
-
-
-
-

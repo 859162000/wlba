@@ -2697,10 +2697,10 @@ class HappyMonkeyAPIView(APIView):
     def post(self, request):
         self.token = 'happy_monkey'
         rewards = {
-            (0, 5): 'happy_monkey_88',
-            (6, 10): 'happy_monkey_188',
-            (11, 15): 'happy_monkey_588',
-            (16, 100000000): 'happy_monkey_888'
+            (0, 5): 'happy_monkey_66',
+            (6, 10): 'happy_monkey_166',
+            (11, 15): 'happy_monkey_566',
+            (16, 100000000): 'happy_monkey_666'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
@@ -2737,7 +2737,6 @@ class HappyMonkeyAPIView(APIView):
                     remain_chance=1)
 
             total = request.POST.get('total', None)
-            total=5
             exp_name = ''
             for key, value in rewards.items():
                 if total>=key[0] and total<=key[1]:
