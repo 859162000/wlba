@@ -15,14 +15,22 @@ class Migration(SchemaMigration):
 
         # Adding field 'AppMemorabilia.created_time'
         db.add_column(u'wanglibao_announcement_appmemorabilia', 'created_time',
-                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 3, 25, 0, 0), auto_now_add=True, blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 3, 30, 0, 0), auto_now_add=True, blank=True),
                       keep_default=False)
 
         # Adding field 'AppMemorabilia.updated_time'
         db.add_column(u'wanglibao_announcement_appmemorabilia', 'updated_time',
-                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 3, 25, 0, 0), auto_now=True, blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2016, 3, 30, 0, 0), auto_now=True, blank=True),
                       keep_default=False)
 
+        # Adding field 'AppMemorabilia.page_title'
+        db.add_column(u'wanglibao_announcement_appmemorabilia', 'page_title',
+                      self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True),
+                      keep_default=False)
+
+
+        # Changing field 'AppMemorabilia.detail_link'
+        db.alter_column(u'wanglibao_announcement_appmemorabilia', 'detail_link', self.gf('django.db.models.fields.CharField')(max_length=255, null=True))
 
     def backwards(self, orm):
         # Deleting field 'AppMemorabilia.content'
@@ -34,6 +42,12 @@ class Migration(SchemaMigration):
         # Deleting field 'AppMemorabilia.updated_time'
         db.delete_column(u'wanglibao_announcement_appmemorabilia', 'updated_time')
 
+        # Deleting field 'AppMemorabilia.page_title'
+        db.delete_column(u'wanglibao_announcement_appmemorabilia', 'page_title')
+
+
+        # Changing field 'AppMemorabilia.detail_link'
+        db.alter_column(u'wanglibao_announcement_appmemorabilia', 'detail_link', self.gf('django.db.models.fields.CharField')(default='', max_length=255))
 
     models = {
         u'wanglibao_announcement.announcement': {
@@ -56,17 +70,18 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['-priority']", 'object_name': 'AppMemorabilia'},
             'banner': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
             'content': ('ckeditor.fields.RichTextField', [], {}),
-            'created_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 3, 25, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
-            'detail_link': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'created_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 3, 30, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
+            'detail_link': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'done_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime.now'}),
             'end_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'hide_link': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'page_title': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'priority': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'start_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'status': ('django.db.models.fields.SmallIntegerField', [], {'default': '0', 'max_length': '2'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'updated_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 3, 25, 0, 0)', 'auto_now': 'True', 'blank': 'True'})
+            'updated_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 3, 30, 0, 0)', 'auto_now': 'True', 'blank': 'True'})
         }
     }
 
