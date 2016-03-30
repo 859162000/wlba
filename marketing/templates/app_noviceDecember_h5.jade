@@ -5,7 +5,15 @@ html(style="background: #fff2d5")
         title 网利宝
         include include/app_head
         link(href="/static/styles/mobile_activity/app_noviceDecember_h5.css?v=2016032901", rel="stylesheet")
-        - csrf_token
+        script.
+            //百度统计
+            var _hmt = _hmt || [];
+            (function() {
+              var hm = document.createElement("script");
+              hm.src = "//hm.baidu.com/hm.js?7ebbd4a8cd5bfd5bbef9d415e0847eb3";
+              var s = document.getElementsByTagName("script")[0];
+              s.parentNode.insertBefore(hm, s);
+            })();
     body
         img.banner(src="/static/imgs/mobile_activity/app_noviceDecember_h5/banner_3.jpg")
         img.step_title(src="/static/imgs/mobile_activity/app_noviceDecember_h5/step_title_img.jpg")
