@@ -281,7 +281,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         other: function() {
             $('.code_wrap').show();
 
-            var token = getQueryStringByName('promo_token')
+            var token = getQueryStringByName('promo_token');
+            if(token == 'hexunjd' || token == 'hexunht'){
+                $('.hexunht').show()
+            }
             $('#take').click(function() {
                 if(token == 'hexunjd' || token == 'hexunht'){
                     window.location.href = '/weixin/regist/';

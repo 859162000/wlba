@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
 from wanglibao_reward.models import WanglibaoActivityReward
 from experience_gold.models import ExperienceEvent
+from experience_gold.backends import SendExperienceGold
 from weixin.models import WeixinAccounts
 import qrcode
 import hashlib
@@ -1312,6 +1313,38 @@ class JuChengRegister(CoopRegister):
                     "mtype": "activity"
                 })
 
+class HappyMonkeyRegister(CoopRegister):
+    def __init__(self, request):
+        super(HappyMonkeyRegister, self).__init__(request)
+        self.c_code = 'fwhyx'
+        self.invite_code = 'fwhyx'
+        self.token = 'happy_monkey'
+        self.request = request
+
+    def register_call_back(self, user):
+        rewards = {
+            (0, 5): 'happy_monkey_66',
+            (6, 10): 'happy_monkey_166',
+            (11, 15): 'happy_monkey_566',
+            (16, 100000000): 'happy_monkey_666'
+        }
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        total = self.request.POST.get('total', None)
+        exp_name = ''
+        for key, value in rewards.items():
+            if total>=key[0] and total<=key[1]:
+                exp_name = value
+
+        reward = ActivityReward.objects.create(
+                user=user,
+                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                channel=self.token,
+                create_at=today,
+                left_times=0,
+                join_times=1,)
+
+        SendExperienceGold(self.request.user).send(reward.experience.id)
+
 
 class WeixinRedpackRegister(CoopRegister):
     def __init__(self, request):
@@ -1353,6 +1386,11 @@ class XunleiVipRegister(CoopRegister):
         self.external_channel_user_key = 'xluserid'
         self.coop_time_key = 'time'
         self.coop_sign_key = 'sign'
+
+        if ENV == ENV_PRODUCTION:
+            activity_start_time = '2016-03-30 00:00:00'
+        else:
+            activity_start_time = '2016-03-28 17:30:00'
 
     @property
     def channel_user(self):
@@ -1444,7 +1482,9 @@ class XunleiVipRegister(CoopRegister):
                     if first_p2p_record and int(first_p2p_record.amount) >= 1000:
                         self.purchase_call_back(user, first_p2p_record.order_id)
 
-                    # 处理渠道用户每次投资上报回调补发
+                    # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
+                    activity_start_time = datetime.datetime.strptime(activity_start_time, "%Y-%m-%d %H:%M:%S")
+                    p2p_records = p2p_records.filter(create_time__gte=activity_start_time)
                     for p2p_record in p2p_records:
                         if p2p_record.id != first_p2p_record.id:
                             self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
@@ -1573,6 +1613,9 @@ class XunleiVipRegister(CoopRegister):
                         "mtype": "activity"
                     })
 
+        # 根据迅雷勋章活动开始时间查询
+        activity_start_time = datetime.datetime.strptime(activity_start_time, "%Y-%m-%d %H:%M:%S")
+        p2p_records = p2p_records.filter(create_time__gte=activity_start_time)
         p2p_record = p2p_records.filter(order_id=order_id).first()
         self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
@@ -2000,7 +2043,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
-                          BiSouYiRegister]
+                          BiSouYiRegister, HappyMonkeyRegister]
 
 
 # ######################第三方用户查询#####################

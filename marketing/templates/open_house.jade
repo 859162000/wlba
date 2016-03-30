@@ -10,12 +10,13 @@ html
     body(style="background:#fff")
         include global/g_nav
         .banner
+          span.triangle.triangle4
         mixin title(cls, text, pcls)
           .hd_intro
             h2(class=cls)
             p(class=pcls)=text
             span
-        +title("intro_tle1", "Activity Introfuction", "")
+        +title("intro_tle1", "Activity Introduction", "")
         p.intro_text 为了更好地与投资人建立透明、公开的沟通平台，让投资人对我们有更具体的认知，对品牌有进一步的认识，网利宝特别策划开放日系列活动。
         .introbox
           dl.intro_dls1
@@ -36,7 +37,7 @@ html
           dt
             img(src="/static/imgs/pc_activity/open_house/hd_intro4.jpg")
           dd 此外，观察团成员还将获得网利宝精心准备的小礼品一份
-        span.triangle
+        span.triangle.triangles
         .arrange
            +title("intro_tle2", "Activity Arrangements", "")
            ul
@@ -56,30 +57,30 @@ html
              li
                a 招募人数：
                span ≤10人
-            span.triangle
+            span.triangle.triangle1
         .hd_dialog
           +title("intro_tle3", "The Registration Window", "diaps")
           .hd_login
             ul#lg_uls
               li
                 span.lg_spans1
-                input#username(type="text" placeholder="请输入真实姓名")
+                input#username(type="text", placeholder="请输入真实姓名", autocomplete="off")
                 a.lg_name
               li
                 span.lg_spans2
-                input#phone(type="text" placeholder="请输入网利宝注册手机号")
+                input#phone(type="text", placeholder="请输入网利宝注册手机号", autocomplete="off")
                 a.lg_phone
               li
                 span.lg_spans3
-                input#address(type="text" placeholder="请填写所在城市")
+                input#address(type="text", placeholder="请填写所在城市(如：北京)", autocomplete="off")
                 a.lg_address
             a#login_btn.login_btn 提交报名信息
             p.login_text 注：报名截止到2016年4月7日，工作人员将从报名者中选择10人组成“观察团”，并将通过预留的电话与您取得联系！具体活动安排，我们将在电话沟通时告知。
             span.triangle.triangle2
         .hd_intro2
-            h2(class=cls)
-            p(class=pcls)=text
-            span
+          h2.intro_tle3
+          p.diaps Wang li bao Introduction
+          span
         p.wlb_intro 网利宝专注打造中国第一家产业银行，独创“产业银行”的商业模式，在产业细分领域深耕，联合国内领先的金融机构、产业龙头进行战略合作，为投资用户提供安全优质的理财产品，不断解决优质中小企业的融资需求、助力实体经济发展。
         p.wlb_intro 网利宝的高管团队在互联网、金融领域具有多年管理经验，互联网团队成员主要来自全球最大的中文搜索引擎“百度”、世界第二大网络公司“阿里巴巴”和中国领先的互联网安全软件与互联网服务公司“奇虎360”，金融团队成员在世界顶级投行摩根士丹利、美银美林、高盛、全球最大的20家对冲基金之一“Fortress Investment Group”、淡马锡旗下风投机构祥峰投资、华夏基金、沃尔玛中国、中金(CICC)等知名公司担任过重要职位，他们把在金融和互联网行业的深刻认知、深厚经验带到了网利宝，使网利宝成为了业内金融属性最强、最具互联网特色的在线理财平台。
         .wlb_box
@@ -111,7 +112,8 @@ html
               h6 2015年12月
               p 网利宝用户突破百万
         span.triangle.triangle3
-        include global/g_footer
+        .open_footer *网利宝保留此次活动解释权，如果您在过程中有任何意见和建议，欢迎致电垂询：4008-588-066
+        //include global/g_footer
         .mesg
         .dialog
           p 恭喜您，报名成功，报名截至后我们回抽取10名投资人组成“参观团”，并致电联系。

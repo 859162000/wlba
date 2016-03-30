@@ -9,9 +9,10 @@ from django.conf import settings
 from django.utils import timezone
 import datetime
 
-from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
+from wechatpy import WeChatClient
+from weixin.models import SubscribeRecord, SubscribeService, WeixinUser, WeixinAccounts
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
-from weixin.util import sendTemplate
+from weixin.util import sendTemplate, getMiscValue
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
@@ -105,3 +106,19 @@ def sentTemplate(kwargs):
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if w_user and template and w_user.subscribe:
         sendTemplate(w_user, template)
+
+@app.task
+def sentCustomerMsg(txt, openid):
+    fwh_info = getMiscValue("weixin_qrcode_info")
+    original_id = fwh_info.get("fwh")
+    if original_id:
+        weixin_account = WeixinAccounts.getByOriginalId(original_id)
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+        client.message._send_custom_message({
+                                    "touser":openid,
+                                    "msgtype":"text",
+                                    "text":
+                                    {
+                                        "content": txt
+                                    }
+                                }, account="007@wanglibao400")
