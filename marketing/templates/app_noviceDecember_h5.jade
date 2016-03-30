@@ -4,8 +4,16 @@ html(style="background: #fff2d5")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_noviceDecember_h5.css?v=123101", rel="stylesheet")
-        - csrf_token
+        link(href="/static/styles/mobile_activity/app_noviceDecember_h5.css?v=2016032901", rel="stylesheet")
+        script.
+            //百度统计
+            var _hmt = _hmt || [];
+            (function() {
+              var hm = document.createElement("script");
+              hm.src = "//hm.baidu.com/hm.js?7ebbd4a8cd5bfd5bbef9d415e0847eb3";
+              var s = document.getElementsByTagName("script")[0];
+              s.parentNode.insertBefore(hm, s);
+            })();
     body
         img.banner(src="/static/imgs/mobile_activity/app_noviceDecember_h5/banner_3.jpg")
         img.step_title(src="/static/imgs/mobile_activity/app_noviceDecember_h5/step_title_img.jpg")
@@ -15,20 +23,22 @@ html(style="background: #fff2d5")
                 .box.box_1
                     .text_wrap
                         .title 1.注册
-                        p 注册就送28888元体验金
+                        .title_left
+                            p 注册就送28888元体验金
+                            p +50元现金红包
                     img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/step_img_1.png")
 
                 .button#take 立即领取
                 .line
                 .box.box_3
                     .text_wrap
-                        .title_long 2.首次充值
-                        p 新手首次完成充值送80元红包
+                        .title_long 2.首次投资
+                        p 首次投资最高再送250元红包
                     img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/step_img_3.png")
                 .box.box_3
                     .text_wrap
-                        .title_long 3.首次投资
-                        p 首次投资最高再送220元红包
+                        .title_long 3.邀请好友
+                        p 邀请好友，最高可得100元红包
                     img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/step_img_4.png")
                 .button#take_red 领取红包
         .strategy_wrap
@@ -40,23 +50,23 @@ html(style="background: #fff2d5")
                         dd 活动期间新用户注册即送28888元体验金，专享1天10%年化收益，我出本金，收益全归你！
                     dl
                         dt 2.
-                        dd 注册后首次充值（充值金额≥100元）成功即获得80元红包。
+                        dd 活动期间新用户注册即送50元红包（满5000元可用，限1月以上标期）
                     dl
                         dt 3.
                         dd 注册后首次投资满额即可获得红包奖励，规则如下（三选一）：
-                        dd.space a. 1000元≤首次投资＜5000元，送20元直抵红包
-                        dd.space b. 5000元≤首次投资＜10000元，送100元直抵红包
-                        dd.space c. 10000元≤首次投资，送220元直抵红包
-                    p!=' 备注：首次投资所赠红包适用范围限投3月标(含）以上。<span class="click_rule">点击立即查看新手红包规则>></span>'
+                        dd.space a. 1000元≤首次投资＜5000元，送100元直抵红包
+                        dd.space b. 5000元≤首次投资＜10000元，送150元直抵红包
+                        dd.space c. 10000元≤首次投资，送250元直抵红包
+                    p!=' 备注：首次投资所赠红包适用范围限投3月标及以上。<span class="click_rule">点击立即查看新手红包规则>></span>'
                     img.logo(src="/static/imgs/mobile_activity/app_noviceDecember_h5/logo_img.png")
                 .rule_red
                     .title 【新手红包使用规则】
                     dl
                         dt 1.
-                        dd 首次充值所赠80元红包单笔投资满5000元可直抵使用，有效期自领取日起7天内有效；
+                        dd 新手注册所赠50元红包单笔投资满5000元可直抵使用，有效期自领取日起7天内有效；
                     dl
                         dt 2.
-                        dd 首投所赠20元红包单笔投资满2500元可直抵使用、100元红包单笔投资满10000元可直抵使用、220元红包单笔投资满20000元可直抵使用。有效期自领取日起15天内有效。
+                        dd 首投所赠100元红包单笔投资满15000元可直抵使用、150元红包单笔投资满20000元可直抵使用、250元红包单笔投资满30000元可直抵使用。有效期自领取日起15天内有效。
         .recommend_send_red
             img.title_bg(src="/static/imgs/mobile_activity/app_noviceDecember_h5/send_red_title.png")
             .main
@@ -72,22 +82,22 @@ html(style="background: #fff2d5")
                     ul.second
                         li.first 新用户奖励
                         li.second 新手首投奖励红包
-                        li 20元
                         li 100元
-                        li 220元
+                        li 150元
+                        li 250元
                     ul
                         li.first 老用户奖励
                         li.second 邀请人所得推荐奖励红包
+                        li 30元
                         li 50元
-                        li 80元
                         li 100元
                 p.small!='备注：邀请好友所赠红包不限标期，投资时可直抵现金使用。<br><span class="see_red_rule">点击立即查看邀请红包规则>></span>'
                 .red_use_rule
                     .title 【邀请红包使用规则】
-                    p 邀请所赠50元红包单笔投资满1000元可直抵使用、80元红包单笔投资满2000元可直抵使用、100元红包单笔投资满3000元可直抵使用。有效期自领取日起15天内有效。
+                    p 邀请所赠30元红包单笔投资满1000元可直抵使用、50元红包单笔投资满2000元可直抵使用、100元红包单笔投资满3000元可直抵使用。有效期自领取日起15天内有效。
         .how_recommend
             .title 【如何邀请】
-            p &nbsp;&nbsp;&nbsp;&nbsp;好友使用你的邀请码或邀请链接注册，并完成首投（1000元起投），即算成功邀请，你可获50元红包。<br>&nbsp;&nbsp;&nbsp;&nbsp;受邀好友首投金额越高，赠送红包金额越高，邀请每个好友最高送100元。<br>&nbsp;&nbsp;&nbsp;&nbsp;所以邀请好友多多投资吧！多邀多送，上不封顶！TA好我也好！<br>&nbsp;&nbsp;&nbsp;&nbsp;登录后，在“我的账户 > 全民淘金”可查看专属邀请码。使用手机移动端，邀请更轻松！
+            p &nbsp;&nbsp;&nbsp;&nbsp;好友使用你的邀请码或邀请链接注册，并完成首投（1000元起投），即算成功邀请，你可获30元红包。<br>&nbsp;&nbsp;&nbsp;&nbsp;受邀好友首投金额越高，赠送红包金额越高，邀请每个好友最高送100元。<br>&nbsp;&nbsp;&nbsp;&nbsp;所以邀请好友多多投资吧！多邀多送，上不封顶！TA好我也好！<br>&nbsp;&nbsp;&nbsp;&nbsp;登录后，在“我的账户 > 全民淘金”可查看专属邀请码。使用手机移动端，邀请更轻松！
             .button#go_user 立即前往
             .title 【投资流程】
             img.step_img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/how_use_img.png")
@@ -95,7 +105,7 @@ html(style="background: #fff2d5")
               .red_rule
                   dl
                     dt 1.
-                    dd 活动时间：2016年3月12日0:00开始，活动结束时间以网站公告为准；
+                    dd 活动时间：2016年3月30日0:00开始，结束时间以网站公告为准；
                   dl
                     dt 2.
                     dd 所有所得红包均为直抵红包，投资时可选择使用红包，直抵现金使用；
@@ -104,12 +114,9 @@ html(style="background: #fff2d5")
                     dd 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
                   dl
                     dt 4.
-                    dd 首次充值所得80元红包不限标期。首次投资满额所得红包限投3月标以上；
-                  dl
-                    dt 5.
-                    dd 手机号为网利宝唯一账户，通过网利宝电脑端官网、手机客户端、官方微信号、部分渠道主动新注册用户均可享受活动红包福利，部分合作渠道无标示新手活动的来源用户无法享受此活动奖励。
+                    dd 手机号为网利宝唯一账户，通过网利宝电脑端官网、手机客户端、官方微信号、部分渠道主动新注册用户均可享受活动红包福利，部分合作渠道无标示新手活动的来源用户无法享受此活动奖励
                   dl(style="display:none")#ios-show
-                    dt 6.
+                    dt 5.
                     dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
                   p.small.hexunht(style='display:none;') 此页面收益仅供参考
                   p.small 网利宝对此活动享有最终解释权

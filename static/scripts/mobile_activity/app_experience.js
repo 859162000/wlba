@@ -407,7 +407,7 @@ org.experience = (function (org) {
                 if (data.ph == '') {
                     login = false;
                     $('.receive_box').on('click', function(){
-                        mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/mobile/'});
+                        mixins.registerApp({refresh:1, url:'https://www.wanglibao.com/activity/experience/mobile/'});
                     })
                 } else {
                     login = true;
@@ -416,7 +416,11 @@ org.experience = (function (org) {
             })
         },
         other: function(){
-            org.experience.init()
+             var ua = navigator.userAgent.toLowerCase();
+             if(ua.match(/MicroMessenger/i)=="micromessenger") {
+                 $('.down_load_wlb').show();
+             }
+            org.experience.init();
         }
     })
 
