@@ -13,8 +13,10 @@ class Command(BaseCommand):
         from wanglibao_pay.models import Card
 
         self.kuai_short_pay = KuaiShortPay()
-        self.phone = raw_input('phone: ').strip()
-        self.card_no = raw_input('card_no: ').strip()
+        # self.phone = raw_input('phone: ').strip()
+        # self.card_no = raw_input('card_no: ').strip()
+        self.phone = '15011488086'
+        self.card_no = '6225880145470549'
 
         self.short_card_no = self.card_no[:6] + self.card_no[-4:]
         self.user = WanglibaoUserProfile.objects.get(phone=self.phone).user     
@@ -44,8 +46,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.setUp()
-        # self.test_bind_pay()
-        # raw_input('continue/kill')
+        self.test_bind_pay()
+        raw_input('continue/kill')
         self.test_qpay_no_vcode()
         raw_input('continue/kill')
         self.test_qpay_with_vcode()
