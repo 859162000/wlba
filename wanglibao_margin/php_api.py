@@ -11,6 +11,7 @@ from rest_framework import renderers
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 
+from wanglibao import settings
 from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy
@@ -186,20 +187,26 @@ class SendMessages(APIView):
         messages = messages.split('|')
 
         try:
-            from wanglibao_sms.tasks import send_messages
-            if not ext:
-                send_messages.apply_async(kwargs={
-                    'phones': phones,
-                    'messages': messages,
-                })
+            if settings.ENV == settings.ENV_PRODUCTION:
+                from wanglibao_sms.tasks import send_messages
+                if not ext:
+                    send_messages.apply_async(kwargs={
+                        'phones': phones,
+                        'messages': messages,
+                    })
+                else:
+                    send_messages.apply_async(kwargs={
+                        'phones': phones,
+                        'messages': messages,
+                        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+                    })
+                ret = {'status': 1, 'message': 'Succeed'}
             else:
-                send_messages.apply_async(kwargs={
-                    'phones': phones,
-                    'messages': messages,
-                    'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-                })
-            ret = {'status': 1, 'message': 'Succeed'}
+                from wanglibao_sms.send_php import PHPSendSMS
+                for phone in phones:
+                    PHPSendSMS().send_sms_msg_one(7, phone, 'phone', messages[phones.index(phone)])
         except Exception, e:
+            logger.debug(u'发送短息失败! err = {}'.format(str(e)))
             ret = {'status': 0, 'message': e}
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

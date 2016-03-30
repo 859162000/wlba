@@ -41,8 +41,8 @@ class MarginRecord(models.Model):
     freeze_after = models.DecimalField(verbose_name=u'操作后冻结金额', max_digits=20, decimal_places=2, null=True)
 
     amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
-    margin_before = models.DecimalField(verbose_name=u'操作前用户后余额', max_digits=20, decimal_places=2, null=True)
-    margin_current = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
+    margin_before = models.DecimalField(verbose_name=u'操作前用户余额', max_digits=20, decimal_places=2, null=True)
+    margin_current = models.DecimalField(verbose_name=u'用户最终余额', max_digits=20, decimal_places=2)
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
     def __unicode__(self):
