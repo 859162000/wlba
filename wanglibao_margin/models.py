@@ -102,6 +102,8 @@ class MonthProduct(models.Model):
     cancel_status = models.BooleanField(default=False, verbose_name=u'是否已取消')   # 流标, 用户冻结金额恢复状态
     trade_status = models.CharField(choices=TRADE_STATUS, default='NEW', max_length=8, verbose_name=u'交易状态')
 
+    settle_status = models.BooleanField(default=False, verbose_name=u'是否已审核')   # 冻结资金加入代收本金
+
     created_at = models.DateTimeField(verbose_name=u'月利宝生效时间', auto_now_add=True)
 
     class Meta:

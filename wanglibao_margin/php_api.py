@@ -409,6 +409,12 @@ class YueLiBaoCheck(APIView):
                     product_id=product_id, cancel_status=False, trade_status='PAID')
 
                 for product in month_products:
+                    if product.settle_status:
+                        logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
+                                    format(product.id), product_id)
+                        continue
+                    product.settle_status = True
+                    product.save()
                     # 已支付, 直接返回成功
                     user = product.user
                     product_id = product.product_id
@@ -417,6 +423,7 @@ class YueLiBaoCheck(APIView):
 
                 # 进行全民淘金数据写入
                 calc_php_commission(product_id)
+                logger.info(u'全民淘金数据写入: {}\n'.format(product_id))
 
                 ret.update(status=1,
                            msg='success')
@@ -424,6 +431,7 @@ class YueLiBaoCheck(APIView):
             logger.debug(u'月利宝id: {} 满标审核失败: {}\n'.format(product_id, str(e)))
             ret.update(status=0,
                        msg=str(e))
+        logger.info('ret = {}'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
