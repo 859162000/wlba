@@ -18,7 +18,7 @@ logger = logging.getLogger('marketing')
 def sendData(message,param):
     """往数据部门提供的接口发送实时数据"""
     posturl = settings.SEND_PHP_URL
-    print json.dumps(message)
+    #print json.dumps(message)
     try:
         res = requests.post(url = posturl, json=json.dumps(message))
         if res.status_code != 200:
@@ -44,7 +44,14 @@ def send_register_data(user_id, device_type):
     message['tel'] = user.wanglibaouserprofile.phone
     message['zc_time'] = timezone.localtime(user.date_joined).strftime('%Y-%m-%d %H:%M:%S')
     message['zc_from_userid'] = introduce.id if introduce else 0
-    message['channel_id'] = channel.id if channel else 0
+    #message['channel_id'] = channel.id if channel else 0
+    if channel:
+        if channel.is_abandoned:
+            message['channel_id'] = 9
+        else:
+            message['channel_id'] = channel.id
+    else:
+        message['channel_id'] = 0
     message['channel_code'] = channel.code if channel else ''
     message['channel_image'] = channel.image.name if channel else ''
     message['channel_name'] = channel.name if channel else ''

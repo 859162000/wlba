@@ -6,12 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db import transaction
 from django.utils import timezone
+from django.template import Template, Context
 import logging
 import base64
 import datetime
 import traceback
+import json
 from wanglibao_account.backends import invite_earning
-from weixin.models import UserDailyActionRecord, SeriesActionActivity, SeriesActionActivityRule
+from weixin.models import UserDailyActionRecord, SeriesActionActivity, SeriesActionActivityRule, WeixinUser
 from experience_gold.models import ExperienceEventRecord
 from util import process_user_daily_action
 from wanglibao_reward.models import ActivityRewardRecord
@@ -20,9 +22,11 @@ from wanglibao_redpack.backends import give_activity_redpack_for_hby, get_start_
 from wanglibao_redpack.backends import _send_message_for_hby
 from experience_gold.backends import SendExperienceGold
 from wanglibao_rest.utils import split_ua
-from marketing.models import IntroducedBy, Reward, RewardRecord
+from marketing.models import Reward
 from wanglibao_activity.backends import _keep_reward_record, _send_message_template
-from django.template import Template, Context
+from tasks import sentCustomerMsg, sentTemplate
+from constant import SIGN_IN_TEMPLATE_ID
+
 
 logger = logging.getLogger("weixin")
 # https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
@@ -53,7 +57,14 @@ class DailyActionAPIView(APIView):
         action_type = unicode(request.POST.get('action_type', '').strip())
         if not action_type or action_type not in [u'share', u'sign_in']:
             return Response({'ret_code':-1, 'message':'系统错误'})
-        ret_code, status, daily_record = process_user_daily_action(user, action_type=action_type)
+        user_agent = request.META['HTTP_USER_AGENT']
+        platform = u"app"
+        if "MicroMessenger" in user_agent:
+            platform = u"weixin"
+
+        ret_code, status, daily_record = process_user_daily_action(user, platform=platform, action_type=action_type)
+        if ret_code == 2:
+            return Response({'ret_code': -1, 'message':'系统忙，请重试'})
         data = {'status': status, 'continue_days': daily_record.continue_days}
         if status and daily_record.experience_record_id:
             experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
@@ -98,55 +109,36 @@ class GetContinueActionReward(APIView):
         # recycle_continue_days = sign_record.continue_days % (maxDayNote + 1)
         if recycle_continue_days!=days:
             return Response({'ret_code':-1, 'message':u'不符合领取条件'})
-        reward_record = ActivityRewardRecord.objects.filter(activity_code=current_activity.code, create_date=today, user=user).first()
-        if not reward_record:
-            reward_record = ActivityRewardRecord.objects.create(
-                activity_code=current_activity.code,
-                create_date=today,
-                user=user,
-                activity_desc=u'用户领取连续%s天签到奖励'%days
-            )
+
+        reward_record, create = ActivityRewardRecord.objects.get_or_create(
+                    activity_code=current_activity.code,
+                    create_date=today,
+                    user=user
+                    )
         if reward_record.status:
            return Response({'ret_code':-1, 'message':u'奖励已经领取过了'})
         device = split_ua(self.request)
+        user_agent = request.META['HTTP_USER_AGENT']
+        is_weixin = False
+        if "MicroMessenger" in user_agent:
+            is_weixin = True
         device_type = device['device_type']
         events = []
         records = []
+        experience_events = []
+        rewards = []
         redpack_txts = []
+        redpack_record_ids = ""
+        experience_record_ids = ""
         with transaction.atomic():
             reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=current_activity.code, create_date=today, user=user).first()
+            if reward_record.status:
+                return Response({'ret_code':-1, 'message':u'奖励已经领取过了'})
             rules = SeriesActionActivityRule.objects.filter(activity=current_activity, is_used=True)
             for rule in rules:
-                if rule.gift_type == "redpack":
-                    redpack_record_ids = ""
-                    redpack_ids = rule.redpack.split(',')
-                    for redpack_id in redpack_ids:
-                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
-                        if not redpack_event:
-                            return Response({"ret_code":-1,"message":'系统错误'})
-                        status, messege, record = give_activity_redpack_for_hby(request.user, redpack_event, device_type)
-                        if not status:
-                            return Response({"ret_code":-1,"message":messege})
-                        redpack_text = "None"
-                        if redpack_event.rtype == 'interest_coupon':
-                            redpack_text = "%s%%加息券"%redpack_event.amount
-                        if redpack_event.rtype == 'percent':
-                            redpack_text = "%s%%百分比红包"%redpack_event.amount
-                        if redpack_event.rtype == 'direct':
-                            redpack_text = "%s元红包"%int(redpack_event.amount)
-                        redpack_txts.append(redpack_text)
-                        redpack_record_ids += (str(record.id) + ",")
-                        events.append(redpack_event)
-                        records.append(record)
-                    reward_record.redpack_record_ids = redpack_record_ids
-                if rule.gift_type == "experience_gold":
-                    experience_record_ids = ""
-                    experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=rule.redpack)
-                    if not experience_record_id:
-                        return Response({"ret_code":-1, "message":'体验金发放失败'})
-                    redpack_txts.append('%s元体验金'%int(experience_event.amount))
-                    experience_record_ids += (str(experience_record_id) + ",")
-                    reward_record.experience_record_ids = experience_record_ids
+                sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, experience_events, records, redpack_txts, device_type)
+                redpack_record_ids += sub_redpack_record_ids
+                experience_record_ids += sub_experience_record_ids
                 if rule.gift_type == "reward":
                     now = timezone.now()
                     reward = Reward.objects.filter(type=rule.reward,
@@ -168,21 +160,56 @@ class GetContinueActionReward(APIView):
                             'name': name,
                         })
                         if has_reward_record:
+                            rewards.append(reward)
                             redpack_txts.append(name)
                             if rule.msg_template:
                                 msg = Template(rule.msg_template)
                                 content = msg.render(context)
                                 _send_message_template(user, rule.rule_name, content)
+                    else:
+                        sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, experience_events, records,redpack_txts, device_type, is_addition=True)
+                        redpack_record_ids += sub_redpack_record_ids
+                        experience_record_ids += sub_experience_record_ids
 
+            reward_record.redpack_record_ids = redpack_record_ids
+            reward_record.experience_record_ids = experience_record_ids
             reward_record.activity_code_time = timezone.now()
             reward_record.status = True
+            reward_record.activity_desc=u'用户领取连续%s天签到奖励'%days
             reward_record.save()
         try:
+            w_user = WeixinUser.objects.filter(user=user).first()
             for idx, event in enumerate(events):
                 record = records[idx]
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           record.created_at, event.available_at, event.unavailable_at)
                 _send_message_for_hby(request.user, event, end_time)
+                if is_weixin and w_user:
+                    sentCustomerMsg.apply_async(kwargs={
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日 %H:%M:%S')), #\n兑换码:%s
+                            "openid":w_user.openid,
+                        },
+                                                    queue='celery02')
+            if is_weixin and w_user:
+                for reward in rewards:
+                    sentCustomerMsg.apply_async(kwargs={
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n兑换码:%s"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
+                            "openid":w_user.openid,
+                        },
+                                                    queue='celery02')
+            if is_weixin and w_user:
+                for experience_event in experience_events:
+                    sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                    "openid":w_user.openid,
+                    "template_id":SIGN_IN_TEMPLATE_ID,
+                    "first":u"恭喜您获得连续%s天签到奖励\n奖励金额：%s"%(getattr(experience_event, "desc_text", "体验金")),
+                    "keyword1":timezone.localtime(sign_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "keyword2":"%s天" % sign_record.continue_days,
+                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count(),
+                    "url":settings.CALLBACK_HOST + "/weixin/sub_experience/account/"
+                })},
+                                                queue='celery02')
+
         except Exception, e:
             logger.debug(traceback.format_exc())
         logger.debug(redpack_txts)
@@ -191,6 +218,63 @@ class GetContinueActionReward(APIView):
         if maxDayNote == recycle_continue_days:
             mysterious_day = maxDayNote
         return Response({"ret_code":0, "message":result_msg, "mysterious_day":mysterious_day})
+
+    def giveReward(self, user, rule, events, experience_events, records, redpack_txts, device_type, is_addition=False):
+        redpack_ids = None
+        experience_record_ids = ""
+        redpack_record_ids = ""
+        if not is_addition:
+            if rule.gift_type == "redpack":
+                redpack_ids = rule.redpack.split(',')
+
+            if rule.gift_type == "experience_gold":
+                self.give_experience(user, experience_events, redpack_txts, rule.redpack)
+        else:
+            if rule.addition_gift_type == "redpack":
+                redpack_ids = rule.addition_redpack.split(',')
+
+            if rule.gift_type == "experience_gold":
+                experience_record_ids = self.give_experience(user, experience_events, redpack_txts, rule.redpack)
+        if redpack_ids:
+            redpack_record_ids = self.give_redpack(user, events, records, redpack_txts, redpack_ids, device_type)
+        return redpack_record_ids, experience_record_ids
+
+    def give_redpack(self, user, events, records, redpack_txts, redpack_ids, device_type):
+        redpack_record_ids = ""
+        # redpack_ids = rule.redpack.split(',')
+        for redpack_id in redpack_ids:
+            redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+            if not redpack_event:
+                return Response({"ret_code":-1,"message":'系统错误'})
+            status, messege, record = give_activity_redpack_for_hby(user, redpack_event, device_type)
+            if not status:
+                return Response({"ret_code":-1,"message":messege})
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                redpack_text = "%s%%百分比红包"%redpack_event.amount
+            if redpack_event.rtype == 'direct':
+                redpack_text = "%s元红包"%int(redpack_event.amount)
+            setattr(redpack_event, 'desc_text', redpack_text)
+            redpack_txts.append(redpack_text)
+            redpack_record_ids += (str(record.id) + ",")
+            events.append(redpack_event)
+            records.append(record)
+        return redpack_record_ids
+
+    def give_experience(self, user, experience_events, redpack_txts, experience_event_id):
+        experience_record_ids = ""
+        experience_record_id, experience_event = SendExperienceGold(user).send(pk=experience_event_id)
+        if not experience_record_id:
+            return Response({"ret_code":-1, "message":'体验金发放失败'})
+        experience_events.append(experience_event)
+        experience_event_text = '%s元体验金'%int(experience_event.amount)
+        redpack_txts.append(experience_event_text)
+        setattr(experience_event, 'desc_text', experience_event_text)
+        experience_event.experience_event_text = experience_event_text
+        experience_record_ids += (str(experience_record_id) + ",")
+        return experience_record_ids
 
 class GetSignShareInfo(APIView):
     permission_classes = (IsAuthenticated, )
@@ -207,17 +291,21 @@ class GetSignShareInfo(APIView):
         sign_info['sign_total_count'] = sign_total_count
         sign_info['status'] = False
         sign_info['amount']=0
+        sign_info['today_should_continue_days'] = 0
         if sign_record and sign_record.status:
             sign_info['status'] = True
             sign_info['continue_days'] = sign_record.continue_days
+            sign_info['today_should_continue_days'] = sign_record.continue_days
             if sign_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=sign_record.experience_record_id)
                 sign_info['amount']=experience_record.event.amount
         else:
             yesterday_sign_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=u'sign_in').first()
             sign_info['continue_days'] = 0
+            sign_info['today_should_continue_days'] = 0
             if yesterday_sign_record:
                 sign_info['continue_days'] = yesterday_sign_record.continue_days
+                sign_info['today_should_continue_days'] = yesterday_sign_record.continue_days + 1
         nextDayNote = None
         activities = SeriesActionActivity.objects.filter(is_stopped=False, start_at__lte=timezone.now(), end_at__gte=timezone.now()).all()
         length = len(activities)
@@ -226,21 +314,23 @@ class GetSignShareInfo(APIView):
             maxDayNote=activities[length-1].days
             if sign_info['continue_days'] < maxDayNote:
                 recycle_continue_days = sign_info['continue_days']
+                today_should_recycle_continue_days = sign_info['today_should_continue_days']
             elif sign_info['continue_days'] % maxDayNote == 0:
                 recycle_continue_days = maxDayNote
+                today_should_recycle_continue_days = maxDayNote
             else:
                 recycle_continue_days = sign_info['continue_days'] % maxDayNote
-
+                today_should_recycle_continue_days = sign_info['today_should_continue_days'] % maxDayNote
             # if float(sign_info['continue_days'])/maxDayNote <= 1:
             #     recycle_continue_days = sign_info['continue_days'] % (maxDayNote + 1)
             # else:
             #     recycle_continue_days = sign_info['continue_days'] % maxDayNote
             sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
             for activity in activities:
-                if activity.days >= recycle_continue_days:
+                if activity.days >= today_should_recycle_continue_days:
                     nextDayNote=activity.days
                     sign_info['continueGiftFetched']=False
-                    if activity.days == recycle_continue_days:
+                    if activity.days == today_should_recycle_continue_days:
                         reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, create_date=today, user=user).first()
                         if reward_record and reward_record.status:
                             sign_info['continueGiftFetched']=reward_record.status#是否已经领取神秘礼物

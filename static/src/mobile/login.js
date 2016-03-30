@@ -28,7 +28,6 @@ import { check } from './mixins/from_validation'
     //验证表单
     const checkOperation = () => {
         return new Promise((resolve, reject) => {
-            alert("check");
             function checkOperation() {
                 const checklist = [
                     {type: 'phone', value: $identifier.val()},
@@ -71,7 +70,6 @@ import { check } from './mixins/from_validation'
     }
 
     $submit.on('click', () => {
-        alert(3);
         checkOperation()
             .then((result)=> {
                 console.log(result); //check success
