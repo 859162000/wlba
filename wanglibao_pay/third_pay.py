@@ -483,7 +483,7 @@ def bind_pay_deposit(request):
         return {"ret_code": 20002, "message": "银行ID不正确"}
     
     #验证银行卡和银行匹配
-    if len(card_no) == 10 and bank.cards_info:
+    if len(card_no) != 10 and bank.cards_info:
         cardinfo = check_bank_carkinfo(card_no,bank)
         #返回ret_code为20075的话表示银行卡和银行不匹配
         if cardinfo['ret_code'] == 20075:
