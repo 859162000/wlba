@@ -388,15 +388,14 @@ class CoopDataDispatchApi(APIView):
 
                 product_instance = P2PProduct.objects.filter(pk=product['id']).first()
                 if product_instance:
-                    product_instance_status = product_instance.status
+                    if product_instance.status == product['status']:
+                        continue
                     product_form = P2PProductForm(product, instance=product_instance)
                 else:
-                    product_instance_status = ''
                     product_form = P2PProductForm(product)
 
                 if product_form.is_valid():
                     if product_instance:
-                        if product_instance_status != product['status']:
                             product_form.save()
                     else:
                         product_instance = P2PProduct()
