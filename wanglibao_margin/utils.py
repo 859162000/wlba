@@ -9,7 +9,7 @@ def save_to_margin(req_data):
     margin = req_data.get("margin", '')
     if margin:
         margin = json.loads(margin)
-        margin_instance = Margin.objects.filter(user_id=margin['user_id']).first()
+        margin_instance = Margin.objects.filter(user_id=margin['user']).first()
         if margin_instance:
             margin_form = MarginForm(margin, instance=margin_instance)
         else:
