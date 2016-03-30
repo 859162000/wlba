@@ -217,14 +217,16 @@ def p2p_auto_ready_for_settle():
 
 
 @app.task
-def coop_product_push():
+def coop_product_push(products=None):
     product_query_status = [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核',
                             u'满标已审核', u'还款中', u'流标']
-    products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
-                                         (Q(status__in=product_query_status) |
-                                          (Q(status=u'已完成') &
-                                           Q(make_loans_time__isnull=False) &
-                                           Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+    if not products:
+        products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
+                                             (Q(status__in=product_query_status) |
+                                              (Q(status=u'已完成') &
+                                               Q(make_loans_time__isnull=False) &
+                                               Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+
     products = products.values('id', 'version', 'category', 'types__name', 'name',
                                'short_name', 'serial_number', 'status', 'period',
                                'brief', 'expected_earning_rate', 'excess_earning_rate',
