@@ -39,8 +39,13 @@ org.checin_in = (function () {
         limit_gift: false,
         init: function(mixins){
             lib.appShare = mixins;
-            lib.appShare.firstLoadWebView({name: 'signIn'});
+            try{
+                lib.appShare.firstLoadWebView({name: 'signIn'});
+            }catch(e){
+
+            }
             lib.fetch();
+
         },
         share: function(result){
             var
@@ -291,6 +296,7 @@ org.checin_in = (function () {
 
 
 wlb.ready({
+    debug: true,
     app: function (mixins) {
         function connect(data) {
             org.ajax({
@@ -316,11 +322,10 @@ wlb.ready({
                 connect(data)
             }
         })
-
     },
     other: function () {
-        //org.checin_in.init()
-        alert('guy ! open in app!')
+        org.checin_in.init(ee)
+        //alert('guy ! open in app!')
     }
 })
 
