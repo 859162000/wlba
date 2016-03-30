@@ -2770,7 +2770,7 @@ class AirportServiceRewardTemplate(TemplateView):
         airport_service_reward = getMiscValue("airport_service_reward")
         rule_ids = airport_service_reward['rule_ids']
         return {
-
+            "rule_ids":rule_ids
             }
 
 class FetchAirportServiceReward(APIView):
