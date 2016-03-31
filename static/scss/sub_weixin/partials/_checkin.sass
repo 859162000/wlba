@@ -9,6 +9,40 @@
   50%
     -webkit-transform: translate(rem(3),rem(-2))
 
+@mixin pulse
+  .circle-item-warp
+    animation-name: pulse
+    -webkit-animation-name: pulse
+    animation-duration: 1s
+    -webkit-animation-duration: 1s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-iteration-count: infinite
+    -webkit-animation-iteration-count: infinite
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+@-webkit-keyframes pulse
+  from
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+  50%
+    -webkit-transform: scale3d(1.1, 1.1, 1.1)
+    transform: scale3d(1.1, 1.1, 1.1)
+  to
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+
+@keyframes pulse
+  from
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+  50%
+    -webkit-transform: scale3d(1.1, 1.1, 1.1)
+    transform: scale3d(1.1, 1.1, 1.1)
+  to
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+
 .check-in-banner
   display: block
   width: 100%
@@ -219,9 +253,10 @@
     .circle-item
       opacity: 0
 .active-gift-doing
-  .circle-item-warp
-    background: url("/static/imgs/sub_weixin/checkin/icon_gift_active.png") no-repeat center
-    background-size: 120%
+  +pulse
+  //.circle-item-warp
+  //  background: url("/static/imgs/sub_weixin/checkin/icon_gift_active.png") no-repeat center
+  //  background-size: 120%
   .circle-item
     opacity: 0
 
@@ -321,6 +356,8 @@
     background-size: 105%
   .circle-item
     opacity: 0
+
+
 
 .check-in-rules-layout
   padding: 0 1rem
