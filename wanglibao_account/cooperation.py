@@ -596,11 +596,13 @@ class BaJinSheCallback(CoopCallback):
         profit_methods = kwargs['profit_methods']
         state = kwargs['state']
         income_state = kwargs['income_state']
-        act_data = {
+        reward_data = {
             'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
             'income': float(user_amo.interest),
             'principal': float(user_amo.principal),
             'incomeState': income_state,
+        }
+        act_data = {
             'investmentPid': equity.id,
             'bingdingUid': bid,
             'usn': user_phone,
@@ -614,7 +616,11 @@ class BaJinSheCallback(CoopCallback):
             'apr': product.expected_earning_rate,
             'state': state,
             'purchases': timezone.localtime(equity.created_at).strftime('%Y%m%d%H%M%S'),
+            'reward': [reward_data, ],
         }
+
+        if state != 5:
+            act_data['bearingDate'] = timezone.localtime(equity.confirm_at).strftime('%Y%m%d%H%M%S')
 
         return act_data
 
@@ -669,7 +675,7 @@ class BaJinSheCallback(CoopCallback):
                     user_amos = UserAmortization.objects.filter(user_id=user_amo.user_id, product=product)
                     for user_amo in user_amos:
                         get_amortize_arg['user_amo'] = user_amo
-                        get_amortize_arg['state'] = 0
+                        get_amortize_arg['state'] = 5
                         get_amortize_arg['income_state'] = 1
                         act_data = self.get_amortize_data(**get_amortize_arg)
                         act_data_list.append(act_data)
