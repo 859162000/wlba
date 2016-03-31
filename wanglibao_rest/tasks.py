@@ -39,6 +39,8 @@ def process_amortize(amortizations, product_id):
                 if amo_instance:
                     user_amo = user_amo_form.save()
                 else:
+                    p2p_product = P2PProduct.objects.get(pk=amo['product'])
+                    amo['product'] = p2p_product
                     user_amo = UserAmortization()
                     for k, v in amo.iteritems():
                         setattr(user_amo, k, v)

@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import json
+from django.contrib.auth.models import User
 from .models import Margin
 from .forms import MarginForm
 
@@ -19,6 +20,8 @@ def save_to_margin(req_data):
             if margin_instance:
                 margin_form.save()
             else:
+                user = User.objects.get(pk=margin['user'])
+                margin['user'] = user
                 margin_instance = Margin()
                 for k, v in margin.iteritems():
                     setattr(margin_instance, k, v)

@@ -1,9 +1,10 @@
 # coding=utf-8
 
 import json
-from .models import P2PEquity
-from .forms import P2PEquityForm
+from django.contrib.auth.models import User
 from wanglibao_account.tools import str_to_utc
+from .models import P2PEquity, P2PProduct
+from .forms import P2PEquityForm
 
 
 def save_to_p2p_equity(req_data):
@@ -26,6 +27,10 @@ def save_to_p2p_equity(req_data):
             if equity_instance:
                 equity_form.save()
             else:
+                user = User.objects.get(pk=equity['user'])
+                equity['user'] = user
+                p2p_product = P2PProduct.objects.get(pk=equity['product'])
+                equity['product'] = p2p_product
                 equity_instance = P2PEquity()
                 for k, v in equity.iteritems():
                     setattr(equity_instance, k, v)
