@@ -388,13 +388,13 @@ class AmortizationKeeper(KeeperBaseMixin):
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
         # 推送用户还款计划到渠道中心 add by chenweibin@20160328
-        settled_sub_amos = list()
         for product_amortization in product_amortizations:
             sub_amortizations = product_amortization.subs.all()
+            settled_sub_amos = list()
             for sub_amo in sub_amortizations:
                 settled_sub_amos.append({
                     'id': sub_amo.id,
-                    'product_id': product.id,
+                    'product': product.id,
                     'user_id': sub_amo.user.id,
                     'term': sub_amo.term,
                     'settled': sub_amo.settled,
@@ -592,6 +592,9 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 settled_sub_amos.append({
                     'id': sub_amo.id,
+                    'user_id': sub_amo.user.id,
+                    'product': product.id,
+                    'term': sub_amo.term,
                     'settled': sub_amo.settled,
                     'settlement_time': sub_amo.settlement_time.strftime('%Y-%m-%d %H:%M:%S'),
                 })
@@ -610,7 +613,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             if settled_sub_amos:
                 from .tasks import coop_amortizations_push
                 coop_amortizations_push.apply_async(
-                    kwargs={'amortizations': settled_sub_amos, 'product_id': amortization.product.id})
+                    kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(
