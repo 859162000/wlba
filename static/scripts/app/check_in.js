@@ -334,8 +334,11 @@ org.checin_in = (function () {
                 continueDay = resultCopy.continue_days,
                 currentDay = resultCopy.current_day,
                 giftStatus = resultCopy.continueGiftFetched,
+                mysterious_day = resultCopy.mysterious_day,
                 itemStatus = '',
                 $process = $('.check-in-process'),
+                mysterious_section = false,
+
                 str = "<div class='check-in-process-line'></div>";
                 str +="<div class='check-in-flag-lists'>";
 
@@ -353,12 +356,23 @@ org.checin_in = (function () {
                     itemStatus += " active-doing"
                 }
 
+                if(currentDay + mysterious_day == itemEnd){
+                    mysterious_section = true
+                }
+
                 if(i == itemEnd){
                     //礼物所在天数
-                    itemStatus = giftStatus ?
-                        "active-gift-open "
-                        :
-                        itemEnd - currentDay === 0? 'active-gift-active ' :"active-gift ";
+                    if(mysterious_section){
+                        itemStatus = giftStatus ?
+                            "active-mysterious-open gist-mod "
+                            :
+                            itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
+                    }else{
+                        itemStatus = giftStatus ?
+                            "active-gift-open gist-mod "
+                            :
+                            itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
+                    }
                 }
 
                 str += "<div data-continue='"+i+"' class='flag-items "+itemStatus+"'>";
@@ -369,7 +383,16 @@ org.checin_in = (function () {
                 str += "<div class='check-in-flag'></div>"
                 str += "</div>";
                 str += "</div>";
-                str += "<div class='text-item'>"+i+"天</div>"
+                if(i == itemEnd){
+                    if(giftStatus){
+                        str += "<div class='text-item'>"+i+"天</div>";
+                    }else{
+                        str += "<div class='text-item'>点我</div>";
+                    }
+                }else{
+                    str += "<div class='text-item'>"+i+"天</div>";
+                }
+
                 str += "</div>";
             }
             str += '</div>';
@@ -414,7 +437,7 @@ org.checin_in = (function () {
             }
 
             var giftDay  = null;
-            $('.active-gift, .active-gift-open, .active-gift-active').on('click', function(){
+            $('.gist-mod').on('click', function(){
                 giftDay = resultCopy.nextDayNote - current_day;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
@@ -460,7 +483,8 @@ org.checin_in = (function () {
 
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
                             _self.steriousGift(data.mysterious_day)
-                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
+                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active pulse')
+                            $('.active-mysterious-active').addClass('active-mysterious-open').removeClass('active-mysterious-active pulse')
                         });
                     }
                     if(data.ret_code < 0){
@@ -538,8 +562,8 @@ wlb.ready({
 
     },
     other: function () {
-        //org.checin_in.init()
-        alert('guy ! open in app!')
+        org.checin_in.init()
+        //alert('guy ! open in app!')
     }
 })
 
