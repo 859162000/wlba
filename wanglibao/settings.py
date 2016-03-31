@@ -650,22 +650,22 @@ CELERYBEAT_SCHEDULE = {
     # by Zhoudong 菜苗上报平台信息.
     'caimiao_platform_post': {
         'task': 'wanglibao_account.tasks.caimiao_platform_post_task',
-        'schedule': crontab(minute=0, hour=0, day_of_month=1)
+        'schedule': crontab(minute=50, hour=0, day_of_month=1)
     },
     # by Zhoudong 菜苗上报标的信息.
     'caimiao_p2p_post': {
         'task': 'wanglibao_account.tasks.caimiao_p2p_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=35, hour=0)
     },
     # by Zhoudong 菜苗上报成交量.
     'caimiao_volumes_post': {
         'task': 'wanglibao_account.tasks.caimiao_volumes_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=40, hour=0)
     },
     # by Zhoudong 菜苗上报网贷评级.
     'caimiao_rating_post': {
         'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=45, hour=0)
     },
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
