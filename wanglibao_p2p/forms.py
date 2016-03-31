@@ -103,7 +103,7 @@ class P2PRecordForm(forms.ModelForm):
 class P2PEquityForm(forms.ModelForm):
     equity = forms.CharField(label=u'用户所持份额', error_messages={'required': u'请输入用户所持份额'})
     confirm = forms.CharField(label=u'确认成功', error_messages={'required': u'请输入确认成功'})
-    confirm_at = forms.CharField(label=u'份额确认时间', error_messages={'required': u'请输入份额确认时间'})
+    confirm_at = forms.CharField(label=u'份额确认时间', required=False)
     created_at = forms.CharField(label=u'创建时间', error_messages={'required': u'请输入创建时间'})
 
     class Meta:
