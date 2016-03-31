@@ -185,8 +185,9 @@ def get_p2p_equity(user_id, product_id):
                                 'confirm',
                                 'confirm_at',
                                 'created_at').first()
-        equity['confirm_at'] = equity['confirm_at'].strftime('%Y-%m-%d %H:%M:%S')
         equity['created_at'] = equity['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+        if equity['confirm_at']:
+            equity['confirm_at'] = equity['confirm_at'].strftime('%Y-%m-%d %H:%M:%S')
     else:
         equity = None
 
