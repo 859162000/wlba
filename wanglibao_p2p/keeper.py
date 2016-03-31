@@ -596,7 +596,13 @@ class AmortizationKeeper(KeeperBaseMixin):
                     'product': product.id,
                     'term': sub_amo.term,
                     'settled': sub_amo.settled,
+                    'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
                     'settlement_time': sub_amo.settlement_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'principal': float(sub_amo.principal),
+                    'interest': float(sub_amo.interest),
+                    'penal_interest': float(sub_amo.penal_interest),
+                    'coupon_interest': float(sub_amo.coupon_interest),
+                    'description': sub_amo.description,
                 })
 
             amortization.settled = True
