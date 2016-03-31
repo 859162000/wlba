@@ -132,6 +132,7 @@ html,body
     background: url("/static/imgs/mobile_activity/h5_open_house/bg_tu.jpg") no-repeat center center
     background-size: 100%
     padding-top: 1.125rem
+    -webkit-box-sizing: border-box
 
 .open_list
     width: 80%
@@ -195,7 +196,15 @@ html,body
     height: auto
     margin: 50px 10% 0 10%
     display: -webkit-box
+    display: -moz-box
+    display: -ms-box
+    display: -o-box
+    display: box
     -webkit-box-pack: justify
+    -moz-box-pack: justify
+    -ms-box-pack: justify
+    -o-box-pack: justify
+    box-pack: justify
     dl
         width: 35%
         dt
