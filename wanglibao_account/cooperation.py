@@ -10,6 +10,8 @@ import json
 import copy
 import hashlib
 import logging
+import StringIO
+import traceback
 from django.utils import timezone
 from django.db.models import Sum
 from django.contrib.auth.models import User
@@ -387,7 +389,7 @@ class CoopCallback(object):
         :param user_amo:
         :return:
         """
-        logger.info("%s enter register_call_back with user_amortization[%s]" % (self.channel.code, user_amo.id))
+        logger.info("%s enter amortization_push with user_amortization[%s]" % (self.channel.code, user_amo.id))
 
     def get_channel_processor(self, channel_code):
         """
@@ -410,8 +412,12 @@ class CoopCallback(object):
                 if channel_processor:
                     try:
                         channel_processor(channel).amortization_push(amo)
-                    except Exception, e:
-                        logger.info("%s raise error: %s" % (channel_processor.__name__, e))
+                    except:
+                        # 创建内存文件对象
+                        fp = StringIO.StringIO()
+                        traceback.print_exc(file=fp)
+                        message = fp.getvalue()
+                        logger.info("%s raise error: %s" % (channel_processor.__name__, message))
                 else:
                     logger.info("coop callback not found processor matched for user[%s]" % user_id)
             else:
@@ -642,6 +648,7 @@ class BaJinSheCallback(CoopCallback):
                 equity = P2PEquity.objects.filter(user=user, product=product).first()
                 user_phone = get_user_phone_for_coop(user_amo.user_id)
                 get_amortize_arg = {
+                    'product': product,
                     'equity': equity,
                     'bid': bid,
                     'user_phone': user_phone,
