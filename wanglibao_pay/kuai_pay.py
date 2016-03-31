@@ -1152,7 +1152,7 @@ class KuaiShortPay:
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
             if str(error_code) == str(self.ERR_CODE_WAITING):
                 error_code = '201181'
-                message = u'为保障交易安全，第三方支付通道将给您在银行预留手机号发送短信，请注意接收并回复内容，如有问题请联系客服4008-588－066'
+                error_message = u'为保障交易安全，第三方支付通道将给您在银行预留手机号发送短信，请注意接收并回复内容，如有问题请联系客服4008-588－066'
             return {"ret_code": error_code, "message": error_message, 'order_id':order_id, 'pay_info_id':payinfo_id}
         else:
             # 若TR3已经完成该交易，直接返回结果
