@@ -855,11 +855,13 @@ else:
     #KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
     #KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
 
-    KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
+    KUAI_PEM_PATH = os.path.join(CERT_DIR, "20411004511201290.pem")
     KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "kuai_pay_signature.pem")
-    KUAI_MER_ID = "104110045112012"
+    # KUAI_MER_ID = "104110045112012"
+    KUAI_MER_ID = "812331253110002"
     KUAI_MER_PASS = "vpos123"
-    KUAI_TERM_ID = "00002012"
+    # KUAI_TERM_ID = "00002012"
+    KUAI_TERM_ID = "33120009"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
