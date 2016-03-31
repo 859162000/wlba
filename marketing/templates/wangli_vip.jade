@@ -6,7 +6,7 @@ html
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/wangli_vip.css?v=201603312")
+        link(rel="stylesheet",href="/static/styles/pc_activity/wangli_vip.css?v=201603313")
         - csrf_token
     body(style="background:#fff")
         include global/g_nav
@@ -27,6 +27,32 @@ html
                     .view 查看详情
                 .slide_bottom
                     .main
+                        table
+                            thead
+                                th 级别名称
+                                th 待收本息
+                                th 有效期
+                            tbody
+                                tr
+                                    td 普通会员
+                                    td 投资满1千
+                                    td 终身
+                                tr
+                                    td V1会员
+                                    td 1万≤待收本息<5万
+                                    td 半年
+                                tr
+                                    td V2会员
+                                    td 5万≤待收本息<10万
+                                    td 半年
+                                tr
+                                    td V3会员
+                                    td 10万≤待收本息<50万
+                                    td 半年
+                                tr
+                                    td SVIP会员
+                                    td 50万及以上
+                                    td 半年
                         dl
                             dt 会员定级：
                             dd 完成实名认证并投资满1千元，可以成为网利宝终身会员；
