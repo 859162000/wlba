@@ -2,11 +2,11 @@
 # encoding:utf-8
 
 import json
-from datetime import datetime as dt
 import logging
 import hashlib
 import traceback
 import StringIO
+from datetime import datetime as dt
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from rest_framework.views import APIView
@@ -17,6 +17,7 @@ from django.http import Http404
 from marketing.models import Channels
 from marketing.utils import get_channel_record
 from django.conf import settings
+from wanglibao_account.tools import str_to_utc
 from wanglibao_account.utils import create_user
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_p2p.forms import P2PProductForm, P2PRecordForm
@@ -250,13 +251,13 @@ class CoopDataDispatchApi(APIView):
 
         if pay_info and margin_record:
             margin_record = json.loads(margin_record)
-            margin_record["create_time"] = dt.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
+            margin_record["create_time"] = str_to_utc(margin_record["create_time"])
             margin_record_form = MarginRecordForm(margin_record)
             if margin_record_form.is_valid():
                 pay_info = json.loads(pay_info)
                 margin_record = margin_record_form.save()
                 pay_info["margin_record"] = margin_record.id
-                pay_info["create_time"] = dt.strptime(pay_info["create_time"], '%Y-%m-%d %H:%M:%S')
+                pay_info["create_time"] = str_to_utc(pay_info["create_time"])
                 pay_info_form = PayInfoForm(pay_info)
                 if pay_info_form.is_valid():
                     pay_info = pay_info_form.save()
@@ -280,13 +281,13 @@ class CoopDataDispatchApi(APIView):
         margin_record = req_data.get("margin_record")
         if p2p_record and margin_record:
             margin_record = json.loads(margin_record) if margin_record else None
-            margin_record["create_time"] = dt.strptime(margin_record["create_time"], '%Y-%m-%d %H:%M:%S')
+            margin_record["create_time"] = str_to_utc(margin_record["create_time"])
             margin_record_form = MarginRecordForm(margin_record)
             if margin_record_form.is_valid():
                 p2p_record = json.loads(p2p_record) if p2p_record else None
                 margin_record = margin_record_form.save()
                 p2p_record["margin_record"] = margin_record.id
-                p2p_record["create_time"] = dt.strptime(p2p_record["create_time"], '%Y-%m-%d %H:%M:%S')
+                p2p_record["create_time"] = str_to_utc(p2p_record["create_time"])
                 p2p_record['user'] = p2p_record.get('user_id')
                 p2p_record_form = P2PRecordForm(p2p_record)
                 if p2p_record_form.is_valid():
@@ -377,14 +378,14 @@ class CoopDataDispatchApi(APIView):
         if products:
             products = json.loads(products)
             for product in products:
-                product['publish_time'] = dt.strptime(product['publish_time'], '%Y-%m-%d %H:%M:%S')
-                product['end_time'] = dt.strptime(product['end_time'], '%Y-%m-%d %H:%M:%S')
+                product['publish_time'] = str_to_utc(product['publish_time'])
+                product['end_time'] = str_to_utc(product['end_time'])
                 p_soldout_time = product.get('soldout_time', None)
                 p_make_loans_time = product.get('make_loans_time', None)
                 if p_soldout_time:
-                    product['soldout_time'] = dt.strptime(p_soldout_time, '%Y-%m-%d %H:%M:%S')
+                    product['soldout_time'] = str_to_utc(p_soldout_time)
                 if p_make_loans_time:
-                    product['make_loans_time'] = dt.strptime(p_make_loans_time, '%Y-%m-%d %H:%M:%S')
+                    product['make_loans_time'] = str_to_utc(p_make_loans_time)
 
                 product_instance = P2PProduct.objects.filter(pk=product['id']).first()
                 if product_instance:

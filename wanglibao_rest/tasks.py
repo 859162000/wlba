@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime as dt
 import logging
 from wanglibao.celery import app
 from marketing.utils import get_user_channel_record
+from wanglibao_account.tools import str_to_utc
 from wanglibao_account.cooperation import CoopCallback
 from wanglibao_p2p.models import P2PProduct, UserAmortization
 from wanglibao_p2p.forms import UserAmortizationForm
@@ -30,11 +30,11 @@ def process_amortize(amortizations, product_id):
         if amo_id:
             amo_instance = UserAmortization.objects.filter(pk=amo_id).first()
             if amo_instance:
-                amo['settlement_time'] = dt.strptime(amo['settlement_time'], '%Y-%m-%d %H:%M:%S')
+                amo['settlement_time'] = str_to_utc(amo['settlement_time'])
                 user_amo_form = UserAmortizationForm(amo, instance=amo_instance)
             else:
                 amo['product'] = p2p_product
-                amo['term_date'] = dt.strptime(amo['term_date'], '%Y-%m-%d %H:%M:%S')
+                amo['term_date'] = str_to_utc(amo['term_date'])
                 user_amo_form = UserAmortizationForm(amo)
 
             if user_amo_form.is_valid():
@@ -47,7 +47,7 @@ def process_amortize(amortizations, product_id):
                     user_amo.save()
                 user_amo_list.append(user_amo)
                 save_to_margin(amo)
-                if not user_amo.settled and user_amo.term == 1:
+                if user_amo.term == 1:
                     response_data = save_to_p2p_equity(amo)
             else:
                 logger.info("process_amortizations_push data[%s] invalid" % user_amo_form.errors)
