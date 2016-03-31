@@ -6,7 +6,7 @@ html
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/wangli_vip.css?v=201603311")
+        link(rel="stylesheet",href="/static/styles/pc_activity/wangli_vip.css?v=201603312")
         - csrf_token
     body(style="background:#fff")
         include global/g_nav
@@ -30,7 +30,7 @@ html
                         dl
                             dt 会员定级：
                             dd 完成实名认证并投资满1千元，可以成为网利宝终身会员；
-                            dd VIP和SVIP级别会员则是根据目前在投的定期产品的代收本息金额判断，当普通会员满足升级条件，将于次日升级，享受VIP和SVIP的相应待遇。
+                            dd VIP和SVIP级别会员则是根据目前在投的定期产品的待收本息金额判断，当普通会员满足升级条件，将于次日升级，享受VIP和SVIP的相应待遇。
                         dl.two
                             dt 会员有效期：
                             dd 普通会员有效期为终身，VIP和SVIP有效期均为半年，会员有效期内只升级不降级，有效期内升级的新级别，会员有效期仍为半年；
@@ -98,7 +98,7 @@ html
                     .title 会员权益说明
                     table
                         thead
-                            th 享有特权
+                            th.first 享有特权
                             th 普通会员
                             th VIP1
                             th VIP2
@@ -173,9 +173,9 @@ html
                                 td
                                     img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
                                 td
-                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
                                 td
-                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
                                 td
                                     img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
                                 td
@@ -185,9 +185,9 @@ html
                                 td
                                     img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
                                 td
-                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
                                 td
-                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
                                 td 优先
                                 td 优先
                             tr.white
@@ -336,8 +336,8 @@ html
                         dt 如何由新手变为普通会员？
                         dd 通过实名认证并投资满1000元可成为网利宝普通会员。
                     dl
-                        dt 代收本息满足升级标准是否可以立即成为VIP？
-                        dd 定期产品的代收本息，满足升级标准后，将于达到标准之后的次日升级。
+                        dt 待收本息满足升级标准是否可以立即成为VIP？
+                        dd 定期产品的待收本息，满足升级标准后，将于达到标准之后的次日升级。
                     dl
                         dt 会员升级后会收到多少的会员红包？
                         dd 会员有效期内的每月1日，系统自动发送对应的会员级别红包；用户在1日前升级的，收到的将是升级后的红包，红包不能叠加，升级后将不会收到升级前的红包。 例如：V3会员的会员红包是600元，4月1日收到100元现金红包，如果在4月30日时投资了40万升级到SVIP，5月1日将收到200元的现金红包；如果在1日当天才投的40万，那么收到的还是V3对应的100元现金红包。
@@ -355,5 +355,5 @@ html
 
         include global/g_footer
 script.
-    require(['/static/js/wangli_vip.js?v=2016003311'])
+    require(['/static/js/wangli_vip.js?v=2016003312'])
 
