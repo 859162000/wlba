@@ -2724,6 +2724,7 @@ org.checkIn = (function(org){
                                         lib.altDom.show();
                                     },1);
                                     $("div.bar-content").html('距离神秘礼包还有<span id="giftDay">'+ data.mysterious_day +'</span>天');
+                                    self.find(".text-item").text(lib.giftPosition + "天");
                                 }else{
                                     org.ui.alert(data.message);
                                 }
