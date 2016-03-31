@@ -1,20 +1,36 @@
 # coding=utf-8
 
 import json
-from datetime import datetime as dt
 from .models import P2PEquity
 from .forms import P2PEquityForm
+from wanglibao_account.tools import str_to_utc
 
 
 def save_to_p2p_equity(req_data):
     equity = req_data.get("equity", '')
     if equity:
         equity = json.loads(equity)
-        equity['confirm_at'] = dt.strptime(equity['confirm_at'], '%Y-%m-%d %H:%M:%S')
-        equity['created_at'] = dt.strptime(equity['created_at'], '%Y-%m-%d %H:%M:%S')
-        equity_form = P2PEquityForm(equity)
+        equity['created_at'] = str_to_utc(equity['created_at'])
+        if 'confirm_at' in equity:
+            equity['confirm_at'] = str_to_utc(equity['confirm_at'])
+        else:
+            equity['confirm_at'] = ''
+
+        equity_instance = P2PEquity.objects.filter(pk=equity['id']).first()
+        if equity_instance:
+            equity_form = P2PEquityForm(equity, instance=equity_instance)
+        else:
+            equity_form = P2PEquityForm(equity)
+
         if equity_form.is_valid():
-            equity_form.save()
+            if equity_instance:
+                equity_form.save()
+            else:
+                equity_instance = P2PEquity()
+                for k, v in equity.iteritems():
+                    setattr(equity_instance, k, v)
+                equity_instance.save()
+
             response_data = {
                 'ret_code': 10000,
                 'message': 'success',

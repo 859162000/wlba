@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
+import pytz
 import urllib
+from datetime import datetime as dt
+from wanglibao import settings
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import Client
@@ -56,3 +59,12 @@ def str_to_dict(s):
         pass
 
     return result
+
+
+def str_to_utc(dt_str, _format='%Y-%m-%d %H:%M:%S'):
+    """
+    将字符串转换成UTC时间
+    """
+
+    utc_dt = dt.strptime(dt_str, _format).replace(tzinfo=pytz.utc).astimezone(pytz.timezone(settings.TIME_ZONE))
+    return utc_dt
