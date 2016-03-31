@@ -2716,7 +2716,7 @@ class HappyMonkeyAPIView(APIView):
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         today = time.strftime("%Y-%m-%d", time.localtime())
-        user = user if user else request.user
+        user = user.user if user else request.user
         #今天用户已经玩过了
         reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).first()
         if reward:
@@ -2736,7 +2736,7 @@ class HappyMonkeyAPIView(APIView):
                     activity_code=self.token,
                     remain_chance=1)
 
-            total = request.POST.get('total', None)
+            total = int(request.POST.get('total', None))
             exp_name = ''
             for key, value in rewards.items():
                 if total>=key[0] and total<=key[1]:
@@ -2750,7 +2750,7 @@ class HappyMonkeyAPIView(APIView):
                 left_times=0,
                 join_times=1,)
 
-            SendExperienceGold(request.user).send(reward.experience.id)
+            SendExperienceGold(user).send(reward.experience.id)
             join_record.remain_chance = 0
             join_record.save()
             to_json_response = {
