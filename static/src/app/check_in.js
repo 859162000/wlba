@@ -147,12 +147,12 @@ org.checin_in = (function () {
                         itemStatus = giftStatus ?
                             "active-mysterious-open gist-mod "
                             :
-                            itemEnd - currentDay === 0? 'active-mysterious-active gist-mod shake ' :"active-mysterious gist-mod ";
+                            itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
                     }else{
                         itemStatus = giftStatus ?
-                            "active-gift-open "
+                            "active-gift-open gist-mod "
                             :
-                            itemEnd - currentDay === 0? 'active-gift-active gist-mod ' :"active-gift gist-mod ";
+                            itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
                     }
                 }
 
@@ -264,8 +264,8 @@ org.checin_in = (function () {
 
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
                             _self.steriousGift(data.mysterious_day)
-                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
-                            $('.active-mysterious-active').addClass('active-mysterious-open').removeClass('active-mysterious-active')
+                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active pulse')
+                            $('.active-mysterious-active').addClass('active-mysterious-open').removeClass('active-mysterious-active pulse')
                         });
                     }
                     if(data.ret_code < 0){
