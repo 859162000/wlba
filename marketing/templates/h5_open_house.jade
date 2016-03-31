@@ -61,6 +61,7 @@ html(style="width: 100%;height: auto;position: relative")
       span.triangle.triangle2
         img(src="/static/imgs/mobile_activity/h5_open_house/sanjiao.png")
     .h_house_login
+      .hezis
       +title("open_title2", "/static/imgs/mobile_activity/h5_open_house/ck_title.png", "open_p1", "The Registration Window")
       ul#lg_uls.open_list
         li
@@ -123,6 +124,8 @@ html(style="width: 100%;height: auto;position: relative")
     .dialog
       p 恭喜您，报名成功，报名截至后我们回抽取10名投资人组成“参观团”，并致电联系。
       a#dia_btn 确定
+    script(src='/static/src/mobile/lib/weixin/wx.js')
+    script(src="/static/scripts/component/webview.js?v=20151215")
     script(src="/static/scripts/mobile_activity/app_open_hous.js")
 
 
