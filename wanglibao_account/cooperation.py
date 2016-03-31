@@ -613,7 +613,7 @@ class BaJinSheCallback(CoopCallback):
             'profitMethods': profit_methods,
             'apr': product.expected_earning_rate,
             'state': state,
-            'purchases': timezone.localtime(equity.confirm_at).strftime('%Y%m%d%H%M%S'),
+            'purchases': timezone.localtime(equity.created_at).strftime('%Y%m%d%H%M%S'),
         }
 
         return act_data
