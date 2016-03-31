@@ -118,6 +118,7 @@ class P2PEquity(models.Model):
     confirm = models.BooleanField(u'确认成功', default=False)
     confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
+    unpaid_principal = models.DecimalField(u'P2P待收本金', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
     class Meta:
         unique_together = (('user', 'product'),)
