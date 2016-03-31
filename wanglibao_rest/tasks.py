@@ -25,32 +25,32 @@ def coop_common_callback(user_id, act, order_id=None):
 def process_amortize(amortizations, product_id):
     user_amo_list = list()
     for amo in amortizations:
-        amo_id = amo.get('id', None)
-        if amo_id:
-            amo_instance = UserAmortization.objects.filter(pk=amo_id).first()
-            if amo_instance:
-                amo['settlement_time'] = str_to_utc(amo['settlement_time'])
-                user_amo_form = UserAmortizationForm(amo, instance=amo_instance)
-            else:
-                amo['term_date'] = str_to_utc(amo['term_date'])
-                user_amo_form = UserAmortizationForm(amo)
+        user_id = amo.get('user_id')
+        term = amo.get('term')
+        amo_instance = UserAmortization.objects.filter(user_id=user_id, product_id=product_id, term=term).first()
+        if amo_instance:
+            amo['settlement_time'] = str_to_utc(amo['settlement_time'])
+            user_amo_form = UserAmortizationForm(amo, instance=amo_instance)
+        else:
+            amo['term_date'] = str_to_utc(amo['term_date'])
+            user_amo_form = UserAmortizationForm(amo)
 
-            if user_amo_form.is_valid():
-                if amo_instance:
-                    user_amo = user_amo_form.save()
-                else:
-                    p2p_product = P2PProduct.objects.get(pk=amo['product'])
-                    amo['product'] = p2p_product
-                    user_amo = UserAmortization()
-                    for k, v in amo.iteritems():
-                        setattr(user_amo, k, v)
-                    user_amo.save()
-                user_amo_list.append(user_amo)
-                save_to_margin(amo)
-                if user_amo.term == 1:
-                    response_data = save_to_p2p_equity(amo)
+        if user_amo_form.is_valid():
+            if amo_instance:
+                user_amo = user_amo_form.save()
             else:
-                logger.info("process_amortizations_push data[%s] invalid" % user_amo_form.errors)
+                p2p_product = P2PProduct.objects.get(pk=amo['product'])
+                amo['product'] = p2p_product
+                user_amo = UserAmortization()
+                for k, v in amo.iteritems():
+                    setattr(user_amo, k, v)
+                user_amo.save()
+            user_amo_list.append(user_amo)
+            save_to_margin(amo)
+            if user_amo.term == 1:
+                response_data = save_to_p2p_equity(amo)
+        else:
+            logger.info("process_amortizations_push data[%s] invalid" % user_amo_form.errors)
 
     if user_amo_list:
         CoopCallback().process_amortize_callback(user_amo_list)
