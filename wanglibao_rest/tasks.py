@@ -46,11 +46,13 @@ def process_amortize(amortizations, product_id):
                     setattr(user_amo, k, v)
                 user_amo.save()
             user_amo_list.append(user_amo)
-            save_to_margin(amo)
+            response_data = save_to_margin(amo)
+            logger.info("process_amortize save_to_margin amo[%s] result: %s" % (amo, response_data))
             if user_amo.term == 1:
                 response_data = save_to_p2p_equity(amo)
+                logger.info("process_amortize save_to_p2p_equity amo[%s] result: %s" % (amo, response_data))
         else:
-            logger.info("process_amortizations_push data[%s] invalid" % user_amo_form.errors)
+            logger.info("process_amortize data[%s] invalid" % user_amo_form.errors)
 
     if user_amo_list:
         CoopCallback().process_amortize_callback(user_amo_list)
