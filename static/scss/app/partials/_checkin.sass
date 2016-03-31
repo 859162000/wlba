@@ -7,6 +7,7 @@
 
 .check-in-operation
   display: -webkit-box
+  padding: 0 .5rem
 
 
 .checkin-op-share, .checkin-op-status
@@ -15,26 +16,32 @@
   -webkit-box-orient: horizontal
   -webkit-transform: translate3d(0,0,0)
   transform: translate3d(0,0,0)
+  background: #fff
+  padding: .9rem
+  border-radius: .1rem
+  @media only screen and (max-device-width: 321px)
+    padding: .5rem
 
 .checkin-op-status
-  -webkit-box-pack: end
-  margin-right: 1rem
+  margin-right: .5rem
 
 .checkin-op-share
   -webkit-box-pack: start
-  margin-left: 1rem
 
 .checkin-op-icon
   display: inline-block
   width: rem(90)
   height: rem(90)
+  @media only screen and (max-device-width: 321px)
+    width: rem(80)
+    height: rem(80)
   margin-right: .2rem
 
 .icon-status
-  background: url("/static/imgs/app/checkin/icon_checkin.png") no-repeat center
+  background: url("/static/imgs/app/checkin/icon_checkin.jpg") no-repeat center
   background-size: 100%
 .icon-share
-  background: url("/static/imgs/app/checkin/icon_share.png") no-repeat center
+  background: url("/static/imgs/app/checkin/icon_share.jpg") no-repeat center
   background-size: 100%
 
 .checkin-op-dec
@@ -203,6 +210,22 @@
     background-size: 93%
   .circle-item
     opacity: 0
+
+.active-mysterious, .active-mysterious-active
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/mysterious.png") no-repeat center
+    background-size: 105%
+  .circle-item
+    opacity: 0
+.active-mysterious-open
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/mysterious_active.png") no-repeat center
+    background-size: 105%
+  .circle-item
+    opacity: 0
+
+
+
 .check-in-rules-layout
   padding: 0 1rem
   font-size: .6rem
@@ -349,6 +372,19 @@
     animation-fill-mode: forwards
     -webkit-animation-fill-mode: forwards
 
+  
+.shake
+  .circle-item-warp
+    animation-name: bounceInDown
+    -webkit-animation-name: bounceInDown
+    animation-duration: 1s
+    -webkit-animation-duration: 1s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
 
 @-webkit-keyframes flipInX
   from
@@ -401,3 +437,70 @@
   to
     -webkit-transform: perspective(400px)
     transform: perspective(400px)
+
+@-webkit-keyframes bounceInDown 
+  from, 60%, 75%, 90%, to 
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+  
+
+  0% 
+    opacity: 0
+    -webkit-transform: translate3d(0, -3000px, 0)
+    transform: translate3d(0, -3000px, 0)
+  
+
+  60% 
+    opacity: 1
+    -webkit-transform: translate3d(0, 25px, 0)
+    transform: translate3d(0, 25px, 0)
+  
+
+  75% 
+    -webkit-transform: translate3d(0, -10px, 0)
+    transform: translate3d(0, -10px, 0)
+  
+
+  90% 
+    -webkit-transform: translate3d(0, 5px, 0)
+    transform: translate3d(0, 5px, 0)
+  
+
+  to 
+    -webkit-transform: none
+    transform: none
+  
+
+
+@keyframes bounceInDown 
+  from, 60%, 75%, 90%, to 
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+  
+
+  0% 
+    opacity: 0
+    -webkit-transform: translate3d(0, -3000px, 0)
+    transform: translate3d(0, -3000px, 0)
+  
+
+  60% 
+    opacity: 1
+    -webkit-transform: translate3d(0, 25px, 0)
+    transform: translate3d(0, 25px, 0)
+  
+
+  75% 
+    -webkit-transform: translate3d(0, -10px, 0)
+    transform: translate3d(0, -10px, 0)
+  
+
+  90% 
+    -webkit-transform: translate3d(0, 5px, 0)
+    transform: translate3d(0, 5px, 0)
+  
+
+  to 
+    -webkit-transform: none
+    transform: none
+  
