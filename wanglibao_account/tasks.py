@@ -240,8 +240,9 @@ def caimiao_platform_post_task():
     向菜苗发送平台基本信息
     :return:
     """
-    from wanglibao_account.cooperation import caimiao_post_platform_info
-    caimiao_post_platform_info()
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import caimiao_post_platform_info
+        caimiao_post_platform_info()
 
 
 @app.task
@@ -251,8 +252,9 @@ def caimiao_p2p_info_post_task():
     向菜苗发送新标信息
     :return:
     """
-    from wanglibao_account.cooperation import caimiao_post_p2p_info
-    caimiao_post_p2p_info()
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import caimiao_post_p2p_info
+        caimiao_post_p2p_info()
 
 
 @app.task
@@ -262,8 +264,9 @@ def caimiao_volumes_info_post_task():
     向菜苗发送成交量
     :return:
     """
-    from wanglibao_account.cooperation import caimiao_post_volumes_info
-    caimiao_post_volumes_info()
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import caimiao_post_volumes_info
+        caimiao_post_volumes_info()
 
 
 @app.task
@@ -273,8 +276,9 @@ def caimiao_rating_info_post_task():
     向菜苗发送网贷评级数据
     :return:
     """
-    from wanglibao_account.cooperation import caimiao_post_rating_info
-    caimiao_post_rating_info()
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import caimiao_post_rating_info
+        caimiao_post_rating_info()
 
 
 @app.task
