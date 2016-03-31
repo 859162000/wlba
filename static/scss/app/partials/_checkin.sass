@@ -385,6 +385,18 @@
     -webkit-animation-iteration-count: 1
     animation-fill-mode: forwards
     -webkit-animation-fill-mode: forwards
+.pulse
+  .circle-item-warp
+    animation-name: pulse
+    -webkit-animation-name: pulse
+    animation-duration: 1s
+    -webkit-animation-duration: 1s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-iteration-count: infinite
+    -webkit-animation-iteration-count: infinite
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
 
 @-webkit-keyframes flipInX
   from
@@ -503,4 +515,36 @@
   to 
     -webkit-transform: none
     transform: none
+  
+@-webkit-keyframes pulse 
+  from 
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+  
+
+  50% 
+    -webkit-transform: scale3d(1.1, 1.1, 1.1)
+    transform: scale3d(1.1, 1.1, 1.1)
+  
+
+  to 
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+  
+
+
+@keyframes pulse 
+  from 
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+  
+
+  50% 
+    -webkit-transform: scale3d(1.1, 1.1, 1.1)
+    transform: scale3d(1.1, 1.1, 1.1)
+  
+
+  to 
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
   

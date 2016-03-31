@@ -366,12 +366,12 @@ org.checin_in = (function () {
                         itemStatus = giftStatus ?
                             "active-mysterious-open gist-mod "
                             :
-                            itemEnd - currentDay === 0? 'active-mysterious-active gist-mod shake ' :"active-mysterious gist-mod ";
+                            itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
                     }else{
                         itemStatus = giftStatus ?
                             "active-gift-open "
                             :
-                            itemEnd - currentDay === 0? 'active-gift-active gist-mod ' :"active-gift gist-mod ";
+                            itemEnd - currentDay === 0? 'active-gift gist-mod pulse ' :"active-gift gist-mod ";
                     }
                 }
 
