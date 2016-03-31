@@ -2755,6 +2755,7 @@ class HappyMonkeyAPIView(APIView):
             join_record.save()
             to_json_response = {
                 'ret_code': 0,
+                'type':exp_name,
                 'message': u'用户已经获得%s体验金' % reward.experience.amount,
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
