@@ -33,7 +33,7 @@ def process_amortize(amortizations, product_id):
                 amo['settlement_time'] = str_to_utc(amo['settlement_time'])
                 user_amo_form = UserAmortizationForm(amo, instance=amo_instance)
             else:
-                amo['product'] = p2p_product
+                amo['product'] = product_id
                 amo['term_date'] = str_to_utc(amo['term_date'])
                 user_amo_form = UserAmortizationForm(amo)
 
