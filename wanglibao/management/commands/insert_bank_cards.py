@@ -57,7 +57,19 @@ def check_cards():
         except Exception, error :
                 print error, card.no, card.bank.name
 
-
 class Command(BaseCommand):
     def handle(self, *args, **options):
         insert_bank_cards()
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> 5269534... feature: check card bank for kuai, finish data
