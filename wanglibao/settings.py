@@ -640,10 +640,10 @@ CELERYBEAT_SCHEDULE = {
     },
 
     #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
-    'handle_delay_time_data': {
-        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
-        'schedule': timedelta(minutes=3)
-    },
+    # 'handle_delay_time_data': {
+    #     'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+    #     'schedule': timedelta(minutes=3)
+    # },
 
     # by Zhoudong 菜苗上报平台信息.
     'caimiao_platform_post': {
@@ -668,7 +668,7 @@ CELERYBEAT_SCHEDULE = {
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
         'task': 'wanglibao_redpack.tasks.update_virtual_earning',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=30, hour=1)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
     'zhongjin_send_data': {
