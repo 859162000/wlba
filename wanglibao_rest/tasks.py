@@ -24,7 +24,6 @@ def coop_common_callback(user_id, act, order_id=None):
 @app.task
 def process_amortize(amortizations, product_id):
     user_amo_list = list()
-    p2p_product = P2PProduct.objects.get(pk=product_id)
     for amo in amortizations:
         amo_id = amo.get('id', None)
         if amo_id:
@@ -33,7 +32,6 @@ def process_amortize(amortizations, product_id):
                 amo['settlement_time'] = str_to_utc(amo['settlement_time'])
                 user_amo_form = UserAmortizationForm(amo, instance=amo_instance)
             else:
-                amo['product'] = product_id
                 amo['term_date'] = str_to_utc(amo['term_date'])
                 user_amo_form = UserAmortizationForm(amo)
 
