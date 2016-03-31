@@ -484,7 +484,7 @@ class BaJinSheCallback(CoopCallback):
         if data and bid:
             margin_record = MarginRecord.objects.filter(user_id=user_id, order_id=order_id).first()
             if margin_record:
-                user = User.objects.filter(pk=user_id).first()
+                user = User.objects.filter(pk=user_id).select_related('margin').first()
                 act_data = {
                     'bingdingUid': bid,
                     'usn': get_user_phone_for_coop(user_id),
@@ -562,7 +562,7 @@ class BaJinSheCallback(CoopCallback):
         if data and bid:
             margin_record = MarginRecord.objects.filter(user_id=user_id, order_id=order_id).first()
             if margin_record:
-                user = User.objects.filter(pk=user_id).first()
+                user = User.objects.filter(pk=user_id).select_related('margin').first()
                 act_data = {
                     'bingdingUid': bid,
                     'usn': get_user_phone_for_coop(user_id),
@@ -632,7 +632,7 @@ class BaJinSheCallback(CoopCallback):
             data = get_bajinshe_base_data(order_id)
             bid = get_tid_for_coop(user_amo.user_id)
             if data and bid:
-                user = User.objects.filter(pk=user_amo.user_id).first()
+                user = User.objects.filter(pk=user_amo.user_id).select_related('margin').first()
                 product = user_amo.product
                 period = product.period
                 pay_method = product.pay_method

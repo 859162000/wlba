@@ -105,6 +105,7 @@ class P2PEquityForm(forms.ModelForm):
     confirm = forms.CharField(label=u'确认成功', error_messages={'required': u'请输入确认成功'})
     confirm_at = forms.CharField(label=u'份额确认时间', required=False)
     created_at = forms.CharField(label=u'创建时间', error_messages={'required': u'请输入创建时间'})
+    unpaid_principal = forms.CharField(label=u'待收本金', error_messages={'required': u'请输入待收本金'})
 
     class Meta:
         model = P2PEquity
