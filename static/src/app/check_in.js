@@ -150,7 +150,7 @@ org.checin_in = (function () {
                             itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
                     }else{
                         itemStatus = giftStatus ?
-                            "active-gift-open "
+                            "active-gift-open gist-mod "
                             :
                             itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
                     }
