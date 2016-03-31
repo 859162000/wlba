@@ -12,10 +12,8 @@ def save_to_p2p_equity(req_data):
     if equity:
         equity = json.loads(equity)
         equity['created_at'] = str_to_utc(equity['created_at'])
-        if 'confirm_at' in equity:
+        if equity['created_at']:
             equity['confirm_at'] = str_to_utc(equity['confirm_at'])
-        else:
-            equity['confirm_at'] = ''
 
         equity_instance = P2PEquity.objects.filter(pk=equity['id']).first()
         if equity_instance:
