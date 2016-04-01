@@ -292,21 +292,27 @@ var wlb = (function (pubsub) {
         }
 
         function websocket(callback) {
+
             var host = dics.debug.host;
 
             host = host == '' ? 'localhost' : host;
-            socket = new WebSocket('ws://' + host + ':3000');
+            try{
+                var socket = new WebSocket('ws://' + host + ':3000');
 
-            socket.onopen = function () {
-                pubsub.subscribe('log', function (topics, result) {
-                    socket.send(JSON.stringify({type: result.type, message: result.message}));
-                });
-                callback && callback()
-            };
-            socket.onmessage = function (ev) {
-                var obj = JSON.parse(ev.data);
-                alert(obj.message)
+                socket.onopen = function () {
+                    pubsub.subscribe('log', function (topics, result) {
+                        socket.send(JSON.stringify({type: result.type, message: result.message}));
+                    });
+                    callback && callback()
+                };
+                socket.onmessage = function (ev) {
+                    var obj = JSON.parse(ev.data);
+                    alert(obj.message)
+                }
+            }catch(e){
+                console.log('当前环境无法调试，请在本地局域网内')
             }
+
         }
     }
 
@@ -317,7 +323,7 @@ var wlb = (function (pubsub) {
 })(pubsub);
 
 //wlb.ready({
-//    
+//
 //    debug: {
 //      switch: true  //debug开关
 //      host: '',    //本地ip
