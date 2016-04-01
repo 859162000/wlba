@@ -330,12 +330,14 @@ class GetSignShareInfo(APIView):
                 if activity.days >= today_should_recycle_continue_days:
                     nextDayNote=activity.days
                     sign_info['continueGiftFetched']=False
+                    sign_info['isMysteriGift'] = False
                     if activity.days == today_should_recycle_continue_days:
                         reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, create_date=today, user=user).first()
                         if reward_record and reward_record.status:
                             sign_info['continueGiftFetched']=reward_record.status#是否已经领取神秘礼物
                             if maxDayNote == activity.days:
                                 sign_info['mysterious_day'] = maxDayNote
+                                sign_info['isMysteriGift'] = True
                     break
                 start_day = activity.days + 1
 
