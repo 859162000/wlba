@@ -296,22 +296,23 @@ var wlb = (function (pubsub) {
             var host = dics.debug.host;
 
             host = host == '' ? 'localhost' : host;
+            try{
+                var socket = new WebSocket('ws://' + host + ':3000');
 
-            var tmpTag = 'https:' == document.location.protocol ?  true : false;
-
-            var link = tmpTag ? ('wss://' + host + ':3000') : ('ws://' + host + ':3000');
-            socket = new WebSocket(link);
-
-            socket.onopen = function () {
-                pubsub.subscribe('log', function (topics, result) {
-                    socket.send(JSON.stringify({type: result.type, message: result.message}));
-                });
-                callback && callback()
-            };
-            socket.onmessage = function (ev) {
-                var obj = JSON.parse(ev.data);
-                alert(obj.message)
+                socket.onopen = function () {
+                    pubsub.subscribe('log', function (topics, result) {
+                        socket.send(JSON.stringify({type: result.type, message: result.message}));
+                    });
+                    callback && callback()
+                };
+                socket.onmessage = function (ev) {
+                    var obj = JSON.parse(ev.data);
+                    alert(obj.message)
+                }
+            }catch(e){
+                console.log('当前环境无法调试，请在本地局域网内')
             }
+
         }
     }
 
