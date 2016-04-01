@@ -122,6 +122,7 @@ urlpatterns += patterns(
     url(r'^app_scratch_copy/$', TemplateView.as_view(template_name="app_scratch_copy.jade")),
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
     url(r'^app_open_house/$', TemplateView.as_view(template_name="app_open_house.jade")),
+    url(r'^h5_open_house/$', TemplateView.as_view(template_name="h5_open_house.jade")),
 
 
     url(r'^app_eight_gift_two/$', TemplateView.as_view(template_name="app_eight_gift_two.jade")),
