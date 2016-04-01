@@ -335,7 +335,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
                         $('.popup_box .text').text('恭喜您获得'+data1.redpack.amount+'元红包');
                         $('.popup_box .popup_button').show();
-
+                        chance_num--;
+                        $('#chance_num').text(chance_num);
                         time_count2 = 2;
                         time_intervalId2 = setInterval(timerFunction2, 1000);
                         time_intervalId2;
@@ -403,8 +404,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
                         if(chance_num>0){
                             if(!$(this).find('.card').hasClass('card_box_open')){
-                                chance_num--;
-                                $('#chance_num').text(chance_num);
                                 luck_draw();
                                 //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
                                 //$(this).find('.card').addClass('card_box_open');
@@ -443,8 +442,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     chance_num = $('#chance_num').text();
                     if(chance_num>0){
                         if(!$(this).find('.card').hasClass('card_box_open')){
-                            chance_num--;
-                            $('#chance_num').text(chance_num);
+
                             luck_draw();
                             //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
                             //$(this).find('.card').addClass('card_box_open');

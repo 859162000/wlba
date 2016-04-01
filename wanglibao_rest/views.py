@@ -1800,6 +1800,10 @@ class OauthUserRegisterApi(APIView):
                     'ret_code': 10010,
                     'message': form_error,
                 }
+
+                if response_data['message'] == u'该手机号已经注册':
+                    if channel_code == 'renrenli':
+                        response_data['ret_code'] = 100
         else:
             response_data = {
                 'ret_code': 50002,
