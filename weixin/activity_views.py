@@ -328,8 +328,10 @@ class GetSignShareInfo(APIView):
                     today_should_recycle_continue_days = sign_info['today_should_continue_days'] % maxDayNote
             if maxDayNote==recycle_continue_days and recycle_continue_days != today_should_recycle_continue_days:
                 sign_info['mysterious_day'] = maxDayNote
+                sign_info['current_day'] = 0
             else:
                 sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
+                sign_info['current_day'] = recycle_continue_days
 
             for activity in activities:
                 if activity.days >= today_should_recycle_continue_days:
@@ -345,10 +347,7 @@ class GetSignShareInfo(APIView):
                 start_day = activity.days + 1
             sign_info['isMysteriGift'] = maxDayNote==today_should_recycle_continue_days
 
-            # needDays = nextDayNote-recycle_continue_days
             sign_info['nextDayNote'] = nextDayNote#下一个神秘礼物在第几天
-            # sign_info['needDays'] = needDays
-            sign_info['current_day'] = recycle_continue_days#当前是连续签到活动的第几天
             sign_info['start_day'] = start_day
 
         share_info = data.setdefault('share', {})
