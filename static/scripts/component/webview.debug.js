@@ -292,14 +292,14 @@ var wlb = (function (pubsub) {
         }
 
         function websocket(callback) {
-            var host = dics.debug.host, link;
+
+            var host = dics.debug.host;
 
             host = host == '' ? 'localhost' : host;
-            if(host == 'staging.wanglibao.com'){
-                link = 'wss://' + host + ':3000'
-            }else{
-                link = 'ws://' + host + ':3000'
-            }
+
+            var tmpTag = 'https:' == document.location.protocol ?  true : false;
+
+            var link = tmpTag ? ('wss://' + host + ':3000') : ('ws://' + host + ':3000');
             socket = new WebSocket(link);
 
             socket.onopen = function () {
