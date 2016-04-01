@@ -364,12 +364,12 @@ org.checin_in = (function () {
                     //礼物所在天数
                     if(mysterious_section){
                         itemStatus = giftStatus ?
-                            "active-mysterious-open gist-mod "
+                            "active-mysterious-open gist-mod active-did "
                             :
                             itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
                     }else{
                         itemStatus = giftStatus ?
-                            "active-gift-open gist-mod "
+                            "active-gift-open gist-mod active-did "
                             :
                             itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
                     }
@@ -402,12 +402,14 @@ org.checin_in = (function () {
             var _self = this, resultCopy = result.data.sign_in;
 
             //连续签到日
-            var update_current_day = resultCopy.today_should_continue_days;
+            var update_current_day = resultCopy.current_day;
             var steriousGift_days = resultCopy.mysterious_day;
 
             //当日是否签到
             if(!resultCopy.status){
                 _self.checkInOpeartion('sign_in', function(data){
+                    //更新天数
+                    update_current_day++
 
                     if(data.data.status){
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
@@ -483,6 +485,7 @@ org.checin_in = (function () {
 
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
                             _self.steriousGift(data.mysterious_day)
+                            $('.active-gift-active, .active-mysterious-active').find('.text-item').text(days+ '天');
                             $('.active-gift-active').addClass('active-gift-open active-doing ').removeClass('active-gift-active pulse')
                             $('.active-mysterious-active').addClass('active-mysterious-open active-doing').removeClass('active-mysterious-active pulse')
                         });
