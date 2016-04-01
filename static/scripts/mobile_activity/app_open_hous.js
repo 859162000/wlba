@@ -285,7 +285,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://staging.wanglibao.com/',
+		var host = 'https://www.wanglibao.com/',
 			shareImg = host + '/static/imgs/mobile_activity/h5_open_house/banner.jpg',
 			shareLink = host + '/activity/h5_open_house/',
 			shareMainTit = '网利宝开放日开始报名啦',
