@@ -317,9 +317,10 @@ var wlb = (function (pubsub) {
 })(pubsub);
 
 //wlb.ready({
+//    
 //    debug: {
-//      switch: true
-//      host: '',
+//      switch: true  //debug开关
+//      host: '',    //本地ip
 //    },
 //    app: function(mixins){
 //        回调参数是app接口实例对象.

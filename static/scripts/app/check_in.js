@@ -258,15 +258,6 @@ org.checin_in = (function () {
         limit_gift: false,
         init: function(mixins){
             lib.appShare = mixins;
-<<<<<<< HEAD
-
-=======
-            try{
-                lib.appShare.firstLoadWebView({name: 'signIn'});
-            }catch(e){
-
-            }
->>>>>>> debug
             lib.fetch();
 
         },
