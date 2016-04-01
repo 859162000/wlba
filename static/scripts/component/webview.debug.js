@@ -3,7 +3,48 @@
  * last update 2016-3-27
  */
 
-var wlb = (function () {
+var pubsub = {};
+
+(function (q) {
+
+    var topics = {},
+        subUid = -1;
+    q.publish = function (topic, args) {
+
+        if (!topics[topic]) {
+            return false;
+        }
+
+        setTimeout(function () {
+            var subscribers = topics[topic],
+                len = subscribers ? subscribers.length : 0;
+
+            while (len--) {
+                subscribers[len].func(topic, args);
+            }
+        }, 0);
+
+        return true;
+
+    };
+
+    q.subscribe = function (topic, func) {
+
+        if (!topics[topic]) {
+            topics[topic] = [];
+        }
+
+        var token = (++subUid).toString();
+        topics[topic].push({
+            token: token,
+            func: func
+        });
+        return token;
+    };
+}(pubsub));
+
+
+var wlb = (function (pubsub) {
 
     var unique;
 
@@ -11,24 +52,24 @@ var wlb = (function () {
         this.bridge = bridge;  //WebViewJavascriptBridge对象
     }
 
-    Mixin.isAPP= function(){
+    Mixin.isAPP = function () {
         var u = navigator.userAgent;
-        if(u.indexOf('wlbAPP') > -1){
+        if (u.indexOf('wlbAPP') > -1) {
             return true
         }
         return false
     };
 
-    Mixin.filterJSON = function(target){
+    Mixin.filterJSON = function (target) {
         var
             u = navigator.userAgent,
             toString = Object.prototype.toString,
             newJSON = target;
 
-        if(u.indexOf('Android') > -1 && toString.call(newJSON) == '[object String]'){
-            try{
+        if (u.indexOf('Android') > -1 && toString.call(newJSON) == '[object String]') {
+            try {
                 newJSON = eval("(" + target + ")");
-            }catch(e){
+            } catch (e) {
                 return newJSON
             }
         }
@@ -46,6 +87,7 @@ var wlb = (function () {
             var data = {'post': {}, 'callback': null};
             var toString = Object.prototype.toString;
 
+
             if (toString.call(ops) == '[object Object]') {
                 for (var p in ops) {
                     data.post[p] = ops[p];
@@ -58,6 +100,7 @@ var wlb = (function () {
             }
 
             data.callback = toString.call(callback) == '[object Function]' ? callback : null;
+
             return data
         },
         /**
@@ -125,7 +168,7 @@ var wlb = (function () {
         authenticated: function (data, callback) {
             var options = this._setData(data, callback);
             this.bridge.callHandler('authenticated', options.post, function (response) {
-                var responseData  = Mixin.filterJSON(response);
+                var responseData = Mixin.filterJSON(response);
                 options.callback && options.callback(responseData);
             });
         },
@@ -144,16 +187,16 @@ var wlb = (function () {
          * @param data 自定义分享信息
          * @param callback 回调 {title: 活动标题, content: 活动描述, shareUrl:'指定分享的url', image: ''}
          */
-        touchShare: function(data, callback){
+        touchShare: function (data, callback) {
             var options = this._setData(data, callback);
             this.bridge.callHandler('touchShare', options.post, function (response) {
-                var responseData  = Mixin.filterJSON(response);
+                var responseData = Mixin.filterJSON(response);
                 options.callback && options.callback(responseData);
             });
         },
-        shareStatus: function(callback){
+        shareStatus: function (callback) {
             this.bridge.registerHandler('shareStatus', function (backdata, responseCallback) {
-                var responseData  = Mixin.filterJSON(backdata);
+                var responseData = Mixin.filterJSON(backdata);
                 callback && callback(responseData)
             });
         },
@@ -166,15 +209,16 @@ var wlb = (function () {
             var options = this._setData(data, callback);
 
             this.bridge.callHandler('sendUserInfo', {}, function (response) {
+                var responseData = Mixin.filterJSON(response);
 
-                var responseData  = Mixin.filterJSON(response);
                 options.callback && options.callback(responseData);
+
             });
         }
     }
 
-    function getMixin(bridge){
-        if( unique === undefined ){
+    function getMixin(bridge) {
+        if (unique === undefined) {
             unique = new Mixin(bridge);
         }
         return unique;
@@ -187,36 +231,82 @@ var wlb = (function () {
          * 检查user-agent： 如果是app就保持侦听
          *
          */
-        function listen(){
-            if(Mixin.isAPP()){
+        var debug  =  dics.debug ? (dics.debug.switch || false) : false;
 
-                if(window.WebViewJavascriptBridge){
+        var socket;
+        if (debug) websocket(listen);
+
+        function listen() {
+            if (Mixin.isAPP()) {
+                if (window.WebViewJavascriptBridge) {
                     run({callback: 'app', data: WebViewJavascriptBridge});
-                }else{
+                } else {
                     document.addEventListener('WebViewJavascriptBridgeReady', function () {
                         run({callback: 'app', data: WebViewJavascriptBridge})
                     }, false)
                 }
-            }else{
+            } else {
                 run({callback: 'other', data: null})
             }
         }
 
-        listen();
+        if (!debug) listen();
 
         function run(target) {
             var mixins;
 
+            if (debug) pubsub.publish('log', {type: 'success', message: '当前执行环境为:' + target.callback});
+
             if (target.callback && target.callback == 'app') {
                 mixins = getMixin(target.data);
+                if (debug) Interception(mixins);
                 mixins._init();
             }
             try {
+
+                if (debug) pubsub.publish('log', {type: 'success', message: '执行回调:' + target.callback});
                 dics[target.callback](mixins);
+
             } catch (e) {
-                console.log('请传入正确的参数格式如{app: function(){}, other: function(){}}, 目前缺少 ' + target.callback);
+                if (debug) pubsub.publish('log', {type: 'error', message: '异常:' + target.callback});
             }
 
+        }
+
+        function Interception(albert) {
+
+            for (var property in  albert) {
+
+                (function (property) {
+
+                    var original = albert[property];
+                    if (typeof original === 'function') {
+                        albert[property] = function (data, callback) {
+                            pubsub.publish('log', {type: 'success',  message: '开始动作:' + property + '\n接收参数:\ndata:' + data + "\ncallback:" + callback});
+                            return original.call(albert, data, callback);
+                        };
+                    }
+
+                })(property)
+            }
+        }
+
+        function websocket(callback) {
+            var host = dics.debug.host;
+
+            host = host == '' ? 'localhost' : host;
+            socket = new WebSocket('ws://' + host + ':3000');
+
+            socket.onopen = function () {
+                pubsub.subscribe('log', function (topics, result) {
+                    socket.send(JSON.stringify({type: result.type, message: result.message}));
+                });
+                callback && callback()
+            };
+            socket.onmessage = function (ev) {
+                var obj = JSON.parse(ev.data);
+                alert(obj.message)
+            }
         }
     }
 
@@ -224,14 +314,18 @@ var wlb = (function () {
         ready: ready
     }
 
-})();
+})(pubsub);
 
- //wlb.ready({
- //    app: function(mixins){
- //        回调参数是app接口实例对象.
- //        console.log('app场景')
- //    },
- //    other: function(){
- //       console.log('其他场景的业务逻辑')
- //    }
- //})
+//wlb.ready({
+//    debug: {
+//      switch: true
+//      host: '',
+//    },
+//    app: function(mixins){
+//        回调参数是app接口实例对象.
+//        console.log('app场景')
+//    },
+//    other: function(){
+//       console.log('其他场景的业务逻辑')
+//    }
+//})
