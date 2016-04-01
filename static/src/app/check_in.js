@@ -137,8 +137,8 @@ org.checin_in = (function () {
                     itemStatus += " active-doing"
                 }
 
-                if(currentDay + mysterious_day == itemEnd){
-                    mysterious_section = true
+                if(i == itemEnd){
+                    if(resultCopy.isMysteriGift)  mysterious_section = true
                 }
 
                 if(i == itemEnd){
@@ -183,18 +183,16 @@ org.checin_in = (function () {
             var _self = this, resultCopy = result.data.sign_in;
 
             //连续签到日
-            var current_day = resultCopy.current_day;
+            var update_current_day = resultCopy.today_should_continue_days;
             var steriousGift_days = resultCopy.mysterious_day;
 
             //当日是否签到
             if(!resultCopy.status){
                 _self.checkInOpeartion('sign_in', function(data){
-                    //签到成功更新连续签到日
-                    current_day++;
 
                     if(data.data.status){
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
-                            triggerUI(current_day)
+                            triggerUI(update_current_day)
                             _self.signIn(true, data.data.experience_amount)
                             _self.steriousGift(steriousGift_days - 1);
                         })
@@ -204,8 +202,10 @@ org.checin_in = (function () {
                     function triggerUI(count){
                         $.each($('.flag-items'), function(){
                             if($(this).attr('data-continue') * 1 == count){
-                                if($(this).hasClass('active-gift')){
-                                    $(this).addClass('active-gift-active').removeClass('active-gift').siblings('.flag-items').removeClass('active-doing');
+                                if($(this).hasClass('active-gift')) {
+                                    $(this).addClass('active-gift-active pulse').removeClass('active-gift').siblings('.flag-items').removeClass('active-doing');
+                                }else if($(this).hasClass('active-mysterious')){
+                                    $(this).addClass('active-mysterious-active pulse').removeClass('active-mysterious').siblings('.flag-items').removeClass('active-doing');
                                 }else{
                                     $(this).addClass('active-did active-doing').siblings('.flag-items').removeClass('active-doing')
                                 }
@@ -219,14 +219,14 @@ org.checin_in = (function () {
 
             var giftDay  = null;
             $('.gist-mod').on('click', function(){
-                giftDay = resultCopy.nextDayNote - current_day;
+                giftDay = resultCopy.nextDayNote - update_current_day;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
                         org.ui.alert('礼物已经领取过了！')
                     }else{
                         if(!_self.limit_click){
                             _self.limit_click =true;
-                            _self.fetchGift(current_day)
+                            _self.fetchGift(update_current_day)
                         }
                     }
                 }else if(giftDay > 0){
@@ -264,8 +264,8 @@ org.checin_in = (function () {
 
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
                             _self.steriousGift(data.mysterious_day)
-                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active pulse')
-                            $('.active-mysterious-active').addClass('active-mysterious-open').removeClass('active-mysterious-active pulse')
+                            $('.active-gift-active').addClass('active-gift-open active-doing ').removeClass('active-gift-active pulse')
+                            $('.active-mysterious-active').addClass('active-mysterious-open active-doing').removeClass('active-mysterious-active pulse')
                         });
                     }
                     if(data.ret_code < 0){
@@ -287,7 +287,7 @@ org.checin_in = (function () {
                     _self.share(data)
                     _self.steriousGift(data.data.sign_in.mysterious_day)
                     _self.process(data)
-                    //_self.checkIn(data)
+                    _self.checkIn(data)
                 }
             })
         },
