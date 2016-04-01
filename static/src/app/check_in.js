@@ -287,7 +287,7 @@ org.checin_in = (function () {
                     _self.share(data)
                     _self.steriousGift(data.data.sign_in.mysterious_day)
                     _self.process(data)
-                    _self.checkIn(data)
+                    //_self.checkIn(data)
                 }
             })
         },
