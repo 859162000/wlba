@@ -4,11 +4,11 @@
  */
 
 var pubsub = {};
+
 (function (q) {
 
-    var topics = {}, // 回调函数存放的数组
+    var topics = {},
         subUid = -1;
-    // 发布方法
     q.publish = function (topic, args) {
 
         if (!topics[topic]) {
@@ -27,7 +27,7 @@ var pubsub = {};
         return true;
 
     };
-    //订阅方法
+
     q.subscribe = function (topic, func) {
 
         if (!topics[topic]) {
@@ -40,20 +40,6 @@ var pubsub = {};
             func: func
         });
         return token;
-    };
-    //退订方法
-    q.unsubscribe = function (token) {
-        for (var m in topics) {
-            if (topics[m]) {
-                for (var i = 0, j = topics[m].length; i < j; i++) {
-                    if (topics[m][i].token === token) {
-                        topics[m].splice(i, 1);
-                        return token;
-                    }
-                }
-            }
-        }
-        return false;
     };
 }(pubsub));
 
@@ -245,9 +231,10 @@ var wlb = (function (pubsub) {
          * 检查user-agent： 如果是app就保持侦听
          *
          */
-        var debug = dics.debug || false;
+        var debug  =  dics.debug ? (dics.debug.switch || false) : false;
+
         var socket;
-        if (debug) websocket();
+        if (debug) websocket(listen);
 
         function listen() {
             if (Mixin.isAPP()) {
@@ -263,8 +250,7 @@ var wlb = (function (pubsub) {
             }
         }
 
-
-        listen();
+        if (!debug) listen();
 
         function run(target) {
             var mixins;
@@ -305,13 +291,17 @@ var wlb = (function (pubsub) {
             }
         }
 
-        function websocket() {
-            socket = new WebSocket('ws://192.168.20.145:3000');
+        function websocket(callback) {
+            var host = dics.debug.host;
+
+            host = host == '' ? 'localhost' : host;
+            socket = new WebSocket('ws://' + host + ':3000');
 
             socket.onopen = function () {
                 pubsub.subscribe('log', function (topics, result) {
                     socket.send(JSON.stringify({type: result.type, message: result.message}));
                 });
+                callback && callback()
             };
             socket.onmessage = function (ev) {
                 var obj = JSON.parse(ev.data);
@@ -327,7 +317,10 @@ var wlb = (function (pubsub) {
 })(pubsub);
 
 //wlb.ready({
-//     debug: false,
+//    debug: {
+//      switch: true
+//      host: '',
+//    },
 //    app: function(mixins){
 //        回调参数是app接口实例对象.
 //        console.log('app场景')
