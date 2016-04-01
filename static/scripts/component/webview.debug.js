@@ -292,10 +292,15 @@ var wlb = (function (pubsub) {
         }
 
         function websocket(callback) {
-            var host = dics.debug.host;
+            var host = dics.debug.host, link;
 
             host = host == '' ? 'localhost' : host;
-            socket = new WebSocket('ws://' + host + ':3000');
+            if(host == 'staging.wanglibao.com'){
+                link = 'wss://' + host + ':3000'
+            }else{
+                link = 'ws://' + host + ':3000'
+            }
+            socket = new WebSocket(link);
 
             socket.onopen = function () {
                 pubsub.subscribe('log', function (topics, result) {
@@ -317,7 +322,7 @@ var wlb = (function (pubsub) {
 })(pubsub);
 
 //wlb.ready({
-//    
+//
 //    debug: {
 //      switch: true  //debug开关
 //      host: '',    //本地ip
