@@ -3,7 +3,62 @@
  * last update 2016-3-27
  */
 
-var wlb = (function () {
+var pubsub = {};
+(function (q) {
+
+    var topics = {}, // 回调函数存放的数组
+        subUid = -1;
+    // 发布方法
+    q.publish = function (topic, args) {
+
+        if (!topics[topic]) {
+            return false;
+        }
+
+        setTimeout(function () {
+            var subscribers = topics[topic],
+                len = subscribers ? subscribers.length : 0;
+
+            while (len--) {
+                subscribers[len].func(topic, args);
+            }
+        }, 0);
+
+        return true;
+
+    };
+    //订阅方法
+    q.subscribe = function (topic, func) {
+
+        if (!topics[topic]) {
+            topics[topic] = [];
+        }
+
+        var token = (++subUid).toString();
+        topics[topic].push({
+            token: token,
+            func: func
+        });
+        return token;
+    };
+    //退订方法
+    q.unsubscribe = function (token) {
+        for (var m in topics) {
+            if (topics[m]) {
+                for (var i = 0, j = topics[m].length; i < j; i++) {
+                    if (topics[m][i].token === token) {
+                        topics[m].splice(i, 1);
+                        return token;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+}(pubsub));
+
+
+var wlb = (function (pubsub) {
 
     var unique;
 
@@ -191,6 +246,8 @@ var wlb = (function () {
          *
          */
         var debug = dics.debug || false;
+        var socket;
+        if (debug) websocket();
 
         function listen() {
             if (Mixin.isAPP()) {
@@ -206,12 +263,13 @@ var wlb = (function () {
             }
         }
 
+
         listen();
 
         function run(target) {
             var mixins;
 
-            if (debug) alert('执行环境为:' + target.callback);
+            if (debug) pubsub.publish('log', {type: 'success', message: '当前执行环境为:' + target.callback});
 
             if (target.callback && target.callback == 'app') {
                 mixins = getMixin(target.data);
@@ -220,11 +278,11 @@ var wlb = (function () {
             }
             try {
 
-                if (debug) alert('执行回调' + target.callback);
+                if (debug) pubsub.publish('log', {type: 'success', message: '执行回调:' + target.callback});
                 dics[target.callback](mixins);
 
             } catch (e) {
-                if (debug) alert('执行回调异常: ' + e.message);
+                if (debug) pubsub.publish('log', {type: 'error', message: '异常:' + target.callback});
             }
 
         }
@@ -237,17 +295,28 @@ var wlb = (function () {
 
                     var original = albert[property];
                     if (typeof original === 'function') {
-
                         albert[property] = function (data, callback) {
-                            alert('开始动作:' + property + '\n接收参数:\n1:' + data + "\n2:" + callback);
+                            pubsub.publish('log', {type: 'success',  message: '开始动作:' + property + '\n接收参数:\ndata:' + data + "\ncallback:" + callback});
                             return original.call(albert, data, callback);
                         };
-
                     }
 
                 })(property)
             }
-            ;
+        }
+
+        function websocket() {
+            socket = new WebSocket('ws://192.168.20.145:3000');
+
+            socket.onopen = function () {
+                pubsub.subscribe('log', function (topics, result) {
+                    socket.send(JSON.stringify({type: result.type, message: result.message}));
+                });
+            };
+            socket.onmessage = function (ev) {
+                var obj = JSON.parse(ev.data);
+                alert(obj.message)
+            }
         }
     }
 
@@ -255,7 +324,7 @@ var wlb = (function () {
         ready: ready
     }
 
-})();
+})(pubsub);
 
 //wlb.ready({
 //     debug: false,
