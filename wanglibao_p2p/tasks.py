@@ -27,6 +27,7 @@ from wanglibao_account.utils import generate_coop_base_data
 from wanglibao_account.tasks import common_callback_for_post
 from marketing.utils import get_user_channel_record
 from django.conf import settings
+from wanglibao_p2p.utility import get_user_margin, get_p2p_equity
 
 logger = get_task_logger(__name__)
 
@@ -216,14 +217,16 @@ def p2p_auto_ready_for_settle():
 
 
 @app.task
-def coop_product_push():
+def coop_product_push(products=None):
     product_query_status = [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核',
                             u'满标已审核', u'还款中', u'流标']
-    products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
-                                         (Q(status__in=product_query_status) |
-                                          (Q(status=u'已完成') &
-                                           Q(make_loans_time__isnull=False) &
-                                           Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+    if not products:
+        products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
+                                             (Q(status__in=product_query_status) |
+                                              (Q(status=u'已完成') &
+                                               Q(make_loans_time__isnull=False) &
+                                               Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+
     products = products.values('id', 'version', 'category', 'types__name', 'name',
                                'short_name', 'serial_number', 'status', 'period',
                                'brief', 'expected_earning_rate', 'excess_earning_rate',
@@ -264,9 +267,8 @@ def coop_amortizations_push(amortizations, product_id):
         channel = get_user_channel_record(amo["user_id"])
         if channel:
             amo['terms'] = amo_terms
-            equity_record = EquityRecord.objects.filter(catalog=u'申购确认', product_id=product_id, user_id=amo["user_id"]).first()
-            amo['equity_confirm_at'] = equity_record.create_time.strftime('%Y-%m-%d %H:%M:%S')
-            amo['equity_amount'] = float(equity_record.amount)
+            amo['margin'] = json.dumps(get_user_margin(amo["user_id"]))
+            amo['equity'] = json.dumps(get_p2p_equity(amo["user_id"], product_id))
             amortization_list.append(amo)
 
     if amortization_list:

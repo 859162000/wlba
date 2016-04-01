@@ -2697,10 +2697,10 @@ class HappyMonkeyAPIView(APIView):
     def post(self, request):
         self.token = 'happy_monkey'
         rewards = {
-            (0, 5): 'happy_monkey_88',
-            (6, 10): 'happy_monkey_188',
-            (11, 15): 'happy_monkey_588',
-            (16, 100000000): 'happy_monkey_888'
+            (0, 5): 'happy_monkey_66',
+            (6, 10): 'happy_monkey_166',
+            (11, 15): 'happy_monkey_566',
+            (16, 100000000): 'happy_monkey_666'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
@@ -2716,10 +2716,10 @@ class HappyMonkeyAPIView(APIView):
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         today = time.strftime("%Y-%m-%d", time.localtime())
-        user = user if user else request.user
+        user = user.user if user else request.user
         #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).first()
-        if reward:
+        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).last()
+        if reward and today == str(reward.create_at)[:10]:
             to_json_response = {
                 'ret_code': 1001,
                 'message': u'每一个用户,一天只能玩一次',
@@ -2736,8 +2736,7 @@ class HappyMonkeyAPIView(APIView):
                     activity_code=self.token,
                     remain_chance=1)
 
-            total = request.POST.get('total', None)
-            total=5
+            total = int(request.POST.get('total', None))
             exp_name = ''
             for key, value in rewards.items():
                 if total>=key[0] and total<=key[1]:
@@ -2751,11 +2750,12 @@ class HappyMonkeyAPIView(APIView):
                 left_times=0,
                 join_times=1,)
 
-            SendExperienceGold(request.user).send(reward.experience.id)
+            SendExperienceGold(user).send(reward.experience.id)
             join_record.remain_chance = 0
             join_record.save()
             to_json_response = {
                 'ret_code': 0,
+                'type':exp_name,
                 'message': u'用户已经获得%s体验金' % reward.experience.amount,
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')

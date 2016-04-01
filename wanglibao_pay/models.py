@@ -30,7 +30,6 @@ class Bank(models.Model):
     withdraw_limit = models.CharField(max_length=500, blank=True, verbose_name=u"银行提现限额", default="")
     have_company_channel = models.BooleanField(u"是否对公", default=False)
     cards_info = models.TextField(max_length=10000, default='', blank=True, verbose_name=u'银行卡号识别码')
-    
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     channel = models.CharField(u'手机支付通道', max_length=20, blank=True, null=True, choices=(
@@ -177,8 +176,8 @@ class PayInfo(models.Model):
         return simplejson.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
 
     def save_error(self, error_code, error_message, is_inner_error=False):
-        self.error_code += '|' + str(error_code)
-        self.error_message = '|' + error_message
+        self.error_code = str(error_code)
+        self.error_message = error_message
         if is_inner_error:
             self.status = self.EXCEPTION
         else:

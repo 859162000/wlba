@@ -9,6 +9,40 @@
   50%
     -webkit-transform: translate(rem(3),rem(-2))
 
+@mixin pulse
+  .circle-item-warp
+    animation-name: pulse
+    -webkit-animation-name: pulse
+    animation-duration: 1s
+    -webkit-animation-duration: 1s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-iteration-count: infinite
+    -webkit-animation-iteration-count: infinite
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+@-webkit-keyframes pulse
+  from
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+  50%
+    -webkit-transform: scale3d(1.1, 1.1, 1.1)
+    transform: scale3d(1.1, 1.1, 1.1)
+  to
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+
+@keyframes pulse
+  from
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+  50%
+    -webkit-transform: scale3d(1.1, 1.1, 1.1)
+    transform: scale3d(1.1, 1.1, 1.1)
+  to
+    -webkit-transform: scale3d(1, 1, 1)
+    transform: scale3d(1, 1, 1)
+
 .check-in-banner
   display: block
   width: 100%
@@ -17,20 +51,25 @@
 
 .check-in-operation
   display: -webkit-box
-
+  padding: 0 .5rem
 
 .checkin-op-share, .checkin-op-status
   -webkit-box-flex: 1
   display: -webkit-box
   -webkit-box-orient: horizontal
+  -webkit-transform: translate3d(0,0,0)
+  transform: translate3d(0,0,0)
+  background: #fff
+  padding: .9rem
+  border-radius: .1rem
+  @media only screen and (max-device-width: 321px)
+    padding: .5rem
 
 .checkin-op-status
-  -webkit-box-pack: end
-  margin-right: 1rem
+  margin-right: .5rem
 
 .checkin-op-share
   -webkit-box-pack: start
-  margin-left: 1rem
   .has-share
     display: none
   &.checkin-share-ok
@@ -44,23 +83,29 @@
   width: rem(90)
   height: rem(90)
   margin-right: .2rem
+  @media only screen and (max-device-width: 321px)
+    width: rem(80)
+    height: rem(80)
 
 .icon-status
-  background: url("/static/imgs/sub_weixin/checkin/icon_checkin.png") no-repeat center
+  background: url("/static/imgs/app/checkin/icon_checkin.jpg") no-repeat center
   background-size: 100%
 .icon-share
-  background: url("/static/imgs/sub_weixin/checkin/icon_share.png") no-repeat center
+  background: url("/static/imgs/app/checkin/icon_share.jpg") no-repeat center
   background-size: 100%
 
 .checkin-op-dec
   padding-top: .2rem
   text-align: right
+  min-width: rem(150)
   .op-dec-title
     font-size: .75rem
     color: #666
   .op-dec-detail
     color: #999
     font-size: .6rem
+  .op-detail-blue
+    color: #5DB5F2
   .op-detail-orange
     color: #f5a623
 
@@ -142,7 +187,7 @@
   .flag-items
     display: inline-block
     text-align: center
-    margin: 0 .2rem
+    margin: 0 .1rem
     @media screen and (min-device-width: 374px)
       margin: 0 .3rem
     @media screen and (min-device-width: 413px)
@@ -196,23 +241,125 @@
 .active-gift
   .circle-item-warp
     background: url("/static/imgs/sub_weixin/checkin/icon_gift.png") no-repeat center
-    background-size: 93%
+    background-size: 100%
   .circle-item
     opacity: 0
-  &.active-doing
-    .circle-item-warp
-      background-image: url("/static/imgs/sub_weixin/checkin/icon_gift_active.png")
-      background-size: 120%
-      //animation: checkIn-animate 0.7s linear infinite
-      //-webkit-animation: checkIn-animate 0.7s linear infinite
-  &.active-gift-open
-    .circle-item-warp
-      height: 1.8rem
-      margin-top: -0.2rem
-      background-image: url("/static/imgs/sub_weixin/checkin/icon_gift_open.png")
-      background-size: 93%
-      //-webkit-animation: none
-      //animation: none
+.active-gift-open
+  .circle-item-warp
+    height: 1.8rem
+    margin-top: -0.2rem
+    background: url("/static/imgs/sub_weixin/checkin/icon_gift_open.png") no-repeat center
+    background-size: 93%
+    .circle-item
+      opacity: 0
+.active-gift-doing
+  +pulse
+  //.circle-item-warp
+  //  background: url("/static/imgs/sub_weixin/checkin/icon_gift_active.png") no-repeat center
+  //  background-size: 120%
+  .circle-item
+    opacity: 0
+
+.active-mysterious, .active-mysterious-active
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/mysterious.png") no-repeat center
+    background-size: 105%
+  .circle-item
+    opacity: 0
+.active-mysterious-open
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/mysterious_active.png") no-repeat center
+    background-size: 105%
+  .circle-item
+    opacity: 0
+
+@mixin shake
+  .circle-item-warp
+    animation-name: bounceInDown
+    -webkit-animation-name: bounceInDown
+    animation-duration: 1s
+    -webkit-animation-duration: 1s
+    animation-timing-function: ease-in
+    -webkit-animation-timing-function: ease-in
+    animation-iteration-count: 1
+    -webkit-animation-iteration-count: 1
+    animation-fill-mode: forwards
+    -webkit-animation-fill-mode: forwards
+
+@-webkit-keyframes bounceInDown
+  from, 60%, 75%, 90%, to
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+
+
+  0%
+    opacity: 0
+    -webkit-transform: translate3d(0, -3000px, 0)
+    transform: translate3d(0, -3000px, 0)
+
+
+  60%
+    opacity: 1
+    -webkit-transform: translate3d(0, 25px, 0)
+    transform: translate3d(0, 25px, 0)
+
+
+  75%
+    -webkit-transform: translate3d(0, -10px, 0)
+    transform: translate3d(0, -10px, 0)
+
+
+  90%
+    -webkit-transform: translate3d(0, 5px, 0)
+    transform: translate3d(0, 5px, 0)
+
+
+  to
+    -webkit-transform: none
+    transform: none
+
+
+
+@keyframes bounceInDown
+  from, 60%, 75%, 90%, to
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000)
+
+  0%
+    opacity: 0
+    -webkit-transform: translate3d(0, -3000px, 0)
+    transform: translate3d(0, -3000px, 0)
+
+  60%
+    opacity: 1
+    -webkit-transform: translate3d(0, 25px, 0)
+    transform: translate3d(0, 25px, 0)
+
+  75%
+    -webkit-transform: translate3d(0, -10px, 0)
+    transform: translate3d(0, -10px, 0)
+
+  90%
+    -webkit-transform: translate3d(0, 5px, 0)
+    transform: translate3d(0, 5px, 0)
+
+  to
+    -webkit-transform: none
+    transform: none
+
+.active-mysterious
+  &.active-gift-doing
+    //+shake
+    +pulse
+.active-mysterious-open
+  .circle-item-warp
+    background: url("/static/imgs/app/checkin/mysterious_active.png") no-repeat center
+    background-size: 105%
+  .circle-item
+    opacity: 0
+
+
+
 .check-in-rules-layout
   padding: 0 1rem
   font-size: .6rem

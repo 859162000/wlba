@@ -594,6 +594,10 @@ class SeriesActionActivityRule(models.Model):
         ('redpack', u'优惠券'),
         ('experience_gold', u'体验金'),
     )
+    ADDITION_GIFT_TYPE = (
+        ('redpack', u'优惠券'),
+        ('experience_gold', u'体验金'),
+    )
     activity = models.ForeignKey(SeriesActionActivity, verbose_name=u'活动名称')
     rule_name = models.CharField(u'规则名称', max_length=128)
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
@@ -621,7 +625,10 @@ class SeriesActionActivityRule(models.Model):
                                               help_text=u'邀请人短信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
     created_at = models.DateTimeField(auto_now=True, default=timezone.now)
     is_used = models.BooleanField(u'是否启用', default=False)
-
+    addition_gift_type = models.CharField(u'备用赠送类型', default="", max_length=20, choices=ADDITION_GIFT_TYPE)
+    addition_redpack = models.CharField(u'对应活动ID', default="", max_length=200, blank=True,
+                                   help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，否则会导致无法发放<br/>\
+                                   如需要多个ID则用英文逗号隔开,如:1,2,3')
     class Meta:
         verbose_name = u'连续操作活动奖励规则'
         verbose_name_plural = u'连续操作活动奖励规则'
@@ -630,6 +637,11 @@ class UserDailyActionRecord(models.Model):
     ACTION_TYPES = (
         (u'sign_in', u'用户签到'),
         (u'share', u'用户分享')
+    )
+    PLATFORMS = (
+        (u"app", u"app"),
+        (u"weixin", u"weixin"),
+        (u"pc", u"pc")
     )
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
@@ -640,6 +652,7 @@ class UserDailyActionRecord(models.Model):
     continue_days = models.IntegerField('连续天数', default=0)
     experience_record_id = models.IntegerField(default=0, verbose_name=u'体验金发放流水ID')
     status = models.BooleanField(default=False, verbose_name=u'是否成功')
+    platform = models.CharField(u'操作平台', default=u"", choices=PLATFORMS, max_length=32)
     class Meta:
         unique_together = (("user", "action_type", "create_date"), )
 

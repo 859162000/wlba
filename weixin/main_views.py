@@ -43,7 +43,6 @@ class WXLogin(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(WXLogin, self).get_context_data(**kwargs)
-        self.request.session['openid'] = self.openid
         next = self.request.GET.get('next', '')
         next = urllib.unquote(next.encode('utf-8'))
 
@@ -65,6 +64,7 @@ class WXLogin(TemplateView):
                     oauth = WeChatOAuth(account.app_id, account.app_secret, )
                     user_info = oauth.fetch_access_token(code)
                     self.openid = user_info.get('openid')
+                    request.session['openid'] = self.openid
                     w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
                     # w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
                     # if is_first:

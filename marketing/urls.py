@@ -86,7 +86,9 @@ urlpatterns = patterns(
     url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
     url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
     url(r'^open_house/$', TemplateView.as_view(template_name="open_house.jade")),
+    url(r'^airport_operation/$', TemplateView.as_view(template_name="airport_operation.jade")),
     # url(r'^spring_mobilization/$', TemplateView.as_view(template_name="spring_mobilization.jade")),
+    url(r'^wangli_vip/$', TemplateView.as_view(template_name="wangli_vip.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
@@ -122,6 +124,7 @@ urlpatterns += patterns(
     url(r'^app_scratch_copy/$', TemplateView.as_view(template_name="app_scratch_copy.jade")),
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
     url(r'^app_open_house/$', TemplateView.as_view(template_name="app_open_house.jade")),
+    url(r'^h5_open_house/$', TemplateView.as_view(template_name="h5_open_house.jade")),
 
 
     url(r'^app_eight_gift_two/$', TemplateView.as_view(template_name="app_eight_gift_two.jade")),
