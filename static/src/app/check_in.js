@@ -39,8 +39,8 @@ org.checin_in = (function () {
         limit_gift: false,
         init: function(mixins){
             lib.appShare = mixins;
-
             lib.fetch();
+
         },
         share: function(result){
             var
@@ -315,6 +315,10 @@ org.checin_in = (function () {
 
 
 wlb.ready({
+    debug: {
+        switch: true,
+        host: '192.168.20.145'
+    },
     app: function (mixins) {
         function connect(data) {
             org.ajax({
@@ -340,7 +344,6 @@ wlb.ready({
                 connect(data)
             }
         })
-
     },
     other: function () {
         org.checin_in.init()
