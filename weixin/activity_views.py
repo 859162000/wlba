@@ -287,8 +287,8 @@ class GetSignShareInfo(APIView):
         share_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=u'share').first()
         data = {}
         sign_info = data.setdefault('sign_in', {})
-        sign_total_count = UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
-        sign_info['sign_total_count'] = sign_total_count
+        # sign_total_count = UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
+        # sign_info['sign_total_count'] = sign_total_count
         sign_info['status'] = False
         sign_info['amount']=0
         sign_info['today_should_continue_days'] = 0
