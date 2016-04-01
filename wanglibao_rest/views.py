@@ -892,10 +892,15 @@ class HasValidationAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({"ret_code": 0, "message": u"您已认证通过"})
+            return Response({
+                "ret_code": 0,
+                "message": u"您已认证通过",
+                "name": profile.name,
+                "id_number": "%s************%s" % (profile.id_number[:3], profile.id_number[-3:]),
+                "id_valid_time": profile.id_valid_time if not profile.id_valid_time else redpack_backends.local_transform_str(profile.id_valid_time)
+            })
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
-
 
 class IdValidate(APIView):
     """
