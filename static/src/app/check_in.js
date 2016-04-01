@@ -315,10 +315,6 @@ org.checin_in = (function () {
 
 
 wlb.ready({
-    debug: {
-        switch: true,
-        host: '192.168.20.145'
-    },
     app: function (mixins) {
         function connect(data) {
             org.ajax({
