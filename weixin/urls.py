@@ -84,7 +84,7 @@ urlpatterns = patterns(
                                                                                             name='sub_invite'),
     url(r'^award_index/$', fwh_login_required(TemplateView.as_view(template_name="sub_award.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='award_index'),
-    url(r'^award_reatcoin/$', login_required(RedirectView.as_view(url='/weixin/award_eatcoin/'),login_url='/weixin/sub_login_redirect/')),
+    url(r'^award_reatcoin/$', fwh_login_required(RedirectView.as_view(url='/weixin/award_eatcoin/'),login_url='/weixin/sub_login_redirect/')),
     url(r'^award_eatcoin/$', TemplateView.as_view(template_name="sub_eatcoin.jade")),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
 
