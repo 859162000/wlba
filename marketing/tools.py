@@ -105,9 +105,6 @@ def register_ok(user_id, device):
         utils.log_clientinfo(device, "register", user_id)
     except Exception:
         pass
-    sendWechatPhoneReward.apply_async(kwargs={
-        "user_id": user_id,
-    })
     #往数据中心发送注册信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_register_data.apply_async(kwargs={
