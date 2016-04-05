@@ -181,7 +181,6 @@ class CoopRegister(object):
         self.internal_channel_client_id_key = 'client_id'
         self.channel_access_token_key = 'access_token'
 
-
     @property
     def channel_code(self):
         """
@@ -2004,15 +2003,30 @@ class BiSouYiRegister(BaJinSheRegister):
         super(BiSouYiRegister, self).__init__(request)
         self.c_code = 'bisouyi'
         self.external_channel_client_id_key = 'cid'
-        self.channel_sign_key = 'sign'
+        self.external_channel_phone_key = 'mobile'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_sign_key = 'sign'
+        self.internal_channel_sign_key = 'sign'
         self.channel_content_key = 'content'
 
     def save_to_session(self):
+        if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+            req_data = json.loads(self.request.body.strip())
+        else:
+            req_data = self.request.REQUEST
+
         channel_code = self.get_channel_code_from_request()
-        channel_user = self.request.GET.get(self.external_channel_user_key, None)
-        client_id = self.request.GET.get(self.external_channel_client_id_key, None)
-        sign = self.request.GET.get(self.channel_sign_key, None)
-        content = self.request.GET.get(self.channel_content_key, None)
+        channel_phone = req_data.get(self.external_channel_phone_key, None)
+        sign = req_data.get(self.external_channel_sign_key, None)
+        channel_user = req_data.get(self.external_channel_user_key, None)
+        content = req_data.get(self.channel_content_key, None)
+        client_id = req_data.get(self.external_channel_client_id_key, None)
+
+        if not client_id:
+            client_id = self.request.META.get(self.external_channel_client_id_key, None)
+
+        if not sign:
+            sign = self.request.META.get(self.external_channel_sign_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -2020,19 +2034,25 @@ class BiSouYiRegister(BaJinSheRegister):
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
 
-        if client_id:
-            self.request.session[self.internal_channel_client_id_key] = client_id
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
 
         if sign:
-            self.request.session[self.channel_sign_key] = sign
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
 
         if content:
             self.request.session[self.channel_content_key] = content
 
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
-        self.request.session.pop(self.channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.channel_content_key, None)
+        self.request.session.pop(self.internal_channel_key, None)
 
 
 # 注册第三方通道

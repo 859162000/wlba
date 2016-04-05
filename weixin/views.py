@@ -585,7 +585,8 @@ class WeixinCoopRegister(TemplateView):
         token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
 
         if token:
-            token = token
+            tp_name = 'service_regist_%s.jade' % token.lower()
+            self.template_name = tp_name
         elif token_session:
             token = token_session
         else:
