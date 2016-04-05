@@ -34,7 +34,6 @@ webpackJsonp([5],[
 	    //验证表单
 	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
-	            alert("check");
 	            function checkOperation() {
 	                var checklist = [{ type: 'phone', value: $identifier.val() }, { type: 'password', value: $password.val() }];
 	                return (0, _from_validation.check)(checklist);
@@ -80,7 +79,6 @@ webpackJsonp([5],[
 	    }
 
 	    $submit.on('click', function () {
-	        alert(3);
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
 	            return login('/weixin/api/login/');
@@ -119,7 +117,19 @@ webpackJsonp([5],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
+	    //return new Promise(function(resolve, reject){
+	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
+	    //
+	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
+	    //
+	    //    $button.on('click', () => {
+	    //        $alert.hide();
+	    //        //alert(typeof callback+" ,"+callback);
+	    //        //callback();
+	    //        resolve();
+	    //    })
+	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
@@ -128,7 +138,8 @@ webpackJsonp([5],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        //alert(typeof callback+" ,"+callback);
+	        callback();
 	    });
 	};
 
@@ -139,7 +150,7 @@ webpackJsonp([5],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -276,7 +287,9 @@ webpackJsonp([5],[
 	            //不等于空
 	            if (!isEmpty) {
 	                if (icon != '') target.siblings('.' + icon).addClass('active');
-	                if (othericon != '') $('.' + othericon).removeAttr('disabled');
+	                if (othericon != '') {
+	                    $('.' + othericon).removeAttr('disabled');
+	                }
 	                if (operation != '') target.siblings('.' + operation).show();
 	            }
 	        }

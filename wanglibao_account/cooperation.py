@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
 from wanglibao_reward.models import WanglibaoActivityReward
 from experience_gold.models import ExperienceEvent
+from experience_gold.backends import SendExperienceGold
 from weixin.models import WeixinAccounts
 import qrcode
 import hashlib
@@ -76,6 +77,7 @@ from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 import json
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest.utils import generate_bajinshe_sign
+from wanglibao_p2p.utility import get_p2p_equity, get_user_margin
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -178,7 +180,6 @@ class CoopRegister(object):
         # 传递渠道oauth客户端ID时使用的变量名
         self.internal_channel_client_id_key = 'client_id'
         self.channel_access_token_key = 'access_token'
-
 
     @property
     def channel_code(self):
@@ -1312,6 +1313,38 @@ class JuChengRegister(CoopRegister):
                     "mtype": "activity"
                 })
 
+class HappyMonkeyRegister(CoopRegister):
+    def __init__(self, request):
+        super(HappyMonkeyRegister, self).__init__(request)
+        self.c_code = 'fwhyx'
+        self.invite_code = 'fwhyx'
+        self.token = 'happy_monkey'
+        self.request = request
+
+    def register_call_back(self, user):
+        rewards = {
+            (0, 5): 'happy_monkey_66',
+            (6, 10): 'happy_monkey_166',
+            (11, 15): 'happy_monkey_566',
+            (16, 100000000): 'happy_monkey_666'
+        }
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        total = self.request.POST.get('total', None)
+        exp_name = ''
+        for key, value in rewards.items():
+            if total>=key[0] and total<=key[1]:
+                exp_name = value
+
+        reward = ActivityReward.objects.create(
+                user=user,
+                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                channel=self.token,
+                create_at=today,
+                left_times=0,
+                join_times=1,)
+
+        SendExperienceGold(self.request.user).send(reward.experience.id)
+
 
 class WeixinRedpackRegister(CoopRegister):
     def __init__(self, request):
@@ -1355,9 +1388,9 @@ class XunleiVipRegister(CoopRegister):
         self.coop_sign_key = 'sign'
 
         if ENV == ENV_PRODUCTION:
-            activity_start_time = '2016-03-30 00:00:00'
+            self.activity_start_time = datetime.datetime.strptime('2016-03-30 00:00:00', "%Y-%m-%d %H:%M:%S")
         else:
-            activity_start_time = '2016-03-28 17:30:00'
+            self.activity_start_time = datetime.datetime.strptime('2016-03-28 17:30:00', "%Y-%m-%d %H:%M:%S")
 
     @property
     def channel_user(self):
@@ -1450,8 +1483,7 @@ class XunleiVipRegister(CoopRegister):
                         self.purchase_call_back(user, first_p2p_record.order_id)
 
                     # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
-                    activity_start_time = datetime.datetime.strptime(activity_start_time, "%Y-%m-%d %H:%M:%S")
-                    p2p_records = p2p_records.filter(create_time__gte=activity_start_time)
+                    p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
                     for p2p_record in p2p_records:
                         if p2p_record.id != first_p2p_record.id:
                             self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
@@ -1581,8 +1613,7 @@ class XunleiVipRegister(CoopRegister):
                     })
 
         # 根据迅雷勋章活动开始时间查询
-        activity_start_time = datetime.datetime.strptime(activity_start_time, "%Y-%m-%d %H:%M:%S")
-        p2p_records = p2p_records.filter(create_time__gte=activity_start_time)
+        p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
         p2p_record = p2p_records.filter(order_id=order_id).first()
         self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
@@ -1866,6 +1897,7 @@ class BaJinSheRegister(CoopRegister):
             act_data = {
                 'p2p_record': json.dumps(p2p_record),
                 'margin_record': json.dumps(margin_record),
+                'margin': json.dumps(get_user_margin(user.id)),
             }
             data = dict(base_data, **act_data)
 
@@ -1908,6 +1940,7 @@ class BaJinSheRegister(CoopRegister):
             act_data = {
                 'pay_info': json.dumps(pay_info_data),
                 'margin_record': json.dumps(margin_record_data),
+                'margin': json.dumps(get_user_margin(user.id)),
             }
             data = dict(base_data, **act_data)
 
@@ -1970,15 +2003,30 @@ class BiSouYiRegister(BaJinSheRegister):
         super(BiSouYiRegister, self).__init__(request)
         self.c_code = 'bisouyi'
         self.external_channel_client_id_key = 'cid'
-        self.channel_sign_key = 'sign'
+        self.external_channel_phone_key = 'mobile'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_sign_key = 'sign'
+        self.internal_channel_sign_key = 'sign'
         self.channel_content_key = 'content'
 
     def save_to_session(self):
+        if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+            req_data = json.loads(self.request.body.strip())
+        else:
+            req_data = self.request.REQUEST
+
         channel_code = self.get_channel_code_from_request()
-        channel_user = self.request.GET.get(self.external_channel_user_key, None)
-        client_id = self.request.GET.get(self.external_channel_client_id_key, None)
-        sign = self.request.GET.get(self.channel_sign_key, None)
-        content = self.request.GET.get(self.channel_content_key, None)
+        channel_phone = req_data.get(self.external_channel_phone_key, None)
+        sign = req_data.get(self.external_channel_sign_key, None)
+        channel_user = req_data.get(self.external_channel_user_key, None)
+        content = req_data.get(self.channel_content_key, None)
+        client_id = req_data.get(self.external_channel_client_id_key, None)
+
+        if not client_id:
+            client_id = self.request.META.get(self.external_channel_client_id_key, None)
+
+        if not sign:
+            sign = self.request.META.get(self.external_channel_sign_key, None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
@@ -1986,19 +2034,25 @@ class BiSouYiRegister(BaJinSheRegister):
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
 
-        if client_id:
-            self.request.session[self.internal_channel_client_id_key] = client_id
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
 
         if sign:
-            self.request.session[self.channel_sign_key] = sign
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
 
         if content:
             self.request.session[self.channel_content_key] = content
 
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
-        self.request.session.pop(self.channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.channel_content_key, None)
+        self.request.session.pop(self.internal_channel_key, None)
 
 
 # 注册第三方通道
@@ -2010,7 +2064,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
-                          BiSouYiRegister]
+                          BiSouYiRegister, HappyMonkeyRegister]
 
 
 # ######################第三方用户查询#####################

@@ -1817,6 +1817,10 @@ class OauthUserRegisterApi(APIView):
                     'ret_code': 10010,
                     'message': form_error,
                 }
+
+                if response_data['message'] == u'该手机号已经注册':
+                    if channel_code == 'renrenli':
+                        response_data['ret_code'] = 100
         else:
             response_data = {
                 'ret_code': 50002,
@@ -1840,7 +1844,7 @@ class OauthUserRegisterApi(APIView):
 class BiSouYiRegisterApi(APIView):
     permission_classes = ()
 
-    def get(self, request):
+    def post(self, request):
         form = BiSouYiRegisterForm(self.request.session)
         if form.is_valid():
             if form.check_sign():
@@ -1858,7 +1862,6 @@ class BiSouYiRegisterApi(APIView):
 
                     client_id = form.cleaned_data['client_id']
                     channel_code = form.cleaned_data['channel_code']
-                    token = form.get_token()
 
                     # 处理第三方渠道的用户信息
                     CoopRegister(request).all_processors_for_user_register(user, channel_code)
@@ -1867,17 +1870,25 @@ class BiSouYiRegisterApi(APIView):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                     tid = get_uid_for_coop(user.id)
-                    ret_data = push_coop_access_token(phone, client_id, tid, settings.BISOUYI_COOP_KEY, token)
-                    message = ret_data['message']
+                    response_data = get_coop_access_token(phone, client_id, tid, settings.BISOUYI_CLIENT_SECRET)
                 else:
-                    message = u'用户创建失败'
+                    response_data = {
+                        'ret_code': 10012,
+                        'message': u'用户创建失败',
+                    }
             else:
-                message = u'无效签名'
+                response_data = {
+                    'ret_code': 10011,
+                    'message': u'无效签名',
+                }
         else:
-            message = form.errors.values()[0][0]
+            response_data = {
+                'ret_code': 10010,
+                'message': form.errors.values()[0][0],
+            }
 
-        logger.info("BiSouYiRegisterApi process result: %s" % message)
-        return HttpResponseRedirect('/')
+        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
 class GeetestAPIView(APIView):
@@ -1927,23 +1938,29 @@ class ActivityUserInfoUploadApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = ActivityUserInfoForm(request.POST)
-        if form.is_valid():
-            user_info = ActivityUserInfo()
-            user_info.name = form.cleaned_data['name']
-            user_info.phone = form.cleaned_data['phone']
-            user_info.address = form.cleaned_data['address']
-            user_info.is_wlb_phone = form.check_wlb_phone()
-            user_info.save()
-            response_data = {
-                'ret_code': 10000,
-                'message': 'success',
-            }
+        activity_end_time = datetime.datetime.strptime('2016-04-7 23:59:59', "%Y-%m-%d %H:%M:%S")
+        if activity_end_time > timezone.now():
+            form = ActivityUserInfoForm(request.POST)
+            if form.is_valid():
+                user_info = ActivityUserInfo()
+                user_info.name = form.cleaned_data['name']
+                user_info.phone = form.cleaned_data['phone']
+                user_info.address = form.cleaned_data['address']
+                user_info.is_wlb_phone = form.check_wlb_phone()
+                user_info.save()
+                response_data = {
+                    'ret_code': 10000,
+                    'message': 'success',
+                }
+            else:
+                response_data = {
+                    'ret_code': 10001,
+                    'message': form.errors
+                }
         else:
             response_data = {
-                'ret_code': 10001,
-                'message': form.errors
+                'ret_code': 20001,
+                'message': u'活动已结束'
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-

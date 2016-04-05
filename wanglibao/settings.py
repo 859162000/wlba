@@ -651,22 +651,22 @@ CELERYBEAT_SCHEDULE = {
     # by Zhoudong 菜苗上报平台信息.
     'caimiao_platform_post': {
         'task': 'wanglibao_account.tasks.caimiao_platform_post_task',
-        'schedule': crontab(minute=0, hour=0, day_of_month=1)
+        'schedule': crontab(minute=50, hour=0, day_of_month=1)
     },
     # by Zhoudong 菜苗上报标的信息.
     'caimiao_p2p_post': {
         'task': 'wanglibao_account.tasks.caimiao_p2p_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=35, hour=0)
     },
     # by Zhoudong 菜苗上报成交量.
     'caimiao_volumes_post': {
         'task': 'wanglibao_account.tasks.caimiao_volumes_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=40, hour=0)
     },
     # by Zhoudong 菜苗上报网贷评级.
     'caimiao_rating_post': {
         'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=45, hour=0)
     },
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
@@ -856,11 +856,13 @@ else:
     #KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
     #KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
 
-    KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
+    KUAI_PEM_PATH = os.path.join(CERT_DIR, "20411004511201290.pem")
     KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "kuai_pay_signature.pem")
-    KUAI_MER_ID = "104110045112012"
+    # KUAI_MER_ID = "104110045112012"
+    KUAI_MER_ID = "812331253110002"
     KUAI_MER_PASS = "vpos123"
-    KUAI_TERM_ID = "00002012"
+    # KUAI_TERM_ID = "00002012"
+    KUAI_TERM_ID = "33120009"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
@@ -1223,11 +1225,15 @@ else:
 # 比搜益
 BISOUYI_CHANNEL_CODE = 'bisouyi'
 if ENV == ENV_PRODUCTION:
-    BISOUYI_AES_KEY = ''
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = ''
 else:
-    BISOUYI_AES_KEY = ''
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
 

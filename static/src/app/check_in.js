@@ -38,8 +38,9 @@ org.checin_in = (function () {
         appShare: null,
         limit_gift: false,
         init: function(mixins){
-            lib.appShare = mixins
+            lib.appShare = mixins;
             lib.fetch();
+
         },
         share: function(result){
             var
@@ -114,8 +115,11 @@ org.checin_in = (function () {
                 continueDay = resultCopy.continue_days,
                 currentDay = resultCopy.current_day,
                 giftStatus = resultCopy.continueGiftFetched,
+                mysterious_day = resultCopy.mysterious_day,
                 itemStatus = '',
                 $process = $('.check-in-process'),
+                mysterious_section = false,
+
                 str = "<div class='check-in-process-line'></div>";
                 str +="<div class='check-in-flag-lists'>";
 
@@ -134,11 +138,22 @@ org.checin_in = (function () {
                 }
 
                 if(i == itemEnd){
+                    if(resultCopy.isMysteriGift)  mysterious_section = true
+                }
+
+                if(i == itemEnd){
                     //礼物所在天数
-                    itemStatus = giftStatus ?
-                        "active-gift-open "
-                        :
-                        itemEnd - currentDay === 0? 'active-gift-active ' :"active-gift ";
+                    if(mysterious_section){
+                        itemStatus = giftStatus ?
+                            "active-mysterious-open gist-mod active-did "
+                            :
+                            itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
+                    }else{
+                        itemStatus = giftStatus ?
+                            "active-gift-open gist-mod active-did "
+                            :
+                            itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
+                    }
                 }
 
                 str += "<div data-continue='"+i+"' class='flag-items "+itemStatus+"'>";
@@ -149,7 +164,16 @@ org.checin_in = (function () {
                 str += "<div class='check-in-flag'></div>"
                 str += "</div>";
                 str += "</div>";
-                str += "<div class='text-item'>"+i+"天</div>"
+                if(i == itemEnd){
+                    if(giftStatus){
+                        str += "<div class='text-item'>"+i+"天</div>";
+                    }else{
+                        str += "<div class='text-item'>点我</div>";
+                    }
+                }else{
+                    str += "<div class='text-item'>"+i+"天</div>";
+                }
+
                 str += "</div>";
             }
             str += '</div>';
@@ -159,18 +183,18 @@ org.checin_in = (function () {
             var _self = this, resultCopy = result.data.sign_in;
 
             //连续签到日
-            var current_day = resultCopy.current_day;
+            var update_current_day = resultCopy.current_day;
             var steriousGift_days = resultCopy.mysterious_day;
 
             //当日是否签到
             if(!resultCopy.status){
                 _self.checkInOpeartion('sign_in', function(data){
-                    //签到成功更新连续签到日
-                    current_day++;
+                    //更新天数
+                    update_current_day++
 
                     if(data.data.status){
                         _self.checkInAlert('flag', '今日签到成功！获得'+data.data.experience_amount+'元体验金', '在(我的账户－体验金)中查看', function(){
-                            triggerUI(current_day)
+                            triggerUI(update_current_day)
                             _self.signIn(true, data.data.experience_amount)
                             _self.steriousGift(steriousGift_days - 1);
                         })
@@ -180,8 +204,10 @@ org.checin_in = (function () {
                     function triggerUI(count){
                         $.each($('.flag-items'), function(){
                             if($(this).attr('data-continue') * 1 == count){
-                                if($(this).hasClass('active-gift')){
-                                    $(this).addClass('active-gift-active').removeClass('active-gift').siblings('.flag-items').removeClass('active-doing');
+                                if($(this).hasClass('active-gift')) {
+                                    $(this).addClass('active-gift-active pulse').removeClass('active-gift').siblings('.flag-items').removeClass('active-doing');
+                                }else if($(this).hasClass('active-mysterious')){
+                                    $(this).addClass('active-mysterious-active pulse').removeClass('active-mysterious').siblings('.flag-items').removeClass('active-doing');
                                 }else{
                                     $(this).addClass('active-did active-doing').siblings('.flag-items').removeClass('active-doing')
                                 }
@@ -194,15 +220,15 @@ org.checin_in = (function () {
             }
 
             var giftDay  = null;
-            $('.active-gift, .active-gift-open, .active-gift-active').on('click', function(){
-                giftDay = resultCopy.nextDayNote - current_day;
+            $('.gist-mod').on('click', function(){
+                giftDay = resultCopy.nextDayNote - update_current_day;
                 if(giftDay == 0){
                     if(resultCopy.continueGiftFetched){
                         org.ui.alert('礼物已经领取过了！')
                     }else{
                         if(!_self.limit_click){
                             _self.limit_click =true;
-                            _self.fetchGift(current_day)
+                            _self.fetchGift(update_current_day)
                         }
                     }
                 }else if(giftDay > 0){
@@ -240,7 +266,9 @@ org.checin_in = (function () {
 
                         _self.checkInAlert('gift', data.message, '在(我的账户)中查看', function(){
                             _self.steriousGift(data.mysterious_day)
-                            $('.active-gift-active').addClass('active-gift-open').removeClass('active-gift-active')
+                            $('.active-gift-active, .active-mysterious-active').find('.text-item').text(days+ '天');
+                            $('.active-gift-active').addClass('active-gift-open active-doing ').removeClass('active-gift-active pulse')
+                            $('.active-mysterious-active').addClass('active-mysterious-open active-doing').removeClass('active-mysterious-active pulse')
                         });
                     }
                     if(data.ret_code < 0){
@@ -306,7 +334,7 @@ wlb.ready({
             })
         }
 
-
+        mixins.firstLoadWebView({name: 'signIn'});
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 mixins.loginApp({refresh: 1, url: ''})
@@ -315,11 +343,10 @@ wlb.ready({
                 connect(data)
             }
         })
-
     },
     other: function () {
-        //org.checin_in.init()
-        alert('guy ! open in app!')
+        org.checin_in.init()
+        //alert('guy ! open in app!')
     }
 })
 

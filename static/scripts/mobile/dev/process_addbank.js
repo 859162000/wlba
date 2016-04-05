@@ -115,7 +115,7 @@ webpackJsonp([6],[
 	                        window.localStorage.setItem('bank', _content);
 	                        return callback && callback(_content);
 	                    } else {
-	                        return alert(results.message);
+	                        return (0, _ui.Alert)(results.message);
 	                    }
 	                },
 	                error: function error(data) {
@@ -159,7 +159,7 @@ webpackJsonp([6],[
 	        checkOperation_submit().then(function (result) {
 	            var check_recharge = $(_this).attr('data-recharge');
 	            if (check_recharge == 'true') {
-	                confirm("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
+	                (0, _ui.Confirm)("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
 	            } else {
 	                recharge({ firstRecharge: false });
 	            }
@@ -186,7 +186,7 @@ webpackJsonp([6],[
 	            },
 	            success: function success(data) {
 	                if (data.ret_code > 0) {
-	                    return alert(data.message);
+	                    return (0, _ui.Alert)(data.message);
 	                } else {
 	                    $(".error-sign").remove();
 	                    if (check.firstRecharge) {
@@ -196,7 +196,7 @@ webpackJsonp([6],[
 	                            var next_url = (0, _api.getQueryStringByName)('next'),
 	                                next = next_url == '' ? '/weixin/list/' : next_url;
 	                            return {
-	                                v: alert('绑卡成功！', function () {
+	                                v: (0, _ui.Alert)('绑卡成功！', function () {
 	                                    window.location.href = next;
 	                                })
 	                            };
@@ -208,7 +208,7 @@ webpackJsonp([6],[
 	            },
 	            error: function error(result) {
 	                var data = JSON.parse(result.responseText);
-	                return alert(data.detail);
+	                return (0, _ui.Alert)(data.detail);
 	            },
 	            complete: function complete() {
 	                if (check.firstRecharge) {
@@ -238,7 +238,19 @@ webpackJsonp([6],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
+	    //return new Promise(function(resolve, reject){
+	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
+	    //
+	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
+	    //
+	    //    $button.on('click', () => {
+	    //        $alert.hide();
+	    //        //alert(typeof callback+" ,"+callback);
+	    //        //callback();
+	    //        resolve();
+	    //    })
+	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
@@ -247,7 +259,8 @@ webpackJsonp([6],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        //alert(typeof callback+" ,"+callback);
+	        callback();
 	    });
 	};
 
@@ -258,7 +271,7 @@ webpackJsonp([6],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -395,7 +408,9 @@ webpackJsonp([6],[
 	            //不等于空
 	            if (!isEmpty) {
 	                if (icon != '') target.siblings('.' + icon).addClass('active');
-	                if (othericon != '') $('.' + othericon).removeAttr('disabled');
+	                if (othericon != '') {
+	                    $('.' + othericon).removeAttr('disabled');
+	                }
 	                if (operation != '') target.siblings('.' + operation).show();
 	            }
 	        }

@@ -50,6 +50,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
                             BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, ActivityUserInfoUploadApi, GeetestAPIView)
+                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, ActivityUserInfoUploadApi,
+                                  BiSouYiRegisterApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -63,7 +65,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, FetchAirportServiceReward)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -287,6 +289,7 @@ urlpatterns += patterns(
     url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view()),
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
     url(r'^geetest/$', GeetestAPIView.as_view()),
+    url(r'^airport_reward/fetch/$', FetchAirportServiceReward.as_view()),
 )
 
 # app端改版新接口
@@ -361,4 +364,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^activity_user_info/upload/$', ActivityUserInfoUploadApi.as_view()),
+)
+
+# 比搜益用户注册接口
+urlpatterns += patterns(
+    '',
+    url(r'^bisouyi/register/$', BiSouYiRegisterApi.as_view()),
 )
