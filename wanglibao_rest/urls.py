@@ -51,7 +51,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
                             BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, ActivityUserInfoUploadApi, GeetestAPIView)
                             BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, ActivityUserInfoUploadApi,
-                                  BiSouYiRegisterApi)
+                            BiSouYiRegisterApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
