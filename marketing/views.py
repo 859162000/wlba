@@ -2718,7 +2718,7 @@ class HappyMonkeyAPIView(APIView):
         today = time.strftime("%Y-%m-%d", time.localtime())
         user = user.user if user else request.user
         #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).last()
+        reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
         if reward and today == str(reward.create_at)[:10]:
             to_json_response = {
                 'ret_code': 1001,
