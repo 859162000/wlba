@@ -39,7 +39,6 @@ webpackJsonp([12],[
 	        otherlist: [{ target: $agreement, required: true }],
 	        done: function done() {
 	            if (validClass.status()) {
-	                console.log(validClass.status());
 	                $validate_operation.attr('disabled', true);
 	            }
 	        }
@@ -666,7 +665,7 @@ webpackJsonp([12],[
 	            }).then(function (message) {
 	                (0, _ui.signModel)(message);
 	                console.log('短信发送成功');
-	                var count = 10;
+	                var count = 60;
 	                return timerFunction(count);
 	            }).catch(function (message) {
 	                (0, _ui.signModel)(message);
