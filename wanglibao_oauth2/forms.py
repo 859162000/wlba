@@ -2,8 +2,8 @@
 
 import hashlib
 from django import forms
+from django.contrib.auth.models import User
 from .models import Client, RefreshToken, OauthUser
-from wanglibao_account.models import Binding
 
 
 class ClientAuthForm(forms.Form):
@@ -36,17 +36,15 @@ class UserAndClientForm(forms.Form):
     the user.
     """
 
-    channel_user = forms.CharField(required=True, error_messages={'required': u'用户id是必须的'})
     client_id = forms.CharField(required=True, error_messages={'required': u'客户端id是必须的'})
     phone = forms.CharField(required=True, error_messages={'required': u'手机号是必须的'})
     sign = forms.CharField(required=True, error_messages={'required': u'签名是必须的'})
 
     def clean(self):
-        channel_user = self.cleaned_data.get('channel_user')
         client_id = self.cleaned_data.get('client_id')
         phone = self.cleaned_data.get('phone')
         sign = self.cleaned_data.get('sign')
-        if channel_user and client_id and phone and sign:
+        if client_id and phone and sign:
             try:
                 client = Client.objects.get(client_id=client_id)
             except Client.DoesNotExist:
@@ -55,9 +53,9 @@ class UserAndClientForm(forms.Form):
                     message=u'无效客户端id'
                 )
             else:
-                binding = Binding.objects.filter(bid=channel_user, user__wanglibaouserprofile__phone=phone).first()
-                if binding:
-                    user_id = binding.user.id
+                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                if user:
+                    user_id = user.id
                     try:
                         oauth_user = OauthUser.objects.get(user_id=user_id, client=client)
                     except OauthUser.DoesNotExist:
@@ -78,7 +76,7 @@ class UserAndClientForm(forms.Form):
                 else:
                     raise forms.ValidationError(
                         code=10104,
-                        message=u'手机号和用户id无法关联',
+                        message=u'无效手机号',
                     )
 
         return self.cleaned_data
