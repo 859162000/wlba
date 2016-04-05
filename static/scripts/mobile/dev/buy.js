@@ -306,7 +306,7 @@ webpackJsonp([1],[
 	    //confirm
 	    var confirm_ui = function confirm_ui(amount) {
 	        return new Promise(function (resolve, reject) {
-	            confirm('购买金额为' + amount, '确认投资', function () {
+	            (0, _ui.Confirm)('购买金额为' + amount, '确认投资', function () {
 	                resolve(amount);
 	            });
 	        });

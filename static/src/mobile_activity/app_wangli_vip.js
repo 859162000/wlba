@@ -9,8 +9,22 @@
     });
     var login = false;
 
-    var chance_num;
-    var card_no;
+    $('.banner_main .view').on('click',function(){
+        var ele = $('#banenr .slide_bottom');
+        var curHeight = ele.height();
+        var autoHeight = ele.css('height', 'auto').height();
+		$('.banner_main .view').addClass('view_activate');
+		ele.height(curHeight).animate({height: autoHeight},500);
+
+    });
+
+	$('#banenr .slide_bottom .bottom_arrow').click(function(){
+		var ele = $('#banenr .slide_bottom');
+        var curHeight = ele.height();
+		$('.banner_main .view').removeClass('view_activate');
+		ele.height(curHeight).animate({height: 0},500);
+	});
+
 
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
