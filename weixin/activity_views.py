@@ -210,7 +210,7 @@ class GetContinueActionReward(APIView):
             if is_weixin and w_user:
                 for experience_event in experience_events:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n快去我的账户－体验金页面查看吧！"%(days, getattr(experience_event, "desc_text", "体验金"), timezone.localtime(experience_event.unavailable_at).strftime("%Y年%m月%d日")),
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n快去我的账户－体验金页面查看吧！"%(days, getattr(experience_event, "desc_text", "体验金")),
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
