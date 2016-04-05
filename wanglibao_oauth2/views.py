@@ -8,6 +8,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.http import HttpResponse
+from django.db.models import Q
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
 
@@ -149,7 +150,9 @@ class AccessTokenOauthView(APIView):
                 try:
                     if (int(get_current_utc_timestamp()) - int(utc_timestamp)) <= 120000:
                         if sign == generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
-                            access_token = AccessToken.objects.filter(token=token, expires__gte=timezone.now())
+                            access_token = AccessToken.objects.filter(Q(token=token) &
+                                                                      (Q(expires__gte=timezone.now() |
+                                                                       Q(client__token_expire_switch=False))))
                             if access_token.exists():
                                 utc_timestamp = get_current_utc_timestamp()
                                 response_data = {
