@@ -458,3 +458,10 @@ if ENV == ENV_PRODUCTION:
     RENRENLI_PURCHASE_PUSH_URL = 'http://openapi.amoydao.com/zlo/getp2pinfo/getsubscribe/'
 else:
     RENRENLI_PURCHASE_PUSH_URL = 'http://openapi.amoydao.com/zlo/getp2pinfo/getsubscribe/'
+
+
+# 比搜益
+BISOUYI_PCODE = '10002'
+BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
