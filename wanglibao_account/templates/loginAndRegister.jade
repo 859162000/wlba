@@ -7,7 +7,7 @@ html
     - with '网利宝官网' as title
     include global/g_head
     - endwith
-    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
+    script(src="https://static.geetest.com/static/tools/gt.js")
   body
     include global/g_nav
     .i-mod-wrap.login-box-bg
@@ -50,6 +50,10 @@ html
                         li
                             i.icon.iconfont.icon-key
                             input#loginPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                        li.captcha-box(style="display:none")
+                            #captcha-box
+                            input(type="hidden")#captcha-status
+                            input(type="hidden")#check-tag
                         li.baoxian
                             em.bao-icon
                             span 账户资金安全由阳光保险承保
