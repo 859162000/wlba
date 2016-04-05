@@ -38,6 +38,7 @@ class Client(models.Model):
     channel = models.ForeignKey(Channels, verbose_name=u'渠道', help_text=u'渠道', blank=True, null=True)
     client_name = models.CharField(u'客户端名称', max_length=20)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
+    token_expire_switch = models.BooleanField(u'token超时开关', default=True, help_text=u'默认开启')
 
     def __unicode__(self):
         return self.client_name
