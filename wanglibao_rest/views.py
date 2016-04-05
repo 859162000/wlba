@@ -1878,23 +1878,29 @@ class ActivityUserInfoUploadApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = ActivityUserInfoForm(request.POST)
-        if form.is_valid():
-            user_info = ActivityUserInfo()
-            user_info.name = form.cleaned_data['name']
-            user_info.phone = form.cleaned_data['phone']
-            user_info.address = form.cleaned_data['address']
-            user_info.is_wlb_phone = form.check_wlb_phone()
-            user_info.save()
-            response_data = {
-                'ret_code': 10000,
-                'message': 'success',
-            }
+        activity_end_time = datetime.datetime.strptime('2016-04-7 23:59:59', "%Y-%m-%d %H:%M:%S")
+        if activity_end_time > timezone.now():
+            form = ActivityUserInfoForm(request.POST)
+            if form.is_valid():
+                user_info = ActivityUserInfo()
+                user_info.name = form.cleaned_data['name']
+                user_info.phone = form.cleaned_data['phone']
+                user_info.address = form.cleaned_data['address']
+                user_info.is_wlb_phone = form.check_wlb_phone()
+                user_info.save()
+                response_data = {
+                    'ret_code': 10000,
+                    'message': 'success',
+                }
+            else:
+                response_data = {
+                    'ret_code': 10001,
+                    'message': form.errors
+                }
         else:
             response_data = {
-                'ret_code': 10001,
-                'message': form.errors
+                'ret_code': 20001,
+                'message': u'活动已结束'
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-
