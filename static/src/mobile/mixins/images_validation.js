@@ -2,9 +2,9 @@ import { ajax } from './api'
 import { signModel } from './ui'
 import { check } from './from_validation'
 
+export var timeIntervalId = null;
 export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
 
-    let intervalId = null;
     const $validate_operation = $('button[name=validate_operation]');
 
     //获取图像验证码
@@ -54,7 +54,7 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
                 error: function (xhr) {
                     var result = JSON.parse(xhr.responseText);
                     $validate_operation.removeAttr('disabled').text('获取验证码');
-                    clearInterval(intervalId);
+                    clearInterval(timeIntervalId);
                     validation();
                     return reject(result.message);
                 }
@@ -70,14 +70,14 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
                     count--;
                     return $validate_operation.text(`${count}秒后可重发`);
                 } else {
-                    clearInterval(intervalId);
+                    clearInterval(timeIntervalId);
                     $validate_operation.text('重新获取').removeAttr('disabled');
                     validation();
                     return reject('倒计时失效，请重新获取')
                 }
             };
             timerFunction();
-            return intervalId = setInterval(timerFunction, 1000);
+            return timeIntervalId = setInterval(timerFunction, 1000);
         })
     }
 
