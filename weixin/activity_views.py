@@ -140,10 +140,14 @@ class GetContinueActionReward(APIView):
                 redpack_record_ids += sub_redpack_record_ids
                 experience_record_ids += sub_experience_record_ids
                 if rule.gift_type == "reward":
-                    now = timezone.now()
-                    reward = Reward.objects.filter(type=rule.reward,
-                                                   is_used=False,
-                                                   end_time__gte=now).first()
+                    reward_list = rule.reward.split(",")
+                    for reward_type in reward_list:
+                        now = timezone.now()
+                        reward = Reward.objects.filter(type=reward_type,
+                                                       is_used=False,
+                                                       end_time__gte=now).first()
+                        if reward:
+                            break
                     if reward:
                         reward.is_used = True
                         reward.save()
