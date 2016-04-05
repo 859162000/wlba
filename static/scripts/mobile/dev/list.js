@@ -53,7 +53,7 @@ webpackJsonp([4],[
 	                canGetPage = true;
 	            },
 	            error: function error() {
-	                alert('Ajax error!');
+	                (0, _ui.Alert)('Ajax error!');
 	            },
 	            complete: function complete() {
 	                $('.load-text').html('点击查看更多项目');
