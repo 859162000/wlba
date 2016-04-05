@@ -370,10 +370,16 @@ class RenRenLiRegister(CoopRegister):
             binding.save()
 
 
+class BiSouYiRegister(CoopRegister):
+    def __init__(self, *args, **kwargs):
+        super(BiSouYiRegister, self).__init__(*args, **kwargs)
+
+
 # 注册第三方通道
 coop_register_processor = {
     'bajinshe': 'BaJinSheRegister',
     'renrenli': 'RenRenLiRegister',
+    'bisouyi': 'BiSouYiRegister',
 }
 
 
