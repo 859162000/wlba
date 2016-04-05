@@ -137,6 +137,7 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
+    'wanglibao_geetest',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -182,7 +183,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        #'HOST': '192.168.1.242',
     }
 
 import sys
