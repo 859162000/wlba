@@ -50,7 +50,7 @@ from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
                                   get_coop_access_token, push_coop_access_token)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
-from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1, safe_id
+from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
@@ -67,6 +67,7 @@ from weixin.models import WeixinUser
 from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
+from wanglibao_geetest.geetest import GeetestLib
 from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
@@ -129,10 +130,15 @@ class SendValidationCodeView(APIView):
             descrpition: if...else(line98~line101)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -141,6 +147,23 @@ class SendValidationCodeView(APIView):
         return Response({
                             'message': message
                         }, status=status)
+
+
+    def validate_captcha(self, request):
+        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
 
 
 class TestSendRegisterValidationCodeView(APIView):
@@ -897,13 +920,7 @@ class HasValidationAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({
-                "ret_code": 0,
-                "message": u"您已认证通过",
-                "name": profile.name,
-                "id_number": "%s************%s" % (profile.id_number[:3], profile.id_number[-3:]),
-                "id_valid_time": profile.id_valid_time if not profile.id_valid_time else redpack_backends.local_transform_str(profile.id_valid_time)
-            })
+            return Response({"ret_code": 0, "message": u"您已认证通过"})
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
@@ -1874,27 +1891,76 @@ class BiSouYiRegisterApi(APIView):
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
+class GeetestAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+
+    def post(self, request):
+        self.type = request.POST.get('type', None)
+        if self.type == 'get':
+            return self.get_captcha(request)
+        if self.type == 'validate':
+            return self.validate_captcha(request)
+
+    def get_captcha(self, request):
+        user_id = random.randint(1,100)
+        gt = GeetestLib(self.id, self.key)
+        status = gt.pre_process()
+        request.session[gt.GT_STATUS_SESSION_KEY] = status
+        request.session["user_id"] = user_id
+        response_str = gt.get_response_str()
+        return HttpResponse(response_str)
+
+    def validate_captcha(self, request):
+        resp = {"result":'error'}
+        if request.method == "POST":
+            gt = GeetestLib(self.id, self.key)
+            challenge = request.POST.get(gt.FN_CHALLENGE, '')
+            validate = request.POST.get(gt.FN_VALIDATE, '')
+            seccode = request.POST.get(gt.FN_SECCODE, '')
+            status = request.session[gt.GT_STATUS_SESSION_KEY]
+            user_id = request.session["user_id"]
+            if status:
+                result = gt.success_validate(challenge, validate, seccode)
+            else:
+                result = gt.failback_validate(challenge, validate, seccode)
+            result = "success" if result else "fail"
+            resp = {"result":result}
+            print 'result:', result
+            return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
+        return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
+
+
 class ActivityUserInfoUploadApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = ActivityUserInfoForm(request.POST)
-        if form.is_valid():
-            user_info = ActivityUserInfo()
-            user_info.name = form.cleaned_data['name']
-            user_info.phone = form.cleaned_data['phone']
-            user_info.address = form.cleaned_data['address']
-            user_info.is_wlb_phone = form.check_wlb_phone()
-            user_info.save()
-            response_data = {
-                'ret_code': 10000,
-                'message': 'success',
-            }
+        activity_end_time = datetime.datetime.strptime('2016-04-7 23:59:59', "%Y-%m-%d %H:%M:%S")
+        if activity_end_time > timezone.now():
+            form = ActivityUserInfoForm(request.POST)
+            if form.is_valid():
+                user_info = ActivityUserInfo()
+                user_info.name = form.cleaned_data['name']
+                user_info.phone = form.cleaned_data['phone']
+                user_info.address = form.cleaned_data['address']
+                user_info.is_wlb_phone = form.check_wlb_phone()
+                user_info.save()
+                response_data = {
+                    'ret_code': 10000,
+                    'message': 'success',
+                }
+            else:
+                response_data = {
+                    'ret_code': 10001,
+                    'message': form.errors
+                }
         else:
             response_data = {
-                'ret_code': 10001,
-                'message': form.errors
+                'ret_code': 20001,
+                'message': u'活动已结束'
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-

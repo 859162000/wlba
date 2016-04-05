@@ -1,4 +1,4 @@
-webpackJsonp([12],[
+webpackJsonp([13],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -26,8 +26,8 @@ webpackJsonp([12],[
 	        $password = $('input[name=password]'),
 	        $invite_code = $('input[name=invite_code]'),
 	        $agreement = $('input[name=agreement]'),
-	        $captcha = $('#captcha'),
 	        $validate_operation = $('button[name=validate_operation]'),
+	        $captcha = $('#captcha'),
 	        $token = $('#token');
 
 	    //---------------初始化操作start---------
@@ -98,9 +98,18 @@ webpackJsonp([12],[
 	        });
 	    };
 
+	    function getUrl(c) {
+	        var lUrl = window.location.href;
+	        var urlArr = lUrl.split(c);
+	        return urlArr[1].indexOf("&") > -1 ? urlArr[1].substring(0, urlArr[1].indexOf("&")) : urlArr[1];
+	    }
+
 	    //注册
 	    function register(url) {
 	        var invite_val = $.trim($invite_code.val());
+	        var cid = getUrl("cid="),
+	            content = getUrl("content="),
+	            sign = getUrl("sign=");
 	        return new Promise(function (resolve, reject) {
 	            (0, _api.ajax)({
 	                url: url,
@@ -112,7 +121,9 @@ webpackJsonp([12],[
 	                    'captcha_1': $captcha_1.val(),
 	                    'validate_code': $validate_code.val(),
 	                    'invite_code': invite_val === "" ? $token.val() : invite_val,
-	                    'invite_phone': ''
+	                    'cid': cid,
+	                    'content': content,
+	                    'sign': sign
 	                },
 	                beforeSend: function beforeSend() {
 	                    $submit.text('注册中,请稍等...').attr('disabled', 'true');
@@ -133,18 +144,21 @@ webpackJsonp([12],[
 	    $submit.on('click', function () {
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
-	            return register('/api/register/');
+	            //return register('/api/register/');
+	            return register('/api/bisouyi/register/?promo_token=bisouyi');
 	        }).then(function (result) {
 	            console.log('register success');
-	            if (result.ret_code === 0) {
+	            if (result.ret_code === 10010) {
+
+	                BSY.Oauth(); //对接
+
 	                (0, _ui.Alert)('注册成功', function () {
-	                    var next = (0, _api.getQueryStringByName)('next') == '' ? '/weixin/regist/first/' : (0, _api.getQueryStringByName)('next');
-	                    next = (0, _api.getQueryStringByName)('mobile') == '' ? next : next + '&mobile=' + (0, _api.getQueryStringByName)('mobile');
-	                    next = (0, _api.getQueryStringByName)('serverId') == '' ? next : next + '&serverId=' + (0, _api.getQueryStringByName)('serverId');
-	                    window.location.href = next;
+	                    //var next = getQueryStringByName('next') == '' ? '/weixin/regist/first/' : getQueryStringByName('next');
+	                    //    next = getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ getQueryStringByName('mobile');
+	                    //    next = getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ getQueryStringByName('serverId');
+	                    window.location.href = '/weixin/list/';
 	                });
-	            }
-	            if (result.ret_code > 0) {
+	            } else {
 	                (0, _ui.signModel)(result.message);
 	            }
 	        }).catch(function (xhr) {
