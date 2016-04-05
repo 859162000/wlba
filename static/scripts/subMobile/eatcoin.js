@@ -302,10 +302,10 @@ $(function(){
             }
         });
     }
-    $(document).ready(function(){
-        setTimeout(function(){
+    $(document).ready(function() {
+        setTimeout(function () {
             $(window).scrollTop(1);
-        },0);
+        }, 0);
         document.getElementById('car_audio').play();
         document.addEventListener("WeixinJSBridgeReady", function () {
             WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
@@ -313,21 +313,28 @@ $(function(){
             });
         }, false);
         var cunt = 0;
-        var imgNum=$("img").length;
-        $("img").load(function(){
-            if (!--imgNum) {
-                var progress = setInterval(function () {
-                    cunt++;
-                    $(".loaded").css("background-size", cunt * 10 + "%" + " " + "100%");
-                    if (cunt == 11) {
-                        clearInterval(progress);
-                        $(".loadding_page").hide();
-                        $(".start_page").show();
-                    }
-                }, 100);
-            }
-        });
 
+       // $("img").load(function(){
+        //   console.log(immgInx+1);
+        //    if(immgInx++==imgNum){
+        //       if(cunt==0) {
+         //          alert(imgNum);
+                   var progress = setInterval(function () {
+                       $(".loaded").css("background-size", cunt * 10 + "%" + " " + "100%");
+                       if (cunt == 11) {
+                           clearInterval(progress);
+                           $(".loadding_page").hide();
+                           $(".start_page").show();
+                       }else{
+                           cunt++;
+                       }
+                   }, 500);
+         //      }
+        //    }
+        //});
+        document.ontouchmove = function(e){
+            e.preventDefault();
+        }
         $(".again_btn").bind("click",function(){
             $(".reward_page").hide();
             $("#box").show();
@@ -384,6 +391,7 @@ $(function(){
                     }else{
                         $(".blank").show();
                         $(".yz_tc").show();
+                        $(".phone input").val(phone);
                         sxyzm();
                     }
                 } else{
@@ -429,8 +437,24 @@ $(function(){
         $(".hqdx input").click(function(){
             $(this).attr("disabled","disabled");
             $(this).css("background-image","url(/static/imgs/sub_weixin/eatcoin/un_get_note.png)");
+            var dxsj = 60;
             var phone = $(".yz_tc .phone input").val();
             var param = {"captcha_0":$(".img_yzm img").attr("key"),"captcha_1":$(".input_yzm input").val()};
+            $(this).hide().siblings().show();
+            var self = this
+            var djs = setInterval(function(){
+                if(dxsj==1){
+                    $(self).removeAttr("disabled");
+                    $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
+                    $(self).show().siblings().hide();
+                    $(self).siblings().text(60);
+                    clearInterval(djs);
+                }else{
+                    dxsj--
+                    $(self).siblings().text(dxsj);
+                }
+
+            },1000)
             $.ajax({
                 type:"post",
                 url:"/api/phone_validation_code/register/"+phone+"/",
@@ -440,6 +464,10 @@ $(function(){
                     //console.log(data);
                 },
                 error:function(data){
+                    if(eval("(" + data.responseText+ ")").message=="图片验证码错误"){
+                        sxyzm();
+                        $(".input_yzm input").val();
+                    };
                     alert(eval("(" + data.responseText+ ")").message);
                 }
             })

@@ -67,5 +67,6 @@ html,body{width:100%;height:100%;padding:0;margin:0;overflow:hidden;}
 .yz_tc .sjdx div{float: left}
 .sjdx .srdx input{position: absolute;width: 54.3%;height: 100%;background: url("/static/imgs/sub_weixin/eatcoin/input_note.png")no-repeat;background-size: 100% 100%;border: 0;font-size:3vh;text-align: center;color:#fff}
 .sjdx .hqdx input{position: absolute;width: 43%;height: 91%;left: 58%;top: 8.8%;background: url("/static/imgs/sub_weixin/eatcoin/un_get_note.png")no-repeat;background-size: 100% 100%;border: 0px}
+.sjdx .hqdx span{position: absolute;width: 43%;height: 91%;left: 57%;top: 24.8%;display: none;}
 .yz_tc .dllq img{position: absolute;left: 10.8%;top: 75.1%}
 ::-webkit-input-placeholder {color: #fff;}
