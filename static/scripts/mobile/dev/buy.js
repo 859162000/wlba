@@ -150,7 +150,7 @@ webpackJsonp([1],[
 	                }
 
 	                if (result.ret_code > 0) {
-	                    alert(result.message);
+	                    Alert(result.message);
 	                }
 	            }
 	        });
@@ -249,11 +249,11 @@ webpackJsonp([1],[
 	                    return;
 	                }
 	                if (result.error_number > 0) {
-	                    return alert(result.message);
+	                    return Alert(result.message);
 	                }
 	            },
 	            error: function error(xhr) {
-	                alert('服务器异常');
+	                Alert('服务器异常');
 	            },
 	            complete: function complete() {
 	                $submit.removeAttr('disabled').text("立即投资");
@@ -334,7 +334,7 @@ webpackJsonp([1],[
 	            //交易密码操作
 	            trade_operation(amount, buy);
 	        }).catch(function (res) {
-	            alert(res);
+	            Alert(res);
 	        });
 	    });
 

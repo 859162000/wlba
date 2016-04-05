@@ -1,5 +1,5 @@
 import { ajax } from './mixins/api'
-import { signModel } from './mixins/ui'
+import { signModel, Alert } from './mixins/ui'
 
 
 (()=> {
@@ -47,7 +47,7 @@ import { signModel } from './mixins/ui'
                 canGetPage = true;
             },
             error () {
-                alert('Ajax error!')
+                Alert('Ajax error!')
             },
             complete () {
                 $('.load-text').html('点击查看更多项目');
