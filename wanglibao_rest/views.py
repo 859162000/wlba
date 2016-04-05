@@ -13,9 +13,7 @@ from rest_framework.views import APIView
 from wanglibao_account.cooperation import CoopRegister, CoopSessionProcessor, RenRenLiCallback
 from django.utils import timezone
 from wanglibao_rest.utils import has_binding_for_bid, get_coop_binding_for_phone
-from django.http import Http404
 from marketing.models import Channels
-from marketing.utils import get_channel_record
 from django.conf import settings
 from wanglibao_account.tools import str_to_utc
 from wanglibao_account.utils import create_user
@@ -24,14 +22,14 @@ from wanglibao_p2p.forms import P2PProductForm, P2PRecordForm
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
 from wanglibao_margin.utils import save_to_margin
-from .forms import CoopDataDispatchForm
-from .tasks import coop_common_callback, process_amortize
 from marketing.forms import ChannelForm
 from wanglibao_account.forms import UserRegisterForm, UserForm
 from wanglibao_oauth2.models import Client
 from wanglibao_account.models import Binding
-from wanglibao_account.tools import get_client_with_channel_code
-from wanglibao_rest.utils import utc_to_local_timestamp
+from wanglibao_rest import utils as rest_utils
+from .forms import CoopDataDispatchForm, AccessUserExistsForm, BiSouYiUserExistsForm
+from .tasks import coop_common_callback, process_amortize
+from .utils import utc_to_local_timestamp, generate_bisouyi_content, generate_bisouyi_sign
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -65,111 +63,86 @@ class AccessUserExistsApi(APIView):
 
     permission_classes = ()
 
-    def check_sign(self, client_id, phone, key, sign):
-        local_sign = hashlib.md5('-'.join([str(client_id), str(phone), key])).hexdigest()
-        if local_sign == sign:
-            sign_is_ok = True
+    def post(self, request):
+        form = AccessUserExistsForm(request.session)
+        channel_code = request.GET.get('promo_token')
+
+        if form.is_valid():
+            phone = form.cleaned_data['phone']
+            user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+            binding = get_coop_binding_for_phone(channel_code, phone)
+            coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
+            sign_is_ok = coop_sign_check()
+            coop_register_processor = getattr(rest_utils, 'process__user_exists' % channel_code.lower(), None)
+            response_data = coop_register_processor(user, binding, sign_is_ok)
         else:
-            sign_is_ok = False
+            response_data = {
+                'ret_code': 10020,
+                'message': form.errors.values()[0][0],
+            }
 
-        return sign_is_ok
-
-    def post(self, request, **kwargs):
-        channel_code = request.GET.get('promo_token', None)
-        if channel_code:
-            channel = get_channel_record(channel_code)
-            if channel:
-                sign = request.session.get('sign')
-                if sign:
-                    client_id = request.session.get('client_id')
-                    if client_id:
-                        client = get_client_with_channel_code(channel_code)
-                        if client:
-                            phone = request.session.get('phone')
-                            if phone:
-                                if self.check_sign(client_id, phone, client.client_secret, sign):
-                                    binding = get_coop_binding_for_phone(channel_code, phone)
-                                    user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-                                    if binding and user:
-                                        response_data = {
-                                            'user_id': binding.bid,
-                                            'code': 10000,
-                                            'msg': u'该号已注册',
-                                            'invitation_code': binding.bid,
-                                            'ext': ''
-                                        }
-                                    elif not user:
-                                        response_data = {
-                                            'user_id': None,
-                                            'code': 10001,
-                                            'msg': u'该号未注册',
-                                            'invitation_code': None,
-                                            'ext': ''
-                                        }
-                                    else:
-                                        response_data = {
-                                            'user_id': None,
-                                            'code': 10002,
-                                            'msg': u'该号已注册，非本渠道用户',
-                                            'invitation_code': None,
-                                            'ext': ''
-                                        }
-
-                                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-                                else:
-                                    response_data = {
-                                        'user_id': None,
-                                        'code': 10008,
-                                        'msg': u'无效签名',
-                                        'invitation_code': None,
-                                        'ext': ''
-                                    }
-                            else:
-                                response_data = {
-                                    'user_id': None,
-                                    'code': 10007,
-                                    'msg': u'手机号不存在',
-                                    'invitation_code': None,
-                                    'ext': ''
-                                }
-                        else:
-                            response_data = {
-                                'user_id': None,
-                                'code': 10006,
-                                'msg': u'无效客户端id不存在',
-                                'invitation_code': None,
-                                'ext': ''
-                            }
-                    else:
-                        response_data = {
-                            'user_id': None,
-                            'code': 10005,
-                            'msg': u'客户端id参数不存在',
-                            'invitation_code': None,
-                            'ext': ''
-                        }
-                else:
-                    response_data = {
-                        'user_id': None,
-                        'code': 10004,
-                        'msg': u'签名参数不存在',
-                        'invitation_code': None,
-                        'ext': ''
-                    }
-            else:
-                response_data = {
-                    'user_id': None,
-                    'code': 10003,
-                    'msg': u'无效promo_token',
-                    'invitation_code': None,
-                    'ext': ''
-                }
-        else:
-            return Http404(u'页面不存在')
+        if channel_code == 'bajinshe':
+            response_data['code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['message']
+            response_data.pop('message')
 
         CoopSessionProcessor(request).all_processors_for_session(1)
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
+    permission_classes = ()
+
+    def post(self, request):
+        form = BiSouYiUserExistsForm(request.session)
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                _type = 0 if user else 1
+                user_type = u'是' if user else u'否'
+                content_data = {
+                    'code': 10000,
+                    'message': 'success',
+                    'status': 1,
+                    'yaccount': user_type,
+                    'mobile': phone,
+                    'type': _type,
+                }
+            else:
+                content_data = {
+                    'code': 10010,
+                    'message': u'无效签名',
+                }
+        else:
+            content_data = {
+                'code': 10020,
+                'message': form.errors.values()[0][0],
+            }
+
+        content_data['pcode'] = settings.BISOUYI_PCODE
+        if content_data['code'] != 10000:
+            content_data['status'] = 0
+
+        content = generate_bisouyi_content(content_data)
+        client_id = settings.BISOUYI_CLIENT_ID
+        sign = generate_bisouyi_sign(content)
+        response_data = {
+            'cid': client_id,
+            'sign': sign,
+            'conten': content,
+        }
+
+        http_response = HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+        http_response['cid'] = client_id
+        http_response['sign'] = sign
+
+        CoopSessionProcessor(request).all_processors_for_session(1)
+        return http_response
 
 
 class CoopDataDispatchApi(APIView):

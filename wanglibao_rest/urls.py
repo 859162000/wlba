@@ -4,7 +4,7 @@
 from django.conf.urls import patterns, url
 
 from wanglibao_rest.views import (BidHasBindingForChannel, AccessUserExistsApi, CoopDataDispatchApi,
-                                  RenRenLiQueryApi)
+                                  RenRenLiQueryApi, BiSouYiUserExistsApi)
 
 
 urlpatterns = patterns(
@@ -20,4 +20,7 @@ urlpatterns = patterns(
 
     # 人人利查询接口
     url(r'^renrenli/query/$', RenRenLiQueryApi.as_view()),
+
+    # 比搜益判断手机号是否已经绑定渠道或被注册
+    url(r'^bisouyi/exists/$', BiSouYiUserExistsApi.as_view()),
 )
