@@ -1,6 +1,6 @@
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
-import { signModel } from './mixins/ui'
+import { Alert, signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { validation } from './mixins/images_validation'
 
@@ -128,7 +128,7 @@ import { validation } from './mixins/images_validation'
             .then((result)=> {
                 console.log('register success');
                 if (result.ret_code === 0) {
-                    alert('注册成功', ()=> {
+                    Alert('注册成功', ()=> {
                         var next = getQueryStringByName('next') == '' ? '/weixin/regist/first/' : getQueryStringByName('next');
                             next = getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ getQueryStringByName('mobile');
                             next = getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ getQueryStringByName('serverId');

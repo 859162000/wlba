@@ -98,7 +98,7 @@ webpackJsonp([11],[
 	                }
 
 	                if (result.ret_code > 0) {
-	                    alert(result.message);
+	                    (0, _ui.Alert)(result.message);
 	                }
 	            }
 	        });
@@ -185,11 +185,11 @@ webpackJsonp([11],[
 	                    data.cards.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
 	                }
 	                if (data.ret_code > 0 && data.ret_code != 20071) {
-	                    return alert(data.message);
+	                    return (0, _ui.Alert)(data.message);
 	                }
 	            },
 	            error: function error(data) {
-	                return alert('系统异常，请稍后再试');
+	                return (0, _ui.Alert)('系统异常，请稍后再试');
 	            }
 	        });
 	    };
@@ -251,12 +251,12 @@ webpackJsonp([11],[
 	                    });
 	                }
 	                if (result.ret_code > 0) {
-	                    return alert(result.message);
+	                    return (0, _ui.Alert)(result.message);
 	                }
 	            },
 	            error: function error(data) {
 	                if (data.status >= 403) {
-	                    alert('服务器繁忙，请稍后再试');
+	                    (0, _ui.Alert)('服务器繁忙，请稍后再试');
 	                }
 	            },
 	            complete: function complete() {
@@ -276,7 +276,7 @@ webpackJsonp([11],[
 	            //交易密码操作
 	            trade_operation(amount);
 	        }).catch(function (res) {
-	            alert(res);
+	            (0, _ui.Alert)(res);
 	        });
 	    });
 	    //---------------login操作end---------
@@ -299,7 +299,19 @@ webpackJsonp([11],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
+	    //return new Promise(function(resolve, reject){
+	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
+	    //
+	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
+	    //
+	    //    $button.on('click', () => {
+	    //        $alert.hide();
+	    //        //alert(typeof callback+" ,"+callback);
+	    //        //callback();
+	    //        resolve();
+	    //    })
+	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
@@ -308,7 +320,8 @@ webpackJsonp([11],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        //alert(typeof callback+" ,"+callback);
+	        callback();
 	    });
 	};
 
@@ -319,7 +332,7 @@ webpackJsonp([11],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -360,8 +373,11 @@ webpackJsonp([11],[
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.Automatic = undefined;
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _images_validation = __webpack_require__(12);
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -456,7 +472,13 @@ webpackJsonp([11],[
 	            //不等于空
 	            if (!isEmpty) {
 	                if (icon != '') target.siblings('.' + icon).addClass('active');
-	                if (othericon != '') $('.' + othericon).removeAttr('disabled');
+	                if (othericon != '') {
+	                    $('.' + othericon).removeAttr('disabled');
+	                    if (_images_validation.timeIntervalId) {
+	                        clearInterval(_images_validation.timeIntervalId);
+	                        $('.' + othericon).text('获取验证码');
+	                    }
+	                }
 	                if (operation != '') target.siblings('.' + operation).show();
 	            }
 	        }
@@ -845,6 +867,147 @@ webpackJsonp([11],[
 	        $('.tran-alert-lock').find('.tran-dec-entry').html(dec);
 	        $('.lock-back').html(right).one('click', function () {
 	            callback && callback();
+	        });
+	    }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 8 */,
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.validation = exports.timeIntervalId = undefined;
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _api = __webpack_require__(3);
+
+	var _ui = __webpack_require__(2);
+
+	var _from_validation = __webpack_require__(6);
+
+	var timeIntervalId = exports.timeIntervalId = null;
+	var validation = exports.validation = function validation($phone, $captcha_0, $captcha_1, $captcha) {
+
+	    var $validate_operation = $('button[name=validate_operation]');
+
+	    //获取图像验证码
+	    function validation() {
+	        var url = '/captcha/refresh/?v=' + new Date().getTime();
+	        $.get(url, function (result) {
+	            $captcha.attr('src', result['image_url']);
+	            $captcha_0.val(result['key']);
+	        });
+	    }
+
+	    validation();
+
+	    //验证表单
+	    var checkOperation = function checkOperation(phone) {
+	        return new Promise(function (resolve, reject) {
+	            function checkOperation() {
+	                var checklist = [{ type: 'phone', value: phone }];
+	                return (0, _from_validation.check)(checklist);
+	            }
+
+	            var _checkOperation = checkOperation();
+
+	            var _checkOperation2 = _slicedToArray(_checkOperation, 2);
+
+	            var isThrough = _checkOperation2[0];
+	            var sign = _checkOperation2[1];
+
+	            if (isThrough) return resolve('验证成功');
+
+	            return reject(sign);
+	        });
+	    };
+
+	    //获取短信验证码
+	    function fetchValidation(phone, captcha_0, captcha_1) {
+	        return new Promise(function (resolve, reject) {
+	            (0, _api.ajax)({
+	                url: '/api/phone_validation_code/' + phone + '/',
+	                data: {
+	                    captcha_0: captcha_0,
+	                    captcha_1: captcha_1
+	                },
+	                type: 'POST',
+	                beforeSend: function beforeSend() {
+	                    $validate_operation.attr('disabled', 'disabled').text('发送中..');
+	                },
+	                success: function success() {
+	                    resolve('短信已发送，请注意查收！');
+	                },
+
+	                error: function error(xhr) {
+	                    var result = JSON.parse(xhr.responseText);
+	                    $validate_operation.removeAttr('disabled').text('获取验证码');
+	                    clearInterval(timeIntervalId);
+	                    validation();
+	                    return reject(result.message);
+	                }
+	            });
+	        });
+	    }
+
+	    //倒计时
+	    function timerFunction(count) {
+	        return new Promise(function (resolve, reject) {
+	            var timerFunction = function timerFunction() {
+	                if (count > 1) {
+	                    count--;
+	                    return $validate_operation.text(count + '秒后可重发');
+	                } else {
+	                    clearInterval(timeIntervalId);
+	                    $validate_operation.text('重新获取').removeAttr('disabled');
+	                    validation();
+	                    return reject('倒计时失效，请重新获取');
+	                }
+	            };
+	            timerFunction();
+	            return exports.timeIntervalId = timeIntervalId = setInterval(timerFunction, 1000);
+	        });
+	    }
+
+	    //图像验证码
+	    $captcha.on('click', function () {
+	        validation();
+	    });
+
+	    //短信验证码
+	    $validate_operation.on('click', function () {
+	        var phone = $phone.val(),
+	            captcha_0 = $captcha_0.val(),
+	            captcha_1 = $captcha_1.val();
+	        chained(phone, captcha_0, captcha_1);
+	    });
+
+	    function chained(phone, captcha_0, captcha_1) {
+	        /**
+	         * 所有的逻辑在这里，获取短信验证码的时候，先检查手机号是否符合，
+	         * 成功后 fetchValidation（发送短信请求）
+	         * 成功后 timerFunction（倒计时）
+	         */
+	        checkOperation(phone).then(function () {
+	            console.log('验证成功');
+	            return fetchValidation(phone, captcha_0, captcha_1);
+	        }).then(function (message) {
+	            (0, _ui.signModel)(message);
+	            console.log('短信发送成功');
+	            var count = 60;
+	            return timerFunction(count);
+	        }).catch(function (message) {
+	            (0, _ui.signModel)(message);
 	        });
 	    }
 	};
