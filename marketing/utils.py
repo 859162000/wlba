@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import re
 import pytz
 import time
 from datetime import datetime, timedelta
@@ -200,6 +201,13 @@ def utype_is_mobile(request):
     if ua:
         user_agent = parse(ua)
         if user_agent.is_mobile:
+            is_mobile = True
+
+    device_list = ['android', 'iphone']
+    user_agent = ua.lower()
+    for device in device_list:
+        match = re.search(device, user_agent)
+        if match and match.group():
             is_mobile = True
 
     return is_mobile
