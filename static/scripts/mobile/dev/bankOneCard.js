@@ -52,8 +52,6 @@ webpackJsonp([0],[
 	                if (data.status_code === 0) {
 	                    $set_bank_sig.hide();
 	                    return (0, _ui.Alert)('绑定成功', function () {
-	                        //var url  = window.location.href;
-	                        //window.location.href = url;
 	                        window.location.reload();
 	                    });
 	                }
