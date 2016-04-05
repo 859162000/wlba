@@ -114,22 +114,22 @@ def _send(target_user, msgTxt, push_type):
     msg = Message()
     msg.target_user = target_user
     msg.message_text = msgTxt
-    mset = MessageNoticeSet.objects.filter(user=target_user, mtype=msgTxt.mtype).first()
+    # mset = MessageNoticeSet.objects.filter(user=target_user, mtype=msgTxt.mtype).first()
     notice = True
-    #不管有没有设置，默认都发推送
-    if mset or not mset:
-        #notice = mset.notice
-        devices = UserPushId.objects.filter(user=target_user)
-        if devices:
-            channel = bae_channel.BaeChannel()
-            msg_key = "wanglibao_%s" % time.time()
-            message = {"message":msgTxt.content, "user_id":target_user.id, "type":push_type}
-            for d in devices:
-                if d.device_type in ("ios", "iPhone", "iPad"):
-                    #res, cont = channel.pushIosMessage(d.push_user_id, d.push_channel_id, message, msg_key)
-                    pass
-                elif d.device_type == "android":
-                    res, cont = channel.pushAndroidMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+    # #不管有没有设置，默认都发推送
+    # if mset or not mset:
+    #     #notice = mset.notice
+    #     devices = UserPushId.objects.filter(user=target_user)
+    #     if devices:
+    #         channel = bae_channel.BaeChannel()
+    #         msg_key = "wanglibao_%s" % time.time()
+    #         message = {"message":msgTxt.content, "user_id":target_user.id, "type":push_type}
+    #         for d in devices:
+    #             if d.device_type in ("ios", "iPhone", "iPad"):
+    #                 #res, cont = channel.pushIosMessage(d.push_user_id, d.push_channel_id, message, msg_key)
+    #                 pass
+    #             elif d.device_type == "android":
+    #                 res, cont = channel.pushAndroidMessage(d.push_user_id, d.push_channel_id, message, msg_key)
 
     msg.notice = notice
     msg.save()
@@ -150,21 +150,21 @@ def _send_batch(user_objs, msgTxt, push_type):
 
     Message.objects.bulk_create(msg_list)
 
-    devices = UserPushId.objects.filter(user__in=user_objs)
-
-    channel = bae_channel.BaeChannel()
-    msg_key = "wanglibao_%s" % time.time()
-    message = {"message": msgTxt.content, "type":push_type}
-
-    for device in devices:
-        # notice = True
-        #不管有没有设置，默认都发推送
-        message['user_id'] = device.user.id
-
-        if device.device_type in ("ios", "iPhone", "iPad"):
-            res, cont = channel.pushIosMessage(device.push_user_id, device.push_channel_id, message, msg_key)
-        elif device.device_type == "android":
-            res, cont = channel.pushAndroidMessage(device.push_user_id, device.push_channel_id, message, msg_key)
+    # devices = UserPushId.objects.filter(user__in=user_objs)
+    #
+    # channel = bae_channel.BaeChannel()
+    # msg_key = "wanglibao_%s" % time.time()
+    # message = {"message": msgTxt.content, "type":push_type}
+    #
+    # for device in devices:
+    #     # notice = True
+    #     #不管有没有设置，默认都发推送
+    #     message['user_id'] = device.user.id
+    #
+    #     if device.device_type in ("ios", "iPhone", "iPad"):
+    #         res, cont = channel.pushIosMessage(device.push_user_id, device.push_channel_id, message, msg_key)
+    #     elif device.device_type == "android":
+    #         res, cont = channel.pushAndroidMessage(device.push_user_id, device.push_channel_id, message, msg_key)
 
     return True
 
