@@ -264,7 +264,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://staging.wanglibao.com/',
+		var host = 'https://www.wanglibao.com/',
 			shareName = '网利宝会员初体验，邀你来体验',
 			shareImg = host + '/static/imgs/mobile_activity/app_wangli_vip/300x300.jpg',
 			shareLink = host + 'activity/app_wangli_vip/',
