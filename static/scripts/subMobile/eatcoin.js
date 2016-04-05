@@ -384,7 +384,7 @@ $(function(){
                 lqjl(param);
             }else{
                 var phone = $(".iphone input").val();
-                if(phone && /^1[3|4|5|8|7|]\d{9}$/.test(phone)){
+                if(phone && /^1[2|3|4|5|8|7|]\d{9}$/.test(phone)){
                     var param = {"total":total,"phone":phone};
                     if(isRegister(phone)){
                         lqjl(param);
