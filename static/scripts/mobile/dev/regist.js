@@ -12,9 +12,9 @@ webpackJsonp([12],[
 
 	var _ui = __webpack_require__(2);
 
-	var _from_validation = __webpack_require__(6);
+	var _from_validation = __webpack_require__(7);
 
-	var _images_validation = __webpack_require__(12);
+	var _images_validation = __webpack_require__(6);
 
 	(function () {
 
@@ -413,129 +413,6 @@ webpackJsonp([12],[
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	/**
-	 * 表单验证
-	 * @param checklist
-	 * @returns {*[]}
-	 */
-	var check = exports.check = function check(checklist) {
-	    var result = null;
-	    var error = null;
-
-
-	    $.each(checklist, function (index, target) {
-	        var _validation$target$ty = validation[target.type](target.value);
-
-	        var _validation$target$ty2 = _slicedToArray(_validation$target$ty, 2);
-
-	        result = _validation$target$ty2[0];
-	        error = _validation$target$ty2[1];
-
-	        if (!result) return false;
-	    });
-
-	    return [result, error];
-	};
-
-	var validation = {
-	    phone: function phone(str) {
-	        var phone = parseInt($.trim(str)),
-	            error = '请输入正确的手机号',
-	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
-
-	        if (re.test(phone)) {
-	            return [true, ''];
-	        }
-	        return [false, error];
-	    },
-	    password: function password(str) {
-	        var error = '密码为6-20位数字/字母/符号/区分大小写',
-	            re = new RegExp(/^\d{6,20}$/);
-	        if (re.test($.trim(str))) {
-	            return [true, ''];
-	        }
-	        return [false, error];
-	    },
-	    rePassword: function rePassword() {
-	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	        var _ref$psw = _ref.psw;
-	        var psw = _ref$psw === undefined ? null : _ref$psw;
-	        var _ref$repeatPsw = _ref.repeatPsw;
-	        var repeatPsw = _ref$repeatPsw === undefined ? null : _ref$repeatPsw;
-
-	        var error = '两次密码不相同';
-	        if (psw !== repeatPsw) {
-	            return [false, error];
-	        }
-	        return [true, ''];
-	    },
-	    tranPassword: function tranPassword(str) {
-	        var error = '交易密码为6位数字',
-	            re = new RegExp(/^\d{6}$/);
-	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
-	            return [true, ''];
-	        }
-	        return [false, error];
-	    },
-	    bankCard: function bankCard(str) {
-	        var error = '银行卡号不正确',
-	            re = new RegExp(/^\d{12,20}$/);
-	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
-	            return [true, ''];
-	        }
-	        return [false, error];
-	    },
-	    idCard: function idCard(str) {
-	        var error = '身份证号不正确',
-	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
-	        if (re.test($.trim(str))) {
-	            return [true, ''];
-	        }
-	        return [false, error];
-	    },
-	    money100: function money100(str) {
-	        var error = '请输入100的倍数金额';
-	        if (str % 100 === 0) {
-	            return [true, ''];
-	        }
-	        return [false, error];
-	    },
-	    isEmpty: function isEmpty(str) {
-	        var error = '请填写全部的表单';
-	        if (str === '') {
-	            return [false, error];
-	        }
-	        return [true, ''];
-	    },
-	    isMoney: function isMoney(str) {
-	        var error = '请正确填写金额',
-	            int = str * 1;
-	        if (!isNaN(int) && int > 0) {
-	            return [true, ''];
-	        }
-	        return [false, error];
-	    }
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
 	exports.validation = undefined;
 
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -544,7 +421,7 @@ webpackJsonp([12],[
 
 	var _ui = __webpack_require__(2);
 
-	var _from_validation = __webpack_require__(6);
+	var _from_validation = __webpack_require__(7);
 
 	var validation = exports.validation = function validation($phone, $captcha_0, $captcha_1, $captcha) {
 
@@ -660,6 +537,124 @@ webpackJsonp([12],[
 	        }).catch(function (message) {
 	            (0, _ui.signModel)(message);
 	        });
+	    }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	/**
+	 * 表单验证
+	 * @param checklist
+	 * @returns {*[]}
+	 */
+	var check = exports.check = function check(checklist) {
+	    var result = null;
+	    var error = null;
+
+
+	    $.each(checklist, function (index, target) {
+	        var _validation$target$ty = validation[target.type](target.value);
+
+	        var _validation$target$ty2 = _slicedToArray(_validation$target$ty, 2);
+
+	        result = _validation$target$ty2[0];
+	        error = _validation$target$ty2[1];
+
+	        if (!result) return false;
+	    });
+
+	    return [result, error];
+	};
+
+	var validation = {
+	    phone: function phone(str) {
+	        var phone = parseInt($.trim(str)),
+	            error = '请输入正确的手机号',
+	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+
+	        if (re.test(phone)) {
+	            return [true, ''];
+	        }
+	        return [false, error];
+	    },
+	    password: function password(str) {
+	        var error = '密码为6-20位数字/字母/符号/区分大小写',
+	            re = new RegExp(/^\d{6,20}$/);
+	        if (re.test($.trim(str))) {
+	            return [true, ''];
+	        }
+	        return [false, error];
+	    },
+	    rePassword: function rePassword() {
+	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	        var _ref$psw = _ref.psw;
+	        var psw = _ref$psw === undefined ? null : _ref$psw;
+	        var _ref$repeatPsw = _ref.repeatPsw;
+	        var repeatPsw = _ref$repeatPsw === undefined ? null : _ref$repeatPsw;
+
+	        var error = '两次密码不相同';
+	        if (psw !== repeatPsw) {
+	            return [false, error];
+	        }
+	        return [true, ''];
+	    },
+	    tranPassword: function tranPassword(str) {
+	        var error = '交易密码为6位数字',
+	            re = new RegExp(/^\d{6}$/);
+	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
+	            return [true, ''];
+	        }
+	        return [false, error];
+	    },
+	    bankCard: function bankCard(str) {
+	        var error = '银行卡号不正确',
+	            re = new RegExp(/^\d{12,20}$/);
+	        if (re.test($.trim(str)) && !isNaN($.trim(str))) {
+	            return [true, ''];
+	        }
+	        return [false, error];
+	    },
+	    idCard: function idCard(str) {
+	        var error = '身份证号不正确',
+	            re = new RegExp(/^([0-9]{17}([0-9]|x|X){1})|([0-9]{15})$/);
+	        if (re.test($.trim(str))) {
+	            return [true, ''];
+	        }
+	        return [false, error];
+	    },
+	    money100: function money100(str) {
+	        var error = '请输入100的倍数金额';
+	        if (str % 100 === 0) {
+	            return [true, ''];
+	        }
+	        return [false, error];
+	    },
+	    isEmpty: function isEmpty(str) {
+	        var error = '请填写全部的表单';
+	        if (str === '') {
+	            return [false, error];
+	        }
+	        return [true, ''];
+	    },
+	    isMoney: function isMoney(str) {
+	        var error = '请正确填写金额',
+	            int = str * 1;
+	        if (!isNaN(int) && int > 0) {
+	            return [true, ''];
+	        }
+	        return [false, error];
 	    }
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
