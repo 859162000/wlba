@@ -240,7 +240,7 @@ $(function(){
         },1000)
     }
     function fxApi(conten){
-        var winHot = window.location.href;
+        var winHot = window.location.protocol+"//"+window.location.host;
         var link = winHot;
         var img = winHot+"/static/imgs/sub_weixin/eatcoin/wx_logo.jpg";
         var tit = "天降福利 幸运来袭";
@@ -384,7 +384,7 @@ $(function(){
                 lqjl(param);
             }else{
                 var phone = $(".iphone input").val();
-                if(phone && /^1[3|4|5|8|7|]\d{9}$/.test(phone)){
+                if(phone && /^1[2|3|4|5|8|7|]\d{9}$/.test(phone)){
                     var param = {"total":total,"phone":phone};
                     if(isRegister(phone)){
                         lqjl(param);
@@ -403,7 +403,7 @@ $(function(){
         function sxyzm(){
             $.ajax({
                 type:"get",
-                url:"/anti/captcha/refresh",
+                url:"/anti/captcha/refresh/",
                 data:{key:new Date().getTime()},
                 dataType:"json",
                 success:function(data){

@@ -10,15 +10,15 @@ webpackJsonp([6],[
 
 	var _ui = __webpack_require__(2);
 
-	var _from_validation = __webpack_require__(7);
+	var _from_validation = __webpack_require__(6);
 
 	var _automatic_detection = __webpack_require__(5);
 
 	var _api = __webpack_require__(3);
 
-	var _simple_validation = __webpack_require__(10);
+	var _simple_validation = __webpack_require__(9);
 
-	var _bank_limit = __webpack_require__(11);
+	var _bank_limit = __webpack_require__(10);
 
 	(function () {
 
@@ -473,8 +473,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 6 */,
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -592,9 +591,9 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
+/* 7 */,
 /* 8 */,
-/* 9 */,
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -612,7 +611,7 @@ webpackJsonp([6],[
 
 	var _ui = __webpack_require__(2);
 
-	var _from_validation = __webpack_require__(7);
+	var _from_validation = __webpack_require__(6);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -760,7 +759,7 @@ webpackJsonp([6],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";

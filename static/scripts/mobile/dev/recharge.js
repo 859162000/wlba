@@ -12,9 +12,9 @@ webpackJsonp([11],[
 
 	var _ui = __webpack_require__(2);
 
-	var _from_validation = __webpack_require__(7);
+	var _from_validation = __webpack_require__(6);
 
-	var _trade_validation = __webpack_require__(8);
+	var _trade_validation = __webpack_require__(7);
 
 	(function () {
 
@@ -534,8 +534,7 @@ webpackJsonp([11],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 6 */,
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -653,7 +652,7 @@ webpackJsonp([11],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
