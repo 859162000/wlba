@@ -265,11 +265,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = 'https://staging.wanglibao.com/',
-			shareName = '春日总动员',
-			shareImg = host + '/static/imgs/mobile_activity/app_spring_mobilization/300x300.jpg',
-			shareLink = host + 'weixin_activity/spring_reward/',
-			shareMainTit = '春日总动员',
-			shareBody = '万份豪礼倾情送，全民来抢乐出游！';
+			shareName = '网利宝会员初体验，邀你来体验',
+			shareImg = host + '/static/imgs/mobile_activity/app_wangli_vip/300x300.jpg',
+			shareLink = host + 'activity/app_wangli_vip/',
+			shareMainTit = '网利宝会员初体验，邀你来体验',
+			shareBody = '多种特权接入中，总有一款适合你！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -279,7 +279,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '春日总动员',
+			title: '网利宝会员初体验，邀你来体验',
 			link : shareLink,
 			imgUrl: shareImg
 		})
