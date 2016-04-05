@@ -1,5 +1,5 @@
-import './mixins/ui.js'
-import {ajax } from './mixins/api'
+import { Alert } from './mixins/ui.js'
+import { ajax } from './mixins/api'
 
 
 (()=>{
@@ -18,21 +18,20 @@ import {ajax } from './mixins/api'
             no = $(this).attr('data-no'),
             name = $(this).attr('data-name');
 
-        $set_bank_sig.show()
-        $name.text(name)
-        $no.text(no.slice(-4))
+        $set_bank_sig.show();
+        $name.text(name);
+        $no.text(no.slice(-4));
         $bank_confirm.attr('data-id', id)
     })
 
     $bank_cancel.on('click', function(){
-        $set_bank_sig.hide()
+        $set_bank_sig.hide();
     })
 
     $bank_confirm.on('click', function(){
-        var id = $(this).attr('data-id')
+        var id = $(this).attr('data-id');
         putBank(id)
     })
-
 
     function putBank(id){
         const $set_bank_sig  = $('.set-bank-sign');
@@ -48,16 +47,17 @@ import {ajax } from './mixins/api'
             success (data) {
                 if(data.status_code === 0 ){
                     $set_bank_sig.hide();
-                    return alert('绑定成功', function(){
-                        var url  = window.location.href;
-                        window.location.href = url;
-                    })
+                    return Alert('绑定成功', function(){
+                        //var url  = window.location.href;
+                        //window.location.href = url;
+                        window.location.reload();
+                    });
                 }
             },
             error (xhr) {
                 $set_bank_sig.hide();
                 var result = JSON.parse(xhr.responseText);
-                return alert(result.detail+ '，一个账号只能绑定一张卡')
+                return Alert(result.detail+ '，一个账号只能绑定一张卡')
             },
             complete (){
                 $('.bank-confirm').text('立即绑定').removeAttr('disabled');

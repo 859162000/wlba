@@ -140,10 +140,14 @@ class GetContinueActionReward(APIView):
                 redpack_record_ids += sub_redpack_record_ids
                 experience_record_ids += sub_experience_record_ids
                 if rule.gift_type == "reward":
-                    now = timezone.now()
-                    reward = Reward.objects.filter(type=rule.reward,
-                                                   is_used=False,
-                                                   end_time__gte=now).first()
+                    reward_list = rule.reward.split(",")
+                    for reward_type in reward_list:
+                        now = timezone.now()
+                        reward = Reward.objects.filter(type=reward_type,
+                                                       is_used=False,
+                                                       end_time__gte=now).first()
+                        if reward:
+                            break
                     if reward:
                         reward.is_used = True
                         reward.save()
@@ -186,29 +190,34 @@ class GetContinueActionReward(APIView):
                 _send_message_for_hby(request.user, event, end_time)
                 if is_weixin and w_user:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日 %H:%M:%S')), #\n兑换码:%s
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n快去我的账户－理财券页面查看吧！"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日 %H:%M:%S')), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
             if is_weixin and w_user:
                 for reward in rewards:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n兑换码:%s"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n兑换码:%s\n天天签到不要停，快去兑换吧！"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
             if is_weixin and w_user:
                 for experience_event in experience_events:
-                    sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                    "openid":w_user.openid,
-                    "template_id":SIGN_IN_TEMPLATE_ID,
-                    "first":u"恭喜您获得连续%s天签到奖励\n奖励金额：%s"%(getattr(experience_event, "desc_text", "体验金")),
-                    "keyword1":timezone.localtime(sign_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
-                    "keyword2":"%s天" % sign_record.continue_days,
-                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count(),
-                    "url":settings.CALLBACK_HOST + "/weixin/sub_experience/account/"
-                })},
-                                                queue='celery02')
+                    sentCustomerMsg.apply_async(kwargs={
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n快去我的账户－体验金页面查看吧！"%(days, getattr(experience_event, "desc_text", "体验金"), timezone.localtime(experience_event.unavailable_at).strftime("%Y年%m月%d日")),
+                            "openid":w_user.openid,
+                        },
+                                                    queue='celery02')
+                #     sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                #     "openid":w_user.openid,
+                #     "template_id":SIGN_IN_TEMPLATE_ID,
+                #     "first":u"恭喜您获得连续%s天签到奖励\n奖励金额：%s"%(getattr(experience_event, "desc_text", "体验金")),
+                #     "keyword1":timezone.localtime(sign_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                #     "keyword2":"%s天" % sign_record.continue_days,
+                #     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count(),
+                #     "url":settings.CALLBACK_HOST + "/weixin/sub_experience/account/"
+                # })},
+                #                                 queue='celery02')
 
         except Exception, e:
             logger.debug(traceback.format_exc())

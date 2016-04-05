@@ -131,7 +131,7 @@ webpackJsonp([12],[
 	        }).then(function (result) {
 	            console.log('register success');
 	            if (result.ret_code === 0) {
-	                alert('注册成功', function () {
+	                (0, _ui.Alert)('注册成功', function () {
 	                    var next = (0, _api.getQueryStringByName)('next') == '' ? '/weixin/regist/first/' : (0, _api.getQueryStringByName)('next');
 	                    next = (0, _api.getQueryStringByName)('mobile') == '' ? next : next + '&mobile=' + (0, _api.getQueryStringByName)('mobile');
 	                    next = (0, _api.getQueryStringByName)('serverId') == '' ? next : next + '&serverId=' + (0, _api.getQueryStringByName)('serverId');
@@ -170,7 +170,19 @@ webpackJsonp([12],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
+	    //return new Promise(function(resolve, reject){
+	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
+	    //
+	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
+	    //
+	    //    $button.on('click', () => {
+	    //        $alert.hide();
+	    //        //alert(typeof callback+" ,"+callback);
+	    //        //callback();
+	    //        resolve();
+	    //    })
+	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
@@ -179,7 +191,8 @@ webpackJsonp([12],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        //alert(typeof callback+" ,"+callback);
+	        callback();
 	    });
 	};
 
@@ -190,7 +203,7 @@ webpackJsonp([12],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -231,8 +244,11 @@ webpackJsonp([12],[
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.Automatic = undefined;
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _images_validation = __webpack_require__(12);
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -327,7 +343,13 @@ webpackJsonp([12],[
 	            //不等于空
 	            if (!isEmpty) {
 	                if (icon != '') target.siblings('.' + icon).addClass('active');
-	                if (othericon != '') $('.' + othericon).removeAttr('disabled');
+	                if (othericon != '') {
+	                    $('.' + othericon).removeAttr('disabled');
+	                    if (_images_validation.timeIntervalId) {
+	                        clearInterval(_images_validation.timeIntervalId);
+	                        $('.' + othericon).text('获取验证码');
+	                    }
+	                }
 	                if (operation != '') target.siblings('.' + operation).show();
 	            }
 	        }
@@ -521,7 +543,7 @@ webpackJsonp([12],[
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.validation = undefined;
+	exports.validation = exports.timeIntervalId = undefined;
 
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
@@ -531,9 +553,9 @@ webpackJsonp([12],[
 
 	var _from_validation = __webpack_require__(6);
 
+	var timeIntervalId = exports.timeIntervalId = null;
 	var validation = exports.validation = function validation($phone, $captcha_0, $captcha_1, $captcha) {
 
-	    var intervalId = null;
 	    var $validate_operation = $('button[name=validate_operation]');
 
 	    //获取图像验证码
@@ -588,7 +610,7 @@ webpackJsonp([12],[
 	                error: function error(xhr) {
 	                    var result = JSON.parse(xhr.responseText);
 	                    $validate_operation.removeAttr('disabled').text('获取验证码');
-	                    clearInterval(intervalId);
+	                    clearInterval(timeIntervalId);
 	                    validation();
 	                    return reject(result.message);
 	                }
@@ -604,14 +626,14 @@ webpackJsonp([12],[
 	                    count--;
 	                    return $validate_operation.text(count + '秒后可重发');
 	                } else {
-	                    clearInterval(intervalId);
+	                    clearInterval(timeIntervalId);
 	                    $validate_operation.text('重新获取').removeAttr('disabled');
 	                    validation();
 	                    return reject('倒计时失效，请重新获取');
 	                }
 	            };
 	            timerFunction();
-	            return intervalId = setInterval(timerFunction, 1000);
+	            return exports.timeIntervalId = timeIntervalId = setInterval(timerFunction, 1000);
 	        });
 	    }
 
