@@ -4,7 +4,7 @@ webpackJsonp([0],[
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
-	__webpack_require__(2);
+	var _ui = __webpack_require__(2);
 
 	var _api = __webpack_require__(3);
 
@@ -51,16 +51,15 @@ webpackJsonp([0],[
 	            success: function success(data) {
 	                if (data.status_code === 0) {
 	                    $set_bank_sig.hide();
-	                    return alert('绑定成功', function () {
-	                        var url = window.location.href;
-	                        window.location.href = url;
+	                    return (0, _ui.Alert)('绑定成功', function () {
+	                        window.location.reload();
 	                    });
 	                }
 	            },
 	            error: function error(xhr) {
 	                $set_bank_sig.hide();
 	                var result = JSON.parse(xhr.responseText);
-	                return alert(result.detail + '，一个账号只能绑定一张卡');
+	                return (0, _ui.Alert)(result.detail + '，一个账号只能绑定一张卡');
 	            },
 	            complete: function complete() {
 	                $('.bank-confirm').text('立即绑定').removeAttr('disabled');
@@ -86,7 +85,19 @@ webpackJsonp([0],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
+	    //return new Promise(function(resolve, reject){
+	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
+	    //
+	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
+	    //
+	    //    $button.on('click', () => {
+	    //        $alert.hide();
+	    //        //alert(typeof callback+" ,"+callback);
+	    //        //callback();
+	    //        resolve();
+	    //    })
+	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
@@ -95,7 +106,8 @@ webpackJsonp([0],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        //alert(typeof callback+" ,"+callback);
+	        callback();
 	    });
 	};
 
@@ -106,7 +118,7 @@ webpackJsonp([0],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];

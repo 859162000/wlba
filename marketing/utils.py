@@ -195,19 +195,24 @@ def pc_data_generator():
     }
 
 
+def utype_is_app(request):
+    is_app = False
+    device_list = ['android', 'iphone']
+    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+    for device in device_list:
+        match = re.search(device, user_agent)
+        if match and match.group():
+            is_app = True
+
+    return is_app
+
+
 def utype_is_mobile(request):
     is_mobile = False
     ua = request.META.get('HTTP_USER_AGENT', '')
     if ua:
         user_agent = parse(ua)
         if user_agent.is_mobile:
-            is_mobile = True
-
-    device_list = ['android', 'iphone']
-    user_agent = ua.lower()
-    for device in device_list:
-        match = re.search(device, user_agent)
-        if match and match.group():
             is_mobile = True
 
     return is_mobile

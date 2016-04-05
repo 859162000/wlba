@@ -60,7 +60,7 @@ from wanglibao_account import message as inside_message
 from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
-from marketing.utils import get_user_channel_record, utype_is_mobile
+from marketing.utils import get_user_channel_record, utype_is_mobile, utype_is_app
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -2716,10 +2716,10 @@ class HappyMonkeyAPIView(APIView):
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         today = time.strftime("%Y-%m-%d", time.localtime())
-        user = user if user else request.user
+        user = user.user if user else request.user
         #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).first()
-        if reward:
+        reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
+        if reward and today == str(reward.create_at)[:10]:
             to_json_response = {
                 'ret_code': 1001,
                 'message': u'每一个用户,一天只能玩一次',
@@ -2736,7 +2736,7 @@ class HappyMonkeyAPIView(APIView):
                     activity_code=self.token,
                     remain_chance=1)
 
-            total = request.POST.get('total', None)
+            total = int(request.POST.get('total', None))
             exp_name = ''
             for key, value in rewards.items():
                 if total>=key[0] and total<=key[1]:
@@ -2750,11 +2750,12 @@ class HappyMonkeyAPIView(APIView):
                 left_times=0,
                 join_times=1,)
 
-            SendExperienceGold(request.user).send(reward.experience.id)
+            SendExperienceGold(user).send(reward.experience.id)
             join_record.remain_chance = 0
             join_record.save()
             to_json_response = {
                 'ret_code': 0,
+                'type':exp_name,
                 'message': u'用户已经获得%s体验金' % reward.experience.amount,
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -3204,5 +3205,8 @@ class OpenHouseApiView(TemplateView):
             self.template_name = 'app_open_house.jade'
         else:
             self.template_name = 'open_house.jade'
+
+        if utype_is_app(self.request):
+            self.template_name = 'h5_open_house.jade'
 
         return {}

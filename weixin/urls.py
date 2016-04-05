@@ -19,6 +19,7 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
+    url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^coop_regist/$', views.WeixinCoopRegister.as_view(), name="weixin_coop_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
@@ -84,6 +85,8 @@ urlpatterns = patterns(
                                                                                             name='sub_invite'),
     url(r'^award_index/$', fwh_login_required(TemplateView.as_view(template_name="sub_award.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='award_index'),
+    url(r'^award_reatcoin/$', fwh_login_required(RedirectView.as_view(url='/weixin/award_eatcoin/'),login_url='/weixin/sub_login_redirect/')),
+    url(r'^award_eatcoin/$', TemplateView.as_view(template_name="sub_eatcoin.jade")),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
 
     url(r'^sub_regist_first/$', fwh_login_required(TemplateView.as_view(template_name="service_registProcess_first.jade"), login_url="/weixin/sub_login_redirect/")),

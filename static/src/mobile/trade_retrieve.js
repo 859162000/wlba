@@ -1,6 +1,6 @@
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
-import { signModel } from './mixins/ui'
+import { Alert, signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
@@ -91,7 +91,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                 }
 
                 if(result.ret_code > 0 ){
-                    alert(result.message);
+                    Alert(result.message);
                 }
             },
             complete: function(){
