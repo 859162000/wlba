@@ -48,8 +48,6 @@ import { ajax } from './mixins/api'
                 if(data.status_code === 0 ){
                     $set_bank_sig.hide();
                     return Alert('绑定成功', function(){
-                        //var url  = window.location.href;
-                        //window.location.href = url;
                         window.location.reload();
                     });
                 }
