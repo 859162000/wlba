@@ -3,7 +3,7 @@ import { signModel } from './ui'
 import { check } from './from_validation'
 
 export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
-    
+
     let timeIntervalId = null;
     const $validate_operation = $('button[name=validate_operation]');
 
@@ -24,7 +24,6 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
     });
 
     function render(){
-
         //验证表单
         const checkOperation = (phone) => {
             return new Promise((resolve, reject) => {
@@ -92,6 +91,7 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
 
 
         //短信验证码
+
         $validate_operation.on('click', function () {
             const phone = $phone.val(),
                 captcha_0 = $captcha_0.val(),
