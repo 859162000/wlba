@@ -22,6 +22,7 @@ from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
 
 from wanglibao_rest import utils
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger('wanglibao_margin')
 
@@ -233,7 +234,7 @@ class CheckTradePassword(APIView):
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
-class CheckAppTradePassword(APIView):
+class CheckAppTradePassword(DecryptParmsAPIView):
     """
     http请求方式: POST  检查交易密码。
     http://xxxxxx.com/php/trade_password/
@@ -245,12 +246,13 @@ class CheckAppTradePassword(APIView):
 
     def post(self, request):
         user_id = request.user
-        trade_password = self.request.POST.get('password')
+        trade_password = self.params.get('password', "").strip()
+        logger.info("in class CheckAppTradePassword,  self.params = {}\n".format(self.params))
         try:
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
             ret = {'status': 0, 'message': str(e)}
-            logger.debug('CheckTradePassword error with {}!\n'.format(str(e)))
+            logger.debug('CheckTradePassword error with {}!\n'.format(e.message))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
