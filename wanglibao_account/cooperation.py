@@ -813,6 +813,15 @@ class RenRenLiCallback(CoopCallback):
             else:
                 logger.info("renrenli get_amotize_data failed with bid[%s] data[%s]" % (bid, data))
 
+
+class BiSouYiCallback(CoopCallback):
+    def __init__(self, *args, **kwargs):
+        super(BiSouYiCallback, self).__init__(*args, **kwargs)
+        self.coop_id = settings.BAJINSHE_COOP_ID
+        self.coop_key = settings.BAJINSHE_COOP_KEY
+        self.register_call_back_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
+
+
 # 第三方回调通道
 coop_callback_processor = {
     'bajinshe': 'BaJinSheCallback',
