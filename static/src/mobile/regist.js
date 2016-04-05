@@ -16,6 +16,7 @@ import { validation } from './mixins/images_validation'
         $invite_code = $('input[name=invite_code]'),
         $agreement = $('input[name=agreement]'),
         $captcha = $('#captcha'),
+        $validate_operation = $('button[name=validate_operation]'),
         $token = $('#token');
 
 //---------------初始化操作start---------
@@ -32,15 +33,20 @@ import { validation } from './mixins/images_validation'
         checklist: autolist,
         otherlist: [
             {target: $agreement, required: true}
-        ]
+        ],
+        done: function(){
+            if(validClass.status()){
+                $validate_operation.attr('disabled', true);
+            }
+        }
     });
     auto.operationClear();
     auto.operationPassword();
 //---------------初始化操作end---------
 
     //短信验证码
-    validation($identifier, $captcha_0, $captcha_1, $captcha)
-
+    var validClass = validation($identifier, $captcha_0, $captcha_1, $captcha);
+    validClass.render();
 //---------------注册操作start---------
     //用户协议
     $("#agreement").on('click', function () {
