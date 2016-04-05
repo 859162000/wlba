@@ -15,6 +15,7 @@ import { validation } from './mixins/images_validation'
         $password = $('input[name=password]'),
         $invite_code = $('input[name=invite_code]'),
         $agreement = $('input[name=agreement]'),
+        $validate_operation = $('button[name=validate_operation]'),
         $captcha = $('#captcha'),
         $token = $('#token');
 
@@ -32,15 +33,20 @@ import { validation } from './mixins/images_validation'
         checklist: autolist,
         otherlist: [
             {target: $agreement, required: true}
-        ]
+        ],
+        done: function(){
+            if(validClass.status()){
+                $validate_operation.attr('disabled', true);
+            }
+        }
     });
     auto.operationClear();
     auto.operationPassword();
 //---------------初始化操作end---------
 
     //短信验证码
-    validation($identifier, $captcha_0, $captcha_1, $captcha)
-
+   var validClass = validation($identifier, $captcha_0, $captcha_1, $captcha);
+    validClass.render();
 //---------------注册操作start---------
     //用户协议
     $("#agreement").on('click', function () {
@@ -87,12 +93,18 @@ import { validation } from './mixins/images_validation'
         })
     }
 
+    function getUrl(c){
+        const lUrl = window.location.href;
+        let urlArr = lUrl.split(c);
+        return urlArr[1].indexOf("&") > -1 ?  urlArr[1].substring(0,urlArr[1].indexOf("&")) : urlArr[1];
+    }
+
     //注册
     function register(url) {
         let invite_val = $.trim($invite_code.val());
-        const lUrl = window.location.href,
-            urlArr = lUrl.split("&");
-        console.log(urlArr);
+        const cid = getUrl("cid="),
+            content = getUrl("content="),
+            sign = getUrl("sign=");
         return new Promise((resolve, reject) => {
             ajax({
                 url: url,
@@ -104,7 +116,9 @@ import { validation } from './mixins/images_validation'
                     'captcha_1': $captcha_1.val(),
                     'validate_code': $validate_code.val(),
                     'invite_code': invite_val === "" ? $token.val() : invite_val,
-                    'invite_phone': ''
+                    'cid': cid,
+                    'content': content,
+                    'sign': sign
                 },
                 beforeSend(){
                     $submit.text('注册中,请稍等...').attr('disabled', 'true');
@@ -131,15 +145,17 @@ import { validation } from './mixins/images_validation'
             })
             .then((result)=> {
                 console.log('register success');
-                if (result.ret_code === 0) {
+                if (result.ret_code === 10010) {
+
+                    BSY.Oauth();//对接
+
                     Alert('注册成功', ()=> {
-                        var next = getQueryStringByName('next') == '' ? '/weixin/regist/first/' : getQueryStringByName('next');
-                            next = getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ getQueryStringByName('mobile');
-                            next = getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ getQueryStringByName('serverId');
-                        window.location.href = next;
+                        //var next = getQueryStringByName('next') == '' ? '/weixin/regist/first/' : getQueryStringByName('next');
+                        //    next = getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ getQueryStringByName('mobile');
+                        //    next = getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ getQueryStringByName('serverId');
+                        window.location.href = '/weixin/list/';
                     });
-                }
-                if (result.ret_code > 0) {
+                } else {
                     signModel(result.message)
                 }
             })
