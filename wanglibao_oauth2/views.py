@@ -151,8 +151,8 @@ class AccessTokenOauthView(APIView):
                     if (int(get_current_utc_timestamp()) - int(utc_timestamp)) <= 120000:
                         if sign == generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
                             access_token = AccessToken.objects.filter(Q(token=token) &
-                                                                      (Q(expires__gte=timezone.now() |
-                                                                       Q(client__token_expire_switch=False))))
+                                                                      (Q(expires__gte=timezone.now()) |
+                                                                       Q(client__token_expire_switch=False)))
                             if access_token.exists():
                                 utc_timestamp = get_current_utc_timestamp()
                                 response_data = {
