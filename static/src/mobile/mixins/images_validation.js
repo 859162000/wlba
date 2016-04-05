@@ -2,9 +2,9 @@ import { ajax } from './api'
 import { signModel } from './ui'
 import { check } from './from_validation'
 
-export var timeIntervalId = null;
 export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
-
+    
+    let timeIntervalId = null;
     const $validate_operation = $('button[name=validate_operation]');
 
     //获取图像验证码
