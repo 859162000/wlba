@@ -1,55 +1,86 @@
-webpackJsonp([6],[
+webpackJsonp([13],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	var _ui = __webpack_require__(2);
-
-	var _from_validation = __webpack_require__(6);
 
 	var _automatic_detection = __webpack_require__(5);
 
 	var _api = __webpack_require__(3);
 
-	var _simple_validation = __webpack_require__(9);
+	var _ui = __webpack_require__(2);
 
-	var _bank_limit = __webpack_require__(10);
+	var _from_validation = __webpack_require__(6);
+
+	var _images_validation = __webpack_require__(12);
 
 	(function () {
 
 	    var $submit = $('button[type=submit]'),
-	        $bank = $('select[name=bank]'),
-	        $bankcard = $('input[name=bankcard]'),
-	        $bankphone = $('input[name=bankphone]'),
-	        $validation = $('input[name=validation]'),
-	        $money = $('input[name=money]');
+	        $identifier = $('input[name=identifier]'),
+	        $captcha_1 = $('input[name=captcha_1]'),
+	        $captcha_0 = $('input[name=captcha_0]'),
+	        $validate_code = $('input[name=validate_code]'),
+	        $password = $('input[name=password]'),
+	        $invite_code = $('input[name=invite_code]'),
+	        $agreement = $('input[name=agreement]'),
+	        $validate_operation = $('button[name=validate_operation]'),
+	        $captcha = $('#captcha'),
+	        $token = $('#token');
 
 	    //---------------初始化操作start---------
-	    var autolist = [{ target: $bank, required: true }, { target: $bankcard, required: true }, { target: $bankphone, required: true }, { target: $validation, required: true }, { target: $money, required: true }];
+	    var autolist = [{ target: $identifier, required: true }, { target: $captcha_1, required: true }, { target: $validate_code, required: true }, { target: $password, required: true }, { target: $invite_code, required: false }];
 	    //自动检查
 	    var auto = new _automatic_detection.Automatic({
 	        submit: $submit,
-	        checklist: autolist
+	        checklist: autolist,
+	        otherlist: [{ target: $agreement, required: true }],
+	        done: function done() {
+	            if (validClass.status()) {
+	                $validate_operation.attr('disabled', true);
+	            }
+	        }
 	    });
 	    auto.operationClear();
-
-	    var codeAutoList = [{ target: $bank, required: true }, { target: $bankcard, required: true }, { target: $bankphone, required: true }];
-	    var code = new _automatic_detection.Automatic({
-	        submit: $('.regist-validation'),
-	        checklist: codeAutoList
-	    });
+	    auto.operationPassword();
 	    //---------------初始化操作end---------
 
-	    //验证短信码所需表单
-	    var checkOperation_validation = function checkOperation_validation() {
+	    //短信验证码
+	    var validClass = (0, _images_validation.validation)($identifier, $captcha_0, $captcha_1, $captcha);
+	    validClass.render();
+	    //---------------注册操作start---------
+	    //用户协议
+	    $("#agreement").on('click', function () {
+	        $(this).toggleClass('agreement');
+	        $(this).hasClass('agreement') ? $agreement.attr('checked', 'checked') : $agreement.removeAttr('checked');
+	        $identifier.trigger('input');
+	    });
+	    //显示协议
+	    var $showXiyi = $('.xieyi-btn'),
+	        $cancelXiyi = $('.cancel-xiyie'),
+	        $protocolDiv = $('.regist-protocol-div');
+	    $showXiyi.on('click', function (event) {
+	        event.preventDefault();
+	        $protocolDiv.css('display', 'block');
+	        setTimeout(function () {
+	            $protocolDiv.css('top', '0%');
+	        }, 0);
+	    });
+	    //关闭协议
+	    $cancelXiyi.on('click', function () {
+	        $protocolDiv.css('top', '100%');
+	        setTimeout(function () {
+	            $protocolDiv.css('display', 'none');
+	        }, 200);
+	    });
+
+	    //验证表单
+	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
 	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }];
+	                var checklist = [{ type: 'phone', value: $identifier.val() }, { type: 'isEmpty', value: $captcha_1.val() }, { type: 'isEmpty', value: $validate_code.val() }, { type: 'password', value: $password.val() }];
 	                return (0, _from_validation.check)(checklist);
 	            }
 
@@ -67,158 +98,79 @@ webpackJsonp([6],[
 	        });
 	    };
 
-	    //验证表单
-	    var checkOperation_submit = function checkOperation_submit() {
+	    function getUrl(c) {
+	        var lUrl = window.location.href;
+	        var urlArr = lUrl.split(c);
+	        return urlArr[1].indexOf("&") > -1 ? urlArr[1].substring(0, urlArr[1].indexOf("&")) : urlArr[1];
+	    }
+
+	    //注册
+	    function register(url) {
+	        var invite_val = $.trim($invite_code.val());
+	        var cid = getUrl("cid="),
+	            content = getUrl("content="),
+	            sign = getUrl("sign=");
 	        return new Promise(function (resolve, reject) {
-	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }, { type: 'isEmpty', value: $validation.val() }];
-	                return (0, _from_validation.check)(checklist);
-	            }
-
-	            var _checkOperation3 = checkOperation();
-
-	            var _checkOperation4 = _slicedToArray(_checkOperation3, 2);
-
-	            var isThrough = _checkOperation4[0];
-	            var sign = _checkOperation4[1];
-
-	            if (isThrough) return resolve('验证成功');
-
-	            (0, _ui.signModel)(sign);
-	            return console.log('验证失败');
-	        });
-	    };
-
-	    //渲染银行卡
-	    var appendBanks = function appendBanks(banks) {
-	        var str = '';
-	        for (var bank in banks) {
-	            str += '<option value ="' + banks[bank].gate_id + '" >' + banks[bank].name + '</option>';
-	        }
-	        return str;
-	    };
-
-	    //获取银行卡
-	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank1')) {
-	            var content = JSON.parse(localStorage.getItem('bank'));
-	            $bank.append(appendBanks(content));
-	            return callback && callback(content);
-	        } else {
 	            (0, _api.ajax)({
+	                url: url,
 	                type: 'POST',
-	                url: '/api/bank/list_new/',
-	                success: function success(results) {
-	                    if (results.ret_code === 0) {
-	                        var _content = JSON.stringify(results.banks);
-	                        $bank.append(appendBanks(results.banks));
-	                        window.localStorage.setItem('bank', _content);
-	                        return callback && callback(_content);
-	                    } else {
-	                        return (0, _ui.Alert)(results.message);
-	                    }
+	                data: {
+	                    'identifier': $identifier.val(),
+	                    'password': $password.val(),
+	                    'captcha_0': $captcha_0.val(),
+	                    'captcha_1': $captcha_1.val(),
+	                    'validate_code': $validate_code.val(),
+	                    'invite_code': invite_val === "" ? $token.val() : invite_val,
+	                    'cid': cid,
+	                    'content': content,
+	                    'sign': sign
 	                },
-	                error: function error(data) {
-	                    console.log(data);
+	                beforeSend: function beforeSend() {
+	                    $submit.text('注册中,请稍等...').attr('disabled', 'true');
+	                },
+	                success: function success(data) {
+	                    resolve(data);
+	                },
+	                error: function error(xhr) {
+	                    reject(xhr);
+	                },
+	                complete: function complete() {
+	                    $submit.text('立即注册 ｜ 领取奖励').removeAttr('disabled');
 	                }
 	            });
-	        }
-	    };
-
-	    fetch_banklist(function (banklist) {
-	        _bank_limit.limit.getInstance({
-	            target: $('.limit-bank-item'),
-	            limit_data: banklist
-	        });
-	    });
-
-	    var $validation_btn = $('button[name=validation_btn]');
-
-	    var simple_validation = new _simple_validation.Simple_validation({
-	        target: $validation_btn,
-	        VALIDATION_URL: '/api/pay/deposit_new/'
-	    });
-
-	    //短信验证码
-	    $validation_btn.on('click', function () {
-
-	        simple_validation.set_check_list([{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }]);
-
-	        simple_validation.set_ajax_data({
-	            card_no: $bankcard.val(),
-	            gate_id: $bank.val(),
-	            phone: $bankphone.val(),
-	            amount: $money.length > 0 ? $money.val() : 0.01
-	        });
-	        simple_validation.start();
-	    });
-	    //绑卡操作
-	    $submit.on('click', function () {
-	        var _this = this;
-
-	        checkOperation_submit().then(function (result) {
-	            var check_recharge = $(_this).attr('data-recharge');
-	            if (check_recharge == 'true') {
-	                (0, _ui.Confirm)("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
-	            } else {
-	                recharge({ firstRecharge: false });
-	            }
-	        }).catch(function (result) {});
-	    });
-
-	    function recharge(check) {
-	        (0, _api.ajax)({
-	            type: 'POST',
-	            url: '/api/pay/cnp/dynnum_new/',
-	            data: {
-	                phone: $bankphone.val(),
-	                vcode: $validation.val(),
-	                order_id: $('input[name=order_id]').val(),
-	                token: $('input[name=token]').val(),
-	                set_the_one_card: true
-	            },
-	            beforeSend: function beforeSend() {
-	                if (check.firstRecharge) {
-	                    $submit.attr('disabled', 'disabled').text('充值中...');
-	                } else {
-	                    $submit.attr('disabled', 'disabled').text('绑卡中...');
-	                }
-	            },
-	            success: function success(data) {
-	                if (data.ret_code > 0) {
-	                    return (0, _ui.Alert)(data.message);
-	                } else {
-	                    $(".error-sign").remove();
-	                    if (check.firstRecharge) {
-	                        $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
-	                    } else {
-	                        var _ret = function () {
-	                            var next_url = (0, _api.getQueryStringByName)('next'),
-	                                next = next_url == '' ? '/weixin/list/' : next_url;
-	                            return {
-	                                v: (0, _ui.Alert)('绑卡成功！', function () {
-	                                    window.location.href = next;
-	                                })
-	                            };
-	                        }();
-
-	                        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	                    }
-	                }
-	            },
-	            error: function error(result) {
-	                var data = JSON.parse(result.responseText);
-	                return (0, _ui.Alert)(data.detail);
-	            },
-	            complete: function complete() {
-	                if (check.firstRecharge) {
-	                    $submit.removeAttr('disabled').text('绑卡并充值');
-	                } else {
-	                    $submit.removeAttr('disabled').text('立即绑卡');
-	                }
-	            }
 	        });
 	    }
+
+	    $submit.on('click', function () {
+	        checkOperation().then(function (result) {
+	            console.log(result); //check success
+	            //return register('/api/register/');
+	            return register('/api/bisouyi/register/?promo_token=bisouyi');
+	        }).then(function (result) {
+	            console.log('register success');
+	            if (result.ret_code === 10010) {
+
+	                BSY.Oauth(); //对接
+
+	                (0, _ui.Alert)('注册成功', function () {
+	                    //var next = getQueryStringByName('next') == '' ? '/weixin/regist/first/' : getQueryStringByName('next');
+	                    //    next = getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ getQueryStringByName('mobile');
+	                    //    next = getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ getQueryStringByName('serverId');
+	                    window.location.href = '/weixin/list/';
+	                });
+	            } else {
+	                (0, _ui.signModel)(result.message);
+	            }
+	        }).catch(function (xhr) {
+	            var result = JSON.parse(xhr.responseText);
+	            if (xhr.status === 429) {
+	                (0, _ui.signModel)('系统繁忙，请稍候重试');
+	            } else {
+	                (0, _ui.signModel)(result.message);
+	            }
+	        });
+	    });
+	    //---------------注册操作end---------
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
@@ -593,7 +545,10 @@ webpackJsonp([6],[
 /***/ },
 /* 7 */,
 /* 8 */,
-/* 9 */
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -601,11 +556,9 @@ webpackJsonp([6],[
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.Simple_validation = undefined;
+	exports.validation = undefined;
 
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _api = __webpack_require__(3);
 
@@ -613,250 +566,148 @@ webpackJsonp([6],[
 
 	var _from_validation = __webpack_require__(6);
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var validation = exports.validation = function validation($phone, $captcha_0, $captcha_1, $captcha) {
 
-	/**
-	 * 短信验证码按钮封装
-	 * @param VALIDATION_URL 必填
-	 * @param target  必填
-	 * @param validation_form 必填
-	 * @param callback 选填
-	 */
+	    var timeIntervalId = null;
+	    var $validate_operation = $('button[name=validate_operation]');
 
-	var Simple_validation = exports.Simple_validation = function () {
-	    function Simple_validation() {
-	        var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	        var _ref$target = _ref.target;
-	        var target = _ref$target === undefined ? null : _ref$target;
-	        var _ref$VALIDATION_URL = _ref.VALIDATION_URL;
-	        var VALIDATION_URL = _ref$VALIDATION_URL === undefined ? null : _ref$VALIDATION_URL;
-	        var _ref$callback = _ref.callback;
-	        var callback = _ref$callback === undefined ? null : _ref$callback;
-
-	        _classCallCheck(this, Simple_validation);
-
-	        var _ref2 = [target, VALIDATION_URL, callback];
-	        this.target = _ref2[0];
-	        this.VALIDATION_URL = _ref2[1];
-	        this.callback = _ref2[2];
-
-	        this.post_data = null;
-	        this.check_list = null;
-	        this.intervalId = null;
-	        this.before_validation = this.before_validation.bind(this);
-	        this.timerFunction = this.timerFunction.bind(this);
-	        this.execute_request = this.execute_request.bind(this);
+	    //获取图像验证码
+	    function validation() {
+	        var url = '/captcha/refresh/?v=' + new Date().getTime();
+	        $.get(url, function (result) {
+	            $captcha.attr('src', result['image_url']);
+	            $captcha_0.val(result['key']);
+	        });
 	    }
 
-	    _createClass(Simple_validation, [{
-	        key: 'set_ajax_data',
-	        value: function set_ajax_data(data_list) {
-	            this.post_data = data_list;
-	        }
-	    }, {
-	        key: 'set_check_list',
-	        value: function set_check_list(list) {
-	            this.check_list = list;
-	        }
-	    }, {
-	        key: 'before_validation',
-	        value: function before_validation() {
-	            var checklist = this.check_list;
+	    validation();
 
+	    //图像验证码
+	    $captcha.on('click', function () {
+	        validation();
+	    });
+
+	    function render() {
+	        //验证表单
+	        var checkOperation = function checkOperation(phone) {
 	            return new Promise(function (resolve, reject) {
-	                function validation_operation() {
-	                    var form_list = checklist;
-	                    return (0, _from_validation.check)(form_list);
+	                function checkOperation() {
+	                    var checklist = [{ type: 'phone', value: phone }];
+	                    return (0, _from_validation.check)(checklist);
 	                }
 
-	                var _validation_operation = validation_operation();
+	                var _checkOperation = checkOperation();
 
-	                var _validation_operation2 = _slicedToArray(_validation_operation, 2);
+	                var _checkOperation2 = _slicedToArray(_checkOperation, 2);
 
-	                var isThrough = _validation_operation2[0];
-	                var sign = _validation_operation2[1];
+	                var isThrough = _checkOperation2[0];
+	                var sign = _checkOperation2[1];
 
 	                if (isThrough) return resolve('验证成功');
 
 	                return reject(sign);
 	            });
-	        }
-	    }, {
-	        key: 'execute_request',
-	        value: function execute_request() {
-	            var $target = this.target,
-	                VALIDATION_URL = this.VALIDATION_URL,
-	                post_data = this.post_data,
-	                intervalId = this.intervalId;
+	        };
 
+	        //获取短信验证码
+	        function fetchValidation(phone, captcha_0, captcha_1) {
 	            return new Promise(function (resolve, reject) {
 	                (0, _api.ajax)({
-	                    url: VALIDATION_URL,
+	                    url: '/api/phone_validation_code/' + phone + '/',
+	                    data: {
+	                        captcha_0: captcha_0,
+	                        captcha_1: captcha_1
+	                    },
 	                    type: 'POST',
-	                    data: post_data,
 	                    beforeSend: function beforeSend() {
-	                        $target.attr('disabled', 'disabled').text('发送中..');
+	                        $validate_operation.attr('disabled', 'disabled').text('发送中..');
 	                    },
-	                    success: function success(data) {
-	                        if (data.ret_code > 0) {
-	                            clearInterval(intervalId);
-	                            $target.text('重新获取').removeAttr('disabled').css('background', '#50b143');
+	                    success: function success() {
+	                        resolve('短信已发送，请注意查收！');
+	                    },
 
-	                            return reject(data.message);
-	                        } else {
-	                            $("input[name='order_id']").val(data.order_id);
-	                            $("input[name='token']").val(data.token);
-	                            return resolve('短信已发送，请注意查收！');
-	                        }
-	                    },
-	                    error: function error(result) {
-	                        clearInterval(intervalId);
-	                        $target.text('重新获取').removeAttr('disabled').css('background', '#50b143');
-	                        return reject(result);
+	                    error: function error(xhr) {
+	                        var result = JSON.parse(xhr.responseText);
+	                        $validate_operation.removeAttr('disabled').text('获取验证码');
+	                        clearInterval(timeIntervalId);
+	                        timeIntervalId = null;
+	                        validation();
+	                        return reject(result.message);
 	                    }
 	                });
 	            });
 	        }
-	    }, {
-	        key: 'timerFunction',
-	        value: function timerFunction(count) {
-	            var $target = this.target;
-	            var intervalId = void 0;
-	            var timerInside = function timerInside() {
-	                if (count > 1) {
-	                    count--;
-	                    return $target.text(count + '秒后可重发');
-	                } else {
-	                    clearInterval(intervalId);
-	                    $target.text('重新获取').removeAttr('disabled');
-	                    return (0, _ui.signModel)('倒计时失效，请重新获取');
-	                }
-	            };
-	            timerInside();
-	            intervalId = setInterval(timerInside, 1000);
-	            return this.intervalId = intervalId;
-	        }
-	    }, {
-	        key: 'start',
-	        value: function start() {
-	            var _this = this;
 
-	            this.before_validation().then(function (result) {
-	                console.log('验证通过');
-	                return _this.execute_request();
-	            }).then(function (result) {
-	                (0, _ui.signModel)(result);
-	                _this.timerFunction(60);
-	            }).catch(function (result) {
-	                return (0, _ui.signModel)(result);
+	        //倒计时
+	        function timerFunction(count) {
+	            return new Promise(function (resolve, reject) {
+	                var timerFunction = function timerFunction() {
+	                    if (count > 1) {
+	                        count--;
+	                        return $validate_operation.text(count + '秒后可重发');
+	                    } else {
+	                        clearInterval(timeIntervalId);
+	                        timeIntervalId = null;
+	                        $validate_operation.text('重新获取').removeAttr('disabled');
+	                        validation();
+	                        return reject('倒计时失效，请重新获取');
+	                    }
+	                };
+	                timerFunction();
+	                return timeIntervalId = setInterval(timerFunction, 1000);
 	            });
 	        }
-	    }]);
 
-	    return Simple_validation;
-	}();
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+	        //短信验证码
 
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
+	        $validate_operation.on('click', function () {
+	            var phone = $phone.val(),
+	                captcha_0 = $captcha_0.val(),
+	                captcha_1 = $captcha_1.val();
+	            chained(phone, captcha_0, captcha_1);
+	        });
 
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * 银行限额
-	 * @type {{getInstance}}
-	 *
-	 */
-
-	var limit = exports.limit = function () {
-
-	    var _instance = null;
-
-	    var Limit = function () {
-	        function Limit() {
-	            var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	            var _ref$target = _ref.target;
-	            var target = _ref$target === undefined ? null : _ref$target;
-	            var _ref$limit_data = _ref.limit_data;
-	            var limit_data = _ref$limit_data === undefined ? null : _ref$limit_data;
-
-	            _classCallCheck(this, Limit);
-
-	            var _ref2 = [target, limit_data];
-	            this.target = _ref2[0];
-	            this.limit_data = _ref2[1];
-
-
-	            this._format_limit = this._format_limit.bind(this);
-	            this.target.html(this._style(this.limit_data));
+	        function chained(phone, captcha_0, captcha_1) {
+	            /**
+	             * 所有的逻辑在这里，获取短信验证码的时候，先检查手机号是否符合，
+	             * 成功后 fetchValidation（发送短信请求）
+	             * 成功后 timerFunction（倒计时）
+	             */
+	            checkOperation(phone).then(function () {
+	                console.log('验证成功');
+	                return fetchValidation(phone, captcha_0, captcha_1);
+	            }).then(function (message) {
+	                (0, _ui.signModel)(message);
+	                console.log('短信发送成功');
+	                var count = 60;
+	                return timerFunction(count);
+	            }).catch(function (message) {
+	                (0, _ui.signModel)(message);
+	            });
 	        }
+	    }
 
-	        _createClass(Limit, [{
-	            key: "_style",
-	            value: function _style(limit_data) {
-	                limit_data = JSON.parse(limit_data);
-	                var string_list = '';
-	                for (var i = 0; i < limit_data.length; i++) {
-	                    string_list += "<div class='limit-bank-list'>";
-	                    string_list += "<div class='limit-list-dec'>";
-	                    string_list += "<div class='bank-name'>" + limit_data[i].name + "</div>";
-	                    string_list += "<div class='bank-limit'>首次限额" + this._format_limit(limit_data[i].first_one) + "/单笔限额" + this._format_limit(limit_data[i].first_one) + "/日限额" + this._format_limit(limit_data[i].second_day) + "</div>";
-	                    string_list += "</div>";
-	                    string_list += "<div class='limit-list-icon " + limit_data[i].bank_id + "'></div>";
-	                    string_list += "</div>";
-	                }
-
-	                return string_list;
-	            }
-	        }, {
-	            key: "_format_limit",
-	            value: function _format_limit(amount) {
-	                var money = amount,
-	                    reg = /^\d{5,}$/,
-	                    reg2 = /^\d{4}$/;
-	                if (reg.test(amount)) {
-	                    return money = amount.replace('0000', '') + '万';
-	                }
-	                if (reg2.test(amount)) {
-	                    return money = amount.replace('000', '') + '千';
-	                }
-	            }
-	            //
-	            //show(){
-	            //    this.target.show()
-	            //}
-	            //
-	            //hide(){
-	            //    this.target.hide()
-	            //}
-
-	        }]);
-
-	        return Limit;
-	    }();
-
-	    var getInstance = function getInstance(data) {
-	        if (!_instance) {
-	            _instance = new Limit(data);
+	    function destory() {
+	        if (timeIntervalId) {
+	            clearInterval(timeIntervalId);
+	            $validate_operation.removeAttr('disabled').text('获取验证码');
 	        }
-	        return _instance;
-	    };
+	    }
 
+	    function status() {
+	        if (timeIntervalId) {
+	            return true;
+	        }
+	        return false;
+	    }
 	    return {
-	        getInstance: getInstance
+	        render: render, //初始化定时器
+	        status: status, //定时器的状态
+	        destory: destory, //销毁定时器
+	        validation: validation //暴露出短信接口
 	    };
-	}();
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }
 ]);

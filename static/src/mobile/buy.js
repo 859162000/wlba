@@ -134,7 +134,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                 }
 
                 if(result.ret_code > 0 ){
-                    alert(result.message);
+                    Alert(result.message);
                 }
             }
         })
@@ -235,11 +235,11 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                     return
                 }
                 if(result.error_number > 0){
-                    return alert(result.message);
+                    return Alert(result.message);
                 }
             },
             error: function (xhr) {
-                alert('服务器异常');
+                Alert('服务器异常');
             },
             complete: function () {
                 $submit.removeAttr('disabled').text("立即投资");
@@ -328,7 +328,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                 trade_operation(amount, buy)
             })
             .catch((res) => {
-               alert(res)
+               Alert(res)
             })
     });
 

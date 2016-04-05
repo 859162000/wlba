@@ -288,6 +288,7 @@ urlpatterns += patterns(
     url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
     url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view()),
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
+    url(r'^geetest/$', GeetestAPIView.as_view()),
     url(r'^airport_reward/fetch/$', FetchAirportServiceReward.as_view()),
 )
 
