@@ -159,7 +159,7 @@ webpackJsonp([6],[
 	        checkOperation_submit().then(function (result) {
 	            var check_recharge = $(_this).attr('data-recharge');
 	            if (check_recharge == 'true') {
-	                confirm("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
+	                (0, _ui.Confirm)("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
 	            } else {
 	                recharge({ firstRecharge: false });
 	            }

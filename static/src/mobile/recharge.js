@@ -1,6 +1,6 @@
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
-import { Alert, signModel } from './mixins/ui'
+import { Alert, Confirm, signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
@@ -52,7 +52,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
     //confirm
     const confirm_ui = (amount) => {
         return new Promise((resolve, reject)=> {
-            confirm(`充值金额为${amount}`, '确认充值', ()=> {
+            Confirm(`充值金额为${amount}`, '确认充值', ()=> {
                 resolve(amount)
             })
         })
