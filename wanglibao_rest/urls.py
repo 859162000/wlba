@@ -49,7 +49,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, ActivityUserInfoUploadApi)
+                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, ActivityUserInfoUploadApi,
+                                  BiSouYiRegisterApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -361,4 +362,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^activity_user_info/upload/$', ActivityUserInfoUploadApi.as_view()),
+)
+
+# 比搜益用户注册接口
+urlpatterns += patterns(
+    '',
+    url(r'^bisouyi/register/$', BiSouYiRegisterApi.as_view()),
 )
