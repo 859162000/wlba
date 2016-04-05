@@ -7,6 +7,8 @@ import logging
 import hashlib
 import requests
 import datetime
+import StringIO
+import traceback
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
@@ -246,8 +248,11 @@ def get_coop_access_token(phone, client_id, tid, coop_key):
             'ret_code': 50001,
             'message': 'api error'
         }
-        logger.info("get_coop_access_token failed to connect")
-        logger.info(e)
+        # 创建内存文件对象
+        fp = StringIO.StringIO()
+        traceback.print_exc(file=fp)
+        message = fp.getvalue()
+        logger.info("get_coop_access_token failed to connect with error %s" % message)
 
     return response_data
 
