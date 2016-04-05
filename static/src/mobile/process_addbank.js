@@ -1,4 +1,4 @@
-import { signModel } from './mixins/ui'
+import { Confirm, signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
@@ -163,7 +163,7 @@ import { limit} from './mixins/bank_limit.js'
             .then((result) =>{
                 var check_recharge = $(this).attr('data-recharge')
                 if(check_recharge == 'true'){
-                    confirm("充值金额为" + $money.val(), '确认充值', recharge, {firstRecharge: true});
+                    Confirm("充值金额为" + $money.val(), '确认充值', recharge, {firstRecharge: true});
                 }else{
                     recharge({firstRecharge: false})
                 }

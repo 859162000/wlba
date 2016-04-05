@@ -1,0 +1,141 @@
+doctype html
+html(lang='zh-CN')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1,user-scalable=no')
+    meta(name='x5-orientation', content='portrait')
+    title 天降福利 幸运来袭
+    link(href='/static/styles/sub_weixin/eatcoin.css', rel='stylesheet')
+    script(type='text/javascript', src='/static/js/lib/jquery.min.js')
+    script(type='text/javascript', src='/static/src/subMobile/lib/weixin/wx.js')
+    script(type='text/javascript', src='/static/scripts/subMobile/eatcoin.js')
+  body
+    audio#car_audio(preload='preload', src='/static/imgs/sub_weixin/eatcoin/001.mp3', loop='')
+    .logo
+      img(src='/static/imgs/sub_weixin/eatcoin/logo.png', width='21.2%', height='4.6%')
+    #box(style='border: 0;margin: 0;padding: 0;overflow: hidden;background-color: #000000;')
+      canvas#canvas(style='display: block;')
+      .f(style=' width:33.1%;height:7%;position:absolute; top:2.2%; left: 2%;')
+        span.number 0
+        span.dw 个
+      img.monkeyPending(src='/static/imgs/sub_weixin/eatcoin/monkeyPending.gif', width='34.7%', height='32.5%')
+      .djs
+        span 3
+      .sz
+        img(src='/static/imgs/sub_weixin/eatcoin/sz.gif', width='80.1%', height='23%')
+    .loadding_page
+      .loadding
+        .loadding_bj
+          .loaded
+      .loading_monkey
+        img.monkey_hand_left(src='/static/imgs/sub_weixin/eatcoin/monkey_hand.png', width='3.5%', height='2.3%')
+        img.monkey(src='/static/imgs/sub_weixin/eatcoin/loading_monkey.gif', width='19.5%', height='14.6%')
+        img.monkey_hand_right(src='/static/imgs/sub_weixin/eatcoin/monkey_hand_right.png', width='3.5%', height='2.3%')
+      .loading_text loading...
+    .start_page
+      .title
+        img(src='/static/imgs/sub_weixin/eatcoin/font.png', width='88.5%', height='29.5%')
+      .bag
+        img(src='/static/imgs/sub_weixin/eatcoin/bag.png', width='46.9%', height='38.1%')
+      .play_btn
+        img(src='/static/imgs/sub_weixin/eatcoin/play_btn.png', width='22.1%', height='14.5%')
+      .instructions
+        a(href='javascript:;') 活动说明
+      .bounced
+        .close
+          img(src='/static/imgs/sub_weixin/eatcoin/Close_bounced.png', width='11.2%', height='7.6%')
+        .instructions_text
+          p(style='text-align: center') 活动说明
+          p 1、左右点击屏幕控制拿着福袋的聪明猴获得最多的金币，装进非金币物品游戏结束，装进钱带的金币越多，则奖励越大；
+          p 2、绑定微信服务号用户每天又一次赚取奖励的机会，可以重复玩游戏获得最高奖励
+          p 3、游戏结束后，系统自动提示奖励，并且奖励自动发放到您的网利宝账户
+          p 4、在法律允许范围内，本活动最终解释权归网利科技所有
+    .blank
+    .reward_page
+      .lq(style='display: block')
+        .reward_txt
+          div
+            | 恭喜您收集了
+            span.jbsl 5
+            | 枚金币
+          div
+            | 赚取
+            span.jp 888元
+            | 体验金
+        .gold_bag
+          img(src='/static/imgs/sub_weixin/eatcoin/Gold_bag5.png', width='71.9%', height='33%')
+        .iphone
+          input(type='tel', maxlength='11', placeholder='请输入电话号码', value='')
+        .btn
+          .get_reward_btn
+          .again_btn
+        .gm
+          img(src='/static/imgs/sub_weixin/eatcoin/gm.png', width='100%', height='36.7%')
+        .cd
+          img(src='/static/imgs/sub_weixin/eatcoin/cd.png', width='75.5%', height='24.9%')
+        .yz_tc
+          .close
+            img(src='/static/imgs/sub_weixin/eatcoin/Close_bounced.png', width='13.2%', height='7.6%', style='position: fixed;left: 85.4%')
+          .phone
+            img(src='/static/imgs/sub_weixin/eatcoin/phone_icon.png', width='5.0%', height='7.4%')
+            input(type='tel', maxlength='11', placeholder='输入手机号', value='')
+          .yzm
+            .input_yzm
+              input(type='tel', maxlength='4', placeholder='输入验证码', value='')
+            .img_yzm
+              img(src='/static/imgs/sub_weixin/eatcoin/yzm.png', width='27.7%', height='76.8%')
+            .sx
+              img(src='/static/imgs/sub_weixin/eatcoin/sx_yzm.png', width='12.1%', height='66.3%')
+          .sjdx
+            .srdx
+              input(type='tel', maxlength='6', placeholder='输入短信码', value='')
+            .hqdx
+              input(disabled='', type='button')
+              span.dxdjs 60
+          .dllq
+            img(src='/static/imgs/sub_weixin/eatcoin/un_dl_lq.png', width='75.7%', height='16.3%')
+      .fx(style='display: none;')
+        .cg_txt(style='top: 10%')
+          div(style='font-size: 4vh') 恭喜您
+          div(style='font-size: 3vh')
+            span.jp(style='font-size: 4vh') 888元
+            | 体验金领取成功
+        .tyj
+          span.jp 888元
+        button.fx_btn
+        .ewm
+          img(src='/static/imgs/sub_weixin/eatcoin/ewm.png', width='35.5%', height='23.3%')
+        .ermts
+          div 长按上方二维码
+          div 查看并使用您的奖励
+        .fxts
+          img(src='/static/imgs/sub_weixin/eatcoin/fx_instructions.png', width='24.3%', height='17.5%')
+          .fxjs 点击右上角分享给好友
+          .fxtl
+            .fxpyq
+              span
+                img(src='/static/imgs/sub_weixin/eatcoin/CircleOfFriends.png')
+              span 分享到朋友圈
+            .fshy
+              span
+                img(src='/static/imgs/sub_weixin/eatcoin/send.png')
+              span 发送给好友
+        .gm
+          img(src='/static/imgs/sub_weixin/eatcoin/fx_gm.png', width='100%', height='36.7%', style='top: 9.3%')
+        .cd
+          img(src='/static/imgs/sub_weixin/eatcoin/fx_cd.png', width='94.7%', height='30.2%', style='left: 2.7%;top:23.2%')
+      .zlyc(style='display: none')
+        .txt 您今天已经领取奖励
+        .tyj
+          span 888元
+        button.cl_btn
+    .m(style='font-size:1.25em; width:5.3%;height:5.3%;position:absolute; top:2.1%; left: 91.5%;text-align:right')
+      .stop
+  script.
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?55fcf0f3d843f47b4785c7ec44de129c";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();

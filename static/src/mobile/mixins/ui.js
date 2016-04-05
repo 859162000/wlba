@@ -4,15 +4,28 @@
  * @param text 文字说明
  * @param callback 回调函数
  */
-window.alert = function(text, callback){
+export const Alert = (text, callback) =>{
+    //return new Promise(function(resolve, reject){
+    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
+    //
+    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
+    //
+    //    $button.on('click', () => {
+    //        $alert.hide();
+    //        //alert(typeof callback+" ,"+callback);
+    //        //callback();
+    //        resolve();
+    //    })
+    //});
 
     const $alert =$('.wx-alert'), $button =$('.wx-submit');
 
-    $alert.css('display','-webkit-box').find('.wx-text').text(text)
+    $alert.css('display','-webkit-box').find('.wx-text').text(text);
 
     $button.on('click', () => {
         $alert.hide();
-        callback && callback()
+        //alert(typeof callback+" ,"+callback);
+        callback();
     })
 }
 
@@ -23,7 +36,7 @@ window.alert = function(text, callback){
  * @param callback  回调函数
  * @param callbackData 回调函数的数据
  */
-window.confirm = (title, certainName = '确定', callback = null, callbackData = null) => {
+export const Confirm = (title, certainName = '确定', callback = null, callbackData = null) => {
     const $confirm = $('.confirm-warp')
     if($confirm.length <= 0 ) return
     $confirm.show();

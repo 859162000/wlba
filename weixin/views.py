@@ -368,16 +368,18 @@ class WeixinJoinView(View):
         # 累计签到：{{keyword3.DATA}}
 
             if ret_code == 1:
-                reply = -1
-                sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                    "openid":weixin_user.openid,
-                    "template_id":SIGN_IN_TEMPLATE_ID,
-                    "first":reply_msg%(u"今日你已签到", experience_amount),
-                    "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
-                    "keyword2":"%s天" % daily_record.continue_days,
-                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
-                })},
-                                                queue='celery02')
+                txt = "今日你已签到，连续签到可获得更多奖励，记得明天再来哦！"
+                reply = create_reply(txt, self.msg)
+                # reply = -1
+                # sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                #     "openid":weixin_user.openid,
+                #     "template_id":SIGN_IN_TEMPLATE_ID,
+                #     "first":reply_msg%(u"今日你已签到", experience_amount),
+                #     "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                #     "keyword2":"%s天" % daily_record.continue_days,
+                #     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
+                # })},
+                #                                 queue='celery02')
             elif ret_code == 0:
                 reply = -1
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({

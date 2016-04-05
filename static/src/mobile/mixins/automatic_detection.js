@@ -1,3 +1,4 @@
+import { timeIntervalId } from './images_validation'
 /**
  * 表单自动检测
  */
@@ -66,7 +67,13 @@ export class Automatic {
         //不等于空
         if (!isEmpty) {
             if (icon != '') target.siblings(`.${icon}`).addClass('active');
-            if (othericon != '') $(`.${othericon}`).removeAttr('disabled');
+            if (othericon != '') {
+                $(`.${othericon}`).removeAttr('disabled');
+                if(timeIntervalId){
+                    clearInterval(timeIntervalId);
+                    $(`.${othericon}`).text('获取验证码')
+                }
+            }
             if (operation != '') target.siblings(`.${operation}`).show();
 
         }

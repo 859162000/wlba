@@ -140,10 +140,14 @@ class GetContinueActionReward(APIView):
                 redpack_record_ids += sub_redpack_record_ids
                 experience_record_ids += sub_experience_record_ids
                 if rule.gift_type == "reward":
-                    now = timezone.now()
-                    reward = Reward.objects.filter(type=rule.reward,
-                                                   is_used=False,
-                                                   end_time__gte=now).first()
+                    reward_list = rule.reward.split(",")
+                    for reward_type in reward_list:
+                        now = timezone.now()
+                        reward = Reward.objects.filter(type=reward_type,
+                                                       is_used=False,
+                                                       end_time__gte=now).first()
+                        if reward:
+                            break
                     if reward:
                         reward.is_used = True
                         reward.save()
@@ -186,29 +190,34 @@ class GetContinueActionReward(APIView):
                 _send_message_for_hby(request.user, event, end_time)
                 if is_weixin and w_user:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日 %H:%M:%S')), #\n兑换码:%s
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n快去我的账户－理财券页面查看吧！"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日 %H:%M:%S')), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
             if is_weixin and w_user:
                 for reward in rewards:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n兑换码:%s"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n兑换码:%s\n天天签到不要停，快去兑换吧！"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
             if is_weixin and w_user:
                 for experience_event in experience_events:
-                    sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                    "openid":w_user.openid,
-                    "template_id":SIGN_IN_TEMPLATE_ID,
-                    "first":u"恭喜您获得连续%s天签到奖励\n奖励金额：%s"%(getattr(experience_event, "desc_text", "体验金")),
-                    "keyword1":timezone.localtime(sign_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
-                    "keyword2":"%s天" % sign_record.continue_days,
-                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count(),
-                    "url":settings.CALLBACK_HOST + "/weixin/sub_experience/account/"
-                })},
-                                                queue='celery02')
+                    sentCustomerMsg.apply_async(kwargs={
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n快去我的账户－体验金页面查看吧！"%(days, getattr(experience_event, "desc_text", "体验金"), timezone.localtime(experience_event.unavailable_at).strftime("%Y年%m月%d日")),
+                            "openid":w_user.openid,
+                        },
+                                                    queue='celery02')
+                #     sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                #     "openid":w_user.openid,
+                #     "template_id":SIGN_IN_TEMPLATE_ID,
+                #     "first":u"恭喜您获得连续%s天签到奖励\n奖励金额：%s"%(getattr(experience_event, "desc_text", "体验金")),
+                #     "keyword1":timezone.localtime(sign_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                #     "keyword2":"%s天" % sign_record.continue_days,
+                #     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count(),
+                #     "url":settings.CALLBACK_HOST + "/weixin/sub_experience/account/"
+                # })},
+                #                                 queue='celery02')
 
         except Exception, e:
             logger.debug(traceback.format_exc())
@@ -287,8 +296,8 @@ class GetSignShareInfo(APIView):
         share_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=u'share').first()
         data = {}
         sign_info = data.setdefault('sign_in', {})
-        sign_total_count = UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
-        sign_info['sign_total_count'] = sign_total_count
+        # sign_total_count = UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
+        # sign_info['sign_total_count'] = sign_total_count
         sign_info['status'] = False
         sign_info['amount']=0
         sign_info['today_should_continue_days'] = 0
@@ -314,18 +323,25 @@ class GetSignShareInfo(APIView):
             maxDayNote=activities[length-1].days
             if sign_info['continue_days'] < maxDayNote:
                 recycle_continue_days = sign_info['continue_days']
-                today_should_recycle_continue_days = sign_info['today_should_continue_days']
             elif sign_info['continue_days'] % maxDayNote == 0:
                 recycle_continue_days = maxDayNote
-                today_should_recycle_continue_days = maxDayNote
             else:
                 recycle_continue_days = sign_info['continue_days'] % maxDayNote
-                today_should_recycle_continue_days = sign_info['today_should_continue_days'] % maxDayNote
-            # if float(sign_info['continue_days'])/maxDayNote <= 1:
-            #     recycle_continue_days = sign_info['continue_days'] % (maxDayNote + 1)
-            # else:
-            #     recycle_continue_days = sign_info['continue_days'] % maxDayNote
-            sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
+            today_should_recycle_continue_days = recycle_continue_days
+            if sign_info['today_should_continue_days'] != sign_info['continue_days']:
+                if sign_info['today_should_continue_days'] < maxDayNote:
+                    today_should_recycle_continue_days = sign_info['today_should_continue_days']
+                elif sign_info['today_should_continue_days'] % maxDayNote == 0:
+                    today_should_recycle_continue_days = maxDayNote
+                else:
+                    today_should_recycle_continue_days = sign_info['today_should_continue_days'] % maxDayNote
+            if maxDayNote==recycle_continue_days and recycle_continue_days != today_should_recycle_continue_days:
+                sign_info['mysterious_day'] = maxDayNote
+                sign_info['current_day'] = 0
+            else:
+                sign_info['mysterious_day'] = maxDayNote-recycle_continue_days
+                sign_info['current_day'] = recycle_continue_days
+
             for activity in activities:
                 if activity.days >= today_should_recycle_continue_days:
                     nextDayNote=activity.days
@@ -338,11 +354,9 @@ class GetSignShareInfo(APIView):
                                 sign_info['mysterious_day'] = maxDayNote
                     break
                 start_day = activity.days + 1
+            sign_info['isMysteriGift'] = maxDayNote==today_should_recycle_continue_days
 
-            # needDays = nextDayNote-recycle_continue_days
             sign_info['nextDayNote'] = nextDayNote#下一个神秘礼物在第几天
-            # sign_info['needDays'] = needDays
-            sign_info['current_day'] = recycle_continue_days#当前是连续签到活动的第几天
             sign_info['start_day'] = start_day
 
         share_info = data.setdefault('share', {})

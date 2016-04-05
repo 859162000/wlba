@@ -2682,6 +2682,7 @@ org.checkIn = (function(org){
         shareAmount: 0,
         nowDay: 0,
         giftPosition: 0,
+        isMysteriGift: false, //是否当前礼物是神秘礼物
         isMysterious: false, //当前显示内容是否包含神秘礼物
         init: function(){
             lib.getGift();
@@ -2726,6 +2727,7 @@ org.checkIn = (function(org){
                     lib.nowDay = nowDay;
                     lib.giftPosition = giftNum;
                     lib.money = result.sign_in.amount;
+                    lib.isMysteriGift = result.sign_in.isMysteriGift;//是否当前礼物是神秘礼物
                     var checkIn = $(".checkin-op-status"),
                         checkIn_detail = checkIn.find(".op-dec-detail"),
                         checkShare = $(".checkin-op-share");
@@ -2751,6 +2753,9 @@ org.checkIn = (function(org){
                                 className = 'active-did active-gift active-mysterious';
                             }
                             if(hasGift){
+                                if(lib.isMysteriGift){
+                                    className += " active-mysterious-open";
+                                }
                                 className += " active-gift-open";
                                 dayTit = i + '天';
                             }else{
