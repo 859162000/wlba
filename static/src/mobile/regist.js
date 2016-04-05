@@ -36,7 +36,6 @@ import { validation } from './mixins/images_validation'
         ],
         done: function(){
             if(validClass.status()){
-                console.log(validClass.status())
                 $validate_operation.attr('disabled', true);
             }
         }

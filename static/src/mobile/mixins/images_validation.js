@@ -113,7 +113,7 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
                 .then((message)=> {
                     signModel(message);
                     console.log('短信发送成功');
-                    let count = 10;
+                    let count = 60;
                     return timerFunction(count)
                 })
                 .catch((message)=> {
