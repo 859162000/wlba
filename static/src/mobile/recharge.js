@@ -1,6 +1,6 @@
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
-import { signModel } from './mixins/ui'
+import { Alert, Confirm, signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
@@ -52,7 +52,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
     //confirm
     const confirm_ui = (amount) => {
         return new Promise((resolve, reject)=> {
-            confirm(`充值金额为${amount}`, '确认充值', ()=> {
+            Confirm(`充值金额为${amount}`, '确认充值', ()=> {
                 resolve(amount)
             })
         })
@@ -87,7 +87,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                 }
 
                 if(result.ret_code > 0 ){
-                    alert(result.message);
+                    Alert(result.message);
                 }
             }
         })
@@ -175,11 +175,11 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                     data.cards.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
                 }
                 if (data.ret_code > 0 && data.ret_code != 20071) {
-                    return alert(data.message);
+                    return Alert(data.message);
                 }
             },
             error (data) {
-                return alert('系统异常，请稍后再试');
+                return Alert('系统异常，请稍后再试');
             }
         })
     }
@@ -242,12 +242,12 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                     })
                 }
                 if (result.ret_code > 0) {
-                    return alert(result.message);
+                    return Alert(result.message);
                 }
             },
             error: function (data) {
                 if (data.status >= 403) {
-                    alert('服务器繁忙，请稍后再试');
+                    Alert('服务器繁忙，请稍后再试');
                 }
             },
             complete: function () {
@@ -270,7 +270,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                 trade_operation(amount)
             })
             .catch((res) => {
-               alert(res)
+               Alert(res)
             })
     });
 //---------------login操作end---------

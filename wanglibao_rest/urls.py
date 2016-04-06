@@ -40,16 +40,18 @@ from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
-                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
-                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
-                            SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
-                            LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
-                            DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
-                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi, ActivityUserInfoUploadApi)
+                                  UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
+                                  WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                                  SendVoiceCodeNewAPIView, YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
+                                  TestSendRegisterValidationCodeView, SendVoiceCodeTwoAPIView, MobileDownloadAPIView,
+                                  Statistics, KuaipanPurchaseListAPIView, LatestDataAPIView, ShareUrlAPIView,
+                                  TopsOfDayView, TopsOfWeekView, InvestRecord, DepositGateAPIView, PushTestView,
+                                  WeixinSendRegisterValidationCodeView, GestureAddView, GestureUpdateView,
+                                  GestureIsEnabledView, LoginAPIView, GuestCheckView, CaptchaValidationCodeView,
+                                  TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
+                                  InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
+                                  BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi,
+                                  ActivityUserInfoUploadApi, BiSouYiRegisterApi, GeetestAPIView)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -286,6 +288,7 @@ urlpatterns += patterns(
     url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
     url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view()),
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
+    url(r'^geetest/$', GeetestAPIView.as_view()),
     url(r'^airport_reward/fetch/$', FetchAirportServiceReward.as_view()),
 )
 
@@ -361,4 +364,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^activity_user_info/upload/$', ActivityUserInfoUploadApi.as_view()),
+)
+
+# 比搜益用户注册接口
+urlpatterns += patterns(
+    '',
+    url(r'^bisouyi/register/$', BiSouYiRegisterApi.as_view()),
 )

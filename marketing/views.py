@@ -60,7 +60,7 @@ from wanglibao_account import message as inside_message
 from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
-from marketing.utils import get_user_channel_record
+from marketing.utils import get_user_channel_record, utype_is_mobile, utype_is_app
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -2697,10 +2697,10 @@ class HappyMonkeyAPIView(APIView):
     def post(self, request):
         self.token = 'happy_monkey'
         rewards = {
-            (0, 5): 'happy_monkey_66',
-            (6, 10): 'happy_monkey_166',
-            (11, 15): 'happy_monkey_566',
-            (16, 100000000): 'happy_monkey_666'
+            (0, 20): 'happy_monkey_66',
+            (21, 40): 'happy_monkey_166',
+            (41, 60): 'happy_monkey_566',
+            (61, 100000000): 'happy_monkey_866'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
@@ -2718,7 +2718,7 @@ class HappyMonkeyAPIView(APIView):
         today = time.strftime("%Y-%m-%d", time.localtime())
         user = user.user if user else request.user
         #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).last()
+        reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
         if reward and today == str(reward.create_at)[:10]:
             to_json_response = {
                 'ret_code': 1001,
@@ -3194,3 +3194,19 @@ class CustomerAccount2015ApiView(APIView):
 
         resp = {"error_code":error_code, "error_message":error_message, "account":account_dict}
         return HttpResponse(json.dumps(resp, sort_keys=True), content_type='application/json')
+
+
+class OpenHouseApiView(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        is_mobile = utype_is_mobile(self.request)
+        if is_mobile:
+            self.template_name = 'app_open_house.jade'
+        else:
+            self.template_name = 'open_house.jade'
+
+        if utype_is_app(self.request):
+            self.template_name = 'h5_open_house.jade'
+
+        return {}

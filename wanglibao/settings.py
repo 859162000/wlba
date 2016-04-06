@@ -137,6 +137,7 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
+    'wanglibao_geetest',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -182,7 +183,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        #'HOST': '192.168.1.242',
     }
 
 import sys
@@ -1224,11 +1225,15 @@ else:
 # 比搜益
 BISOUYI_CHANNEL_CODE = 'bisouyi'
 if ENV == ENV_PRODUCTION:
-    BISOUYI_AES_KEY = ''
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = ''
 else:
-    BISOUYI_AES_KEY = ''
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
 

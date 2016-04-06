@@ -197,14 +197,13 @@
             }
 
         /*输入手机号，验证码*/
-        var myreg = /^(((12[0-9]{1}|)|(13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1})|(14[57]{1})|(17[0678]{1}))+\d{8})$/;
         $('.input_phone').on('focus',function(){
            $('.get_code').text('获取验证码').removeAttr('disabled').removeClass('wait');
         });
 
 
         $('.input_phone').blur(function(){
-            if(!myreg.test($(".input_phone").val()))
+            if($(".input_phone").val().length!=11)
             {
                 $('.error_phone').show();
                 phone_true = false;

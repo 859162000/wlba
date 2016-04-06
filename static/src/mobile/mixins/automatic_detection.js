@@ -66,7 +66,9 @@ export class Automatic {
         //不等于空
         if (!isEmpty) {
             if (icon != '') target.siblings(`.${icon}`).addClass('active');
-            if (othericon != '') $(`.${othericon}`).removeAttr('disabled');
+            if (othericon != '') {
+                $(`.${othericon}`).removeAttr('disabled');
+            }
             if (operation != '') target.siblings(`.${operation}`).show();
 
         }
