@@ -46,8 +46,7 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
-                                  get_coop_access_token, push_coop_access_token)
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
@@ -69,7 +68,7 @@ from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
 from wanglibao_account.cooperation import get_uid_for_coop
-from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
+from .forms import OauthUserRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 
 
@@ -1838,56 +1837,6 @@ class OauthUserRegisterApi(APIView):
             response_data['msg'] = response_data['message']
             response_data.pop('message')
 
-        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-
-
-class BiSouYiRegisterApi(APIView):
-    permission_classes = ()
-
-    def post(self, request):
-        form = BiSouYiRegisterForm(self.request.session)
-        if form.is_valid():
-            if form.check_sign():
-                phone = form.get_phone()
-                password = generate_random_password(6)
-                user = create_user(phone, password, "")
-                if user:
-                    auth_user = authenticate(identifier=phone, password=password)
-                    auth_login(request, auth_user)
-
-                    send_messages.apply_async(kwargs={
-                        "phones": [phone, ],
-                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
-                    })
-
-                    client_id = form.cleaned_data['client_id']
-                    channel_code = form.cleaned_data['channel_code']
-
-                    # 处理第三方渠道的用户信息
-                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
-
-                    device = split_ua(request)
-                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
-
-                    tid = get_uid_for_coop(user.id)
-                    response_data = get_coop_access_token(phone, client_id, tid, settings.BISOUYI_CLIENT_SECRET)
-                else:
-                    response_data = {
-                        'ret_code': 10012,
-                        'message': u'用户创建失败',
-                    }
-            else:
-                response_data = {
-                    'ret_code': 10011,
-                    'message': u'无效签名',
-                }
-        else:
-            response_data = {
-                'ret_code': 10010,
-                'message': form.errors.values()[0][0],
-            }
-
-        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 

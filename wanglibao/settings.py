@@ -184,7 +184,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        #'HOST': '192.168.1.242',
+        'HOST': '192.168.1.242',
     }
 
 import sys
@@ -1231,12 +1231,14 @@ if ENV == ENV_PRODUCTION:
     BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = ''
+    BISOUYI_PCODE = '10002'
 else:
     BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
     BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
     BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
+    BISOUYI_PCODE = '10002'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
