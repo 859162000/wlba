@@ -12,12 +12,12 @@ import traceback
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
-from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
+
 
 logger = logging.getLogger(__name__)
 

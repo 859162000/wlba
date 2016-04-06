@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'^account/bankcard/add/$', login_required(views.WeixinAccountBankCardAdd.as_view(), login_url='/weixin/login/'), name='weixin_bankcard_add'),
 
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
+    url(r'^coop_login/$', views.WeixinCoopLogin.as_view(), name='weixin_coop_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),

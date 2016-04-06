@@ -2822,7 +2822,7 @@ org.checkIn = (function(org){
                 //lib.shareFn();return;
                 var giftDay = lib.giftPosition - lib.nowDay;
                 if(giftDay > 0){
-                    org.ui.alert("还未达到礼品日");
+                    org.ui.alert("继续努力，签满才能拆哦！");
                     return;
                 }
                 var self = $(this),
@@ -2857,6 +2857,12 @@ org.checkIn = (function(org){
                                     self.find(".text-item").text(lib.giftPosition + "天");
                                 }else{
                                     org.ui.alert(data.message);
+                                }
+                                giftOk = true;
+                            },
+                            error: function(XMLHttpRequest){
+                                if(XMLHttpRequest.status == 500){
+                                    org.ui.alert("系统繁忙");
                                 }
                                 giftOk = true;
                             }

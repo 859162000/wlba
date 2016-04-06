@@ -233,7 +233,7 @@ org.checin_in = (function () {
                     }
                 }else if(giftDay > 0){
                     console.log(giftDay)
-                    org.ui.alert('还未到达礼品日！')
+                    org.ui.alert('继续努力，签满才能拆哦！')
                 }
             })
 
@@ -273,6 +273,11 @@ org.checin_in = (function () {
                     }
                     if(data.ret_code < 0){
                         org.ui.alert(data.message)
+                    }
+                },
+                error: function(XMLHttpRequest){
+                    if(XMLHttpRequest.status == 500){
+                        org.ui.alert("系统繁忙");
                     }
                 },
                 complete: function(){
@@ -345,8 +350,8 @@ wlb.ready({
         })
     },
     other: function () {
-        org.checin_in.init()
-        //alert('guy ! open in app!')
+        //org.checin_in.init();
+        console.log('guy ! open in app!')
     }
 })
 
