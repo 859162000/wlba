@@ -2697,10 +2697,10 @@ class HappyMonkeyAPIView(APIView):
     def post(self, request):
         self.token = 'happy_monkey'
         rewards = {
-            (0, 5): 'happy_monkey_66',
-            (6, 10): 'happy_monkey_166',
-            (11, 15): 'happy_monkey_566',
-            (16, 100000000): 'happy_monkey_666'
+            (0, 20): 'happy_monkey_66',
+            (21, 40): 'happy_monkey_166',
+            (41, 60): 'happy_monkey_566',
+            (61, 100000000): 'happy_monkey_866'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
