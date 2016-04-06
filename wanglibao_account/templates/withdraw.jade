@@ -75,8 +75,7 @@ block main
                 .aa.trade_pwd_is_set(style='display:none')
                     .span5
                       input.withdraw-input(type='text',onfocus="this.type='password'", name='trade_pwd', placeholder='请输入交易密码')
-                    if user.wanglibaouserprofile.utype != '3'
-                        a(href='javascript:void(0)',tag='1').forget-pwd 忘记交易密码？
+                      a(href='javascript:void(0)',tag='1').forget-pwd 忘记交易密码？
                 .bb.trade_pwd_is_set_no(style='display:none')
                     .bank-counts(style='display:none')
                         a(href='javascript:void(0)',tag='2').forget-pwd 设置交易密码
@@ -203,10 +202,7 @@ block main
             a(href='javascript:void(0)').no#temporaryNot 暂不绑卡
             a(href='/accounts/bankcard/').yes 去绑卡
     #id-validate(style='display: none')
-        if user.wanglibaouserprofile.utype == '3'
-            input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}',data-type='qiye')
-        else
-            input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
+        input#id-is-valid(type='hidden', value='{{user.wanglibaouserprofile.id_is_valid}}')
         .padding-xl.align-center
           p 为保证您的资金安全，请先进行实名认证
           .space-vertical-l
