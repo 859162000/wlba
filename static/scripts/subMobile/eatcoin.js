@@ -209,6 +209,7 @@ $(function(){
     }
     function m(event){
         var windowX = window.innerWidth;
+        console.log(event.targetTouches[0]);
         if(event.targetTouches[0].clientX>windowX/2){
             sprite.x = (windowX/4*3)-playerWidth/2;
         }else{
@@ -240,8 +241,8 @@ $(function(){
         },1000)
     }
     function fxApi(conten){
-        var winHot = window.location.href;
-        var link = winHot;
+        var winHot = window.location.protocol+"//"+window.location.host;
+        var link = window.location.href;
         var img = winHot+"/static/imgs/sub_weixin/eatcoin/wx_logo.jpg";
         var tit = "天降福利 幸运来袭";
         wx.onMenuShareAppMessage({
@@ -384,7 +385,7 @@ $(function(){
                 lqjl(param);
             }else{
                 var phone = $(".iphone input").val();
-                if(phone && /^1[3|4|5|8|7|]\d{9}$/.test(phone)){
+                if(phone && /^1[2|3|4|5|8|7|]\d{9}$/.test(phone)){
                     var param = {"total":total,"phone":phone};
                     if(isRegister(phone)){
                         lqjl(param);
@@ -403,7 +404,7 @@ $(function(){
         function sxyzm(){
             $.ajax({
                 type:"get",
-                url:"/anti/captcha/refresh",
+                url:"/anti/captcha/refresh/",
                 data:{key:new Date().getTime()},
                 dataType:"json",
                 success:function(data){
@@ -464,11 +465,20 @@ $(function(){
                     //console.log(data);
                 },
                 error:function(data){
-                    if(eval("(" + data.responseText+ ")").message=="图片验证码错误"){
+                    //var message = new Function("return "+data.responseText)();
+                    //alert(message.message);
+                    //alert(eval("(" + data.responseText+ ")").message);
+                    alert(data.responseText.split(":")[1].split('"')[1]);
+                    //if(eval("(" + data.responseText+ ")").message=="图片验证码错误"){
                         sxyzm();
                         $(".input_yzm input").val();
-                    };
-                    alert(eval("(" + data.responseText+ ")").message);
+                        $(self).removeAttr("disabled");
+                        $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
+                        $(self).show().siblings().hide();
+                        $(self).siblings().text(60);
+                        clearInterval(djs);
+                   // };
+                    //alert(eval("(" + data.responseText+ ")").message);
                 }
             })
         })

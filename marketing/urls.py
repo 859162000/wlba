@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
-                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi
+                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
+                            OpenHouseApiView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -85,7 +86,8 @@ urlpatterns = patterns(
     url(r'^two-novice/$', TemplateView.as_view(template_name="two-novice.jade")),
     url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
     url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
-    url(r'^open_house/$', TemplateView.as_view(template_name="open_house.jade")),
+    # url(r'^open_house/$', TemplateView.as_view(template_name="open_house.jade")),
+    url(r'^open_house/$', OpenHouseApiView.as_view()),
     url(r'^airport_operation/$', TemplateView.as_view(template_name="airport_operation.jade")),
     # url(r'^spring_mobilization/$', TemplateView.as_view(template_name="spring_mobilization.jade")),
     url(r'^wangli_vip/$', TemplateView.as_view(template_name="wangli_vip.jade")),
@@ -191,7 +193,7 @@ urlpatterns += patterns(
     url(r'^app_send_reward/$', TemplateView.as_view(template_name="app_send_reward.jade")),
     url(r'^app_january_reward/$', TemplateView.as_view(template_name="app_january_reward.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
-    # url(r'^app_spring_mobilization/$', TemplateView.as_view(template_name="app_spring_mobilization.jade")),
+    url(r'^app_wangli_vip/$', TemplateView.as_view(template_name="app_wangli_vip.jade")),
 
     url(r'^weixin_mammon/$', TemplateView.as_view(template_name="h5_mammon.jade")),
     url(r'^app_two_novice/$', TemplateView.as_view(template_name="app_two_novice.jade")),
