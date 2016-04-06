@@ -148,7 +148,8 @@ webpackJsonp([13],[
 	            return register('/api/bisouyi/register/?promo_token=bisouyi');
 	        }).then(function (result) {
 	            console.log('register success');
-	            if (result.ret_code === 10010) {
+	            if (result.ret_code === 10000) {
+	                //成功
 
 	                BSY.Oauth(); //对接
 
@@ -191,27 +192,13 @@ webpackJsonp([13],[
 	 * @param callback 回调函数
 	 */
 	var Alert = exports.Alert = function Alert(text, callback) {
-	    //return new Promise(function(resolve, reject){
-	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
-	    //
-	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
-	    //
-	    //    $button.on('click', () => {
-	    //        $alert.hide();
-	    //        //alert(typeof callback+" ,"+callback);
-	    //        //callback();
-	    //        resolve();
-	    //    })
-	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        //alert(typeof callback+" ,"+callback);
 	        callback();
 	    });
 	};
