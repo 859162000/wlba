@@ -1,4 +1,4 @@
-import { Confirm, signModel } from './mixins/ui'
+import { Alert, Confirm, signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
@@ -113,7 +113,7 @@ import { limit} from './mixins/bank_limit.js'
                         return callback && callback(content)
 
                     } else {
-                        return alert(results.message);
+                        return Alert(results.message);
                     }
                 },
                 error (data) {
@@ -195,7 +195,7 @@ import { limit} from './mixins/bank_limit.js'
             },
             success (data) {
                 if (data.ret_code > 0) {
-                    return alert(data.message);
+                    return Alert(data.message);
                 } else {
                     $(".error-sign").remove();
                     if(check.firstRecharge){
@@ -203,7 +203,7 @@ import { limit} from './mixins/bank_limit.js'
                     }else{
                         const next_url = getQueryStringByName('next'),
                             next = next_url == '' ? '/weixin/list/' : next_url;
-                        return alert('绑卡成功！', ()=>{
+                        return Alert('绑卡成功！', ()=>{
                             window.location.href = next;
                         });
                     }
@@ -212,7 +212,7 @@ import { limit} from './mixins/bank_limit.js'
             },
             error (result){
                 var data = JSON.parse(result.responseText);
-                return alert(data.detail);
+                return Alert(data.detail);
             },
             complete () {
                 if(check.firstRecharge){

@@ -30,7 +30,7 @@
 /******/ 	// "0" means "already loaded"
 /******/ 	// Array means "loading", array contains callbacks
 /******/ 	var installedChunks = {
-/******/ 		14:0
+/******/ 		15:0
 /******/ 	};
 
 /******/ 	// The require function
@@ -76,7 +76,7 @@
 /******/ 			script.charset = 'utf-8';
 /******/ 			script.async = true;
 
-/******/ 			script.src = __webpack_require__.p + "" + chunkId + "." + ({"0":"bankOneCard","1":"buy","2":"calculator","3":"detail","4":"list","5":"login","6":"process_addbank","7":"process_authentication","8":"received_all","9":"received_detail","10":"received_month","11":"recharge","12":"regist","13":"trade_retrieve"}[chunkId]||chunkId) + ".js";
+/******/ 			script.src = __webpack_require__.p + "" + chunkId + "." + ({"0":"bankOneCard","1":"buy","2":"calculator","3":"detail","4":"list","5":"login","6":"process_addbank","7":"process_authentication","8":"received_all","9":"received_detail","10":"received_month","11":"recharge","12":"regist","13":"regist_bsy","14":"trade_retrieve"}[chunkId]||chunkId) + ".js";
 /******/ 			head.appendChild(script);
 /******/ 		}
 /******/ 	};

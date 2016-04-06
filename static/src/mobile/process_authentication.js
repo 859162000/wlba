@@ -79,19 +79,19 @@ import { check } from './mixins/from_validation'
             })
             .then((result)=> {
                 console.log('success');
-                if (!result.validate == 'true') return alert('认证失败，请重试');
-                alert("实名认证成功!", function () {
+                if (!result.validate == 'true') return Alert('认证失败，请重试');
+                Alert("实名认证成功!", function () {
                     return window.location.href = '/weixin/regist/second/';
                 });
             })
             .catch((xhr) => {
                 const result = JSON.parse(xhr.responseText);
                 if(result.error_number == 8){
-                    alert(result.message,function(){
+                    Alert(result.message,function(){
                        window.location.href = '/weixin/list/';
                     });
                 }else{
-                    return alert(result.message);
+                    return Alert(result.message);
                 }
             })
     });

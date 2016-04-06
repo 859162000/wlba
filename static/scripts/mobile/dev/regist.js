@@ -39,7 +39,6 @@ webpackJsonp([12],[
 	        otherlist: [{ target: $agreement, required: true }],
 	        done: function done() {
 	            if (validClass.status()) {
-	                console.log(validClass.status());
 	                $validate_operation.attr('disabled', true);
 	            }
 	        }
@@ -575,7 +574,6 @@ webpackJsonp([12],[
 	    });
 
 	    function render() {
-
 	        //验证表单
 	        var checkOperation = function checkOperation(phone) {
 	            return new Promise(function (resolve, reject) {
@@ -647,6 +645,7 @@ webpackJsonp([12],[
 	        }
 
 	        //短信验证码
+
 	        $validate_operation.on('click', function () {
 	            var phone = $phone.val(),
 	                captcha_0 = $captcha_0.val(),
@@ -666,7 +665,7 @@ webpackJsonp([12],[
 	            }).then(function (message) {
 	                (0, _ui.signModel)(message);
 	                console.log('短信发送成功');
-	                var count = 10;
+	                var count = 60;
 	                return timerFunction(count);
 	            }).catch(function (message) {
 	                (0, _ui.signModel)(message);

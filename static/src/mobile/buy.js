@@ -1,7 +1,7 @@
 import './mixins/promise'
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, calculate } from './mixins/api'
-import { Confirm, signModel } from './mixins/ui'
+import { Confirm, signModel, Alert } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
@@ -44,6 +44,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
         }
 
         if (inputTargetAmount < redPackInvestamount) {
+            $submit.prop('disabled', true)
             return $redpackInvestamount.show();//未达到红包使用门槛
         }
 
@@ -134,7 +135,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                 }
 
                 if(result.ret_code > 0 ){
-                    alert(result.message);
+                    Alert(result.message);
                 }
             }
         })
@@ -235,11 +236,11 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                     return
                 }
                 if(result.error_number > 0){
-                    return alert(result.message);
+                    return Alert(result.message);
                 }
             },
             error: function (xhr) {
-                alert('服务器异常');
+                Alert('服务器异常');
             },
             complete: function () {
                 $submit.removeAttr('disabled').text("立即投资");
@@ -328,7 +329,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                 trade_operation(amount, buy)
             })
             .catch((res) => {
-               alert(res)
+               Alert(res)
             })
     });
 

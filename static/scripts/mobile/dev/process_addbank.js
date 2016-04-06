@@ -115,7 +115,7 @@ webpackJsonp([6],[
 	                        window.localStorage.setItem('bank', _content);
 	                        return callback && callback(_content);
 	                    } else {
-	                        return alert(results.message);
+	                        return (0, _ui.Alert)(results.message);
 	                    }
 	                },
 	                error: function error(data) {
@@ -186,7 +186,7 @@ webpackJsonp([6],[
 	            },
 	            success: function success(data) {
 	                if (data.ret_code > 0) {
-	                    return alert(data.message);
+	                    return (0, _ui.Alert)(data.message);
 	                } else {
 	                    $(".error-sign").remove();
 	                    if (check.firstRecharge) {
@@ -196,7 +196,7 @@ webpackJsonp([6],[
 	                            var next_url = (0, _api.getQueryStringByName)('next'),
 	                                next = next_url == '' ? '/weixin/list/' : next_url;
 	                            return {
-	                                v: alert('绑卡成功！', function () {
+	                                v: (0, _ui.Alert)('绑卡成功！', function () {
 	                                    window.location.href = next;
 	                                })
 	                            };
@@ -208,7 +208,7 @@ webpackJsonp([6],[
 	            },
 	            error: function error(result) {
 	                var data = JSON.parse(result.responseText);
-	                return alert(data.detail);
+	                return (0, _ui.Alert)(data.detail);
 	            },
 	            complete: function complete() {
 	                if (check.firstRecharge) {
