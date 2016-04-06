@@ -73,7 +73,7 @@ class AccessUserExistsApi(APIView):
             binding = get_coop_binding_for_phone(channel_code, phone)
             coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
             sign_is_ok = coop_sign_check()
-            coop_register_processor = getattr(rest_utils, 'process__user_exists' % channel_code.lower(), None)
+            coop_register_processor = getattr(rest_utils, 'process_%s_user_exists' % channel_code.lower(), None)
             response_data = coop_register_processor(user, binding, sign_is_ok)
         else:
             response_data = {
