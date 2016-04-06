@@ -59,6 +59,7 @@ webpackJsonp([1],[
 	        }
 
 	        if (inputTargetAmount < redPackInvestamount) {
+	            $submit.prop('disabled', true);
 	            return $redpackInvestamount.show(); //未达到红包使用门槛
 	        }
 
@@ -150,7 +151,7 @@ webpackJsonp([1],[
 	                }
 
 	                if (result.ret_code > 0) {
-	                    Alert(result.message);
+	                    (0, _ui.Alert)(result.message);
 	                }
 	            }
 	        });
@@ -249,11 +250,11 @@ webpackJsonp([1],[
 	                    return;
 	                }
 	                if (result.error_number > 0) {
-	                    return Alert(result.message);
+	                    return (0, _ui.Alert)(result.message);
 	                }
 	            },
 	            error: function error(xhr) {
-	                Alert('服务器异常');
+	                (0, _ui.Alert)('服务器异常');
 	            },
 	            complete: function complete() {
 	                $submit.removeAttr('disabled').text("立即投资");
@@ -334,7 +335,7 @@ webpackJsonp([1],[
 	            //交易密码操作
 	            trade_operation(amount, buy);
 	        }).catch(function (res) {
-	            Alert(res);
+	            (0, _ui.Alert)(res);
 	        });
 	    });
 
@@ -359,27 +360,13 @@ webpackJsonp([1],[
 	 * @param callback 回调函数
 	 */
 	var Alert = exports.Alert = function Alert(text, callback) {
-	    //return new Promise(function(resolve, reject){
-	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
-	    //
-	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
-	    //
-	    //    $button.on('click', () => {
-	    //        $alert.hide();
-	    //        //alert(typeof callback+" ,"+callback);
-	    //        //callback();
-	    //        resolve();
-	    //    })
-	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        //alert(typeof callback+" ,"+callback);
 	        callback();
 	    });
 	};

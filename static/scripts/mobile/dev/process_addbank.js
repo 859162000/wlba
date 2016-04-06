@@ -45,11 +45,11 @@ webpackJsonp([6],[
 	    });
 	    //---------------初始化操作end---------
 
-	    //验证短信码所需表单
-	    var checkOperation_validation = function checkOperation_validation() {
+	    //验证表单
+	    var checkOperation_submit = function checkOperation_submit() {
 	        return new Promise(function (resolve, reject) {
 	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }];
+	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }, { type: 'isEmpty', value: $validation.val() }];
 	                return (0, _from_validation.check)(checklist);
 	            }
 
@@ -59,28 +59,6 @@ webpackJsonp([6],[
 
 	            var isThrough = _checkOperation2[0];
 	            var sign = _checkOperation2[1];
-
-	            if (isThrough) return resolve('验证成功');
-
-	            (0, _ui.signModel)(sign);
-	            return console.log('验证失败');
-	        });
-	    };
-
-	    //验证表单
-	    var checkOperation_submit = function checkOperation_submit() {
-	        return new Promise(function (resolve, reject) {
-	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }, { type: 'isEmpty', value: $validation.val() }];
-	                return (0, _from_validation.check)(checklist);
-	            }
-
-	            var _checkOperation3 = checkOperation();
-
-	            var _checkOperation4 = _slicedToArray(_checkOperation3, 2);
-
-	            var isThrough = _checkOperation4[0];
-	            var sign = _checkOperation4[1];
 
 	            if (isThrough) return resolve('验证成功');
 
@@ -100,8 +78,8 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank1')) {
-	            var content = JSON.parse(localStorage.getItem('bank'));
+	        if (localStorage.getItem('bank_update')) {
+	            var content = JSON.parse(localStorage.getItem('bank_update'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
 	        } else {
@@ -112,8 +90,8 @@ webpackJsonp([6],[
 	                    if (results.ret_code === 0) {
 	                        var _content = JSON.stringify(results.banks);
 	                        $bank.append(appendBanks(results.banks));
-	                        window.localStorage.setItem('bank', _content);
-	                        return callback && callback(_content);
+	                        window.localStorage.setItem('bank_update', _content);
+	                        return callback && callback(results.banks);
 	                    } else {
 	                        return (0, _ui.Alert)(results.message);
 	                    }
@@ -239,27 +217,13 @@ webpackJsonp([6],[
 	 * @param callback 回调函数
 	 */
 	var Alert = exports.Alert = function Alert(text, callback) {
-	    //return new Promise(function(resolve, reject){
-	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
-	    //
-	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
-	    //
-	    //    $button.on('click', () => {
-	    //        $alert.hide();
-	    //        //alert(typeof callback+" ,"+callback);
-	    //        //callback();
-	    //        resolve();
-	    //    })
-	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        //alert(typeof callback+" ,"+callback);
 	        callback();
 	    });
 	};
@@ -805,7 +769,6 @@ webpackJsonp([6],[
 	        _createClass(Limit, [{
 	            key: "_style",
 	            value: function _style(limit_data) {
-	                limit_data = JSON.parse(limit_data);
 	                var string_list = '';
 	                for (var i = 0; i < limit_data.length; i++) {
 	                    string_list += "<div class='limit-bank-list'>";
@@ -832,15 +795,6 @@ webpackJsonp([6],[
 	                    return money = amount.replace('000', '') + '千';
 	                }
 	            }
-	            //
-	            //show(){
-	            //    this.target.show()
-	            //}
-	            //
-	            //hide(){
-	            //    this.target.hide()
-	            //}
-
 	        }]);
 
 	        return Limit;

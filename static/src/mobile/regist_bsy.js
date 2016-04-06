@@ -145,7 +145,7 @@ import { validation } from './mixins/images_validation'
             })
             .then((result)=> {
                 console.log('register success');
-                if (result.ret_code === 10010) {
+                if (result.ret_code === 10000) {//成功
 
                     BSY.Oauth();//对接
 
