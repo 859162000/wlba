@@ -148,7 +148,8 @@ webpackJsonp([13],[
 	            return register('/api/bisouyi/register/?promo_token=bisouyi');
 	        }).then(function (result) {
 	            console.log('register success');
-	            if (result.ret_code === 10010) {
+	            if (result.ret_code === 10000) {
+	                //成功
 
 	                BSY.Oauth(); //对接
 
