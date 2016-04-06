@@ -318,8 +318,8 @@ class CoopRegister(object):
         """
         self.save_to_binding(user)
         self.save_to_oauthuser(user)
-        self.register_call_back(user)
         self.save_to_access_token(user)
+        self.register_call_back(user)
 
     def get_channel_processor(self, channel_code):
         """
