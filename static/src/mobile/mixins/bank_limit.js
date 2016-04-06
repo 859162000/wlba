@@ -18,7 +18,6 @@ export const limit = (()=>{
         }
 
         _style(limit_data){
-            limit_data = JSON.parse(limit_data);
             let string_list = ''
             for(let i =0; i< limit_data.length;i++){
                 string_list += "<div class='limit-bank-list'>"
@@ -42,14 +41,6 @@ export const limit = (()=>{
                 return money = amount.replace('000','') + '千'
             }
         }
-        //
-        //show(){
-        //    this.target.show()
-        //}
-        //
-        //hide(){
-        //    this.target.hide()
-        //}
     }
 
     const getInstance = (data) => {

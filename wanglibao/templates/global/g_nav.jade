@@ -5,7 +5,7 @@
 
   .g-small-nav
     .g-samll-start
-      .samll-nav-hotline 客服热线 ： 400-858-8066
+      .samll-nav-hotline 客服热线 ： 4008-588-066
 
       .samll-nav-wechat.samll-nav-animate
         span 关注有惊喜
@@ -54,34 +54,21 @@
       .g-user
         if activeItem == "我的账户"
           myacount = 'highlight'
-        a(href="javascript:void(0)", class='{{myacount}}')#checkUserType.user-nav
+        a(href="/accounts/home/", class='{{myacount}}').user-nav
           if user.is_authenticated
             i.user-icon-img-active
           else
             i.user-icon-img
           span.user-text 我的账户
           i.icon.iconfont.icon-down
-        if user.wanglibaouserprofile.utype == '3'
-            if user.wanglibaouserprofile.id_is_valid
-                ul.g-nav-user-nav#minNavs
-                  mixin liItem(url, text)
-                    li
-                      a(href=url)=text
-                  +liItem('/pay/banks/', '我要充值')
-                  +liItem('/pay/withdraw/', '我要提现')
-                  if user.wanglibaouserprofile.utype != '3'
-                    +liItem('/accounts/auto_tender/', '自动投标')
-                  +liItem('/accounts/transaction/p2p/', '交易记录')
-        else
-            ul.g-nav-user-nav#minNavs
-              mixin liItem(url, text)
-                li
-                  a(href=url)=text
-              +liItem('/pay/banks/', '我要充值')
-              +liItem('/pay/withdraw/', '我要提现')
-              if user.wanglibaouserprofile.utype != '3'
-                +liItem('/accounts/auto_tender/', '自动投标')
-              +liItem('/accounts/transaction/p2p/', '交易记录')
+        ul.g-nav-user-nav#minNavs
+          mixin liItem(url, text)
+            li
+              a(href=url)=text
+          +liItem('/pay/banks/', '我要充值')
+          +liItem('/pay/withdraw/', '我要提现')
+          +liItem('/accounts/auto_tender/', '自动投标')
+          +liItem('/accounts/transaction/p2p/', '交易记录')
 
     .g-nav-box
       mixin nav-item(name, link, news)
