@@ -193,10 +193,11 @@ class CoopDataDispatchApi(APIView):
             bid = req_data.get('bid')
             client_id = req_data.get('client_id')
             order_id = req_data.get('order_id')
+            access_token = req_data.get('access_token')
             user = create_user(user_id, phone)
             if user:
                 try:
-                    CoopRegister(btype, bid, client_id, order_id).all_processors_for_user_register(user)
+                    CoopRegister(btype, bid, client_id, order_id, access_token).all_processors_for_user_register(user)
                 except Exception, e:
                     response_data = {
                         'ret_code': 10025,

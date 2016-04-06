@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_oauth2.models import OauthUser, Client
+from wanglibao_oauth2.models import OauthUser, Client, AccessToken
 from wanglibao_rest.utils import get_utc_timestamp, utc_to_local_timestamp
 from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.models import P2PRecord, UserAmortization, P2PEquity
@@ -256,11 +256,12 @@ class CoopRegister(object):
     """
     第三方用户注册api
     """
-    def __init__(self, btype, bid=None, client_id=None, order_id=None):
+    def __init__(self, btype, bid=None, client_id=None, order_id=None, access_token=None):
         self.btype = btype
         self.bid = bid
         self.client_id = client_id
         self.order_id = order_id
+        self.access_token = access_token
         self.channel = get_channel_record(self.btype)
 
     def save_to_binding(self, user):
@@ -290,6 +291,16 @@ class CoopRegister(object):
             except Client.DoesNotExist:
                 logger.info("user[%s] save to oauthuser failed with invalid client_id [%s]" % (user.id, self.client_id))
 
+    def save_to_access_token(self, user):
+        if self.access_token and self.client_id:
+            client = Client.objects.filter(client_id=self.client_id).first()
+            if client:
+                access_token = AccessToken()
+                access_token.token = self.access_token
+                access_token.client = client
+                access_token.user = user
+                access_token.save()
+
     def register_call_back(self, user):
         """
         用户注册成功后的回调
@@ -305,6 +316,7 @@ class CoopRegister(object):
         self.save_to_binding(user)
         self.save_to_oauthuser(user)
         self.register_call_back(user)
+        self.save_to_access_token(user)
 
     def get_channel_processor(self, channel_code):
         """
