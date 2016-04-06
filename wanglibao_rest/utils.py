@@ -12,16 +12,12 @@ import traceback
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
-from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
-from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.debug import sensitive_post_parameters
-from django.views.decorators.cache import never_cache
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
+
 
 logger = logging.getLogger(__name__)
 
@@ -330,34 +326,5 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
         'invitation_code': channel_code,
         'ext': '',
     }
-
-    return response_data
-
-
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def user_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
-    def messenger(message, user=None):
-        res = dict()
-        if user:
-            res['nick_name'] = user.wanglibaouserprofile.nick_name
-        res['message'] = message
-        return res
-
-    form = authentication_form(request, data=request.POST)
-    if form.is_valid():
-        auth_login(request, form.get_user())
-
-        if request.POST.has_key('remember_me'):
-            request.session.set_expiry(604800)
-        else:
-            request.session.set_expiry(1800)
-
-        response_data = messenger('success', user=request.user)
-        response_data['ret_code'] = 10000
-    else:
-        response_data = messenger(form.errors)
-        response_data['ret_code'] = 10001
 
     return response_data
