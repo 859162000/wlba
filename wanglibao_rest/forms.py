@@ -176,7 +176,13 @@ class BiSouYiRegisterForm(forms.Form):
                     if detect_identifier_type(phone) == 'phone':
                         users = User.objects.filter(wanglibaouserprofile__phone=phone)
                         if not users.exists():
-                            return content, content_data
+                            if 'other' in content_data:
+                                return content, content_data
+                            else:
+                                raise forms.ValidationError(
+                                    code=10018,
+                                    message=u'content没有包含other'
+                                )
                         else:
                             raise forms.ValidationError(
                                 code=10017,
@@ -201,6 +207,10 @@ class BiSouYiRegisterForm(forms.Form):
     def get_phone(self):
         phone = str(self.cleaned_data['content'][1]['mobile'])
         return phone
+
+    def get_other(self):
+        other = self.cleaned_data['content'][1]['other']
+        return other
 
     def check_sign(self):
         client_id = self.cleaned_data['client_id']
