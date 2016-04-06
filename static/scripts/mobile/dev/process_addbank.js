@@ -100,7 +100,7 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank1')) {
+	        if (localStorage.getItem('bank')) {
 	            var content = JSON.parse(localStorage.getItem('bank'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
