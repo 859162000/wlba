@@ -245,7 +245,7 @@ class GetContinueActionReward(APIView):
                 redpack_ids = rule.addition_redpack.split(',')
 
             if rule.addition_gift_type == "experience_gold":
-                experience_record_ids = self.give_experience(user, experience_events, redpack_txts, rule.redpack)
+                experience_record_ids = self.give_experience(user, experience_events, redpack_txts, rule.addition_redpack)
                 if isinstance(experience_record_ids, Response):
                     return None, experience_record_ids
         if redpack_ids:
