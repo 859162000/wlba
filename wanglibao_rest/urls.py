@@ -51,7 +51,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                                   TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
                                   InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
                                   BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi,
-                                  ActivityUserInfoUploadApi, BiSouYiRegisterApi, GeetestAPIView)
+                                  ActivityUserInfoUploadApi, GeetestAPIView)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -62,7 +62,7 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView,
                              GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
+from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, BiSouYiRegisterApi, BiSouYiLoginApi)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
                                     QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, FetchAirportServiceReward)
@@ -366,8 +366,11 @@ urlpatterns += patterns(
     url(r'^activity_user_info/upload/$', ActivityUserInfoUploadApi.as_view()),
 )
 
-# 比搜益用户注册接口
+# 比搜益接口
 urlpatterns += patterns(
     '',
+    # 新用户注册
     url(r'^bisouyi/register/$', BiSouYiRegisterApi.as_view()),
+    # 老用户登录
+    url(r'^bisouyi/login/$', BiSouYiLoginApi.as_view()),
 )
