@@ -1,7 +1,7 @@
 import './mixins/promise'
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, calculate } from './mixins/api'
-import { Confirm, signModel } from './mixins/ui'
+import { Confirm, signModel, Alert } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
@@ -44,6 +44,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
         }
 
         if (inputTargetAmount < redPackInvestamount) {
+            $submit.prop('disabled', true)
             return $redpackInvestamount.show();//未达到红包使用门槛
         }
 

@@ -85,18 +85,18 @@ webpackJsonp([7],[
 	            });
 	        }).then(function (result) {
 	            console.log('success');
-	            if (!result.validate == 'true') return Alert('认证失败，请重试');
-	            Alert("实名认证成功!", function () {
+	            if (!result.validate == 'true') return (0, _ui.Alert)('认证失败，请重试');
+	            (0, _ui.Alert)("实名认证成功!", function () {
 	                return window.location.href = '/weixin/regist/second/';
 	            });
 	        }).catch(function (xhr) {
 	            var result = JSON.parse(xhr.responseText);
 	            if (result.error_number == 8) {
-	                Alert(result.message, function () {
+	                (0, _ui.Alert)(result.message, function () {
 	                    window.location.href = '/weixin/list/';
 	                });
 	            } else {
-	                return Alert(result.message);
+	                return (0, _ui.Alert)(result.message);
 	            }
 	        });
 	    });
