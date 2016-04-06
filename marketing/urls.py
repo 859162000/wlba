@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
-                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi
+                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
+                            OpenHouseApiView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -85,7 +86,8 @@ urlpatterns = patterns(
     url(r'^two-novice/$', TemplateView.as_view(template_name="two-novice.jade")),
     url(r'^brige/$', TemplateView.as_view(template_name="javascriptBrige.html")),
     url(r'^damai-back/$', TemplateView.as_view(template_name="damai-back.jade")),
-    url(r'^open_house/$', TemplateView.as_view(template_name="open_house.jade")),
+    # url(r'^open_house/$', TemplateView.as_view(template_name="open_house.jade")),
+    url(r'^open_house/$', OpenHouseApiView.as_view()),
     url(r'^airport_operation/$', TemplateView.as_view(template_name="airport_operation.jade")),
     # url(r'^spring_mobilization/$', TemplateView.as_view(template_name="spring_mobilization.jade")),
     url(r'^wangli_vip/$', TemplateView.as_view(template_name="wangli_vip.jade")),

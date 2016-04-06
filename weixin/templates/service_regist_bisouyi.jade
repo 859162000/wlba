@@ -51,11 +51,11 @@ html(style="background: #f5f5f5")
           .password
         input(type='password', name='password', placeholder= '请设置密码',data-icon='wx-input-icon',  autocomplete='off').wx-input-main
         .wx-operation-icon.wx-hide-password.wx-password-operation
-      .wx-input-public
-        .wx-input-icon
-          .token
-        input(type='text', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', data-icon='wx-input-icon',  autocomplete='off').wx-input-main
-        input(type="hidden", name="token", id="token", value="{{token}}")
+      //.wx-input-public
+      //  .wx-input-icon
+      //    .token
+      //  input(type='text', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', data-icon='wx-input-icon',  autocomplete='off').wx-input-main
+      input(type="hidden", name="token", id="token", value="{{token}}")
 
 
       //账户安全
@@ -105,6 +105,9 @@ html(style="background: #f5f5f5")
     include include/ui_model/mobile_errorsign
     include include/ui_model/mobile_alert
     include include/tracking
-    script(src='/static/scripts/mobile/pro/vendor.zepto.js?20160322')
-    script(src='/static/scripts/mobile/pro/regist.js?2016040501')
+
+    script(src='/static/src/mobile/lib/Bsy-Oauth.min.1.0.js')
+    script(src='/static/scripts/mobile/dev/vendor.zepto.js?20160405')
+    script(src='/static/scripts/mobile/dev/regist_bsy.js?2016040502')
+
     //script(data-init='regist', src="/static/scripts/mobile/dist/mobile.js?v=201251207")
