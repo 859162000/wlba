@@ -292,6 +292,8 @@ class CoopRegister(object):
                 logger.info("user[%s] save to oauthuser failed with invalid client_id [%s]" % (user.id, self.client_id))
 
     def save_to_access_token(self, user):
+        logger.info("user[%s] enter save_to_access_token with client_id[%s] access_token[%s]" % (user.id, self.client_id,
+                                                                                                 self.access_token))
         if self.access_token and self.client_id:
             client = Client.objects.filter(client_id=self.client_id).first()
             if client:
@@ -300,6 +302,7 @@ class CoopRegister(object):
                 access_token.client = client
                 access_token.user = user
                 access_token.save()
+                logger.info("user[%s] save_to_access_token success")
 
     def register_call_back(self, user):
         """
