@@ -1,27 +1,40 @@
-getCookie = function(name) {
-    var cookie, cookieValue, cookies, i;
-    cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        cookies = document.cookie.split(";");
-        i = 0;
-        while (i < cookies.length) {
-            cookie = $.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+var csrfSafeMethod, getCookie, sameOrigin,
+    getCookie = function (name) {
+        var cookie, cookieValue, cookies, i;
+        cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            cookies = document.cookie.split(";");
+            i = 0;
+            while (i < cookies.length) {
+                cookie = $.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+                i++;
             }
-            i++;
         }
-    }
-    return cookieValue;
+        return cookieValue;
+    };
+csrfSafeMethod = function (method) {
+    return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+};
+sameOrigin = function (url) {
+    var host, origin, protocol, sr_origin;
+    host = document.location.host;
+    protocol = document.location.protocol;
+    sr_origin = "//" + host;
+    origin = protocol + sr_origin;
+    return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
 };
 $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        //if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
             xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-        //}
+        }
     }
 });
+
 $(function(){
     var box = $('#box');
     box.css('width',window.innerWidth);
@@ -85,17 +98,23 @@ $(function(){
     }
     function chansheng(){
         if(shi%h==0){
-            for(var j=2*chi;j<2*(chi+1);j++){
-                //alert("@@@")
+            for(var j=chi;j<chi+1;j++){
                 tu[j]=new object();
                 var i=zh_x[Math.round(Math.random()*1)];
-                if(j==2*chi+1)
-                {
-                    while(Math.abs(i-tu[2*chi].x)<30){
-                        i=zh_x[Math.round(Math.random()*1)];
-                    }
+
+                if(chi%5==0){
+                    tu[j].image.src = "/static/imgs/sub_weixin/eatcoin/bomb.gif";
+                    tu[j].q = 2;
+                    tu[j+1]=new object();
+                    tu[j+1].image.src="/static/imgs/sub_weixin/eatcoin/jinbi.png";
+                    tu[j+1].q = 1;
+                    chi++;
+                }else{
+                    tu[j].image.src="/static/imgs/sub_weixin/eatcoin/jinbi.png";
+                    tu[j].q = 1;
                 }
-                var k=Math.round(Math.random()*zl);
+
+                /*var k=Math.round(Math.random()*zl);
                 if(k < 80){
                     tu[j].image.src="/static/imgs/sub_weixin/eatcoin/jinbi.png";
                     tu[j].q = 1;
@@ -109,9 +128,9 @@ $(function(){
                             tu[j].q = 1;
                         }
                     }
-               }
+                }*/
                 tu[j].x=i;
-                tu[j].y=-100;
+                tu[j].y=0;
                 var tu1 = tu[j];
             }
            chi++;
@@ -140,14 +159,14 @@ $(function(){
                         $(".logo").show();
                         var jl = $(".number").text()
                         $(".jbsl").text(jl);
-                        if(jl>=0&&jl<=5){
+                        if(jl>=0&&jl<=20){
                             jp = "66元";
-                        }else if(jl>=6&&jl<=10){
+                        }else if(jl>=21&&jl<=40){
                             jp = "166元";
-                        }else if(jl>=11&&jl<=15){
+                        }else if(jl>=41&&jl<=60){
                             jp = "566元";
-                        }else if(jl>=16){
-                            jp = "666元";
+                        }else if(jl>=61){
+                            jp = "866元";
                         }
                         var conten = "我用幸运猴接了"+$(".number").html()+"个金币，快来试试你能接多少个吧！";
                         fxApi(conten);
@@ -209,7 +228,6 @@ $(function(){
     }
     function m(event){
         var windowX = window.innerWidth;
-        console.log(event.targetTouches[0]);
         if(event.targetTouches[0].clientX>windowX/2){
             sprite.x = (windowX/4*3)-playerWidth/2;
         }else{
@@ -253,38 +271,38 @@ $(function(){
             type: 'link', // 分享类型,music、video或link，不填默认为link
             dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+               //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
         wx.onMenuShareTimeline({
             title: tit, // 分享标题
-            link: winHot, // 分享链接
+            link: link, // 分享链接
             imgUrl: img, // 分享图标
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+                //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
         wx.onMenuShareQQ({
             title: tit, // 分享标题
             desc: conten, // 分享描述
-            link:winHot, // 分享链接
+            link:link, // 分享链接
             imgUrl: img, // 分享图标
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+                //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
@@ -294,11 +312,11 @@ $(function(){
             link: link, // 分享链接
             imgUrl: img, // 分享图标
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+                //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
@@ -448,11 +466,11 @@ $(function(){
                     $(self).removeAttr("disabled");
                     $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
                     $(self).show().siblings().hide();
-                    $(self).siblings().text(60);
+                    $(self).siblings().text("60秒后重发");
                     clearInterval(djs);
                 }else{
                     dxsj--
-                    $(self).siblings().text(dxsj);
+                    $(self).siblings().text(dxsj+"秒后重发");
                 }
 
             },1000)
@@ -462,20 +480,23 @@ $(function(){
                 data:param,
                 dataType:"json",
                 success:function(data){
-                    //console.log(data);
+
                 },
-                error:function(data){
-                    //var message = new Function("return "+data.responseText)();
-                    //alert(message.message);
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                     //console.log(XMLHttpRequest);
+                    //console.log(textStatus);
+                    //console.log(errorThrown);
+                    alert(new Function('return '+XMLHttpRequest.responseText)().message);
                     //alert(eval("(" + data.responseText+ ")").message);
-                    alert(data.responseText.split(":")[1].split('"')[1]);
+                   //alert(data.responseText);
+                    //alert(data.responseText.split(":")[1].split('"')[1]);
                     //if(eval("(" + data.responseText+ ")").message=="图片验证码错误"){
                         sxyzm();
                         $(".input_yzm input").val();
                         $(self).removeAttr("disabled");
                         $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
                         $(self).show().siblings().hide();
-                        $(self).siblings().text(60);
+                        $(self).siblings().text("60秒后重发");
                         clearInterval(djs);
                    // };
                     //alert(eval("(" + data.responseText+ ")").message);
