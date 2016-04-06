@@ -137,8 +137,8 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
-    'wanglibao_geetest',
     'wanglibao_invite',
+    'wanglibao_geetest',
 )
 
 MIDDLEWARE_CLASSES = (
