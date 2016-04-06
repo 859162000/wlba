@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'experience_gold',
     'wanglibao_qiye',
     'wanglibao_geetest',
+    'wanglibao_invite',
 )
 
 MIDDLEWARE_CLASSES = (
