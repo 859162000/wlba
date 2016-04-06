@@ -10,6 +10,7 @@ html(lang='zh-CN')
     script(type='text/javascript', src='/static/src/subMobile/lib/weixin/wx.js')
     script(type='text/javascript', src='/static/scripts/subMobile/eatcoin.js')
   body
+    - csrf_token
     audio#car_audio(preload='preload', src='/static/imgs/sub_weixin/eatcoin/001.mp3', loop='')
     .logo
       img(src='/static/imgs/sub_weixin/eatcoin/logo.png', width='21.2%', height='4.6%')
