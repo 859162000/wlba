@@ -5,26 +5,12 @@
  * @param callback 回调函数
  */
 export const Alert = (text, callback) =>{
-    //return new Promise(function(resolve, reject){
-    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
-    //
-    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
-    //
-    //    $button.on('click', () => {
-    //        $alert.hide();
-    //        //alert(typeof callback+" ,"+callback);
-    //        //callback();
-    //        resolve();
-    //    })
-    //});
 
     const $alert =$('.wx-alert'), $button =$('.wx-submit');
-
     $alert.css('display','-webkit-box').find('.wx-text').text(text);
 
     $button.on('click', () => {
         $alert.hide();
-        //alert(typeof callback+" ,"+callback);
         callback();
     })
 }
@@ -54,7 +40,6 @@ export const Confirm = (title, certainName = '确定', callback = null, callback
         }
     })
 }
-
 
 export const signModel = (text) => {
     $('.error-sign').html(text).removeClass('moveDown').addClass('moveDown').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {

@@ -51,6 +51,8 @@ import traceback
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.db import transaction, IntegrityError
+from django.template.loader import get_template
+from django.template import TemplateDoesNotExist
 from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
@@ -550,6 +552,48 @@ class WeixinLogin(TemplateView):
             }
 
 
+class WeixinCoopLogin(TemplateView):
+    template_name = 'weixin_login.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinCoopLogin, self).get_context_data(**kwargs)
+        code = self.request.GET.get('code')
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            tp_name = 'weixin_login_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
+
+        if code:
+            account_id = self.request.GET.get('state')
+            try:
+                account = Account.objects.get(pk=account_id)
+            except Account.DoesNotExist:
+                return HttpResponseNotFound()
+
+            try:
+                oauth = WeChatOAuth(account.app_id, account.app_secret)
+                res = oauth.fetch_access_token(code)
+                account.oauth_access_token = res.get('access_token')
+                account.oauth_access_token_expires_in = res.get('expires_in')
+                account.oauth_refresh_token = res.get('refresh_token')
+                account.save()
+                WeixinUser.objects.get_or_create(openid=res.get('openid'))
+                context['openid'] = res.get('openid')
+            except WeChatException, e:
+                pass
+        next = self.request.GET.get('next', '')
+        next = urllib.unquote(next.encode('utf-8'))
+        return {
+            'context': context,
+            'next': next
+            }
+
+
 class WeixinRegister(TemplateView):
     template_name = 'weixin_regist_new.jade'
 
@@ -578,7 +622,7 @@ class WeixinRegister(TemplateView):
 
 
 class WeixinCoopRegister(TemplateView):
-    template_name = 'service_regist_bjs.jade'
+    template_name = 'weixin_regist_new.jade'
 
     def get_context_data(self, **kwargs):
         token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
@@ -586,7 +630,11 @@ class WeixinCoopRegister(TemplateView):
 
         if token:
             tp_name = 'service_regist_%s.jade' % token.lower()
-            self.template_name = tp_name
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
         elif token_session:
             token = token_session
         else:
