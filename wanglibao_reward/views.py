@@ -2767,6 +2767,7 @@ class FetchMarchAwardAPI(APIView):
 
 class AirportServiceRewardTemplate(TemplateView):
     def get_context_data(self, **kwargs):
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         airport_service_reward = getMiscValue("airport_service_reward")
         rule_ids = airport_service_reward['rule_ids']
         return {
@@ -2777,7 +2778,7 @@ class FetchAirportServiceReward(APIView):
     authentication_classes = (IsAuthenticated, )
 
     def post(self, request):
-        # airport_service_reward = {"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         rule_id = request.DATA.get('rule_id', "").strip()
         if not rule_id or not rule_id.isdigit():
             return Response({"ret_code":-1, "message":""})
