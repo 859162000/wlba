@@ -270,7 +270,7 @@ class GetContinueActionReward(APIView):
             if redpack_event.rtype == 'percent':
                 redpack_text = "%s%%百分比红包"%redpack_event.amount
             if redpack_event.rtype == 'direct':
-                redpack_text = "%s元红包"%int(redpack_event.amount)
+                redpack_text = "%s元直抵红包"%int(redpack_event.amount)
             setattr(redpack_event, 'desc_text', redpack_text)
             redpack_txts.append(redpack_text)
             redpack_record_ids += (str(record.id) + ",")
