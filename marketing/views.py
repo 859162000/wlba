@@ -2697,10 +2697,10 @@ class HappyMonkeyAPIView(APIView):
     def post(self, request):
         self.token = 'happy_monkey'
         rewards = {
-            (0, 20): 'happy_monkey_66',
-            (21, 40): 'happy_monkey_166',
-            (41, 60): 'happy_monkey_566',
-            (61, 100000000): 'happy_monkey_866'
+            (0, 20): u'幸福猴66元体验金',
+            (21, 40): u'幸福猴166元体验金',
+            (41, 60): u'幸福猴566元体验金',
+            (61, 100000000): u'幸福猴866体验金'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
@@ -2754,13 +2754,6 @@ class HappyMonkeyAPIView(APIView):
             SendExperienceGold(user).send(reward.experience.id)
             join_record.remain_chance = 0
             join_record.save()
-
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": user.id,
-                "title": u"天降福利活动体验金",
-                "content": u'恭喜您获得天降福利活动体验金%s元,请您使用;感谢你对网利宝的关注与支持.' % (exp_gold.amount,),
-                "mtype": "activity"
-            })
 
             to_json_response = {
                 'ret_code': 0,
