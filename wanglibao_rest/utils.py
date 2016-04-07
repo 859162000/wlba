@@ -9,6 +9,7 @@ import requests
 import datetime
 import StringIO
 import traceback
+import shortuuid
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
@@ -224,6 +225,15 @@ def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
 
 
+def long_token():
+    """
+    Generate a hash that can be used as an application secret
+    """
+    hash = hashlib.sha1(shortuuid.uuid())
+    hash.update(settings.SECRET_KEY)
+    return hash.hexdigest()
+
+
 def get_coop_access_token(phone, client_id, tid, coop_key):
     url = settings.COOP_ACCESS_TOKEN_URL
     logger.info('enter get_coop_access_token with url[%s]' % url)
@@ -291,26 +301,22 @@ def push_coop_access_token(phone, client_id, tid, coop_key, token):
 
 def process_renrenli_register(request, user, phone, client_id, channel_code):
     tid = get_uid_for_coop(user.id)
-    res_data = get_coop_access_token(phone, client_id, tid, settings.RENRENLI_COOP_KEY)
+    token = long_token()
 
-    if int(res_data['ret_code']) == 10000:
-        callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
-        callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
-        data = {
-            'Cust_key': tid,
-            'Access_tokens': res_data['access_token'],
-            'Callback_url': callback_url,
-        }
-        response_data = {
-            'ret_code': 101,
-            'message': u'成功',
-            'Data': data,
-        }
-    else:
-        response_data = {
-            'ret_code': res_data['ret_code'],
-            'message': res_data['message'],
-        }
+    callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
+    callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
+    data = {
+        'Cust_key': tid,
+        'Access_tokens': token,
+        'Callback_url': callback_url,
+    }
+    response_data = {
+        'ret_code': 101,
+        'message': u'成功',
+        'Data': data,
+    }
+
+    user.access_token = token
 
     return response_data
 
