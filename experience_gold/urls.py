@@ -21,6 +21,7 @@ urlpatterns = patterns(
     #     ),
     url(r'^experience/(?P<template>(mobile|gold|redirect))/$', ExperienceGoldView.as_view(), name="experience_gold"),
     url(r'^experience/explain/$', TemplateView.as_view(template_name="experience_explain.jade")),
+    url(r'^experience/detail/$', TemplateView.as_view(template_name="experience_detail.jade")),
     url(r'^experience/(?P<template>(account))/$', ExperienceGoldView.as_view()),
 )
 

@@ -1,0 +1,22 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include global/g_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/experience_detail.css?v=20160406")
+    body
+        - csrf_token
+        include global/g_nav
+        .experience-detail-box
+            .detail-box-one
+                .detail-one-left
+                    h3 新手体验标
+                    ul
+                        li
+                            p
+                                span 1
+                                label 元
+                            p 投资金额
