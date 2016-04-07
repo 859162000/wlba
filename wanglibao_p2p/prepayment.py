@@ -77,8 +77,11 @@ class PrepaymentHistory(object):
                 pname = u"%s,期限%s个月" % (product.name, product.period)
 
             for user_amortization in user_amortizations:
+                logger.error("提前还款用户: [%s], [%s]" % (user_amortization.user.id, user_amortization.user.wanglibaouserprofile.phone))
                 # 计算最终计算提前还款的本金, 利息, 罚息, 加息
                 user_record = self.get_user_repayment(user_amortization, penal_interest, repayment_type, payment_date)
+                logger.error("新的本金: [%s], 利息:[%s], 加息:[%s], repayment_type:[%s], payment_date:[%s]" % (
+                    user_record.principal, user_record.interest, user_record.coupon_interest, repayment_type, payment_date))
 
                 user_margin_keeper = MarginKeeper(user_record.user)
                 # 提前还款需要将加息金额还给用户(重新计算后的该用户所用加息券的加息金额)
@@ -91,6 +94,7 @@ class PrepaymentHistory(object):
                 user_record.amortization = amortization
 
                 amortization_records.append(user_record)
+                logger.error("order_id: %s" % order_id)
 
                 # 提前还款短信
                 # 提前还款金额 = 本金 + 利息 + 罚息 + 加息
@@ -104,39 +108,39 @@ class PrepaymentHistory(object):
                                                                 amo_amount))
 
                 # 提前还款站内信
-                title, content = messages.msg_bid_prepayment(pname, timezone.now(), amo_amount)
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": user_amortization.user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "amortize"
-                })
-                try:
-                    weixin_user = WeixinUser.objects.filter(user=user_amortization.user).first()
-
-                    if weixin_user and weixin_user.subscribe:
-                        now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
-                        sentTemplate.apply_async(kwargs={
-                            "kwargs": json.dumps({
-                                "openid": weixin_user.openid,
-                                "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                "keyword1": product.name,
-                                "keyword2": "%s 元" % str(amo_amount),
-                                "keyword3": now,
-                            })
-                        }, queue='celery02')
-
-                except Exception, e:
-                    pass
+                # title, content = messages.msg_bid_prepayment(pname, timezone.now(), amo_amount)
+                # inside_message.send_one.apply_async(kwargs={
+                #     "user_id": user_amortization.user.id,
+                #     "title": title,
+                #     "content": content,
+                #     "mtype": "amortize"
+                # })
+                # try:
+                #     weixin_user = WeixinUser.objects.filter(user=user_amortization.user).first()
+                #
+                #     if weixin_user and weixin_user.subscribe:
+                #         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+                #         sentTemplate.apply_async(kwargs={
+                #             "kwargs": json.dumps({
+                #                 "openid": weixin_user.openid,
+                #                 "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                #                 "keyword1": product.name,
+                #                 "keyword2": "%s 元" % str(amo_amount),
+                #                 "keyword3": now,
+                #             })
+                #         }, queue='celery02')
+                #
+                # except Exception, e:
+                #     pass
 
                 # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
-                try:
-                    if user_record.principal > 0:
-                        activity_backends.check_activity(user_amortization.user, 'repaid', 'pc', user_record.principal, product.id)
-                except Exception:
-                    logger.debug("提前还款, user: {}, principal: {}, product_id: {}".format(
-                        user_amortization.user, user_record.principal, product.id
-                    ))
+                # try:
+                #     if user_record.principal > 0:
+                #         activity_backends.check_activity(user_amortization.user, 'repaid', 'pc', user_record.principal, product.id)
+                # except Exception:
+                #     logger.debug("提前还款, user: {}, principal: {}, product_id: {}".format(
+                #         user_amortization.user, user_record.principal, product.id
+                #     ))
 
             amortization_records.append(product_record)
 
@@ -148,11 +152,11 @@ class PrepaymentHistory(object):
                 .update(settled=True, settlement_time=timezone.now())
             ProductKeeper(self.product).finish(None)
 
-            #发短信
-            send_messages.apply_async(kwargs={
-                "phones": phone_list,
-                "messages": message_list
-            })
+            # 发短信
+            # send_messages.apply_async(kwargs={
+            #     "phones": phone_list,
+            #     "messages": message_list
+            # })
         return product_record
 
     def get_product_amortization(self, payment_date):
