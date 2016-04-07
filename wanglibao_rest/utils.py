@@ -17,7 +17,6 @@ from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from wanglibao_account.models import Binding
-from wanglibao_account.forms import BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
 
 
@@ -215,6 +214,7 @@ def process_for_renrenli_landpage(request, channel_code):
 
 
 def process_for_bisouyi_landpage(request, channel_code):
+    from wanglibao_account.forms import BiSouYiRegisterForm
     form = BiSouYiRegisterForm(request.session, action='login')
     if form.is_valid():
         if form.check_sign():
