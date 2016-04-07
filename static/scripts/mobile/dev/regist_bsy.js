@@ -1,4 +1,4 @@
-webpackJsonp([13],[
+webpackJsonp([14],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -107,9 +107,6 @@ webpackJsonp([13],[
 	    //注册
 	    function register(url) {
 	        var invite_val = $.trim($invite_code.val());
-	        var cid = getUrl("cid="),
-	            content = getUrl("content="),
-	            sign = getUrl("sign=");
 	        return new Promise(function (resolve, reject) {
 	            (0, _api.ajax)({
 	                url: url,
@@ -120,10 +117,7 @@ webpackJsonp([13],[
 	                    'captcha_0': $captcha_0.val(),
 	                    'captcha_1': $captcha_1.val(),
 	                    'validate_code': $validate_code.val(),
-	                    'invite_code': invite_val === "" ? $token.val() : invite_val,
-	                    'cid': cid,
-	                    'content': content,
-	                    'sign': sign
+	                    'invite_code': invite_val === "" ? $token.val() : invite_val
 	                },
 	                beforeSend: function beforeSend() {
 	                    $submit.text('注册中,请稍等...').attr('disabled', 'true');
@@ -461,7 +455,7 @@ webpackJsonp([13],[
 	    password: function password(str) {
 	        var error = '密码为6-20位数字/字母/符号/区分大小写',
 	            re = new RegExp(/^\d{6,20}$/);
-	        if (re.test($.trim(str))) {
+	        if (6 < $.trim(str).length && $.trim(str).length < 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];

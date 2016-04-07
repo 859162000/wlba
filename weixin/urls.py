@@ -52,7 +52,6 @@ urlpatterns = patterns(
     url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
-    #bsy
     url(r'^p2p_list/coop/$', views.P2PListView.as_view(), name='weixin_p2p_list_coop'),
 
     # js api
