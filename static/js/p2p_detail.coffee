@@ -12,7 +12,7 @@ require.config
     "ddslick": ['jquery']
   urlArgs: 'v=2016040701'
 
-require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
+require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal, validate, ddslick)->
   isFirst = true
 
   getFormatedNumber = (num) ->
