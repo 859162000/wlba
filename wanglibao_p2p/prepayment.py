@@ -57,6 +57,8 @@ class PrepaymentHistory(object):
         """
         with transaction.atomic(savepoint=savepoint):
             amortization = ProductAmortization.objects.select_for_update().get(id=self.amortization.id)
+            if amortization.settled:
+                raise PrepaymentException()
             # 1.生成产品提前还款记录
             # amortization = self.amortization
             product_record = self.get_product_repayment(penal_interest, repayment_type, payment_date)
