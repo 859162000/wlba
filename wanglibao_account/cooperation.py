@@ -19,12 +19,13 @@ from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client, AccessToken
-from wanglibao_rest.utils import get_utc_timestamp, utc_to_local_timestamp
+from wanglibao_rest.utils import (get_utc_timestamp, utc_to_local_timestamp, generate_bisouyi_content,
+                                  generate_bisouyi_sign)
 from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.models import P2PRecord, UserAmortization, P2PEquity
 from wanglibao_p2p.utils import get_user_p2p_total_asset
 from wanglibao import settings
-from .tasks import bajinshe_callback, renrenli_callback
+from .tasks import bajinshe_callback, renrenli_callback, common_callback_for_post
 from .utils import get_bajinshe_base_data, get_renrenli_base_data
 
 
@@ -256,12 +257,13 @@ class CoopRegister(object):
     """
     第三方用户注册api
     """
-    def __init__(self, btype, bid=None, client_id=None, order_id=None, access_token=None):
+    def __init__(self, btype, bid=None, client_id=None, order_id=None, access_token=None, account=None):
         self.btype = btype
         self.bid = bid
         self.client_id = client_id
         self.order_id = order_id
         self.access_token = access_token
+        self.account = account
         self.channel = get_channel_record(self.btype)
 
     def save_to_binding(self, user):
@@ -277,6 +279,8 @@ class CoopRegister(object):
             binding.channel = self.channel
             if self.bid:
                 binding.bid = self.bid
+            if self.account:
+                binding.b_account = self.account
             binding.save()
 
     def save_to_oauthuser(self, user):
@@ -836,6 +840,40 @@ class BiSouYiCallback(CoopCallback):
         self.coop_key = settings.BAJINSHE_COOP_KEY
         self.register_call_back_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
 
+    def register_call_back(self, user_id, order_id, total_asset=0, p2p_margin=0, base_data=None):
+        super(BiSouYiCallback, self).register_call_back(user_id, order_id)
+        binding = Binding.objects.filter(user_id=user_id).select_related('channel').first()
+        oauth_user = OauthUser.objects.filter(user_id=user_id).select_related('client').first()
+        access_token = AccessToken.objects.filter(user_id=user_id).first()
+        if oauth_user and access_token and binding and binding.b_account:
+            phone = get_user_phone_for_coop(user_id)
+            account = binding.b_account
+            client_id = oauth_user.client.client_id
+            channel_code = binding.channel.code
+            access_token = access_token.token
+
+            content_data = {
+                'pcode': settings.BISOUYI_PCODE,
+                'token': access_token,
+                'yaccount': phone,
+                'jaccount': account,
+                'mobile': phone,
+                'type': 1,
+                'tstatus': 1,
+            }
+
+            content = generate_bisouyi_content(content_data)
+
+            headers = {
+                'Content-Type': 'application/json',
+                'cid': client_id,
+                'sign': generate_bisouyi_sign(content),
+            }
+
+            # 授权回调
+            common_callback_for_post.apply_async(
+                kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL, 'params': json.dumps(content_data),
+                        'channel': channel_code, 'headers': headers})
 
 # 第三方回调通道
 coop_callback_processor = {

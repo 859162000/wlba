@@ -37,12 +37,15 @@ def common_callback(url, params, channel):
 
 
 @app.task
-def common_callback_for_post(url, params, channel):
+def common_callback_for_post(url, params, channel, headers=None):
     logger.info("Enter %s_callback task===>>>" % channel)
     ret = None
     try:
         logger.info(params)
-        ret = requests.post(url, data=params)
+        if headers:
+            ret = requests.post(url, data=params, headers=headers)
+        else:
+            ret = requests.post(url, data=params)
         logger.info('%s callback url: %s' % (channel, ret.url))
         logger.info('callback return: %s' % ret.text)
     except Exception, e:

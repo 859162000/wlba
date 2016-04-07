@@ -22,6 +22,7 @@ try:
 except ImportError:
     timezone = None
 
+
 def now():
     if timezone:
         return timezone.now()

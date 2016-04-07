@@ -83,6 +83,7 @@ def generate_bisouyi_sign(content):
 
 
 def process_bajinshe_user_exists(user, binding, sign_is_ok):
+    phone_unregister = False
     if sign_is_ok:
         if user:
             if binding and user:
@@ -90,14 +91,16 @@ def process_bajinshe_user_exists(user, binding, sign_is_ok):
                     'ret_code': 10000,
                     'message': u'该号已注册',
                 }
+
             elif not user:
+                phone_unregister = True
                 response_data = {
-                    'ret_code': 10001,
+                    'ret_code': 10000,
                     'message': u'该号未注册',
                 }
             else:
                 response_data = {
-                    'ret_code': 10002,
+                    'ret_code': 10000,
                     'message': u'该号已注册，非本渠道用户',
                 }
         else:
@@ -111,9 +114,10 @@ def process_bajinshe_user_exists(user, binding, sign_is_ok):
             'message': u'无效签名',
         }
 
-    response_data['invitation_code'] = None
+    response_data['invitation_code'] = ''
+    response_data['user_id'] = ''
     response_data['ext'] = ''
-    if response_data['ret_code'] == 10000:
+    if phone_unregister:
         response_data['user_id'] = binding.bid
         response_data['invitation_code'] = binding.channel.code
 

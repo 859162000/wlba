@@ -73,3 +73,25 @@ class UserForm(forms.Form):
             )
         else:
             return user
+
+
+class UserValidateForm(forms.Form):
+    name = forms.CharField(max_length=32, label=u'姓名', error_messages={'required': u'姓名是必须的'})
+    id_number = forms.CharField(max_length=128, label=u'身份证号', error_messages={'required': u'身份证号是必须的'})
+    id_valid_time = forms.CharField(max_length=30, label=u'实名时间', error_messages={'required': u'实名时间是必须的'})
+    user_id = forms.IntegerField(error_messages={
+        'required': u'用户id是必须的',
+        'invalid': u'用户id必须是数字'
+    })
+
+    def clean_user_id(self):
+        user_id = self.cleaned_data['user_id']
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            raise forms.ValidationError(
+                code=10020,
+                message=u'无效用户id'
+            )
+        else:
+            return user

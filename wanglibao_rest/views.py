@@ -23,7 +23,7 @@ from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
 from wanglibao_margin.utils import save_to_margin
 from marketing.forms import ChannelForm
-from wanglibao_account.forms import UserRegisterForm, UserForm
+from wanglibao_account.forms import UserRegisterForm, UserForm, UserValidateForm
 from wanglibao_oauth2.models import Client
 from wanglibao_account.models import Binding
 from wanglibao_rest import utils as rest_utils
@@ -194,10 +194,12 @@ class CoopDataDispatchApi(APIView):
             client_id = req_data.get('client_id')
             order_id = req_data.get('order_id')
             access_token = req_data.get('access_token')
+            account = req_data.get('account')
             user = create_user(user_id, phone)
             if user:
                 try:
-                    CoopRegister(btype, bid, client_id, order_id, access_token).all_processors_for_user_register(user)
+                    CoopRegister(btype, bid, client_id,
+                                 order_id, access_token, account).all_processors_for_user_register(user)
                 except Exception, e:
                     response_data = {
                         'ret_code': 10025,
@@ -298,11 +300,17 @@ class CoopDataDispatchApi(APIView):
         return response_data
 
     def process_validate(self, req_data):
-        form = UserForm(req_data)
+        form = UserValidateForm(req_data)
         if form.is_valid():
             user = form.cleaned_data['user_id']
+            name = form.cleaned_data['name']
+            id_number = form.cleaned_data['id_number']
+            id_valid_time = form.cleaned_data['id_valid_time']
+            id_valid_time = str_to_utc(id_valid_time)
+            user.wanglibaouserprofile.name = name
+            user.wanglibaouserprofile.id_number = id_number
             user.wanglibaouserprofile.id_is_valid = True
-            user.wanglibaouserprofile.id_valid_time = timezone.now()
+            user.wanglibaouserprofile.id_valid_time = id_valid_time
             user.wanglibaouserprofile.save()
             response_data = {
                 'ret_code': 10000,

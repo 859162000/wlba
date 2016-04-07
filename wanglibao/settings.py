@@ -465,7 +465,32 @@ else:
 
 
 # 比搜益
-BISOUYI_PCODE = '10002'
-BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
-BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
-BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
+if ENV == ENV_PRODUCTION:
+    BISOUYI_PCODE = '10002'
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
+    BISOUYI_PRODUCT_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/product/basice'
+    BISOUYI_PRODUCT_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/product/status'
+    BISOUYI_INTEREST_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/money'
+    BISOUYI_PURCHASE_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchase'
+    BISOUYI_PURCHASE_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseStauts'
+    BISOUYI_WITHDRAW_RECHARGE_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/ransom'
+    BISOUYI_WITHDRAW_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/ransomStatus'
+    BISOUYI_BIND_CARD_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/opened'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+else:
+    BISOUYI_PCODE = '10002'
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
+    BISOUYI_PRODUCT_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/product/basice'
+    BISOUYI_PRODUCT_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/product/status'
+    BISOUYI_INTEREST_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/money'
+    BISOUYI_PURCHASE_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchase'
+    BISOUYI_PURCHASE_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseStauts'
+    BISOUYI_WITHDRAW_RECHARGE_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/ransom'
+    BISOUYI_WITHDRAW_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/ransomStatus'
+    BISOUYI_BIND_CARD_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/opened'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+

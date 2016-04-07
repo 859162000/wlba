@@ -15,6 +15,8 @@ class WanglibaoUserProfile(models.Model):
     phone = models.CharField(u'手机号码', max_length=64, blank=True)
     phone_verified = models.BooleanField(u'手机号码是否已验证', default=False)
 
+    name = models.CharField(max_length=12, blank=True, help_text=u'姓名')
+    id_number = models.CharField(max_length=64, blank=True, help_text=u'身份证号', db_index=True)
     id_is_valid = models.BooleanField(u'身份证是否通过验证', default=False)
     id_valid_time = models.DateTimeField(u"实名认证时间", blank=True, null=True)
 
