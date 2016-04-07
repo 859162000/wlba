@@ -1843,6 +1843,9 @@ class BaJinSheRegister(CoopRegister):
         logger.info("%s-Enter validate_call_back for user[%s]" % (channel.code, user.id))
         data = generate_coop_base_data('validate')
         data['user_id'] = user.id
+        data['name'] = user.wanglibaouserprofile.name
+        data['id_number'] = user.wanglibaouserprofile.id_number
+        data['id_valid_time'] = user.wanglibaouserprofile.id_valid_time.strftime('%Y-%m-%d %H:%M:%S')
         coop_callback_for_post.apply_async(
             kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
@@ -1866,6 +1869,7 @@ class BaJinSheRegister(CoopRegister):
                 'btype': self.channel_code,
                 'user_id': user.id,
                 'access_token': getattr(user, 'access_token', ''),
+                'account': getattr(user, 'account', ''),
             }
             data = dict(base_data, **act_data)
             common_callback_for_post.apply_async(
