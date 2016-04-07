@@ -85,28 +85,22 @@ def generate_bisouyi_sign(content):
 def process_bajinshe_user_exists(user, binding, sign_is_ok):
     is_bjs_user = False
     if sign_is_ok:
-        if user:
-            if binding and user:
-                is_bjs_user = True
-                response_data = {
-                    'ret_code': 10000,
-                    'message': u'该号已注册',
-                }
+        if binding and user:
+            is_bjs_user = True
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号已注册',
+            }
 
-            elif not user:
-                response_data = {
-                    'ret_code': 10000,
-                    'message': u'该号未注册',
-                }
-            else:
-                response_data = {
-                    'ret_code': 10000,
-                    'message': u'该号已注册，非本渠道用户',
-                }
+        elif not user:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号未注册',
+            }
         else:
             response_data = {
-                'ret_code': 10007,
-                'message': u'手机号不存在',
+                'ret_code': 10000,
+                'message': u'该号已注册，非本渠道用户',
             }
     else:
         response_data = {
