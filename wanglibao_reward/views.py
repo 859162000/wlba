@@ -2820,7 +2820,7 @@ class FetchAirportServiceReward(APIView):
             return Response({"ret_code": -1, "message": "您已领取奖励过~"})
         if is_new:
             if not user_ib.bought_at:
-                return Response({"ret_code": -1, "message": "您还没有投资，快去投资吧~"})
+                return Response({"ret_code":-2, "message": "您还没有投资，快去投资吧~"})
             first_buy = P2PRecord.objects.filter(user=user).order_by('create_time').first()
             if first_buy.amount <new_min_amount:
                 return Response({"ret_code": -1, "message": "首次投资不足金额~"})
