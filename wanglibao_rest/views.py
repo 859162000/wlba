@@ -67,7 +67,6 @@ from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
-from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 
@@ -1787,14 +1786,14 @@ class OauthUserRegisterApi(APIView):
                             "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
                         })
 
-                        # 处理第三方渠道的用户信息
-                        CoopRegister(request).all_processors_for_user_register(user, channel_code)
-
                         tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                         coop_register_processor = getattr(rest_utils, 'process_%s_register' % channel_code.lower(), None)
                         if coop_register_processor:
                             response_data = coop_register_processor(request, user, phone, client_id, channel_code)
+
+                            # 处理第三方渠道的用户信息
+                            CoopRegister(request).all_processors_for_user_register(user, channel_code)
                         else:
                             response_data = {
                                 'ret_code': 50001,

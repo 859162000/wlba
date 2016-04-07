@@ -2767,6 +2767,7 @@ class FetchMarchAwardAPI(APIView):
 
 class AirportServiceRewardTemplate(TemplateView):
     def get_context_data(self, **kwargs):
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         airport_service_reward = getMiscValue("airport_service_reward")
         rule_ids = airport_service_reward['rule_ids']
         return {
@@ -2777,7 +2778,7 @@ class FetchAirportServiceReward(APIView):
     authentication_classes = (IsAuthenticated, )
 
     def post(self, request):
-        # airport_service_reward = {"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         rule_id = request.DATA.get('rule_id', "").strip()
         if not rule_id or not rule_id.isdigit():
             return Response({"ret_code":-1, "message":""})
@@ -2820,7 +2821,7 @@ class FetchAirportServiceReward(APIView):
             return Response({"ret_code": -1, "message": "您已领取奖励过~"})
         if is_new:
             if not user_ib.bought_at:
-                return Response({"ret_code": -1, "message": "您还没有投资，快去投资吧~"})
+                return Response({"ret_code":-2, "message": "您还没有投资，快去投资吧~"})
             first_buy = P2PRecord.objects.filter(user=user).order_by('create_time').first()
             if first_buy.amount <new_min_amount:
                 return Response({"ret_code": -1, "message": "首次投资不足金额~"})

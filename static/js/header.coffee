@@ -1,8 +1,17 @@
 require.config
   paths:
-    jquery: 'lib/jquery.min'
-    iealert: 'lib/iealert.min'
+    "jquery": 'lib/jquery.min'
+    "iealert": 'lib/iealert.min'
+    'jquery.modal': 'lib/jquery.modal.min'
+    "underscore": 'lib/underscore-min'
+    "tools": 'lib/modal.tools'
+    "jquery.validate": 'lib/jquery.validate.min'
+    "ddslick": 'lib/jquery.ddslick'
+
   shim:
+    "jquery.validate": ['jquery']
+    "ddslick": ['jquery']
+    'jquery.modal': ['jquery']
     'iealert': ['jquery']
 
 require ['jquery', 'lib/backend', 'iealert'], ($, backend, iealert)->
