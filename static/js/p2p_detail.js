@@ -13,7 +13,7 @@
       "jquery.validate": ['jquery'],
       "ddslick": ['jquery']
     },
-    urlArgs: 'v=20160407'
+    urlArgs: 'v=2016040701'
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
