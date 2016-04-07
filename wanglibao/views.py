@@ -292,7 +292,7 @@ def landpage_view(request):
         # 判断是否属于交易操作
         if action:
             is_mobile = utype_is_mobile(request)
-            if action in ['purchase', 'deposit', 'withdraw', 'account_home']:
+            if action in ['purchase', 'deposit', 'withdraw', 'account_home', 'equity']:
                 if action == 'purchase':
                     product_id = request.session.get('product_id', '')
                     if product_id:
@@ -300,12 +300,20 @@ def landpage_view(request):
                             url = reverse('weixin_p2p_detail', kwargs={'id': product_id, 'template': 'buy'})
                         else:
                             url = reverse('p2p detail', kwargs={'id': product_id})
+                    else:
+                        action_uri = 'weixin_p2p_list_coop' if is_mobile else 'p2p_list'
+                        url = reverse(action_uri)
                 elif action == 'deposit':
                     action_uri = 'weixin_recharge_first' if is_mobile else 'pay-banks'
                     url = reverse(action_uri)
                 elif action == 'withdraw':
                     action_uri = 'weixin_recharge_first' if is_mobile else 'withdraw'
                     url = reverse(action_uri)
+                elif action == 'equity':
+                    if is_mobile:
+                        url = reverse('weixin_transaction', kwargs={'status': 'buying'})
+                    else:
+                        url = reverse('account_home')
                 else:
                     action_uri = 'weixin_account' if is_mobile else 'account_home'
                     url = reverse(action_uri)

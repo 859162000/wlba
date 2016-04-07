@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from wanglibao_account.models import Binding
+from wanglibao_account.forms import BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
 
 
@@ -211,6 +212,23 @@ def process_for_renrenli_landpage(request, channel_code):
         access_token = request.session.get('access_token', None)
 
     coop_token_login(request, phone, client_id, access_token)
+
+
+def process_for_bisouyi_landpage(request, channel_code):
+    form = BiSouYiRegisterForm(request.session, action='login')
+    if form.is_valid():
+        if form.check_sign():
+            phone = form.get_phone()
+            access_token = form.get_token()
+            client_id = form.cleaned_data['client_id']
+            coop_token_login(request, phone, client_id, access_token)
+            error_msg = 'success'
+        else:
+            error_msg = u'无效签名'
+    else:
+        error_msg = form.errors.values()[0][0]
+
+    logger.info("process_for_bisouyi_landpage process result: %s" % error_msg)
 
 
 def has_binding_for_bid(channel_code, bid):
