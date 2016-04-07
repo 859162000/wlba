@@ -56,8 +56,9 @@ class PrepaymentHistory(object):
                 #4. 计算当期未计息天数
         """
         with transaction.atomic(savepoint=savepoint):
+            amortization = ProductAmortization.objects.select_for_update().get(id=self.amortization.id)
             # 1.生成产品提前还款记录
-            amortization = self.amortization
+            # amortization = self.amortization
             product_record = self.get_product_repayment(penal_interest, repayment_type, payment_date)
             order_id = OrderHelper.place_order(None, order_type=self.catalog, product_id=self.product.id, status=u'新建').id
             product_record.order_id = order_id
