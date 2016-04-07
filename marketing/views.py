@@ -2742,9 +2742,10 @@ class HappyMonkeyAPIView(APIView):
                 if total>=key[0] and total<=key[1]:
                     exp_name = value
 
+            exp_gold=ExperienceEvent.objects.filter(name=exp_name).first()
             reward = ActivityReward.objects.create(
                 user=user,
-                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                experience=exp_gold,
                 channel=self.token,
                 create_at=today,
                 left_times=0,
@@ -2753,6 +2754,14 @@ class HappyMonkeyAPIView(APIView):
             SendExperienceGold(user).send(reward.experience.id)
             join_record.remain_chance = 0
             join_record.save()
+
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"天降福利活动体验金",
+                "content": u'恭喜您获得天降福利活动体验金%s元,请您使用;感谢你对网利宝的关注与支持.' % (exp_gold.amount,),
+                "mtype": "activity"
+            })
+
             to_json_response = {
                 'ret_code': 0,
                 'type':exp_name,
