@@ -875,6 +875,18 @@ class BiSouYiCallback(CoopCallback):
                 kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL, 'params': json.dumps(content_data),
                         'channel': channel_code, 'headers': headers})
 
+    def purchase_call_back(self, user_id, order_id):
+        super(BiSouYiCallback, self).purchase_call_back(user_id, order_id)
+        oauth_user = OauthUser.objects.filter(user_id=user_id).select_related('client').first()
+        if oauth_user:
+            content_data = {
+                'pcode': settings.BISOUYI_PCODE,
+                'yaccount': get_user_phone_for_coop(user_id),
+                'type': 1,
+                'tstatus': 1,
+            }
+
+
 # 第三方回调通道
 coop_callback_processor = {
     'bajinshe': 'BaJinSheCallback',

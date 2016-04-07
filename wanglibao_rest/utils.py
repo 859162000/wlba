@@ -83,17 +83,17 @@ def generate_bisouyi_sign(content):
 
 
 def process_bajinshe_user_exists(user, binding, sign_is_ok):
-    phone_unregister = False
+    is_bjs_user = False
     if sign_is_ok:
         if user:
             if binding and user:
+                is_bjs_user = True
                 response_data = {
                     'ret_code': 10000,
                     'message': u'该号已注册',
                 }
 
             elif not user:
-                phone_unregister = True
                 response_data = {
                     'ret_code': 10000,
                     'message': u'该号未注册',
@@ -117,7 +117,7 @@ def process_bajinshe_user_exists(user, binding, sign_is_ok):
     response_data['invitation_code'] = ''
     response_data['user_id'] = ''
     response_data['ext'] = ''
-    if phone_unregister:
+    if is_bjs_user:
         response_data['user_id'] = binding.bid
         response_data['invitation_code'] = binding.channel.code
 
