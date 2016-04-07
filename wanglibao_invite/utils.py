@@ -9,30 +9,33 @@ from .models import WechatUserDailyReward, InviteRelation, InviteRewardRecord, U
 from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_message_for_hby, get_start_end_time
 from wanglibao_redpack.models import RedPackEvent
 from experience_gold.backends import SendExperienceGold
-
+from wanglibao_p2p.models import P2PRecord
 
 def iter_method(data):
-    total = sum(data.values())
+    total = sum([vv[1] for vv in data.values()])
     rad = random.randint(1,total)
 
     cur_total = 0
     res = ""
     for k, v in data.items():
-        cur_total += v
+        cur_total += v[1]
         if rad<= cur_total:
             res = k
             break
     return res
 
 def getRandomRedpackId():
-    # redpack_data = getMiscValue("redpack_rain")
-    redpack_data = {'1': 20,'2': 30, '3': 40, '4': 10}
+    # share_invite_config = getMiscValue("share_invite_config")
+    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
+    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0}
+    redpack_data = {'1': [0, 20], '2': [0, 30], '3': [0, 40], '4': [0, 10]}
     redpack_id = int(iter_method(redpack_data))
     return redpack_id
 
 def getWechatDailyReward(openid):
     w_user = WeixinUser.objects.get(openid=openid)
     today = datetime.datetime.today()
+
     redpack_id = getRandomRedpackId()
     daily_reward, _ = WechatUserDailyReward.objects.get_or_create(
         create_date=today,
@@ -75,16 +78,35 @@ def sendDailyReward(user, daily_reward_id, save_point=False):
         return 0, "ok"
 
 def sendInviteReward(user):
-    InviteRewardRecord
+    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
+    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0, "invite_experience_id":1}
+    share_invite_config = getMiscValue("share_invite_config")
+    base_experience_amount = share_invite_config.get('base_experience_amount', 0)
+    # InviteRewardRecord
     inv_relation = InviteRelation.objects.filter(user=user).first()
     if inv_relation:
         inviter = inv_relation.inviter
         if inviter:
             inviter_extra = UserExtraInfo.objects.filter(user=inviter).first()
-            if inviter_extra.invite_experience_amount > 20000:
+            if inviter_extra.invite_experience_amount < base_experience_amount:
                 #todo
-                #give redpack
-                pass
+                invite_experience_id = share_invite_config['invite_experience_id']
+                SendExperienceGold(user).send(pk=invite_experience_id)
+
+def sendInvestReward(user):
+    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
+    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0, "invite_experience_id":1}
+    share_invite_config = getMiscValue("share_invite_config")
+    base_experience_amount = share_invite_config.get('base_experience_amount', 0)
+    # InviteRewardRecord
+    inv_relation = InviteRelation.objects.filter(user=user).first()
+    if inv_relation:
+        inviter = inv_relation.inviter
+        if inviter:
+            first_buy = P2PRecord.objects.filter(user=user,
+                                                 # create_time__gt=
+                                                 ).order_by('create_time').first()
+
 
 
 

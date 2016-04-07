@@ -34,6 +34,7 @@ class InviteRewardRecord(models.Model):
         ('V', u'实名认证'),
         ('D', u'充值'),
         ('B', u'购买'),
+        ('FB', u'首次购买'),
     )
     invite_relation = models.ForeignKey(InviteRelation)
     action = models.CharField(max_length=10, blank=False, null=False, choices=ACTION)
