@@ -207,7 +207,7 @@ class SendMessages(APIView):
                 for phone in phones:
                     PHPSendSMS().send_sms_msg_one(7, phone, 'phone', messages[phones.index(phone)])
         except Exception, e:
-            logger.debug(u'发送短息失败! err = {}'.format(str(e)))
+            logger.debug(u'发送短息失败! phones = {}, err = {}'.format(phones, e.message))
             ret = {'status': 0, 'message': e}
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

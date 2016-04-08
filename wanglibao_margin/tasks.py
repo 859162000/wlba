@@ -157,7 +157,7 @@ def assignment_buy(buyer_token=None, seller_token=None):
     url = settings.PHP_SQS_HOST
     ret = save_to_sqs(url, data)
 
-    logger.info('in buy zhaizhuang, buyer_token = {}, seller_token = {}'.format(buyer_token, seller_token))
+    logger.info('in buy zhaizhuan, buyer_token = {}, seller_token = {}'.format(buyer_token, seller_token))
     logger.info('save to sqs! args = {}, return = {}'.format(data, ret))
 
     print ret.text
