@@ -62,8 +62,9 @@ def bisouyi_product_push(product=None):
                                                  Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
         if product_list.exists():
             for product in product_list:
-                product_data = generate_bajinshe_product_data(product)
-                product_data_list.append(product_data)
+                product_data = generate_bisouyi_product_data(product, 'info')
+                product_status_data = generate_bisouyi_product_data(product, 'status')
+                product_data_list.append((product_data, product_status_data))
     else:
         product_data = generate_bisouyi_product_data(product, 'info')
         product_status_data = generate_bisouyi_product_data(product, 'status')
