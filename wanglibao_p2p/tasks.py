@@ -21,7 +21,7 @@ _LOCALS = locals()
 
 
 @app.task
-def bajinshe_product_push(product=None):
+def bajinshe_product_push(product=None, product_list=None):
     push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
     coop_id = settings.BAJINSHE_COOP_ID
     coop_key = settings.BAJINSHE_COOP_KEY
@@ -30,9 +30,7 @@ def bajinshe_product_push(product=None):
     if access_token:
         product_data_list = list()
         if not product:
-            product_list = P2PProduct.objects.filter(~Q(status=u'已完成') | (Q(status=u'已完成') & Q(make_loans_time__isnull=False) &
-                                                     Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
-            if product_list.exists():
+            if product_list and product_list.exists():
                 for product in product_list:
                     product_data = generate_bajinshe_product_data(product)
                     product_data_list.append(product_data)
@@ -55,12 +53,10 @@ def bajinshe_product_push(product=None):
 
 
 @app.task
-def bisouyi_product_push(product=None):
+def bisouyi_product_push(product=None, product_list=None):
     product_data_list = list()
     if not product:
-        product_list = P2PProduct.objects.filter(~Q(status=u'已完成') | (Q(status=u'已完成') & Q(make_loans_time__isnull=False) &
-                                                 Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
-        if product_list.exists():
+        if product_list and product_list.exists():
             for product in product_list:
                 product_data = generate_bisouyi_product_data(product, 'info')
                 product_status_data = generate_bisouyi_product_data(product, 'status')
@@ -92,9 +88,15 @@ def bisouyi_product_push(product=None):
 
 @app.task
 def process_channel_product_push(product=None):
+    product_list=None
+    if not product:
+        product_list = P2PProduct.objects.filter(~Q(status=u'已完成') |
+                                                 (Q(status=u'已完成') &
+                                                  Q(make_loans_time__isnull=False) &
+                                                  Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
     for k, v in _LOCALS.iteritems():
         if k.lower().find('_product_push') != -1:
             try:
-                v.apply_async(kwargs={'product': product})
+                v(product=product, product_list=product_list)
             except Exception, e:
                 logger.warning("process_channel_product_push dispatch %s raise error: %s" % (k, e))

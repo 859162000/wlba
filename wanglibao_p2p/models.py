@@ -44,6 +44,13 @@ class P2PProduct(models.Model):
 
     warrant_company = models.CharField(u'担保公司', max_length=64)
 
+    flow_time = models.DateTimeField(u'流标时间', default=timezone.now(), db_index=True)
+
+    def save(self, *args, **kwargs):
+        if self.status == u'流标':
+            self.flow_time = timezone.now()
+        super(P2PProduct, self).save(*args, **kwargs)
+
     @property
     def completion_rate(self):
         if not self.total_amount > 0:
