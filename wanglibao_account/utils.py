@@ -1,9 +1,11 @@
 # coding=utf-8
+
 import string
 import uuid
 import re
 import datetime
 import time
+from random import randint
 from django.conf import settings
 #from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -33,7 +35,7 @@ from wanglibao_redis.backend import redis_backend
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_rest.utils import get_current_utc_timestamp
-
+from report.crypto import Aes
 
 
 logger = logging.getLogger(__name__)
@@ -843,3 +845,30 @@ def generate_coop_base_data(act):
         'channel': channel,
     }
     return data
+
+
+def generate_random_password(length):
+    if length < 0:
+        raise Exception("生成随机密码的长度有误")
+
+    random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    password = ""
+    index = 0
+    while index < length:
+        password += str(random_list[randint(0,len(random_list)-1)])
+        index += 1
+    return str(password)
+
+
+def generate_bisouyi_content(data):
+    data = json.dumps(data)
+    ase = Aes()
+    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data)
+    return encrypt_text
+
+
+def generate_bisouyi_sign(content):
+    client_id = settings.BISOUYI_CLIENT_ID
+    key = settings.BISOUYI_CLIENT_SECRET
+    sign = hashlib.md5(client_id + key + content).hexdigest()
+    return sign

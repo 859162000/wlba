@@ -1,4 +1,4 @@
-webpackJsonp([11],[
+webpackJsonp([12],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -300,27 +300,13 @@ webpackJsonp([11],[
 	 * @param callback 回调函数
 	 */
 	var Alert = exports.Alert = function Alert(text, callback) {
-	    //return new Promise(function(resolve, reject){
-	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
-	    //
-	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
-	    //
-	    //    $button.on('click', () => {
-	    //        $alert.hide();
-	    //        //alert(typeof callback+" ,"+callback);
-	    //        //callback();
-	    //        resolve();
-	    //    })
-	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        //alert(typeof callback+" ,"+callback);
 	        callback();
 	    });
 	};
@@ -583,7 +569,7 @@ webpackJsonp([11],[
 	    password: function password(str) {
 	        var error = '密码为6-20位数字/字母/符号/区分大小写',
 	            re = new RegExp(/^\d{6,20}$/);
-	        if (re.test($.trim(str))) {
+	        if (6 < $.trim(str).length && $.trim(str).length < 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];

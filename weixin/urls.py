@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'^account/bankcard/add/$', login_required(views.WeixinAccountBankCardAdd.as_view(), login_url='/weixin/login/'), name='weixin_bankcard_add'),
 
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
+    url(r'^coop_login/$', views.WeixinCoopLogin.as_view(), name='weixin_coop_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
@@ -51,9 +52,7 @@ urlpatterns = patterns(
     url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
-    #bsy
-    url(r'^login_bsy/$', TemplateView.as_view(template_name="weixin_login_bsy.jade")),
-    url(r'^list_bsy/$', views.P2PListView.as_view(template_name='weixin_list_bsy.jade'), name='weixin_p2p_list_bsy'),
+    url(r'^p2p_list/coop/$', views.P2PListView.as_view(), name='weixin_p2p_list_coop'),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),

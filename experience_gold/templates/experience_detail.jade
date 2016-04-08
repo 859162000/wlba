@@ -10,13 +10,64 @@ html
     body
         - csrf_token
         include global/g_nav
-        .experience-detail-box
-            .detail-box-one
-                .detail-one-left
+        .experience-detail-box.clearfix
+            .detail-box-one.clearfix
+                .new-user-icon
+                .detail-one-left.clearfix
                     h3 新手体验标
-                    ul
-                        li
+                    ul.clearfix
+                        li.one
                             p
                                 span 1
                                 label 元
-                            p 投资金额
+                            p.info-s 投资金额
+                        li.two
+                            p
+                                span 1
+                                label 天
+                            p.info-s 还款期限
+                        li.three
+                            p
+                                span 10
+                                label %
+                            p.info-s 年化收益
+                    p.project-dec 项目描述：新用户投资1元，产品到期后享有28888元的投资收益。体验安全、高效的投资服务。
+                .detail-one-right.clearfix
+                    p.profit 投资1元享
+                        span 28888
+                        | 超高收益
+                    p.down-fonts 本标仅限网利宝APP可投，请扫码下载
+                    .ex-download-app.mg-t-sm
+                        img(src='/static/imgs/pc_activity/experience_detail/erweima.png', alt='p2p金融').dol-app.mg-r-sm.fl
+                        .dol-btn.fl
+                          .t-d4 网利宝APP-随时随地 让钱生钱
+                          a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
+                            .span3.android-icon.bg-d8.t-d6
+                              i.icon.iconfont.icon-android
+                            .span9.btn-text.bg-d7.font-s.t-d11 Android版下载
+                          a(href='https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8').dol-btn-warp
+                            .span3.android-icon.bg-d9.t-d6
+                              i.icon.iconfont.icon-ios
+                            .span9.btn-text.bg-d7.font-s.t-d11 iPhone版下载
+            .detail-box-two.clearfix
+                .look-rule
+                    a(href="javascript:void(0)") 详细规则
+                        i
+                h3 产品描述
+                .describe-box
+                    .describe-img.img1
+                    .describe-fonts 新用户投资1元，到期后享有28888元的投资收益。体验安全 、高效的投资服务。新用户在投资前需要实名认证 、绑定银行卡才可充值1元。
+            .detail-box-two.clearfix
+                h3 如何计算收益
+                .describe-box
+                    .describe-img.img2
+                    .describe-fonts
+                        p 28888 * 10% * 1天 \ 365天 ＝ 8.02元
+                        p 本金 * 年化利率 * 标期限 \ 1年 ＝ 收益
+            .detail-box-two.mb70.clearfix
+                h3 回款方式
+                .describe-box
+                    .describe-img.img3
+                    .describe-fonts 到期后，8.02元的收益自动回到您的账户余额中，可以随时手动体现，一到三个工作日内到账。
+        include global/g_footer
+

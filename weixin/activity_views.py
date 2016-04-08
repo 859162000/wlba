@@ -178,6 +178,10 @@ class GetContinueActionReward(APIView):
                                 _send_message_template(user, rule.rule_name, content)
                     else:
                         sub_redpack_record_ids, sub_experience_record_ids = self.giveReward(user, rule, events, experience_events, records,redpack_txts, device_type, is_addition=True)
+                        if isinstance(sub_redpack_record_ids, Response):
+                            return sub_redpack_record_ids
+                        if isinstance(sub_experience_record_ids, Response):
+                            return sub_experience_record_ids
                         redpack_record_ids += sub_redpack_record_ids
                         experience_record_ids += sub_experience_record_ids
 
@@ -196,21 +200,21 @@ class GetContinueActionReward(APIView):
                 _send_message_for_hby(request.user, event, end_time)
                 if is_weixin and w_user:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n快去我的账户－理财券页面查看吧！"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日 %H:%M:%S')), #\n兑换码:%s
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励：%s\n有效期至：%s\n快去我的账户－理财券页面查看吧！"%(days, getattr(event, "desc_text", "优惠券"), end_time.strftime('%Y年%m月%d日')), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
             if is_weixin and w_user:
                 for reward in rewards:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n有效期至:%s\n兑换码:%s\n天天签到不要停，快去兑换吧！"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励：%s\n有效期至：%s\n兑换码：%s\n天天签到不要停，快去兑换吧！"%(days, reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
             if is_weixin and w_user:
                 for experience_event in experience_events:
                     sentCustomerMsg.apply_async(kwargs={
-                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励:%s\n快去我的账户－体验金页面查看吧！"%(days, getattr(experience_event, "desc_text", "体验金")),
+                            "txt":"恭喜您获得连续%s天签到奖励\n签到奖励：%s\n快去我的账户－体验金页面查看吧！"%(days, getattr(experience_event, "desc_text", "体验金")),
                             "openid":w_user.openid,
                         },
                                                     queue='celery02')
@@ -240,8 +244,8 @@ class GetContinueActionReward(APIView):
             if rule.addition_gift_type == "redpack":
                 redpack_ids = rule.addition_redpack.split(',')
 
-            if rule.gift_type == "experience_gold":
-                experience_record_ids = self.give_experience(user, experience_events, redpack_txts, rule.redpack)
+            if rule.addition_gift_type == "experience_gold":
+                experience_record_ids = self.give_experience(user, experience_events, redpack_txts, rule.addition_redpack)
                 if isinstance(experience_record_ids, Response):
                     return None, experience_record_ids
         if redpack_ids:
@@ -266,7 +270,7 @@ class GetContinueActionReward(APIView):
             if redpack_event.rtype == 'percent':
                 redpack_text = "%s%%百分比红包"%redpack_event.amount
             if redpack_event.rtype == 'direct':
-                redpack_text = "%s元红包"%int(redpack_event.amount)
+                redpack_text = "%s元直抵红包"%int(redpack_event.amount)
             setattr(redpack_event, 'desc_text', redpack_text)
             redpack_txts.append(redpack_text)
             redpack_record_ids += (str(record.id) + ",")

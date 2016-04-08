@@ -9,15 +9,16 @@ import requests
 import datetime
 import StringIO
 import traceback
+import shortuuid
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
-from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
+
 
 logger = logging.getLogger(__name__)
 
@@ -212,6 +213,24 @@ def process_for_renrenli_landpage(request, channel_code):
     coop_token_login(request, phone, client_id, access_token)
 
 
+def process_for_bisouyi_landpage(request, channel_code):
+    from wanglibao_account.forms import BiSouYiRegisterForm
+    form = BiSouYiRegisterForm(request.session, action='login')
+    if form.is_valid():
+        if form.check_sign():
+            phone = form.get_phone()
+            access_token = form.get_token()
+            client_id = form.cleaned_data['client_id']
+            coop_token_login(request, phone, client_id, access_token)
+            error_msg = 'success'
+        else:
+            error_msg = u'无效签名'
+    else:
+        error_msg = form.errors.values()[0][0]
+
+    logger.info("process_for_bisouyi_landpage process result: %s" % error_msg)
+
+
 def has_binding_for_bid(channel_code, bid):
     return Binding.objects.filter(btype=channel_code, bid=bid).exists()
 
@@ -222,6 +241,15 @@ def get_coop_binding_for_phone(channel_code, phone):
 
 def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
+
+
+def long_token():
+    """
+    Generate a hash that can be used as an application secret
+    """
+    hash = hashlib.sha1(shortuuid.uuid())
+    hash.update(settings.SECRET_KEY)
+    return hash.hexdigest()
 
 
 def get_coop_access_token(phone, client_id, tid, coop_key):
@@ -291,26 +319,22 @@ def push_coop_access_token(phone, client_id, tid, coop_key, token):
 
 def process_renrenli_register(request, user, phone, client_id, channel_code):
     tid = get_uid_for_coop(user.id)
-    res_data = get_coop_access_token(phone, client_id, tid, settings.RENRENLI_COOP_KEY)
+    token = long_token()
 
-    if int(res_data['ret_code']) == 10000:
-        callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
-        callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
-        data = {
-            'Cust_key': tid,
-            'Access_tokens': res_data['access_token'],
-            'Callback_url': callback_url,
-        }
-        response_data = {
-            'ret_code': 101,
-            'message': u'成功',
-            'Data': data,
-        }
-    else:
-        response_data = {
-            'ret_code': res_data['ret_code'],
-            'message': res_data['message'],
-        }
+    callback_url = request.get_host() + '/landpage/' + '?promo_token=' + channel_code
+    callback_url = callback_url + '&client_id=' + client_id + '&phone=' + phone
+    data = {
+        'Cust_key': tid,
+        'Access_tokens': token,
+        'Callback_url': callback_url,
+    }
+    response_data = {
+        'ret_code': 101,
+        'message': u'成功',
+        'Data': data,
+    }
+
+    user.access_token = token
 
     return response_data
 

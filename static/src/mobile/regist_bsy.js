@@ -102,9 +102,6 @@ import { validation } from './mixins/images_validation'
     //注册
     function register(url) {
         let invite_val = $.trim($invite_code.val());
-        const cid = getUrl("cid="),
-            content = getUrl("content="),
-            sign = getUrl("sign=");
         return new Promise((resolve, reject) => {
             ajax({
                 url: url,
@@ -115,10 +112,7 @@ import { validation } from './mixins/images_validation'
                     'captcha_0': $captcha_0.val(),
                     'captcha_1': $captcha_1.val(),
                     'validate_code': $validate_code.val(),
-                    'invite_code': invite_val === "" ? $token.val() : invite_val,
-                    'cid': cid,
-                    'content': content,
-                    'sign': sign
+                    'invite_code': invite_val === "" ? $token.val() : invite_val
                 },
                 beforeSend(){
                     $submit.text('注册中,请稍等...').attr('disabled', 'true');
@@ -145,7 +139,7 @@ import { validation } from './mixins/images_validation'
             })
             .then((result)=> {
                 console.log('register success');
-                if (result.ret_code === 10010) {
+                if (result.ret_code === 10000) {//成功
 
                     BSY.Oauth();//对接
 

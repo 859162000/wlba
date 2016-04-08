@@ -1,4 +1,4 @@
-webpackJsonp([9],{
+webpackJsonp([10],{
 
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
@@ -56,27 +56,13 @@ webpackJsonp([9],{
 	 * @param callback 回调函数
 	 */
 	var Alert = exports.Alert = function Alert(text, callback) {
-	    //return new Promise(function(resolve, reject){
-	    //    const $alert =$('.wx-alert'), $button =$('.wx-submit');
-	    //
-	    //    $alert.css('display','-webkit-box').find('.wx-text').text(text);
-	    //
-	    //    $button.on('click', () => {
-	    //        $alert.hide();
-	    //        //alert(typeof callback+" ,"+callback);
-	    //        //callback();
-	    //        resolve();
-	    //    })
-	    //});
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        //alert(typeof callback+" ,"+callback);
 	        callback();
 	    });
 	};
