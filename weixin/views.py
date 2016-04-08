@@ -937,6 +937,16 @@ class P2PListView(TemplateView):
     template_name = 'weixin_list.jade'
 
     def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            tp_name = 'weixin_list_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
+
         p2p_products = []
 
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()

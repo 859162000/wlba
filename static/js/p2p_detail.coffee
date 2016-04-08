@@ -1,16 +1,3 @@
-require.config
-  paths:
-    jquery: 'lib/jquery.min'
-    underscore: 'lib/underscore-min'
-    tools: 'lib/modal.tools'
-    "jquery.validate": 'lib/jquery.validate.min'
-    'jquery.modal': 'lib/jquery.modal.min'
-    ddslick: 'lib/jquery.ddslick'
-
-  shims:
-    "jquery.validate": ['jquery']
-    "ddslick": ['jquery']
-  urlArgs: 'v=20160407'
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
   isFirst = true
