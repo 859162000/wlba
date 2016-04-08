@@ -395,12 +395,7 @@ CELERY_QUEUES = {
 
 from datetime import timedelta
 
-CELERYBEAT_SCHEDULE = {
-    'bajinshe_product_push-5-minutes': {
-        'task': 'wanglibao_p2p.tasks.bajinshe_product_push',
-        'schedule': timedelta(minutes=5),
-    },
-}
+CELERYBEAT_SCHEDULE = {}
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
 CELERYBEAT_SCHEDULE_FILENAME = "/tmp/celerybeat-schedule"
@@ -494,3 +489,8 @@ else:
     BISOUYI_BIND_CARD_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/opened'
     BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
 
+
+if ENV == ENV_PRODUCTION:
+    WLB_URL = 'https://www.wanglibao.com'
+else:
+    WLB_URL = 'https://staging.wanglibao.com'

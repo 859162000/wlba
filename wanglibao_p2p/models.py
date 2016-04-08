@@ -42,12 +42,34 @@ class P2PProduct(models.Model):
 
     limit_per_user = models.FloatField(u'单用户购买限额(0-1的系数)*', default=1)
 
+    warrant_company = models.CharField(u'担保公司', max_length=64)
+
+    @property
+    def completion_rate(self):
+        if not self.total_amount > 0:
+            return 0
+        return float(self.ordered_amount) / float(self.total_amount) * 100
+
+    @property
+    def remain_amount(self):
+        if not self.total_amount > 0:
+            return 0
+        return float(self.total_amount) - float(self.ordered_amount)
+
+    @property
+    def get_pc_url(self):
+        return '/p2p/detail/%s' % self.id
+
+    @property
+    def get_h5_url(self):
+        return '/weixin/view/buy/%s' % self.id
+
     class Meta:
         verbose_name = u'P2P产品'
         verbose_name_plural = u'P2P产品'
 
     def __unicode__(self):
-        return u'%s<%s>' % (self.id,self.name)
+        return u'%s<%s>' % (self.id, self.name)
 
 
 class P2PRecord(models.Model):

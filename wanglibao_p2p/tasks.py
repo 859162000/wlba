@@ -7,92 +7,93 @@ from celery.utils.log import get_task_logger
 
 from django.db.models import Q
 from django.utils import timezone
-from wanglibao.celery import app
-from wanglibao_p2p.models import P2PProduct
-from wanglibao_account.utils import get_bajinshe_access_token
 from django.conf import settings
+from wanglibao.celery import app
+from wanglibao_rest.utils import generate_bisouyi_sign, generate_bisouyi_content
+from wanglibao_account.utils import get_bajinshe_access_token
+from wanglibao_account.tasks import common_callback_for_post
+from .models import P2PProduct
+from .utils import (generate_bajinshe_product_data, generate_bisouyi_product_data)
 
 logger = get_task_logger(__name__)
 
+_LOCALS = locals()
+
 
 @app.task
-def bajinshe_product_push():
+def bajinshe_product_push(product=None):
     push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
     coop_id = settings.BAJINSHE_COOP_ID
     coop_key = settings.BAJINSHE_COOP_KEY
     order_id = '%s_0000' % timezone.now().strftime("%Y%m%d%H%M%S")
     access_token = get_bajinshe_access_token(coop_id, coop_key, order_id)
     if access_token:
-        product_list = P2PProduct.objects.filter(~Q(status=u'已完成') | (Q(status=u'已完成') & Q(make_loans_time__isnull=False) &
-                                                 Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
-        if product_list.exists():
-            product_data_list = []
-            for product in product_list:
-                product_total_amount = product.total_amount
-                product_status = product.status
-                pay_method = product.pay_method
-                if pay_method == u'等额本息':
-                    pay_method_code = 3
-                elif pay_method == u'按月付息':
-                    pay_method_code = 1
-                elif pay_method == u'日计息一次性还本付息':
-                    pay_method_code = 2
-                elif pay_method == u'到期还本付息':
-                    pay_method_code = 2
-                else:
-                    pay_method_code = 11
+        product_data_list = list()
+        if not product:
+            product_list = P2PProduct.objects.filter(~Q(status=u'已完成') | (Q(status=u'已完成') & Q(make_loans_time__isnull=False) &
+                                                     Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
+            if product_list.exists():
+                for product in product_list:
+                    product_data = generate_bajinshe_product_data(product)
+                    product_data_list.append(product_data)
+        else:
+            product_data = generate_bajinshe_product_data(product)
+            product_data_list.append(product_data)
 
-                if product_status == u'正在招标':
-                    product_status_code = 1
-                elif product_status in (u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'):
-                    product_status_code = 2
-                elif product_status in (u'录标', u'录标完成', u'待审核'):
-                    product_status_code = 3
-                elif product_status == u'还款中':
-                    product_status_code = 5
-                else:
-                    product_status_code = 0
-
-                if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-                    periodType = 1
-                else:
-                    periodType = 2
-
-                product_data = {
-                    'pid': product.id,
-                    'productType': 2,
-                    'productName': product.name,
-                    'apr': product.expected_earning_rate,
-                    'amount': product_total_amount,
-                    'pmType': pay_method_code,
-                    'minIa': 100,
-                    'progress': float('%.1f' % (float(product.ordered_amount) / product_total_amount * 100)),
-                    'status': product_status_code,
-                    'period': product.period,
-                    'periodType': periodType,
-                }
-
-                product_data_list.append(product_data)
-            else:
-                data = {
-                    'access_token': access_token,
-                    'platform': coop_id,
-                    'order_id': order_id,
-                    'prod': product_data_list,
-                }
+        if product_data_list:
+            data = {
+                'access_token': access_token,
+                'platform': coop_id,
+                'order_id': order_id,
+                'prod': product_data_list,
+            }
 
             headers = {
                'Content-Type': 'application/json',
             }
-            res = requests.post(url=push_url, data=json.dumps(data), headers=headers)
-            res_status_code = res.status_code
-            logger.info("bajinshe push product url %s" % res.url)
-            if res_status_code == 200:
-                res_data = res.json()
-                if res_data['code'] != '10000':
-                    logger.info("bajinshe push product return %s" % res_data)
-                else:
-                    logger.info("bajinshe push product,count[%s],suceess" % len(product_data_list))
-            else:
-                logger.info("bajinshe push product connect failed with status code [%s]" % res_status_code)
-                logger.info(res.text)
+            common_callback_for_post(url=push_url, params=json.dumps(data), channel='bajinshe', headers=headers)
+
+
+@app.task
+def bisouyi_product_push(product=None):
+    product_data_list = list()
+    if not product:
+        product_list = P2PProduct.objects.filter(~Q(status=u'已完成') | (Q(status=u'已完成') & Q(make_loans_time__isnull=False) &
+                                                 Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
+        if product_list.exists():
+            for product in product_list:
+                product_data = generate_bajinshe_product_data(product)
+                product_data_list.append(product_data)
+    else:
+        product_data = generate_bisouyi_product_data(product, 'info')
+        product_status_data = generate_bisouyi_product_data(product, 'status')
+        product_data_list.append((product_data, product_status_data))
+
+    for product_data, product_status_data in product_data_list:
+        headers = {
+            'Content-Type': 'application/json',
+            'cid': settings.BISOUYI_CLIENT_ID,
+        }
+        product_data_content = generate_bisouyi_content(product_data)
+        product_data_sign = generate_bisouyi_sign(product_data_content)
+        headers['sign'] = product_data_sign
+        data = {'content': product_data_content}
+        common_callback_for_post(url=settings.BISOUYI_PRODUCT_PUSH_URL, params=json.dumps(data),
+                                 channel='bisouyi', headers=headers)
+
+        product_status_data_content = generate_bisouyi_content(product_status_data)
+        product_status_data_sign = generate_bisouyi_sign(product_status_data_content)
+        headers['sign'] = product_status_data_sign
+        data = {'content': product_status_data_content}
+        common_callback_for_post(url=settings.BISOUYI_PRODUCT_PUSH_URL, params=json.dumps(data),
+                                 channel='bisouyi', headers=headers)
+
+
+@app.task
+def process_channel_product_push(product=None):
+    for k, v in _LOCALS.iteritems():
+        if k.lower().find('_product_push') != -1:
+            try:
+                v.apply_async(kwargs={'product': product})
+            except Exception, e:
+                logger.warning("process_channel_product_push dispatch %s raise error: %s" % (k, e))

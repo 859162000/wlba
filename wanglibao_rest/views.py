@@ -6,27 +6,29 @@ import logging
 import hashlib
 import traceback
 import StringIO
+from rest_framework.views import APIView
 from datetime import datetime as dt
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from rest_framework.views import APIView
-from wanglibao_account.cooperation import CoopRegister, CoopSessionProcessor, RenRenLiCallback
 from django.utils import timezone
-from wanglibao_rest.utils import has_binding_for_bid, get_coop_binding_for_phone
-from marketing.models import Channels
 from django.conf import settings
+from marketing.models import Channels
+from marketing.forms import ChannelForm
+from wanglibao_account.models import Binding
 from wanglibao_account.tools import str_to_utc
 from wanglibao_account.utils import create_user
+from wanglibao_account.forms import UserRegisterForm, UserForm, UserValidateForm
+from wanglibao_account.cooperation import CoopRegister, CoopSessionProcessor, RenRenLiCallback
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_p2p.forms import P2PProductForm, P2PRecordForm
+from wanglibao_p2p.tasks import process_channel_product_push
+from wanglibao_p2p.utils import save_to_p2p_equity
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_margin.forms import MarginRecordForm
 from wanglibao_margin.utils import save_to_margin
-from marketing.forms import ChannelForm
-from wanglibao_account.forms import UserRegisterForm, UserForm, UserValidateForm
 from wanglibao_oauth2.models import Client
-from wanglibao_account.models import Binding
 from wanglibao_rest import utils as rest_utils
+from wanglibao_rest.utils import has_binding_for_bid, get_coop_binding_for_phone
 from .forms import CoopDataDispatchForm, AccessUserExistsForm, BiSouYiUserExistsForm
 from .tasks import coop_common_callback, process_amortize
 from .utils import utc_to_local_timestamp, generate_bisouyi_content, generate_bisouyi_sign
@@ -64,6 +66,8 @@ class AccessUserExistsApi(APIView):
     permission_classes = ()
 
     def post(self, request):
+        logger.info("enter AccessUserExistsApi with data [%s], [%s]" % (request.REQUEST, request.body))
+
         form = AccessUserExistsForm(request.session)
         channel_code = request.GET.get('promo_token')
 
@@ -268,7 +272,13 @@ class CoopDataDispatchApi(APIView):
                 p2p_record_form = P2PRecordForm(p2p_record)
                 if p2p_record_form.is_valid():
                     p2p_record = p2p_record_form.save()
-                    response_data = save_to_margin(req_data)
+                    save_margin_response_data = save_to_margin(req_data)
+                    save_equity_response_data = save_to_p2p_equity(req_data)
+                    if save_margin_response_data['ret_code'] != 10000:
+                        response_data = save_margin_response_data
+                    else:
+                        response_data = save_equity_response_data
+
                     coop_common_callback.apply_async(
                         kwargs={'user_id': p2p_record.user_id, 'act': 'purchase', 'order_id': p2p_record.order_id})
                 else:
@@ -385,6 +395,11 @@ class CoopDataDispatchApi(APIView):
                         for k, v in product.iteritems():
                             setattr(product_instance, k, v)
                         product_instance.save()
+
+                    # 推送标的信息到第三方
+                    process_channel_product_push.apply_async(
+                        kwargs={'product': product_instance}
+                    )
                 else:
                     message = product_form.errors.values()[0][0]
                     logger.info("process_products_push data[%s] invalid with form error: %s" % (product, message))

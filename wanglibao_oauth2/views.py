@@ -91,7 +91,8 @@ class AccessTokenView(AccessTokenBaseView):
         As per :rfc:`3.2` the token endpoint *only* supports POST requests.
         """
 
-        logger.info("enter AccessTokenView with data[%s] grant_type[%s]" % (request.session, grant_type))
+        logger.info("enter AccessTokenView with data [%s], [%s] grant_type[%s]" % (request.REQUEST,
+                                                                                   request.body, grant_type))
 
         if constants.ENFORCE_SECURE and not request.is_secure():
             response_data = {
