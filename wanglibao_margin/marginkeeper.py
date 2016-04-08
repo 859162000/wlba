@@ -211,6 +211,21 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description, order_id)
             return record
 
+    # 从账户余额中扣钱
+    def reduce_margin(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            if amount > margin.margin:
+                logger.debug('扣款失败:user id: {}, amount:{}'.format(self.user.id, amount))
+                return
+            margin.margin -= amount
+            margin.save()
+            catalog = u'系统清算'
+            record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
+
     def __tracer(self, catalog, amount, margin_current, description=u'', order_id=None):
         if not order_id:
             order_id = self.order_id

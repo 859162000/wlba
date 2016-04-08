@@ -2816,18 +2816,20 @@ class FetchAirportServiceReward(APIView):
         if user_ib and user_channel.code==activity.channel:
             is_new = True
 
-        reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
-        if reward_record and reward_record.status:
-            return Response({"ret_code": -1, "message": "您已领取奖励过~"})
+
         if is_new:
             if not user_ib.bought_at:
                 return Response({"ret_code":-2, "message": "您还没有投资，快去投资吧~"})
             first_buy = P2PRecord.objects.filter(user=user).order_by('create_time').first()
-            if first_buy.amount <new_min_amount:
+            if first_buy.amount <5000:
                 return Response({"ret_code": -1, "message": "首次投资不足金额~"})
+            return Response({"ret_code": -1, "message": "奖品只能获得一份~"})
         else:
             if activity_rule.is_invite_in_date:
                 return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+            reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
+            if reward_record and reward_record.status:
+                return Response({"ret_code": -1, "message": "您已领取奖励过~"})
             p2precord = P2PRecord.objects.filter(user=user,
                                              create_time__gte=activity.start_at,
                                              amount__gte=old_min_amount,

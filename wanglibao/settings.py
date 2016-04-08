@@ -1265,8 +1265,7 @@ SUIT_CONFIG = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
-# REDIS_PASSWORD = 'wanglibank_redis'
-REDIS_PASSWORD = ''
+REDIS_PASSWORD = 'wanglibank_redis'
 
 # CACHES = {
 #     'default': {
