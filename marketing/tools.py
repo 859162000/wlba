@@ -105,9 +105,6 @@ def register_ok(user_id, device):
         utils.log_clientinfo(device, "register", user_id)
     except Exception:
         pass
-    sendWechatPhoneReward.apply_async(kwargs={
-        "user_id": user_id,
-    })
     #往数据中心发送注册信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_register_data.apply_async(kwargs={
@@ -131,7 +128,7 @@ def idvalidate_ok(user_id, device):
             send_idvalidate_data.apply_async(kwargs={
                 "user_id": user_id, "device_type":device_type,
             })
-
+        
 @app.task
 def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
@@ -202,7 +199,7 @@ def deposit_ok(user_id, amount, device, order_id):
         send_deposit_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
         })
-
+        
 @app.task
 def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -255,7 +252,6 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
     except Exception:
         pass
     
-
     #往数据中心发送提现信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_withdraw_data.apply_async(kwargs={

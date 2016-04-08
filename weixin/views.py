@@ -51,6 +51,8 @@ import traceback
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.db import transaction, IntegrityError
+from django.template.loader import get_template
+from django.template import TemplateDoesNotExist
 from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
@@ -354,10 +356,10 @@ class WeixinJoinView(View):
             self.process_user_operate(OTHER_MENU)
         return reply
 
-    def process_sign_in(self, weixin_user, user):
+    def process_sign_in(self, weixin_user, user, platform=u"weixin"):
         reply = -1
         try:
-            ret_code, status, daily_record = process_user_daily_action(user, action_type=u'sign_in')
+            ret_code, status, daily_record = process_user_daily_action(user, platform, action_type=u'sign_in')
             experience_amount = 0
             if daily_record.experience_record_id:
                 experience_record = ExperienceEventRecord.objects.get(id=daily_record.experience_record_id)
@@ -368,16 +370,18 @@ class WeixinJoinView(View):
         # 累计签到：{{keyword3.DATA}}
 
             if ret_code == 1:
-                reply = -1
-                sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                    "openid":weixin_user.openid,
-                    "template_id":SIGN_IN_TEMPLATE_ID,
-                    "first":reply_msg%(u"今日你已签到", experience_amount),
-                    "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
-                    "keyword2":"%s天" % daily_record.continue_days,
-                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
-                })},
-                                                queue='celery02')
+                txt = "今日你已签到，连续签到可获得更多奖励，记得明天再来哦！"
+                reply = create_reply(txt, self.msg)
+                # reply = -1
+                # sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                #     "openid":weixin_user.openid,
+                #     "template_id":SIGN_IN_TEMPLATE_ID,
+                #     "first":reply_msg%(u"今日你已签到", experience_amount),
+                #     "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                #     "keyword2":"%s天" % daily_record.continue_days,
+                #     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
+                # })},
+                #                                 queue='celery02')
             elif ret_code == 0:
                 reply = -1
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
@@ -576,14 +580,19 @@ class WeixinRegister(TemplateView):
 
 
 class WeixinCoopRegister(TemplateView):
-    template_name = 'service_regist_bjs.jade'
+    template_name = 'weixin_regist_new.jade'
 
     def get_context_data(self, **kwargs):
         token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
 
         if token:
-            token = token
+            tp_name = 'service_regist_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
         elif token_session:
             token = token_session
         else:
