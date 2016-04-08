@@ -52,9 +52,7 @@ urlpatterns = patterns(
     url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
-    #bsy
-    # url(r'^login_bsy/$', TemplateView.as_view(template_name="weixin_login_bsy.jade")),
-    # url(r'^list_bsy/$', views.P2PListView.as_view(template_name='weixin_list_bsy.jade'), name='weixin_p2p_list_bsy'),
+    url(r'^p2p_list/coop/$', views.P2PListView.as_view(), name='weixin_p2p_list_coop'),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
