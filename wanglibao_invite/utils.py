@@ -24,25 +24,27 @@ def iter_method(data):
             break
     return res
 
-def getRandomRedpackId():
-    # share_invite_config = getMiscValue("share_invite_config")
-    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
-    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0}
-    redpack_data = {'1': [0, 20], '2': [0, 30], '3': [0, 40], '4': [0, 10]}
-    redpack_id = int(iter_method(redpack_data))
+def getRandomRedpackId(redpack_data):
+    # redpack_data = {'1': [0, 20], '2': [0, 30], '3': [0, 40], '4': [0, 10]}
+    redpack_id = iter_method(redpack_data)
     return redpack_id
 
 def getWechatDailyReward(openid):
     w_user = WeixinUser.objects.get(openid=openid)
     today = datetime.datetime.today()
-
-    redpack_id = getRandomRedpackId()
+    share_invite_config = getMiscValue("share_invite_config")
+    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
+    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0}
+    redpack_data = {'1': [0, 20], '2': [0, 30], '3': [0, 40], '4': [0, 10]}# share_invite_config["daily_rewards"]
+    reward_types = share_invite_config['reward_types']
+    redpack_id = getRandomRedpackId(redpack_data)
+    redpack_type = reward_types[redpack_data[redpack_id][0]]
     daily_reward, _ = WechatUserDailyReward.objects.get_or_create(
         create_date=today,
         w_user=w_user,
-        reward_type='redpack',#pei zhi
-        action_type="redpack_rain",#pei zhi
-        redpack_id=redpack_id,
+        reward_type=redpack_type,#pei zhi
+        # action_type="redpack_rain",#pei zhi
+        redpack_id=int(redpack_id),
     )
     if daily_reward.status:
         return -1, ""
@@ -97,7 +99,6 @@ def sendInvestReward(user):
     # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
     # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0, "invite_experience_id":1}
     share_invite_config = getMiscValue("share_invite_config")
-    base_experience_amount = share_invite_config.get('base_experience_amount', 0)
     # InviteRewardRecord
     inv_relation = InviteRelation.objects.filter(user=user).first()
     if inv_relation:

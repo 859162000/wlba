@@ -51,7 +51,7 @@ class WechatUserDailyReward(models.Model):
     )
     w_user = models.ForeignKey(WeixinUser)
     user = models.ForeignKey(User, null=True)
-    action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
+    # action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
     create_date = models.DateField(u'创建日期', auto_now_add=True,  db_index=True)
     reward_type = models.CharField(u'奖品类型', max_length=20, choices=REWARD_TYPE)
     redpack_id = models.IntegerField(default=0, verbose_name=u'优惠券ID', null=True)
