@@ -97,7 +97,7 @@ def process_channel_product_push(product=None):
                                                   Q(make_loans_time__isnull=False) &
                                                   Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
     for k, v in _LOCALS.iteritems():
-        if k.lower().find('_product_push') != -1:
+        if k.lower().find('_product_push') != -1 and k != 'process_channel_product_push':
             try:
                 v(product=product, product_list=product_list)
             except Exception, e:
