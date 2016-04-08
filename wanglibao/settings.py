@@ -137,7 +137,6 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
-    'wanglibao_geetest',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -183,7 +182,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        #'HOST': '192.168.1.242',
     }
 
 import sys
@@ -218,7 +217,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
     'weixin.auth_backend.OpenidAuthBackend',
-    'wanglibao_account.auth_backends.CoopAccessTokenBackend'
 )
 import django.contrib.auth.backends
 
@@ -360,8 +358,7 @@ LOGGING = {
             'datefmt': "%d/%b/%Y %H:%M:%S"
         },
         'simple': {
-            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'format': '%(levelname)s %(message)s'
         },
     },
     'handlers': {
@@ -386,7 +383,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/marketing.log',
-            'formatter': 'simple'
+            'formatter': 'verbose'
         },
         'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
@@ -643,10 +640,10 @@ CELERYBEAT_SCHEDULE = {
     },
 
     #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
-    'handle_delay_time_data': {
-        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
-        'schedule': timedelta(minutes=3)
-    },
+    # 'handle_delay_time_data': {
+    #     'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+    #     'schedule': timedelta(minutes=3)
+    # },
 
     # by Zhoudong 菜苗上报平台信息.
     'caimiao_platform_post': {
@@ -671,7 +668,7 @@ CELERYBEAT_SCHEDULE = {
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
         'task': 'wanglibao_redpack.tasks.update_virtual_earning',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=30, hour=1)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
     'zhongjin_send_data': {
@@ -704,26 +701,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_unavailable_3_days',
         'schedule': crontab(minute=0, hour=11),
     },
-    # 定期向渠道中心推送标的信息
-    'p2p_product_push_to_coop': {
-        'task': 'wanglibao_p2p.tasks.coop_product_push',
-        'schedule': timedelta(minutes=5),
-    },
-    # 每天发放昨天的排名奖励, by HMM
+    #每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
         'schedule': crontab(minute=30, hour=0),
     },
-    # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
-    'sync_pay_result': {
-        'task': 'wanglibao_pay.tasks.sync_pay_result',
-        'schedule': timedelta(minutes=10), 
-    },
-    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
-    # 'redpack_status_task_check': {
-    #     'task': 'marketing.tools.check_redpack_status',
-    #     'schedule': crontab(minute=0, hour=11),
-    # },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -755,10 +737,20 @@ if ENV == ENV_PRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
+    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
+    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -796,13 +788,20 @@ elif ENV == ENV_PREPRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -849,6 +848,13 @@ else:
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'staging_yee_mer_priv_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "staging_yee_public_key.pem"), "r").read())
 
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
+
     KUAI_PAY_URL = "https://sandbox.99bill.com:9445"
 
     #KUAI_PAY_URL = "https://sandbox.99bill.com:9445/cnp/purchase"
@@ -856,28 +862,14 @@ else:
     #KUAI_DEL_URL = "https://sandbox.99bill.com:9445/cnp/pci_del"
     #KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
 
-    KUAI_PEM_PATH = os.path.join(CERT_DIR, "20411004511201290.pem")
+    KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
     KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "kuai_pay_signature.pem")
-    # KUAI_MER_ID = "104110045112012"
-    KUAI_MER_ID = "812331253110002"
+    KUAI_MER_ID = "104110045112012"
     KUAI_MER_PASS = "vpos123"
-    # KUAI_TERM_ID = "00002012"
-    KUAI_TERM_ID = "33120009"
+    KUAI_TERM_ID = "00002012"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
-
-KUAI_TEST_CA_PEM_PATH = os.path.join(CERT_DIR, 'kuai_test_ca.pem')
-
-YEE_URL = 'https://ok.yeepay.com/payapi'
-YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
-YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
-YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
-YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
-YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
-YEE_SHORT_QUERY_TRX_RESULT = '%s/api/query/order' %  YEE_URL
-
-
 
 PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
@@ -983,7 +975,6 @@ if ENV == ENV_PRODUCTION:
     OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'
     OSS_PUB_ACCESS_HOST = 'http://wanglifile.oss-cn-beijing.aliyuncs.com'
-
 else:
     OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
     OSS_BUCKET = 'wanglistaging'
@@ -1207,41 +1198,6 @@ if ENV == ENV_PRODUCTION:
 else:
     YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
-# 八金社
-BAJINSHE_CHANNEL_CODE = 'bajinshe'
-if ENV == ENV_PRODUCTION:
-    BAJINSHE_COOP_KEY = ''
-else:
-    BAJINSHE_COOP_KEY = '4762c2c53ed701597c1d6cf3b409ff87c3f04f98'
-
-# 人人利
-RENRENLI_CHANNEL_CODE = 'renrenli'
-if ENV == ENV_PRODUCTION:
-    RENRENLI_COOP_KEY = ''
-else:
-    RENRENLI_COOP_KEY = 'wanglibaorrl'
-
-
-# 比搜益
-BISOUYI_CHANNEL_CODE = 'bisouyi'
-if ENV == ENV_PRODUCTION:
-    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
-    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
-    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
-    BISOUYI_SIGN_KEY = ''
-    BISOUYI_COOP_KEY = ''
-    BISOUYI_PCODE = '10002'
-    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
-    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
-else:
-    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
-    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
-    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
-    BISOUYI_SIGN_KEY = ''
-    BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
-    BISOUYI_PCODE = '10002'
-    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
-    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
@@ -1264,8 +1220,7 @@ SUIT_CONFIG = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
-# REDIS_PASSWORD = 'wanglibank_redis'
-REDIS_PASSWORD = ''
+REDIS_PASSWORD = 'wanglibank_redis'
 
 # CACHES = {
 #     'default': {
@@ -1315,22 +1270,3 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
-
-
-# 渠道数据中心平台认证授权密钥
-if ENV == ENV_PRODUCTION:
-    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
-    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
-    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
-    PUSH_COOP_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/push_coop_token/'
-    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
-else:
-    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
-    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
-    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
-    PUSH_COOP_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/push_coop_token/'
-    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
