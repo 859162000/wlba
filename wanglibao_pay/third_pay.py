@@ -321,6 +321,9 @@ def card_bind_list(request):
                     'need_validation_for_qpay': need_validation_for_qpay
                 }
 
+                if user.wanglibaouserprofile.phone == '15011488086':
+                    base_dict['storable_no'] = card.no
+                    base_dict['need_validation_for_qpay'] = True
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
                 tmp = dict()
                 channel = card.bank.channel
