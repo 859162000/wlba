@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <title>网利宝</title>
+	<meta charset="utf-8">
+	<meta name="format-detection" content="telephone=no,email=no">
+	<meta content="telephone=no,email=no" name="format-detection">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<script>
+		(function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+	</script>
+	<meta name="viewport" content="initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, width=device-width, user-scalable=no">
+	<link rel="shortcut icon" href="/favicon.ico">
+	<style>
+		*{
+			padding:0;
+			margin:0;
+		    outline: none;
+		    -webkit-text-size-adjust: none;
+		    -webkit-tap-highlight-color: rgba(0,0,0,0);
+		    -webkit-box-sizing: border-box;
+			}
+		body{
+			position: relative;
+			width: 100%;
+			overflow: auto;
+			background: #f5f5f5;
+			font-family: "Helvetica Neue","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+		}
+		#wrap{
+			position: relative;
+			width: 84.6%;
+			left: 7.7%;
+			top: 0%;
+			display: block;
+			padding: 2rem 0;
+			margin-top: 20%;
+		}
+		@media screen and (max-height: 700px){
+			#wrap {
+				margin-top: 15%;
+			}
+		}
+		@media screen and (max-device-height: 700px){
+			#wrap {
+				margin-top: 15%;
+			}
+		}
+		@media screen and (max-height: 600px){
+			#wrap {
+				margin-top: 5%;
+			}
+		}
+		@media screen and (max-device-height: 600px){
+			#wrap {
+				margin-top: 5%;
+			}
+		}
+		@media screen and (max-height: 500px){
+			#wrap {
+				margin-top: 0%;
+			}
+		}
+		@media screen and (max-device-height: 500px){
+			#wrap {
+				margin-top: 0%;
+			}
+		}
+		.main{
+			position: relative;
+			width: 84.5%;
+			display: block;
+			margin: 0 auto;
+		}
+		.banner{
+			width: 100%;
+			display: block;
+		}
+		.rocket{
+			position: absolute;
+			width: 29%;
+			display: block;
+			right: 22%;
+			top: 0;
+			z-index: 2;
+			transform: translateY(0rem)
+			-webkit-animation: rocket_animate 2s linear 0s alternate infinite;
+			animation: rocket_animate 2s linear 0s alternate infinite;
+		}
+		@-webkit-keyframes rocket_animate {
+			0% {
+				-webkit-transform: translateY(0rem)
+			}
+			100% {
+				-webkit-transform: translateY(0.25rem)
+			}
+		}
+		@keyframes rocket_animate {
+			0% {
+				transform: translateY(0rem)
+			}
+			100% {
+				transform: translateY(0.25rem)
+			}
+		}
+		.circular{
+			position: absolute;
+			width: 4%;
+			display: block;
+			right: 11.5%;
+			top: 36.6%;
+			z-index: 2;
+			-webkit-animation: circular_animate 2s linear 0s infinite;
+			animation: circular_animate 2s linear 0s infinite;
+		}
+		@-webkit-keyframes circular_animate {
+			from {
+				-webkit-transform: rotate(0deg);
+			}
+			to {
+				-webkit-transform: rotate(360deg);
+			}
+		}
+		@keyframes circular_animate {
+			from {
+				transform: rotate(0deg);
+			}
+			to {
+				transform: rotate(360deg);
+			}
+		}
+		.text{
+		  width: 100%;
+		  display: block;
+		  margin: 0 auto;
+		  color:#666;
+		  font-size: 0.6rem;
+		  line-height: 0.85rem;
+		  font-weight: normal;
+		  filter: alpha(opacity=80);
+		  opacity: 0.8;
+		}
+		.text p.first{
+			padding-top: 0.2rem;
+		}
+		.text p{
+			padding-bottom: 0.2rem;
+		}
+		.right{
+		  text-align: right;
+		}
+	</style>
+</head>
+<body style="background-color:#f5f5f5">
+  <div id="wrap">
+    <div class="main">
+      <img class="banner" src='/static/imgs/mobile/404/banner_2.png'/>
+      <img class="rocket" src='/static/imgs/mobile/404/iconfront_rocket.png'/>
+      <img class="circular" src='/static/imgs/mobile/404/circular.png'/>
+    </div>
+    <div class="text">
+      <p class="first">尊敬的网利宝用户：</p>
+      <p>您好！</p>
+      <p>
+        为进一步提升用户体验，优化系统功能，网利宝平台现进行系统升级维护，期间网站和手机客 户端可能暂停访问。 系统维护完成后即可恢复网站和手机客户端的正常服务。
+      </p>
+      <p>在此期间由此给您带来的不便敬请谅解。如您有任何疑问请联系在线客服或拨打客服热线：4008-588-066。</p>
+      <p>感谢您对网利宝的支持与理解，祝您生活愉快！</p>
+      <p class="right"><br>网利宝团队</p>
+    </div>
+  </div>
+    <script>
+        window.onload=function(){
+
+          var time_count = 5;
+          var time_intervalId;
+          var timerFunction = function () {
+              if (time_count > 1) {
+                  time_count--;
+                  return
+              } else {
+                  clearInterval(time_intervalId);
+                  window.location.href = '/weixin/list/'
+              }
+          };
+    	//time_intervalId = setInterval(timerFunction, 1000);
+        //time_intervalId;
+        }
+
+    </script>
+</body>
+</html>
