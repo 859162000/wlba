@@ -54,6 +54,8 @@ def bajinshe_product_push(product=None, product_list=None):
 
 @app.task
 def bisouyi_product_push(product=None, product_list=None):
+    return
+
     product_data_list = list()
     if not product:
         if product_list and product_list.exists():
@@ -88,9 +90,9 @@ def bisouyi_product_push(product=None, product_list=None):
 
 @app.task
 def process_channel_product_push(product=None):
-    product_list=None
+    product_list = None
     if not product:
-        product_list = P2PProduct.objects.filter(~Q(status=u'已完成') |
+        product_list = P2PProduct.objects.filter(~Q(status__in=(u'已完成', u'流标')) |
                                                  (Q(status=u'已完成') &
                                                   Q(make_loans_time__isnull=False) &
                                                   Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
