@@ -2557,6 +2557,8 @@ org.checkIn = (function(org){
         shareAmount: 0,
         nowDay: 0,
         giftPosition: 0,
+        isMysteriGift: false, //是否当前礼物是神秘礼物
+        isMysterious: false, //当前显示内容是否包含神秘礼物
         init: function(){
             lib.getGift();
             lib.closeAlt();
@@ -2596,9 +2598,11 @@ org.checkIn = (function(org){
                         hasGift = result.sign_in.continueGiftFetched, //礼物是否领取
                         className = '',
                         html = '';
+                    var dayTit = '';
                     lib.nowDay = nowDay;
                     lib.giftPosition = giftNum;
                     lib.money = result.sign_in.amount;
+                    lib.isMysteriGift = result.sign_in.isMysteriGift;//是否当前礼物是神秘礼物
                     var checkIn = $(".checkin-op-status"),
                         checkIn_detail = checkIn.find(".op-dec-detail"),
                         checkShare = $(".checkin-op-share");
@@ -2614,18 +2618,37 @@ org.checkIn = (function(org){
                         checkShare.find(".op-detail-orange").text("＋"+ result.share.amount +"元体验金");
                     }
                     for(var i=result.sign_in.start_day; i<=giftNum; i++){
+                        if((i-result.sign_in.start_day) === nextNum){//包含神秘礼物
+                            lib.isMysterious = true;
+                        }
                         if(i === nowDay && nowDay === giftNum){
-                            className = 'active-did active-gift active-doing';
+                            className = 'active-did active-gift';
+                            dayTit = '点我';
+                            if(lib.isMysterious){
+                                className = 'active-did active-gift active-mysterious';
+                            }
                             if(hasGift){
-                               className += " active-gift-open";
+                                if(lib.isMysteriGift){
+                                    className += " active-mysterious-open";
+                                }
+                                className += " active-gift-open";
+                                dayTit = i + '天';
+                            }else{
+                                className += " active-gift-doing";
                             }
                         }else{
+                            dayTit = i + '天';
                             if(i < nowDay){
                                 className = 'active-did';
                             }else if(i === nowDay){
                                 className = 'active-did active-doing';
                             }else if(i === giftNum){
-                                className = 'active-gift';
+                                if(lib.isMysterious){
+                                    className = 'active-gift active-mysterious';
+                                }else{
+                                    className = 'active-gift';
+                                }
+                                dayTit = '点我';
                             }else{
                                 className = '';
                             }
@@ -2638,7 +2661,7 @@ org.checkIn = (function(org){
                                             '<div class="check-in-flag"></div>'+
                                         '</div>'+
                                     '</div>' +
-                                    '<div class="text-item">'+ i +'天</div>' +
+                                    '<div class="text-item">'+ dayTit +'</div>' +
                                 '</div>';
                     }
                     $("div.check-in-flag-lists").html(html);
@@ -2674,21 +2697,22 @@ org.checkIn = (function(org){
                 //lib.shareFn();return;
                 var giftDay = lib.giftPosition - lib.nowDay;
                 if(giftDay > 0){
-                    org.ui.alert("还未达到礼品日");
+                    org.ui.alert("继续努力，签满才能拆哦！");
                     return;
                 }
                 var self = $(this),
-                    now = 0;
+                    now = lib.nowDay;
                 lib.altDom.prop("class","check-in-alert-layout");
                 if(self.hasClass("active-gift-open")){
-                    lib.altDom.find("#gift-msg").html("您已领取礼物！");
-                    setTimeout(function(){
-                        lib.altDom.show();
-                    },1);
+                    //lib.altDom.find("#gift-msg").html("您已领取礼物！");
+                    //setTimeout(function(){
+                    //    lib.altDom.show();
+                    //},1);
+                     org.ui.alert('奖励已经领取过了');
                 }else{
                     if(giftOk){
                         giftOk = false;
-                        now = parseInt(self.find(".text-item").text());
+                        //now = parseInt(self.find(".text-item").text());
                         org.ajax({
                             url:"/weixin/continue_action_reward/",
                             type:"post",
@@ -2696,14 +2720,24 @@ org.checkIn = (function(org){
                             dataType: "json",
                             success: function(data){
                                 if(data.mysterious_day != undefined){
-                                    self.addClass("active-gift-open");
+                                    if(lib.isMysterious){
+                                        self.addClass("active-mysterious-open");
+                                    }
+                                    self.removeClass("active-gift-doing").addClass("active-gift-open");
                                     lib.altDom.find("#gift-msg").html(data.message);
                                     setTimeout(function(){
                                         lib.altDom.show();
                                     },1);
                                     $("div.bar-content").html('距离神秘礼包还有<span id="giftDay">'+ data.mysterious_day +'</span>天');
+                                    self.find(".text-item").text(lib.giftPosition + "天");
                                 }else{
                                     org.ui.alert(data.message);
+                                }
+                                giftOk = true;
+                            },
+                            error: function(XMLHttpRequest){
+                                if(XMLHttpRequest.status == 500){
+                                    org.ui.alert("系统繁忙");
                                 }
                                 giftOk = true;
                             }
