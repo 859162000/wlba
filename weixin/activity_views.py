@@ -24,8 +24,7 @@ from experience_gold.backends import SendExperienceGold
 from wanglibao_rest.utils import split_ua
 from marketing.models import Reward
 from wanglibao_activity.backends import _keep_reward_record, _send_message_template
-from tasks import sentCustomerMsg, sentTemplate
-from constant import SIGN_IN_TEMPLATE_ID
+from tasks import sentCustomerMsg
 
 
 logger = logging.getLogger("weixin")

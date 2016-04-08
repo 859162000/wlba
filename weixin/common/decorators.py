@@ -23,12 +23,12 @@ def fwh_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, l
     """
     def handle_user(request):
         user = request.user
-        return user.is_authenticated()
-        # openid = request.session.get('openid')
-        # if user.is_authenticated() and openid:
-        #     w_user = WeixinUser.objects.filter(openid=openid, user=user).first()
-        #     return (w_user is not None)
-        # return False
+        # return user.is_authenticated()
+        openid = request.session.get('openid')
+        if user.is_authenticated() and openid:
+            w_user = WeixinUser.objects.filter(openid=openid, user=user).first()
+            return (w_user is not None)
+        return False
     actual_decorator = user_passes_test(
         handle_user,
         login_url=login_url,
