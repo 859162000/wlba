@@ -35,7 +35,6 @@ from wanglibao_rest.utils import split_ua
 from weixin.models import WeixinUser
 from weixin.constant import PRODUCT_INVEST_SUCCESS_TEMPLATE_ID
 from weixin.tasks import sentTemplate
-from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
 
 logger = logging.getLogger('wanglibao_account')
 
@@ -90,8 +89,8 @@ class P2PTrader(object):
                 if result['rtype'] != 'interest_coupon':
                     red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'],
                                                                     order_id=redpack_order_id, savepoint=False)
-                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功',
-                                         amount=amount, deduct=result['deduct'], redpack=redpack)
+                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
+                                        amount=amount, deduct=result['deduct'], redpack=redpack)
 
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False, platform=platform)
             margin_record = self.margin_keeper.freeze(amount, description=description, savepoint=False)
@@ -195,8 +194,6 @@ class P2PTrader(object):
 
         except Exception, e:
             logger.debug("=====sentTemplate=================%s"%e.message)
-
-        processMarchAwardAfterP2pBuy(self.user, self.product, self.order_id, amount)
 
         return product_record, margin_record, equity
 

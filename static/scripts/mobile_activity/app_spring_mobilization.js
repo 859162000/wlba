@@ -224,47 +224,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         type: 'post',
         success: function(data1) {
             h5_user_static = data1.login;
-            if(h5_user_static){
-                    $('span#zero').hide();
-                    $('span#chance_num').css('display','inline-block');
-                }else {
-                $('span#chance_num').hide();
-                $('span#zero').css('display', 'inline-block');
-            }
         }
     });
     var login = false;
-    wlb.ready({
-        app: function(mixins) {
 
-            mixins.sendUserInfo(function(data) {
-                if (data.ph == '') {
-                    login = false;
+    var chance_num;
+    var card_no;
 
-                    $('.button').click(function() {
-                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
-                    });
 
-                } else {
-                    login = true;
-                    $('.button').click(function() {
-                        mixins.jumpToManageMoney();
-                    });
-                }
-            })
-        },
-        other: function() {
-            $('.button').click(function() {
-                if (h5_user_static) {
-                    window.location.href = '/weixin/list/'
-                } else {
-                    window.location.href = '/weixin/login/?next=/weixin/list/'
-                }
-            })
-            //console.log('其他场景的业务逻辑');
-
-        }
-    });
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
 		type : 'GET',
@@ -286,7 +253,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = 'https://staging.wanglibao.com/',
 			shareName = '春日总动员',
 			shareImg = host + '/static/imgs/mobile_activity/app_spring_mobilization/300x300.jpg',
-			shareLink = host + 'march_reward/app/',
+			shareLink = host + 'weixin_activity/spring_reward/',
 			shareMainTit = '春日总动员',
 			shareBody = '万份豪礼倾情送，全民来抢乐出游！';
 		//分享给微信好友
@@ -347,34 +314,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         };
 
-        /*翻牌*/
-        var chance_num;
-        var card_no;
-        $('.card_box').click(function(){
-            card_no=$(this).attr('data-card');
-            if(h5_user_static){
-                chance_num = $('#chance_num').text();
-                if(chance_num>0){
-                    if(!$(this).find('.card').hasClass('card_box_open')){
-                        chance_num--;
-                        $('#chance_num').text(chance_num);
-                        luck_draw();
-                        //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
-                        //$(this).find('.card').addClass('card_box_open');
-                    }
-
-                }else{
-                    $('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
-                    $('.popup_box').show();
-                    time_count = 2;
-                    time_intervalId = setInterval(timerFunction, 1000);
-                    time_intervalId;
-                }
-            }else{
-                window.location.href = '/weixin/login/?next=/weixin_activity/spring_reward/'
-            }
-
-        });
 
         $('.popup_button').click(function(){
             $('.popup_box').hide();
@@ -417,5 +356,113 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         }
         /*翻牌抽奖结束*/
+
+    wlb.ready({
+        app: function(mixins) {
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
+                    }
+                })
+            }
+			mixins.shareData({title: '春日总动员', content: '万份豪礼倾情送，全民来抢乐出游！'});
+            mixins.sendUserInfo(function(data) {
+                if (data.ph == '') {
+                    login = false;
+                    $('span#chance_num').text('0');
+                    $('.button').click(function() {
+                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
+                    });
+
+                } else {
+                    connect(data);
+
+                    login = true;
+                    $('.button').click(function() {
+                        mixins.jumpToManageMoney();
+                    });
+                }
+
+                $('.card_box').click(function(){
+                    card_no=$(this).attr('data-card');
+                    if(data.ph != ''){
+                        chance_num = $('#chance_num').text();
+
+                        if(chance_num>0){
+                            if(!$(this).find('.card').hasClass('card_box_open')){
+                                chance_num--;
+                                $('#chance_num').text(chance_num);
+                                luck_draw();
+                                //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
+                                //$(this).find('.card').addClass('card_box_open');
+                            }
+                        }else{
+                            $('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
+                            $('.popup_box .popup_button').hide();
+                            $('.popup_box').show();
+                            time_count = 2;
+                            time_intervalId = setInterval(timerFunction, 1000);
+                            time_intervalId;
+                        }
+                    }else{
+                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/weixin_activity/spring_reward/'});
+                    }
+                });
+            })
+        },
+        other: function() {
+            if(h5_user_static){
+            }else {
+                $('span#chance_num').text('0');
+            }
+            $('.button').click(function() {
+                if(h5_user_static) {
+                    window.location.href = '/weixin/list/'
+                }else {
+                    window.location.href = '/weixin/login/?next=/weixin/list/'
+                }
+            })
+            //console.log('其他场景的业务逻辑');
+
+            $('.card_box').click(function(){
+                card_no=$(this).attr('data-card');
+                if(h5_user_static){
+                    chance_num = $('#chance_num').text();
+                    if(chance_num>0){
+                        if(!$(this).find('.card').hasClass('card_box_open')){
+                            chance_num--;
+                            $('#chance_num').text(chance_num);
+                            luck_draw();
+                            //$('.card_box[data-card="'+card_no+'"] .num').text('qwe');
+                            //$(this).find('.card').addClass('card_box_open');
+                        }
+                    }else{
+                        $('.popup_box .text').text('您还没有翻牌机会，赶紧去投资吧');
+                        $('.popup_box .popup_button').hide();
+                        $('.popup_box').show();
+                        time_count = 2;
+                        time_intervalId = setInterval(timerFunction, 1000);
+                        time_intervalId;
+                    }
+                }else{
+                    window.location.href = '/weixin/login/?next=/weixin_activity/spring_reward/'
+                }
+            });
+
+        }
+    });
 
 })(org);

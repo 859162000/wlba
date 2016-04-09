@@ -1,0 +1,31 @@
+.pager
+  padding: 10px 0
+  text-align: center
+  ul
+    font-size: 0
+.pager-prev, .pager-next, .pager-page-number
+  +inline-block()
+
+  .pager-anchor
+    padding: 0 15px
+    +line-height(32)
+    color: #999999
+    border: solid 1px #d9d9d9
+    font-size: $font-xs
+    background-color: #ffffff
+    display: inline-block
+
+  &.active, &:hover
+    .pager-anchor
+      border-color: #f25a46
+      color: #f25a46
+.pager-prev
+  a
+    border-radius: 15px 0 0 15px
+.pager-next
+  a
+    border-radius: 0 15px 15px 0
+  //&:hover.disabled, &.disabled
+  //  .pager-anchor
+  //    border-color: #f25a46
+  //    color: #f25a46

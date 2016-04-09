@@ -71,8 +71,8 @@ class ManDaoSMSBackEnd(SMSBackEnd):
 
         if ext:
             params = {
-                'sn': settings.SMS_MANDAO_SN_MARKETING,
-                'pwd': settings.SMS_MANDAO_MD5_PWD_MARKETING,
+                'sn': settings.SMS_MANDAO_SN,
+                'pwd': settings.SMS_MANDAO_MD5_PWD,
                 'mobile': phone,
                 'content': text,
                 'ext': ext,
@@ -82,8 +82,8 @@ class ManDaoSMSBackEnd(SMSBackEnd):
             }
         else:
             params = {
-                'sn': settings.SMS_MANDAO_SN,
-                'pwd': settings.SMS_MANDAO_MD5_PWD,
+                'sn': settings.SMS_MANDAO_SN_MARKETING,
+                'pwd': settings.SMS_MANDAO_MD5_PWD_MARKETING,
                 'mobile': phone,
                 'content': text,
                 'ext': '',

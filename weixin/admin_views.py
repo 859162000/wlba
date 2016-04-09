@@ -240,9 +240,9 @@ class WeixinCustomerServiceApi(AdminAPIView):
 
     @weixin_api_error
     def get(self, request):
-        res = self.client.customservice.get_accounts()
-        self.client.customservice.upload_headimg()
-        return Response(res.json())
+        kefu_list = self.client.customservice.get_accounts()
+        # self.client.customservice.upload_headimg()
+        return Response({"kf_list":kefu_list})
 
     @weixin_api_error
     def post(self, request):

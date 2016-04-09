@@ -1,5 +1,4 @@
 # encoding:utf-8
-from wanglibao_margin.php_utils import get_php_redis_principle
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
@@ -14,6 +13,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
 import datetime
 from django.db import transaction
 import logging
@@ -22,6 +22,7 @@ import json
 import urllib
 import re
 import random
+
 
 
 logger = logging.getLogger("weixin")
@@ -51,7 +52,7 @@ def get_fwh_login_url(next=None):
 
 
 if not FWH_LOGIN_URL:
-   get_fwh_login_url()
+    get_fwh_login_url()
 
 
 def redirectToJumpPage(message, next=None):
@@ -192,10 +193,6 @@ def getAccountInfo(user):
     p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
     p2p_unpayed_principle = unpayed_principle  # P2P待收本金
 
-    # 增加从PHP项目来的月利宝待收本金
-    php_principle = get_php_redis_principle(user.pk)
-    p2p_unpayed_principle += php_principle
-
     p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
     fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
@@ -227,40 +224,49 @@ def _generate_ajax_template(content, template_name=None):
     return template.render(context)
 
 
-def process_user_daily_action(user, action_type=u'sign_in'):
+def process_user_daily_action(user, platform="app", action_type=u'sign_in'):
 
     if action_type not in [u'share', u'sign_in']:
         return -1, False, None
     today = datetime.date.today()
     yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
     daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=action_type).first()
-    if not daily_record:
-        daily_record = UserDailyActionRecord.objects.create(
-            user=user,
-            action_type=action_type
-        )
-    if daily_record.status:
-        return 1, False, daily_record
-    with transaction.atomic():
-        daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
-        seg = SendExperienceGold(user)
-        experience_event = getSignExperience_gold()
-        if experience_event:
-            experience_record_id, experience_event = seg.send(experience_event.id)
-            daily_record.experience_record_id = experience_record_id
-        daily_record.status=True
-        yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=action_type).first()
-        continue_days = 1
-        if yesterday_record:
-            continue_days += yesterday_record.continue_days
-        daily_record.continue_days=continue_days
-        daily_record.save()
+    try:
+        if not daily_record:
+            daily_record = UserDailyActionRecord.objects.create(
+                user=user,
+                action_type=action_type
+            )
+        if daily_record.status:
+            return 1, False, daily_record
+        with transaction.atomic():
+            daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
+            if daily_record.status:
+                return 1, False, daily_record
+            seg = SendExperienceGold(user)
+            if action_type == u'share':
+                experience_event = getSignExperience_gold(give_mode=u"share")
+            else:
+                experience_event = getSignExperience_gold()
+            if experience_event:
+                experience_record_id, experience_event = seg.send(experience_event.id)
+                daily_record.experience_record_id = experience_record_id
+            daily_record.status=True
+            yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=action_type).first()
+            continue_days = 1
+            if yesterday_record:
+                continue_days += yesterday_record.continue_days
+            daily_record.continue_days=continue_days
+            daily_record.platform = platform
+            daily_record.save()
+    except IntegrityError, e:
+        return 2, False, daily_record
     return 0, True, daily_record
 
 
-def getSignExperience_gold():
+def getSignExperience_gold(give_mode=u'weixin_sign_in'):
     now = timezone.now()
-    query_object = ExperienceEvent.objects.filter(invalid=False, give_mode='weixin_sign_in',
+    query_object = ExperienceEvent.objects.filter(invalid=False, give_mode=give_mode,
                                                       available_at__lt=now, unavailable_at__gt=now)
     experience_events = query_object.order_by('amount').all()
     length = len(experience_events)
@@ -304,3 +310,10 @@ def sendContinueRuleReward(activity_rule):
     gift_record.activity_code = self.activity.code
     gift_record.activity_code_time = timezone.now()
     gift_record.save()
+
+def getMiscValue(key):
+    m = Misc.objects.filter(key=key).first()
+    info = {}
+    if m and m.value:
+        info = json.loads(m.value)
+    return info

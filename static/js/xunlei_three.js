@@ -141,9 +141,7 @@
                 data: {activity: 'xunlei'},
                 async: false
             }).done(function (data) {
-                console.log(data)
                 chances();
-                //console.log(data['ret_code'])
                 if (data['ret_code'] == 0) {
                     img.animate({'width': 0}, 500, function () {
                         $(this).hide().next().show();
@@ -200,14 +198,10 @@
                 type: "GET",
                 async: false
             }).done(function (data) {
-                console.log(data);
                 if (data['ret_code'] == 0) {
                     $('.titlexunlei span').text(' ' + data['count'] + ' ');
                 }
-
-
             });
-
         }
 
 

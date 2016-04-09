@@ -170,3 +170,110 @@ def save_to_redis(sender, **kw):
 # post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
 post_save.connect(create_profile, sender=User, dispatch_uid="users-profile-creation-signal")
 post_save.connect(save_to_redis, sender=WanglibaoUserProfile, dispatch_uid="users-profile-save_to_redis-signal")
+
+import decimal
+from datetime import date, datetime
+class Account2015(models.Model):
+    user_id = models.IntegerField(primary_key=True)
+    zc_ranking = models.IntegerField(u'注册排名', default=0, null=False)
+    tz_times = models.IntegerField(u'投资次数', default=0, null=False)
+    tz_amount = models.DecimalField(u'投资总金额', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_ranking_percent = models.DecimalField(u'投资排名百分比', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_max_amount = models.DecimalField(u'最大单笔投资额', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_max_ranking_percent = models.DecimalField(u'最大单笔投资排名百分比', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_sterm_amount = models.DecimalField(u'短期项目投资比例', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_mterm_amount = models.DecimalField(u'中期项目投资比例', default=0.00, null=False, max_digits=20, decimal_places=2)
+    tz_lterm_amount = models.DecimalField(u'长期项目投资比例', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_total = models.DecimalField(u'总收益', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_reward = models.DecimalField(u'羊毛数', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_hb_expire = models.DecimalField(u'过期红包金额', default=0.00, null=False, max_digits=20, decimal_places=2)
+    income_jxq_expire = models.DecimalField(u'过期加息券额度', default=0.00, null=False, max_digits=20, decimal_places=2)
+    invite_count = models.IntegerField(u'邀请好友数', default=0, null=False)
+    invite_income = models.DecimalField(u'邀请好友总佣金', default=0.00, null=False, max_digits=20, decimal_places=2)
+
+    first_visit_time = models.DateTimeField(u'首次访问时间', null=True)
+    first_visit_ipaddr = models.CharField(u'首次访问来源IP地址', null=True, max_length=20)
+    last_visit_time = models.DateTimeField(u'最近访问时间', null=True)
+    last_visit_ipaddr = models.CharField(u'最近访问来源IP地址', null=True, max_length=20)
+    total_visit_count = models.IntegerField(u'总计访问次数', default=0, null=False, db_index=True)
+
+    def toJSON_filter(self, jsondump=False, include=None, exclude=None):
+        fields = []
+        for field in self._meta.fields:
+            inflag = False
+            if include:
+                if field.name in include:
+                   inflag = True
+            else:
+                inflag = True
+
+            if exclude:
+                if field.name in exclude:
+                    inflag = False
+
+            if inflag:
+                fields.append(field.name)
+
+        d = {}
+        for attr in fields:
+            value = getattr(self, attr)
+            if isinstance(value, datetime):
+                d[attr] = value.strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(value, date):
+                d[attr] = value.strftime('%Y-%m-%d')
+            elif isinstance(value, decimal.Decimal):
+                d[attr] = str(value)
+            else:
+                d[attr] = getattr(self, attr)
+
+        if jsondump:
+            import json
+            return json.dumps(d)
+        else:
+            return d
+
+
+class ActivityUserInfo(models.Model):
+    name = models.CharField(u'姓名', max_length=32)
+    phone = models.CharField(u'手机号', max_length=11)
+    address = models.TextField(u'地址', max_length=255)
+    is_wlb_phone = models.BooleanField(u'是否网利宝手机号', default=False)
+    extra = models.CharField(max_length=200, default="", blank=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    updated_at = models.DateTimeField(u'更新时间', auto_now=True)
+
+    class Meta:
+        verbose_name = u'活动用户信息'
+        verbose_name_plural = u'活动用户信息'
+
+
+class RepeatPaymentUser(models.Model):
+    """3.31重复回款用户应收本息余额表"""
+    user_id = models.IntegerField(u'用户ID', primary_key=True)
+    name = models.CharField(u'姓名', max_length=32)
+    phone = models.CharField(u'手机号', max_length=11)
+    principal = models.DecimalField(u'应收本金', max_digits=10, decimal_places=2)
+    interest = models.DecimalField(u'应收利息', max_digits=10, decimal_places=2)
+    amount = models.DecimalField(u'剩余应收本息合计', max_digits=10, decimal_places=2, default=decimal.Decimal('0.00'))
+    is_every_day = models.BooleanField(u'是否每天自动扣款', default=True)
+    product_ids = models.CharField(u'新投资标的ID', max_length=32, blank=True,
+                                   help_text=u'如果用户不同意从每天的回款中扣除,则在此填写用户新购标的ID号,多个用,分割')
+
+    class Meta:
+        verbose_name = u'应收重复回款用户列表'
+        verbose_name_plural = u'应收重复回款用户列表'
+
+
+class RepeatPaymentUserRecords(models.Model):
+    """重复回款用户应收本息扣款流水记录"""
+    user_id = models.IntegerField(u'用户ID')
+    name = models.CharField(u'姓名', max_length=32)
+    phone = models.CharField(u'手机号', max_length=11)
+    amount = models.DecimalField(u'扣款金额', max_digits=10, decimal_places=2, default=decimal.Decimal('0.00'))
+    amount_current = models.DecimalField(u'扣款后剩余应收', max_digits=10, decimal_places=2, default=decimal.Decimal('0.00'))
+    description = models.CharField(u'扣款描述', max_length=200, default=u'')
+    create_time = models.DateTimeField(u'流水时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = u'应收重复回款用户扣款流水'
+        verbose_name_plural = u'应收重复回款用户扣款流水'

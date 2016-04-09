@@ -648,35 +648,35 @@ CELERYBEAT_SCHEDULE = {
     },
 
     #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
-    'handle_delay_time_data': {
-        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
-        'schedule': timedelta(minutes=3)
-    },
+    # 'handle_delay_time_data': {
+    #     'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+    #     'schedule': timedelta(minutes=3)
+    # },
 
     # by Zhoudong 菜苗上报平台信息.
     'caimiao_platform_post': {
         'task': 'wanglibao_account.tasks.caimiao_platform_post_task',
-        'schedule': crontab(minute=0, hour=0, day_of_month=1)
+        'schedule': crontab(minute=50, hour=0, day_of_month=1)
     },
     # by Zhoudong 菜苗上报标的信息.
     'caimiao_p2p_post': {
         'task': 'wanglibao_account.tasks.caimiao_p2p_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=35, hour=0)
     },
     # by Zhoudong 菜苗上报成交量.
     'caimiao_volumes_post': {
         'task': 'wanglibao_account.tasks.caimiao_volumes_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=40, hour=0)
     },
     # by Zhoudong 菜苗上报网贷评级.
     'caimiao_rating_post': {
         'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=45, hour=0)
     },
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
         'task': 'wanglibao_redpack.tasks.update_virtual_earning',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=30, hour=1)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
     'zhongjin_send_data': {
@@ -726,7 +726,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'assignment_buy_task_check': {
         'task': 'wanglibao_margin.tasks.assignment_buy',
-        'schedule': timedelta(minutes=1),
+        'schedule': crontab(minute=30, hour=0),
     },
 }
 
@@ -759,7 +759,7 @@ if ENV == ENV_PRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
@@ -810,7 +810,7 @@ elif ENV == ENV_PREPRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
@@ -928,10 +928,15 @@ VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
 # 用户实名接口v1剩余可用次数 Modify by chenweibin on 2016-03-03
 VALID_V1_TOTAL = 8000
 
+# 用户实名接口v2域名, ws.nciic.org.cn(新), api.nciic.com.cn(旧)
+VERIFY_V2_DOMAIN = 'ws.nciic.org.cn'
+# VERIFY_V2_DOMAIN = 'api.nciic.com.cn'
+
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV1&V2AutoBackEnd'
 # ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+    # ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
     STATIC_FILE_HOST = ''
@@ -969,10 +974,11 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
             ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
             ['TextColor', 'BGColor'], ['Link', 'Unlink', 'Anchor'],
-            ['Image', 'Flash', 'Table', 'HorizontalRule'],
+            ['Image', 'Flash', 'allMedias', 'Table', 'HorizontalRule'],
             ['Smiley', 'SpecialChar'],
         ],
         'toolbar': 'custom',
+        'extraPlugins' : 'allMedias',
     },
     "mini":{
         'entities':False,
@@ -990,16 +996,26 @@ ACCESS_KEY = 'nwogz9MF5VjadUSsuDzDM0lKlTN4BN'
 if ENV == ENV_PRODUCTION:
     OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'
-
+    OSS_PUB_ACCESS_HOST = 'http://wanglifile.oss-cn-beijing.aliyuncs.com'
 else:
     OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
     OSS_BUCKET = 'wanglistaging'
+    OSS_PUB_ACCESS_HOST = 'http://wanglistaging.oss-cn-beijing.aliyuncs.com'
 
 #ISCJDAO = False
 #CJDAOKEY = '1234'
 #RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 #RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 #POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
+
+
+#往PHP数据中心发送数据接口生产地址和开关
+if ENV == ENV_PRODUCTION:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = True
+else:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = False
 
 # 天芒
 if ENV == ENV_PRODUCTION:
@@ -1180,11 +1196,15 @@ WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_QUERY_URL = 'http://dynamic.vip.xunlei.com/xljinku/checkOrder'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
+XUNLEIVIP_BIND_CARD_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_bind.php'
+XUNLEIVIP_PURCHASE_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_invest.php'
+XUNLEIVIP_TASK_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_task.php'
 XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
+XUNLEI_TASK_AMOUNT = 10000
 
 # 脉脉
 WLB_FOR_MAIMAI1_KEY = '2004'

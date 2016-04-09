@@ -62,7 +62,6 @@ from weixin.models import WeixinUser
 from wanglibao_rest.common import DecryptParmsAPIView
 from marketing.tools import withdraw_submit_ok
 from misc.models import Misc
-from wanglibao_pay.tasks import sync_bind_card
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -80,7 +79,10 @@ class BankListView(TemplateView):
         default_bank = Bank.get_deposit_banks().filter(
             name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
-        bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        try:
+            bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        except:
+            bank_num = 16
         #bank_num = 20
         context.update({
             'default_bank': default_bank,
@@ -415,6 +417,11 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
+            try:
+                device = split_ua(request)
+            except:
+                device = {'device_type':'pc'}
+            
             name = user.wanglibaouserprofile.name or u'用户'
             withdraw_submit_ok.apply_async(kwargs={
                 "user_id": user.id,
@@ -422,7 +429,8 @@ class WithdrawCompleteView(TemplateView):
                 "phone": user.wanglibaouserprofile.phone,
                 "amount": amount,
                 "bank_name": card.bank.name,
-                "order_id": order.id
+                "order_id": order.id,
+                "device": device
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -677,20 +685,6 @@ class WithdrawTransactions(TemplateView):
                         "phones": [payinfo.user.wanglibaouserprofile.phone],
                         "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name, amount)]
                     })
-                    weixin_user = WeixinUser.objects.filter(user=payinfo.user).first()
-                    if weixin_user:
-                        pass
-                        # bank_name = result['bank_name']
-                        # sentTemplate.apply_async(kwargs={
-                        #     "kwargs":json.dumps({
-                        #                 "openid":weixin_user.openid,
-                        #                 "template_id":WITH_DRAW_SUCCESS_TEMPLATE_ID,
-                        #                 "first":u"亲爱的%s，您的提现申请已受理"%name,
-                        #                 "keyword1":result['amount'],
-                        #                 "keyword2":bank_name,
-                        #                 "keyword3":withdraw_ok_time,
-                        #                     })},
-                        #                 queue='celery02')
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -1178,6 +1172,10 @@ class WithdrawAPIView(DecryptParmsAPIView):
 
         # 短信通知添加用户名
         user = request.user
+        try:
+            device = split_ua(request)
+        except:
+            device = {'device_type':'pc'}
         name = user.wanglibaouserprofile.name or u'用户'
         if not result['ret_code']:
             withdraw_submit_ok.apply_async(kwargs={
@@ -1186,7 +1184,8 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "phone": request.user.wanglibaouserprofile.phone,
                 "amount": result['amount'],
                 "bank_name": result['bank_name'],
-                "order_id": result['order_id']
+                "order_id": result['order_id'],
+                "device": device
             })
         return Response(result)
 
@@ -1345,12 +1344,6 @@ class CardConfigTemplateView(TemplateView):
                 'kuai_cards': kuai_cards, 'yee_cards': yee_cards, 'banks_info':
                 banks_info}
         return res
-
-
-
-
-
-
 
 
 

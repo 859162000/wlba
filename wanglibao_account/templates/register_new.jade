@@ -10,10 +10,11 @@ html
         include global/g_nav
         - csrf_token
         .register
+            .login-href 已有网利宝账号？请
+                a(href='/accounts/login/') 登录
             .register_nav_min
             .register_box.clearfix
                 #registerForm.login-form
-                    .h5.register_welfare 注册即送28888元体验金
                     .registerFormDiv
                         ul.registerForm
                             li.clearfix
@@ -23,11 +24,12 @@ html
                                 else
                                   input#registerMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
                             li.clearfix
-                                label 计算结果 ：
+                                label 图片验证 ：
                                 input(type="hidden", name="captcha_0", autocomplete="off")
                                 input#registerCode.w115.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入计算结果", autocomplete='off', title="请输入验证码")
-                                img.captchaImg.fl(alt="captcha", src="")
-                                i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
+                                img.captchaImg.fl(alt="captcha", src="")#registerRefresh
+                                //i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
+                                //#captcha-box.fl
                             li#passWordInput.pwdLi.clearfix
                                 label 输入密码 ：
                                 input.registerPwd.placeholderInput.checkPwd(type="text",onfocus="this.type='password'",name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
@@ -48,22 +50,26 @@ html
                                     input#agreement.checkboxStyle(type="checkbox", name="",checked='checked')
                                     a(href='/agreement/',target='_blank') 我已阅读并同意《网利宝注册协议》
                             .form_submit.clearfix
-                                .submitFormStyle#registerSubmit 注册
-                                .go_login 已有网利宝帐号，请
-                                    a(href='/accounts/login/') 登录
+                                .submitFormStyle#registerSubmit
                 .register_info
-                    .go_next_welfare 下一步奖励：
-                    .red_packets.clearfix
-                        i
-                        label 实名认证送20元现金红包
-                    .info_middle.clearfix
-                        .welfare_ed 已获得的奖励：
-                        .nothing 奖励空空如也～
-                        .go_finish 赶紧完成操作，赢取奖励吧
-                    .info_ewm.clearfix
-                        i
-                        label 关注网利宝官方微信
+                    h3 新手大礼包，你来我就送！
+                    .reward-box
+                        .reward-left
+                            p
+                                span 28888
+                                | 元
+                            p 注册即送
+                        .reward-right 体验金
+                    .reward-box
+                        .reward-left
+                            p
+                                span 50
+                                | 元
+                            p 注册即送
+                        .reward-right 红包
     include global/g_footer
     script.
-      require(["/static/src/pc/login.js?v=20151202"])
+      require(["/static/src/pc/login.js?v=20160329"])
+
+
 

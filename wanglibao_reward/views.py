@@ -41,8 +41,9 @@ from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
+import pickle
 from urllib import urlencode,quote
-from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
+from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote, WanglibaoRewardJoinRecord
 from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
@@ -58,6 +59,8 @@ from wanglibao.templatetags.formatters import convert_to_10k
 from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 from wanglibao_redis.backend import redis_backend
+from weixin.util import getMiscValue
+
 logger = logging.getLogger('wanglibao_reward')
 
 class WeixinShareDetailView(TemplateView):
@@ -1138,26 +1141,60 @@ class XunleiDistribute(ActivityRewardDistribute):
         status, response_msg = self.judge_valid_user(request, self.channels)
         if False==status:
             return response_msg
-        else:
-            self.generate(request)
-            return self.get_chances(request)
+        # Modify by hb on 2016-03-08
+        # else:
+        #     self.generate(request)
+        #     return self.get_chances(request)
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code=self.token).first()
+            if not join_record:
+                try :
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=request.user,
+                        activity_code=self.token,
+                        remain_chance=1,
+                    )
+                except Exception, ex :
+                    logger.exception("WanglibaoRewardJoinRecord: [%s] [%s] : [%s]" % (request.user, self.token, ex))
+                    rep = { 'err_code':2000, 'err_messege':u'系统繁忙，请稍后重试', }
+                    return HttpResponse(json.dumps(rep), content_type='application/json')
+            if join_record and join_record.remain_chance>0 :
+                self.generate(request)
+                join_record.remain_chance = join_record.remain_chance - 1
+                join_record.save()
+
+        return self.get_chances(request)
 
     def generate(self, request):
         #  判断有没有生成抽奖记录
         counts = WanglibaoActivityReward.objects.filter(user=request.user, activity=self.token).count()
         if counts > 0:
             return
+
+        ### Modify by hb on 2016-03-09
+        # experience_rate = {
+        #     1588: ('xunlei_experience_1588', 0, 4, 9),
+        #     1888: ('xunlei_experience_1888', 3, 8),
+        #     2588: ('xunlei_experience_2588', 2, 7),
+        #     3588: ('xunlei_experience_3588', 1, 6),
+        #     5888: ('xunlei_experience_5888', 5, ),
+        # }
+        # event_rate = {
+        #     1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
+        #     1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+        # }
         experience_rate = {
-            1588: ('xunlei_experience_1588', 0, 4, 9),
-            1888: ('xunlei_experience_1888', 3, 8),
-            2588: ('xunlei_experience_2588', 2, 7),
-            3588: ('xunlei_experience_3588', 1, 6),
-            5888: ('xunlei_experience_5888', 5, ),
+            1588: (u'春季迅雷活动奖励-体验金1588', 0, 4, 9),
+            1888: (u'春季迅雷活动奖励-体验金1888', 3, 8),
+            2588: (u'春季迅雷活动奖励-体验金2588', 2, 7),
+            3588: (u'春季迅雷活动奖励-体验金3588', 1, 6),
+            5888: (u'春季迅雷活动奖励-体验金5888', 5, ),
         }
         event_rate = {
-            1.0: ('xunlei_event_rate_1.0', 0, 2, 4, 6, 8),
-            1.5: ('xunlei_event_rate_1.5', 1, 3, 5, 7, 9)
+            1.0: (u'春季迅雷活动奖励-加息券1.0', 0, 2, 4, 6, 8),
+            1.5: (u'春季迅雷活动奖励-加息券1.5', 1, 3, 5, 7, 9)
         }
+
         p2p_record = P2PRecord.objects.filter(user=request.user).first()
         if not p2p_record:  # 新用户
             no_reward = int(time.time()) % 3  # 保证未抽中的次数是随机的
@@ -1173,6 +1210,8 @@ class XunleiDistribute(ActivityRewardDistribute):
                     continue
 
                 counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(experience=None).count()
+                # Modify by hb on 2015-03-08
+                counts = counts % 9
                 for key, value in experience_rate.items():
                     if counts+1 not in value:
                         continue
@@ -1192,6 +1231,8 @@ class XunleiDistribute(ActivityRewardDistribute):
             for unused in xrange(3):
                 if when_reward == unused:
                     counts = WanglibaoActivityReward.objects.filter(activity=self.token).exclude(redpack_event=None).count()
+                    # Modify by hb on 2015-03-08
+                    counts = counts % 9
                     for key, value in event_rate.items():
                         if counts+1 not in value:
                             continue
@@ -1220,7 +1261,9 @@ class XunleiDistribute(ActivityRewardDistribute):
         if False == status:
             return response_msg
 
-        self.generate(request)
+        #Modify by hb on 2015-03-08
+        # self.generate(request)
+        self.generate_rewards(request)
 
         with transaction.atomic():
             reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, has_sent=0, activity=self.token).first()
@@ -1665,11 +1708,14 @@ class WeixinActivityAPIView(APIView):
         }
         records = WanglibaoActivityReward.objects.filter(activity=self.activity_name).exclude(p2p_amount=0)
         counter = (records.count()+1) % 10
+        margin_record = MarginRecord.objects.filter(user=user, order_id=order_id).first()
+        logger.debug('weixin_guaguaka counter:%s' % counter)
         when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
         for _index in xrange(3):
             if _index == when_dist_redpack:
                 for key, value in points.items():
                     if str(counter) in key:
+                        logger.debug('weixin_guaguaka counter:%s, value:%s' % (counter,value[2]))
                         WanglibaoActivityReward.objects.create(
                             order_id=order_id,
                             user=user,
@@ -1681,7 +1727,7 @@ class WeixinActivityAPIView(APIView):
                             join_times=1,
                             channel='weixin',
                             has_sent=False,
-                            p2p_amount=value[1]
+                            p2p_amount=margin_record.amount
                         )
                         break
             else:
@@ -2599,22 +2645,27 @@ class MarchAwardTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         rank_activity = Activity.objects.filter(code='march_awards').first()
-        # utc_now = timezone.now()
-        yesterday = datetime.datetime.now()-datetime.timedelta(1)
-        yesterday_end = local_to_utc(yesterday, 'max')
-        yesterday_start = local_to_utc(yesterday, 'min')
+        utc_now = timezone.now()
+        # yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        # yesterday_end = local_to_utc(yesterday, 'max')
+        # yesterday_start = local_to_utc(yesterday, 'min')
         ranks = []
         chances = 0
-        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
-            user = self.request.user
-            if user.is_authenticated():
-                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+        user = self.request.user
+        yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        yesterday_end = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
+        yesterday_end = local_to_utc(yesterday_end, "")
+        # yesterday_start = local_to_utc(yesterday, 'min')
+
+        if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
-                ranks = redis_backend()._lrange('top_ranks', 0, -1)
+                ranks = pickle.loads(redis_backend()._get('top_ranks'))
             except:
-                pass
+                logger.debug("-------------------------------redis read ranks error")
             if not ranks:
                 ranks = updateRedisTopRank()
+            if user.is_authenticated():
+                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
 
         award_list = []
         redpack_events = {}
@@ -2638,7 +2689,7 @@ class MarchAwardTemplate(TemplateView):
             idx = 0
 
             for rank in ranks:
-                print rank
+                # print rank
                 rank['amount__sum'] = float(rank['amount__sum'])
                 event = redpack_events[rank_awards[idx]]
                 rank['coupon'] = event.amount
@@ -2657,11 +2708,8 @@ class FetchMarchAwardAPI(APIView):
 
     def post(self, request):
         rank_activity = Activity.objects.filter(code='march_awards').first()
-        # utc_now = timezone.now()
-        yesterday = datetime.datetime.now()-datetime.timedelta(1)
-        yesterday_end = local_to_utc(yesterday, 'max')
-        yesterday_start = local_to_utc(yesterday, 'min')
-        if rank_activity and ((not rank_activity.is_stopped) or (rank_activity.is_stopped and rank_activity.stopped_at>yesterday_end)) and rank_activity.start_at<=yesterday_start and rank_activity.end_at>=yesterday_start:
+        utc_now = timezone.now()
+        if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<=utc_now and rank_activity.end_at>=utc_now:
             user = request.user
                 # {u'highest': 50000,
                 #  u'invest_amounts': [5000, 10000, 20000, 30000, 40000, 50000],
@@ -2680,7 +2728,7 @@ class FetchMarchAwardAPI(APIView):
             with transaction.atomic():
                 p2pReward = P2pOrderRewardRecord.objects.select_for_update().filter(user=user, status=False).first()
                 if not p2pReward:
-                    return Response({"ret_code":-1, "message":"没有翻牌机会"})
+                    return Response({"ret_code":-1, "message":"您还没有翻牌机会，赶紧去投资吧"})
                 p2pRecord = P2PRecord.objects.filter(order_id=p2pReward.order_id).first()
                 if not p2pRecord:
                     return Response({"ret_code":-1, "message":"投资条件不符合"})
@@ -2718,7 +2766,84 @@ class FetchMarchAwardAPI(APIView):
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
 
+class FetchAirportServiceReward(APIView):
+    authentication_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        activity = Activity.objects.filter(code='').first()
+        if activity.is_stopped:
+            return Response({"ret_code":-1, "message":"活动已经截止"})
+        now = timezone.now()
+        if activity.start_at > now:
+            return Response({"ret_code":-1, "message":"活动还未开始"})
+        if activity.end_at < now:
+            return Response({"ret_code":-1, "message":"活动已经结束"})
+        user = request.user
+        # reward_name = request.DATA.get('reward_name', "").strip()
+        # if not reward_name:
+        #     return Response({"ret_code":-1, "message":""})
+        rule_id = request.DATA.get('rule_id', "").strip()
+        if not rule_id or not rule_id.isdigit():
+            return Response({"ret_code":-1, "message":""})
+        rule_id = int(rule_id)
+        activity_rules = ActivityRule.objects.filter(activity=activity).all()
+        activity_rule = None
+        for a_rule in activity_rules:
+            if a_rule.id == rule_id:
+                activity_rule = a_rule
+                break
+
+        if not activity_rule or activity_rule.gift_type!=u"reward" or not activity_rule.reward or not activity_rule.is_used:
+            return Response({"ret_code": -1, "message": ""})
+
+        reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+        if not reward:
+            return Response({"ret_code": -1, "message": ""})
+        user_ib = IntroducedBy.objects.filter(user=user, created_at__gt=activity.start_at).first()
+        is_new = True
+        if not user_ib:
+            is_new = False
+
+        if activity_rule.is_invite_in_date:
+            if not is_new or not user_ib.channel or user_ib.channel.code != activity.channel:
+                return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+        if is_new:
+            return Response({"ret_code": -1, "message": ""})
+        airport_service_reward_limit = getMiscValue("airport_service_reward")
+        min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
+
+        first_buy = P2PRecord.objects.filter(user=user,
+                                             create_time__gt=activity.start_at
+                                             ).order_by('create_time').first()
+        if not first_buy or float(first_buy.amount) < min_amount:
+            return Response({"ret_code": -1, "message": "抱歉，您还不符合奖励条件哦~"})
 
 
+        reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
+        if not reward_record:
+            reward_record = ActivityRewardRecord.objects.create(
+                activity_code=activity.code,
+                user=user
+            )
+        if reward_record.status:
+            return Response({"ret_code": -1, "message": "您已领取奖励"})
 
+        with transaction.atomic():
+            reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=activity.code, user=request.user).first()
+
+            reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+            if not reward:
+                Response({"ret_code": -1, "message": "该奖品已经发完了"})
+            reward.is_used = True
+            reward.save()
+            reward_record.activity_desc = u"领取了%s,reward_id:%s"%(reward.type, reward.id)
+            reward_record.status = True
+            reward_record.save()
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": request.user.id,
+            "title": reward.reward.type,
+            "content": reward.reward.content,
+            "mtype": "activity"
+        })
+        return Response({"ret_code": 0, "message": "奖品领取成功"})
 
