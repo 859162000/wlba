@@ -43,7 +43,8 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
+from wanglibao_account.utils import (detect_identifier_type, create_user, generate_contract, update_coop_order,
+                                     generate_bisouyi_content, generate_bisouyi_sign)
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.serializers import UserSerializer
@@ -80,6 +81,7 @@ from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha, BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_account.tasks import common_callback_for_post
 
 
 logger = logging.getLogger(__name__)
@@ -2725,9 +2727,6 @@ def user_register(request):
 
         user = create_user(identifier, password, nickname, user_type)
         if user:
-
-            # 处理第三方渠道的用户信息
-            CoopRegister(request).all_processors_for_user_register(user, invitecode)
             auth_user = authenticate(identifier=identifier, password=password)
 
             auth.login(request, auth_user)
@@ -2762,7 +2761,7 @@ class BiSouYiRegisterApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = BiSouYiRegisterForm(self.request.session)
+        form = BiSouYiRegisterForm(self.request.session, action='register')
         oauth_data = {
             'pcode': settings.BISOUYI_PCODE,
             'status': 0,
@@ -2772,23 +2771,27 @@ class BiSouYiRegisterApi(APIView):
                 response_data = user_register(request)
                 if int(response_data['ret_code']) == 10000:
                     user = request.user
-                    phone = form.get_phone()
-                    client_id = form.cleaned_data['client_id']
-                    tid = utils.get_uid_for_coop(user.id)
-                    response_data = utils.get_coop_access_token(phone, client_id, tid, settings.BISOUYI_CLIENT_SECRET)
-                    if int(response_data['ret_code']) == 10000:
-                        start_time = timezone.localtime(timezone.now())
-                        end_time = start_time + datetime.timedelta(seconds=response_data['expires_in'])
-                        oauth_data['token'] = response_data['access_token']
-                        oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
-                        oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
-                        oauth_data['status'] = 1
+                    access_token = utils.long_token()
+                    account = form.get_account()
+                    user.access_token = access_token
+                    user.account = account
+                    channel_code = form.cleaned_data['channel_code']
 
-                        response_data = {
-                            'ret_code': 10000,
-                            'message': 'success',
-                            'next_url': form.get_other(),
-                        }
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                    start_time = timezone.localtime(timezone.now())
+                    end_time = start_time + datetime.timedelta(seconds=599)
+                    oauth_data['token'] = response_data['access_token']
+                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['status'] = 1
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                        'next_url': form.get_other(),
+                    }
             else:
                 response_data = {
                     'ret_code': 10011,
@@ -2811,8 +2814,9 @@ class BiSouYiLoginApi(APIView):
 
     def post(self, request):
         form = BiSouYiRegisterForm(self.request.session)
+        p_code = settings.BISOUYI_PCODE
         oauth_data = {
-            'pcode': settings.BISOUYI_PCODE,
+            'pcode': p_code,
             'status': 0,
         }
         if form.is_valid():
@@ -2821,22 +2825,47 @@ class BiSouYiLoginApi(APIView):
                 if int(response_data['ret_code']) == 10000:
                     user = request.user
                     phone = form.get_phone()
+                    account = form.get_account()
                     client_id = form.cleaned_data['client_id']
-                    tid = utils.get_uid_for_coop(user.id)
-                    response_data = utils.get_coop_access_token(phone, client_id, tid, settings.BISOUYI_CLIENT_SECRET)
-                    if int(response_data['ret_code']) == 10000:
-                        start_time = timezone.localtime(timezone.now())
-                        end_time = start_time + datetime.timedelta(seconds=response_data['expires_in'])
-                        oauth_data['token'] = response_data['access_token']
-                        oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
-                        oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
-                        oauth_data['status'] = 1
+                    channel_code = form.cleaned_data['channel_code']
+                    access_token = utils.long_token()
 
-                        response_data = {
-                            'ret_code': 10000,
-                            'message': 'success',
-                            'next_url': form.get_other(),
-                        }
+                    content_data = {
+                        'pcode': p_code,
+                        'token': access_token,
+                        'yaccount': phone,
+                        'jaccount': account,
+                        'mobile': phone,
+                        'type': 0,
+                        'tstatus': 1,
+                    }
+
+                    content = generate_bisouyi_content(content_data)
+
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'cid': client_id,
+                        'sign': generate_bisouyi_sign(content),
+                    }
+
+                    # 授权回调
+                    common_callback_for_post.apply_async(
+                        kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL,
+                                'params': json.dumps(content_data),
+                                'channel': channel_code, 'headers': headers})
+
+                    start_time = timezone.localtime(timezone.now())
+                    end_time = start_time + datetime.timedelta(seconds=599)
+                    oauth_data['token'] = access_token
+                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['status'] = 1
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                        'next_url': form.get_other(),
+                    }
 
                     user_phone = user.wanglibaouserprofile.phone
                     if phone != user_phone:

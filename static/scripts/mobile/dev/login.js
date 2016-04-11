@@ -387,7 +387,7 @@ webpackJsonp([5],[
 	    password: function password(str) {
 	        var error = '密码为6-20位数字/字母/符号/区分大小写',
 	            re = new RegExp(/^\d{6,20}$/);
-	        if (re.test($.trim(str))) {
+	        if (6 < $.trim(str).length && $.trim(str).length < 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];

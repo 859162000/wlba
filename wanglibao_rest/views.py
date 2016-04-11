@@ -67,7 +67,6 @@ from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
-from wanglibao_account.cooperation import get_uid_for_coop
 from .forms import OauthUserRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 
@@ -202,6 +201,7 @@ class SendRegisterValidationCodeView(APIView):
             descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
             return Response({"message": u"该手机号已经被注册，不能重复注册", 
@@ -211,7 +211,10 @@ class SendRegisterValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -220,6 +223,24 @@ class SendRegisterValidationCodeView(APIView):
         # 仅在用户注册时使用
         status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({'message': message, "type": "validation"}, status=status)
+
+    def validate_captcha(self, request):
+        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
+
+
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
@@ -1787,14 +1808,14 @@ class OauthUserRegisterApi(APIView):
                             "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
                         })
 
-                        # 处理第三方渠道的用户信息
-                        CoopRegister(request).all_processors_for_user_register(user, channel_code)
-
                         tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                         coop_register_processor = getattr(rest_utils, 'process_%s_register' % channel_code.lower(), None)
                         if coop_register_processor:
                             response_data = coop_register_processor(request, user, phone, client_id, channel_code)
+
+                            # 处理第三方渠道的用户信息
+                            CoopRegister(request).all_processors_for_user_register(user, channel_code)
                         else:
                             response_data = {
                                 'ret_code': 50001,
@@ -1849,9 +1870,12 @@ class GeetestAPIView(APIView):
 
     def post(self, request):
         self.type = request.POST.get('type', None)
+        import time
         if self.type == 'get':
+            # time.sleep(10)
             return self.get_captcha(request)
         if self.type == 'validate':
+            # time.sleep(10)
             return self.validate_captcha(request)
 
     def get_captcha(self, request):

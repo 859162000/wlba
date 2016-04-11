@@ -2697,10 +2697,10 @@ class HappyMonkeyAPIView(APIView):
     def post(self, request):
         self.token = 'happy_monkey'
         rewards = {
-            (0, 20): 'happy_monkey_66',
-            (21, 40): 'happy_monkey_166',
-            (41, 60): 'happy_monkey_566',
-            (61, 100000000): 'happy_monkey_866'
+            (0, 20): u'幸福猴66元体验金',
+            (21, 40): u'幸福猴166元体验金',
+            (41, 60): u'幸福猴566元体验金',
+            (61, 100000000): u'幸福猴866体验金'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
@@ -2742,9 +2742,10 @@ class HappyMonkeyAPIView(APIView):
                 if total>=key[0] and total<=key[1]:
                     exp_name = value
 
+            exp_gold=ExperienceEvent.objects.filter(name=exp_name).first()
             reward = ActivityReward.objects.create(
                 user=user,
-                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                experience=exp_gold,
                 channel=self.token,
                 create_at=today,
                 left_times=0,
@@ -2753,6 +2754,7 @@ class HappyMonkeyAPIView(APIView):
             SendExperienceGold(user).send(reward.experience.id)
             join_record.remain_chance = 0
             join_record.save()
+
             to_json_response = {
                 'ret_code': 0,
                 'type':exp_name,

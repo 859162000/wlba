@@ -233,11 +233,12 @@ def coop_product_push(products=None):
                                'excess_earning_description', 'pay_method', 'amortization_count',
                                'repaying_source', 'total_amount', 'ordered_amount',
                                'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
-                               'limit_per_user')
+                               'limit_per_user', 'warrant_company__name')
 
     product_list = [product for product in products]
     for product in product_list:
         product['types'] = product['types__name']
+        product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
         if product['soldout_time']:

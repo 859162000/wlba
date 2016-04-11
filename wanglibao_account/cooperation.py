@@ -59,7 +59,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback, coop_callback_for_post
+                                    xunleivip_callback, coop_callback_for_post, common_callback_for_post
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -1843,6 +1843,9 @@ class BaJinSheRegister(CoopRegister):
         logger.info("%s-Enter validate_call_back for user[%s]" % (channel.code, user.id))
         data = generate_coop_base_data('validate')
         data['user_id'] = user.id
+        data['name'] = user.wanglibaouserprofile.name
+        data['id_number'] = user.wanglibaouserprofile.id_number
+        data['id_valid_time'] = user.wanglibaouserprofile.id_valid_time.strftime('%Y-%m-%d %H:%M:%S')
         coop_callback_for_post.apply_async(
             kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
@@ -1866,6 +1869,8 @@ class BaJinSheRegister(CoopRegister):
                     'phone': user.wanglibaouserprofile.phone,
                     'btype': self.channel_code,
                     'user_id': user.id,
+                    'access_token': getattr(user, 'access_token', ''),
+                    'account': getattr(user, 'account', ''),
                 }
                 data = dict(base_data, **act_data)
                 res = requests.post(url=self.call_back_url, data=data)
@@ -1878,6 +1883,20 @@ class BaJinSheRegister(CoopRegister):
                 logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
             else:
                 logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
+
+            # base_data = generate_coop_base_data('register')
+            # act_data = {
+            #     'client_id': client_id,
+            #     'bid': self.channel_user,
+            #     'phone': user.wanglibaouserprofile.phone,
+            #     'btype': self.channel_code,
+            #     'user_id': user.id,
+            #     'access_token': getattr(user, 'access_token', ''),
+            #     'account': getattr(user, 'account', ''),
+            # }
+            # data = dict(base_data, **act_data)
+            # common_callback_for_post.apply_async(
+            #     kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
 
     def purchase_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
@@ -1898,6 +1917,7 @@ class BaJinSheRegister(CoopRegister):
                 'p2p_record': json.dumps(p2p_record),
                 'margin_record': json.dumps(margin_record),
                 'margin': json.dumps(get_user_margin(user.id)),
+                'equity': json.dumps(get_p2p_equity(user.id, p2p_record['product_id']))
             }
             data = dict(base_data, **act_data)
 
