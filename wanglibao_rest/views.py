@@ -201,6 +201,7 @@ class SendRegisterValidationCodeView(APIView):
             descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
             return Response({"message": u"该手机号已经被注册，不能重复注册", 
@@ -210,7 +211,10 @@ class SendRegisterValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -219,6 +223,24 @@ class SendRegisterValidationCodeView(APIView):
         # 仅在用户注册时使用
         status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({'message': message, "type": "validation"}, status=status)
+
+    def validate_captcha(self, request):
+        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
+
+
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
@@ -1848,9 +1870,12 @@ class GeetestAPIView(APIView):
 
     def post(self, request):
         self.type = request.POST.get('type', None)
+        import time
         if self.type == 'get':
+            # time.sleep(10)
             return self.get_captcha(request)
         if self.type == 'validate':
+            time.sleep(10)
             return self.validate_captcha(request)
 
     def get_captcha(self, request):

@@ -1228,21 +1228,17 @@ class KuaiShortPay:
                     'bank_id': card.bank.kuai_code,
                     'time': timezone.now().strftime("%Y%m%d%H%M%S") }
 
-            if len(card_no) == 10 and mode != 'vcode_for_qpay':
-                self._request_dict = dic
-                data = self._sp_qpay_xml(dic)
-                # logger.critical("second pay info")
-                # logger.critical(u"%s"%data)
-                url = self.PAY_URL
+            if len(card_no) == 10:  
+                if mode != 'vcode_for_qpay':
+                    self._request_dict = dic
+                    data = self._sp_qpay_xml(dic)
+                    url = self.PAY_URL
+                else:
+                    data = self._sp_dynnum_xml_for_qpay(dic)
+                    url = self.DYNNUM_URL
             else:
                 self._request_dict = dic
-                if mode == 'vcode_for_qpay':
-                    data = self._sp_dynnum_xml_for_qpay(dic)
-                else:
-                    data = self._sp_dynnum_xml(dic)
-                # logger.critical("first pay info")
-                # logger.critical(u"%s" % data)
-
+                data = self._sp_dynnum_xml(dic)
                 url = self.DYNNUM_URL
 
             res = self._request(data, url)
