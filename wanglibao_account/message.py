@@ -3,7 +3,11 @@
 
 
 import time
+
+import requests
 from django.contrib.auth.models import User
+
+from wanglibao import settings
 from wanglibao.celery import app
 from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type, UserPushId
 from wanglibao_sms import bae_channel
@@ -222,15 +226,21 @@ def send_one(user_id, title, content, mtype, push_type="in"):
     """
         给某个人发送站内信（需要推送时也在这里写）
     """
-    msgTxt = create(title, content, mtype)
-    if not msgTxt:
-        return False
+    if not settings.PHP_INSIDE_MESSAGE_SWITCH:
+        msgTxt = create(title, content, mtype)
+        if not msgTxt:
+            return False
 
-    user = User.objects.filter(pk=user_id).first()
-    if not user:
-        return False
-    _send(user, msgTxt, push_type)
-    return True
+        user = User.objects.filter(pk=user_id).first()
+        if not user:
+            return False
+        _send(user, msgTxt, push_type)
+        return True
+    else:
+        response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
+                                 data={'uid': user_id, 'mtype': mtype, 'title': title, 'content': content})
+        return response.json().get('status')
+
 
 @app.task
 def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_type="in"):
