@@ -1304,9 +1304,24 @@ DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
 
+
 # settings for PHP
 PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
 PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
+
+# 控制发送站内信的地方, PHP消息中心还是主站.
+PHP_INSIDE_MESSAGE_SWITCH = True
+
+# PHP 发送站内信地址
+PHP_SEND_INSIDE_MESSAGE = "http://192.168.10.84/workspace/MsgAPI/message.php/message/inside"
+# PHP 查询未读数量
+PHP_UNREAD_MESSAGES_COUNT = "http://192.168.10.84/workspace/MsgAPI/message.php/message/count"
+# PHP 站内信显示
+PHP_INSIDE_MESSAGES_LIST = "http://192.168.10.84/workspace/MsgAPI/message.php/message/list"
+
 if ENV == ENV_PRODUCTION:
     PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
     PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'
+    PHP_SEND_INSIDE_MESSAGE = "http://192.168.10.84/workspace/MsgAPI/message.php/message/inside"
+    PHP_UNREAD_MESSAGES_COUNT = "http://192.168.10.84/workspace/MsgAPI/message.php/message/count"
+    PHP_INSIDE_MESSAGES_LIST = "http://192.168.10.84/workspace/MsgAPI/message.php/message/list"
