@@ -49,6 +49,7 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
             type: 'POST',
             url: '/api/geetest/',
             dataType: 'json',
+            timeout: 5000,
             data:{
                 type : 'get'
             },
@@ -76,26 +77,45 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                     })
                     captchaObj.getValidate();
                 })
+                $('#check-tag').val('false');
+            },
+            error: function(XMLHttpRequest,status){
+                type == 'regist' ? $('.captcha-box1').show() : $('.captcha-box').hide();
+                $('#check-tag').val('falses');
+               if(type == 'regist'){
+                   $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+                   $('#registerSMSCode').val('');
+                }
+
             }
         });
     }
     //极验二次验证
-    fastTestTwo = function(fun){
+    fastTestTwo = function(fun,type){
         if($('#captcha-status').val() == 'true') {
             $.ajax({
                 type: 'POST',
                 url: '/api/geetest/',
                 dataType: 'json',
+                timeout: 5000,
                 data: {
                     type: 'validate',
                     geetest_validate: array.geetest_validate,
                     geetest_seccode: array.geetest_seccode,
                     geetest_challenge: array.geetest_challenge
                 }
-            }).done(function (data) {
+            }).success(function (data) {
                 fun();
-            }).fail(function (xhr) {
-                error.text('请输入图片验证码')
+            }).error(function (xhr) {
+                if(type=='login'){
+                    fun();
+                }else{
+                    $('.loginError').text('图片验证码错误');
+                    $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+                    $('#registerSMSCode').val('');
+                    $('.captcha-box1').show();$('.captcha-box').hide();
+                    $('#check-tag').val('');
+                }
             })
         }else{
             $('.loginError').text('图片验证码错误');
@@ -142,10 +162,10 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
             var self = $.trim($('#'+form).find('#registerSMSCode').val());
             str = '短信';
         }
-        //else{
-        //    var self = $.trim($('#'+form).find('.checkCode').val());
-        //    str = '图片';
-        //}
+        else{
+            var self = $.trim($('#'+form).find('.checkCode').val());
+            str = '图片';
+        }
         if(self == '') {
             $('#'+form).find('.loginError').text('请输入'+ str +'验证码');
             checkStatus = false;
@@ -199,13 +219,15 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
         phoneNumber = $.trim($("#registerMobile").val());
         var captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
         var captcha_1 = $('#registerForm').find('#registerCode').val();
+        if($('#check-tag').val() == 'false'){
+            datas = 'type=geetest'+'&geetest_validate='+array.geetest_validate+'&geetest_seccode='+array.geetest_seccode+'&geetest_challenge='+array.geetest_challenge;
+        }else{
+            datas = 'captcha_0='+captcha_0+'&captcha_1='+captcha_1;
+        }
         $.ajax({
             url: "/api/phone_validation_code/register/" + phoneNumber + "/",
             type: "POST",
-            data: {
-                captcha_0: captcha_0,
-                captcha_1: captcha_1
-            }
+            data: datas
         }).done(function() {
             count = 60;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
@@ -287,19 +309,20 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                 o = JSON.parse(str);
             if(o.value >= 2){
                 fastTestOne('login');
-                $('#check-tag').val('false');
             }
         }
-
+        //刷新图片验证码
+        $('#loginRefresh').on('click',function(){
+            imgCodeRe('loginForm')
+        })
         //提交登录表单
         $('#loginSubmit').on('click',function(){
             if(checkMobileFun('loginForm') && checkPwdFun('loginForm')){
                 if($('#check-tag').val() == 'false'){
-                    fastTestTwo(loginSubmitFun);
+                    fastTestTwo(loginSubmitFun,'login');
                 }else{
                     loginSubmitFun();
                 }
-
             }
         })
         //登录
@@ -331,7 +354,6 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                     $.cookie("counts", str, { path: '/'});
                     if (clickCount == 2) {
                         fastTestOne('login');
-                        $('#check-tag').val('false');
                     }
                 }
                 var result = JSON.parse(xhr.responseText);
@@ -426,12 +448,23 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
         $('#registerSubmit').on('click',function(){
             var btnSelf = $(this);
             if (!btnSelf.hasClass('.submitFormStyleNo')) {
-                if (checkMobileFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
-                    if ($("#agreement").is(':checked')) {
-                        error.text('');btnSelf.addClass('submitFormStyleNo');
-                        fastTestTwo(submitRegist);
-                    } else {
-                        error.text('请查看网利宝注册协议');
+                if($('#check-tag').val() == 'false'){
+                    if (checkMobileFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
+                        if ($("#agreement").is(':checked')) {
+                            error.text('');btnSelf.addClass('submitFormStyleNo');
+                            $('#check-tag').val() == 'falses' ?  submitRegist() : fastTestTwo(submitRegist);
+                        } else {
+                            error.text('请查看网利宝注册协议');
+                        }
+                    }
+                }else{
+                    if (checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
+                        if ($("#agreement").is(':checked')) {
+                            error.text('');btnSelf.addClass('submitFormStyleNo');
+                            submitRegist();
+                        } else {
+                            error.text('请查看网利宝注册协议');
+                        }
                     }
                 }
             }
