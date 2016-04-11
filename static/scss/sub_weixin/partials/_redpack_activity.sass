@@ -1,9 +1,21 @@
+.service-redpacket-bg1
+  background: #751B34 url("/static/imgs/sub_weixin/redpack_activity/redpack_bg.png") center top no-repeat
+  background-size: 100% auto
+.service-redpacket-grey
+  background: #F1F1F1
+.mt70
+  margin-top: rem(70)
+.mt20
+  margin-top: rem(20)
 .service-redpack-activity
-  background: url("/static/imgs/sub_weixin/redpack_activity/redpack_bg.png") center center no-repeat
-  background-size: cover
+  overflow-x: hidden
+  .y-color
+    color: #FEE464
   .top-tit
     text-align: center
     padding-top: rem(48)
+    display: -webkit-box
+    -webkit-box-pack: center
     .top-photo
       display: -webkit-box
       -webkit-box-align: center
@@ -12,7 +24,7 @@
       height: rem(67)
       border-radius: rem(35)
       overflow: hidden
-      margin-right: rem(20)
+      margin-right: rem(30)
       vertical-align: middle
       background-color: #fff
       border: 1px solid #fff
@@ -27,7 +39,7 @@
       color: #ED4242
       padding: rem(4) rem(8)
       border-radius: rem(8)
-      vertical-align: middle
+      margin-top: rem(8)
       &:before
         display: block
         content: ''
@@ -37,5 +49,248 @@
         left: rem(-20)
         top: 50%
         margin-top: rem(-10)
+  .redpacket
+    position: relative
+    width: rem(510)
+    height: rem(690)
+    margin: rem(48) auto rem(155)
+    .main-box
+      position: relative
+      z-index: 2
+      background: url("/static/imgs/sub_weixin/redpack_activity/iconfont_red_close@2x.png") center top no-repeat
+      background-size: 100% 100%
+      width: 100%
+      height: 100%
+      text-align: center
+      color: #FEE464
+    .price-box
+      padding-top: rem(297)
+      font-size: rem(60)
+      line-height: rem(84)
+    .price-tit
+      font-size: rem(28)
+      line-height: rem(40)
+    .cloud-top
+      position: absolute
+      z-index: 1
+      left: rem(-72)
+      top: rem(140)
+      background: url("/static/imgs/sub_weixin/redpack_activity/iconfont_cloud2@2x.png") center top no-repeat
+      width: rem(120)
+      height: rem(60)
+    .cloud-btm
+      position: absolute
+      z-index: 3
+      background: url("/static/imgs/sub_weixin/redpack_activity/iconfont_cloud1@2x.png") center top no-repeat
+      width: rem(128)
+      height: rem(68)
+      right: rem(-72)
+      bottom: rem(92)
+    .price-btn
+      margin: rem(87) auto 0
+      width: rem(320)
+      height: rem(88)
+      line-height: rem(88)
+      font-size: rem(32)
+      background: #FEE464
+      box-shadow: 0 rem(6) 0 #FC9329
+      border-radius: rem(200)
+      color: #D92B45
+      font-weight: bold
+  .activity-rule
+    padding: 0 rem(40)
+    font-size: rem(24)
+    color: #fff
+    line-height: rem(38)
+    .rule-list
+      margin-top: rem(5)
+      opacity: 0.7
         
-        
+  .redpacket-get
+    margin-bottom: 0
+    .main-box
+      background-image: url("/static/imgs/sub_weixin/redpack_activity/iconfont_red_open@2x.png")
+      padding-top: 4rem
+      .price-box
+        padding-top: 0
+      .price-b-tit
+        color: #fff
+        font-size: rem(40)
+        line-height: rem(60)
+        margin-bottom: rem(10)
+      .share-promote
+        color: #fff
+        opacity: 0.7
+        font-size: rem(28)
+        margin-top: rem(60)
+      .price-btn
+        margin-top: 0
+        &.mt70
+          margin-top: rem(70)
+      .price-code
+        text-align: center
+        img
+          width: rem(192)
+  .redpacket-get-list
+    position: relative
+    width: rem(550)
+    margin: rem(34) auto
+    @mixin arr-box
+      width: 0
+      height: 0
+      border: rem(35) dashed #B82331
+      display: block
+      content: ""
+      position: absolute
+      z-index: 1
+      top: 50%
+      margin-top: rem(-35)
+    &:before
+      +arr-box
+      border-left: rem(20) solid transparent
+      left: rem(-38)
+    &:after
+      +arr-box
+      border-right: rem(20) solid transparent
+      right: rem(-38)
+    .list-box
+      background: #D92B45
+      border-radius: rem(8)
+      position: relative
+      z-index: 3
+      color: #fff
+      line-height: rem(40)
+      padding: rem(10) rem(30)
+      box-shadow: 1px 1px 2px #9B1421
+      .l-tit
+        font-size: rem(24)
+      .b-tit
+        font-size: rem(32)
+      .bb-tit
+        font-size: rem(40)
+      .list-box-item
+        display: -webkit-box
+        .list-item
+          overflow: hidden
+          height: rem(40)
+          &:first-child
+            width: rem(200)
+        //.y-color
+        //  .bb-tit
+        //    display: inline-block
+        //    width: rem(155)
+        //    text-align: right
+
+//设置登录密码
+.service-redpacket-login
+  position: absolute
+  width: 100%
+  height: 100%
+  .logo-leo
+    width: 100%
+    text-align: center
+    img
+      width: rem(320)
+  .mian-protome
+    color: #979797
+    font-size: rem(28)
+    text-align: center
+    opacity: 0.5
+  .input-box
+    border: 1px solid #E3E3E5
+    border-radius: rem(8)
+    background: #fff
+    margin: rem(25) rem(27)
+    padding: 0 rem(27)
+    .wx-input-public
+      height: rem(100)
+      border-bottom: 1px solid #ddd
+      display: -webkit-box
+      -webkit-box-align: center
+      -webkit-box-flex: 1
+    .wx-input-icon
+      width: 0.9rem
+    .password
+      width: 0.9rem
+      height: 1.1rem
+      background: url("/static/imgs/sub_weixin/input_icon/login_pwd.png") center center no-repeat
+      background-size: 100%
+    .captcha
+      width: 0.925rem
+      height: 0.9rem
+      background: url("/static/imgs/sub_weixin/input_icon/login_code.png") center center no-repeat
+      background-size: 100%
+    .phone
+      width: 0.9rem
+      height: 1.125rem
+      background: url("/static/imgs/sub_weixin/input_icon/login_phone.png") center center no-repeat
+      background-size: 100%
+    .wx-input-main
+      height: 100%
+      border: 0
+      font-size: rem(28)
+      -webkit-appearance: none
+      -webkit-box-flex: 1
+      display: block
+      padding: 0 0.2rem 0 rem(20)
+    .wx-password-operation
+      width: 1rem
+      height: 1rem
+      background: url("/static/imgs/sub_weixin/input_icon/login_eyes.png") center center no-repeat
+      background-size: 100%
+    .show-password
+      background-image: url("/static/imgs/sub_weixin/input_icon/login_eyes_active.png")
+    .form-edit-icon
+      width: 1rem
+      height: 1rem
+      background: url("/static/imgs/sub_weixin/input_icon/clear.png") center center no-repeat
+      background-size: 100%
+      display: none
+    .icon-show
+      display: block
+    .wx-validation
+      border-left: 1px solid #ddd
+      height: rem(57)
+      width: rem(192)
+      padding-left: rem(53)
+      padding-right: rem(26)
+    .wx-validation-btn
+      border: 0
+      background: none
+      font-size: rem(28)
+      display: block
+      width: 100%
+      height: 100%
+  .service-btn-box
+    margin: rem(132) rem(27) 0
+  .service-login-btn
+    background: #CBCBCB
+    height: rem(88)
+    border-radius: rem(8)
+    display: block
+    width: 100%
+    border: 0
+    font-size: rem(32)
+    color: #fff
+  .safe-box
+    position: absolute
+    bottom: rem(102)
+    width: 100%
+    text-align: center
+    color: #50B143
+    font-size: rem(24)
+    .safe-icon
+      display: inline-block
+      width: 0.8rem
+      height: 0.9rem
+      background: url("/static/imgs/sub_weixin/redpack_activity/safe.png") center center no-repeat
+      background-size: contain
+      vertical-align: top
+      margin-right: rem(10)
+  .wx-input-icon-active
+    .password
+      background-image: url("/static/imgs/sub_weixin/input_icon/login_pwd_active.png")
+    .captcha
+      background-image: url("/static/imgs/sub_weixin/input_icon/login_code_active.png")
+    .phone
+      background-image: url("/static/imgs/sub_weixin/input_icon/login_phone_active.png")

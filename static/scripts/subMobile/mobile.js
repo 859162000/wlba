@@ -402,6 +402,7 @@ org.ui = (function () {
                             }
                         ],$self);
                     }
+
                     var disabledBg = 'rgba(219,73,63,.5)', activeBg = 'rgba(219,73,63,1)';
                     if (options.submitStyle) {
                         disabledBg = options.submitStyle.disabledBg || 'rgba(219,73,63,.5)';
@@ -2912,6 +2913,137 @@ org.checkIn = (function(org){
         init: lib.init
     }
 })(org);
+
+//红包雨
+org.redpacket = (function(org){
+    var lib = {
+        init: function(){
+            lib._checkFrom();
+        },
+        _checkFrom: function () {
+            org.ui.focusInput({
+                submit: $('button.service-login-btn'),
+                inputList: [
+                    {target: $('input.first-pwd'), required: true},
+                    {target: $('input.second-pwd'), required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': '#cbcbcb',
+                    'activeBg': '#DB493F'
+                }
+            });
+        }
+    }
+    return {
+        init: lib.init
+    }
+})(org);
+
+//红包雨 绑定微信
+org.redpacket_bind = (function(org){
+    var lib = {
+        $captcha_img: $("#captcha"),
+        $captcha_key: $("input[name='captcha_0']"),
+        init: function(){
+            lib._checkFrom();
+            lib._captcha_refresh();
+            //刷新验证码
+            lib.$captcha_img.on('click', function () {
+                lib._captcha_refresh();
+            });
+        },
+        _captcha_refresh: function () {
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function (res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_key.val(res['key']);
+            });
+        },
+        _checkFrom: function () {
+            var $phone = $("input.tel-inp"),
+                $captcha = $('input.captcha-inp'),
+                $captcha_0 = $("input[name=captcha_0]"),
+                $captcha_1 = $("input[name=captcha_1]"),
+                $getValidate = $('button.wx-validation-btn');
+
+            org.ui.focusInput({
+                submit: $('button.service-login-btn'),
+                inputList: [
+                    {target: $phone, required: true},
+                    {target: $captcha, required: true},
+                    {target: $('input.validate_inp'), required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': '#cbcbcb',
+                    'activeBg': '#DB493F'
+                }
+            });
+            //验证码 按钮
+            org.ui.focusInput({
+                submit: $getValidate,
+                inputList: [
+                    {target: $captcha, required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': 'none',
+                    'activeBg': 'none'
+                }
+            });
+
+            //获取验证码
+            $getValidate.on('click', function () {
+                var phoneNumber = $phone.val(),
+                    $that = $(this), //保存指针
+                    count = 60,  //60秒倒计时
+                    intervalId; //定时器
+
+                if (!check['identifier'](phoneNumber, 'phone')) return; //号码不符合退出
+                $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
+                org.ajax({
+                    url: '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    data: {
+                        captcha_0: $captcha_0.val(),
+                        captcha_1: $captcha_1.val(),
+                    },
+                    type: 'POST',
+                    error: function (xhr) {
+                        clearInterval(intervalId);
+                        var result = JSON.parse(xhr.responseText);
+                        org.ui.showSign(result.message);
+                        $that.text('点击获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        lib._captcha_refresh();
+                    }
+                });
+                //倒计时
+                var timerFunction = function () {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text(count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        return lib._captcha_refresh();
+                    }
+                };
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            });
+            //校验方法
+            var check = {
+                identifier: function (val) {
+                    var isRight = false,
+                        re = new RegExp(/^1[0-9]{10}$/);
+                    re.test($.trim(val)) ? isRight = true : (org.ui.showSign('请输入正确的手机号'), isRight = false);
+                    return isRight;
+                }
+            }
+        }
+    }
+    return {
+        init: lib.init
+    }
+})(org);
+
 
 ;(function(org){
     $.each($('script'), function(){
