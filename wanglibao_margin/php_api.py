@@ -251,7 +251,7 @@ class CheckAppTradePassword(DecryptParmsAPIView):
         try:
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
-            ret = {'status': 0, 'message': str(e)}
+            ret = {'status': -1, 'message': str(e)}
             logger.debug('CheckTradePassword error with {}!\n'.format(e.message))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
