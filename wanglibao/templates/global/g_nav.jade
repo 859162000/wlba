@@ -26,11 +26,6 @@
             .wechat-hover-dec 下载网利宝APP
 
     .g-samll-end
-      //if user.is_authenticated
-      //  if user.wanglibaouserprofile.utype == '3'
-      //    a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
-      //else
-      //  a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
       a(href='http://lianmeng.wanglibao.com/', target='_blank')#investment.samll-nav-guide 网利联盟
       a(href='/data_cube/',target="_blank").samll-nav-guide 平台数据
       a(href='/pc_guide/').samll-nav-guide 新手指引
@@ -61,7 +56,7 @@
             i.user-icon-img
           span.user-text 我的账户
           i.icon.iconfont.icon-down
-        ul.g-nav-user-nav#minNavs
+        ul.g-nav-user-nav.user-nav-hover#minNavs
           mixin liItem(url, text)
             li
               a(href=url)=text
@@ -71,22 +66,46 @@
           +liItem('/accounts/transaction/p2p/', '交易记录')
 
     .g-nav-box
-      mixin nav-item(name, link, news)
+      mixin nav-item(className, name, link, smallNav, news)
         if activeItem == name
-            a.highlight(href=link)= name
+          .g-nav-list(class=className)
+            a.highlight(href=link, class='nav-a')= name
               if news
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
+              if smallNav == 'list'
+                  i.icon.iconfont.icon-down
+            if smallNav == 'list'
+              ul.g-nav-user-nav.list-nav-hover
+                mixin smallNav(url, text)
+                  li
+                    a(href=url)=text
+                +smallNav('/ylb/monthly.php', '月利宝')
+                +smallNav('/pay/withdraw/', '散标')
+                +smallNav('/ylb/exchange.php', '转让标')
+
         else
-            a(href=link)= name
-              if news
-                img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
+            .g-nav-list(class=className)
+              a(href=link, class='nav-a')= name
+                if news
+                  img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
+                if smallNav == 'list'
+                  i.icon.iconfont.icon-down
+              if smallNav == 'list'
 
-      +nav-item('首页', '/')
-      +nav-item('理财专区', '/p2p/list/')
-      +nav-item('贷款专区', '/finance/')
-      +nav-item('活动专区', '/activity/area/')
-      +nav-item('安全保障', '/security')
+                ul.g-nav-user-nav.list-nav-hover
+                  mixin smallNav(url, text)
+                    li
+                      a(href=url)=text
+                  +smallNav('/ylb/monthly.php', '月利宝')
+                  +smallNav('/pay/withdraw/', '散标')
+                  +smallNav('/ylb/exchange.php', '转让标')
 
+
+      +nav-item('nav-index', '首页', '/')
+      +nav-item('nav-p2p', '理财专区', '/p2p/list/', 'list')
+      +nav-item('nav-dai', '贷款专区', '/finance/')
+      +nav-item('nav-area', '活动专区', '/activity/area/')
+      +nav-item('nav-security', '安全保障', '/security')
   .g-nav-multicolour-line
 
 

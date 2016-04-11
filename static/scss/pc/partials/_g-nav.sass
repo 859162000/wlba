@@ -33,15 +33,23 @@ $g-nav-height-fixed: 60px
 
   .g-nav-box
     float: right
-    overflow: hidden
-    a
+    //overflow: hidden
+    .g-nav-list
       position: relative
       float: left
       text-align: center
+    a.nav-a
+      display: inline-block
       font-size: $font-m
       padding: 0 20px
       line-height: $g-nav-height
       height: $g-nav-height
+    .nav-p2p
+      .icon
+        font-size: 12px
+        color: #bfbfbf
+        vertical-align: middle
+        margin-left: 3px
     .nav-news
       position: absolute
       top: 14px
@@ -51,7 +59,8 @@ $g-nav-height-fixed: 60px
   .g-user-warp
     margin-left: 40px
     float: right
-  .g-user
+
+  .g-user,.nav-p2p
     position: relative
     font-size: $font-m
     &:hover, &:active
@@ -79,7 +88,7 @@ $g-nav-height-fixed: 60px
       font-size: $font-xs
       color: #bfbfbf
       vertical-align: middle
-  .g-nav-user-nav
+  .g-nav-user-nav,.list-nav-hover
     position: absolute
     top: $g-nav-height - 1px
     right: 0
@@ -95,7 +104,10 @@ $g-nav-height-fixed: 60px
       &:hover, &:active
         background: $bg-d15
         color: $bg-d1
-
+  .list-nav-hover
+    width: 100%
+    a
+      width: 100%
 
 .g-nav-fixed
   position: fixed
@@ -111,7 +123,7 @@ $g-nav-height-fixed: 60px
     .logo_l
       display: none
   .g-nav-box
-    a
+    a.nav-a
       line-height: $g-nav-height-fixed
       height: $g-nav-height-fixed
     .nav-news
