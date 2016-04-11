@@ -570,11 +570,17 @@ def get_unread_msgs(user_id):
     :return:
     """
     ret = dict()
-    try:
-        unread_num = Message.objects.filter(target_user=user_id, read_status=False, notice=True).count()
-        ret.update(status=1, unread_num=unread_num)
-    except Exception, e:
-        ret.update(status=0, msg=str(e))
+    if not settings.PHP_INSIDE_MESSAGE_SWITCH:
+        try:
+            unread_num = Message.objects.filter(target_user=user_id, read_status=False, notice=True).count()
+            ret.update(status=1, unread_num=unread_num)
+        except Exception, e:
+            ret.update(status=0, msg=str(e))
+    else:
+        response = requests.get(settings.PHP_UNREAD_MESSAGES_COUNT + '?uid={}'.format(user_id))
+        res = response.json()
+        if res['code'] == 'success':
+            ret.update(status=1, unread_num=res['data'])
 
     return ret
 
