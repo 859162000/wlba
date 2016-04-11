@@ -42,6 +42,7 @@ window.alert = function(name){
     window.frames[0].window.alert(name);
     iframe.parentNode.removeChild(iframe);
 }
+
 $(function(){
     var box = $('#box');
     box.css('width',window.innerWidth);
@@ -326,9 +327,11 @@ $(function(){
         });
     }
     $(document).ready(function() {
-        setInterval(function () {
+
+        //document.body.scrollTop = 100;
+        /*setInterval(function () {
             $(window).scrollTop(0);
-        }, 0);
+        }, 0);*/
         //IOS下自动播放背景音乐
         document.getElementById('car_audio').play();
         document.addEventListener("WeixinJSBridgeReady", function () {
@@ -347,9 +350,9 @@ $(function(){
                 cunt++;
             }
         }, 500);
-        document.ontouchmove = function(e){
+        document.addEventListener("touchmove",function(e){
             e.preventDefault();
-        }
+        },false);
          /* document.touchmove= function(e){
             e.preventDefault();
         }*/
@@ -479,6 +482,29 @@ $(function(){
         $(".sx").click(function(){
             sxyzm();
         });
+        $(window).resize(function(){
+           // alert("########");
+            //alert(window.innerHeight);
+            //if($("body").offset().top>-1) {
+            $("body").offset({"top": 0, "left": 0});
+            //}
+        })
+//        alert(window.innerHeight);
+        $(".iphone input").focus(function(e){
+           // e.preventDefault();
+            if($("body").offset().top>-1) {
+                $("body").offset({"top": -280, "left": 0});
+            }
+        }).blur(function(){
+            if($("body").offset().top>-1) {
+                $("body").offset({"top": 0, "left": 0});
+            }
+        })
+        $(".srdx input").focus(function(){
+            $("body").offset({"top":-80,"left":0});
+        }).blur(function(){
+            $("body").offset({"top":0,"left":0});
+        })
         $(".hqdx input").click(function(){
             $(this).attr("disabled","disabled");
             $(this).css("background-image","url(/static/imgs/sub_weixin/eatcoin/un_get_note.png)");
