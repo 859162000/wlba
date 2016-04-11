@@ -484,16 +484,16 @@ $(function(){
         });
         $(window).resize(function(){
            // alert("########");
-  //          alert(window.innerHeight);
+            //alert(window.innerHeight);
             //if($("body").offset().top>-1) {
-                $("body").offset({"top": 0, "left": 0});
+            $("body").offset({"top": 0, "left": 0});
             //}
         })
 //        alert(window.innerHeight);
         $(".iphone input").focus(function(e){
            // e.preventDefault();
             if($("body").offset().top>-1) {
-                $("body").offset({"top": -0, "left": 0});
+                $("body").offset({"top": -280, "left": 0});
             }
         }).blur(function(){
             if($("body").offset().top>-1) {
