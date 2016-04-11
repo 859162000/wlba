@@ -68,6 +68,7 @@ urlpatterns = patterns(
     url(r'api/account/wx_getinfo/$', views.GetUserInfo.as_view(), name='weixin_get_account_user_info'),
     url(r'api/generate/qr_limit_scene_ticket/$', views.GenerateQRLimitSceneTicket.as_view(), name='generate_qr_limit_scene_ticket'),#生成永久二维码
     url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),#生成临时二维码
+    url(r'api/generate/qr_invite_scene_ticket/$', views.GenerateInviteQRSceneTicket.as_view(), name='qr_invite_scene_ticket'),#生成邀请二维码
 
     #
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
@@ -124,6 +125,17 @@ urlpatterns += patterns(
     url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
     url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
     url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
+
+)
+#活动页面
+urlpatterns += patterns(
+    '',
+    url(r'^activity/invite/$', fwh_login_required(TemplateView.as_view(template_name=".jade"),login_url='/weixin/sub_login_redirect/'),name='fwh_invite'),
+)
+#h5活动页面
+urlpatterns += patterns(
+    '',
+    url(r'^activity/share/$', TemplateView.as_view(template_name=".jade"), name='weixin_share'),
 )
 # 微信管理后台
 urlpatterns += patterns(

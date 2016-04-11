@@ -60,6 +60,7 @@ from misc.models import Misc
 from wechatpy.parser import parse_message
 from wechatpy.messages import BaseMessage, TextMessage
 import datetime, time
+import base64
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
@@ -67,10 +68,12 @@ from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from wanglibao_profile.models import WanglibaoUserProfile
 from weixin.tasks import detect_product_biding, sentTemplate
-from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record, process_user_daily_action
+from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_scene_record, process_user_daily_action, getMiscValue
 from weixin.util import FWH_UNBIND_URL, filter_emoji
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_redis.backend import redis_backend
+# from wanglibao_invite.models import WechatInviteRelation
+
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
@@ -140,6 +143,7 @@ class WeixinJoinView(View):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
+        logger.debug("entering post=============================self.msg::::%s"%self.msg)
         msg = self.msg
         reply = None
         toUserName = msg._data['ToUserName']
@@ -454,11 +458,12 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt = bindUser(w_user, user)
-                    channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
-                    if channel:
-                        scene_id = channel.code
-                    reply = create_reply(txt, self.msg)
+                    scene_id, reply = self.process_digital_code(w_user, user, channel_digital_code)
+                    # rs, txt = bindUser(w_user, user)
+                    # channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
+                    # if channel:
+                    #     scene_id = channel.code
+                    # reply = create_reply(txt, self.msg)
         if not old_subscribe and w_user.subscribe:
             w_user.scene_id = scene_id
             w_user.save()
@@ -473,6 +478,31 @@ class WeixinJoinView(View):
                 txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)
         return reply
+
+    def process_digital_code(self, w_user, user, channel_digital_code):
+        share_invite_fwh_config = getMiscValue("share_invite_fwh_config")
+        #share_invite_fwh_config = {"share_invite_digital_codes":[000], "articles":{"000":[{"image":"","url":"p={fp}","title":"","description":""}]}}
+        channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
+        share_invite_digital_codes = share_invite_fwh_config["share_invite_digital_codes"]
+        scene_id = channel_digital_code
+        if channel:
+            scene_id = channel.code
+        if channel_digital_code in share_invite_digital_codes:
+            inviter = user
+            from wanglibao_profile.models import WanglibaoUserProfile
+            profile = WanglibaoUserProfile.objects.filter(user=inviter).first()
+            # WechatInviteRelation.objects.get_or_create(inviter=inviter, w_user_invited=w_user)
+            articles = share_invite_fwh_config["articles"][channel_digital_code]
+            for article in articles:
+                article['url'] = article['url'].format(fp=base64.b64encode(profile.phone)[0:-1])
+            reply = create_reply(articles, self.msg)
+        else:
+            rs, txt = bindUser(w_user, user)
+            reply = create_reply(txt, self.msg)
+
+        return scene_id, reply
+
+
 
     def getSubscribeArticle(self):
         big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
@@ -1636,6 +1666,30 @@ class GenerateQRSceneTicket(APIView):
         logger.debug("code does not exist")
         return Response({'errcode':-2, 'errmsg':"code does not exist", "qrcode_url":weixin_account.qrcode_url})
 
+class GenerateInviteQRSceneTicket(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        original_id = request.GET.get('original_id')
+        inviter_id = request.GET.get('inviter_id')
+        channel_code = request.GET.get('code')
+        if not original_id or not inviter_id or not inviter_id.isdigit() or not channel_code:
+            return Response({'errcode':-1, 'errmsg':"-1"})
+        weixin_account = WeixinAccounts.getByOriginalId(original_id)
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
+        channel = WeiXinChannel.objects.filter(code=channel_code).first()
+        if channel:
+            scene_id = inviter_id + str(channel.digital_code)
+            scene_id = int(scene_id)
+        # print int(request.user.id)
+        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
+        # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
+        try:
+            rs = client.qrcode.create(qrcode_data)
+            qrcode_url = client.qrcode.get_url(rs.get('ticket'))
+        except WeChatException,e:
+            logger.debug("'errcode':%s, 'errmsg':%s"%(e.errcode, e.errmsg))
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg, "qrcode_url":weixin_account.qrcode_url})
+        return Response({'qrcode_url':qrcode_url})
 
 
 class GenerateQRLimitSceneTicket(APIView):

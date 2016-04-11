@@ -45,6 +45,11 @@ class InviteRewardRecord(models.Model):
     created_at = models.DateTimeField(auto_now=True, default=timezone.now)
 
 
+# class WechatInviteRelation(models.Model):
+#     inviter = models.ForeignKey(User)
+#     w_user_invited = models.ForeignKey(WeixinUser)
+
+
 class WechatUserDailyReward(models.Model):
     ACTION_TYPES = (
         (u'redpack_rain', u'红包雨'),
