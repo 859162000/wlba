@@ -834,14 +834,21 @@ def _send_message_template(user, title, content):
         "title": title,
         "content": content,
         "mtype": "activity"
-    })
+    }, queue='celery02')
 
 
 def _send_sms_template(phone, content):
     # 发送短信,功能推送id: 7
     # 直接发送短信内容
-    from wanglibao_sms.send_php import PHPSendSMS
-    PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content)
+    # from wanglibao_sms.send_php import PHPSendSMS
+    from wanglibao_sms.tasks import send_sms_msg_one
+    send_sms_msg_one.apply_async(kwargs={
+        'rule_id': 7,
+        'phone': phone,
+        'user_type': 'phone',
+        'content': content
+    }, queue='celery02')
+    # PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content)
 
     # send_messages.apply_async(kwargs={
     #     "phones": [phone, ],
@@ -854,16 +861,18 @@ def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):
     weixin_user = WeixinUser.objects.filter(user=user).first()
     if weixin_user:
         now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-        remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。"%(amount,
-                                                                     invest_amount, end_date)
-        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                    "openid":weixin_user.openid,
-                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                    "name1":"",
-                                    "name2":user.wanglibaouserprofile.phone,
-                                    "time":now_str+'\n',
-                                    "remark":remark
-                                        })},
-                                    queue='celery02'
-                                    )
+        remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。" % (
+            amount, invest_amount, end_date)
+
+        sentTemplate.apply_async(kwargs={
+            "kwargs": json.dumps({
+                "openid": weixin_user.openid,
+                "template_id": BIND_SUCCESS_TEMPLATE_ID,
+                "name1": "",
+                "name2": user.wanglibaouserprofile.phone,
+                "time": now_str+'\n',
+                "remark": remark
+            })
+        }, queue='celery02')
+
 
