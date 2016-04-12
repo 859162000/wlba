@@ -213,14 +213,18 @@ class P2PProduct(ProductBase):
         try:
             status_dict = {u'正在招标':9, u'满标待打款':8, u'满标已打款':8, u'满标待审核':8, u'满标已审核':8, u'还款中':7, u'已完成':6}
             self.status_int = status_dict.get(self.status, 0)
-
-            from .tasks import coop_product_push
-            coop_product_push.apply_async(
-                kwargs={'product_id': self.id}
-            )
         except:
             pass
         super(P2PProduct, self).save(*args, **kwargs)
+        try:
+            if self.id:
+                from .tasks import coop_product_push
+                coop_product_push.apply_async(
+                    countdown=5,
+                    kwargs={'product_id': self.id}
+                )
+        except:
+            pass
 
     class Meta:
         verbose_name_plural = u'P2P产品'
