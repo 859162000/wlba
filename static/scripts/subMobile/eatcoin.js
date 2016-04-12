@@ -350,6 +350,7 @@ $(function(){
                 cunt++;
             }
         }, 500);
+
         document.addEventListener("touchmove",function(e){
             e.preventDefault();
         },false);
@@ -461,7 +462,7 @@ $(function(){
         $(".sx").click(function(){
             sxyzm();
         });
-
+        var djs;
         $(".hqdx input").click(function(){
             $(this).attr("disabled","disabled");
             $(this).css("background-image","url(/static/imgs/sub_weixin/eatcoin/un_get_note.png)");
@@ -470,7 +471,7 @@ $(function(){
             var param = {"captcha_0":$(".img_yzm img").attr("key"),"captcha_1":$(".input_yzm input").val()};
             $(this).hide().siblings().show();
             var self = this
-            var djs = setInterval(function(){
+            djs = setInterval(function(){
                 if(dxsj==1){
                     $(self).removeAttr("disabled");
                     $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
@@ -560,6 +561,8 @@ $(function(){
         $(".yz_tc .close").click(function(){
             $(".blank").hide();
             $(this).parent().hide();
+            clearInterval(djs);
+            $(".hqdx input").show().siblings().hide().text("60秒后重发")
         })
         window.addEventListener('orientationchange', function(event){
             if( window.orientation == 90 || window.orientation == -90 ) {
