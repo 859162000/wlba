@@ -112,6 +112,7 @@ org.checin_in = (function () {
             var resultCopy = result.data.sign_in,
                 itemStart =  resultCopy.start_day,
                 itemEnd   = resultCopy.nextDayNote,
+                continueDay = resultCopy.continue_days,
                 currentDay = resultCopy.current_day,
                 giftStatus = resultCopy.continueGiftFetched,
                 mysterious_day = resultCopy.mysterious_day,
@@ -136,7 +137,7 @@ org.checin_in = (function () {
                     itemStatus += " active-doing"
                 }
 
-                if((i - itemStart) === mysterious_day){//包含神秘礼物区间
+                if((i - currentDay) === mysterious_day){//包含神秘礼物区间
                     mysterious_section = true;
                 }
 
@@ -146,17 +147,39 @@ org.checin_in = (function () {
 
                 if(i == itemEnd){
                     //礼物所在天数
-                    if(mysterious_section){
-                        itemStatus = giftStatus ?
-                            "active-mysterious-open gist-mod active-did "
-                            :
-                            "active-mysterious gist-mod ";
+                    if(giftStatus){
+                        //已领取
+                        if(resultCopy.isMysteriGift){
+                            //已领取含神秘礼物
+                            itemStatus = "active-mysterious-open gist-mod active-did "
+                        }else{
+                            itemStatus = "active-gift-open gist-mod active-did ";
+                            //不包含神秘礼物
+                        }
                     }else{
-                        itemStatus = giftStatus ?
-                            "active-gift-open gist-mod active-did "
-                            :
-                            "active-gift gist-mod ";
+                        //未领取
+                        if(mysterious_section){
+                            //包含神秘礼物
+
+                            itemStatus = itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
+                        }else{
+                            //不包含神秘礼物
+
+                            itemStatus = itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
+                        }
                     }
+
+                    //if(mysterious_section){
+                    //    itemStatus = giftStatus ?
+                    //        "active-mysterious-open gist-mod active-did "
+                    //        :
+                    //        itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
+                    //}else{
+                    //    itemStatus = giftStatus ?
+                    //        "active-gift-open gist-mod active-did "
+                    //        :
+                    //        itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
+                    //}
                 }
 
                 str += "<div data-continue='"+i+"' class='flag-items "+itemStatus+"'>";
