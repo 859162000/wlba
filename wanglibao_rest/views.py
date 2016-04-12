@@ -63,12 +63,13 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
-from weixin.util import bindUser
+from weixin.util import bindUser, createInvite
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
+from wanglibao_invite.invite_common import ShareInviteRegister
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -420,8 +421,10 @@ class RegisterAPIView(DecryptParmsAPIView):
             if register_channel and register_channel == 'fwh':
                 openid = request.session.get('openid')
                 if openid:
+                    ShareInviteRegister(request).process_for_register(request.user, openid)
                     w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
                     bindUser(w_user, request.user)
+
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):

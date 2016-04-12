@@ -375,8 +375,33 @@ class GetSignShareInfo(APIView):
         return Response({"ret_code": 0, "data": data})
 
 
+class WechatInviteTemplate(TemplateView):
+    template_name = ""
 
+    def get_context_data(self, **kwargs):
+        identifier = self.request.GET.get('phone')
+        phone = base64.b64decode(identifier + '=')
+        user = self.request.user
+        return {
+        }
 
+    def dispatch(self, request, *args, **kwargs):
+        return super(WechatInviteTemplate, self).dispatch(request, *args, **kwargs)
+
+class WechatShareTemplate(TemplateView):
+    template_name = ""
+
+    def get_context_data(self, **kwargs):
+        identifier = self.request.GET.get('phone')
+        phone = base64.b64decode(identifier + '=')
+        user = self.request.user
+
+        return {
+        }
+
+    def dispatch(self, request, *args, **kwargs):
+
+        return super(WechatShareTemplate, self).dispatch(request, *args, **kwargs)
 
 
 

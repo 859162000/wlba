@@ -167,6 +167,12 @@ def unbindUser(w_user, user):
     w_user.save()
     _process_record(w_user, user, 'unbind', "解除绑定")
 
+from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_invite.models import InviteRelation
+def createInvite(friend_phone, user):
+    profile = WanglibaoUserProfile.objects.filter(phone=friend_phone).first()
+    InviteRelation.objects.get_or_create(user=user, inviter=profile.user)
+
 def getAccountInfo(user):
 
     p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
