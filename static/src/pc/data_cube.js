@@ -406,7 +406,10 @@ require(['echarts','echarts/chart/pie'],function(ec){//饼形图
     pie4_data = typeData(dataVal.way);//还款方式
     //整理融资金额/融资类型的排序
     var pie2_data_r = {"val": [pie2_data.val[4],pie2_data.val[2],pie2_data.val[1],pie2_data.val[3],pie2_data.val[0]], "num": [pie2_data.num[4],pie2_data.num[2],pie2_data.num[1],pie2_data.num[3],pie2_data.num[0]]};
-    var pie3_data_r = {"val": [pie3_data.val[0],pie3_data.val[2],pie3_data.val[3],pie3_data.val[4],pie3_data.val[5],pie3_data.val[6],pie3_data.val[7],pie3_data.val[1]], "num": [pie3_data.num[0],pie3_data.num[2],pie3_data.num[3],pie3_data.num[4],pie3_data.num[5],pie3_data.num[6],pie3_data.num[7],pie3_data.num[1]]};
+    //var pie3_data_r = {"val": [pie3_data.val[0],pie3_data.val[2],pie3_data.val[3],pie3_data.val[4],pie3_data.val[5],pie3_data.val[6],pie3_data.val[7],pie3_data.val[1]], "num": [pie3_data.num[0],pie3_data.num[2],pie3_data.num[3],pie3_data.num[4],pie3_data.num[5],pie3_data.num[6],pie3_data.num[7],pie3_data.num[1]]};
+
+    var pie3_data_r = {"val": pie3_data.val, "num": pie3_data.num};
+
     // 为echarts对象加载数据
     pie1.setOption(setOpt({'name':'融资期限','legendData': pie1_data.val, "itemDate": pie1_data.num},"vertical",30));
     pie2.setOption(setOpt({'name':'融资金额','legendData': pie2_data_r.val, "itemDate": pie2_data_r.num},"vertical",30));
