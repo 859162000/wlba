@@ -12,7 +12,7 @@ block sidebar
     include include/user_center_sidebar
 block main
   .account-home-panel
-    .account-home-panel--title-bar
+    .row.align-right
       if user.wanglibaouserprofile.utype == '3'
         span.nickname#qiyeUser 企业用户：
           i
@@ -23,93 +23,85 @@ block main
           else
             span
               a#name-hight(href="/accounts/id_verify/") 立即进行实名认证
-
-    .card-panel
+    .row.clearfix
+      .pull-left
+        p
+          span(style='font-size:36px;line-height:1;color:#333;') {{p2p_total_asset|money_format}}
+        p.font-s(style='color:#999') 可用余额(元)
+      .pull-left
+        .clamp-xl
+          .new-account-bar(style='left:0;margin:0;padding:0')
+            a.button-home-action.red-btn(href="/pay/banks/") 充值
+            a.button-home-action.margin-left-s(href="/pay/withdraw/") 取现
+    .row.margin-top-m
       .total-asset-money-card
         p.align-center
-          span#total_asset.big_number(data-p2p="{{p2p_total_asset}}") {{total_asset|money_format}}
-        p.align-center 总资产(元)
+          span.big_number {{p2p_total_asset|money_format}}
+        p.align-center.desc 总资产(元)
+
       .sign-money-card
         =
-      if mode == 'p2p'
-        .brief--p2p-total-asset.active
-          a(href="/accounts/home/")
-            p.align-center
-              span.big_number {{p2p_total_asset|money_format}}
-            p.align-center 理财专区(元)
+
+      .p2p-asset--detail-container
+        .p2p-asset--detail
+          p
+            span.big_number {{user.margin.margin | money_format}}
+          p.desc 可用余额
         .sign-money-card
-          //+
-      else
-        .brief--p2p-total-asset
-          a(href="/accounts/home/")
-            p.align-center
-              span.big_number {{p2p_total_asset|money_format}}
-            p.align-center 理财专区(元)
+          +
+        .p2p-asset--detail
+          p
+            span.big_number {{p2p_unpay_principle|money_format}}
+          p.desc 待收本金
         .sign-money-card
-      //    +
+          +
+        .p2p-asset--detail
+          p
+            span.big_number {{margin_freeze|money_format}}
+          p.desc 投资冻结
+        .sign-money-card
+          +
+        .p2p-asset--detail
+          p
+            span.big_number {{margin_withdrawing|money_format}}
+          p.desc 提现冻结
+      //.total-asset-money-card
+      //  p.align-center
+      //    span#total_asset.big_number(data-p2p="{{p2p_total_asset}}") {{total_asset|money_format}}
+      //  p.align-center 总资产(元)
+      //.sign-money-card
+      //  =
       //if mode == 'p2p'
-      //  .brief--fund-total-asset
-      //    a(href="/accounts/home/experience/")
+      //  .brief--p2p-total-asset.active
+      //    a(href="/accounts/home/")
       //      p.align-center
-      //        span.big_number {{experience_account.unpaid_interest}}
-      //      p.align-center 体验金(元)
+      //        span.big_number {{p2p_total_asset|money_format}}
+      //      p.align-center 理财专区(元)
+      //  .sign-money-card
+      //    //+
       //else
-      //  .brief--fund-total-asset.active
-      //    a(href="/accounts/home/experience/")
+      //  .brief--p2p-total-asset
+      //    a(href="/accounts/home/")
       //      p.align-center
-      //        span.big_number {{experience_account.unpaid_interest}}
-            p.align-center 体验金(元)
+      //        span.big_number {{p2p_total_asset|money_format}}
+      //      p.align-center 理财专区(元)
+      //  .sign-money-card
+
   if mode == 'p2p'
     .account-home-panel__no-padding
       .account-home-panel--title-bar__product
         ul.title-bar--tabs
-          li.title-bar--tab.active
+          li.title-bar--tab.active.new-bar-tab
             a.title-bar--tab--anchor(href="javascript:void(0)") 散标
-          li.title-bar--tab
+          li.title-bar--tab.new-bar-tab
             a.title-bar--tab--anchor(href="/ylb/monthly.php?action=userMonthly") 月利宝
-          li.title-bar--tab
+          li.title-bar--tab.new-bar-tab
             a.title-bar--tab--anchor(href="/ylb/monthly.php?action=userMonthly&type=1") 转让标
-          li.title-bar--tab#tyjzq(style="display:none")
+          li.title-bar--tab.new-bar-tab#tyjzq(style="display:none")
             a.title-bar--tab--anchor(href="/accounts/home/experience/") 体验金专区
             i
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
-      .clamp-xl
-        .account-home-panel--action-bar
-          a.button-home-action(href="/pay/banks/") 充值
-          a.button-home-action.margin-left-m(href="/pay/withdraw/") 取现
 
-        .row
-          .total-asset-money-card
-            p.align-center
-              span.big_number {{p2p_total_asset|money_format}}
-            p.align-center.desc 理财专区资产(元)
-
-          .sign-money-card
-            =
-
-          .p2p-asset--detail-container
-            .p2p-asset--detail
-              p
-                span.big_number {{user.margin.margin | money_format}}
-              p.desc 余额
-            .sign-money-card
-              +
-            .p2p-asset--detail
-              p
-                span.big_number {{p2p_unpay_principle|money_format}}
-              p.desc 待收本金
-            .sign-money-card
-              +
-            .p2p-asset--detail
-              p
-                span.big_number {{margin_freeze|money_format}}
-              p.desc 投资中冻结金额
-            .sign-money-card
-              +
-            .p2p-asset--detail
-              p
-                span.big_number {{margin_withdrawing|money_format}}
-              p.desc 提现中冻结金额
         .space-vertical-s
 
         table.table

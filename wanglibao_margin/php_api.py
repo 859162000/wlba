@@ -22,7 +22,8 @@ from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
 
 from wanglibao_rest import utils
-from wanglibao_rest.common import DecryptParmsAPIView
+from wanglibao_rest.common import PHPDecryptParmsAPIView
+
 
 logger = logging.getLogger('wanglibao_margin')
 
@@ -234,7 +235,7 @@ class CheckTradePassword(APIView):
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
-class CheckAppTradePassword(DecryptParmsAPIView):
+class CheckAppTradePassword(PHPDecryptParmsAPIView):
     """
     http请求方式: POST  检查交易密码。
     http://xxxxxx.com/php/trade_password/
@@ -245,9 +246,11 @@ class CheckAppTradePassword(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request):
-        user_id = request.user
-        trade_password = self.params.get('password', "").strip()
-        logger.info("in class CheckAppTradePassword,  self.params = {}\n".format(self.params))
+        trade_password = self.params.get('trade_pwd', "").strip()
+        user_id = self.request.POST.get('user_id', "").strip()
+        logger.info('post uid = {}, password = {}'.format(user_id, self.request.POST.get('password')))
+        logger.info("in class CheckAppTradePassword, self.params = {}, trade_password = {}\n"
+                    .format(self.params, trade_password))
         try:
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
@@ -556,9 +559,9 @@ class YueLiBaoRefund(APIView):
                             msg_list.append({'refundId': arg['refundId'], 'status': 1})
 
                         except Exception, e:
-                            print e
                             ret.update(status=0,
                                        msg=str(e))
+                            logger.debug('in YueLiBaoRefund error = {}\n'.format(e.message))
                             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
                 ret.update(status=1,

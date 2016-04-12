@@ -5,6 +5,7 @@ from report.crypto import getDecryptedContent
 from rest_framework.authentication import get_authorization_header, TokenAuthentication
 from django.conf import settings
 import json
+import simplejson
 import logging
 
 logger = logging.getLogger("wanglibao_rest")
@@ -19,14 +20,16 @@ class DecryptParmsAPIView(APIView):
             # logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
             method = request.method.lower()
             self.params = {}
-            request_params = {}
-            if method == "get":
-                request_params = request.GET
-            if method == "post":
-                request_params = request.DATA
+            self.request_params = getattr(self, "request_params", {})
+
+            if not self.request_params:
+                if method == "get":
+                    self.request_params = request.GET
+                if method == "post":
+                    self.request_params = request.DATA
 
             token_key = ""
-            for k, v in request_params.iteritems():
+            for k, v in self.request_params.iteritems():
                 if k == 'param':
                     self.params[k] = {}
                     if type(v) is unicode:
@@ -50,3 +53,23 @@ class DecryptParmsAPIView(APIView):
         except Exception, e:
             logger.debug("===decrypt in wanglibao_rest.common====error:%s"%e.message)
 
+
+class PHPDecryptParmsAPIView(DecryptParmsAPIView):
+    def initial(self, request, *args, **kwargs):
+        """
+        Runs anything that needs to occur prior to calling the method handler.
+        """
+        try:
+            self.request_params = {}
+            password = request.POST.get("password", "")
+            try:
+                self.request_params = json.loads(password)
+            except Exception, e:
+                try:
+                    passwd = password.replace('\\\\', '\\')
+                    self.request_params = simplejson.loads(passwd)
+                except Exception, e:
+                    logger.debug('PHPDecryptParmsAPIView decode error : {}'.format(e.message))
+            super(PHPDecryptParmsAPIView, self).initial(request, args, kwargs)
+        except Exception, e:
+            logger.debug('PHPDecryptParmsAPIView error = {}'.format(e.message))

@@ -1318,6 +1318,9 @@ PHP_SEND_INSIDE_MESSAGE = "http://192.168.10.84/workspace/MsgAPI/message.php/mes
 PHP_UNREAD_MESSAGES_COUNT = "http://192.168.10.84/workspace/MsgAPI/message.php/message/count"
 # PHP 站内信显示
 PHP_INSIDE_MESSAGES_LIST = "http://192.168.10.84/workspace/MsgAPI/message.php/message/list"
+# PHP 读站内信
+PHP_INSIDE_MESSAGE_READ = 'http://192.168.10.84/workspace/MsgAPI/message.php/message'
+PHP_INSIDE_MESSAGE_READ_ALL = 'http://192.168.10.84/workspace/MsgAPI/message.php/message'
 
 if ENV == ENV_PRODUCTION:
     PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
@@ -1325,3 +1328,5 @@ if ENV == ENV_PRODUCTION:
     PHP_SEND_INSIDE_MESSAGE = "http://192.168.10.84/workspace/MsgAPI/message.php/message/inside"
     PHP_UNREAD_MESSAGES_COUNT = "http://192.168.10.84/workspace/MsgAPI/message.php/message/count"
     PHP_INSIDE_MESSAGES_LIST = "http://192.168.10.84/workspace/MsgAPI/message.php/message/list"
+    PHP_INSIDE_MESSAGE_READ = 'http://192.168.10.84/workspace/MsgAPI/message.php/message'
+    PHP_INSIDE_MESSAGE_READ_ALL = 'http://192.168.10.84/workspace/MsgAPI/message.php/message'
