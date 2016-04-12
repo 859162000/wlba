@@ -331,7 +331,6 @@ org.checin_in = (function () {
             var resultCopy = result.data.sign_in,
                 itemStart =  resultCopy.start_day,
                 itemEnd   = resultCopy.nextDayNote,
-                continueDay = resultCopy.continue_days,
                 currentDay = resultCopy.current_day,
                 giftStatus = resultCopy.continueGiftFetched,
                 mysterious_day = resultCopy.mysterious_day,
@@ -356,9 +355,13 @@ org.checin_in = (function () {
                     itemStatus += " active-doing"
                 }
 
-                if(i == itemEnd){
-                    if(resultCopy.isMysteriGift)  mysterious_section = true
+                if((i - itemStart) === mysterious_day){//包含神秘礼物区间
+                    mysterious_section = true;
                 }
+
+                //if(i == itemEnd){
+                //    if(resultCopy.isMysteriGift)  mysterious_section = true
+                //}
 
                 if(i == itemEnd){
                     //礼物所在天数
@@ -366,12 +369,12 @@ org.checin_in = (function () {
                         itemStatus = giftStatus ?
                             "active-mysterious-open gist-mod active-did "
                             :
-                            itemEnd - currentDay === 0? 'active-mysterious-active gist-mod pulse ' :"active-mysterious gist-mod ";
+                            "active-mysterious gist-mod ";
                     }else{
                         itemStatus = giftStatus ?
                             "active-gift-open gist-mod active-did "
                             :
-                            itemEnd - currentDay === 0? 'active-gift-active gist-mod pulse ' :"active-gift gist-mod ";
+                            "active-gift gist-mod ";
                     }
                 }
 
@@ -569,7 +572,7 @@ wlb.ready({
         })
     },
     other: function () {
-        //org.checin_in.init();
+        org.checin_in.init();
         console.log('guy ! open in app!')
     }
 })
