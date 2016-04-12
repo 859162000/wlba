@@ -307,7 +307,9 @@ def card_bind_list(request):
 
             need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
             for card in cards:
-                if need_sms and need_sms.value == '1' and card.is_bind_kuai:
+                storable_no = card.no[:6] + card.no[-4:]
+                if (need_sms and need_sms.value == '1' and card.is_bind_kuai) or \
+                        _is_switch_channel(user, storable_no):
                     need_validation_for_qpay = True
                 else:
                     need_validation_for_qpay = False
@@ -316,7 +318,7 @@ def card_bind_list(request):
                     'bank_id': card.bank.code,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
-                    'storable_no': card.no[:6] + card.no[-4:],
+                    'storable_no': storable_no,
                     'is_the_one_card': card.is_the_one_card,
                     'need_validation_for_qpay': need_validation_for_qpay
                 }
@@ -329,12 +331,12 @@ def card_bind_list(request):
                     if card.bank.huifu_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.huifu_bind_limit))
 
-                elif channel == 'yeepay' and card.is_bind_yee:
+                elif channel == 'yeepay' and (card.is_bind_kuai or card.is_bind_yee):
                     tmp.update(base_dict)
                     if card.bank.yee_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.yee_bind_limit))
 
-                elif channel == 'kuaipay' and card.is_bind_kuai:
+                elif channel == 'kuaipay' and (card.is_bind_kuai or card.is_bind_yee):
                     tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
@@ -419,6 +421,23 @@ def card_unbind(request):
 
     return _unbind_common(request, card, bank)
 
+def _is_switch_channel(user, card_no):
+    """
+    是否银行切换支付渠道后，用户第一次使用已经绑定在另一个渠道的卡
+    """
+    if len(card_no) != 10:
+        return False
+    card = Card.objects.filter(user=user,
+                               no__startswith=card_no[:6],
+                               no__endswith=card_no[-4:])\
+                       .filter(Q(is_bind_kuai=True)|Q(is_bind_yee=True))\
+                       .first()
+    if not card:
+        return False
+    if (card.is_bind_yee==True and card.is_bind_kuai==False and card.bank.channel== 'kuaipay') or \
+       (card.is_bind_kuai==True  and card.is_bind_yee==False  and card.bank.channel=='yeepay'):
+        return True
+    return False
 
 def bind_pay_deposit(request):
     """ 根据银行设置的支付渠道进行支付渠道的支付
@@ -435,8 +454,17 @@ def bind_pay_deposit(request):
     ip = util.get_client_ip(request)
 
     mode = request.DATA.get('mode', '').strip()
-
     user = request.user
+    
+# cheat para for switch channel
+    if mode == 'vcode_for_qpay' and _is_switch_channel(user, card_no):
+        # need modify
+        card = Card.objects.get(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:])
+        card_no = card.no
+        gate_id = card.bank.gate_id
+        mode = ''
+# end cheat para
+
     if user.wanglibaouserprofile.utype == '3':
         return {"ret_code": 30059, "message": u"企业用户无法请求该接口"}
 
@@ -542,6 +570,10 @@ def bind_pay_dynnum(request):
         res = YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
+# cheat para for switch channel
+        if mode=='qpay_with_sms' and _is_switch_channel(user, card_no):
+            mode = ''
+# end cheat para
         res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, 
                                             token, input_phone, device,
                                             ip, request, mode=mode)
