@@ -23,7 +23,7 @@ html,body{width:100%;height:100%;padding:0;margin:0;overflow:hidden;}
 .start_page .title img{position: absolute;top:9.3%;left:6.9%;}
 .start_page .bag img{position: absolute;top:40.7%;left:26.9%}
 .start_page .play_btn img{position: absolute;top:62.1%;left:38.4%}
-.start_page .instructions a{font-size: 1.45em;color: red;position: absolute;top:81.7%;left:31.7%;width: 35%;height: 5%;text-align: center;text-decoration: underline}
+.start_page .instructions a{font-size: 1.45em;color: red;position: absolute;top:81.7%;left:31.7%;width: 35%;height: 5%;text-align: center;text-decoration: none}
 .start_page .bounced{background: url("/static/imgs/sub_weixin/eatcoin/bounced_bj.png")no-repeat;position: absolute;width: 71.7%;height: 56.4%;z-index: 10;left:14.9%;top: 23.6%;background-size: 100% 100%;opacity: 1;display: none}
 .bounced .close img{position: fixed;left: 77.9%;top:22.4%;z-index: 2}
 .bounced .instructions_text{position:absolute;width:89%;height:89%;font-size: 2vh;margin: auto;color: #c73c2e;top: 1.6%;left: 6.9%;font-family: SimHei}
@@ -39,12 +39,12 @@ html,body{width:100%;height:100%;padding:0;margin:0;overflow:hidden;}
 .gm img{position: absolute;top: 25.8%}
 .cd img{position: absolute;left: 12.9%;top:25.7%;z-index:1}
 .reward_page .tyj{position: absolute;left: 9.9%;top: 27.3%;background: url("/static/imgs/sub_weixin/eatcoin/LotteryTicket.png")no-repeat;background-size: 100% 100%;width:77.5%;height:16.7%;z-index: 1}
-.reward_page .tyj span{position: fixed;left: 36.8%;top: 33%;font-size: 5vh;color: red;font-weight: bolder;display:inline-block;width: 46.7%;height: 4.9%;text-align: center;}
+.reward_page .tyj span{position: absolute;left: 40.8%;top: 33%;font-size:2em;color: red;font-weight: bolder;display:inline-block;width: 46.7%;height: 4.9%;text-align: center;}
 .reward_page .fx_btn{position: absolute;width: 43.5%;height: 9.2%;left: 28%;top:48.8%;background: url("/static/imgs/sub_weixin/eatcoin/fx_btn.png")no-repeat;background-size: 100% 100%;border: 0;}
 .fx .ewm img{position: absolute;left: 32.3%;top:62%}
-.fx .ermts{position: absolute;width: 34.3%;top: 87.1%;left:32.3%;font-size: 2vh;text-align: center;color:#d84943;}
+.fx .ermts{position: absolute;width: 46.3%;top: 86.1%;left:26.3%;font-size: 1em;text-align: center;color:#d84943;}
 .zlyc .ewm img{position: absolute;left: 32.3%;top:32%}
-.zlyc .ermts{position: absolute;width: 34.3%;top: 60.1%;left:32.3%;font-size: 2vh;text-align: center;color:#d84943;}
+.zlyc .ermts{position: absolute;width: 46.3%;top: 60.1%;left:26.3%;font-size: 16px;text-align: center;color:#d84943;}
 .fxts{display: none;}
 .reward_page .fx .fxts img{position: absolute;z-index: 10;left: 73.3%;top: 0.2%}
 .reward_page .fx .fxts .fxjs{position: absolute;z-index: 10;width: 24.5%;color: #fff;font-size: 2.73vh;top:6.9%;left: 51.1%}
@@ -52,7 +52,7 @@ html,body{width:100%;height:100%;padding:0;margin:0;overflow:hidden;}
 .fxtl span{float:left;display: inline-block;line-height: 36px;}
 .fxtl span img{position: static !important;width: 70%}
 .fshy{clear: left;float: left}
-.reward_page .zlyc .txt{position: absolute;left: 21.9%;top: 20.1%;font-size: 3vh;color:red ;width: 57%;text-align: center}
+.reward_page .zlyc .txt{position: absolute;left: 21.9%;top: 20.1%;font-size: 20px;color:red ;width: 57%;text-align: center}
 .reward_page .cl_btn{position: absolute;width: 43.5%;height: 9.2%;left: 28%;top:70.7%;background: url("/static/imgs/sub_weixin/eatcoin/again_btn.png")no-repeat;background-size: 100% 100%;border: 0;}
 .m .stop{position:absolute;background: url("/static/imgs/sub_weixin/eatcoin/jinzhi.png")no-repeat;background-size:100% 100%;width: 158.3%;height: 111.3%;top:-9.6%;left: -18.8%;display: none;}
 .logo img{position: absolute;left: 39.3%;top: 93.7%}
