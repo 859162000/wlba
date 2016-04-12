@@ -89,13 +89,17 @@ def bisouyi_product_push(product=None, product_list=None):
 
 
 @app.task
-def process_channel_product_push(product=None):
+def process_channel_product_push(product_id=None):
+    product = None
     product_list = None
-    if not product:
+    if not product_id:
         product_list = P2PProduct.objects.filter(~Q(status__in=(u'已完成', u'流标')) |
                                                  (Q(status=u'已完成') &
                                                   Q(make_loans_time__isnull=False) &
                                                   Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
+    else:
+        product = P2PProduct.objects.filter(pk=product_id).first()
+
     for k, v in _LOCALS.iteritems():
         if k.lower().find('_product_push') != -1 and k != 'process_channel_product_push':
             try:

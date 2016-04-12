@@ -398,7 +398,7 @@ class CoopDataDispatchApi(APIView):
 
                     # 推送标的信息到第三方
                     process_channel_product_push.apply_async(
-                        kwargs={'product': product_instance}
+                        kwargs={'product': product_instance.id}
                     )
                 else:
                     message = product_form.errors
