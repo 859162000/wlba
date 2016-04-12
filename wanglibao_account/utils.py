@@ -35,6 +35,7 @@ from wanglibao_redis.backend import redis_backend
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_rest.utils import get_current_utc_timestamp
+from report.crypto import Aes
 
 
 logger = logging.getLogger(__name__)
@@ -857,3 +858,17 @@ def generate_random_password(length):
         password += str(random_list[randint(0,len(random_list)-1)])
         index += 1
     return str(password)
+
+
+def generate_bisouyi_content(data):
+    data = json.dumps(data)
+    ase = Aes()
+    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data)
+    return encrypt_text
+
+
+def generate_bisouyi_sign(content):
+    client_id = settings.BISOUYI_CLIENT_ID
+    key = settings.BISOUYI_CLIENT_SECRET
+    sign = hashlib.md5(client_id + key + content).hexdigest()
+    return sign

@@ -2767,6 +2767,7 @@ class FetchMarchAwardAPI(APIView):
 
 class AirportServiceRewardTemplate(TemplateView):
     def get_context_data(self, **kwargs):
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         airport_service_reward = getMiscValue("airport_service_reward")
         rule_ids = airport_service_reward['rule_ids']
         return {
@@ -2777,7 +2778,7 @@ class FetchAirportServiceReward(APIView):
     authentication_classes = (IsAuthenticated, )
 
     def post(self, request):
-        # airport_service_reward = {"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         rule_id = request.DATA.get('rule_id', "").strip()
         if not rule_id or not rule_id.isdigit():
             return Response({"ret_code":-1, "message":""})
@@ -2815,18 +2816,20 @@ class FetchAirportServiceReward(APIView):
         if user_ib and user_channel.code==activity.channel:
             is_new = True
 
-        reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
-        if reward_record and reward_record.status:
-            return Response({"ret_code": -1, "message": "您已领取奖励过~"})
+
         if is_new:
             if not user_ib.bought_at:
-                return Response({"ret_code": -1, "message": "您还没有投资，快去投资吧~"})
+                return Response({"ret_code":-2, "message": "您还没有投资，快去投资吧~"})
             first_buy = P2PRecord.objects.filter(user=user).order_by('create_time').first()
-            if first_buy.amount <new_min_amount:
+            if first_buy.amount <5000:
                 return Response({"ret_code": -1, "message": "首次投资不足金额~"})
+            return Response({"ret_code": -1, "message": "奖品只能获得一份~"})
         else:
             if activity_rule.is_invite_in_date:
                 return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+            reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
+            if reward_record and reward_record.status:
+                return Response({"ret_code": -1, "message": "您已领取奖励过~"})
             p2precord = P2PRecord.objects.filter(user=user,
                                              create_time__gte=activity.start_at,
                                              amount__gte=old_min_amount,

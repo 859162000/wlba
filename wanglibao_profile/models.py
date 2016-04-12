@@ -152,3 +152,35 @@ class ActivityUserInfo(models.Model):
     class Meta:
         verbose_name = u'活动用户信息'
         verbose_name_plural = u'活动用户信息'
+
+
+class RepeatPaymentUser(models.Model):
+    """3.31重复回款用户应收本息余额表"""
+    user_id = models.IntegerField(u'用户ID', primary_key=True)
+    name = models.CharField(u'姓名', max_length=32)
+    phone = models.CharField(u'手机号', max_length=11)
+    principal = models.DecimalField(u'应收本金', max_digits=10, decimal_places=2)
+    interest = models.DecimalField(u'应收利息', max_digits=10, decimal_places=2)
+    amount = models.DecimalField(u'剩余应收本息合计', max_digits=10, decimal_places=2, default=decimal.Decimal('0.00'))
+    is_every_day = models.BooleanField(u'是否每天自动扣款', default=True)
+    product_ids = models.CharField(u'新投资标的ID', max_length=32, blank=True,
+                                   help_text=u'如果用户不同意从每天的回款中扣除,则在此填写用户新购标的ID号,多个用,分割')
+
+    class Meta:
+        verbose_name = u'应收重复回款用户列表'
+        verbose_name_plural = u'应收重复回款用户列表'
+
+
+class RepeatPaymentUserRecords(models.Model):
+    """重复回款用户应收本息扣款流水记录"""
+    user_id = models.IntegerField(u'用户ID')
+    name = models.CharField(u'姓名', max_length=32)
+    phone = models.CharField(u'手机号', max_length=11)
+    amount = models.DecimalField(u'扣款金额', max_digits=10, decimal_places=2, default=decimal.Decimal('0.00'))
+    amount_current = models.DecimalField(u'扣款后剩余应收', max_digits=10, decimal_places=2, default=decimal.Decimal('0.00'))
+    description = models.CharField(u'扣款描述', max_length=200, default=u'')
+    create_time = models.DateTimeField(u'流水时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = u'应收重复回款用户扣款流水'
+        verbose_name_plural = u'应收重复回款用户扣款流水'

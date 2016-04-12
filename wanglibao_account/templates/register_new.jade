@@ -24,13 +24,16 @@ html
                                   input#registerMobile.placeholderInput.checkMobile(value='{{ phone }}', type="text",  name="identifier", title="请输入手机号")
                                 else
                                   input#registerMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
-                            li.clearfix
+                            li.captcha-box1.clearfix(style='display:none')
                                 label 图片验证 ：
-                                //input(type="hidden", name="captcha_0", autocomplete="off")
-                                //input#registerCode.w115.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入计算结果", autocomplete='off', title="请输入验证码")
-                                //img.captchaImg.fl(alt="captcha", src="")#registerRefresh
+                                input(type="hidden", name="captcha_0", autocomplete="off")
+                                input#registerCode.w115.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入计算结果", autocomplete='off', title="请输入验证码")
+                                img.captchaImg.fl(alt="captcha", src="")#registerRefresh
                                 //i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
+                            li.captcha-box(style='display:none')
+                                label 图片验证 ：
                                 input(type="hidden")#captcha-status
+                                input(type="hidden")#check-tag
                                 #captcha-box.fl
                             li#passWordInput.pwdLi.clearfix
                                 label 输入密码 ：
@@ -39,8 +42,8 @@ html
                                 label 验证码 ：
                                 input#registerSMSCode.w115.placeholderInput.checkSEMCode(type="text", name="button-get-validate-code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
                                 button.getCodeBtn.buttonGray(type='button') 获取验证码
-                            li.voice(style='display:none')
-                                没有收到验证码？请尝试<a href="javascript:void(0)" class="voiceValidate">语音验证</a>
+                                .voice(style='display:none')
+                                    | 没有收到验证码？请尝试<a href="javascript:void(0)" class="voiceValidate">语音验证</a>
                             li.clearfix
                                 label 邀请码 ：
                                 input#invitecode.placeholderInput(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码（选填）")

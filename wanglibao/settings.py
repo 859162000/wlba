@@ -1235,6 +1235,8 @@ if ENV == ENV_PRODUCTION:
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = ''
     BISOUYI_PCODE = '10002'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 else:
     BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
     BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
@@ -1242,6 +1244,8 @@ else:
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
     BISOUYI_PCODE = '10002'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
@@ -1264,8 +1268,7 @@ SUIT_CONFIG = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
-# REDIS_PASSWORD = 'wanglibank_redis'
-REDIS_PASSWORD = ''
+REDIS_PASSWORD = 'wanglibank_redis'
 
 # CACHES = {
 #     'default': {

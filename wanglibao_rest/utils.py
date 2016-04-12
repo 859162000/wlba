@@ -213,6 +213,24 @@ def process_for_renrenli_landpage(request, channel_code):
     coop_token_login(request, phone, client_id, access_token)
 
 
+def process_for_bisouyi_landpage(request, channel_code):
+    from wanglibao_account.forms import BiSouYiRegisterForm
+    form = BiSouYiRegisterForm(request.session, action='login')
+    if form.is_valid():
+        if form.check_sign():
+            phone = form.get_phone()
+            access_token = form.get_token()
+            client_id = form.cleaned_data['client_id']
+            coop_token_login(request, phone, client_id, access_token)
+            error_msg = 'success'
+        else:
+            error_msg = u'无效签名'
+    else:
+        error_msg = form.errors.values()[0][0]
+
+    logger.info("process_for_bisouyi_landpage process result: %s" % error_msg)
+
+
 def has_binding_for_bid(channel_code, bid):
     return Binding.objects.filter(btype=channel_code, bid=bid).exists()
 

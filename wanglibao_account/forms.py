@@ -478,6 +478,10 @@ class ManualModifyPhoneForm(forms.Form):
 
 
 class BiSouYiRegisterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.action = kwargs.pop('action', None)
+        super(BiSouYiRegisterForm, self).__init__(*args, **kwargs)
+
     channel_code = forms.CharField(error_messages={'required': u'渠道码是必须的'})
     client_id = forms.CharField(error_messages={'required': u'客户端id是必须的'})
     sign = forms.CharField(error_messages={'required': u'签名是必须的'})
@@ -521,9 +525,21 @@ class BiSouYiRegisterForm(forms.Form):
                     phone = str(content_data['mobile'])
                     if detect_identifier_type(phone) == 'phone':
                         users = User.objects.filter(wanglibaouserprofile__phone=phone)
-                        if not users.exists():
+                        if not users.exists() or self.action != 'register':
                             if 'other' in content_data:
-                                return content, content_data
+                                if 'account' in content_data:
+                                    if self.action == 'login':
+                                        if 'token' not in content_data:
+                                            raise forms.ValidationError(
+                                                code=10020,
+                                                message=u'content没有包含token'
+                                            )
+                                    return content, content_data
+                                else:
+                                    raise forms.ValidationError(
+                                        code=10019,
+                                        message=u'content没有包含account'
+                                    )
                             else:
                                 raise forms.ValidationError(
                                     code=10018,
@@ -557,6 +573,14 @@ class BiSouYiRegisterForm(forms.Form):
     def get_other(self):
         other = self.cleaned_data['content'][1]['other']
         return other
+
+    def get_account(self):
+        account = self.cleaned_data['content'][1]['account']
+        return account
+
+    def get_token(self):
+        token = self.cleaned_data['content'][1]['token']
+        return token
 
     def check_sign(self):
         client_id = self.cleaned_data['client_id']
