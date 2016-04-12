@@ -98,16 +98,20 @@ block main
         p 3. 提现银行账号的开户名必须与银行卡名一致， 否则提现失败。
         p 4. 提现最高限额：单笔限额50万（民生银行单笔限额5万），单日不限次数
     #img-code-div2(style="display:none")
-        form#img-code-form.img-code-form(method='post', action='',tag='')
-            .form-row
-                label.img-code-label 请输入验证码：
-                input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
-                img.captcha.captcha-img(alt="captcha", src="")
-                button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
-            .code-img-error
-        .clearfix.tc
-            span.submit-code-img#submit-code-img4 确定
+        .captcha-box1(style="display:none")
+            #captcha-box.captcha-box
+            input(type="hidden")#captcha-status
+        .captcha-box2(style="display:none")
+            form#img-code-form.img-code-form(method='post', action='',tag='')
+                .form-row
+                    label.img-code-label 请输入验证码：
+                    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                    img.captcha.captcha-img(alt="captcha", src="")
+                    button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                .code-img-error
+            .clearfix.tc
+                span.submit-code-img#submit-code-img4 确定
     #poundageExplain(style="display:none")
         p.explainTitle 温馨提示
         .poundageExplain.clearfix
