@@ -203,7 +203,7 @@ urlpatterns += patterns(
     url(r'^php/send_messages/$', SendMessages.as_view(), name='php_send_messages'),
 
     url(r'^php/trade_password/$', CheckTradePassword.as_view(), name='php_trade_password'),
-    url(r'^php/trade_password/app/$', CheckAppTradePassword.as_view(), name='php_app_trade_password'),
+    url(r'^php/app/trade_password/$', CheckAppTradePassword.as_view(), name='php_app_trade_password'),
     url(r'^php/redpacks/list/$', GetRedPacks.as_view(), name='php_unused_redpacks'),
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),

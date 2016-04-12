@@ -1362,7 +1362,11 @@ class MessageDetailAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, message_id):
-        result = inside_message.sign_read(request.user, message_id)
+        if not settings.PHP_INSIDE_MESSAGE_SWITCH:
+            result = inside_message.sign_read(request.user, message_id)
+        else:
+            url = None
+            result = request.POST(url, data = {})
         return Response(result)
 
 
