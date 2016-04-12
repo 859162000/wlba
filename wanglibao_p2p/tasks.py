@@ -12,6 +12,7 @@ from wanglibao.celery import app
 from wanglibao_rest.utils import generate_bisouyi_sign, generate_bisouyi_content
 from wanglibao_account.utils import get_bajinshe_access_token
 from wanglibao_account.tasks import common_callback_for_post
+from . import GlobalVar
 from .models import P2PProduct
 from .utils import (generate_bajinshe_product_data, generate_bisouyi_product_data)
 
@@ -106,3 +107,9 @@ def process_channel_product_push(product_id=None):
                 v(product=product, product_list=product_list)
             except Exception, e:
                 logger.warning("process_channel_product_push dispatch %s raise error: %s" % (k, e))
+
+
+# 只在程序初始化时执行
+if GlobalVar.get_push_status() is False:
+    process_channel_product_push.apply_async()
+    GlobalVar.set_push_status()
