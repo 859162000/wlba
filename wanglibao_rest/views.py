@@ -1872,7 +1872,7 @@ class GeetestAPIView(APIView):
         self.type = request.POST.get('type', None)
         import time
         if self.type == 'get':
-            #time.sleep(10)
+            time.sleep(10)
             return self.get_captcha(request)
         if self.type == 'validate':
             time.sleep(10)
