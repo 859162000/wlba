@@ -19,7 +19,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
-    var addFormValidateor, geetestStatus, max_amount, min_amount, _refreshCode, _sendSMSFun, _showModal;
+    var addFormValidateor, max_amount, min_amount, _refreshCode, _showModal;
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
@@ -90,79 +90,39 @@
         }
       }
     });
-    geetestStatus = '';
-    $.ajax({
-      type: 'POST',
-      url: '/api/geetest/',
-      dataType: 'json',
-      timeout: 5000,
-      data: {
-        type: 'get'
-      }
-    }).success(function(data) {
-      var config;
-      geetestStatus = 'true';
-      config = {
-        gt: data.gt,
-        challenge: data.challenge,
-        product: "popup",
-        offline: !data.success
-      };
-      $.modal.close();
-      return initGeetest(config, function(captchaObj) {
-        captchaObj.appendTo("#captcha-box");
-        captchaObj.bindOn(".ispan4-omega");
-        captchaObj.onSuccess(function() {
-          var array;
-          $.modal.close();
-          array = captchaObj.getValidate();
-          return _sendSMSFun(array);
-        });
-        captchaObj.onFail(function() {});
-        captchaObj.onRefresh(function() {});
-        return captchaObj.getValidate();
-      });
-    }).error(function(data) {
-      return geetestStatus = 'false';
-    });
     $('.ispan4-omega').click(function() {
-      if ((geetestStatus === 'false') || (geetestStatus === '')) {
-        $('.captcha-box2').show();
-        $('.code-img-error').html('');
-        $('#img-code-div2').find('#id_captcha_1').val('');
-        _refreshCode();
-        return $('#img-code-div2').modal();
-      }
+      $('.code-img-error').html('');
+      $('#img-code-div2').modal();
+      $('#img-code-div2').find('#id_captcha_1').val('');
+      return _refreshCode();
     });
     $('.captcha-refresh').click(function() {
       return _refreshCode();
     });
     _refreshCode = function() {
       var url;
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/";
       return $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);
       });
     };
-    _sendSMSFun = function(array) {
-      var captcha_0, captcha_1, count, dataStr, element, intervalId, phoneNumber, timerFunction;
+    $("#submit-code-img4").click(function(e) {
+      var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
       element = $('#button-get-code-btn');
       if ($(element).attr('disabled')) {
         return;
       }
       phoneNumber = $(element).attr("data-phone");
-      if ((array === '') || (array === void 0)) {
-        captcha_0 = $('#id_captcha_0').val();
-        captcha_1 = $('.captcha').val();
-        dataStr = 'captcha_0=' + captcha_0 + '&captcha_1=' + captcha_1;
-      } else {
-        dataStr = 'type=geetest' + '&geetest_validate=' + array.geetest_validate + '&geetest_seccode=' + array.geetest_seccode + '&geetest_challenge=' + array.geetest_challenge;
-      }
+      captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
+      captcha_1 = $(this).parents('form').find('.captcha').val();
       $.ajax({
         url: "/api/phone_validation_code/" + phoneNumber + "/",
         type: "POST",
-        data: dataStr
+        data: {
+          captcha_0: captcha_0,
+          captcha_1: captcha_1
+        }
       }).fail(function(xhr) {
         var result;
         clearInterval(intervalId);
@@ -171,29 +131,22 @@
         $(element).addClass('button-red');
         $(element).removeClass('button-gray');
         result = JSON.parse(xhr.responseText);
-        if ((array === '') || (array === void 0)) {
-          if (result.type === 'captcha') {
-            return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
-          } else {
-            if (xhr.status >= 400) {
-              return tool.modalAlert({
-                title: '温馨提示',
-                msg: result.message
-              });
-            }
-          }
+        if (result.type === 'captcha') {
+          return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
         } else {
-          return $('#codeError').text(result.message);
+          if (xhr.status >= 400) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message
+            });
+          }
         }
       }).success(function() {
-        $('#codeError,.code-img-error').text('');
         element.attr('disabled', 'disabled');
         element.removeClass('button-red');
         element.addClass('button-gray');
         $('.voice-validate').attr('disabled', 'disabled');
-        if ((array === '') || (array === void 0)) {
-          return $.modal.close();
-        }
+        return $.modal.close();
       });
       intervalId;
       count = 60;
@@ -219,9 +172,6 @@
       };
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
-    };
-    $("#submit-code-img4").click(function(e) {
-      return _sendSMSFun();
     });
     $(".voice").on('click', '.voice-validate', function(e) {
       var element, url;
