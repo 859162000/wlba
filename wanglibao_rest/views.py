@@ -401,7 +401,7 @@ class CoopDataDispatchApi(APIView):
                         kwargs={'product': product_instance}
                     )
                 else:
-                    message = product_form.errors.values()[0][0]
+                    message = product_form.errors
                     logger.info("process_products_push data[%s] invalid with form error: %s" % (product, message))
 
         logger.info("process_products_push done")

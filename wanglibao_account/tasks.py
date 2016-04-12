@@ -1,18 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import logging
 import requests
 import urllib
-from decimal import Decimal
 from wanglibao.celery import app
-from wanglibao import settings
-from wanglibao_pay.models import PayInfo
-from wanglibao_margin.models import MarginRecord
-from .utils import get_bajinshe_access_token, get_bajinshe_base_data
-from wanglibao_account.tools import get_tid_for_coop, get_user_phone_for_coop
-from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 

@@ -69,9 +69,10 @@ def get_user_p2p_total_asset(user):
     p2p_margin = user.margin.margin  # P2P余额
     p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
     p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
+    other_amount = user.margin.other_amount  # P2P待收本金
     p2p_unpayed_principle = unpayed_principle  # P2P待收本金
 
-    p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
+    p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle + other_amount
 
     return p2p_total_asset
 
@@ -103,22 +104,27 @@ def generate_bajinshe_product_data(product):
         product_status_code = 0
 
     if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-        periodType = 1
+        period_type = 1
     else:
-        periodType = 2
+        period_type = 2
+
+    ordered_amount = product.ordered_amount
+    _progress = '%.1f' % (float(ordered_amount) / product_total_amount * 100)
+    if _progress == 0 and ordered_amount > 0:
+        _progress = 0.1
 
     product_data = {
         'pid': product.id,
         'productType': 2,
-        'productName': product.name,
-        'apr': product.expected_earning_rate,
+        'productName': product.name[:50],
+        'apr': int(product.expected_earning_rate),
         'amount': product_total_amount,
         'pmType': pay_method_code,
         'minIa': 100,
-        'progress': float('%.1f' % (float(product.ordered_amount) / product_total_amount * 100)),
+        'progress': _progress,
         'status': product_status_code,
         'period': product.period,
-        'periodType': periodType,
+        'periodType': period_type,
     }
 
     return product_data

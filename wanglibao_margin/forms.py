@@ -11,6 +11,7 @@ class MarginForm(forms.ModelForm):
     invest = forms.CharField(label=u'已投资金额', error_messages={'required': u'请输入已投资金额'})
     uninvested = forms.CharField(label=u'充值未投资金额', error_messages={'required': u'请输入充值未投资金额'})
     uninvested_freeze = forms.CharField(label=u'充值未投资冻结金额', error_messages={'required': u'请输入充值未投资冻结金额'})
+    other_amount = forms.CharField(label=u'其他金额', error_messages={'required': u'请输入其他金额'})
 
     class Meta:
         model = Margin
