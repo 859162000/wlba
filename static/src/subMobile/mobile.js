@@ -596,8 +596,7 @@ org.regist = (function (org) {
                         'validate_code': $validation.val(),
                         'invite_code': token,
                         'tid': tid,
-                        'invite_phone': invite_phone,
-                        
+                        'invite_phone': invite_phone
                     },
                     beforeSend: function () {
                         $submit.text('注册中,请稍等...');
