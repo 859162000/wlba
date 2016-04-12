@@ -1899,6 +1899,7 @@ class GeetestAPIView(APIView):
             if status:
                 result = gt.success_validate(challenge, validate, seccode)
             else:
+				sleep(10)
                 result = gt.failback_validate(challenge, validate, seccode)
             result = "success" if result else "fail"
             resp = {"result":result}
