@@ -28,6 +28,7 @@ from wanglibao_account.tasks import common_callback_for_post
 from marketing.utils import get_user_channel_record
 from django.conf import settings
 from wanglibao_p2p.utility import get_user_margin, get_p2p_equity
+from . import GlobalVar
 
 logger = get_task_logger(__name__)
 
@@ -283,3 +284,9 @@ def coop_amortizations_push(amortizations, product_id):
         data = dict(base_data, **act_data)
         common_callback_for_post.apply_async(
             kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_amos_push'})
+
+
+# 只在程序初始化时执行
+if GlobalVar.get_push_status() is False:
+    coop_product_push.apply_async()
+    GlobalVar.set_push_status()

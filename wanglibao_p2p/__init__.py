@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
-from .tasks import coop_product_push
 
+class GlobalVar(object):
+    first_product_push_to_coop = False
 
-coop_product_push.apply_async()
+    @staticmethod
+    def set_push_status():
+        GlobalVar.first_product_push_to_coop = True
+
+    @staticmethod
+    def get_push_status():
+        return GlobalVar.first_product_push_to_coop
