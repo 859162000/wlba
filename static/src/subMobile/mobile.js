@@ -596,7 +596,8 @@ org.regist = (function (org) {
                         'validate_code': $validation.val(),
                         'invite_code': token,
                         'tid': tid,
-                        'invite_phone': invite_phone
+                        'invite_phone': invite_phone,
+                        
                     },
                     beforeSend: function () {
                         $submit.text('注册中,请稍等...');
@@ -2794,6 +2795,7 @@ org.redpacket = (function(org){
     var lib = {
         init: function(){
             lib._checkFrom();
+            lib.shareOk();
         },
         _checkFrom: function () {
             org.ui.focusInput({
@@ -2807,10 +2809,19 @@ org.redpacket = (function(org){
                     'activeBg': '#DB493F'
                 }
             });
+        },
+        shareOk: function(){
+            var url = window.location.protocol +"//" + window.location.host;
+            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'', shareMainTit:'网利宝天天送我钱，连拿7天还送大礼包！', shareBody:'速来抢钱', success:lib.shareFn};
+            org.detail.share(share, true);
+        },
+        redpacket_bind: function(){
+
         }
     }
     return {
         init: lib.init
+
     }
 })(org);
 
@@ -2822,6 +2833,7 @@ org.redpacket_bind = (function(org){
         init: function(){
             lib._checkFrom();
             lib._captcha_refresh();
+            lib.shareOk();
             //刷新验证码
             lib.$captcha_img.on('click', function () {
                 lib._captcha_refresh();
@@ -2838,15 +2850,16 @@ org.redpacket_bind = (function(org){
             var $phone = $("input.tel-inp"),
                 $captcha = $('input.captcha-inp'),
                 $captcha_0 = $("input[name=captcha_0]"),
-                $captcha_1 = $("input[name=captcha_1]"),
-                $getValidate = $('button.wx-validation-btn');
+                $validate = $('input.validate_inp'),
+                $getValidate = $('button.wx-validation-btn'),
+                $submit = $('button.service-login-btn');
 
             org.ui.focusInput({
-                submit: $('button.service-login-btn'),
+                submit: $submit,
                 inputList: [
                     {target: $phone, required: true},
                     {target: $captcha, required: true},
-                    {target: $('input.validate_inp'), required: true}
+                    {target: $validate, required: true}
                 ],
                 submitStyle: {
                     'disabledBg': '#cbcbcb',
@@ -2878,7 +2891,7 @@ org.redpacket_bind = (function(org){
                     url: '/api/phone_validation_code/register/' + phoneNumber + '/',
                     data: {
                         captcha_0: $captcha_0.val(),
-                        captcha_1: $captcha_1.val(),
+                        captcha_1: $captcha.val()
                     },
                     type: 'POST',
                     error: function (xhr) {
@@ -2910,8 +2923,32 @@ org.redpacket_bind = (function(org){
                         re = new RegExp(/^1[0-9]{10}$/);
                     re.test($.trim(val)) ? isRight = true : (org.ui.showSign('请输入正确的手机号'), isRight = false);
                     return isRight;
+                },
+                isEmpty: function(val){
+                    var isRight = false;
+                    $.trim(val) === "" ? (org.ui.showSign('请输入正确的手机号'), isRight = false) : isRight = true;
+                    return isRight;
                 }
-            }
+            };
+            $submit.on("click", function(){
+                var isSubmit = true;
+                $.each([$phone, $captcha, $validate], function(i, t){
+                    var name = t.attr('name'),
+                        val = t.val();
+                    var fun = check[name] ? check[name] : check['isEmpty'];
+                    if(!fun(val)){
+                        return isSubmit = false;
+                    }
+                });
+                if(!isSubmit) return false;
+                console.log(2);
+
+            });
+        },
+        shareOk: function(){
+            var url = window.location.protocol +"//" + window.location.host;
+            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'', shareMainTit:'网利宝天天送我钱，连拿7天还送大礼包！', shareBody:'速来抢钱', success:lib.shareFn};
+            org.detail.share(share, true);
         }
     }
     return {
