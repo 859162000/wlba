@@ -353,27 +353,6 @@ $(function(){
         document.addEventListener("touchmove",function(e){
             e.preventDefault();
         },false);
-         /* document.touchmove= function(e){
-            e.preventDefault();
-        }*/
-        /*var posStart = 0;//初始化起点坐标
-        var posEnd = 0;//初始化终点坐标
-        function initEvent() {
-            document.addEventListener("touchstart", function(event) {
-                //event.preventDefault();//阻止浏览器默认行为
-                posStart = 0;
-                posStart = event.touches[0].pageY;//获取起点坐标
-            });
-            document.addEventListener("touchend", function(event) {
-                //event.preventDefault();
-                posEnd = 0;
-                posEnd = event.changedTouches[0].pageY;//获取终点坐标
-                if(posStart - posEnd > 20 ){
-                    alert("Cancel");
-                };
-            });
-        };*/
-        //initEvent();
         $(".again_btn").bind("click",function(){
             $(".reward_page").hide();
             $("#box").show();
@@ -482,29 +461,7 @@ $(function(){
         $(".sx").click(function(){
             sxyzm();
         });
-        $(window).resize(function(){
-           // alert("########");
-            //alert(window.innerHeight);
-            //if($("body").offset().top>-1) {
-            $("body").offset({"top": 0, "left": 0});
-            //}
-        })
-//        alert(window.innerHeight);
-        $(".iphone input").focus(function(e){
-           // e.preventDefault();
-            if($("body").offset().top>-1) {
-                $("body").offset({"top": -280, "left": 0});
-            }
-        }).blur(function(){
-            if($("body").offset().top>-1) {
-                $("body").offset({"top": 0, "left": 0});
-            }
-        })
-        $(".srdx input").focus(function(){
-            $("body").offset({"top":-80,"left":0});
-        }).blur(function(){
-            $("body").offset({"top":0,"left":0});
-        })
+
         $(".hqdx input").click(function(){
             $(this).attr("disabled","disabled");
             $(this).css("background-image","url(/static/imgs/sub_weixin/eatcoin/un_get_note.png)");
