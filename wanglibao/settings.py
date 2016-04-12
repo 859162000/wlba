@@ -183,7 +183,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
     }
 
 import sys
@@ -1264,8 +1264,7 @@ SUIT_CONFIG = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
-# REDIS_PASSWORD = 'wanglibank_redis'
-REDIS_PASSWORD = ''
+REDIS_PASSWORD = 'wanglibank_redis'
 
 # CACHES = {
 #     'default': {

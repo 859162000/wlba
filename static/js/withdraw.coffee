@@ -69,43 +69,52 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         minlength: $.format("验证码至少输入1位")
       trade_pwd:
         required: '请输入交易密码'
-
+  geetestStatus = ''
   $.ajax
     type: 'POST'
     url: '/api/geetest/'
     dataType: 'json'
+    timeout: 5000
     data:{
         type : 'get'
     }
   .success (data)->
+    geetestStatus = 'true'
     config = {
         gt: data.gt,
         challenge: data.challenge,
         product: "popup",
         offline: !data.success
     }
+    $.modal.close()
     initGeetest(config, (captchaObj) ->
         captchaObj.appendTo("#captcha-box");
         captchaObj.bindOn(".ispan4-omega");
         captchaObj.onSuccess ()->
+          $.modal.close()
           array = captchaObj.getValidate();
           _sendSMSFun(array);
         captchaObj.onFail ()->
         captchaObj.onRefresh ()->
         captchaObj.getValidate();
     )
-#  $('.ispan4-omega').click () ->
-##    $('.code-img-error').html('')
-##    $('#img-code-div2').find('#id_captcha_1').val('')
-##    _refreshCode()
-#    $('#img-code-div2').modal()
+  .error (data)->
+    geetestStatus = 'false'
+
+  $('.ispan4-omega').click () ->
+    if (geetestStatus == 'false') || (geetestStatus == '')
+      $('.captcha-box2').show()
+      $('.code-img-error').html('')
+      $('#img-code-div2').find('#id_captcha_1').val('')
+      _refreshCode()
+      $('#img-code-div2').modal()
 
 
   $('.captcha-refresh').click ->
     _refreshCode()
 
   _refreshCode = ()->
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/"
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date())
     $.getJSON url, {}, (json)->
       $('input[name="captcha_0"]').val(json.key)
       $('img.captcha').attr('src', json.image_url)
@@ -115,15 +124,16 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     if $(element).attr 'disabled'
       return;
     phoneNumber = $(element).attr("data-phone")
+    if (array == '') || (array == undefined)
+      captcha_0 = $('#id_captcha_0').val()
+      captcha_1 = $('.captcha').val()
+      dataStr='captcha_0='+captcha_0+'&captcha_1='+captcha_1
+    else
+      dataStr = 'type=geetest'+'&geetest_validate='+ array.geetest_validate+'&geetest_seccode='+array.geetest_seccode+'&geetest_challenge='+array.geetest_challenge
     $.ajax
       url: "/api/phone_validation_code/" + phoneNumber + "/"
       type: "POST"
-      data: {
-        type: 'geetest',
-        geetest_validate: array.geetest_validate,
-        geetest_seccode: array.geetest_seccode,
-        geetest_challenge: array.geetest_challenge
-      }
+      data: dataStr
     .fail (xhr)->
       clearInterval(intervalId)
       $(element).text('重新获取')
@@ -131,13 +141,23 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       $(element).addClass 'button-red'
       $(element).removeClass 'button-gray'
       result = JSON.parse xhr.responseText
-      $('#codeError').text(result.message)
+      if (array == '') || (array == undefined)
+        if result.type == 'captcha'
+          $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message)
+        else
+          if xhr.status >= 400
+            tool.modalAlert({title: '温馨提示', msg: result.message})
+      else
+         $('#codeError').text(result.message)
+
     .success ->
-      $('#codeError').text('')
+      $('#codeError,.code-img-error').text('')
       element.attr 'disabled', 'disabled'
       element.removeClass 'button-red'
       element.addClass 'button-gray'
       $('.voice-validate').attr 'disabled', 'disabled'
+      if (array == '') || (array == undefined)
+        $.modal.close()
 
     intervalId
     count = 60
@@ -164,7 +184,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     timerFunction()
     intervalId = setInterval timerFunction, 1000
 
-#  $("#submit-code-img4").click (e) ->
+  $("#submit-code-img4").click (e) ->
+    _sendSMSFun()
 #    element = $('#button-get-code-btn')
 #    if $(element).attr 'disabled'
 #      return;

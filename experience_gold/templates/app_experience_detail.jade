@@ -1,0 +1,44 @@
+- load formatters
+doctype html
+html(style="background:#5ab5f1")
+    head
+        include include/app_header.jade
+        link(href="/static/styles/mobile_activity/app_experience_detail.css?v=2016041101", rel="stylesheet")
+        body
+            - csrf_token
+            .experience-detail-box
+                .detail-box1
+                    .new-user-icon
+                    .box1-top
+                        img(src='/static/imgs/mobile_activity/app_experience_detail/background_tyj.png')
+                    .box1-content
+                        p 预计年化收益
+                        p.p3
+                            span 10.0
+                            label %
+                        p 投资期限1天
+                        .line.mt1
+                        .tyj
+                            span 28888
+                            label 元
+                        .line
+                        .account-info
+                            span 您的账户余额：0.00 元
+                            a(href='javascript:void(0)') 充值
+                        .tyj-info
+                            p.money-info
+                                span.fl 投资金额：
+                                    i 1元
+                                span.fr 体验标金额：
+                                    i 28888元
+                            p 回款时间：2016-03-18 10:53:07
+
+    script(src="/static/scripts/component/webview.js?v=22222222")
+    script(src="/static/scripts/mobile_activity/app_experience.js?v=27131222111")
+    script.
+        var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+        if (ios) {
+            document.getElementById('ios-show').style.display = 'block';
+        }
