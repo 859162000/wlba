@@ -27,6 +27,7 @@ MARGIN_CATALOG_MAPPING = {
     u"全民淘金": u"佣金收益",
     u"体验金利息冲减": u"系统清算",
     u"活动收益冲减": u"系统清算",
+    u"系统清算": u"系统清算",
 }
 
 # 资金流水前后台字段中资金增减对照表,
@@ -49,6 +50,7 @@ MARGIN_CATALOG_SIGN_MAPPING = {
     u"全民淘金": u"+",
     u"体验金利息冲减": u"-",
     u"活动收益冲减": u"-",
+    u"系统清算": u"-",
 }
 
 
@@ -76,7 +78,7 @@ def margin_records(request):
         obj = {
             "id": record.id,
             "catalog": MARGIN_CATALOG_MAPPING.get(record.catalog, record.catalog),
-            "catalog_sign": MARGIN_CATALOG_SIGN_MAPPING.get(record.catalog, record.catalog),
+            "catalog_sign": MARGIN_CATALOG_SIGN_MAPPING.get(record.catalog, ''),
             "create_time": util.fmt_dt_normal(util.local_datetime(record.create_time)),
             "amount": float(record.amount),
             "margin_current": float(record.margin_current),

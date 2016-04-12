@@ -19,7 +19,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
-    var addFormValidateor, max_amount, min_amount, _refreshCode, _sendSMSFun, _showModal;
+    var addFormValidateor, max_amount, min_amount, _refreshCode, _showModal;
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
@@ -90,33 +90,11 @@
         }
       }
     });
-    $.ajax({
-      type: 'POST',
-      url: '/api/geetest/',
-      dataType: 'json',
-      data: {
-        type: 'get'
-      }
-    }).success(function(data) {
-      var config;
-      config = {
-        gt: data.gt,
-        challenge: data.challenge,
-        product: "popup",
-        offline: !data.success
-      };
-      return initGeetest(config, function(captchaObj) {
-        captchaObj.appendTo("#captcha-box");
-        captchaObj.bindOn(".ispan4-omega");
-        captchaObj.onSuccess(function() {
-          var array;
-          array = captchaObj.getValidate();
-          return _sendSMSFun(array);
-        });
-        captchaObj.onFail(function() {});
-        captchaObj.onRefresh(function() {});
-        return captchaObj.getValidate();
-      });
+    $('.ispan4-omega').click(function() {
+      $('.code-img-error').html('');
+      $('#img-code-div2').modal();
+      $('#img-code-div2').find('#id_captcha_1').val('');
+      return _refreshCode();
     });
     $('.captcha-refresh').click(function() {
       return _refreshCode();
@@ -129,21 +107,21 @@
         return $('img.captcha').attr('src', json.image_url);
       });
     };
-    _sendSMSFun = function(array) {
-      var count, element, intervalId, phoneNumber, timerFunction;
+    $("#submit-code-img4").click(function(e) {
+      var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
       element = $('#button-get-code-btn');
       if ($(element).attr('disabled')) {
         return;
       }
       phoneNumber = $(element).attr("data-phone");
+      captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
+      captcha_1 = $(this).parents('form').find('.captcha').val();
       $.ajax({
         url: "/api/phone_validation_code/" + phoneNumber + "/",
         type: "POST",
         data: {
-          type: 'geetest',
-          geetest_validate: array.geetest_validate,
-          geetest_seccode: array.geetest_seccode,
-          geetest_challenge: array.geetest_challenge
+          captcha_0: captcha_0,
+          captcha_1: captcha_1
         }
       }).fail(function(xhr) {
         var result;
@@ -153,13 +131,22 @@
         $(element).addClass('button-red');
         $(element).removeClass('button-gray');
         result = JSON.parse(xhr.responseText);
-        return $('#codeError').text(result.message);
+        if (result.type === 'captcha') {
+          return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
+        } else {
+          if (xhr.status >= 400) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message
+            });
+          }
+        }
       }).success(function() {
-        $('#codeError').text('');
         element.attr('disabled', 'disabled');
         element.removeClass('button-red');
         element.addClass('button-gray');
-        return $('.voice-validate').attr('disabled', 'disabled');
+        $('.voice-validate').attr('disabled', 'disabled');
+        return $.modal.close();
       });
       intervalId;
       count = 60;
@@ -185,7 +172,7 @@
       };
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
-    };
+    });
     $(".voice").on('click', '.voice-validate', function(e) {
       var element, url;
       e.preventDefault();
