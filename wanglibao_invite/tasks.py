@@ -7,7 +7,7 @@ from .models import WechatUserDailyReward, InviteRelation
 from utils import sendDailyReward
 
 @app.task
-def processInviteReward(openid, user_id):
+def processShareInviteDailyReward(openid, user_id):
     w_user = WeixinUser.objects.get(openid=openid)
     rewards = WechatUserDailyReward.objects.filter(w_user=w_user, status=False).all()
     user = User.objects.get(user_id)

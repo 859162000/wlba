@@ -18,36 +18,32 @@ REWARD_TYPE = (
 )
 
 class InviteRelation(models.Model):
-    user = models.ForeignKey(User)
-    inviter = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name="invited", null=False)
+    inviter = models.ForeignKey(User, null=False, related_name="inviter")
     activity_code = models.CharField(u'活动代码*', max_length=64, null=True)
 
 class UserExtraInfo(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     invite_experience_amount = models.FloatField(null=False, default=0, verbose_name=u'体验金金额')
 
 
-class InviteRewardRecord(models.Model):
-    ACTION = (
-        ('R', u'注册'),
-        ('L', u'登录'),
-        ('V', u'实名认证'),
-        ('D', u'充值'),
-        ('B', u'购买'),
-        ('FB', u'首次购买'),
-    )
-    invite_relation = models.ForeignKey(InviteRelation)
-    action = models.CharField(max_length=10, blank=False, null=False, choices=ACTION)
-    reward_type = models.CharField(u'奖品类型', max_length=20, choices=REWARD_TYPE)
-    redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID', null=True)
-    experience_gold_record_id = models.IntegerField(default=0, verbose_name=u'体验金发放流水ID', null=True)
-    status = models.BooleanField(default=False, verbose_name=u'是否成功')
-    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
+# class InviteRewardRecord(models.Model):
+#     ACTION = (
+#         ('R', u'注册'),
+#         ('L', u'登录'),
+#         ('V', u'实名认证'),
+#         ('D', u'充值'),
+#         ('B', u'购买'),
+#         ('FB', u'首次购买'),
+#     )
+#     invite_relation = models.ForeignKey(InviteRelation)
+#     action = models.CharField(max_length=10, blank=False, null=False, choices=ACTION)
+#     reward_type = models.CharField(u'奖品类型', max_length=20, choices=REWARD_TYPE)
+#     redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID', null=True)
+#     experience_gold_record_id = models.IntegerField(default=0, verbose_name=u'体验金发放流水ID', null=True)
+#     status = models.BooleanField(default=False, verbose_name=u'是否成功')
+#     created_at = models.DateTimeField(auto_now=True, default=timezone.now)
 
-
-# class WechatInviteRelation(models.Model):
-#     inviter = models.ForeignKey(User)
-#     w_user_invited = models.ForeignKey(WeixinUser)
 
 
 class WechatUserDailyReward(models.Model):

@@ -5,7 +5,7 @@ import datetime
 from django.db import transaction
 from weixin.util import getMiscValue
 from weixin.models import WeixinUser
-from .models import WechatUserDailyReward, InviteRelation, InviteRewardRecord, UserExtraInfo
+from .models import WechatUserDailyReward, InviteRelation, UserExtraInfo
 from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_message_for_hby, get_start_end_time
 from wanglibao_redpack.models import RedPackEvent
 from experience_gold.backends import SendExperienceGold
@@ -79,34 +79,34 @@ def sendDailyReward(user, daily_reward_id, save_point=False):
         daily_reward.save()
         return 0, "ok"
 
-def sendInviteReward(user):
-    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
-    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0, "invite_experience_id":1}
-    share_invite_config = getMiscValue("share_invite_config")
-    base_experience_amount = share_invite_config.get('base_experience_amount', 0)
-    # InviteRewardRecord
-    inv_relation = InviteRelation.objects.filter(user=user).first()
-    if inv_relation:
-        inviter = inv_relation.inviter
-        if inviter:
-            inviter_extra = UserExtraInfo.objects.filter(user=inviter).first()
-            if inviter_extra.invite_experience_amount < base_experience_amount:
-                #todo
-                invite_experience_id = share_invite_config['invite_experience_id']
-                SendExperienceGold(user).send(pk=invite_experience_id)
-
-def sendInvestReward(user):
-    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
-    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0, "invite_experience_id":1}
-    share_invite_config = getMiscValue("share_invite_config")
-    # InviteRewardRecord
-    inv_relation = InviteRelation.objects.filter(user=user).first()
-    if inv_relation:
-        inviter = inv_relation.inviter
-        if inviter:
-            first_buy = P2PRecord.objects.filter(user=user,
-                                                 # create_time__gt=
-                                                 ).order_by('create_time').first()
+# def sendInviteReward(user):
+#     # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
+#     # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0, "invite_experience_id":1}
+#     share_invite_config = getMiscValue("share_invite_config")
+#     base_experience_amount = share_invite_config.get('base_experience_amount', 0)
+#     # InviteRewardRecord
+#     inv_relation = InviteRelation.objects.filter(user=user).first()
+#     if inv_relation:
+#         inviter = inv_relation.inviter
+#         if inviter:
+#             inviter_extra = UserExtraInfo.objects.filter(user=inviter).first()
+#             if inviter_extra.invite_experience_amount < base_experience_amount:
+#                 #todo
+#                 invite_experience_id = share_invite_config['invite_experience_id']
+#                 SendExperienceGold(user).send(pk=invite_experience_id)
+#
+# def sendInvestReward(user):
+#     # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
+#     # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0, "invite_experience_id":1}
+#     share_invite_config = getMiscValue("share_invite_config")
+#     # InviteRewardRecord
+#     inv_relation = InviteRelation.objects.filter(user=user).first()
+#     if inv_relation:
+#         inviter = inv_relation.inviter
+#         if inviter:
+#             first_buy = P2PRecord.objects.filter(user=user,
+#                                                  # create_time__gt=
+#                                                  ).order_by('create_time').first()
 
 
 

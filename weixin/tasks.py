@@ -14,25 +14,29 @@ from weixin.models import SubscribeRecord, SubscribeService, WeixinUser, WeixinA
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
 from weixin.util import sendTemplate, getMiscValue
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
+from wanglibao_invite.tasks import processShareInviteDailyReward
 
 
 @app.task
 def bind_ok(openid, is_first_bind):
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+    user = weixin_user.user
     if is_first_bind:
         from wanglibao_activity.backends import check_activity
-        check_activity(weixin_user.user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
+        check_activity(user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
     else:
         sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                                     "openid":weixin_user.openid,
                                     "template_id":BIND_SUCCESS_TEMPLATE_ID,
                                     "name1":"",
-                                    "name2":weixin_user.user.wanglibaouserprofile.phone,
+                                    "name2":user.wanglibaouserprofile.phone,
                                     "time":now_str,
                                         })},
                                     queue='celery02'
                                     )
+    processShareInviteDailyReward.apply_async(
+            kwargs={'openid': openid, 'user_id': user.id})
 
 @app.task
 def detect_product_biding(product_id):
