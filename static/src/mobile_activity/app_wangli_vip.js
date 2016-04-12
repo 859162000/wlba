@@ -46,10 +46,10 @@
 	});
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
-			shareName = '网利宝会员初体验，邀你来体验',
+			shareName = '网利宝会员初体验',
 			shareImg = host + '/static/imgs/mobile_activity/app_wangli_vip/300x300.jpg',
 			shareLink = host + 'activity/app_wangli_vip/',
-			shareMainTit = '网利宝会员初体验，邀你来体验',
+			shareMainTit = '网利宝会员初体验',
 			shareBody = '多种特权接入中，总有一款适合你！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
@@ -60,7 +60,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝会员初体验，邀你来体验',
+			title: '网利宝会员初体验',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -72,7 +72,4 @@
 			imgUrl: shareImg
 		})
 	})
-
-
-
 })(org);
