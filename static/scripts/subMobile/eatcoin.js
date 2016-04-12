@@ -350,30 +350,10 @@ $(function(){
                 cunt++;
             }
         }, 500);
+
         document.addEventListener("touchmove",function(e){
             e.preventDefault();
         },false);
-         /* document.touchmove= function(e){
-            e.preventDefault();
-        }*/
-        /*var posStart = 0;//初始化起点坐标
-        var posEnd = 0;//初始化终点坐标
-        function initEvent() {
-            document.addEventListener("touchstart", function(event) {
-                //event.preventDefault();//阻止浏览器默认行为
-                posStart = 0;
-                posStart = event.touches[0].pageY;//获取起点坐标
-            });
-            document.addEventListener("touchend", function(event) {
-                //event.preventDefault();
-                posEnd = 0;
-                posEnd = event.changedTouches[0].pageY;//获取终点坐标
-                if(posStart - posEnd > 20 ){
-                    alert("Cancel");
-                };
-            });
-        };*/
-        //initEvent();
         $(".again_btn").bind("click",function(){
             $(".reward_page").hide();
             $("#box").show();
@@ -482,29 +462,7 @@ $(function(){
         $(".sx").click(function(){
             sxyzm();
         });
-        $(window).resize(function(){
-           // alert("########");
-            //alert(window.innerHeight);
-            //if($("body").offset().top>-1) {
-            $("body").offset({"top": 0, "left": 0});
-            //}
-        })
-//        alert(window.innerHeight);
-        $(".iphone input").focus(function(e){
-           // e.preventDefault();
-            if($("body").offset().top>-1) {
-                $("body").offset({"top": -280, "left": 0});
-            }
-        }).blur(function(){
-            if($("body").offset().top>-1) {
-                $("body").offset({"top": 0, "left": 0});
-            }
-        })
-        $(".srdx input").focus(function(){
-            $("body").offset({"top":-80,"left":0});
-        }).blur(function(){
-            $("body").offset({"top":0,"left":0});
-        })
+        var djs;
         $(".hqdx input").click(function(){
             $(this).attr("disabled","disabled");
             $(this).css("background-image","url(/static/imgs/sub_weixin/eatcoin/un_get_note.png)");
@@ -513,7 +471,7 @@ $(function(){
             var param = {"captcha_0":$(".img_yzm img").attr("key"),"captcha_1":$(".input_yzm input").val()};
             $(this).hide().siblings().show();
             var self = this
-            var djs = setInterval(function(){
+            djs = setInterval(function(){
                 if(dxsj==1){
                     $(self).removeAttr("disabled");
                     $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
@@ -603,6 +561,8 @@ $(function(){
         $(".yz_tc .close").click(function(){
             $(".blank").hide();
             $(this).parent().hide();
+            clearInterval(djs);
+            $(".hqdx input").show().siblings().hide().text("60秒后重发")
         })
         window.addEventListener('orientationchange', function(event){
             if( window.orientation == 90 || window.orientation == -90 ) {
