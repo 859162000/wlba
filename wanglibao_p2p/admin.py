@@ -16,9 +16,9 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminP2PList, AdminPrepayment
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_p2p.forms import RequiredInlineFormSet,ContractTemplateForm
+from wanglibao_p2p.forms import RequiredInlineFormSet, ContractTemplateForm
 from wanglibao_account.models import UserAddress
-from wanglibao_p2p.tasks import automatic_trade, coop_product_push
+from wanglibao_p2p.tasks import automatic_trade
 
 formsets.DEFAULT_MAX_NUM = 2000
 
@@ -339,10 +339,6 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         #     except:
         #         pass
         super(P2PProductAdmin, self).save_model(request, obj, form, change)
-
-        if obj.status == u'正在招标':
-            products = P2PProduct.objects.filter(pk=obj.id)
-            coop_product_push(products)
 
         """
         # 停止这个入口，从watch进入自动投标
