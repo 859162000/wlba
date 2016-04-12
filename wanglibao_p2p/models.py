@@ -44,7 +44,7 @@ class P2PProduct(models.Model):
 
     warrant_company = models.CharField(u'担保公司', max_length=64)
 
-    flow_time = models.DateTimeField(u'流标时间', default=timezone.now(), db_index=True)
+    flow_time = models.DateTimeField(u'流标时间', default=timezone.now(), blank=True, db_index=True)
 
     def save(self, *args, **kwargs):
         if self.status == u'流标':
