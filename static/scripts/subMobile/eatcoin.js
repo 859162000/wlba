@@ -34,6 +34,14 @@ $.ajaxSetup({
         }
     }
 });
+window.alert = function(name){
+    var iframe = document.createElement("IFRAME");
+    iframe.style.display="none";
+    iframe.setAttribute("src", 'data:text/plain,');
+    document.documentElement.appendChild(iframe);
+    window.frames[0].window.alert(name);
+    iframe.parentNode.removeChild(iframe);
+}
 
 $(function(){
     var box = $('#box');
@@ -44,12 +52,12 @@ $(function(){
     var ca=document.getElementById("canvas");//获取画布元素
     var ctx=ca.getContext("2d");//设定画布为2d展示
     var bj1=new Image();//定义背景对象
-    var player=new Image();//定义人的对象
+    var player=new Image();//定义猴子的对象
     var tu=new Array();//定义金币的对象
     bj1.src="/static/imgs/sub_weixin/eatcoin/bj.png";//为背景设置图片
-    player.src="/static/imgs/sub_weixin/eatcoin/monkeyPending.gif";//为人物设置图片
-    var playerWidth =window.innerWidth*0.347;//285;//*B;//人物的宽度
-    var playerHeight =window.innerHeight*0.325;//*B;//人物的高度
+    player.src="/static/imgs/sub_weixin/eatcoin/monkeyPending.gif";//为猴子设置图片
+    var playerWidth =window.innerWidth*0.347;//猴子的宽度
+    var playerHeight =window.innerHeight*0.325;//猴子的高度
     var h=20;
     var sudu = 30;
     var zl=100;
@@ -87,10 +95,7 @@ $(function(){
             type:"get",
             async:false,
             url:"/api/user_exists/"+phone+"/",
-            dataType:"json",
-            //success:function(data){
-            //    return data.existing;
-            //}
+            dataType:"json"
         }).done(function(data){
             isreg = data.existing;
         });
@@ -130,7 +135,7 @@ $(function(){
                     }
                 }*/
                 tu[j].x=i;
-                tu[j].y=0;
+                tu[j].y=-100;
                 var tu1 = tu[j];
             }
            chi++;
@@ -243,7 +248,7 @@ $(function(){
         var djs = setInterval(function(){
             if(js>1) {
                 js--;
-                $(".djs").find("span").text(js)
+                $(".djs").text(js)
             }else{
                 clearInterval(djs);
                 $(".blank").hide();
@@ -322,9 +327,12 @@ $(function(){
         });
     }
     $(document).ready(function() {
-        setTimeout(function () {
-            $(window).scrollTop(1);
-        }, 0);
+
+        //document.body.scrollTop = 100;
+        /*setInterval(function () {
+            $(window).scrollTop(0);
+        }, 0);*/
+        //IOS下自动播放背景音乐
         document.getElementById('car_audio').play();
         document.addEventListener("WeixinJSBridgeReady", function () {
             WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
@@ -332,28 +340,19 @@ $(function(){
             });
         }, false);
         var cunt = 0;
-
-       // $("img").load(function(){
-        //   console.log(immgInx+1);
-        //    if(immgInx++==imgNum){
-        //       if(cunt==0) {
-         //          alert(imgNum);
-                   var progress = setInterval(function () {
-                       $(".loaded").css("background-size", cunt * 10 + "%" + " " + "100%");
-                       if (cunt == 11) {
-                           clearInterval(progress);
-                           $(".loadding_page").hide();
-                           $(".start_page").show();
-                       }else{
-                           cunt++;
-                       }
-                   }, 500);
-         //      }
-        //    }
-        //});
-        document.ontouchmove = function(e){
+        var progress = setInterval(function () {
+            $(".loaded").css("background-size", cunt * 10 + "%" + " " + "100%");
+            if (cunt == 11) {
+                clearInterval(progress);
+                $(".loadding_page").hide();
+                $(".start_page").show();
+            }else{
+                cunt++;
+            }
+        }, 500);
+        document.addEventListener("touchmove",function(e){
             e.preventDefault();
-        }
+        },false);
         $(".again_btn").bind("click",function(){
             $(".reward_page").hide();
             $("#box").show();
@@ -367,7 +366,7 @@ $(function(){
             fs = 0;
             h = 20;
             sudu = 30;
-            $(".djs span").text(3);
+            $(".djs").text(3);
             start();
         });
 
@@ -395,7 +394,12 @@ $(function(){
             $(".logo").hide();
             start();
         });
-
+        $(".blank").click(function(){
+            if(!$(".fxts").is(":hidden")){
+                $(this).hide();
+                $(".fxts").hide();
+            }
+        })
         $(".get_reward_btn").bind("click",function(){
             var total = $(".jbsl").text();
             if($(".iphone input").is(":hidden")){
@@ -411,6 +415,8 @@ $(function(){
                         $(".blank").show();
                         $(".yz_tc").show();
                         $(".phone input").val(phone);
+                        $(".input_yzm input").val("");
+                        $(".srdx input").val("");
                         sxyzm();
                     }
                 } else{
@@ -443,7 +449,9 @@ $(function(){
                         $(".fx").show();
                         $(".blank").hide();
                     }else if(data.ret_code=1001){
-                        alert("每个用户一天只能领取一次奖励");
+                        //alert("每个用户一天只能领取一次奖励");
+                        $(".lq").hide();
+                        $(".zlyc").show();
                     }else{
                         alert(data.message);
                     }
@@ -453,6 +461,7 @@ $(function(){
         $(".sx").click(function(){
             sxyzm();
         });
+
         $(".hqdx input").click(function(){
             $(this).attr("disabled","disabled");
             $(this).css("background-image","url(/static/imgs/sub_weixin/eatcoin/un_get_note.png)");
@@ -483,23 +492,14 @@ $(function(){
 
                 },
                 error:function(XMLHttpRequest, textStatus, errorThrown){
-                     //console.log(XMLHttpRequest);
-                    //console.log(textStatus);
-                    //console.log(errorThrown);
                     alert(new Function('return '+XMLHttpRequest.responseText)().message);
-                    //alert(eval("(" + data.responseText+ ")").message);
-                   //alert(data.responseText);
-                    //alert(data.responseText.split(":")[1].split('"')[1]);
-                    //if(eval("(" + data.responseText+ ")").message=="图片验证码错误"){
-                        sxyzm();
-                        $(".input_yzm input").val();
-                        $(self).removeAttr("disabled");
-                        $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
-                        $(self).show().siblings().hide();
-                        $(self).siblings().text("60秒后重发");
-                        clearInterval(djs);
-                   // };
-                    //alert(eval("(" + data.responseText+ ")").message);
+                    sxyzm();
+                    $(".input_yzm input").val();
+                    $(self).removeAttr("disabled");
+                    $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
+                    $(self).show().siblings().hide();
+                    $(self).siblings().text("60秒后重发");
+                    clearInterval(djs);
                 }
             })
         })
@@ -588,3 +588,4 @@ $(function(){
         })
     })
 });
+

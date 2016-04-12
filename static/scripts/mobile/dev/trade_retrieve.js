@@ -442,7 +442,7 @@ webpackJsonp([15],[
 	    phone: function phone(str) {
 	        var phone = parseInt($.trim(str)),
 	            error = '请输入正确的手机号',
-	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0123456789])[0-9]{8}$/);
 
 	        if (re.test(phone)) {
 	            return [true, ''];

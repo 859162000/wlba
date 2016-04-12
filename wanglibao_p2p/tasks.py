@@ -28,6 +28,7 @@ from wanglibao_account.tasks import common_callback_for_post
 from marketing.utils import get_user_channel_record
 from django.conf import settings
 from wanglibao_p2p.utility import get_user_margin, get_p2p_equity
+from . import GlobalVar
 
 logger = get_task_logger(__name__)
 
@@ -217,15 +218,17 @@ def p2p_auto_ready_for_settle():
 
 
 @app.task
-def coop_product_push(products=None):
+def coop_product_push(product_id=None):
     product_query_status = [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核',
                             u'满标已审核', u'还款中', u'流标']
-    if not products:
+    if not product_id:
         products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
                                              (Q(status__in=product_query_status) |
                                               (Q(status=u'已完成') &
                                                Q(make_loans_time__isnull=False) &
                                                Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+    else:
+        products = P2PProduct.objects.filter(pk=product_id)
 
     products = products.values('id', 'version', 'category', 'types__name', 'name',
                                'short_name', 'serial_number', 'status', 'period',
@@ -233,11 +236,12 @@ def coop_product_push(products=None):
                                'excess_earning_description', 'pay_method', 'amortization_count',
                                'repaying_source', 'total_amount', 'ordered_amount',
                                'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
-                               'limit_per_user')
+                               'limit_per_user', 'warrant_company__name')
 
     product_list = [product for product in products]
     for product in product_list:
         product['types'] = product['types__name']
+        product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
         if product['soldout_time']:
@@ -280,3 +284,9 @@ def coop_amortizations_push(amortizations, product_id):
         data = dict(base_data, **act_data)
         common_callback_for_post.apply_async(
             kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_amos_push'})
+
+
+# 只在程序初始化时执行
+if GlobalVar.get_push_status() is False:
+    coop_product_push.apply_async()
+    GlobalVar.set_push_status()
