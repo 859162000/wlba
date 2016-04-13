@@ -15,6 +15,7 @@ import traceback
 from django.utils import timezone
 from django.db.models import Sum
 from django.contrib.auth.models import User
+from common.utils import product_period_to_days
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -867,12 +868,11 @@ class BiSouYiCallback(CoopCallback):
     def register_call_back(self, user_id, order_id, total_asset=0, p2p_margin=0, base_data=None):
         super(BiSouYiCallback, self).register_call_back(user_id, order_id)
         binding = Binding.objects.filter(user_id=user_id).select_related('channel').first()
-        oauth_user = OauthUser.objects.filter(user_id=user_id).select_related('client').first()
         access_token = AccessToken.objects.filter(user_id=user_id).first()
-        if oauth_user and access_token and binding and binding.b_account:
+        if access_token and binding and binding.b_account:
             phone = get_user_phone_for_coop(user_id)
             account = binding.b_account
-            client_id = oauth_user.client.client_id
+            client_id = settings.BISOUYI_CLIENT_ID
             channel_code = binding.channel.code
             access_token = access_token.token
 
@@ -902,13 +902,43 @@ class BiSouYiCallback(CoopCallback):
     def purchase_call_back(self, user_id, order_id):
         super(BiSouYiCallback, self).purchase_call_back(user_id, order_id)
         oauth_user = OauthUser.objects.filter(user_id=user_id).select_related('client').first()
-        if oauth_user:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购',
+                                              order_id=order_id).select_related('product').first()
+        if oauth_user and p2p_record:
+            product = p2p_record.product
+            pay_method = product.pay_method
+            period = product_period_to_days(pay_method, product.period)
             content_data = {
                 'pcode': settings.BISOUYI_PCODE,
                 'yaccount': get_user_phone_for_coop(user_id),
-                'idcard': 1,
-                'tstatus': 1,
+                'idcard': get_id_number_for_coop(user_id)[:18],
+                'name': product.name[:100],
+                'amoney': float(p2p_record.amount),
+                'aperiod': period,
+                'unit': u'天',
+                'adate': timezone.localtime(p2p_record.create_time).strftime('%Y-%m-%d %H:%M:%S'),
+                'rate': product.expected_earning_rate,
+                'guarantee': pay_method,
+                'sdate': '1970-01-01 00:00:00',
+                'edate': '1970-01-01 00:00:00',
+                'bankcard': get_user_phone_for_coop(user_id),
+                'ptype': 1,
+                'ostatus': 1,
+                'pstatus': 1,
+                'bstatus': 1,
             }
+
+            content = generate_bisouyi_content(content_data)
+
+            headers = {
+                'Content-Type': 'application/json',
+                'cid': settings.BISOUYI_CLIENT_ID,
+                'sign': generate_bisouyi_sign(content),
+            }
+
+            common_callback_for_post.apply_async(
+                kwargs={'url': settings.BISOUYI_PURCHASE_PUSH_URL, 'params': json.dumps(content_data),
+                        'channel': 'bisouyi', 'headers': headers})
 
 
 # 第三方回调通道

@@ -1,9 +1,9 @@
 # coding=utf-8
 
 import json
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import User
+from common.utils import product_period_to_days
 from wanglibao_account.tools import str_to_utc
 from .models import P2PEquity, P2PProduct
 from .forms import P2PEquityForm
@@ -130,17 +130,13 @@ def generate_bajinshe_product_data(product):
     return product_data
 
 
-pay_method_for_months = (u'等额本息', u'按月付息', u'到期还本付息')
 p2p_mortgage_type = (u'物流贷', u'过桥周转业务', u'黄金标', u'商圈贷', u'艺术品贷', u'珠宝贷', u'红木贷', u'一般企业贷')
 def generate_bisouyi_product_data(product, action):
     pay_method = product.pay_method
     status = 1 if product.status == u'正在招标' else 0
 
     if action == 'info':
-        period = product.period
-        # 根据支付方式判定标周期的单位（天/月）,如果是单位为月则转换为天
-        if pay_method in pay_method_for_months:
-            period = relativedelta(months=period).days
+        period = product_period_to_days(pay_method, product.period)
 
         product_type = product.types
         if product_type in (u'房贷', u'车贷'):
@@ -155,9 +151,9 @@ def generate_bisouyi_product_data(product, action):
             'type': 2,
             'attribute': _attribute,
             'category': product.category,
-            'name': product.name,
+            'name': product.name[:100],
             'bidmoney': float(product.total_amount),
-            'rate': product.expected_earning_rate, # FixMe
+            'rate': product.expected_earning_rate,
             'period': period,
             'unit': u'1天',
             'progress': product.completion_rate,
