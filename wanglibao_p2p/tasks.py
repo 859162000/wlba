@@ -286,8 +286,6 @@ def coop_amortizations_push(amortizations, product_id):
 
 
 # 只在程序初始化时执行
-print ">>>>>>>>>>a", GlobalVar.get_push_status()
 if GlobalVar.get_push_status() is False:
     # coop_product_push.apply_async()
     GlobalVar.set_push_status(True)
-print ">>>>>>>>>>b", GlobalVar.get_push_status()
