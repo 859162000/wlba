@@ -65,6 +65,14 @@ def get_phone_for_coop(user_id):
         return None
 
 
+def get_id_number_for_coop(user_id):
+    try:
+        id_number = WanglibaoUserProfile.objects.get(user_id=user_id).id_number
+        return id_number[:6] + '***' + id_number[-4:]
+    except:
+        return None
+
+
 def get_user_phone_for_coop(user_id):
     try:
         phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
@@ -670,12 +678,7 @@ class BaJinSheCallback(CoopCallback):
         profit_methods = kwargs['profit_methods']
         state = kwargs['state']
         income_state = kwargs['income_state']
-        reward_data = {
-            'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
-            'income': float(user_amo.interest),
-            'principal': float(user_amo.principal),
-            'incomeState': income_state,
-        }
+
         act_data = {
             'investmentPid': equity.id,
             'bingdingUid': bid,
@@ -690,8 +693,29 @@ class BaJinSheCallback(CoopCallback):
             'apr': product.expected_earning_rate,
             'state': state,
             'purchases': timezone.localtime(equity.created_at).strftime('%Y%m%d%H%M%S'),
-            'reward': [reward_data, ],
         }
+
+        reward_data_list = list()
+        if user_amo.settled and int(user_amo.term) > 1:
+            user_amos = UserAmortization.objects.filter(product=product, user_id=user_amo.user_id).order_by('term')
+            for user_amo in user_amos:
+                reward_data = {
+                    'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
+                    'income': float(user_amo.interest),
+                    'principal': float(user_amo.principal),
+                    'incomeState': income_state,
+                }
+                reward_data_list.append(reward_data)
+        else:
+            reward_data = {
+                'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
+                'income': float(user_amo.interest),
+                'principal': float(user_amo.principal),
+                'incomeState': income_state,
+            }
+            reward_data_list.append(reward_data)
+
+        act_data['reward'] = reward_data_list
 
         if state != 5:
             act_data['bearingDate'] = timezone.localtime(equity.confirm_at).strftime('%Y%m%d%H%M%S')
@@ -882,7 +906,7 @@ class BiSouYiCallback(CoopCallback):
             content_data = {
                 'pcode': settings.BISOUYI_PCODE,
                 'yaccount': get_user_phone_for_coop(user_id),
-                'type': 1,
+                'idcard': 1,
                 'tstatus': 1,
             }
 
