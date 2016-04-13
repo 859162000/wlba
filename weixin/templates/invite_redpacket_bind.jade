@@ -1,0 +1,38 @@
+//-load formatters
+doctype html
+html.service-redpacket-grey
+  head
+    title 活动登录
+    include include/service_head.jade
+  body.service-redpacket-login
+    .logo-leo.mt70
+      img(src="/static/imgs/sub_weixin/redpack_activity/iconfont_logo4@2x.png")
+    .mian-protome.mt20 快输入手机号，领取奖励啊！
+    .input-box
+      .wx-input-public
+        .wx-input-icon.inp-icon-box
+          .phone
+        input(type="tel", autocomplete="off", placeholder="请输入手机号", name="identifier", data-icon="wx-input-icon", data-target2="inp-icon-box", data-target="identifier-edit", data-val="icon-show", data-empty="").wx-input-main.tel-inp
+        .form-edit-icon.identifier-edit
+      .wx-input-public
+        .wx-input-icon.inp-icon-box
+          .captcha
+        input(type="tel", autocomplete="off", placeholder="请输入计算结果", name="captcha_1", data-icon="wx-input-icon", data-target2="inp-icon-box", data-other="wx-validation-btn").wx-input-main.captcha-inp
+        input(type="hidden", name="captcha_0")
+        .wx-validation
+          img(src="", alt="", width="100%", height="100%")#captcha.captcha-img
+      //.wx-input-public
+      //  .wx-input-icon.inp-icon-box
+      //    .captcha
+      //  input(type="tel", autocomplete="off", placeholder="请输入短信验证码", name="validate_code", data-icon="wx-input-icon", data-target2="inp-icon-box").wx-input-main.validate_inp
+      //  .wx-validation
+      //    button(type="button",name='validate_operation', disabled=true).wx-validation-btn 点击获取
+
+    .service-btn-box
+      button(type="submit", disabled="true").service-login-btn 身份认证同时绑定微信
+
+    .safe-box
+      i.safe-icon
+      | 账户自己安全由阳光保险承保
+
+    script(data-init='redpacket_bind', src="/static/scripts/subMobile/mobile.js?20160105")

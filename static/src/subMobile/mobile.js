@@ -2814,14 +2814,10 @@ org.redpacket = (function(org){
             var url = window.location.protocol +"//" + window.location.host;
             var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'', shareMainTit:'网利宝天天送我钱，连拿7天还送大礼包！', shareBody:'速来抢钱', success:lib.shareFn};
             org.detail.share(share, true);
-        },
-        redpacket_bind: function(){
-
         }
     }
     return {
         init: lib.init
-
     }
 })(org);
 
@@ -2833,7 +2829,6 @@ org.redpacket_bind = (function(org){
         init: function(){
             lib._checkFrom();
             lib._captcha_refresh();
-            lib.shareOk();
             //刷新验证码
             lib.$captcha_img.on('click', function () {
                 lib._captcha_refresh();
@@ -2850,7 +2845,7 @@ org.redpacket_bind = (function(org){
             var $phone = $("input.tel-inp"),
                 $captcha = $('input.captcha-inp'),
                 $captcha_0 = $("input[name=captcha_0]"),
-                $validate = $('input.validate_inp'),
+                //$validate = $('input.validate_inp'),
                 $getValidate = $('button.wx-validation-btn'),
                 $submit = $('button.service-login-btn');
 
@@ -2858,8 +2853,7 @@ org.redpacket_bind = (function(org){
                 submit: $submit,
                 inputList: [
                     {target: $phone, required: true},
-                    {target: $captcha, required: true},
-                    {target: $validate, required: true}
+                    {target: $captcha, required: true}
                 ],
                 submitStyle: {
                     'disabledBg': '#cbcbcb',
@@ -2932,7 +2926,7 @@ org.redpacket_bind = (function(org){
             };
             $submit.on("click", function(){
                 var isSubmit = true;
-                $.each([$phone, $captcha, $validate], function(i, t){
+                $.each([$phone, $captcha], function(i, t){
                     var name = t.attr('name'),
                         val = t.val();
                     var fun = check[name] ? check[name] : check['isEmpty'];
@@ -2944,11 +2938,6 @@ org.redpacket_bind = (function(org){
                 console.log(2);
 
             });
-        },
-        shareOk: function(){
-            var url = window.location.protocol +"//" + window.location.host;
-            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'', shareMainTit:'网利宝天天送我钱，连拿7天还送大礼包！', shareBody:'速来抢钱', success:lib.shareFn};
-            org.detail.share(share, true);
         }
     }
     return {
