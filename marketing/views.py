@@ -2700,7 +2700,7 @@ class HappyMonkeyAPIView(APIView):
             (0, 20): u'幸福猴66元体验金',
             (21, 40): u'幸福猴166元体验金',
             (41, 60): u'幸福猴566元体验金',
-            (61, 100000000): u'幸福猴866体验金'
+            (61, 100000000): u'幸福猴866元体验金'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
@@ -2715,26 +2715,34 @@ class HappyMonkeyAPIView(APIView):
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        today = time.strftime("%Y-%m-%d", time.localtime())
+        today = (datetime.datetime.now()+datetime.timedelta(hours=-8)).strftime("%Y-%m-%d")
         user = user.user if user else request.user
-        #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
-        if reward and today == str(reward.create_at)[:10]:
-            to_json_response = {
-                'ret_code': 1001,
-                'message': u'每一个用户,一天只能玩一次',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         #今天用户没有玩过
         with transaction.atomic():
             logger.debug('enter transaction atomic')
             join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.token).first()
             if not join_record:
-                join_record = WanglibaoRewardJoinRecord.objects.create(
-                    user=user,
-                    activity_code=self.token,
-                    remain_chance=1)
+                try:
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code=self.token,
+                        remain_chance=1)
+                except Exception:
+                    to_json_response = {
+                        'ret_code': 1001,
+                        'message': u'每一个用户,一天只能玩一次',
+                    }
+                    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            #今天用户已经玩过了
+            reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
+            if reward and today == str(reward.create_at)[:10]:
+                to_json_response = {
+                    'ret_code': 1001,
+                    'message': u'每一个用户,一天只能玩一次',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
             total = int(request.POST.get('total', None))
             exp_name = ''
