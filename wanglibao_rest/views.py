@@ -1230,7 +1230,7 @@ class StatisticsInside(APIView):
             .filter(catalog='取款预冻结').aggregate(Sum('amount'))
         yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
         
-        # 今日冲值总额
+        # 今日充值总额
         today_deposit = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
             .filter(catalog='现金存入').aggregate(Sum('amount'))
         today_deposit_amount = today_deposit['amount__sum'] if today_deposit['amount__sum'] else Decimal('0')
