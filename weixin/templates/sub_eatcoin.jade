@@ -78,7 +78,7 @@ html(lang='zh-CN')
             img(src='/static/imgs/sub_weixin/eatcoin/Close_bounced.png', width='13.2%', height='13.2%', style='position: absolute;left: 88.4%')
           .phone
             img(src='/static/imgs/sub_weixin/eatcoin/phone_icon.png', width='5.0%', height='7.4%')
-            input(type='tel', maxlength='11', placeholder='输入手机号', value='')
+            input(type='tel', maxlength='11', placeholder='输入手机号', disabled='', value='')
           .yzm
             .input_yzm
               input(type='text', placeholder='输入验证码', value='')
@@ -88,7 +88,7 @@ html(lang='zh-CN')
               img(src='/static/imgs/sub_weixin/eatcoin/sx_yzm.png', width='12.1%', height='66.3%')
           .sjdx
             .srdx
-              input(type='tel', maxlength='6', placeholder='输入短信码', value='')
+              input(type='tel', maxlength='6', placeholder='输入短信码',value='')
             .hqdx
               input(disabled='', type='button')
               span.dxdjs 60秒后重发
@@ -96,9 +96,9 @@ html(lang='zh-CN')
             img(src='/static/imgs/sub_weixin/eatcoin/un_dl_lq.png', width='75.7%', height='16.3%')
       .fx(style='display: none;')
         .cg_txt(style='top: 10%')
-          div(style='font-size: 4vh') 恭喜您
-          div(style='font-size: 3vh')
-            span.jp(style='font-size: 4vh') 888元
+          div(style='font-size: 24px') 恭喜您
+          div(style='font-size:19px')
+            span.jp(style='font-size:24px') 888元
             | 体验金领取成功
         .tyj
           span.jp 888元
