@@ -125,7 +125,6 @@ class Account(models.Model):
         :param lang: Preferred language code, optional
         :return: JSON data
         """
-        logger.debug("-get_user_info**********************app_id:%s,app_secret:%s"%(self.app_id, self.app_secret))
         access_token = self.access_token
         client = WeChatClient(self.app_id, self.app_secret)
         return client._get(
@@ -332,8 +331,6 @@ class WeixinAccounts(object):
     def getByOriginalId(cls, original_id):
         if not cls.data:
             cls.append_account()
-        logger.debug("original_id::%s"%original_id)
-        logger.debug("cls.data::%s"%cls.data)
         for key, account_info in cls.data.items():
             if account_info['id'].strip() == original_id.strip():
                 return cls(key)

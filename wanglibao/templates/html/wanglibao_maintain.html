@@ -322,14 +322,12 @@
     <div class="money"></div>
 	</div>
 
-    <script type="application/javascript">
-        var t = 5;
+    <script>
+        var t = 3;
         function countDown(){
-            var timeSpan = document.getElementById("span_timer");
             t-- ;
-            timeSpan.innerHTML = t;
             if(t <= 0){
-                location.href = "/";
+                location.href = "http://www.wanglibao.com";
                 clearInterval(inter);
             }
         };

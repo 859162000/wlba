@@ -116,20 +116,16 @@
           document.getElementById('wrap').style.marginTop= '-'+h+'px';
           document.getElementById('wrap').style.opacity= '1';
 
-          var time_count = 5;
-          var time_intervalId;
-          var timerFunction = function () {
-              if (time_count > 1) {
-                  time_count--;
-                  return
-              } else {
-                  clearInterval(time_intervalId);
-                  window.location.href = '/weixin/list/'
-              }
-          };
-		  //time_intervalId = setInterval(timerFunction, 1000);
-		  //time_intervalId;
-        }
+          var t = 3;
+        	function countDown(){
+				t-- ;
+				if(t <= 0){
+					location.href = "http://www.wanglibao.com";
+					clearInterval(inter);
+				}
+			};
+			var inter = setInterval(countDown,1000);
+		}
 
     </script>
 </body>

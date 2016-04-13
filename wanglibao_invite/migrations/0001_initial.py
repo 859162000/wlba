@@ -13,15 +13,19 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='invited', to=orm['auth.User'])),
             ('inviter', self.gf('django.db.models.fields.related.ForeignKey')(related_name='inviter', to=orm['auth.User'])),
-            ('activity_code', self.gf('django.db.models.fields.CharField')(max_length=64, null=True)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_invite', ['InviteRelation'])
+
+        # Adding unique constraint on 'InviteRelation', fields ['user', 'inviter']
+        db.create_unique(u'wanglibao_invite_inviterelation', ['user_id', 'inviter_id'])
 
         # Adding model 'UserExtraInfo'
         db.create_table(u'wanglibao_invite_userextrainfo', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
             ('invite_experience_amount', self.gf('django.db.models.fields.FloatField')(default=0)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_invite', ['UserExtraInfo'])
 
@@ -48,6 +52,9 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Removing unique constraint on 'WechatUserDailyReward', fields ['w_user', 'create_date']
         db.delete_unique(u'wanglibao_invite_wechatuserdailyreward', ['w_user_id', 'create_date'])
+
+        # Removing unique constraint on 'InviteRelation', fields ['user', 'inviter']
+        db.delete_unique(u'wanglibao_invite_inviterelation', ['user_id', 'inviter_id'])
 
         # Deleting model 'InviteRelation'
         db.delete_table(u'wanglibao_invite_inviterelation')
@@ -97,17 +104,18 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'wanglibao_invite.inviterelation': {
-            'Meta': {'object_name': 'InviteRelation'},
-            'activity_code': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
+            'Meta': {'unique_together': "(('user', 'inviter'),)", 'object_name': 'InviteRelation'},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'inviter': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'inviter'", 'to': u"orm['auth.User']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'invited'", 'to': u"orm['auth.User']"})
         },
         u'wanglibao_invite.userextrainfo': {
             'Meta': {'object_name': 'UserExtraInfo'},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invite_experience_amount': ('django.db.models.fields.FloatField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'unique': 'True'})
         },
         u'wanglibao_invite.wechatuserdailyreward': {
             'Meta': {'unique_together': "(('w_user', 'create_date'),)", 'object_name': 'WechatUserDailyReward'},

@@ -204,3 +204,16 @@ def get_p2p_equity(user_id, product_id):
         equity = None
 
     return equity
+
+
+class GlobalVar(object):
+    first_product_push_to_coop = False
+
+    @staticmethod
+    def set_push_status(value):
+        GlobalVar.first_product_push_to_coop = value
+
+    @staticmethod
+    def get_push_status():
+        return GlobalVar.first_product_push_to_coop
+

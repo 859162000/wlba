@@ -20,12 +20,14 @@ REWARD_TYPE = (
 class InviteRelation(models.Model):
     user = models.ForeignKey(User, related_name="invited", null=False)
     inviter = models.ForeignKey(User, null=False, related_name="inviter")
-    activity_code = models.CharField(u'活动代码*', max_length=64, null=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    class Meta:
+        unique_together=(("user", 'inviter'),)
 
 class UserExtraInfo(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, unique=True)
     invite_experience_amount = models.FloatField(null=False, default=0, verbose_name=u'体验金金额')
-
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
 
 # class InviteRewardRecord(models.Model):
 #     ACTION = (
