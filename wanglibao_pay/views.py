@@ -6,7 +6,7 @@ import socket
 import json
 
 from django.contrib.auth.models import User
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.paginator import Paginator
 from django.db import transaction
@@ -1330,7 +1330,10 @@ class CardConfigTemplateView(TemplateView):
         return [self._get_wangli_card(c, wangli_cards) for c in card_num_list] 
 
     def get_context_data(self, **kwargs):
+        print '*'* 50, self.request.GET
         phone = self.request.GET.get('phone')
+        profile = WanglibaoUserProfile.objects.get(phone=phone)
+        user = profile.user
         # 电话页面 
         if not phone:
             return {'phone': None}
@@ -1338,18 +1341,29 @@ class CardConfigTemplateView(TemplateView):
         # 解绑快钱卡
         user_id = self.request.GET.get('user_id')
         card_num = self.request.GET.get('card_num')
+        unbind_channel = self.request.GET.get('unbind_channel')
         kuai_code = self.request.GET.get('kuai_code')
-        if user_id and card_num and kuai_code:
-            third_pay.KuaiShortPay().unbind_card(card_num, kuai_code, user_id)
-        
+        if user_id and card_num:
+            if unbind_channel == 'kuaipay' and kuai_code:
+                third_pay.KuaiShortPay().unbind_card(card_num, kuai_code, user_id)
+            elif unbind_channel == 'yeepay':
+                card = Card.objects.filter(user=user).filter(
+                        Q(no__startswith=card_num[:6])&Q(no__endswith=card_num[-4:])
+                        ).get()
+                print '*'*100 + str(card)
+                third_pay.YeeShortPay().unbind_card(user, card)
         # 显示卡列表
-        profile = WanglibaoUserProfile.objects.get(phone=phone)
-        user = profile.user
-
         wangli_cards = Card.objects.filter(user=user).all()
+        import time
+        pre_time = time.time()
         kuai_cards = third_pay.KuaiShortPay().query_bind_new(user.id)['cards']
+        kuai_time = time.time() - pre_time
+        logger.error('-'*100 + str(kuai_cards) + str(kuai_time))
         kuai_cards = self._get_wangli_cards(kuai_cards, wangli_cards)
+        pre_time = time.time()
         yee_cards = third_pay.YeeShortPay().bind_card_query(user) 
+        kuai_time = time.time() - pre_time
+        logger.error('*'*100 + str(yee_cards)+str(kuai_time))
         yee_cards = [c['card_top'] + c['card_last'] for c in yee_cards['data']['cardlist']]
         yee_cards = self._get_wangli_cards(yee_cards, wangli_cards)
         banks_info = [(b.kuai_code, b.name) for b in Bank.objects.all()]
