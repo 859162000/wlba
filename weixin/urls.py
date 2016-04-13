@@ -128,13 +128,15 @@ urlpatterns += patterns(
 #活动页面
 urlpatterns += patterns(
     '',
-    url(r'^activity/invite/$', fwh_login_required(TemplateView.as_view(template_name="invite_redpacket_bind.jade"),login_url='/weixin/sub_login_redirect/'),name='fwh_invite'),
+    url(r'^activity/invite/$', fwh_login_required(TemplateView.as_view(template_name="invite_redpacket_get.jade"),login_url='/weixin/sub_login_redirect/'),name='fwh_invite'),
 )
 #h5活动页面
 urlpatterns += patterns(
     '',
     url(r'^activity/share/$', TemplateView.as_view(template_name="invite_redpacket_index.jade"), name='weixin_share'),
     url(r'^activity/bind/$', TemplateView.as_view(template_name="invite_redpacket_bind.jade"), name='weixin_share'),
+    url(r'^activity/get/$', TemplateView.as_view(template_name="invite_redpacket_get.jade"), name='weixin_share'),
+    url(r'^activity/code/$', TemplateView.as_view(template_name="invite_redpacket_code.jade"), name='weixin_share'),
 )
 # 微信管理后台
 urlpatterns += patterns(

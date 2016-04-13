@@ -2796,23 +2796,36 @@ org.redpacket = (function(org){
         init: function(){
             lib._checkFrom();
             lib.shareOk();
+            lib.shareFn();
         },
         _checkFrom: function () {
-            org.ui.focusInput({
-                submit: $('button.service-login-btn'),
-                inputList: [
-                    {target: $('input.first-pwd'), required: true},
-                    {target: $('input.second-pwd'), required: true}
-                ],
-                submitStyle: {
-                    'disabledBg': '#cbcbcb',
-                    'activeBg': '#DB493F'
-                }
+            var share_alt = $("section.redpacket-share-alt");
+            //分享　引导
+            $("div.js-share-btn").on("click",function(){
+                share_alt.show();
+            });
+            share_alt.on("click",function(){
+                $(this).hide();
             });
         },
-        shareOk: function(){
+        shareFn: function(){
+            var html = '<div class="invite-share-ok">' +
+                '<div class="share-mian">' +
+                '<div class="share-img"></div>' +
+                '<div class="share-btn-box"><a href="javascript:void(0);">知道了</a></div>' +
+                '</dvi>' +
+                '</div>';
+            var $body = $('body'),
+                dom = $body.find(".invite-share-ok");
+            dom.length > 0 ? dom.css("display", "-webkit-box") : $body.append(html);
+            $body.on(".share-btn-box a", "click", function(){
+                console.log(3);
+            });
+        },
+        shareOk: function(price){
             var url = window.location.protocol +"//" + window.location.host;
-            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'', shareMainTit:'网利宝天天送我钱，连拿7天还送大礼包！', shareBody:'速来抢钱', success:lib.shareFn};
+            price = price ? price : "X";
+            var share = {shareImg: url+'/static/imgs/app/checkin/share_img_check.png',shareLink:url+'', shareMainTit:'网利宝红包花雨季，我今天接了'+ price +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
             org.detail.share(share, true);
         }
     }
@@ -2826,6 +2839,9 @@ org.redpacket_bind = (function(org){
     var lib = {
         $captcha_img: $("#captcha"),
         $captcha_key: $("input[name='captcha_0']"),
+        $login_box: $(".js-invite-login"),
+        $regist_box: $(".js-invite-regist"),
+        $bind_box: $(".js-invite-bind"),
         init: function(){
             lib._checkFrom();
             lib._captcha_refresh();
@@ -2841,13 +2857,37 @@ org.redpacket_bind = (function(org){
                 lib.$captcha_key.val(res['key']);
             });
         },
+        check_validate: function(){　//检验
+            var check = {
+                identifier: function (val) {
+                    var isRight = false,
+                        re = new RegExp(/^1[0-9]{10}$/);
+                    re.test($.trim(val)) ? isRight = true : (org.ui.showSign('请输入正确的手机号'), isRight = false);
+                    return isRight;
+                },
+                password: function(val){
+                    var str = $.trim(val),
+                        isRight = false;
+                    (str.length < 6 || str.length > 20) ? (org.ui.showSign('密码为6-20位数字/字母/符号/区分大小写'), isRight = false) : isRight = true;
+                    return isRight;
+                },
+                isEmpty: function(val){
+                    var isRight = false;
+                    $.trim(val) === "" ? (org.ui.showSign('请完整填写信息'), isRight = false) : isRight = true;
+                    return isRight;
+                }
+            };
+            return {
+                'identifier': check.identifier,
+                'password': check.password,
+                'isEmpty': check.isEmpty
+            }
+        },
         _checkFrom: function () {
-            var $phone = $("input.tel-inp"),
-                $captcha = $('input.captcha-inp'),
-                $captcha_0 = $("input[name=captcha_0]"),
-                //$validate = $('input.validate_inp'),
-                $getValidate = $('button.wx-validation-btn'),
-                $submit = $('button.service-login-btn');
+            var $phone = lib.$bind_box.find("input.tel-inp"),
+                $captcha = lib.$bind_box.find('input.captcha-inp'),
+                $captcha_0 = lib.$bind_box.find("input[name=captcha_0]"),
+                $submit = lib.$bind_box.find('button.js-bind-btn');
 
             org.ui.focusInput({
                 submit: $submit,
@@ -2860,33 +2900,94 @@ org.redpacket_bind = (function(org){
                     'activeBg': '#DB493F'
                 }
             });
-            //验证码 按钮
+
+
+            $submit.on("click", function(){
+                var isSubmit = true;
+                var $phoneNamber = $.trim($phone.val());
+                $.each([$phone, $captcha], function(i, t){
+                    var name = t.attr('name'),
+                        val = t.val();
+                    var fun = lib.check_validate()[name] ? lib.check_validate()[name] : lib.check_validate()['isEmpty'];
+                    if(!fun(val)){
+                        return isSubmit = false;
+                    }
+                });
+                if(!isSubmit) return false;
+
+                lib.$bind_box.hide();
+
+                //lib.redpacket_login($phoneNamber);
+                lib.redpacket_regist($phoneNamber);
+            });
+        },
+        redpacket_login: function(tel){//登录
+            lib.$login_box.find(".mian-protome").html("输入密码，登录" + tel.substring(0,3) + "****" + tel.substring(8,11) + "账户");
+            lib.$login_box.show();
+            var $pwd = lib.$login_box.find("input.first-pwd"),
+                $submit = $("button.js-login-btn");
             org.ui.focusInput({
-                submit: $getValidate,
+                submit: $submit,
                 inputList: [
-                    {target: $captcha, required: true}
+                    {target: $pwd, required: true}
                 ],
                 submitStyle: {
-                    'disabledBg': 'none',
-                    'activeBg': 'none'
+                    'disabledBg': '#cbcbcb',
+                    'activeBg': '#DB493F'
+                }
+            });
+            $submit.on("click",function(){
+                if(!lib.check_validate().password($pwd.val())) return;
+                console.log("ok");
+            });
+        },
+        redpacket_regist: function(tel){//注册
+            lib.$regist_box.find(".mian-protome").html("输入密码，登录" + tel.substring(0,3) + "****" + tel.substring(8,11) + "账户");
+            lib.$regist_box.show();
+            var $agreeBox = lib.$regist_box.find(".regist-protocol-div"),
+                $submit = lib.$regist_box.find("button.js-regist-btn"),
+                $validate = lib.$regist_box.find("input.validate_inp"),
+                $pwd = lib.$regist_box.find("input.first-pwd"),
+                $getValidate = lib.$regist_box.find('button.wx-validation-btn');
+            //注册协议
+            lib.$regist_box.find(".agreement").on("click", function(e){
+                console.log(41);
+                e.preventDefault();
+                $agreeBox.show();
+                setTimeout(function(){
+                   $agreeBox.css("top",0);
+                },0);
+            });
+            $agreeBox.find(".cancel-xiyie").on("click", function(e){
+                e.preventDefault();
+                $agreeBox.css("top",'100%');
+                setTimeout(function(){
+                   $agreeBox.css('display', 'none');
+                },200);
+            });
+            //input
+            org.ui.focusInput({
+                submit: $submit,
+                inputList: [
+                    {target: $validate, required: true},
+                    {target: $pwd, required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': '#cbcbcb',
+                    'activeBg': '#DB493F'
                 }
             });
 
             //获取验证码
             $getValidate.on('click', function () {
-                var phoneNumber = $phone.val(),
-                    $that = $(this), //保存指针
+                var $that = $(this), //保存指针
                     count = 60,  //60秒倒计时
                     intervalId; //定时器
 
-                if (!check['identifier'](phoneNumber, 'phone')) return; //号码不符合退出
+                if (!lib.check_validate()['identifier'](tel, 'phone')) return; //号码不符合退出
                 $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
                 org.ajax({
-                    url: '/api/phone_validation_code/register/' + phoneNumber + '/',
-                    data: {
-                        captcha_0: $captcha_0.val(),
-                        captcha_1: $captcha.val()
-                    },
+                    url: '/api/phone_validation_code/register/' + tel + '/',
                     type: 'POST',
                     error: function (xhr) {
                         clearInterval(intervalId);
@@ -2910,36 +3011,37 @@ org.redpacket_bind = (function(org){
                 timerFunction();
                 return intervalId = setInterval(timerFunction, 1000);
             });
-            //校验方法
-            var check = {
-                identifier: function (val) {
-                    var isRight = false,
-                        re = new RegExp(/^1[0-9]{10}$/);
-                    re.test($.trim(val)) ? isRight = true : (org.ui.showSign('请输入正确的手机号'), isRight = false);
-                    return isRight;
-                },
-                isEmpty: function(val){
-                    var isRight = false;
-                    $.trim(val) === "" ? (org.ui.showSign('请输入正确的手机号'), isRight = false) : isRight = true;
-                    return isRight;
-                }
-            };
+
+            //提交
             $submit.on("click", function(){
                 var isSubmit = true;
-                $.each([$phone, $captcha], function(i, t){
+                $.each([$validate, $pwd], function(i, t){
                     var name = t.attr('name'),
                         val = t.val();
-                    var fun = check[name] ? check[name] : check['isEmpty'];
+                    var fun = lib.check_validate()[name] ? lib.check_validate()[name] : lib.check_validate()['isEmpty'];
                     if(!fun(val)){
                         return isSubmit = false;
                     }
                 });
                 if(!isSubmit) return false;
-                console.log(2);
 
+                console.log("ok");
             });
         }
+    };
+    return {
+        init: lib.init
     }
+})(org);
+
+//红包雨　登录/注册
+org.redpacket_set = (function(org){
+    var lib = {
+        init: function(){
+
+        },
+
+    };
     return {
         init: lib.init
     }
