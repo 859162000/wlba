@@ -170,7 +170,6 @@
     padding: 0.45rem 2.5% 0
     position: relative
     display: inline-block
-
     dl
       clear: both
       width: 100%
@@ -191,8 +190,13 @@
         display: block
       dd.dd
         width: 78%
+        @media screen and (max-device-width: 370px)
+          width: 82%
+        @media screen and (max-width: 370px)
+          width: 82%
         span
           width: 0.6rem
+          display: inline-block
     img
       position: absolute
       right: 3%
@@ -200,6 +204,10 @@
       z-index: 1
       width: 16.2%
       display: block
+      @media screen and (max-device-width: 370px)
+        right: 1%
+      @media screen and (max-width: 370px)
+        right: 1%
   .adopt_raiders_title
     width: 100%
     display: block
@@ -320,6 +328,10 @@
     padding: 0.6rem 0
   .explain_text_4
     padding: 0.6rem 0 1rem
+    span
+      padding-bottom: 0.25rem
+      width: 100%
+      display: block
   .main_footer
     width: 100%
     text-align: center
@@ -331,7 +343,7 @@
       padding-bottom: 0.25rem
       max-height: 9999rem
     p.text_2
-      font-size: 0.3rem
+      font-size: 0.25rem
       line-height: 0.35rem
       color: #262525
       max-height: 9999rem
