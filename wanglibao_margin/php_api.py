@@ -726,7 +726,7 @@ class GetRedPacks(APIView):
 
         red_pack_info = dict()
         period = int(self.request.REQUEST.get('period'))
-        uid = int(self.request.REQUEST.get('userId')) or 0
+        uid = self.request.REQUEST.get('userId') or 0
         if request.user:
             uid = request.user.id
 
