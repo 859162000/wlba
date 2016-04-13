@@ -57,18 +57,18 @@ html,body{width:100%;height:100%;padding:0;margin:0;overflow:hidden;}
 .m .stop{position:absolute;background: url("/static/imgs/sub_weixin/eatcoin/jinzhi.png")no-repeat;background-size:100% 100%;width: 158.3%;height: 111.3%;top:-9.6%;left: -18.8%;display: none;}
 .logo img{position: absolute;left: 39.3%;top: 93.7%}
 
-.yz_tc{display:none;position: absolute;left: 5.9%;top: 29.7%;width: 89.3%;height: 48.3%;background: url("/static/imgs/sub_weixin/eatcoin/sj_bj.png")no-repeat;background-size: 100% 100%;z-index: 11;}
-.yz_tc .phone input{position:absolute;width: 78.2%;height:14.5%;background: url("/static/imgs/sub_weixin/eatcoin/iPhone_input.png")no-repeat;color:#fff;top: 11%;left: 10.8%;background-size:100% 100%;border: 0;font-size:18px;text-align: center;}
-.yz_tc .phone img{position: absolute;left: 19.7%;top: 14.9%;z-index: 12}
-.yz_tc .yzm{position: absolute;width: 78.2%;height:14.5%;color:#fff;top: 31%;left: 10.8%;border: 0;font-size:3vh;text-align: center;}
+.yz_tc{display:none;position: absolute;left: 5.9%;top: 23.7%;width: 89.3%;height: 48.3%;background: url("/static/imgs/sub_weixin/eatcoin/sj_bj.png")no-repeat;background-size: 100% 100%;z-index: 11;}
+.yz_tc .phone input{position:absolute;width: 78.2%;height:14.5%;background: url("/static/imgs/sub_weixin/eatcoin/iPhone_input.png")no-repeat;color:#fff;top: 11%;left: 8.8%;background-size:100% 100%;border: 0;font-size:18px;text-align: center;}
+.yz_tc .phone img{position: absolute;left: 19.7%;top: 15.9%;z-index: 12}
+.yz_tc .yzm{position: absolute;width: 78.2%;height:14.5%;color:#fff;top: 31%;left: 8.8%;border: 0;font-size:3vh;text-align: center;}
 .yz_tc .yzm div{float: left;}
 .yzm .input_yzm input{position: absolute;width: 54.3%;height: 100%;background: url("/static/imgs/sub_weixin/eatcoin/input_yzm.png")no-repeat;background-size: 100% 100%;border: 0;font-size:18px;text-align: center;color:#fff}
-.yzm .img_yzm img{position: absolute;left: 64%;top: 16.4%}
-.yzm .sx img{position: absolute;left: 92.7%;top: 16.4%}
-.yz_tc .sjdx {position: absolute;width: 78.2%;height:14.5%;color:#fff;top: 52%;left: 10.8%;border: 0;font-size:3vh;text-align: center;}
+.yzm .img_yzm img{position: absolute;left: 66%;top: 20.4%}
+.yzm .sx img{position: absolute;left: 95.7%;top: 20.4%}
+.yz_tc .sjdx {position: absolute;width: 78.2%;height:14.5%;color:#fff;top: 52%;left: 8.8%;border: 0;font-size:3vh;text-align: center;}
 .yz_tc .sjdx div{float: left}
 .sjdx .srdx input{position: absolute;width: 54.3%;height: 100%;background: url("/static/imgs/sub_weixin/eatcoin/input_note.png")no-repeat;background-size: 100% 100%;border: 0;font-size:18px;text-align: center;color:#fff}
-.sjdx .hqdx input{position: absolute;width: 43%;height: 91%;left: 62%;top: 8.8%;background: url("/static/imgs/sub_weixin/eatcoin/un_get_note.png")no-repeat;background-size: 100% 100%;border: 0px;opacity: 1}
-.sjdx .hqdx span{position: absolute;width: 43%;height: 91%;left: 57%;top: 24.8%;display: none;font-size: 3vh}
-.yz_tc .dllq img{position: absolute;left: 10.8%;top: 75.1%}
+.sjdx .hqdx input{position: absolute;width: 43%;height: 100%;left: 64%;top:8.8%;background: url("/static/imgs/sub_weixin/eatcoin/un_get_note.png")no-repeat;background-size: 100% 100%;border: 0px;opacity: 1}
+.sjdx .hqdx span{position: absolute;width: 43%;height: 91%;left: 64%;top: 31.8%;line-height:121%;display: none;font-size: 3vh}
+.yz_tc .dllq img{position: absolute;left: 8.8%;top: 75.1%}
 ::-webkit-input-placeholder {color: #fff;}
