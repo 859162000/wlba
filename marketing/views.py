@@ -2706,14 +2706,11 @@ class HappyMonkeyAPIView(APIView):
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
         # 是否是登录用户
         if not request.user.is_authenticated():
-            if phone and user:
-                pass
-            else:
-                to_json_response = {
-                    'ret_code': 1000,
-                    'message': u'用户没有登录',
-                }
-                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         today = (datetime.now()+timedelta(hours=-8)).strftime("%Y-%m-%d")
         user = user.user if user else request.user
