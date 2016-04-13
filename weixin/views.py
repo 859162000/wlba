@@ -143,7 +143,6 @@ class WeixinJoinView(View):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
-        logger.debug("entering post=============================self.msg::::%s"%self.msg)
         msg = self.msg
         reply = None
         toUserName = msg._data['ToUserName']
