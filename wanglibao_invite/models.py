@@ -21,6 +21,7 @@ class InviteRelation(models.Model):
     user = models.ForeignKey(User, related_name="invited", null=False)
     inviter = models.ForeignKey(User, null=False, related_name="inviter")
     activity_code = models.CharField(u'活动代码*', max_length=64, null=True)
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
 
 class UserExtraInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

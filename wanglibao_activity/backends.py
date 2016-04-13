@@ -27,6 +27,7 @@ from weixin.models import WeixinUser
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 from weixin.tasks import sentTemplate
 from wanglibao_reward.models import WanglibaoActivityReward
+from wanglibao_invite.models import InviteRelation
 logger = logging.getLogger(__name__)
 
 
@@ -308,6 +309,17 @@ def _check_introduced_by(user, start_dt, is_invite_in_date):
     else:
         return None
 
+def _check_wx_share_introduced_by(user, start_dt, is_invite_in_date):
+    if is_invite_in_date:
+        ib = InviteRelation.objects.filter(user=user, created_at__gt=start_dt).first()
+    else:
+        ib = InviteRelation.objects.filter(user=user).first()
+
+    if ib:
+        return ib.inviter
+    else:
+        return None
+
 
 def _check_introduced_by_product(user):
     ib = IntroducedBy.objects.filter(user=user).first()
@@ -496,20 +508,29 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_fu
     now = timezone.now()
     if rule.send_type == 'sys_auto':
         # do send
-        if rule.share_type != 'inviter':
+        if rule.share_type != 'inviter' or rule.share_type != 'wxshare_inviter':
             _send_reward(user, rule, rtype, reward_name, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
+
     else:
         # 只记录不发信息
-        if rule.share_type != 'inviter':
+        if rule.share_type != 'inviter' or rule.share_type != 'wxshare_inviter':
             _save_activity_record(rule, user, 'only_record', reward_name, False, is_full)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True, is_full)
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
 
 
 def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None, amount=0):
