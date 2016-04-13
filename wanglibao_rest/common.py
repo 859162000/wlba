@@ -19,6 +19,7 @@ class DecryptParmsAPIView(APIView):
             # logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
             method = request.method.lower()
             self.params = {}
+            self.request_params = getattr(self, "request_params", {})
             if not self.request_params:
                 if method == "get":
                     self.request_params = request.GET
