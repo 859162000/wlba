@@ -145,7 +145,7 @@ class WeixinJoinView(View):
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
-        logger.debug("===================fromUserName:%s; MsgType:%s; Event:%s; EventKey:%s"%(fromUserName, msg._data.get('MsgType', "=="), msg._data.get('Event', "=="), msg._data.get('EventKey', "==")))
+        logger.debug("fromUserName:%s; MsgType:%s; Event:%s; EventKey:%s"%(fromUserName, msg._data.get('MsgType', "=="), msg._data.get('Event', "=="), msg._data.get('EventKey', "==")))
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
         w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
         user = w_user.user
