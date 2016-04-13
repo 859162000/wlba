@@ -155,7 +155,7 @@ class SendValidationCodeView(APIView):
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
         seccode = request.POST.get(gt.FN_SECCODE, '')
-        status = request.session[gt.GT_STATUS_SESSION_KEY]
+        #status = request.session[gt.GT_STATUS_SESSION_KEY]
 
         if status:
             result = gt.success_validate(challenge, validate, seccode)
@@ -1872,10 +1872,10 @@ class GeetestAPIView(APIView):
         self.type = request.POST.get('type', None)
         import time
         if self.type == 'get':
-            #time.sleep(10)
+            # time.sleep(10)
             return self.get_captcha(request)
         if self.type == 'validate':
-            #time.sleep(10)
+            time.sleep(10)
             return self.validate_captcha(request)
 
     def get_captcha(self, request):

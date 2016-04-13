@@ -1326,7 +1326,7 @@ class HappyMonkeyRegister(CoopRegister):
             (0, 5): 'happy_monkey_66',
             (6, 10): 'happy_monkey_166',
             (11, 15): 'happy_monkey_566',
-            (16, 100000000): 'happy_monkey_666'
+            (16, 100000000): 'happy_monkey_866'
         }
         today = time.strftime("%Y-%m-%d", time.localtime())
         total = self.request.POST.get('total', None)

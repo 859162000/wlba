@@ -183,7 +183,10 @@
             }
           }
         } else {
-          return $('#codeError').text(result.message);
+          $('#codeError').text(result.message);
+          if (result.message === '极验验证失败') {
+            return geetestStatus = 'false';
+          }
         }
       }).success(function() {
         $('#codeError,.code-img-error').text('');
