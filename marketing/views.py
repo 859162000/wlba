@@ -2715,7 +2715,7 @@ class HappyMonkeyAPIView(APIView):
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        today = (datetime.datetime.now()+datetime.timedelta(hours=-8)).strftime("%Y-%m-%d")
+        today = (datetime.now()+timedelta(hours=-8)).strftime("%Y-%m-%d")
         user = user.user if user else request.user
 
         #今天用户没有玩过
