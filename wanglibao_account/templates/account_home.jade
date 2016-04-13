@@ -26,7 +26,7 @@ block main
     .row.clearfix
       .pull-left
         p
-          span(style='font-size:36px;line-height:1;color:#333;') {{p2p_total_asset|money_format}}
+          span(style='font-size:36px;line-height:1;color:#333;') {{user.margin.margin | money_format}}
         p.font-s(style='color:#999') 可用余额(元)
       .pull-left
         .clamp-xl
@@ -65,27 +65,7 @@ block main
           p
             span.big_number {{margin_withdrawing|money_format}}
           p.desc 提现冻结
-      //.total-asset-money-card
-      //  p.align-center
-      //    span#total_asset.big_number(data-p2p="{{p2p_total_asset}}") {{total_asset|money_format}}
-      //  p.align-center 总资产(元)
-      //.sign-money-card
-      //  =
-      //if mode == 'p2p'
-      //  .brief--p2p-total-asset.active
-      //    a(href="/accounts/home/")
-      //      p.align-center
-      //        span.big_number {{p2p_total_asset|money_format}}
-      //      p.align-center 理财专区(元)
-      //  .sign-money-card
-      //    //+
-      //else
-      //  .brief--p2p-total-asset
-      //    a(href="/accounts/home/")
-      //      p.align-center
-      //        span.big_number {{p2p_total_asset|money_format}}
-      //      p.align-center 理财专区(元)
-      //  .sign-money-card
+
 
   if mode == 'p2p'
     .account-home-panel__no-padding
@@ -165,11 +145,16 @@ block main
     .account-home-panel__no-padding(style="padding-bottom:20px")
       .account-home-panel--title-bar__product
         ul.title-bar--tabs
-          li.title-bar--tab
-            a.title-bar--tab--anchor(href="/accounts/home/") 理财专区
-          li.title-bar--tab.active
+          li.title-bar--tab.new-bar-tab
+            a.title-bar--tab--anchor(href="/accounts/home/") 散标
+          li.title-bar--tab.new-bar-tab
+            a.title-bar--tab--anchor(href="/ylb/monthly.php?action=userMonthly") 月利宝
+          li.title-bar--tab.new-bar-tab
+            a.title-bar--tab--anchor(href="/ylb/monthly.php?action=userMonthly&type=1") 转让标
+          li.title-bar--tab.new-bar-tab.active#tyjzq(style="display:none")
             a.title-bar--tab--anchor(href="javascript:void(0)") 体验金专区
             i
+
         a.pull-right.align-right.detail-view(href='/activity/experience/gold/', target="_blank")
             i
             | 查看体验金活动
