@@ -1371,11 +1371,12 @@ class MessageDetailAPIView(APIView):
         else:
             result = dict()
             url = settings.PHP_INSIDE_MESSAGE_READ
+            if message_id == 0:
+                url = settings.PHP_INSIDE_MESSAGE_READ_ALL
             response = requests.post(url,
                                      data={'uid': 80990, 'mid': message_id})
             resp = response.json()
             if resp['code'] == 'success':
-                count = len(resp['data'])
                 result.update(ret_code=resp['data'], message=resp['des'])
             else:
                 result.update(ret_code=resp['data'], message=resp['des'])

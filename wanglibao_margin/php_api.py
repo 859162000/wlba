@@ -722,17 +722,22 @@ class GetRedPacks(APIView):
     """
     permission_classes = ()
 
-    def get(self, request):
+    def post(self, request):
 
         red_pack_info = dict()
-        period = int(self.request.REQUEST.get('period'))
-        uid = self.request.REQUEST.get('userId') or 0
-        if request.user:
-            uid = request.user.id
+        period = self.request.POST.get('period', 0)
+        uid = self.request.POST.get('userId', 0)
+        if self.request.user:
+            uid = self.request.user.id
+
+        print '$%^&*('*100
+        print period
+        print uid
+        print self.request.method
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
-        if 1:
+        if period and uid:
             device = utils.split_ua(self.request)
 
             result = php_redpacks(User.objects.get(pk=uid), device['device_type'], period=period)
