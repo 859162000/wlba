@@ -673,14 +673,14 @@ class TheOneCardAPIView(APIView):
         TheOneCard(request.user).set(card_id)
         return Response({'status_code': 0})
 
-    def delete(self, request):
-        """
-        这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
-        :param request:
-        :param card_id:
-        :return:
-        """
-        TheOneCard(request.user).unbind()
-        return Response({'status_code': 0})
+    # def delete(self, request):
+        # """
+        # 这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
+        # :param request:
+        # :param card_id:
+        # :return:
+        # """
+        # TheOneCard(request.user).unbind()
+        # return Response({'status_code': 0})
 
 #######################################同卡进出 end###############################
