@@ -990,7 +990,7 @@ else:
 #往PHP数据中心发送数据接口生产地址和开关
 if ENV == ENV_PRODUCTION:
     SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
-    SEND_PHP_ON_OR_OFF = False
+    SEND_PHP_ON_OR_OFF = True
 else:
     SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
     SEND_PHP_ON_OR_OFF = False
