@@ -122,9 +122,10 @@
                         }else{
                             rankingList.push(['<tr><td style="width:100%; text-align:center">虚位以待</td></tr>'].join(''));
                         }
+
                     }
                     $('.list_main tbody').html(rankingList.join(''));
-
+                    substring_2(json.week_sum_amount);
 
 
                 },error: function(data1){
@@ -138,15 +139,41 @@
         /*逐个字符*/
         function substring(text){
             //alert(text);
-            var num;
             var box_num = $('.num_wrap .num_1').length;
-            for(var i=text.length;i>=0;i--) {
+            for(var i=text.length; i>=0; i--) {
                 if (text.length - 3 != i) {
-                    num = text.charAt(i);
-                    $('.num_wrap .num_1').eq(box_num).text(num);
+                    //num = text.charAt(i);
+                    if(text.length - 2 == i||text.length - 7 == i){
+                        $('.num_wrap').prepend('<span class="num_2"></span>');
+
+                    }else{
+
+                        $('.num_wrap').prepend('<span class="num_1"></span>');
+                    }
+
+                    //$('.num_wrap .num_1').eq(box_num).text(num);
                     box_num--;
                 }
             }
+            $('.num_wrap').prepend('<span class="num_1"></span>');
+
+        };
+
+        function substring_2(text){
+            var num_2;
+            var box_num_2 = $('.num_wrap .num_1').length;
+            var box_num_3 = $('.num_wrap .num_2').length;
+            for(var i=text.length;i>=0;i--) {
+                if (text.length - 3 != i) {
+                    num_2 = text.charAt(i);
+                    $('.num_wrap .num_1').eq(box_num_2).text(num_2);
+                    box_num_2--;
+                }
+            }
+
+            var width = 78*$('.num_wrap .num_1').length+25*$('.num_wrap .num_2').length;
+            $('.num_wrap').css('margin-left','-'+width/2+'px')
+
         };
         /*逐个字符结束*/
 
