@@ -2796,7 +2796,6 @@ org.redpacket = (function(org){
         init: function(){
             lib._checkFrom();
             lib.shareOk();
-            lib.shareFn();
         },
         _checkFrom: function () {
             var share_alt = $("section.redpacket-share-alt");
@@ -2818,8 +2817,8 @@ org.redpacket = (function(org){
             var $body = $('body'),
                 dom = $body.find(".invite-share-ok");
             dom.length > 0 ? dom.css("display", "-webkit-box") : $body.append(html);
-            $body.on(".share-btn-box a", "click", function(){
-                console.log(3);
+            $body.on("click", ".share-btn-box a", function(){
+                $(this).parents(".invite-share-ok").hide();
             });
         },
         shareOk: function(price){
