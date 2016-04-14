@@ -105,7 +105,18 @@
     .rule-list
       margin-top: rem(5)
       opacity: 0.7
-        
+  .redpacket-share-alt
+    display: none
+    background: rgba(0, 0, 0, 0.7)
+    text-align: right
+    position: fixed
+    top: 0
+    left: 0
+    z-index: 999
+    width: 100%
+    height: 100%
+    .share-sign
+      margin-right: 1rem
   .redpacket-get
     margin-bottom: 0
     .main-box
@@ -169,18 +180,37 @@
       .bb-tit
         font-size: rem(40)
       .list-box-item
-        display: -webkit-box
         .list-item
           overflow: hidden
-          height: rem(40)
-          &:first-child
-            width: rem(200)
-        //.y-color
-        //  .bb-tit
-        //    display: inline-block
-        //    width: rem(155)
-        //    text-align: right
-
+          height: rem(50)
+          line-height: rem(50)
+  //分享
+  .invite-share-ok
+    position: fixed
+    z-index: 999
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: rgba(0, 0, 0, 0.7)
+    display: -webkit-box
+    -webkit-box-pack: center
+    -webkit-box-align: center
+    .share-img
+      width: rem(612)
+      height: rem(520)
+      background: url("/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png") center center no-repeat
+      background-size: cover
+    .share-btn-box
+      text-align: center
+      margin-top: 1rem
+      a
+        display: inline-block
+        padding: 0.5rem 3rem
+        border: 1px solid #fff
+        color: #fff
+        font-size: 0.8rem
+        border-radius: 0.2rem
 //设置登录密码
 .service-redpacket-login
   position: absolute
@@ -202,12 +232,14 @@
     background: #fff
     margin: rem(25) rem(27)
     padding: 0 rem(27)
+    overflow: hidden
     .wx-input-public
       height: rem(100)
       border-bottom: 1px solid #ddd
       display: -webkit-box
       -webkit-box-align: center
       -webkit-box-flex: 1
+      margin-bottom: -1px
     .wx-input-icon
       width: 0.9rem
     .password
@@ -233,6 +265,7 @@
       -webkit-box-flex: 1
       display: block
       padding: 0 0.2rem 0 rem(20)
+      background: none
     .wx-password-operation
       width: 1rem
       height: 1rem
@@ -261,6 +294,12 @@
       display: block
       width: 100%
       height: 100%
+  .agree-box
+    text-align: center
+    font-size: rem(28)
+    color: #979797
+    .agreement
+      color: #3399FF
   .service-btn-box
     margin: rem(132) rem(27) 0
   .service-login-btn
@@ -294,3 +333,11 @@
       background-image: url("/static/imgs/sub_weixin/input_icon/login_code_active.png")
     .phone
       background-image: url("/static/imgs/sub_weixin/input_icon/login_phone_active.png")
+
+.invite-regist
+  .regist-protocol-div
+    z-index: 99
+  .agree-box
+    margin-top: 2.5rem
+  .service-btn-box
+    margin-top: 0.5rem

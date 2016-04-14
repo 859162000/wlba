@@ -1,0 +1,30 @@
+//-load formatters
+doctype html
+html.service-redpacket-grey
+  head
+    title 设置密码
+    include include/service_head.jade
+  body.service-redpacket-login
+    .logo-leo.mt70
+      img(src="/static/imgs/sub_weixin/redpack_activity/iconfont_logo4@2x.png")
+    .login-box
+      .mian-protome.mt20 为了您的帐户安全,请设置登录密码!
+      .input-box
+        .wx-input-public
+          .wx-input-icon.inp-icon-box
+            .password
+          input(type="password", autocomplete="off", placeholder="请设置密码", name="password", data-icon="wx-input-icon", data-target2="inp-icon-box").wx-input-main.first-pwd
+          .hide-password.wx-password-operation.password-handle
+        .wx-input-public.inp-icon-box
+          .wx-input-icon
+            .password
+          input(type="password", autocomplete="off", placeholder="确认登录密码", name="password2", data-icon="wx-input-icon", data-target2="inp-icon-box").wx-input-main.second-pwd
+          .hide-password.wx-password-operation.password-handle
+      .service-btn-box
+        button(type="submit", disabled="true").service-login-btn 设置登录密码
+    .register
+    .safe-box
+      i.safe-icon
+      | 账户自己安全由阳光保险承保
+
+    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?20160105")
