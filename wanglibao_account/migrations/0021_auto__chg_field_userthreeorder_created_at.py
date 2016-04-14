@@ -94,15 +94,21 @@ class Migration(SchemaMigration):
             'id_photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'is_valid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
-            'update_verify': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'update_verify': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
         },
         u'wanglibao_account.manualmodifyphonerecord': {
             'Meta': {'ordering': "('-created_at',)", 'object_name': 'ManualModifyPhoneRecord'},
+            'card_user_image': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
+            'card_user_image_status': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'id_back_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
+            'id_back_image_status': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id_front_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
+            'id_front_image_status': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id_user_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
+            'id_user_image_status': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'new_phone': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
             'remarks': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
@@ -129,7 +135,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.messagetext': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'MessageText'},
             'content': ('django.db.models.fields.TextField', [], {}),
-            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1454318117L', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1460627122L', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mtype': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
@@ -160,7 +166,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.userphonebook': {
             'Meta': {'object_name': 'UserPhoneBook'},
             'alert_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 2, 1, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 4, 14, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invite_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'is_invite': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
