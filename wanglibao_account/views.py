@@ -2219,8 +2219,11 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = request.session
-                request_no = params.get('order_id', None)
+                if channel_code == 'zgdx':
+                    params = json.loads(request.body)
+                else:
+                    params = request.POST
+                request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
                 json_response = self.check_params(request_no, result_code, msg)
