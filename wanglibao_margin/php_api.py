@@ -252,7 +252,7 @@ class CheckAppTradePassword(PHPDecryptParmsAPIView):
         logger.info("in class CheckAppTradePassword, self.params = {}, trade_password = {}\n"
                     .format(self.params, trade_password))
         try:
-            ret = trade_pwd_check(user_id, trade_password)
+            ret = trade_pwd_check(int(user_id), trade_password)
         except Exception, e:
             ret = {'status': -1, 'message': str(e)}
             logger.debug('CheckTradePassword error with {}!\n'.format(e.message))
@@ -726,7 +726,9 @@ class GetRedPacks(APIView):
 
         red_pack_info = dict()
         period = int(self.request.REQUEST.get('period'))
-        uid = int(self.request.REQUEST.get('userId'))
+        uid = int(self.request.REQUEST.get('userId')) or 0
+        if request.user:
+            uid = request.user.id
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
