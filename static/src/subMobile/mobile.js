@@ -1270,10 +1270,13 @@ org.recharge = (function (org) {
 
             //手机验证码
             $('.request-check').on('click', function () {
+
                 var $that = $(this), //保存指针
                     count = 60,  //60秒倒计时
                     intervalId; //定时器
-
+                if($that.hasClass("regist-validation-disable")){
+                    return;
+                }
                 var card_no = res.no,
                     gate_id = res.bank.gate_id,
                     amount = $amount.val() * 1;
@@ -1448,24 +1451,24 @@ org.recharge = (function (org) {
             });
         },
         _trade_pwd_seach: function(post_data){
-            if(lib.isValidate){
-                org.ajax({
-                    url: '/api/pay/cnp/dynnum_new/',
-                    type: 'post',
-                    data: {
-                        phone: '',
-                        vcode: $("input[name=validation].count-input").val(),
-                        order_id: $("input[name=order_id]").val(),
-                        token: $("input[name=token]").val(),
-                        set_the_one_card: true,
-                        mode: 'qpay_with_sms'
-                    },
-                    success: function(result){
-                        result.trade_pwd_is_set ? lib._trade_pws_operation(true, post_data): lib._trade_pws_operation(false, post_data);
-                    }
-                })
-                return;
-            }
+            //if(lib.isValidate){
+            //    org.ajax({
+            //        url: '/api/pay/cnp/dynnum_new/',
+            //        type: 'post',
+            //        data: {
+            //            phone: '',
+            //            vcode: $("input[name=validation].count-input").val(),
+            //            order_id: $("input[name=order_id]").val(),
+            //            token: $("input[name=token]").val(),
+            //            set_the_one_card: true,
+            //            mode: 'qpay_with_sms'
+            //        },
+            //        success: function(result){
+            //            result.trade_pwd_is_set ? lib._trade_pws_operation(true, post_data): lib._trade_pws_operation(false, post_data);
+            //        }
+            //    })
+            //    return;
+            //}
             org.ajax({
                 url: '/api/profile/',
                 type: 'GET',
@@ -1570,9 +1573,14 @@ org.recharge = (function (org) {
          * 绑定同卡进出的卡充值
          */
         _rechargeSingleStep: function (operation, data) {
+            var url = '/api/pay/deposit_new/';
+            if(lib.isValidate){
+                data.data.mode = 'qpay_with_sms';
+                url = '/api/pay/cnp/dynnum_new/';
+            }
             org.ajax({
                 type: 'POST',
-                url: '/api/pay/deposit_new/',
+                url: url,
                 data: data.data,
                 beforeSend: function () {
                     data.beforeSend && data.beforeSend()
@@ -2015,6 +2023,8 @@ org.processSecond = (function (org) {
             });
 
             function recharge(check) {
+                var data = {};
+
                 org.ajax({
                     type: 'POST',
                     url: '/api/pay/cnp/dynnum_new/',
