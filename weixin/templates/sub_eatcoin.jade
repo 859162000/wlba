@@ -126,6 +126,9 @@ html(lang='zh-CN')
           img(src='/static/imgs/sub_weixin/eatcoin/fx_cd.png', width='94.7%', height='30.2%', style='left: 2.7%;top:18.2%')
       .zlyc(style='display: none')
         .txt 您今天已经领取奖励
+        .yzc_txt
+          div 您已经使我们的老用户
+          div 请识别下方二维码在服务号中参加活动
         .ewm
           img(src='/static/imgs/sub_weixin/eatcoin/ewm.png', width='35.5%', height='23.3%')
         .ermts
@@ -133,6 +136,12 @@ html(lang='zh-CN')
           div 查看并使用您的奖励
     .m(style='font-size:1.25em; width:5.3%;height:5.3%;position:absolute; top:2.1%; left: 91.5%;text-align:right')
       .stop
+    .page_msg
+      .inner
+        span.msg_icon_wrp
+          i.icon80_smile
+        .msg_content
+          h4 请在微信客户端打开链接
   script.
     var _hmt = _hmt || [];
     (function () {
@@ -141,3 +150,27 @@ html(lang='zh-CN')
       var s = document.getElementsByTagName("script")[0];
       s.parentNode.insertBefore(hm, s);
     })();
+    var useragent = navigator.userAgent;
+    if (useragent.match(/MicroMessenger/i) == 'MicroMessenger') {
+      $(".loadding_page").show();
+      $(".m").show();
+      document.getElementById('car_audio').play();
+      document.addEventListener("WeixinJSBridgeReady", function () {
+        WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
+          document.getElementById('car_audio').play();
+        });
+      }, false);
+      var cunt = 0;
+      var progress = setInterval(function () {
+        $(".loaded").css("background-size", cunt * 10 + "%" + " " + "100%");
+        if (cunt == 11) {
+          clearInterval(progress);
+          $(".loadding_page").hide();
+          $(".start_page").show();
+        } else {
+          cunt++;
+        }
+      }, 500);
+    } else {
+      $(".page_msg").show();
+    }

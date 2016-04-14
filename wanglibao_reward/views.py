@@ -2777,7 +2777,7 @@ class AprilAwardApi(APIView):
                 idx+=1
 
         award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
-        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,})
+        return Response({"chances": chances,"weekranks":weekranks,"week_sum_amount":week_sum_amount,"award_list":award_list,})
 
 class FetchMarchAwardAPI(APIView):
     permission_classes = (IsAuthenticated, )
