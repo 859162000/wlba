@@ -48,7 +48,7 @@ from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank, updateRedisWeekTopRank, updateRedisWeekSum
@@ -2719,6 +2719,7 @@ class AprilAwardApi(APIView):
     """
     四月活动
     """
+    permission_classes = (AllowAny, )
 
     def post(self, request):
         rank_activity = Activity.objects.filter(code='march_awards').first()
@@ -2776,12 +2777,7 @@ class AprilAwardApi(APIView):
                 idx+=1
 
         award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
-        return Response({
-           "chances": chances,
-           "weekranks":weekranks,
-           "week_sum_amount":week_sum_amount,
-           "award_list":award_list,
-            })
+        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,})
 
 class FetchMarchAwardAPI(APIView):
     permission_classes = (IsAuthenticated, )
