@@ -28,6 +28,10 @@ from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEM
 
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
+from wanglibao_reward.tasks import sendWechatPhoneReward
+from marketing.send_data import send_register_data, send_idvalidate_data, send_deposit_data, send_investment_data,\
+     send_withdraw_data
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -55,7 +59,13 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
         pass
     # 发送红包
     # send_lottery.apply_async((user_id,))
-
+    processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
+    #往数据中心发送投资信息数据
+    if settings.SEND_PHP_ON_OR_OFF:
+        send_investment_data.apply_async(kwargs={
+            "user_id": user_id, "amount": amount, "device_type":device_type,
+            "order_id": order_id, "product_id": product_id,
+        })
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
@@ -95,7 +105,11 @@ def register_ok(user_id, device):
         utils.log_clientinfo(device, "register", user_id)
     except Exception:
         pass
-
+    #往数据中心发送注册信息数据
+    if settings.SEND_PHP_ON_OR_OFF:
+        send_register_data.apply_async(kwargs={
+            "user_id": user_id, "device_type":device_type,
+        })
 
 @app.task
 def idvalidate_ok(user_id, device):
@@ -108,7 +122,13 @@ def idvalidate_ok(user_id, device):
         utils.log_clientinfo(device, "validation", user_id)
     except Exception:
         pass
-
+    #往数据中心发送实名信息数据
+    if settings.SEND_PHP_ON_OR_OFF:
+        if user.wanglibaouserprofile.id_is_valid:
+            send_idvalidate_data.apply_async(kwargs={
+                "user_id": user_id, "device_type":device_type,
+            })
+        
 @app.task
 def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
@@ -174,12 +194,28 @@ def deposit_ok(user_id, amount, device, order_id):
     except Exception, e:
         logger.exception('=deposit_ok= Except: [%s]' % str(e))
 
-
+    #往数据中心发送冲值信息数据
+    if settings.SEND_PHP_ON_OR_OFF:
+        send_deposit_data.apply_async(kwargs={
+            "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
+        })
+        
 @app.task
-def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id):
+def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, device):
     user = User.objects.filter(id=user_id).first()
     # 短信通知添加用户名
-
+    try:
+        # 支持通过字典传递完整的device信息或是通过str直接传device_type
+        if isinstance(device, dict):
+            device_type = device['device_type']
+        elif isinstance(device, str) or isinstance(device, unicode):
+            assert device in ['pc', 'ios', 'android']
+            device_type = device
+        else:
+            raise
+    except:
+        device_type = u'pc'
+        logger.exception("=withdraw_ok= Failed to get device_type")
 
     send_messages.apply_async(kwargs={
         'phones': [phone],
@@ -207,12 +243,20 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id):
                                         "keyword1":"%s 元"%str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
-                                        "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % order_id,
+                                        #"url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
                                             })},
                                         queue='celery02')
 
-
-
+    try:
+        utils.log_clientinfo(device, "withdraw", user_id, order_id, amount)
+    except Exception:
+        pass
+    
+    #往数据中心发送提现信息数据
+    if settings.SEND_PHP_ON_OR_OFF:
+        send_withdraw_data.apply_async(kwargs={
+            "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
+        })
 
 @app.task
 def calc_broker_commission(product_id):
@@ -245,8 +289,8 @@ def send_income_message_sms():
     phones_list = []
     messages_list = []
     if incomes:
-        i = 0
-        data_messages = {}
+        # i = 0
+        # data_messages = {}
         for income in incomes:
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile')\
@@ -257,20 +301,20 @@ def send_income_message_sms():
                 from wanglibao.templatetags.formatters import safe_phone_str
                 name = safe_phone_str(phone)
 
-            data_messages[i] = {
-                'user_id': phone,
-                'user_type': 'phone',
-                'params': {
-                    'name': name,
-                    'count': income.get('invite__count'),
-                    'amount': income.get('earning__sum')
-                }
-            }
-            i += 1
-            # phones_list.append(phone)
-            # messages_list.append(messages.sms_income(name,
-            #                                          income.get('invite__count'),
-            #                                          income.get('earning__sum')))
+            # data_messages[i] = {
+            #     'user_id': phone,
+            #     'user_type': 'phone',
+            #     'params': {
+            #         'name': name,
+            #         'count': int(income.get('invite__count')),
+            #         'amount': float(income.get('earning__sum'))
+            #     }
+            # }
+            # i += 1
+            phones_list.append(phone)
+            messages_list.append(messages.sms_income(name,
+                                                     income.get('invite__count'),
+                                                     income.get('earning__sum')))
 
             # 发送站内信
             title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
@@ -283,12 +327,11 @@ def send_income_message_sms():
 
         # 批量发送短信
         # 功能推送id: 3
-        PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
-        # send_messages.apply_async(kwargs={
-        #     "phones": phones_list,
-        #     "messages": messages_list,
-        #     "ext": 666
-        # })
+        # PHPSendSMS().send_sms(rule_id=3, data_messages=data_messages)
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list,
+        })
 
 
 @app.task

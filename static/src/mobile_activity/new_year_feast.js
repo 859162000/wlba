@@ -183,7 +183,7 @@ wlb.ready({
                 }
             })
         }
-
+        mixins.shareData({title: '新年红包宴，每天领一次，最高拿8000！', content: '每天一次开锅领奖：红包、加息券、体验金百发百中。'});
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 $('.pot-s,.packets-btn a').on('click',function(){
@@ -212,7 +212,7 @@ var weChatShare = (function(org){
             dataType : 'json',
             success : function(data) {
                 //请求成功，通过config注入配置信息,
-                wx.config({
+                wx.config({ 
                     debug: false,
                     appId: data.appId,
                     timestamp: data.timestamp,
@@ -223,11 +223,11 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com/activity/new_year_feast/',
+            var host = 'https://www.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = window.location.href,
-                shareMainTit = '新年红包宴，每天可领一次福气大礼包。',
-                shareBody = '每天一次机会，开锅领奖。红包、加息券、体验金100%必中。';
+                shareMainTit = '新年红包宴，每天领一次，最高拿8000！',
+                shareBody = '每天一次开锅领奖：红包、加息券、体验金百发百中。';
             //分享给微信好友
             org.onMenuShareAppMessage({
                 title: shareMainTit,
@@ -237,7 +237,7 @@ var weChatShare = (function(org){
             });
             //分享给微信朋友圈
             org.onMenuShareTimeline({
-                title: '新年红包宴，每天可领一次福气大礼包。',
+                title: shareMainTit,
                 link : shareLink,
                 imgUrl: shareImg
             })

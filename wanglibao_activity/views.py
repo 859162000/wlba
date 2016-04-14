@@ -3,7 +3,7 @@
 from django.views.generic import TemplateView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from wanglibao_activity.models import (ActivityTemplates, ActivityImages, ActivityShow,
-                                       ActivityBannerShow)
+                                       ActivityBannerShow, ActivityBannerPosition)
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -150,6 +150,21 @@ class PcActivityAreaView(TemplateView):
         main_banner = self.get_banner(act_banner_shows, u'主推')
         left_banner = self.get_banner(act_banner_shows, u'副推左')
         right_banner = self.get_banner(act_banner_shows, u'副推右')
+
+        if not main_banner:
+            main_banner = ActivityBannerPosition.objects.all().select_related().first()
+            main_banner.activity_show = main_banner.main
+            main_banner.activity_show.main_banner = main_banner.main_banner
+
+        if not left_banner:
+            left_banner = ActivityBannerPosition.objects.all().select_related().first()
+            left_banner.activity_show = left_banner.second_left
+            left_banner.activity_show.left_banner = left_banner.left_banner
+
+        if not right_banner:
+            right_banner = ActivityBannerPosition.objects.all().select_related().first()
+            right_banner.activity_show = right_banner.second_right
+            right_banner.activity_show.right_banner = right_banner.right_banner
 
         limit = 6
         page = 1

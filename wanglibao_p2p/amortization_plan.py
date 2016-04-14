@@ -5,6 +5,7 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 import math
 
+
 class AmortizationPlan(object):
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None, coupon_year_rate=0):
@@ -15,7 +16,7 @@ class AmortizationPlan(object):
         amortizations = product.amortizations.all()
         today = timezone.now()
         for index, amortization in enumerate(amortizations):
-            #if amortization.term_date is None:
+            # if amortization.term_date is None:
             amortization.term_date = today + relativedelta(months=index + 1)
             amortization.save()
 
@@ -39,10 +40,18 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
         term_amount = Decimal(term_amount).quantize(Decimal('.01'))
 
         total = period * term_amount
-        coupon_total = 0
+        coupon_total = period * coupon_term_amount - amount
+        if coupon_total < 0:
+            coupon_total = 0
 
         result = []
         principal_left = amount
+
+        if coupon_year_rate == 0:
+            principal_left_coupon = 0
+        else:
+            principal_left_coupon = amount
+
         for i in xrange(0, period - 1):
             interest = principal_left * month_rate
             interest = interest.quantize(Decimal('.01'), rounding=ROUND_UP)
@@ -50,25 +59,26 @@ class MatchingPrincipalAndInterest(AmortizationPlan):
             principal = term_amount - interest
             principal = principal.quantize(Decimal('.01'), rounding=ROUND_UP)
 
-            principal_left -= principal
-
-            coupon_interest = principal * coupon_month_rate
+            coupon_interest = principal_left_coupon * coupon_month_rate
             coupon_interest = coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
-            coupon_total += coupon_interest
+
+            principal_coupon = coupon_term_amount - coupon_interest
+            principal_coupon = principal_coupon.quantize(Decimal('.01'), rounding=ROUND_UP)
+
+            principal_left -= principal
+            principal_left_coupon -= principal_coupon
 
             result.append((term_amount, principal, interest, principal_left, coupon_interest,
                            term_amount * (period - i - 1), interest_begin_date + relativedelta(months=i + 1)))
 
-        last_coupon_interest = principal_left * coupon_month_rate
-        last_coupon_interest = last_coupon_interest.quantize(Decimal('.01'), rounding=ROUND_UP)
-
         result.append((term_amount, principal_left, term_amount - principal_left, Decimal(0),
-                       last_coupon_interest, Decimal(0), interest_begin_date + relativedelta(months=period)))
+                       coupon_term_amount - principal_left_coupon, Decimal(0),
+                       interest_begin_date + relativedelta(months=period)))
 
         return {
             "terms": result,
             "total": total,
-            "coupon_total": coupon_total + last_coupon_interest,
+            "coupon_total": coupon_total,
             "interest_arguments": None
         }
 

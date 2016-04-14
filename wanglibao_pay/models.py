@@ -29,7 +29,7 @@ class Bank(models.Model):
     # 提现限额:min_amount=50,max_amount=50000
     withdraw_limit = models.CharField(max_length=500, blank=True, verbose_name=u"银行提现限额", default="")
     have_company_channel = models.BooleanField(u"是否对公", default=False)
-
+    cards_info = models.TextField(max_length=10000, default='', blank=True, verbose_name=u'银行卡号识别码')
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     channel = models.CharField(u'手机支付通道', max_length=20, blank=True, null=True, choices=(
@@ -85,12 +85,21 @@ class Bank(models.Model):
             rs.append(obj)
         return rs
 
+    @property
+    def bank_limit(self):
+        if self.channel == 'kuaipay' and self.kuai_limit:
+            return util.handle_kuai_bank_limit(self.kuai_limit)
+        elif self.channel == 'huifu' and self.huifu_bind_limit:
+            return util.handle_kuai_bank_limit(self.huifu_bind_limit)
+        elif self.channel == 'yeepay' and self.yee_bind_limit:
+            return util.handle_kuai_bank_limit(self.yee_bind_limit)
+
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号', db_index=True)
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
-    add_at = models.DateTimeField(auto_now=True)
+    add_at = models.DateTimeField(auto_now_add=True)
     is_bind_huifu = models.BooleanField(verbose_name=u"是否绑定汇付快捷", default=False)
     is_bind_kuai = models.BooleanField(verbose_name=u"是否绑定快钱快捷", default=False)
     is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
@@ -111,7 +120,7 @@ class PayInfo(models.Model):
     PROCESSING = u'处理中'
     SUCCESS = u'成功'
     FAIL = u'失败'
-    EXCEPTION = u'异常'
+    EjtyXCEPTION = u'异常'
     ACCEPTED = u'已受理'
 
     DEPOSIT = 'D'  # 充值

@@ -25,6 +25,7 @@ from wanglibao_pay.util import fmt_two_amount
 from misc.models import Misc
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing.models import IntroducedBy
+from wanglibao_sms.tasks import send_sms_one
 
 
 logger = logging.getLogger(__name__)
@@ -68,7 +69,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         if records_count == 0:
             # 红包
             records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+                .exclude(redpack__event__rtype='interest_coupon')\
+                .order_by('-redpack__event__amount')
             for x in records:
                 if x.order_id:
                     continue
@@ -112,9 +114,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
 
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           x.created_at, event.available_at, event.unavailable_at)
+                end_time_day = end_time.strftime('%Y-%m-%d')
 
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                        "id": x.id, "invest_amount": event.invest_amount,
+                        "id": x.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
                         "period": event.period, "period_type": event.period_type,
                         "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
@@ -125,6 +128,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         if obj['method'] == REDPACK_RULE['percent']:
                             obj['amount'] = obj['amount']/100.0
                         packages['available'].append(obj)
+            # 排序
+            packages['available'].sort(key=lambda x: x['highest_amount'], reverse=True)
+            packages['available'].sort(key=lambda x: x['end_time_day'])
+            packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # 加息券
         # 检测app版本号，小于2.5.2版本不返回加息券列表
@@ -136,7 +143,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             records_count_p2p = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
             if records_count_p2p == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                    .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+                    .filter(redpack__event__rtype='interest_coupon')\
+                    .order_by('-redpack__event__amount')
                 for coupon in coupons:
                     if coupon.order_id:
                         continue
@@ -182,9 +190,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
 
                     start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                               coupon.created_at, event.available_at, event.unavailable_at)
+                    end_time_day = end_time.strftime('%Y-%m-%d')
 
                     obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                           "id": coupon.id, "invest_amount": event.invest_amount,
+                           "id": coupon.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                            "unavailable_at": stamp(end_time), "event_id": event.id,
                            "period": event.period, "period_type": event.period_type,
                            "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
@@ -196,6 +205,9 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                             if obj['method'] == REDPACK_RULE['interest_coupon']:
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
+                # 排序
+                packages['available'].sort(key=lambda x: x['end_time_day'])
+                packages['available'].sort(key=lambda x: x['amount'], reverse=True)
 
         # packages['available'].sort(key=lambda x: x['unavailable_at'])
         packages['available'].sort(key=lambda x: x['order_by'], reverse=True)
@@ -342,8 +354,14 @@ def _send_message(user, event, end_time):
     # 发送短信,功能推送id: 4
     # 模板中的参数变量必须以 name=value 的形式传入
     phone = user.wanglibaouserprofile.phone
-    PHPSendSMS().send_sms_one(4, phone, 'phone', amount=coupon_amount, rtype=rtype)
-
+    # PHPSendSMS().send_sms_one(4, phone, 'phone', amount=coupon_amount, rtype=rtype)
+    send_sms_one.apply_async(kwargs={
+                                "rule_id": 4,
+                                "phone": phone,
+                                "user_type":'phone',
+                                "amount":coupon_amount,
+                                "rtype":rtype
+                                    })
     # send_messages.apply_async(kwargs={
     #     'phones': [user.wanglibaouserprofile.phone],
     #     'messages': [messages.red_packet_get_alert(coupon_amount, rtype)],
@@ -752,3 +770,88 @@ def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at
 
 def get_app_version():
     misc = Misc.objects.filter(key='android_update').first()
+
+
+# Add by hmm on 2016-2-4
+#为二月红包宴年前专用接口，节后会调整
+def give_activity_redpack_for_hby(user, event, device_type, just_one_packet=False, check_issue_time=False):
+    """
+
+    :param user:
+    :param event: 支持RedPackEevent对象或是一个event的名字
+    :param device_type:
+    :param just_one_packet: 置为True，对于某个红包活动用户只能获得一个红包，不能获得多个
+    :param check_issue_time：检查发放时间，超期不发放
+    :return:
+    """
+    device_type = _decide_device(device_type)
+    # 后台设置必须保证红包的event不重名
+    if not isinstance(event, RedPackEvent):
+        try:
+            event = RedPackEvent.objects.get(name=event)
+        except:
+            return False, u"活动名称错误", 0
+    #检查红包发放时间
+    now = timezone.now()
+    if now < event.give_start_at or now > event.give_end_at:
+        return False, u'活动已过期', 0
+    redpack = RedPack.objects.filter(event=event, status="unused").first()
+    if not redpack:
+        return False, u"没有此优惠券", 0
+    if redpack.token != "":
+        redpack.status = "used"
+        redpack.save()
+    if just_one_packet and RedPackRecord.objects.filter(redpack=redpack, user=user).exists():
+        return False, u"限领一个红包", 0
+    record = RedPackRecord()
+    record.user = user
+    record.redpack = redpack
+    record.change_platform = device_type
+    record.save()
+
+    # start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+    #                                           record.created_at, event.available_at, event.unavailable_at)
+    # _send_message_for_hby(user, event, end_time)
+
+    return True, "", record
+
+
+#为二月红包宴年前专用接口，节后会调整
+def _send_message_for_hby(user, event, end_time):
+    fmt_str = "%Y年%m月%d日"
+    if end_time:
+        unavailable_at = end_time
+    else:
+        unavailable_at = event.unavailable_at
+    give_time = timezone.localtime(unavailable_at).strftime(fmt_str)
+    mtype = 'activity'
+    rtype = u'元红包'
+    coupon_amount = event.amount
+    if event.rtype == 'interest_coupon':
+        rtype = u'%加息券'
+    if event.rtype == 'percent':
+        coupon_amount = event.highest_amount
+
+    # 发送短信,功能推送id: 4
+    # 模板中的参数变量必须以 name=value 的形式传入
+    # phone = user.wanglibaouserprofile.phone
+    # PHPSendSMS().send_sms_one(4, phone, 'phone', amount=coupon_amount, rtype=rtype)
+
+    # send_messages.apply_async(kwargs={
+    #     'phones': [user.wanglibaouserprofile.phone],
+    #     'messages': [messages.red_packet_get_alert(coupon_amount, rtype)],
+    #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+    # })
+    if event.rtype == 'percent':
+        title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
+    elif event.rtype == 'interest_coupon':
+        title, content = messages.msg_give_coupon(event.name, event.amount, give_time)
+        mtype = 'coupon'
+    else:
+        title, content = messages.msg_redpack_give(event.amount, event.name, give_time)
+    inside_message.send_one.apply_async(kwargs={
+        "user_id": user.id,
+        "title": title,
+        "content": content,
+        "mtype": mtype
+    })

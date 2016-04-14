@@ -1,4 +1,9 @@
 # encoding: utf-8
+
+
+import json
+import logging
+import hashlib
 from captcha.fields import CaptchaField
 from captcha.models import CaptchaStore
 
@@ -8,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import F
 
 from utils import detect_identifier_type, verify_id
-from wanglibao_account.models import VerifyCounter, IdVerification
+from wanglibao_account.models import VerifyCounter, IdVerification, ManualModifyPhoneRecord
 from wanglibao_sms.utils import validate_validation_code
 from marketing.models import InviteCode, PromotionToken, Channels
 from wanglibao_account.utils import mlgb_md5
@@ -20,8 +25,10 @@ from rest_framework.authtoken.models import Token
 from marketing.models import LoginAccessToken
 from django.conf import settings
 from wanglibao_profile.models import USER_TYPE
+from report.crypto import Aes
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class EmailOrPhoneRegisterForm(forms.ModelForm):
@@ -60,6 +67,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'mlgb error': u'注册成功',
         'verify_invalid': u'请输入验证码',
         'verify_error': u'短信验证码错误',
+        'manual_modify_exists': u'要注册手机号不能为人工修改手机号正在申请修改的手机号',
     }
 
     class Meta:
@@ -118,6 +126,12 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             )
 
         if len(users) == 0:
+            manual_modify_exists = ManualModifyPhoneRecord.objects.filter(new_phone=identifier, status__in=[u"待初审", u"初审待定", u"待复审"]).exists()
+            if manual_modify_exists:
+                raise forms.ValidationError(
+                        self.error_messages['manual_modify_exists'],
+                        code='manual_modify_exists',
+                )
             return identifier.strip()
         raise forms.ValidationError(
             self.error_messages['duplicate_username'],
@@ -436,9 +450,10 @@ class ManualModifyPhoneForm(forms.Form):
         'validate must not be null': '1',
     }
 
-    id_front_image = forms.ImageField(label='身份证正面照片')
-    id_back_image = forms.ImageField(label='身份证反面照片')
-    id_user_image = forms.ImageField(label='手持身份证照片')
+    id_front_image = forms.ImageField(label='身份证正面照片', required=False)
+    id_back_image = forms.ImageField(label='身份证反面照片', required=False)
+    id_user_image = forms.ImageField(label='手持身份证照片', required=False)
+    card_user_image = forms.ImageField(label='手持银行卡照片', required=False)
     new_phone = forms.CharField(max_length=64, label='新的手机号码')
     validate_code = forms.CharField(label="Validate code for phone", required=False)
     def clean_validate_code(self):
@@ -461,3 +476,118 @@ class ManualModifyPhoneForm(forms.Form):
                     )
         return self.cleaned_data
 
+
+class BiSouYiRegisterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.action = kwargs.pop('action', None)
+        super(BiSouYiRegisterForm, self).__init__(*args, **kwargs)
+
+    channel_code = forms.CharField(error_messages={'required': u'渠道码是必须的'})
+    client_id = forms.CharField(error_messages={'required': u'客户端id是必须的'})
+    sign = forms.CharField(error_messages={'required': u'签名是必须的'})
+    content = forms.CharField(error_messages={'required': u'content是必须的'})
+
+    def clean_client_id(self):
+        client_id = self.cleaned_data['client_id']
+        if client_id == settings.BISOUYI_CLIENT_ID:
+            return client_id
+        else:
+            raise forms.ValidationError(
+                code=10012,
+                message=u'无效客户端id',
+            )
+
+    def clean_channel_code(self):
+        channel_code = self.cleaned_data['channel_code']
+        if channel_code == 'bisouyi':
+            return channel_code
+        else:
+            raise forms.ValidationError(
+                code=10010,
+                message=u'无效渠道码',
+            )
+
+    def clean_content(self):
+        content = self.cleaned_data['content']
+        try:
+            ase = Aes()
+            decrypt_text = ase.decrypt(settings.BISOUYI_AES_KEY, content)
+            content_data = json.loads(decrypt_text)
+        except Exception, e:
+            logger.info("BiSouYiRegisterForm clean_content raise error: %s" % e)
+            raise forms.ValidationError(
+                code=10013,
+                message=u'content解析失败',
+            )
+        else:
+            if isinstance(content_data, dict):
+                if 'mobile' in content_data:
+                    phone = str(content_data['mobile'])
+                    if detect_identifier_type(phone) == 'phone':
+                        users = User.objects.filter(wanglibaouserprofile__phone=phone)
+                        if not users.exists() or self.action != 'register':
+                            if 'other' in content_data:
+                                if 'account' in content_data:
+                                    if self.action == 'login':
+                                        if 'token' not in content_data:
+                                            raise forms.ValidationError(
+                                                code=10020,
+                                                message=u'content没有包含token'
+                                            )
+                                    return content, content_data
+                                else:
+                                    raise forms.ValidationError(
+                                        code=10019,
+                                        message=u'content没有包含account'
+                                    )
+                            else:
+                                raise forms.ValidationError(
+                                    code=10018,
+                                    message=u'content没有包含other'
+                                )
+                        else:
+                            raise forms.ValidationError(
+                                code=10017,
+                                message=u'该手机号已被抢注'
+                            )
+                    else:
+                        raise forms.ValidationError(
+                            code=10014,
+                            message=u'无效手机号'
+                        )
+                else:
+                    raise forms.ValidationError(
+                        code=10015,
+                        message=u'content没有包含phone'
+                    )
+            else:
+                raise forms.ValidationError(
+                    code=10016,
+                    message=u'content不是期望的类型',
+                )
+
+    def get_phone(self):
+        phone = str(self.cleaned_data['content'][1]['mobile'])
+        return phone
+
+    def get_other(self):
+        other = self.cleaned_data['content'][1]['other']
+        return other
+
+    def get_account(self):
+        account = self.cleaned_data['content'][1]['account']
+        return account
+
+    def get_token(self):
+        token = self.cleaned_data['content'][1]['token']
+        return token
+
+    def check_sign(self):
+        client_id = self.cleaned_data['client_id']
+        sign = self.cleaned_data['sign']
+        content = self.cleaned_data['content'][0]
+        local_sign = hashlib.md5(str(client_id) + settings.BISOUYI_CLIENT_SECRET + content).hexdigest()
+        if sign != local_sign:
+            return False
+        else:
+            return True

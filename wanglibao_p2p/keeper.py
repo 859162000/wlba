@@ -27,7 +27,7 @@ import json
 from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
-
+from wanglibao_profile.models import RepeatPaymentUser, RepeatPaymentUserRecords
 
 
 logger = logging.getLogger(__name__)
@@ -387,6 +387,30 @@ class AmortizationKeeper(KeeperBaseMixin):
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
+        # 推送用户还款计划到渠道中心 add by chenweibin@20160328
+        for product_amortization in product_amortizations:
+            sub_amortizations = product_amortization.subs.all()
+            settled_sub_amos = list()
+            for sub_amo in sub_amortizations:
+                settled_sub_amos.append({
+                    'id': sub_amo.id,
+                    'product': product.id,
+                    'user_id': sub_amo.user.id,
+                    'term': sub_amo.term,
+                    'settled': sub_amo.settled,
+                    'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
+                    'principal': float(sub_amo.principal),
+                    'interest': float(sub_amo.interest),
+                    'penal_interest': float(sub_amo.penal_interest),
+                    'coupon_interest': float(sub_amo.coupon_interest),
+                    'description': sub_amo.description,
+                })
+
+            if settled_sub_amos:
+                from .tasks import coop_amortizations_push
+                coop_amortizations_push.apply_async(
+                    kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
+
     # def __generate_useramortization(self, equities):
     #     """
     #     :param equities: 批量生成用户还款计划提高数据库存储性能
@@ -512,6 +536,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             phone_list = list()
             message_list = list()
+            settled_sub_amos = list()
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
@@ -522,6 +547,54 @@ class AmortizationKeeper(KeeperBaseMixin):
                 sub_amo.save()
                 
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
+
+                # 加入重复回款的用户还需要扣回的金额及扣款操作
+                try:
+                    repeat_user = RepeatPaymentUser.objects.select_for_update()\
+                        .filter(user_id=sub_amo.user.id, amount__gt=0).first()
+                    if repeat_user:
+                        repeat_amount = repeat_user.amount
+                        # if repeat_amount > 0:
+                        # 判断是否每天从回款中扣款
+                        is_every_day = True
+                        if not repeat_user.is_every_day:
+                            product_ids = repeat_user.product_ids.split(',')
+                            product_ids = [int(p_id) for p_id in product_ids if p_id.strip() != '']
+                            # 判断当期还款的产品id是否在用户新购标的id中, 不在说明该标不用扣款
+                            if product.id not in product_ids:
+                                is_every_day = False
+
+                        if is_every_day:
+                            # 判断剩余应扣金额是否大于等于本期回款本息之合, 大于等于,则扣本息,否则扣剩余应扣金额
+                            if repeat_amount >= amo_amount:
+                                reduce_amount = amo_amount
+                                reduce_amount_current = repeat_amount - amo_amount  # 剩余应扣金额-本次扣除的本息之合
+                            else:
+                                reduce_amount = repeat_amount
+                                reduce_amount_current = 0
+
+                            print ("repeat_amount: %s, amo_amount: %s, type1:%s, type2:%s" % (
+                                repeat_amount, amo_amount, type(repeat_amount), type(amo_amount)))
+
+                            # 减账户余额
+                            user_margin_keeper.reduce_margin(reduce_amount, u'系统重复回款扣回%s元' % reduce_amount)
+
+                            # 更新剩余应扣金额
+                            repeat_user.amount = reduce_amount_current
+                            repeat_user.save()
+
+                            # 记录扣款流水
+                            repeat_record = RepeatPaymentUserRecords(user_id=sub_amo.user.id,
+                                                                     name=sub_amo.user.wanglibaouserprofile.name,
+                                                                     phone=sub_amo.user.wanglibaouserprofile.phone,
+                                                                     amount=reduce_amount,
+                                                                     amount_current=reduce_amount_current,
+                                                                     description=description)
+                            repeat_record.save()
+                except Exception:
+                    logger.exception('err')
+                    logger.error("用户扣款失败,用户id:[%s], 回款本息合计:[%s]" % (sub_amo.user, amo_amount))
+                    pass
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
                 message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
@@ -564,6 +637,22 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 except Exception,e:
                     pass
+
+                settled_sub_amos.append({
+                    'id': sub_amo.id,
+                    'user_id': sub_amo.user.id,
+                    'product': product.id,
+                    'term': sub_amo.term,
+                    'settled': sub_amo.settled,
+                    'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
+                    'settlement_time': sub_amo.settlement_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'principal': float(sub_amo.principal),
+                    'interest': float(sub_amo.interest),
+                    'penal_interest': float(sub_amo.penal_interest),
+                    'coupon_interest': float(sub_amo.coupon_interest),
+                    'description': sub_amo.description,
+                })
+
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
@@ -574,6 +663,11 @@ class AmortizationKeeper(KeeperBaseMixin):
             })
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
+
+            if settled_sub_amos:
+                from .tasks import coop_amortizations_push
+                coop_amortizations_push.apply_async(
+                    kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(

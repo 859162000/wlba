@@ -10,54 +10,52 @@ html
         include global/g_nav
         - csrf_token
         .register
+            .login-href 暂不绑卡，回到
+                a(href='/') 首页
             .register_nav_min.register_nav_min3
             .register_box.clearfix
-                form#payform.payform(action="/pay/deposit/", method='post', target='_blank')
-                    .login-form
-                        .h5.register_welfare 新手首次完成充值送100元红包
-                        .registerFormDiv
-                            ul.registerForm
-                                li.clearfix
-                                    label 充值金额 ：
-                                    input.placeholderInput#amount(type="text", name="amount", placeholder="请输入充值金额", autocomplete='off', title="请输入充值金额")
-                                    span.error_span
-                                li.clearfix.select_style
-                                    label 银行：
-                                    select#card-select(name='gate_id')
-                                      option(value='') 请选择银行
-                                      for bank in banks
-                                        option(value='{{bank.gate_id}}') {{bank.name}}
-                                    span.error_span
-                            .loginError
-                            .form_bottom
-                                input(type='submit').submitFormStyle#recharge 立即充值
+                .login-form
+                    .registerFormDiv.tie-on-card
+                        ul.registerForm
+                            li.clearfix.select_style
+                                label 银行卡：
+                                select.select_bank.checkCodeStatus(name='gate_id',placeholder="请选择银行")
+                                  option(value='') 请选择银行
+                                  //for bank in banks
+                                  //  option(value='{{bank.gate_id}}',data-id='{{bank.id}}') {{bank.name}}
+                                .bankPop
+                            li.clearfix
+                                label 卡号：
+                                input.placeholderInput.checkCodeStatus.cardId(type="text", name="", placeholder="请输入银行卡号", autocomplete='off', title="请输入银行卡号")
+                            li.clearfix
+                                label 预留手机号：
+                                input.placeholderInput.checkCodeStatus.mobileCode(type="text", name="", placeholder="请输入银行预留手机号", autocomplete='off', title="请输入银行预留手机号")
+                            li.clearfix.codeParent
+                                label 验证码 ：
+                                input(type='hidden')#order_id
+                                input(type='hidden')#token
+                                input#registerSMSCode.w115.placeholderInput.checkCodeStatus.checkSEMCode(type="text", name="button-get-validate-code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                                button.get-code-btn(type='button') 获取验证码
+                        .error-box
+                        .form_bottom
+                            .tie-on-card-btn#tieOnCard
                 .register_info
-                    .go_next_welfare 下一步奖励：
-                    .red_packets.clearfix
-                        i
-                        label 首次投资最高送180元红包
-                    .info_middle.clearfix
-                        .welfare_ed 已获得的奖励：
-                        .welfare_ed_list
-                            i
-                            | 新手注册即送28888元体验金
-                        .welfare_ed_list
-                            i
-                            | 实名认证20元红包
-                    .info_ewm.clearfix
-                        i
-                        label 关注网利宝官方微信
+                    h3 新手大礼包，你来我就送！
+                    .reward-box
+                        .reward-left
+                            p
+                                span 28888
+                                | 元
+                            p 注册即送
+                        .reward-right 体验金
+                    .reward-box
+                        .reward-left
+                            p
+                                span 50
+                                | 元
+                            p 注册即送
+                        .reward-right 红包
     include global/g_footer
-    .recharge_alert#rechargeAlert(style='display:none')
-        .alert_title
-            i
-            | 充值提示
-        .alert_content
-            p 请您在新打开的网上银行页面上完成充值
-            p 完成充值后请根据您的情况点击下面的按钮
-        .alert_btns
-            a(href='/help/').go_help 充值遇到问题
-            a(href='/accounts/register/three/').finished_btn 已完成充值
     script.
       require(["/static/src/pc/register_next.js?v=201512044"])
 

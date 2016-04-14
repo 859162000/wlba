@@ -1,3 +1,5 @@
+
+
 .regist-process-img
   padding:  1.5rem
   img
@@ -16,59 +18,8 @@
   font-size: $font-size14
   color: #5DB5F2
 
-
-@mixin bgitem($name, $imgName)
-  .#{$name}
-    background: url("/static/imgs/mobile/process/#{$imgName}.png") no-repeat
-    background-size: 100%
-
-  .#{$name}-active
-    background: url("/static/imgs/mobile/process/#{$imgName}_active.png") no-repeat
-    background-size: 100%
-
-
 .regist-process-form
-
-  //实名认证姓名
-  .authentication-name
-    width: rem(36)
-    height: rem(45)
-  +bgitem('name-icon', 'name')
-
-  //实名认证身份证
-  .authentication-card
-    width: rem(36)
-    height: rem(50)
-
-  +bgitem('idcard-icon', 'idcard')
-
-  .form-mg-first
-    height: .9rem
-
-  .binding-bank
-    width: rem(37)
-    height: rem(36)
-  +bgitem('bank-icon', 'bank')
-
-  .binding-bankcard
-    width: rem(37)
-    height: rem(29)
-  +bgitem('bankcard-icon', 'card')
-
-  .binding-bankphone
-    width: rem(36)
-    height: rem(45)
-  +bgitem('bankphone-icon', 'phone')
-
-  .binding-validation
-    width: rem(37)
-    height: rem(36)
-  +bgitem('validation-icon', 'code')
-
-  .binding-amount
-    width: rem(37)
-    height: rem(31)
-  +bgitem('amount-icon', 'money')
+  padding: 0 0.5rem
 
 .regist-process-leo
   width: rem(630)

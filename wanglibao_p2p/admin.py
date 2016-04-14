@@ -16,7 +16,7 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminP2PList, AdminPrepayment
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_p2p.forms import RequiredInlineFormSet,ContractTemplateForm
+from wanglibao_p2p.forms import RequiredInlineFormSet, ContractTemplateForm
 from wanglibao_account.models import UserAddress
 from wanglibao_p2p.tasks import automatic_trade
 

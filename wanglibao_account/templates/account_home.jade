@@ -13,16 +13,12 @@ block sidebar
 block main
   .account-home-panel
     .account-home-panel--title-bar
-      if user.wanglibaouserprofile.utype == '3'
-        span.nickname#qiyeUser 企业用户：
-          i
+      span.nickname {{user | safe_phone}}
+      if user.wanglibaouserprofile.id_is_valid
+        span.verified 已实名认证
       else
-          span.nickname {{user | safe_phone}}
-          if user.wanglibaouserprofile.id_is_valid
-            span.verified 已实名认证
-          else
-            span
-              a#name-hight(href="/accounts/id_verify/") 立即进行实名认证
+        span
+          a#name-hight(href="/accounts/id_verify/") 立即进行实名认证
 
     .card-panel
       .total-asset-money-card
@@ -65,7 +61,7 @@ block main
         ul.title-bar--tabs
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 理财专区
-          li.title-bar--tab#tyjzq(style="display:none")
+          li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/experience/") 体验金专区
             i
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
@@ -212,10 +208,11 @@ block main
                             label {{experience_account.product.period}}天
                             span 投资期限
                         li.li_four
-                            if experience_account.experience_amount > 0
-                                a(href='javascript:void(0)').investBtn 立即投资
-                            else
-                                a.invest_ed 立即投资
+                            //if experience_account.experience_amount > 0
+                            //    a(href='javascript:void(0)').investBtn 立即投资
+                            //else
+                            //    a.invest_ed 立即投资
+                            img(src='/static/images/app_download.jpg')
               if experience_amortization
                   .look_more_detail
                     .more_btn
@@ -260,7 +257,7 @@ block main
                         span
                         .explain_content
                             p.name 如何使用？
-                            p 1、体验金只能在相关活动页投资体验标，投资时不能使用其它理财券。体验金有效期自发放日起15天内有效。
+                            p 1、体验金只能在相关活动页投资体验标，投资时不能使用其它理财券。
                             p 2、体验金需要用户手动投资，投资时系统将自动按体验金总额一次性投资完毕。例如，用户A注册获得10000元体验金，未使用，之后该用户通过参与活动获得5000元体验金，此时用户选择投资体验标时（两笔体验金均在有效期内），系统默认将15000元体验金全部投资。
                     li.clearfix
                         span

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import re
 import pytz
 import time
 from datetime import datetime, timedelta
@@ -12,6 +13,7 @@ from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels,
 from wanglibao_p2p.models import AmortizationRecord, P2PRecord
 from wanglibao.settings import THREE_DEFAULT_CHANNEL_CODE
 import logging
+from user_agents import parse
 
 
 logger = logging.getLogger('p2p')
@@ -191,3 +193,27 @@ def pc_data_generator():
         'p2p_register_number':p2p_register_number,
         "p2p_amount_yesterday":float(p2p_amount_yesterday)
     }
+
+
+def utype_is_app(request):
+    is_app = False
+    device_list = ['android', 'iphone']
+    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+    for device in device_list:
+        match = re.search(device, user_agent)
+        if match and match.group():
+            is_app = True
+
+    return is_app
+
+
+def utype_is_mobile(request):
+    is_mobile = False
+    ua = request.META.get('HTTP_USER_AGENT', '')
+    if ua:
+        user_agent = parse(ua)
+        if user_agent.is_mobile:
+            is_mobile = True
+
+    return is_mobile
+

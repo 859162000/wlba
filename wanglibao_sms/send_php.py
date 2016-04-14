@@ -11,7 +11,8 @@ from datetime import datetime
 
 logger = logging.getLogger('wanglibao_sms')
 
-PHP_SMS_HOST = 'http://101.200.149.172/index.php?s=/node_push/send.html'
+# PHP_SMS_HOST = 'http://101.200.149.172/index.php?s=/node_push/send.html'
+PHP_SMS_HOST = 'http://101.200.149.172/api.php?route=/send'
 # PHP_SMS_HOST = 'http://haopeiwen.dev.wanglibao.com/wanglibao_push/index.php?s=/node_push/send.html'
 PHP_AUTH_ID = 'admin'
 PHP_AUTH_KEY = '192006250b4c09247ec02edce69f6a2d'
@@ -75,10 +76,13 @@ class PHPSendSMS(SMSBackEnd):
         post_data_json = json.dumps(post_data)
 
         headers = {'content-type': 'application/json'}
-        response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers)
+        response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers, timeout=2.0)
 
         status_code = response.status_code
-        res_text = json.loads(response.text)
+        try:
+            res_text = json.loads(response.text)
+        except:
+            res_text = response.text
 
         # 写入日志
         logger.info(">>>> json data: {}".format(post_data_json))
@@ -101,7 +105,7 @@ class PHPSendSMS(SMSBackEnd):
                 'user_id': user_id,
                 'user_type': user_type,
                 'params': {
-                    key: kwargs[key] for key in kwargs.keys()
+                    key: str(kwargs[key]) for key in kwargs.keys()
                 }
             }
         }
@@ -141,22 +145,16 @@ def generate_random_str(count):
 def test():
     data = {
         0: {
-            'user_id': '18612803787',
-            'user_type': 'phone',
-            'params': {
-                'a': 'hello',
-            }
-        },
-        1: {
             'user_id': '15038038823',
             'user_type': 'phone',
             'params': {
-                'a': 'hello',
+                'count': 5,
+                'days': 3
             }
         },
     }
 
-    PHPSendSMS.send_sms(5, data)
+    PHPSendSMS.send_sms_one(3, '15038038823', 'phone', name='李先生', count=3, amount=123.45)
 
 
 if __name__ == "__main__":

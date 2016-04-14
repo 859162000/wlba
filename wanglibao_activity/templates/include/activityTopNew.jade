@@ -13,6 +13,12 @@ include include/activityTop2
           .space-vertical-m
           .banner-form--row.align-center
             a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
+      .denglu-user#denglu-user
+        h1 欢迎来网利宝投资理财
+        p 您的登录账户：{{user|display_name}}
+        .user-btn
+          a(href="/accounts/home") 进入我的账户
+        span.xm-com.xm-icon4
     else
         .denelu-form#denglu
             #aug-center

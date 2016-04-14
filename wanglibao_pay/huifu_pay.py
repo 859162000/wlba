@@ -19,7 +19,7 @@ import socket
 from django.conf import settings
 from django.db import transaction
 from wanglibao_pay.util import get_client_ip, fmt_two_amount, handle_kuai_bank_limit, TWO_PLACES
-from wanglibao_pay.views import PayResult
+from wanglibao_pay.models import PayResult
 from marketing import tools
 import xml.etree.ElementTree as ET
 #from wanglibao_sms import messages

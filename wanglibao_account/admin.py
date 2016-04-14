@@ -136,13 +136,14 @@ User.__unicode__ = user_unicode
 
 class IdVerificationAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
+    list_display = ('id', 'user', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
     search_fields = ('name', 'id_number')
     list_filter = ('is_valid', )
+    raw_id_fields = ('user', )
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_idverification'):
-            return ('name', 'id_number', 'is_valid', 'created_at',)
+            return ('user', 'name', 'id_number', 'is_valid', 'created_at',)
         return ()
 
     def has_delete_permission(self, request, obj=None):
@@ -257,7 +258,8 @@ class BindingAdmin(admin.ModelAdmin):
                                   order_prefix)
 
     def save_model(self, request, obj, form, change):
-        if obj.detect_callback is True and obj.btype == 'xunlei9':
+        # 如果渠道为迅雷用户则执行用户回调补发
+        if obj.detect_callback is True and obj.btype == ('xunlei9', 'mxunlei'):
             obj.detect_callback = False
             order_list = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
             if order_list.exists():

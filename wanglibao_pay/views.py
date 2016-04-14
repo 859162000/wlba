@@ -80,7 +80,11 @@ class BankListView(TemplateView):
         default_bank = Bank.get_deposit_banks().filter(
             name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
-        bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        try:
+            bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        except:
+            bank_num = 16
+        #bank_num = 20
         context.update({
             'default_bank': default_bank,
             'banks': Bank.get_deposit_banks()[:bank_num],
@@ -414,6 +418,11 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
+            try:
+                device = split_ua(request)
+            except:
+                device = {'device_type':'pc'}
+            
             name = user.wanglibaouserprofile.name or u'用户'
             withdraw_submit_ok.apply_async(kwargs={
                 "user_id": user.id,
@@ -421,7 +430,8 @@ class WithdrawCompleteView(TemplateView):
                 "phone": user.wanglibaouserprofile.phone,
                 "amount": amount,
                 "bank_name": card.bank.name,
-                "order_id": order.id
+                "order_id": order.id,
+                "device": device
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -1177,6 +1187,10 @@ class WithdrawAPIView(DecryptParmsAPIView):
 
         # 短信通知添加用户名
         user = request.user
+        try:
+            device = split_ua(request)
+        except:
+            device = {'device_type':'pc'}
         name = user.wanglibaouserprofile.name or u'用户'
         if not result['ret_code']:
             withdraw_submit_ok.apply_async(kwargs={
@@ -1185,7 +1199,8 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "phone": request.user.wanglibaouserprofile.phone,
                 "amount": result['amount'],
                 "bank_name": result['bank_name'],
-                "order_id": result['order_id']
+                "order_id": result['order_id'],
+                "device": device
             })
         return Response(result)
 
@@ -1284,6 +1299,85 @@ class UnbindCardTemplateView(TemplateView):
         print avatar_url
         return {'name': profile.name, 'phone': profile.phone, 'social_id': profile.id_number,
                 'bank_name': bank_name, 'card_number': card_number, 'avatar_url': avatar_url}
+
+
+
+class CheckRechargePayinfoView(APIView):
+    '''检查用户是否成功充值过'''
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        user = request.user
+        pay_info = PayInfo.objects.filter(user=request.user)
+        messages = {}
+        if pay_info.filter(status="成功"):
+            messages['recharge'] = True
+        else:
+            messages['recharge'] = False
+        
+        return Response(json.dumps(messages))
+        
+class CardConfigTemplateView(TemplateView):
+    """
+    管理银行卡，到第三方解绑的页面
+    """
+    template_name = 'card_config.jade'
+    def _get_wangli_card(self, card_num, wangli_cards):
+        for c in wangli_cards:
+            if card_num == c.no[:6] + c.no[-4:]:
+                return (card_num, c)
+        return (card_num, None)
+
+    def _get_wangli_cards(self, card_num_list, wangli_cards):
+        return [self._get_wangli_card(c, wangli_cards) for c in card_num_list] 
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone')
+        # 电话页面 
+        if not phone:
+            return {'phone': None}
+
+        # 解绑快钱卡
+        user_id = self.request.GET.get('user_id')
+        card_num = self.request.GET.get('card_num')
+        kuai_code = self.request.GET.get('kuai_code')
+        if user_id and card_num and kuai_code:
+            third_pay.KuaiShortPay().unbind_card(card_num, kuai_code, user_id)
+        
+        # 显示卡列表
+        profile = WanglibaoUserProfile.objects.get(phone=phone)
+        user = profile.user
+
+        wangli_cards = Card.objects.filter(user=user).all()
+        kuai_cards = third_pay.KuaiShortPay().query_bind_new(user.id)['cards']
+        kuai_cards = self._get_wangli_cards(kuai_cards, wangli_cards)
+        yee_cards = third_pay.YeeShortPay().bind_card_query(user) 
+        yee_cards = [c['card_top'] + c['card_last'] for c in yee_cards['data']['cardlist']]
+        yee_cards = self._get_wangli_cards(yee_cards, wangli_cards)
+        banks_info = [(b.kuai_code, b.name) for b in Bank.objects.all()]
+
+        res = {'user_id': profile.user_id, 'phone': phone, 'name': profile.name, 'wangli_cards': wangli_cards,
+                'kuai_cards': kuai_cards, 'yee_cards': yee_cards, 'banks_info':
+                banks_info}
+        return res
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

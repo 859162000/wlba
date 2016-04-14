@@ -11,7 +11,7 @@ from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_pay.serializers import CardSerializer
-
+from misc.models import Misc
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -283,6 +283,13 @@ def withdraw(request):
         pay_info.save()
         return {"ret_code": 20065, 'message': u'余额不足'}
 
+def _need_validation_for_qpay(card):
+    need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
+    if need_sms and need_sms.value == '1' and card.is_bind_kuai:
+        need_validation_for_qpay = True
+    else:
+        need_validation_for_qpay = False
+    return need_validation_for_qpay
 
 def card_bind_list(request):
     # 查询已经绑定支付渠道的银行卡列表
@@ -291,32 +298,6 @@ def card_bind_list(request):
         return {"ret_code": 20071, "message": "请先进行实名认证"}
 
     try:
-        # 查询易宝已经绑定卡
-        res = YeeShortPay().bind_card_query(user=user)
-        if res['ret_code'] not in (0, 20011): return res
-        if 'data' in res and 'cardlist' in res['data']:
-            yee_card_no_list = []
-            for car in res['data']['cardlist']:
-                card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
-                if card:
-                    yee_card_no_list.append(card.no)
-            # if yee_card_no_list:
-            #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
-            #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
-
-        # 查询块钱已经绑定卡
-        res = KuaiShortPay().query_bind_new(user.id)
-        if res['ret_code'] != 0: return res
-        if 'cards' in res:
-            kuai_card_no_list = []
-            for car in res['cards']:
-                card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
-                if card:
-                    kuai_card_no_list.append(card.no)
-            if kuai_card_no_list:
-                Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
-                Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
-
         card_list = []
         cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行'])\
             .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True))\
@@ -340,8 +321,13 @@ def card_bind_list(request):
                     'gate_id': card.bank.gate_id,
                     'storable_no': card.no[:6] + card.no[-4:],
                     'is_the_one_card': card.is_the_one_card,
+                    'need_validation_for_qpay': _need_validation_for_qpay(card)
                 }
 
+                if user.wanglibaouserprofile.phone == '15011488086':
+                    base_dict['storable_no'] = card.no
+                    base_dict['need_validation_for_qpay'] = True
+                    card.is_bind_kuai = True
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
                 tmp = dict()
                 channel = card.bank.channel
@@ -384,7 +370,7 @@ def card_bind_list(request):
         return {"ret_code": 0, "message": "ok", "cards": card_list}
 
     except Exception, e:
-        logger.error(e.message)
+        logger.exception('get bind card list failed:')
         return {"ret_code": 20031, "message": u"请求失败"}
 
 
@@ -451,8 +437,11 @@ def bind_pay_deposit(request):
     card_no = request.DATA.get("card_no", "").strip()
     gate_id = request.DATA.get("gate_id", "").strip()
     input_phone = request.DATA.get("phone", "").strip()
+        
     device_type = split_ua(request)['device_type']
     ip = util.get_client_ip(request)
+
+    mode = request.DATA.get('mode', '').strip()
 
     user = request.user
     if user.wanglibaouserprofile.utype == '3':
@@ -482,6 +471,18 @@ def bind_pay_deposit(request):
 
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
+    
+    #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
+    card_to_bank = False
+    if card_no and bank:
+        cards_info = bank.cards_info.split(',')
+        for no in cards_info:
+            if card_no.startswith(no):
+                card_to_bank = True
+        if card_to_bank:
+            pass
+        else:
+            return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
 
     amount = request.DATA.get('amount', '').strip()
     try:
@@ -495,36 +496,23 @@ def bind_pay_deposit(request):
     if bank.channel == 'huifu':
         result = HuifuShortPay().pre_pay(request)
 
-        # if result['ret_code'] == 0:
-        #     try:
-        #         # 处理第三方用户充值回调
-        #         CoopRegister(request).process_for_recharge(request.user)
-        #     except Exception, e:
-        #         logger.error(e)
-
         return result
 
     elif bank.channel == 'yeepay':
         result = YeeShortPay().pre_pay(request)
 
-        # if result['ret_code'] == 0:
-            # try:
-            #     # 处理第三方用户充值回调
-            #     CoopRegister(request).process_for_recharge(request.user)
-            # except Exception, e:
-            #     logger.error(e)
-
         return result
 
     elif bank.channel == 'kuaipay':
-        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device_type, ip, request)
-
-        # if result['ret_code'] == 0:
-        #     try:
-        #         # 处理第三方用户充值回调
-        #         CoopRegister(request).process_for_recharge(request.user)
-        #     except Exception, e:
-        #         logger.error(e)
+        stop_no_sms_channel = Misc.objects.filter(
+                key='kuai_qpay_stop_no_sms_channel').first()  
+        if stop_no_sms_channel and stop_no_sms_channel.value == '1' and \
+                len(card_no) == 10 and not request.post.get('mode'): 
+                    # mode != vcode_for_qpay
+            return {'ret_code': 20022,
+                    'message': u'部分银行支付安全升级，需更新到最新版本才能使用，快去更新吧'}
+        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, 
+                                        device_type, ip, request, mode=mode)
 
         return result
 
@@ -545,6 +533,7 @@ def bind_pay_dynnum(request):
     set_the_one_card = request.DATA.get('set_the_one_card', '').strip()
     device = split_ua(request)
     ip = util.get_client_ip(request)
+    mode = request.DATA.get('mode', '').strip()
 
     if not order_id.isdigit():
         return {"ret_code":20125, "message":"订单号错误"}
@@ -572,7 +561,9 @@ def bind_pay_dynnum(request):
         res = YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip, request)
+        res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, 
+                                            token, input_phone, device,
+                                            ip, request, mode=mode)
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
@@ -684,6 +675,8 @@ class TheOneCardAPIView(APIView):
     def get(self, request):
         card = TheOneCard(request.user).get()
         serializer = CardSerializer(card)
+        serializer.data.update(
+            {'need_validation_for_qpay': _need_validation_for_qpay(card)})
         return Response(serializer.data)
 
     def put(self, request):
@@ -712,3 +705,21 @@ class TheOneCardAPIView(APIView):
         return Response({'status_code': 0})
 
 #######################################同卡进出 end###############################
+
+def query_trx(order_id):
+    pay_info = PayInfo.objects.get(order_id=order_id)
+    if pay_info.channel == 'yeepay_bind':
+        return YeeShortPay().query_trx_result(order_id)
+    elif pay_info.channel == 'kuaipay':
+        return KuaiShortPay().query_trx_result(order_id)
+    else:
+        return None
+
+
+
+
+
+
+
+
+

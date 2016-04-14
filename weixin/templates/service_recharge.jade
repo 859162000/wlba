@@ -4,15 +4,15 @@ html
     title 充值
     include include/service_head.jade
   body
-    //是否实名认证
-    //if user.wanglibaouserprofile.id_is_valid
     .recharge-loding
       p 正在加载...
       include  include/weixin_loading
-    section.recharge-main
+    section.recharge-main(style="display:none")
       input(type="hidden",name="card_no_hidden")
+      input(type='hidden', name='order_id', value='')
+      input(type='hidden', name='token', value='')
       //card-have类名为绑定过银行卡状态，card-none类名为未绑定过银行卡状态
-      .recharge-bank-edit.card-have.card-hide
+      .recharge-bank-edit
         .bank-count.card-have.bank-select
           .bank-txt-left 账户余额
           .bank-input.bank-account-num
@@ -20,79 +20,76 @@ html
             | 元
         .bank-count.bank-list-btn
           .bank-txt-left 银行卡号
+          //.card-warp
           input(type="tel", name="card_no", placeholder="输入银行卡号", disabled)#card-val.bank-input
         .bank-count.card-have.bank-select
           .bank-txt-left 开户银行
           .bank-txt-name.bank-input
-          .bank-txt-right.js-bank-img
-            img(src="/static/imgs/sub_weixin/recharge/select-bank.png?v=2015121")
+
       .recharge-body
-        .recharge-none-card.card-none.card-hide
-          .recharge-count
-            .count-txt-left 银行卡号
-            input(type="tel", name="card_none_card", placeholder="请输入持卡人储蓄卡号").count-input
-          .recharge-count.bank-select
-            .count-txt-left 开户银行
-            select(type="select", name="gate_id_none_card").count-input.recharge-select
-              option(value = '')  请选择
-              //for bank in banks
-              //  option(value="{{bank.gate_id}}") {{bank.name}}
-        .recharge-all-show.card-hide.card-none.card-have
+        .recharge-all-show
           .recharge-count
             .count-txt-left 充值金额
             input(type="tel", name="amount", placeholder="该银行单笔限额5万元",value='').count-input
             input(type="hidden", name="maxamount", value="200000")
             .count-txt-right 元
-          //p.recharge-max 最高充值200000元
-          //.binding-bank-href 查看支持银行及限额
 
-        .recharge-btn#firstBtn.card-none.card-hide(data-next="{{next}}") 立即充值
-        .recharge-btn#secondBtn.card-have.card-hide(data-first='false') 立即充值
+        //.recharge-btn#firstBtn.card-none.card-hide(data-next="{{next}}") 立即充值
+        //.recharge-btn#secondBtn.card-have.card-hide(data-first='false') 立即充值
+        .value-submit
+          button(type="submit", name='submit')#recharge.value-submit-body.recharge-btn 立即充值
 
-        .recharge-select-bank(style="display:none")
-          .select-bank-body
-            .select-bank-tit 选择银行卡
-            .select-bank-cont
-            .select-cencle 取消
-    //else
-    //  .no-authentication-sign 为保证您的资金安全，请先进行实名认证
-    //      a(href="/weixin/authentication/").authentication-sign-btn 去实名认证
-    //.sign-main
-    //      .sign-body
-    //        img(src="/static/imgs/mobile/sign/sign_icon.png")
-    //        p.sign-tit 恭喜您，充值成功！
-    //        p.balance-tit 本次充值金额：
-    //          em.balance-sign
-    //        a(href="/weixin/list/") 立即购买
-    .page-alt#page-pwd(style="display:none")
-      .account-pwd
-        .pwd-tit 设置交易密码
-        .pwd-close.page-close &times;
-        .pwd-promote 为了您账户资金安全，请设置交易密码
-        .pwd-inps.js-pwd-inps
-          .inp-item
-          .inp-item
-          .inp-item
-          .inp-item
-          .inp-item
-          .inp-item
-          input(type="password",maxlength=6).pwd-input
-    .page-alt#page-error(style="display:none")
-      .account-pwd
-        .pwd-tit 设置交易密码
-        .pwd-close.page-close &times;
-        .pwd-img
-          img(src="/static/imgs/sub_weixin/recharge/pwd-error.png")
-        .pwd-promote 两次交易密码输入不正确，请重新输入
-        .page-btn.page-close 知道了
-    .page-alt#page-net(style="display:none")
-      .account-pwd
-        .pwd-tit 设置交易密码
-        .pwd-close.page-close &times;
-        .pwd-img
-          img(src="/static/imgs/sub_weixin/recharge/pwd-net.png")
-        .pwd-promote 您的网络已断开连接，请稍后再试！
-        .page-btn.page-close 知道了
+    .no-authentication-sign.bankcard(style='display:none;') 为保证您的资金安全，请先选择进行绑卡
+      .take-dec-list(style='text-align:left;')
+        p 温馨提示
+        p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
+        p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
+        p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+        p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+      a(href="/weixin/sub_bankcards/").authentication-sign-btn 立即去绑卡
+
+
+    .no-authentication-sign.unbankcard(style='display:none;') 你还没有绑定银行卡。
+      .take-dec-list(style='text-align:left;')
+        p 温馨提示
+        p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
+        p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
+        p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+        p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+      if recharge
+        a(href="/weixin/sub_regist_second/?next=/weixin/sub_recharge/").authentication-sign-btn 立即去绑卡
+      else
+        a(href="/weixin/sub_regist_second/").authentication-sign-btn 立即去绑卡
+
+    //.page-alt#page-pwd(style="display:none")
+    //  .account-pwd
+    //    .pwd-tit 设置交易密码
+    //    .pwd-close.page-close &times;
+    //    .pwd-promote 为了您账户资金安全，请设置交易密码
+    //    .pwd-inps.js-pwd-inps
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      .inp-item
+    //      input(type="password",maxlength=6).pwd-input
+    //.page-alt#page-error(style="display:none")
+    //  .account-pwd
+    //    .pwd-tit 设置交易密码
+    //    .pwd-close.page-close &times;
+    //    .pwd-img
+    //      img(src="/static/imgs/sub_weixin/recharge/pwd-error.png")
+    //    .pwd-promote 两次交易密码输入不正确，请重新输入
+    //    .page-btn.page-close 知道了
+    //.page-alt#page-net(style="display:none")
+    //  .account-pwd
+    //    .pwd-tit 设置交易密码
+    //    .pwd-close.page-close &times;
+    //    .pwd-img
+    //      img(src="/static/imgs/sub_weixin/recharge/pwd-net.png")
+    //    .pwd-promote 您的网络已断开连接，请稍后再试！
+    //    .page-btn.page-close 知道了
     .page-alt#page-ok(style="display:none")
       .account-pwd
         .recharge-ok-img
@@ -103,6 +100,7 @@ html
           a(href="/weixin/sub_list/") 立即投资
           a(href="javascript:;").continue-rechare 继续充值
     section.recharge-bank
+    include include/service_tran_password
     include include/confirm
     script(data-init="recharge", src="/static/scripts/subMobile/mobile.js?20151222")
 

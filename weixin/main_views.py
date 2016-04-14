@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
+from django.db.models import Q
 from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import is_check_id_verify
 from weixin.models import WeixinAccounts, WeixinUser
@@ -21,12 +22,11 @@ from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
 from wanglibao_p2p.common import get_p2p_list
-from wanglibao_redis.backend import redis_backend
-from wanglibao_rest import utils
-from wanglibao_redpack import backends
-from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser
-from wanglibao_pay.models import Bank
+from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser, getMiscValue
+from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_redpack.backends import list_redpack
+from experience_gold.backends import SendExperienceGold
 
 logger = logging.getLogger("weixin")
 
@@ -43,7 +43,6 @@ class WXLogin(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(WXLogin, self).get_context_data(**kwargs)
-        self.request.session['openid'] = self.openid
         next = self.request.GET.get('next', '')
         next = urllib.unquote(next.encode('utf-8'))
 
@@ -65,6 +64,7 @@ class WXLogin(TemplateView):
                     oauth = WeChatOAuth(account.app_id, account.app_secret, )
                     user_info = oauth.fetch_access_token(code)
                     self.openid = user_info.get('openid')
+                    request.session['openid'] = self.openid
                     w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
                     # w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
                     # if is_first:
@@ -158,18 +158,50 @@ class WXRegister(TemplateView):
 class AccountTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         account_info = getAccountInfo(self.request.user)
-        print account_info
+        info = getMiscValue("fwh_cfg_info")
+        fetch_experience_url = info.get('fetch_experience_url', "").strip()
+        fetch_coupon_url = info.get("fetch_coupon_url", "").strip()
+        if not fetch_coupon_url.startswith("http"):
+            if not fetch_coupon_url.startswith("/"):
+                fetch_coupon_url=settings.CALLBACK_HOST + "/" + fetch_coupon_url
+            else:
+                fetch_coupon_url=settings.CALLBACK_HOST + fetch_coupon_url
+        if not fetch_experience_url.startswith("http"):
+            if not fetch_experience_url.startswith("/"):
+                fetch_experience_url=settings.CALLBACK_HOST + "/" + fetch_experience_url
+            else:
+                fetch_experience_url=settings.CALLBACK_HOST + fetch_experience_url
+        result = list_redpack(self.request.user, 'all', 'all', 0, 'all')
+        seg = SendExperienceGold(self.request.user)
+        experience_amount = seg.get_amount()
+
         return {
             'total_asset': account_info['total_asset'],
             'total_unpaid_interest': account_info['p2p_total_unpaid_interest'],
             'total_paid_interest': account_info['p2p_total_paid_interest'],
             'margin': account_info['p2p_margin'],
+            'fetch_experience_url':fetch_experience_url,
+            'fetch_coupon_url':fetch_coupon_url,
+            'coupon_num':len(result["packages"]['unused']),
+            'experience_amount':experience_amount
         }
 
 class RechargeTemplate(TemplateView):
     def get_context_data(self, **kwargs):
+        banks = Bank.get_kuai_deposit_banks()
+        next = self.request.GET.get('rechargeNext', '')
+        user = self.request.user
+        pay_info = PayInfo.objects.filter(user=user)
+
+        if pay_info.filter(status="成功"):
+            recharge = True
+        else:
+            recharge = False
         margin = self.request.user.margin.margin
         return {
+            'recharge': recharge,
+            'banks': banks,
+            'next' : next,
             'margin': margin if margin else 0.0,
         }
 
@@ -262,6 +294,3 @@ class FWHIdValidate(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         return super(FWHIdValidate, self).dispatch(request, *args, **kwargs)
-
-
-

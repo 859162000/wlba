@@ -53,7 +53,7 @@ from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 import re
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from wanglibao_rest.utils import split_ua
 
@@ -854,6 +854,14 @@ class AppLogoutAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, **kwargs):
+        # 用户端退出时,将错误登录次数清零
+        from wanglibao_profile.models import WanglibaoUserProfile
+
+        user_profile = WanglibaoUserProfile.objects.get(user=request.user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
+
         auth.logout(request)
         return Response({'ret_code': 0, 'message': 'success'})
 
@@ -976,7 +984,7 @@ class AppMemorabiliaView(APIView):
 
         memorabilias = AppMemorabilia.objects.filter(hide_link=False,
                                                      start_time__lte=timezone.now()
-                                                     ).order_by('-priority')
+                                                     ).order_by('-priority', '-updated_time')
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 5)
@@ -1017,28 +1025,53 @@ class AppFinanceView(TemplateView):
         #return super(AppFinanceView, self).get(request, *args, **kwargs)
         return HttpResponseRedirect(reverse('app_finance'))
 
+class AppPraiseAwardView(TemplateView):
+
+    """ Client 点赞 """
+    template_name = 'client_praise_reward.jade'
+
+    def get(self, request, *args, **kwargs):
+
+        device_list = ['micromessenger']
+        user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
+
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return HttpResponseRedirect(reverse('weixin_annual_bonus'))
+
+        return super(AppPraiseAwardView, self).get(request, *args, **kwargs)
+
+class AppCheckInView(TemplateView):
+    """ Client 签到 """
+    template_name = 'client_checkIn.jade'
+
+    def get_context_data(self, **kwargs):
+        return {
+
+        }
 
 
-# class AppMemorabiliaDetailView(TemplateView):
-#     template_name = 'memorabilia_detail.jade'
-#
-#     def get_context_data(self, id, **kwargs):
-#         context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
-#
-#         try:
-#             memorabilia = (AppMemorabilia.objects.get(pk=id,
-#                                                       hide_link=False,
-#                                                       start_time__lte=timezone.now()))
-#
-#         except AppMemorabilia.DoesNotExist:
-#             raise Http404(u'您查找的大事记不存在')
-#
-#         context.update({
-#             'memorabilia': memorabilia,
-#
-#         })
-#
-#         return context
+class AppMemorabiliaDetailView(TemplateView):
+    template_name = 'memorabilia_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
+
+        try:
+            memorabilia = (AppMemorabilia.objects.get(pk=id,
+                                                      hide_link=False,
+                                                      start_time__lte=timezone.now()))
+
+        except AppMemorabilia.DoesNotExist:
+            raise Http404(u'您查找的大事记不存在')
+
+        context.update({
+            'data': memorabilia,
+
+        })
+
+        return context
 
 
 # class AppMemorabiliaPreviewView(TemplateView):

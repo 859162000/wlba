@@ -1,9 +1,18 @@
+# coding=utf-8
+
+import logging
+import requests
+import StringIO
+import traceback
 from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.contrib.auth.backends import ModelBackend
 from utils import detect_identifier_type
+from wanglibao_rest.utils import get_current_utc_timestamp, generate_oauth2_sign
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class EmailPhoneUsernameAuthBackend(object):
@@ -90,3 +99,61 @@ class TokenSecretSignAuthBackend(object):
         except User.DoesNotExist:
             return None
 
+
+class CoopAccessTokenBackend(ModelBackend):
+    def authenticate(self, **kwargs):
+        active_user = None
+        phone = kwargs.get('phone')
+        client_id = kwargs.get('client_id')
+        token = kwargs.get('token')
+        if phone and client_id and token:
+            logger.info("user[%s] enter oauth_token_login with client_id[%s] token[%s]" % (phone, client_id, token))
+            user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+            if user:
+                utc_timestamp = get_current_utc_timestamp()
+                sign = generate_oauth2_sign(user.id, client_id, utc_timestamp, settings.CHANNEL_CENTER_OAUTH_KEY)
+                data = {
+                    'user_id': user.id,
+                    'client_id': client_id,
+                    'access_token': token,
+                    'time': utc_timestamp,
+                    'sign': sign,
+                    'channel': 'base'
+                }
+                try:
+                    res = requests.post(url=settings.OAUTH2_URL, data=data)
+                    if res.status_code == 200:
+                        result = res.json()
+                        logger.info("oauth_token_login connected return [%s]" % result)
+                        res_code = result["ret_code"]
+                        message = result["message"]
+                        if res_code == 10000:
+                            sign = result["sign"]
+                            user_id = result["user_id"]
+                            client_id = result["client_id"]
+                            utc_timestamp = result["time"]
+                            if (int(get_current_utc_timestamp()) - int(utc_timestamp)) <= 120:
+                                local_sign = generate_oauth2_sign(user_id, client_id,
+                                                                  int(utc_timestamp) - 50,
+                                                                  settings.CHANNEL_CENTER_OAUTH_KEY)
+                                if local_sign == sign:
+                                    active_user = user
+                                    message = 'success'
+                                else:
+                                    message = u'无效签名'
+                            else:
+                                message = u'无效时间戳'
+                    else:
+                        logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+                        message = res.text
+                except:
+                    # 创建内存文件对象
+                    fp = StringIO.StringIO()
+                    traceback.print_exc(file=fp)
+                    message = fp.getvalue()
+            else:
+                message = 'invalid phone number'
+
+            logger.info("CoopAccessTokenBackend process result: %s" % message)
+
+        return active_user

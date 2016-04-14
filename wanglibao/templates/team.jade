@@ -1,22 +1,19 @@
+-load formatters
 doctype html
-- with '网利宝理财平台告诉您互联网金融公司如何组建,管理技术团队_网利宝' as title
-include include/common_head
-- endwith
-meta(name="keywords", content="互联网金融,网利宝")
-meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝团队凝聚了一批充满活力、富有进取精神、有着丰富的金融经验以及互联网经验的精英们。")
-body
-  include global/g_nav
-  .container.margin-bottom-xxl
-    .siderbar-div
-      - with '核心团队' as title
-      include include/about_sidebar
-      - endwith
-    .panel-padding.span9-omega
-      .well-s
-        h1.about-title {{about_us.title}}
-        |{{about_us.content|safe}}
-
-
-
-  include global/g_footer
-  include include/tracking
+html
+    head
+        - with '关于我们' as title
+        include global/g_head
+        - endwith
+        meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+        meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    body(style='background:#fff')
+        include global/g_nav
+        - with '关于我们' as title
+        include include/about_sidebar
+        - endwith
+        .team_box
+            | {{about_us.content|safe}}
+        include global/g_footer
+        include include/tracking
+                                                        
