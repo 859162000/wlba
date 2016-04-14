@@ -2719,7 +2719,6 @@ class AprilAwardApi(APIView):
     """
     四月活动
     """
-    permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         rank_activity = Activity.objects.filter(code='march_awards').first()
