@@ -1421,7 +1421,7 @@ org.recharge = (function (org) {
                     },
                     type: 'POST',
                     success: function(data){
-                        if(data.message!=""){
+                        if(data.message && data.message!="ok"){
                             clearInterval(intervalId);
                             org.ui.showSign(data.message);
                             $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
