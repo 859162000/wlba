@@ -149,6 +149,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
             tool.modalAlert({title: '温馨提示', msg: result.message})
       else
          $('#codeError').text(result.message)
+         if result.message == '极验验证失败'
+          geetestStatus = 'false'
 
     .success ->
       $('#codeError,.code-img-error').text('')

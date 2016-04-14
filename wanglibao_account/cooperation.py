@@ -1323,10 +1323,10 @@ class HappyMonkeyRegister(CoopRegister):
 
     def register_call_back(self, user):
         rewards = {
-            (0, 5): 'happy_monkey_66',
-            (6, 10): 'happy_monkey_166',
-            (11, 15): 'happy_monkey_566',
-            (16, 100000000): 'happy_monkey_666'
+            (0, 20): u'幸福猴66元体验金',
+            (21, 40): u'幸福猴166元体验金',
+            (41, 60): u'幸福猴566元体验金',
+            (61, 100000000): u'幸福猴866元体验金'
         }
         today = time.strftime("%Y-%m-%d", time.localtime())
         total = self.request.POST.get('total', None)

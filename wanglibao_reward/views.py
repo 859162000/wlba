@@ -48,10 +48,10 @@ from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank
+from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank, updateRedisWeekTopRank, updateRedisWeekSum
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import  WeChatException
@@ -2650,20 +2650,31 @@ class MarchAwardTemplate(TemplateView):
         # yesterday_end = local_to_utc(yesterday, 'max')
         # yesterday_start = local_to_utc(yesterday, 'min')
         ranks = []
+        weekranks = []
+        week_sum_amount = []
         chances = 0
         user = self.request.user
-        yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        yesterday = datetime.datetime.now() -datetime.timedelta(1)
         yesterday_end = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
         yesterday_end = local_to_utc(yesterday_end, "")
         # yesterday_start = local_to_utc(yesterday, 'min')
+        today = datetime.datetime.now()
 
         if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
                 ranks = pickle.loads(redis_backend()._get('top_ranks'))
+                week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%W')
+                weekranks = pickle.loads(redis_backend()._get(week_top_ranks))
+                week_sum = 'week_sum_' + today.strftime('%Y_%W')
+                week_sum_amount = pickle.loads(redis_backend()._get(week_sum))
             except:
                 logger.debug("-------------------------------redis read ranks error")
             if not ranks:
                 ranks = updateRedisTopRank()
+            if not weekranks:
+                weekranks = updateRedisWeekTopRank()
+            if not week_sum_amount:
+                week_sum_amount = updateRedisWeekSum()
             if user.is_authenticated():
                 chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
 
@@ -2699,9 +2710,74 @@ class MarchAwardTemplate(TemplateView):
         return {
            "chances": chances,
            "top_ranks":ranks,
+           "weekranks":weekranks,
+           "week_sum_amount":week_sum_amount,
            "award_list":award_list,
             }
+    
+class AprilAwardApi(APIView):
+    """
+    四月活动
+    """
+    permission_classes = (AllowAny, )
 
+    def post(self, request):
+        rank_activity = Activity.objects.filter(code='march_awards').first()
+        utc_now = timezone.now()
+        weekranks = []
+        week_sum_amount = []
+        chances = 0
+        user = self.request.user
+        yesterday = datetime.datetime.now() -datetime.timedelta(1)
+        yesterday_end = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
+        yesterday_end = local_to_utc(yesterday_end, "")
+        today = datetime.datetime.now()
+
+        if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
+            try:
+                week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%W')
+                weekranks = pickle.loads(redis_backend()._get(week_top_ranks))
+                week_sum = 'week_sum_' + today.strftime('%Y_%W')
+                week_sum_amount = pickle.loads(redis_backend()._get(week_sum))
+            except:
+                logger.debug("-------------------------------redis read weekranks error")
+            if not weekranks:
+                weekranks = updateRedisWeekTopRank()
+            if not week_sum_amount:
+                week_sum_amount = updateRedisWeekSum()
+            if user.is_authenticated():
+                chances = P2pOrderRewardRecord.objects.filter(user=user, status=False).count()
+
+        award_list = []
+        redpack_events = {}
+        misc = Misc.objects.filter(key='march_awards').first()
+        if misc:
+            march_awards = json.loads(misc.value)
+            rank_awards = march_awards.get('rank_awards', [])
+            rank_awards_set = set(rank_awards)
+
+            for event_id in rank_awards_set:
+                indexes = []
+                for idx, e_id in enumerate(rank_awards):
+                    if event_id==e_id:
+                        indexes.append(idx+1)
+                indexes.sort()
+                indexes = [str(x) for x in indexes]
+                redpack_event = RedPackEvent.objects.filter(id=int(event_id)).first()
+                redpack_events[redpack_event.id]=redpack_event
+                award_list.append({"amount":redpack_event.amount, "rank_desc":",".join(indexes)})
+
+            idx = 0
+
+            for rank in weekranks:
+                # print rank
+                rank['amount__sum'] = float(rank['amount__sum'])
+                event = redpack_events[rank_awards[idx]]
+                rank['coupon'] = event.amount
+                idx+=1
+
+        award_list = sorted(award_list, lambda x,y:cmp(x['amount'],y['amount']), reverse=True)
+        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,})
 
 class FetchMarchAwardAPI(APIView):
     permission_classes = (IsAuthenticated, )
