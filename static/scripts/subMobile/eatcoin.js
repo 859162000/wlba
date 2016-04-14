@@ -442,6 +442,8 @@ $(function(){
                         //alert("每个用户一天只能领取一次奖励");
                         $(".lq").hide();
                         $(".zlyc").show();
+                        $(".zlyc .yzc_txt").hide();
+                        $(".zlyc txt").show();
                     }else{
                         alert(data.message);
                     }
