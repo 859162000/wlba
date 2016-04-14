@@ -283,6 +283,13 @@ def withdraw(request):
         pay_info.save()
         return {"ret_code": 20065, 'message': u'余额不足'}
 
+def _need_validation_for_qpay(card):
+    need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
+    if need_sms and need_sms.value == '1' and card.is_bind_kuai:
+        need_validation_for_qpay = True
+    else:
+        need_validation_for_qpay = False
+    return need_validation_for_qpay
 
 def card_bind_list(request):
     # 查询已经绑定支付渠道的银行卡列表
@@ -306,12 +313,7 @@ def card_bind_list(request):
             min_amount = fee_config.get('min_amount')
             max_amount = fee_config.get('max_amount')
 
-            need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
             for card in cards:
-                if need_sms and need_sms.value == '1' and card.is_bind_kuai:
-                    need_validation_for_qpay = True
-                else:
-                    need_validation_for_qpay = False
                 base_dict = {
                     "card_id": card.id,
                     'bank_id': card.bank.code,
@@ -319,7 +321,7 @@ def card_bind_list(request):
                     'gate_id': card.bank.gate_id,
                     'storable_no': card.no[:6] + card.no[-4:],
                     'is_the_one_card': card.is_the_one_card,
-                    'need_validation_for_qpay': need_validation_for_qpay
+                    'need_validation_for_qpay': _need_validation_for_qpay(card)
                 }
 
                 if user.wanglibaouserprofile.phone == '15011488086':
@@ -673,6 +675,8 @@ class TheOneCardAPIView(APIView):
     def get(self, request):
         card = TheOneCard(request.user).get()
         serializer = CardSerializer(card)
+        serializer.data.update(
+            {'need_validation_for_qpay': _need_validation_for_qpay(card)})
         return Response(serializer.data)
 
     def put(self, request):

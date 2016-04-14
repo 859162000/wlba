@@ -1,0 +1,53 @@
+//-load formatters
+doctype html
+html.service-redpacket-bg1
+  head
+    title 首页
+    include include/service_head.jade
+  body.service-redpack-activity
+    .top-tit
+      .top-photo
+        img(src="/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png")
+      .top-tit 红包雨天天下 接多少看自己
+
+    .redpacket.redpacket-get
+      .cloud-top
+      .cloud-btm
+      .main-box
+        //（您于x月x日获得）
+        .price-b-tit 恭喜您获得
+        .price-box 8888元
+        .price-tit 现金红包
+        .share-promote 分享给好友，可以获得更多奖励
+        .price-btn.js-share-btn.mt70 分享给好友
+
+    .redpacket-get-list
+      .list-box
+        .list-box-item
+          .list-item
+            span.l-tit 注册邀请：
+            span.b-tit <span class="bb-tit">5<span>人
+          .list-item
+            span.l-tit 获得体验金：
+            span.b-tit.y-color <span class="bb-tit">18888<span>元
+        //.list-box-item
+        //  .list-item
+        //    span.l-tit 注册投资：
+        //    span.b-titb <span class="bb-tit">2<span>人
+        //  .list-item
+        //    span.l-tit 获得现金红包：
+        //    span.b-tit.y-color <span class="bb-tit">888<span>元
+
+    .activity-rule
+      .rule-tit 活动规则
+      .rule-list
+        p 1.活动规则活动规则活动规则活动规则
+        p 2.活动规则活动规则活动规则活动规则活动规则
+        p 3.活动规则活动规则活动规则活动规则活动规则
+        p 4.活动规则活动规则活动规则活动规则活动规则
+
+    section.redpacket-share-alt
+      img(src="/static/imgs/sub_weixin/redpack_activity/share_sign.png?2016"  style="width: 8rem;").share-sign
+
+    script(src='/static/src/subMobile/lib/weixin/jweixin-1.0.0.js')
+    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?20160105")
