@@ -18,7 +18,7 @@ from wanglibao_invite.tasks import processShareInviteDailyReward
 
 
 @app.task
-def bind_ok(openid, is_first_bind):
+def bind_ok(openid, is_first_bind, new_registed=False):
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
     user = weixin_user.user
@@ -36,7 +36,7 @@ def bind_ok(openid, is_first_bind):
                                     queue='celery02'
                                     )
     processShareInviteDailyReward.apply_async(
-            kwargs={'openid': openid, 'user_id': user.id})
+            kwargs={'openid': openid, 'user_id': user.id, "new_registed":new_registed})
 
 @app.task
 def detect_product_biding(product_id):

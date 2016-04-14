@@ -133,7 +133,7 @@ def _process_scene_record(w_user, scene_str):
     sr.create_time = int(time.time())
     sr.save()
 
-def bindUser(w_user, user):
+def bindUser(w_user, user, new_registed=False):
     is_first_bind = False
     if w_user.user:
         if w_user.user.id==user.id:
@@ -156,6 +156,7 @@ def bindUser(w_user, user):
     bind_ok.apply_async(kwargs={
         "openid": w_user.openid,
         "is_first_bind":is_first_bind,
+        "new_registed":new_registed,
     },
                         queue='celery01'
                         )

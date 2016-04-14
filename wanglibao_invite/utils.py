@@ -32,9 +32,9 @@ def getRandomRedpackId(redpack_data):
 def getWechatDailyReward(openid):
     w_user = WeixinUser.objects.get(openid=openid)
     today = datetime.datetime.today()
-    share_invite_config = getMiscValue("share_invite_config")
-    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
-    # "first_invest":1000, "base_experience_amount":200000, "first_invest_reward":1, "first_invest_reward_type":0}
+    share_invite_config = getMiscValue("redpack_rain_award_config")
+    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'371': [0,20],'372': [0,30], '373': [0,40], '374': [0,10]},
+    # "new_old_map":{"371":380,"372":381,"373":382,"374":383},"base_experience_amount":200000}
     redpack_data = {'1': [0, 20], '2': [0, 30], '3': [0, 40], '4': [0, 10]}# share_invite_config["daily_rewards"]
     reward_types = share_invite_config['reward_types']
     redpack_id = getRandomRedpackId(redpack_data)
@@ -54,12 +54,21 @@ def getWechatDailyReward(openid):
     return sendDailyReward(user, daily_reward.id, save_point=True)
 
 
-def sendDailyReward(user, daily_reward_id, save_point=False):
+def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False):
     with transaction.atomic(savepoint=save_point):
         daily_reward = WechatUserDailyReward.objects.select_for_update().get(id=daily_reward_id)
         if daily_reward.status:
             return -1, ""
         if daily_reward.reward_type == "redpack":
+            share_invite_config = getMiscValue("redpack_rain_award_config")
+            # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'371': [0,20],'372': [0,30], '373': [0,40], '374': [0,10]},
+            # "new_old_map":{"371":380,"372":381,"373":382,"374":383},"base_experience_amount":200000}
+            new_old_map = share_invite_config.get("new_old_map", {})
+            if not new_registed:
+                #如果是老用户，发放misc里面配置的与新用户红包等额的老用户红包
+                real_redpack_id = int(new_old_map.get(str(daily_reward.redpack_id), daily_reward.redpack_id))
+                daily_reward.redpack_id = real_redpack_id
+
             redpack_event = RedPackEvent.objects.get(id=daily_reward.redpack_id)
             status, msg, record = give_activity_redpack_for_hby(user, redpack_event, 'h5')
             if not status:
@@ -109,9 +118,29 @@ def sendDailyReward(user, daily_reward_id, save_point=False):
 #                                                  ).order_by('create_time').first()
 
 
-
-
-
-
-
-
+# [2016-04-14 15:08:56,293: INFO/MainProcess] Task weixin.tasks.bind_ok[22a2c590-55c5-437a-a647-2ba7c2dcaeeb] succeeded in 0.153715637s: None
+# [2016-04-14 15:08:56,344: ERROR/MainProcess] Task wanglibao_invite.tasks.processShareInviteDailyReward[8388bdaa-033e-4ebb-ae25-a8e607ace6a8] raised unexpected: TypeError("'int' object has no attribute '__getitem__'",)
+# Traceback (most recent call last):
+#   File "/usr/local/lib/python2.7/dist-packages/celery/app/trace.py", line 240, in trace_task
+#     R = retval = fun(*args, **kwargs)
+#   File "/usr/local/lib/python2.7/dist-packages/celery/app/trace.py", line 437, in __protected_call__
+#     return self.run(*args, **kwargs)
+#   File "/home/wanglibao-dev/wangli-backend/wanglibao-backend/wanglibao_invite/tasks.py", line 13, in processShareInviteDailyReward
+#     user = User.objects.get(user_id)
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/manager.py", line 151, in get
+#     return self.get_queryset().get(*args, **kwargs)
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/query.py", line 301, in get
+#     clone = self.filter(*args, **kwargs)
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/query.py", line 593, in filter
+#     return self._filter_or_exclude(False, *args, **kwargs)
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/query.py", line 611, in _filter_or_exclude
+#     clone.query.add_q(Q(*args, **kwargs))
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/sql/query.py", line 1198, in add_q
+#     if not self.need_having(q_object):
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/sql/query.py", line 1161, in need_having
+#     return any(self.need_having(c) for c in obj.children)
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/sql/query.py", line 1161, in <genexpr>
+#     return any(self.need_having(c) for c in obj.children)
+#   File "/usr/local/lib/python2.7/dist-packages/django/db/models/sql/query.py", line 1158, in need_having
+#     return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.aggregates)
+# TypeError: 'int' object has no attribute '__getitem__'

@@ -128,12 +128,12 @@ urlpatterns += patterns(
 #活动页面
 urlpatterns += patterns(
     '',
-    url(r'^activity/invite/$', fwh_login_required(TemplateView.as_view(template_name=".jade"),login_url='/weixin/sub_login_redirect/'),name='fwh_invite'),
+    url(r'^activity/invite/$', fwh_login_required(activity_views.WechatInviteTemplate.as_view(template_name=".jade"),login_url='/weixin/sub_login_redirect/'),name='fwh_invite'),
 )
 #h5活动页面
 urlpatterns += patterns(
     '',
-    url(r'^activity/share/$', TemplateView.as_view(template_name=".jade"), name='weixin_share'),
+    url(r'^activity/share/$', activity_views.WechatShareTemplate.as_view(template_name=".jade"), name='weixin_share'),
 )
 # 微信管理后台
 urlpatterns += patterns(

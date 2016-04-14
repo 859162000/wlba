@@ -379,9 +379,9 @@ class WechatInviteTemplate(TemplateView):
     template_name = ""
 
     def get_context_data(self, **kwargs):
-        identifier = self.request.GET.get('phone')
-        phone = base64.b64decode(identifier + '=')
-        user = self.request.user
+        # identifier = self.request.GET.get('phone')
+        # phone = base64.b64decode(identifier + '=')
+        # user = self.request.user
         return {
         }
 

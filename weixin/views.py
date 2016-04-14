@@ -493,7 +493,7 @@ class WeixinJoinView(View):
             # WechatInviteRelation.objects.get_or_create(inviter=inviter, w_user_invited=w_user)
             articles = share_invite_fwh_config["articles"][channel_digital_code]
             for article in articles:
-                article['url'] = article['url'].format(fp=base64.b64encode(profile.phone+"=")[0:-1])
+                article['url'] = settings.CALLBACK_HOST + article['url'].format(fp=base64.b64encode(profile.phone+"=")[0:-1])
             reply = create_reply(articles, self.msg)
         else:
             rs, txt = bindUser(w_user, user)
