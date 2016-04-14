@@ -23,6 +23,7 @@ from marketing import tools
 from wanglibao_rest.utils import split_ua
 from wanglibao_account.cooperation import CoopRegister
 import re
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -891,9 +892,11 @@ class KuaiShortPay:
     def _request(self, data, url):
         headers = self.headers
         headers['Content-Length'] = str(len(data))
+        pre_req = time.time()
         res = requests.post(url, headers=headers, data=data, cert=self.pem, auth=self.auth)
+        time_used = time.time() - pre_req
         if url not in [self.QUERY_URL,]:
-            logger.error('kuai_pay:%s|%s|%s' % (url, data, res.text))
+            logger.error('kuai_pay:%s|%s|%s|%s' % (url, data, res.text, time_used))
         return res
 
     def _result2dict(self, content):
