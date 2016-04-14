@@ -1,5 +1,8 @@
-from .utils import now
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from django.db import models
+from common.tools import now
 
 
 class AccessTokenManager(models.Manager):

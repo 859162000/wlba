@@ -10,10 +10,10 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .utils import now, short_token, long_token
-from .utils import get_token_expiry, deserialize_instance
-from .managers import AccessTokenManager
+from common.tools import now, deserialize_instance
 from marketing.models import Channels
+from .tools import short_token, long_token, get_token_expiry
+from .managers import AccessTokenManager
 
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')

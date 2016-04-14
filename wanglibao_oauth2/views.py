@@ -1,24 +1,23 @@
 # encoding: utf-8
 
 import json
+import logging
 import StringIO
 import traceback
-import logging
 from datetime import timedelta
 from django.conf import settings
-from django.utils import timezone
 from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
 
 import constants
-from . import AccessTokenBaseView
+from common.tools import get_utc_timestamp, now
+from wanglibao_account.cooperation import CoopSessionProcessor
+from .base_views import AccessTokenBaseView
 from .models import AccessToken, RefreshToken, CoopToken
 from .forms import RefreshTokenGrantForm, UserAndClientForm
-from .utils import now
-from .tools import get_current_utc_timestamp, generate_oauth2_sign
-from wanglibao_account.cooperation import CoopSessionProcessor
+from .utils import generate_oauth2_sign
 
 logger = logging.getLogger(__name__)
 
@@ -149,13 +148,13 @@ class AccessTokenOauthView(APIView):
             key = getattr(settings, '%s_OAUTH_KEY' % channel.upper(), None)
             if key:
                 try:
-                    if (int(get_current_utc_timestamp()) - int(utc_timestamp)) <= 120000:
+                    if (int(get_utc_timestamp()) - int(utc_timestamp)) <= 120000:
                         if sign == generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
                             access_token = AccessToken.objects.filter(Q(token=token) &
-                                                                      (Q(expires__gte=timezone.now()) |
+                                                                      (Q(expires__gte=now()) |
                                                                        Q(client__token_expire_switch=False)))
                             if access_token.exists():
-                                utc_timestamp = get_current_utc_timestamp()
+                                utc_timestamp = get_utc_timestamp()
                                 response_data = {
                                     'user_id': user_id,
                                     'client_id': client_id,

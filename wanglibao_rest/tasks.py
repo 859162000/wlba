@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from common.tools import str_to_utc
 from wanglibao.celery import app
 from marketing.utils import get_user_channel_record
-from wanglibao_account.tools import str_to_utc
 from wanglibao_account.cooperation import CoopCallback
 from wanglibao_p2p.models import P2PProduct, UserAmortization
 from wanglibao_p2p.forms import UserAmortizationForm
 from wanglibao_margin.utils import save_to_margin
 from wanglibao_p2p.utils import save_to_p2p_equity
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_tasks')
 
 
 @app.task

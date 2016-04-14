@@ -1,9 +1,12 @@
-# coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import hashlib
-import string
 import uuid
-import re
+import json
+import string
+import hashlib
+import logging
+import requests
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
@@ -11,18 +14,17 @@ from django.core.mail import EmailMultiAlternatives
 from django.template import add_to_builtins
 from django.template.loader import render_to_string
 from registration.models import RegistrationProfile
+from common.tasks import common_callback
+from common.tools import detect_identifier_type
 from wanglibao import settings
-import logging
-from M2Crypto.EVP import Cipher
-import requests
-import json
-from .tools import get_client_with_channel_code
+from wanglibao_rest.utils import generate_bisouyi_sign, generate_bisouyi_content
+from wanglibao_oauth2.utils import get_client_with_channel_code
+from .models import Binding
 
 
 logger = logging.getLogger(__name__)
 
-ALPHABET = string.ascii_uppercase + string.ascii_lowercase + \
-           string.digits + '-_'
+ALPHABET = string.ascii_uppercase + string.ascii_lowercase + string.digits + '-_'
 ALPHABET_REVERSE = dict((c, i) for (i, c) in enumerate(ALPHABET))
 BASE = len(ALPHABET)
 SIGN_CHARACTER = '$'
@@ -49,19 +51,6 @@ def generate_username(identifier):
     """
     guid = uuid.uuid1()
     return num_encode(guid.int)
-
-
-def detect_identifier_type(identifier):
-    mobile_regex = re.compile('^1\d{10}$')
-    if mobile_regex.match(identifier) is not None:
-        return 'phone'
-
-    email_regex = re.compile(
-        '^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-    if email_regex.match(identifier) is not None:
-        return 'email'
-
-    return 'unknown'
 
 
 @method_decorator(transaction.atomic)
@@ -104,76 +93,12 @@ def create_user(user_id, identifier, user_type='0'):
     return user
 
 
-class Crypto(object):
-    def __init__(self, alg='aes_128_cbc'):
-        self.alg = alg
+def has_binding_for_bid(channel_code, bid):
+    return Binding.objects.filter(channel__code=channel_code, bid=bid).exists()
 
-    def encrypt_mode_cbc(self, data, key, iv):
-        """
-        使用aes_128_cbc算法对数据加密得到字节流
-        :param data:
-        :param key:
-        :param iv:
-        :return:
-        """
 
-        cipher = Cipher(alg=self.alg, key=key, iv=iv, op=1)
-        buf = cipher.update(data)
-        buf += cipher.final()
-        del cipher
-
-        return buf
-
-    def encode_bytes(self, buf):
-        """
-        将字节流16进制加密
-        :param buf:
-        :return:
-        """
-
-        # 将字节流转为十进制
-        des_list = [ord(i) for i in buf]
-
-        # 原码转补码
-        in_list = [~h ^ 255 if h > 128 else h for h in des_list]
-
-        # 十六进制加密
-        ret = []
-        for byte in in_list:
-            ret.append(chr(((byte >> 4) & 0xF) + 97))
-            ret.append(chr((byte & 0xF) + 97))
-        return ''.join(ret)
-
-    def decode_bytes(self, enc_str):
-        """
-        将数据16进制解密为字节流
-        :param enc_str:
-        :return:
-        """
-
-        # 16进制解密
-        in_list = []
-        for i in range(0, len(enc_str), 2):
-            in_list.append(((ord(enc_str[i]) - 97) << 4) + (ord(enc_str[i + 1]) - 97))
-
-        # 十进制转字节流
-        data_buf = ''.join([chr(i) for i in in_list])
-        return data_buf
-
-    def decrypt_mode_cbc(self, data_buf, key, iv):
-        """
-        使用aes_128_cbc算法对数据加密得到字节流
-        :param data_buf:
-        :param key:
-        :param iv:
-        :return:
-        """
-
-        cipher = Cipher(alg=self.alg, key=key, iv=iv, op=0)
-        buf = cipher.update(data_buf)
-        data = buf + cipher.final()
-        del cipher
-        return data
+def get_coop_binding_for_phone(channel_code, phone):
+    return Binding.objects.filter(channel__code=channel_code, user__wanglibaouserprofile__phone=phone).first()
 
 
 def get_bajinshe_access_token(coop_id, coop_key, order_id):
@@ -243,3 +168,23 @@ def get_renrenli_base_data(channel_code):
         }
 
     return data
+
+
+def bisouyi_callback(url, content_data, channel_code, async_callback=True):
+    content = generate_bisouyi_content(content_data)
+
+    headers = {
+        'Content-Type': 'application/json',
+        'cid': settings.BISOUYI_CLIENT_ID,
+        'sign': generate_bisouyi_sign(content),
+    }
+
+    data = {'content': content}
+
+    if async_callback:
+        common_callback.apply_async(
+            kwargs={'channel': channel_code, 'url': url,
+                    'params': json.dumps(data), 'headers': headers})
+    else:
+        common_callback(channel=channel_code, url=url,
+                        params=json.dumps(data), headers=headers)

@@ -12,11 +12,12 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.utils import timezone
 from django.conf import settings
+from common.tools import utc_to_local_timestamp
 from marketing.models import Channels
 from marketing.forms import ChannelForm
 from wanglibao_account.models import Binding
 from wanglibao_account.tools import str_to_utc
-from wanglibao_account.utils import create_user
+from wanglibao_account.utils import create_user, has_binding_for_bid, get_coop_binding_for_phone
 from wanglibao_account.forms import UserRegisterForm, UserForm, UserValidateForm
 from wanglibao_account.cooperation import CoopRegister, CoopSessionProcessor, RenRenLiCallback
 from wanglibao_p2p.models import P2PProduct, P2PRecord
@@ -28,10 +29,9 @@ from wanglibao_margin.forms import MarginRecordForm
 from wanglibao_margin.utils import save_to_margin
 from wanglibao_oauth2.models import Client
 from wanglibao_rest import utils as rest_utils
-from wanglibao_rest.utils import has_binding_for_bid, get_coop_binding_for_phone
 from .forms import CoopDataDispatchForm, AccessUserExistsForm, BiSouYiUserExistsForm
 from .tasks import coop_common_callback, process_amortize
-from .utils import utc_to_local_timestamp, generate_bisouyi_content, generate_bisouyi_sign
+from .utils import generate_bisouyi_content, generate_bisouyi_sign
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -297,7 +297,7 @@ class CoopDataDispatchApi(APIView):
         if form.is_valid():
             user = form.cleaned_data['user_id']
             user.wanglibaouserprofile.is_bind_card = True
-            user.wanglibaouserprofile.first_bind_card_time = timezone.now()
+            user.wanglibaouserprofile.first_bind_card_time = now()
             user.wanglibaouserprofile.save()
             response_data = {
                 'ret_code': 10000,

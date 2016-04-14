@@ -4,7 +4,7 @@ import json
 from django.conf import settings
 from django.contrib.auth.models import User
 from common.utils import product_period_to_days
-from wanglibao_account.tools import str_to_utc
+from common.tools import str_to_utc
 from .models import P2PEquity, P2PProduct
 from .forms import P2PEquityForm
 

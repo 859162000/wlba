@@ -5,6 +5,8 @@ from decimal import Decimal
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+
+from common.tools import now
 from wanglibao_margin.models import MarginRecord
 
 
@@ -32,9 +34,9 @@ class P2PProduct(models.Model):
     total_amount = models.BigIntegerField(u'借款总额*', default=1, blank=False)
     ordered_amount = models.BigIntegerField(u'已募集金额*', default=0)
 
-    publish_time = models.DateTimeField(u'发布时间*', default=lambda: timezone.now() + timezone.timedelta(days=10),
+    publish_time = models.DateTimeField(u'发布时间*', default=lambda: now() + timezone.timedelta(days=10),
                                         blank=False, db_index=True)
-    end_time = models.DateTimeField(u'终止时间*', default=lambda: timezone.now() + timezone.timedelta(days=20),
+    end_time = models.DateTimeField(u'终止时间*', default=lambda: now() + timezone.timedelta(days=20),
                                     blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True, db_index=True)
 
@@ -44,11 +46,11 @@ class P2PProduct(models.Model):
 
     warrant_company = models.CharField(u'担保公司', max_length=64)
 
-    flow_time = models.DateTimeField(u'流标时间', default=timezone.now(), null=True, blank=True, db_index=True)
+    flow_time = models.DateTimeField(u'流标时间', default=now(), null=True, blank=True, db_index=True)
 
     def save(self, *args, **kwargs):
         if self.status == u'流标':
-            self.flow_time = timezone.now()
+            self.flow_time = now()
         super(P2PProduct, self).save(*args, **kwargs)
 
     @property

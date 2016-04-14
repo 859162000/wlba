@@ -3,12 +3,10 @@
 import json
 import hashlib
 from django import forms
-from django.utils import timezone
+from common.tools import Aes, detect_identifier_type
 from wanglibao import settings
 from marketing.utils import get_channel_record
 from wanglibao_oauth2.models import Client
-from wanglibao_account.utils import detect_identifier_type
-from .utils import get_utc_timestamp, Aes
 
 
 class CoopDataDispatchForm(forms.Form):

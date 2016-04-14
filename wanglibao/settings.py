@@ -295,12 +295,24 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_p2p.log',
             'formatter': 'verbose'
         },
+        'wanglibao_tasks': {  # add by chenweibin@20160328
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_tasks.log',
+            'formatter': 'verbose'
+        },
+        'common': {  # add by chenweibin@20160328
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/common.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
             'handlers': ['file', 'console'],
             'propagate': True,
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
         'wanglibao': {
             'handlers': ['file', 'console'],
@@ -327,8 +339,8 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_rest': {  # add by yihen@20151028
-              'handlers': ['wanglibao_rest', 'console'],
-              'level': 'DEBUG'
+            'handlers': ['wanglibao_rest', 'console'],
+            'level': 'INFO'
         },
         'wanglibao_cooperation': {  # add by yihen@20150915
             'handlers': ['wanglibao_cooperation', 'console'],
@@ -339,8 +351,16 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_oauth2': {  # add by yihen@20151028
-              'handlers': ['wanglibao_oauth2', 'console'],
-              'level': 'DEBUG'
+            'handlers': ['wanglibao_oauth2', 'console'],
+            'level': 'DEBUG'
+        },
+        'wanglibao_tasks': {
+            'handlers': ['wanglibao_tasks', 'console'],
+            'level': 'DEBUG'
+        },
+        'common': {
+            'handlers': ['common', 'console'],
+            'level': 'DEBUG'
         },
     }
 }
@@ -474,6 +494,9 @@ if ENV == ENV_PRODUCTION:
     BISOUYI_WITHDRAW_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/ransomStatus'
     BISOUYI_BIND_CARD_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/opened'
     BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_ORDER_RELATION_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseRelation'
+    BISOUYI_ON_INTEREST_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseIncome'
+    BISOUYI_PURCHASE_REFUND_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseRefund'
 else:
     BISOUYI_PCODE = '10002'
     BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
@@ -488,6 +511,9 @@ else:
     BISOUYI_WITHDRAW_STATUS_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/ransomStatus'
     BISOUYI_BIND_CARD_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/opened'
     BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_ORDER_RELATION_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseRelation'
+    BISOUYI_ON_INTEREST_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseIncome'
+    BISOUYI_PURCHASE_REFUND_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/trading/purchaseRefund'
 
 
 if ENV == ENV_PRODUCTION:

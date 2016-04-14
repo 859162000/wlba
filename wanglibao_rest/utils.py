@@ -2,70 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import json
-import time
-import base64
 import logging
 import hashlib
-from django.utils import timezone
-from Crypto.Cipher import AES
+from common.tools import Aes
 from wanglibao import settings
-from wanglibao_account.models import Binding
-from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger(__name__)
-
-
-def has_binding_for_bid(channel_code, bid):
-    return Binding.objects.filter(channel__code=channel_code, bid=bid).exists()
-
-
-def get_coop_binding_for_phone(channel_code, phone):
-    return Binding.objects.filter(channel__code=channel_code, user__wanglibaouserprofile__phone=phone).first()
-
-
-def has_register_for_phone(phone):
-    return WanglibaoUserProfile.objects.filter(phone=phone).exists()
-
-
-def get_utc_timestamp(time_obj=timezone.now()):
-    time_format = '%Y-%m-%d %H:%M:%S'
-    utc_time = time_obj.strftime(time_format)
-    utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
-    return utc_timestamp
-
-
-def utc_to_local_timestamp(time_obj=timezone.now()):
-    time_format = '%Y-%m-%d %H:%M:%S'
-    utc_time = timezone.localtime(time_obj).strftime(time_format)
-    utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
-    return utc_timestamp
-
-
-class Aes(object):
-
-    @classmethod
-    def encrypt(cls, key, plain_text):
-        iv = '\0' * 16
-        cryptor = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
-        padding = '\0'
-        length = 16
-        count = plain_text.count('')
-        if count < length:
-            add = (length - count) + 1
-            plain_text += (padding * add)
-        elif count > length:
-            add = (length - (count % length)) + 1
-            plain_text += (padding * add)
-        cipher_text = cryptor.encrypt(plain_text)
-        return base64.b64encode(cipher_text)
-
-    @classmethod
-    def decrypt(cls, key, text):
-        iv = '\0' * 16
-        cryptor = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
-        text = base64.b64decode(text)
-        plain_text = cryptor.decrypt(text)
-        return plain_text.rstrip("\0")
 
 
 def generate_bisouyi_content(data):

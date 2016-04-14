@@ -16,18 +16,17 @@ from django.utils import timezone
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from common.utils import product_period_to_days
+from common.tools import get_utc_timestamp, utc_to_local_timestamp
+from common.tasks import common_callback
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client, AccessToken
-from wanglibao_rest.utils import (get_utc_timestamp, utc_to_local_timestamp, generate_bisouyi_content,
-                                  generate_bisouyi_sign)
 from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.models import P2PRecord, UserAmortization, P2PEquity
 from wanglibao_p2p.utils import get_user_p2p_total_asset
 from wanglibao import settings
-from .tasks import bajinshe_callback, renrenli_callback, common_callback_for_post
-from .utils import get_bajinshe_base_data, get_renrenli_base_data
+from .utils import get_bajinshe_base_data, get_renrenli_base_data, bisouyi_callback
 
 
 logger = logging.getLogger('wanglibao_cooperation')
@@ -524,13 +523,20 @@ class CoopCallback(object):
 
 
 class BaJinSheCallback(CoopCallback):
+    """需要IP鉴权"""
+
     def __init__(self, *args, **kwargs):
         super(BaJinSheCallback, self).__init__(*args, **kwargs)
+        self.c_code = 'bajinshe'
         self.coop_id = settings.BAJINSHE_COOP_ID
         self.coop_key = settings.BAJINSHE_COOP_KEY
         self.purchase_call_back_url = settings.BAJINSHE_PURCHASE_PUSH_URL
         self.register_call_back_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
         self.transaction_call_back_url = settings.BAJINSHE_TRANSACTION_PUSH_URL
+
+        self.headers = {
+            'Content-Type': 'application/json'
+        }
 
     def register_call_back(self, user_id, order_id, total_asset=0, p2p_margin=0, base_data=None):
         super(BaJinSheCallback, self).register_call_back(user_id, order_id)
@@ -553,10 +559,12 @@ class BaJinSheCallback(CoopCallback):
                 'totalBalance': float(total_asset),
                 'availableBalance': float(p2p_margin),
             }
+
             data['tran'] = [act_data]
-            # 异步回调
-            bajinshe_callback.apply_async(
-                kwargs={'data': json.dumps(data), 'url': self.register_call_back_url})
+
+            common_callback.apply_async(
+                kwargs={'channel': self.c_code, 'url': self.register_call_back_url,
+                        'params': json.dumps(data), 'headers': self.headers})
 
     def recharge_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).recharge_call_back(user_id, order_id)
@@ -580,10 +588,12 @@ class BaJinSheCallback(CoopCallback):
                     'availableBalance': float(margin_record.margin_current),
                     'totalBalance': float(margin_record.margin_current),
                 }
+
                 data['tran'] = [act_data]
-                # 异步回调
-                bajinshe_callback.apply_async(
-                    kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
+
+                common_callback.apply_async(
+                    kwargs={'channel': self.c_code, 'url': self.transaction_call_back_url,
+                            'params': json.dumps(data), 'headers': self.headers})
 
                 # 推送账户数据
                 p2p_margin = user.margin.margin
@@ -629,7 +639,7 @@ class BaJinSheCallback(CoopCallback):
     #             'apr': p2p_record.product.expected_earning_rate,
     #             'state': 1,
     #             'purchases': timezone.localtime(p2p_record.create_time).strftime('%Y%m%d%H%M%S'),
-    #         }
+    #         }"""需要IP鉴权"""
     #         data['tran'] = [act_data]
     #         # 异步回调
     #         bajinshe_callback.apply_async(
@@ -658,10 +668,12 @@ class BaJinSheCallback(CoopCallback):
                     'availableBalance': float(margin_record.margin_current),
                     'totalBalance': float(margin_record.margin_current),
                 }
+
                 data['tran'] = [act_data]
-                # 异步回调
-                bajinshe_callback.apply_async(
-                    kwargs={'data': json.dumps(data), 'url': self.transaction_call_back_url})
+
+                common_callback.apply_async(
+                    kwargs={'channel': self.c_code, 'url': self.transaction_call_back_url,
+                            'params': json.dumps(data), 'headers': self.headers})
 
                 # 推送账户数据
                 p2p_margin = user.margin.margin
@@ -780,9 +792,10 @@ class BaJinSheCallback(CoopCallback):
                         act_data_list.append(act_data)
 
                 data['tran'] = act_data_list
-                # 异步回调
-                bajinshe_callback.apply_async(
-                    kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
+
+                common_callback.apply_async(
+                    kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
+                            'params': json.dumps(data), 'headers': self.headers})
 
                 # 推送账户数据
                 p2p_margin = user.margin.margin
@@ -791,8 +804,11 @@ class BaJinSheCallback(CoopCallback):
 
 
 class RenRenLiCallback(CoopCallback):
+    """需要IP鉴权"""
+
     def __init__(self, *args, **kwargs):
         super(RenRenLiCallback, self).__init__(*args, **kwargs)
+        self.c_code = 'renrenli'
         self.purchase_call_back_url = settings.RENRENLI_PURCHASE_PUSH_URL
         self.coop_account_name = settings.RENRENLI_ACCOUNT_NAME
 
@@ -852,15 +868,20 @@ class RenRenLiCallback(CoopCallback):
                 act_data = self.get_purchase_data(p2p_record)
                 if act_data:
                     data['Data'] = json.dumps([act_data])
-                    renrenli_callback.apply_async(
-                        kwargs={'data': data, 'url': self.purchase_call_back_url})
+
+                    common_callback.apply_async(
+                        kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
+                                'params': data})
             else:
                 logger.info("renrenli get_amotize_data failed with bid[%s] data[%s]" % (bid, data))
 
 
 class BiSouYiCallback(CoopCallback):
+    """需要IP鉴权"""
+
     def __init__(self, *args, **kwargs):
         super(BiSouYiCallback, self).__init__(*args, **kwargs)
+        self.c_code = 'bisouyi'
         self.coop_id = settings.BAJINSHE_COOP_ID
         self.coop_key = settings.BAJINSHE_COOP_KEY
         self.register_call_back_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
@@ -872,8 +893,6 @@ class BiSouYiCallback(CoopCallback):
         if access_token and binding and binding.b_account:
             phone = get_user_phone_for_coop(user_id)
             account = binding.b_account
-            client_id = settings.BISOUYI_CLIENT_ID
-            channel_code = binding.channel.code
             access_token = access_token.token
 
             content_data = {
@@ -886,30 +905,20 @@ class BiSouYiCallback(CoopCallback):
                 'tstatus': 1,
             }
 
-            content = generate_bisouyi_content(content_data)
-
-            headers = {
-                'Content-Type': 'application/json',
-                'cid': client_id,
-                'sign': generate_bisouyi_sign(content),
-            }
-
-            # 授权回调
-            common_callback_for_post.apply_async(
-                kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL, 'params': json.dumps(content_data),
-                        'channel': channel_code, 'headers': headers})
+            bisouyi_callback(settings.BISOUYI_OATUH_PUSH_URL, content_data, self.c_code)
 
     def purchase_call_back(self, user_id, order_id):
         super(BiSouYiCallback, self).purchase_call_back(user_id, order_id)
-        oauth_user = OauthUser.objects.filter(user_id=user_id).select_related('client').first()
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购',
                                               order_id=order_id).select_related('product').first()
-        if oauth_user and p2p_record:
+        if p2p_record:
             product = p2p_record.product
             pay_method = product.pay_method
             period = product_period_to_days(pay_method, product.period)
             content_data = {
                 'pcode': settings.BISOUYI_PCODE,
+                'sn': p2p_record.order_id,
+                'ocode': product.id,
                 'yaccount': get_user_phone_for_coop(user_id),
                 'idcard': get_id_number_for_coop(user_id)[:18],
                 'name': product.name[:100],
@@ -928,17 +937,66 @@ class BiSouYiCallback(CoopCallback):
                 'bstatus': 1,
             }
 
-            content = generate_bisouyi_content(content_data)
+            bisouyi_callback(settings.BISOUYI_PURCHASE_PUSH_URL, content_data, self.c_code, async_callback=False)
 
-            headers = {
-                'Content-Type': 'application/json',
-                'cid': settings.BISOUYI_CLIENT_ID,
-                'sign': generate_bisouyi_sign(content),
-            }
+            p2p_equity = P2PEquity.objects.filter(product=product, user_id=user_id).first()
+            if p2p_equity:
+                content_data = {
+                    'pcode': settings.BISOUYI_PCODE,
+                    'rlsn': p2p_equity.id,
+                    'sn': p2p_record.order_id,
+                    'ocode': product.id,
+                    'yaccount': get_user_phone_for_coop(user_id),
+                    'ostatus': 1,
+                    'pstatus': 1,
+                    'bstatus': 1,
+                }
 
-            common_callback_for_post.apply_async(
-                kwargs={'url': settings.BISOUYI_PURCHASE_PUSH_URL, 'params': json.dumps(content_data),
-                        'channel': 'bisouyi', 'headers': headers})
+                bisouyi_callback(settings.BISOUYI_ORDER_RELATION_PUSH_URL, content_data, self.c_code)
+
+    def amortization_push(self, user_amo):
+        super(BiSouYiCallback, self).amortization_push(user_amo)
+        product = user_amo.product
+        user_id = user_amo.user_id
+        p2p_equity = P2PEquity.objects.filter(product=user_amo.product, user_id=user_amo.user_id).first()
+        if p2p_equity:
+            user_phone = get_user_phone_for_coop(user_amo.user_id)
+            if user_amo.settled:
+                content_data = {
+                    'pcode': settings.BISOUYI_PCODE,
+                    'sn': p2p_equity.id,
+                    'ocode': product.id,
+                    'yaccount': get_user_phone_for_coop(user_id),
+                    'bdate': timezone.localtime(user_amo.settlement_time).strftime('%Y-%m-%d %H:%M:%S'),
+                    'bmoney': user_amo.get_total_amount,
+                    'ostatus': 1,
+                    'pstatus': 1,
+                }
+
+                if user_amo.term == user_amo.terms:
+                    content_data['bstatus'] = 4
+                else:
+                    content_data['bstatus'] = 2
+
+                bisouyi_callback(settings.BISOUYI_ON_INTEREST_PUSH_URL, content_data, self.c_code)
+            else:
+                if int(user_amo.term) == 1:
+                    last_user_amo = UserAmortization.objects.filter(user_id=user_id, product=product,
+                                                                    term=user_amo.terms).first()
+                    if last_user_amo:
+                        content_data = {
+                            'pcode': settings.BISOUYI_PCODE,
+                            'sn': p2p_equity.id,
+                            'ocode': product.id,
+                            'yaccount': user_phone,
+                            'sdate': timezone.localtime(user_amo.created_time).strftime('%Y-%m-%d %H:%M:%S'),
+                            'edate': timezone.localtime(last_user_amo.term_date).strftime('%Y-%m-%d %H:%M:%S'),
+                            'ostatus': 1,
+                            'pstatus': 1,
+                            'bstatus': 1,
+                        }
+
+                        bisouyi_callback(settings.BISOUYI_ON_INTEREST_PUSH_URL, content_data, self.c_code)
 
 
 # 第三方回调通道

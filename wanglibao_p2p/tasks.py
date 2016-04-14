@@ -2,20 +2,19 @@
 # encoding:utf-8
 
 import json
-import requests
-from celery.utils.log import get_task_logger
-
+import logging
 from django.db.models import Q
 from django.utils import timezone
 from django.conf import settings
+
+from common.tools import now
+from common.tasks import common_callback
 from wanglibao.celery import app
-from wanglibao_rest.utils import generate_bisouyi_sign, generate_bisouyi_content
-from wanglibao_account.utils import get_bajinshe_access_token
-from wanglibao_account.tasks import common_callback_for_post
+from wanglibao_account.utils import get_bajinshe_access_token, bisouyi_callback
 from .models import P2PProduct
 from .utils import (generate_bajinshe_product_data, generate_bisouyi_product_data)
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger('wanglibao_tasks')
 
 _LOCALS = locals()
 
@@ -25,7 +24,7 @@ def bajinshe_product_push(product=None, product_list=None):
     push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
     coop_id = settings.BAJINSHE_COOP_ID
     coop_key = settings.BAJINSHE_COOP_KEY
-    order_id = '%s_0000' % timezone.now().strftime("%Y%m%d%H%M%S")
+    order_id = '%s_0000' % now().strftime("%Y%m%d%H%M%S")
     access_token = get_bajinshe_access_token(coop_id, coop_key, order_id)
     if access_token:
         product_data_list = list()
@@ -49,43 +48,32 @@ def bajinshe_product_push(product=None, product_list=None):
             headers = {
                'Content-Type': 'application/json',
             }
-            common_callback_for_post(url=push_url, params=json.dumps(data), channel='bajinshe', headers=headers)
+
+            common_callback.apply_async(
+                kwargs={'channel': 'bajinshe', 'url': push_url,
+                        'params': json.dumps(data), 'headers': headers})
 
 
 @app.task
 def bisouyi_product_push(product=None, product_list=None):
-    return
-
     product_data_list = list()
+    product_data_status_list = list()
     if not product:
         if product_list and product_list.exists():
             for product in product_list:
                 product_data = generate_bisouyi_product_data(product, 'info')
                 product_status_data = generate_bisouyi_product_data(product, 'status')
-                product_data_list.append((product_data, product_status_data))
+                product_data_list.append(product_data)
+                product_data_status_list.append(product_status_data)
     else:
         product_data = generate_bisouyi_product_data(product, 'info')
         product_status_data = generate_bisouyi_product_data(product, 'status')
-        product_data_list.append((product_data, product_status_data))
+        product_data_list.append(product_data)
+        product_data_status_list.append(product_status_data)
 
-    for product_data, product_status_data in product_data_list:
-        headers = {
-            'Content-Type': 'application/json',
-            'cid': settings.BISOUYI_CLIENT_ID,
-        }
-        product_data_content = generate_bisouyi_content(product_data)
-        product_data_sign = generate_bisouyi_sign(product_data_content)
-        headers['sign'] = product_data_sign
-        data = {'content': product_data_content}
-        common_callback_for_post(url=settings.BISOUYI_PRODUCT_PUSH_URL, params=json.dumps(data),
-                                 channel='bisouyi', headers=headers)
+    bisouyi_callback(settings.BISOUYI_PRODUCT_PUSH_URL, product_data_list, 'bisouyi', async_callback=False)
 
-        product_status_data_content = generate_bisouyi_content(product_status_data)
-        product_status_data_sign = generate_bisouyi_sign(product_status_data_content)
-        headers['sign'] = product_status_data_sign
-        data = {'content': product_status_data_content}
-        common_callback_for_post(url=settings.BISOUYI_PRODUCT_PUSH_URL, params=json.dumps(data),
-                                 channel='bisouyi', headers=headers)
+    bisouyi_callback(settings.BISOUYI_PRODUCT_STATUS_PUSH_URL, product_data_status_list, 'bisouyi')
 
 
 @app.task
@@ -96,7 +84,7 @@ def process_channel_product_push(product_id=None):
         product_list = P2PProduct.objects.filter(~Q(status__in=(u'已完成', u'流标')) |
                                                  (Q(status=u'已完成') &
                                                   Q(make_loans_time__isnull=False) &
-                                                  Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
+                                                  Q(make_loans_time__gte=now()-timezone.timedelta(days=1))))
     else:
         product = P2PProduct.objects.filter(pk=product_id).first()
 
