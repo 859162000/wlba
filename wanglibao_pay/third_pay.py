@@ -285,7 +285,7 @@ def withdraw(request):
 
 def _need_validation_for_qpay(card):
     need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
-    if need_sms and need_sms.value == '1' and card.is_bind_kuai:
+    if need_sms and need_sms.value == '1' and card.bank.channel == 'kuaipay':
         need_validation_for_qpay = True
     else:
         need_validation_for_qpay = False

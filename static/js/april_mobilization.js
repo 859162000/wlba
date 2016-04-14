@@ -64,52 +64,119 @@
             }
         })
 
+        function fmoney(s, type) {
+            if (/[^0-9\.]/.test(s))
+                return "0";
+            if (s == null || s == "")
+                return "0";
+            s = s.toString().replace(/^(\d*)$/, "$1.");
+            s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+            s = s.replace(".", ",");
+            var re = /(\d)(\d{3},)/;
+            while (re.test(s))
+                s = s.replace(re, "$1,$2");
+            s = s.replace(/,(\d\d)$/, ".$1");
+            if (type == 0) {// 不带小数位(默认是有小数位)
+                var a = s.split(".");
+                if (a[1] == "00") {
+                    s = a[0];
+                }
+            }
+            return s;
+        }
 
-        /*翻牌抽奖*/
-        function luck_draw(){
+
+        function ajax_data(){
             $.ajax({
                 url: '/api/april_reward/fetch/',
                 type: 'post',
-                success: function (data1) {
-                    //if(data1.ret_code==0){
-                    //    $('.card_box[data-card="'+card_no+'"] .card_prize').text(data1.redpack.amount+'元');
-                    //    $('.card_box[data-card="'+card_no+'"]').find('.card_box_main').addClass('card_box_open');
-					//
-                    //    $('.popup_box .text').text('恭喜您获得'+data1.redpack.amount+'元红包');
-                    //    $('.popup_box .popup_button').show();
-                    //    chance_num--;
-                    //    $('#chance_num').text(chance_num);
-                    //    time_count2 = 3;
-                    //    time_intervalId2 = setInterval(timerFunction2, 1000);
-                    //    time_intervalId2;
-                    //}else{
-                    //    $('.popup_box .text').text(data1.message);
-                    //    $('.popup_box .popup_button').hide();
-                    //    time_count = 3;
-                    //    time_intervalId = setInterval(timerFunction, 1000);
-                    //    time_intervalId;
-                    //}
+                success: function (json) {
+                    substring(json.week_sum_amount);
+
+                    var rankingList = [];
+                    var json_one;
+                    for(var i=1; i<json.weekranks.length; i++){
+                        json_one = json.weekranks[i];
+                        if(json_one!=''){
+                            var number = fmoney(json_one.amount__sum, 0);
+                            if(i<=3){
+                                if(i==1){
+                                    rankingList.push(['<tr class="first">'].join(''));
+                                }else if(i==2){
+                                    rankingList.push(['<tr class="second">'].join(''));
+                                }else if(i==3){
+                                    rankingList.push(['<tr class="third">'].join(''));
+                                }
+                                rankingList.push(['<td class="one"><span class="ico"></span><span class="phone">'+json_one.phone+'</span></td><td class="two">'+number+'元</td><td class="three">'].join(''));
+                                if(i==1){
+                                    rankingList.push(['5张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                                }else if(i==2){
+                                    rankingList.push(['3张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                                }else if(i==3){
+                                    rankingList.push(['2张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                                }
+                            }else{
+                                rankingList.push(['<tr><td class="one"><span class="ico">'+i+'</span><span class="phone">'+json_one.phone+'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                            }
+
+                        }else{
+                            rankingList.push(['<tr><td style="width:100%; text-align:center">虚位以待</td></tr>'].join(''));
+                        }
+
+                    }
+                    $('.list_main tbody').html(rankingList.join(''));
+                    substring_2(json.week_sum_amount);
+
+
                 },error: function(data1){
-                    //$('.popup_box .text').text(data1.message);
-                    //$('.popup_box .popup_button').hide();
-                    //time_count = 3;
-                    //time_intervalId = setInterval(timerFunction, 1000);
-                    //time_intervalId;
+
                 }
             })
         }
         /*翻牌抽奖结束*/
-        luck_draw();
+        ajax_data();
 
-        /*立即投资*/
-        $('.button').click(function(){
-            if(h5_user_static){
-                window.location.href = '/p2p/list/'
-            }else{
-                window.location.href = '/accounts/login/?next=/p2p/list/'
+        /*逐个字符*/
+        function substring(text){
+            //alert(text);
+            var box_num = $('.num_wrap .num_1').length;
+            for(var i=text.length; i>=0; i--) {
+                if (text.length - 3 != i) {
+                    //num = text.charAt(i);
+                    if(text.length - 2 == i||text.length - 7 == i){
+                        $('.num_wrap').prepend('<span class="num_2"></span>');
+
+                    }else{
+
+                        $('.num_wrap').prepend('<span class="num_1"></span>');
+                    }
+
+                    //$('.num_wrap .num_1').eq(box_num).text(num);
+                    box_num--;
+                }
             }
-        })
-        /*立即投资结束*/
+            $('.num_wrap').prepend('<span class="num_1"></span>');
+
+        };
+
+        function substring_2(text){
+            var num_2;
+            var box_num_2 = $('.num_wrap .num_1').length;
+            var box_num_3 = $('.num_wrap .num_2').length;
+            for(var i=text.length;i>=0;i--) {
+                if (text.length - 3 != i) {
+                    num_2 = text.charAt(i);
+                    $('.num_wrap .num_1').eq(box_num_2).text(num_2);
+                    box_num_2--;
+                }
+            }
+
+            var width = 78*$('.num_wrap .num_1').length+25*$('.num_wrap .num_2').length;
+            $('.num_wrap').css('margin-left','-'+width/2+'px')
+
+        };
+        /*逐个字符结束*/
+
 
     })
 
