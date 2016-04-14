@@ -407,9 +407,14 @@ def get_verify_result(id_number, name):
     if not check_birth_date_for_id(id_number):
         return verify_result, id_photo, u'身份证出生日期不合法'
 
+    # add try...except by chenweibin@20160414
     # 根据身份证号出生日期判断用户是否大于或等于18周岁
-    if not check_age_for_id(id_number):
-        return verify_result, id_photo, u'该用户未满18周岁'
+    try:
+        if not check_age_for_id(id_number):
+            return verify_result, id_photo, u'该用户未满18周岁'
+    except Exception, e:
+        logger.info("illegal id_number[%s] get_verify_result raise error: %s" % (id_number, e))
+        return verify_result, id_photo, u'身份证出生日期不合法'
 
     in_conditions = u"""<?xml version="1.0" encoding="UTF-8" ?>
         <ROWS>
