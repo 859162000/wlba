@@ -1380,7 +1380,7 @@ org.recharge = (function (org) {
                 $validation = $("input[name=validation]"),
                 $submit = $("#recharge");
 
-            if(lib.isValidate){
+            if(!lib.isValidate){
                 $submit.removeAttr("disabled");
                 return;
             }
@@ -1410,6 +1410,7 @@ org.recharge = (function (org) {
                     url: '/api/pay/deposit_new/',
                     data: {
                         phone: '',
+                        trade_pwd: '',
                         card_no: sort_card,
                         gate_id: gate_id,
                         amount: amount,
@@ -1425,10 +1426,10 @@ org.recharge = (function (org) {
                     },
                     error: function (xhr) {
                         clearInterval(intervalId);
+                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
                         var result = JSON.parse(xhr.responseText);
                         org.ui.showSign(result.message);
-                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
-                        lib._captcha_refresh();
+                        //lib._captcha_refresh();
                     }
                 });
                 //倒计时
@@ -1439,7 +1440,7 @@ org.recharge = (function (org) {
                     } else {
                         clearInterval(intervalId);
                         $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
-                        return lib._captcha_refresh();
+                        //return lib._captcha_refresh();
                     }
                 };
                 timerFunction();
@@ -1572,12 +1573,16 @@ org.recharge = (function (org) {
             });
         },
         _trade_pwd_seach: function(post_data){
-            if(!lib.isValidate){
-                console.log(5);
+            if(lib.isValidate){
                 org.ajax({
                     url: '/api/pay/cnp/dynnum_new/',
                     type: 'post',
                     data: {
+                        phone: '',
+                        vcode: $("input[name=validation].count-input").val(),
+                        order_id: $("input[name=order_id]").val(),
+                        token: $("input[name=token]").val(),
+                        set_the_one_card: true,
                         mode: 'qpay_with_sms'
                     },
                     success: function(result){
