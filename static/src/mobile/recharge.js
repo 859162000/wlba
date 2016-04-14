@@ -182,7 +182,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                             vcode: $validate_code.val(),
                             order_id: order_data.order_id,
                             token: order_data.token,
-                            set_the_one_card: false,
+                            set_the_one_card: '',
                             trade_pwd: result.password,
                             mode: 'qpay_with_sms'
                         }
