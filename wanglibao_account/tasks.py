@@ -139,6 +139,7 @@ def jinshan_callback(url, params):
 
 @app.task
 def xunleivip_recallback(url, params, channel, order_id):
+    # 需要IP鉴权
     result = xunlei9_order_query(params)
     data = result.get('data', None)
 
@@ -169,6 +170,7 @@ def xunleivip_recallback(url, params, channel, order_id):
 
 @app.task
 def xunleivip_callback(url, params, channel, order_id):
+    # 需要IP鉴权
     logger.info("Enter %s_callback task===>>>" % channel)
     try:
         _params = urllib.urlencode(params)
@@ -218,6 +220,7 @@ def yiche_callback(url, params, channel):
 
 @app.task
 def zgdx_callback(url, params, channel):
+    # 需要IP鉴权
     logger.info("Enter %s_callback task===>>>" % channel)
     ret = None
     try:
