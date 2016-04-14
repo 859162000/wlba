@@ -1,0 +1,90 @@
+-load formatters
+-load mathfilters
+doctype html
+html.no-js(lang="en-gb")
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/april_mobilization.css?v=2015031004")
+        - csrf_token
+    body(style="background:#fff")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+            #main
+                #main_center
+                    .title_img.title_img_1 千万投资，送千万体验金
+                    .title_small.title_small_1 阳光温热，岁月静好，好是好，就是体验金送得太少。<br>这次网利君开仓放“粮”，活动期间，投资就送体验金，多投多送，是不是很赞
+                    .table
+                        table
+                            thead
+                                tr
+                                    th 单笔投资金额
+                                    th 获得体验金奖励
+                            tbody
+                                tr
+                                    td 100≤投资额＜5,000
+                                    td 100
+                                tr
+                                    td 5,000≤投资额＜10,000
+                                    td 5,000
+                                tr
+                                    td 10000≤投资额＜20,000
+                                    td 10,000
+                                tr
+                                    td 20,000≤投资额＜30000
+                                    td 20,000
+                                tr
+                                    td 30,000≤投资额＜40,000
+                                    td 30,000
+                                tr
+                                    td 40,000≤投资额＜50,000
+                                    td 40,000
+                                tr
+                                    td 50,000≤投资额＜80,000
+                                    td 60,000
+                                tr
+                                    td 80,000≤投资额＜100,000
+                                    td 90,000
+                                tr
+                                    td 投资额≥100,000
+                                    td 100,000
+                        .grass.grass_1
+                        .grass.grass_2
+                    dl.rule
+                        dt 活动规则
+                        dd 1、活动有效期：2016年3月X日0：00-2016年3月X日23:59；
+                        dd 2、新老用户均可参与，投资福利红包为直抵现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现；
+                        dd 3、每个红包仅限使用一次，不可叠加使用，也不可与加息券同时使用。红包使用后无论是否有余额均失效，使用详情请见我的账户-理财券红包列表查看；
+                        dd 4、获得实物奖励资格的用户，需在用户中心里完善收货信息，在活动结束后7个工作日内会有客服人员与您联系，请保持手机畅通，所有实物奖品均会在4月10日前发放完毕；
+                        dd 5、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                    .title_img.title_img_2 春暖花开季，温故而加息
+                    .title_big.title_big_1 活动时间：4月18日 - 4月22日
+                    .title_small.title_small_2 活动期间，单笔购买额度满足网利君设定的条件，即可获得相应的加息券！累计可达7%哦！<br>Oh my God，7%？有没有听错？真的没有听错？！是的是的，亲爱的用户，给你特权妥妥的！怎么样，够奔放吧~
+                    .condition_wrap
+                        .box
+                            .top_text 获得加息额度
+                            .gold_img 0.5%
+                            .column.column_1
+                                .text_box
+                                    .text_1 单笔投资金额
+                                    .text_2 ≥ 1,000
+                            .condition_footer
+                                .text_1 使用门槛
+                                .text_2 10,000
+                        .box
+                            .top_text 获得加息额度
+                            .gold_img 0.8%
+                            .column.column_2
+                                .text_box
+                                    .text_1 单笔投资金额
+                                    .text_2 ≥ 1,0000
+                            .condition_footer
+                                .text_1 使用门槛
+                                .text_2 20,000
+        include global/g_footer
+script.
+    require(['/static/js/april_mobilization.js?v=2015031001'])
+
+                                                                    
