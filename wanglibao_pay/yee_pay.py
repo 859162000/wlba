@@ -594,11 +594,12 @@ class YeeShortPay:
         if not request.user.wanglibaouserprofile.id_is_valid:
             return {"ret_code": 20111, "message": "请先进行实名认证"}
 
-        amount = request.DATA.get("amount", "").strip()
-        card_no = request.DATA.get("card_no", "").strip()
-        input_phone = request.DATA.get("phone", "").strip()
-        gate_id = request.DATA.get("gate_id", "").strip()
+        amount = request.POST.get("amount", "").strip()
+        card_no = request.POST.get("card_no", "").strip()
+        input_phone = request.POST.get("phone", "").strip()
+        gate_id = request.POST.get("gate_id", "").strip()
         device_type = split_ua(request)['device_type']
+        logger.error('*'*100+str(request.POST)+str(request.POST))
 
         if not amount or not card_no:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
@@ -624,6 +625,7 @@ class YeeShortPay:
         user = request.user
         profile = user.wanglibaouserprofile
         card, bank = None, None
+        logger.error('*'+gate_id)
         if gate_id:
             bank = Bank.objects.filter(gate_id=gate_id).first()
             if not bank or not bank.yee_bind_code.strip():
@@ -721,10 +723,10 @@ class YeeShortPay:
         """ 验证码通过邦卡支付
             先校邦卡验证码，邦卡验证码通过之后，在进行支付操作
         """
-        vcode = request.DATA.get("vcode", "").strip()
-        order_id = request.DATA.get("order_id", "").strip()
-        request_id = request.DATA.get("token", "").strip()
-        input_phone = request.DATA.get("phone", "").strip()
+        vcode = request.POST.get("vcode", "").strip()
+        order_id = request.POST.get("order_id", "").strip()
+        request_id = request.POST.get("token", "").strip()
+        input_phone = request.POST.get("phone", "").strip()
 
         if not order_id.isdigit():
             return {"ret_code": 20125, "message": "订单号错误"}

@@ -459,10 +459,18 @@ def bind_pay_deposit(request):
 # cheat para for switch channel
     if mode == 'vcode_for_qpay' and _is_switch_channel(user, card_no):
         # need modify
+        logger.error('switch_channel:%s'%card_no)
         card = Card.objects.get(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:])
         card_no = card.no
         gate_id = card.bank.gate_id
         mode = ''
+        # modify for yee_pay
+        request.GET = request.GET.copy()
+        request.POST = request.POST.copy()
+        for request_dict in [request.GET, request.POST]:
+            request_dict['card_no'] = card_no
+            request_dict['gate_id'] = gate_id
+            request_dict['mode'] = mode
 # end cheat para
 
     if user.wanglibaouserprofile.utype == '3':
@@ -573,6 +581,10 @@ def bind_pay_dynnum(request):
 # cheat para for switch channel
         if mode=='qpay_with_sms' and _is_switch_channel(user, card_no):
             mode = ''
+            request.GET = request.GET.copy()
+            request.POST = request.POST.copy()
+            for request_dict in [request.GET, request.POST]:
+                request['mode'] = mode
 # end cheat para
         res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, 
                                             token, input_phone, device,
