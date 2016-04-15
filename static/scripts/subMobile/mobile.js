@@ -1433,6 +1433,7 @@ org.recharge = (function (org) {
                             org.ui.showSign('短信已发送，请注意查收！');
                             lib.order_id = data.order_id;
                             lib.token = data.token;
+                            timerFunction();
                         }
                     },
                     error: function (xhr) {
@@ -1444,6 +1445,7 @@ org.recharge = (function (org) {
                     }
                 });
                 //倒计时
+                var intervalId;
                 var timerFunction = function () {
                     if (count >= 1) {
                         count--;
@@ -1454,8 +1456,7 @@ org.recharge = (function (org) {
                         //return lib._captcha_refresh();
                     }
                 };
-                timerFunction();
-                return intervalId = setInterval(timerFunction, 1000);
+                intervalId = setInterval(timerFunction, 1000);
             });
 
         },
@@ -1537,10 +1538,8 @@ org.recharge = (function (org) {
                             vcode: $("input[name=validation].count-input").val(),
                             order_id: lib.order_id,
                             token: lib.token,
-                            trade_pwd: data.data.trade_pwd,
                             mode: 'qpay_with_sms'
-                        },
-
+                        }
                     };
                 }else{
                     data = {
@@ -1704,23 +1703,10 @@ org.recharge = (function (org) {
          * 绑定同卡进出的卡充值
          */
         _rechargeSingleStep: function (operation, data) {
-            var url = '/api/pay/deposit_new/';
-            var json_data = data.data;
-            if(lib.isValidate){
-                json_data = {
-                    phone: '',
-                    vcode: $("input[name=validation].count-input").val(),
-                    order_id: $("input[name=order_id]").val(),
-                    token: $("input[name=token]").val(),
-                    trade_pwd: data.data.trade_pwd,
-                    mode: 'qpay_with_sms'
-                };
-                url = '/api/pay/cnp/dynnum_new/';
-            }
             org.ajax({
                 type: 'POST',
-                url: url,
-                data: json_data,
+                url: data.url,
+                data: data.data,
                 beforeSend: function () {
                     data.beforeSend && data.beforeSend()
                 },
