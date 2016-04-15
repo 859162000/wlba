@@ -20,6 +20,7 @@ import logging
 import pickle
 from decimal import Decimal
 from weixin.util import getMiscValue
+from wanglibao.templatetags.formatters import safe_phone_str
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -161,7 +162,8 @@ def getTodayTop10Ranks():
     for rank in top_ranks:
         for userprofile in userprofiles:
             if userprofile.user_id == rank['user']:
-                rank['phone'] = userprofile.phone
+                rank['phone'] = safe_phone_str(userprofile.phone)
+                
                 break
     return top_ranks
 
@@ -197,7 +199,7 @@ def getWeekTop10Ranks():
     for rank in top_ranks:
         for userprofile in userprofiles:
             if userprofile.user_id == rank['user']:
-                rank['phone'] = userprofile.phone
+                rank['phone'] = safe_phone_str(userprofile.phone)
                 break
     return top_ranks
 
