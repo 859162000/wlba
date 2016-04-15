@@ -179,7 +179,7 @@ webpackJsonp([12],[
 	                                (0, _ui.Alert)('服务器繁忙，请稍后再试');
 	                            }
 	                        },
-	                        complete: function complete() {
+	                        complete: function complete(trade_operation) {
 	                            if (trade_operation) {
 	                                trade_operation.loadingHide();
 	                                trade_operation.destroy();
@@ -196,9 +196,8 @@ webpackJsonp([12],[
 	                            vcode: $validate_code.val(),
 	                            order_id: order_data.order_id,
 	                            token: order_data.token,
-	                            set_the_one_card: false,
 	                            trade_pwd: result.password,
-	                            mode: 'vcode_for_qpay'
+	                            mode: 'qpay_with_sms'
 	                        };
 	                        recharge(options, operation);
 	                    } else {
@@ -362,7 +361,7 @@ webpackJsonp([12],[
 	                //}
 	            },
 	            complete: function complete() {
-	                options.complete && options.complete();
+	                options.complete && options.complete(trade_operation);
 	                //$submit.removeAttr('disabled').text("充值");
 	            }
 	        });
@@ -382,7 +381,7 @@ webpackJsonp([12],[
 	                options.error && options.error(data);
 	            },
 	            complete: function complete() {
-	                options.complete && options.complete();
+	                options.complete && options.complete(trade_operation);
 	            }
 	        });
 	    };
@@ -434,7 +433,7 @@ webpackJsonp([12],[
 	                        });
 	                    }
 	                },
-	                error: function error() {
+	                error: function error(xhr) {
 	                    var result = JSON.parse(xhr.responseText);
 	                    $validate_operation.removeAttr('disabled').text('获取验证码');
 	                    clearInterval(timeIntervalId);

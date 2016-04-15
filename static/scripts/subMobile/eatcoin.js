@@ -392,6 +392,7 @@ $(function(){
                 var param={"total":total};
                 lqjl(param)
             }else{
+
                 var phone = $(".iphone input").val();
                 if(phone && /^1[2|3|4|5|8|7|]\d{9}$/.test(phone)){
                     var param = {"total":total,"phone":phone};
@@ -401,6 +402,8 @@ $(function(){
                         $(".zlyc .txt").hide();
                         $(".zlyc .yzc_txt").show();
                         $(".zlyc .ermts").hide();
+                        document.getElementById("car_audio").pause();
+                        $(".m").hide();
                     }else{
                         $(".blank").show();
                         $(".yz_tc").show();
@@ -428,6 +431,8 @@ $(function(){
             })
         }
         function lqjl(param){
+            document.getElementById("car_audio").pause();
+            $(".m").hide();
             $.ajax({
                 type:"post",
                 url:"/api/activity/happy_monkey/",
@@ -442,6 +447,8 @@ $(function(){
                         //alert("每个用户一天只能领取一次奖励");
                         $(".lq").hide();
                         $(".zlyc").show();
+                        $(".zlyc .yzc_txt").hide();
+                        $(".zlyc txt").show();
                     }else{
                         alert(data.message);
                     }
