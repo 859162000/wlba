@@ -86,12 +86,14 @@
         }
 
 
+
         function ajax_data(){
             $.ajax({
                 url: '/api/april_reward/fetch/',
                 type: 'post',
                 success: function (json) {
                     substring(json.week_sum_amount);
+
 
                     var rankingList = [];
                     var json_one;
@@ -138,25 +140,39 @@
 
         /*逐个字符*/
         function substring(text){
-            //alert(text);
-            var box_num = $('.num_wrap .num_1').length;
-            for(var i=text.length; i>=0; i--) {
-                if (text.length - 3 != i) {
+            //alert(text.length);
+
+            var num_length = text.length;
+            if(num_length==13){
+                num_length+=2;
+            }
+            if(num_length==14||num_length==10){
+                num_length+=1;
+            }
+
+            for(var i=num_length; i>=0; i--) {
+                if (num_length - 3 != i) {
                     //num = text.charAt(i);
-                    if(text.length - 2 == i||text.length - 7 == i){
+                    if(num_length - 7 == i||num_length - 11 == i||num_length - 15 == i){
                         $('.num_wrap').prepend('<span class="num_2"></span>');
-
+                        //alert(i);
                     }else{
+                        if(num_length - 2 == i){
+                            $('.num_wrap').prepend('<span class="num_3"></span>');
+                        }else{
+                            $('.num_wrap').prepend('<span class="num_1"></span>');
+                        }
 
-                        $('.num_wrap').prepend('<span class="num_1"></span>');
                     }
 
-                    //$('.num_wrap .num_1').eq(box_num).text(num);
-                    box_num--;
                 }
             }
-            $('.num_wrap').prepend('<span class="num_1"></span>');
-
+            if(text.length>=7){
+                $('.num_wrap').prepend('<span class="num_1"></span>');
+                if(text.length!=13&&text.length>10){
+                    $('.num_wrap').prepend('<span class="num_1"></span>');
+                }
+            }
         };
 
         function substring_2(text){
