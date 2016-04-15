@@ -205,6 +205,7 @@ urlpatterns += patterns(
     url(r'^app_xunleithree/$', TemplateView.as_view(template_name="app_xunleithree.jade")),
     url(r'^app_xunleizhuce/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunleizhuce.jade")),
     url(r'^h5_recruit/$', TemplateView.as_view(template_name="h5_recruit.jade")),
+    url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),

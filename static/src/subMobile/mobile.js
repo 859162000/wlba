@@ -310,7 +310,10 @@ org.ui = (function () {
                     }else{
                         targetDom = $('.'+ops[i].target);
                     }
-                    targetDom.addClass(ops[i].addName).removeClass(ops[i].reMove);
+                    if(ops[i].reMove){
+                       targetDom.addClass(ops[i].addName).removeClass(ops[i].reMove);
+                    }
+
                 });
             }
             var returnCheckArr = function () {
@@ -1229,7 +1232,6 @@ org.recharge = (function (org) {
     var lib = {
         $recharge: $('button[name=submit]'),
         $amount: $("input[name='amount']"),
-        $vcode: $('input[name=vcode]'),
         $card_no: $("input[name='card_no']"),
         $recharge_body: $('.recharge-main'),
         $load: $(".recharge-loding"),
@@ -1238,9 +1240,99 @@ org.recharge = (function (org) {
         $card_warp: $('.card-warp'),
         $bank_name: $(".bank-txt-name"),
         data: null,
+        isValidate: false,
+        order_id: '',
+        token: '',
         init: function () {
             lib.the_one_card();
             lib._close_alt($(".continue-rechare"));
+        },
+        /**
+         * 表单验证
+         * @private
+         */
+        _check_form: function(res){
+            var $amount = $("input[name=amount]"),
+                $validation = $("input[name=validation]"),
+                $submit = $("#recharge");
+
+            if(!lib.isValidate){
+                $submit.removeAttr("disabled");
+                return;
+            }
+            $(".js-validate").show();
+            org.ui.focusInput({
+                submit: $submit,
+                inputList: [
+                    {target: $amount, required: true},
+                    {target: $validation, required: true}
+                ]
+            });
+
+            //手机验证码
+            $('.request-check').on('click', function () {
+
+                var $that = $(this), //保存指针
+                    count = 60,  //60秒倒计时
+                    intervalId; //定时器
+                if($that.hasClass("regist-validation-disable")){
+                    return;
+                }
+                var card_no = res.no,
+                    gate_id = res.bank.gate_id,
+                    amount = $amount.val() * 1;
+                amount = amount ? amount : 0;
+                var sort_card = card_no.slice(0, 6) + card_no.slice(-4);
+
+                $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
+                org.ajax({
+                    url: '/api/pay/deposit_new/',
+                    data: {
+                        phone: '',
+                        trade_pwd: '',
+                        card_no: sort_card,
+                        gate_id: gate_id,
+                        amount: amount,
+                        mode: 'vcode_for_qpay'
+                    },
+                    type: 'POST',
+                    before: function(){
+                        $that.text('发送中……');
+                    },
+                    success: function(data){
+                        if(data.message && data.message!="ok"){
+                            clearInterval(intervalId);
+                            org.ui.showSign(data.message);
+                            $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                        }else{
+                            org.ui.showSign('短信已发送，请注意查收！');
+                            lib.order_id = data.order_id;
+                            lib.token = data.token;
+                        }
+                    },
+                    error: function (xhr) {
+                        clearInterval(intervalId);
+                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                        var result = JSON.parse(xhr.responseText);
+                        org.ui.showSign(result.message);
+                        //lib._captcha_refresh();
+                    }
+                });
+                //倒计时
+                var timerFunction = function () {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text(count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        //return lib._captcha_refresh();
+                    }
+                };
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            });
+
         },
         /**
          * 判断有没有同卡进出的卡
@@ -1252,7 +1344,9 @@ org.recharge = (function (org) {
                 url: '/api/pay/the_one_card/',
                 success: function (data) {
                     //同卡进出
-                   _self.on_card_operation(data);
+                    _self.on_card_operation(data);
+                    lib.isValidate = data.need_validation_for_qpay;
+                    lib._check_form(data);
                 },
                 error: function (data) {
                     //没有同卡进出
@@ -1309,50 +1403,66 @@ org.recharge = (function (org) {
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
                 }
+                var data = {};
+                if(lib.isValidate){
+                    data = {
+                        url: '/api/pay/cnp/dynnum_new/',
+                        data: {
+                            phone: '',
+                            vcode: $("input[name=validation].count-input").val(),
+                            order_id: lib.order_id,
+                            token: lib.token,
+                            trade_pwd: data.data.trade_pwd,
+                            mode: 'qpay_with_sms'
+                        },
 
-                var data = {
-                    data: {
-                        phone: '',
-                        card_no: sort_card,
-                        amount: amount,
-                        gate_id: gate_id
-                    },
-                    beforeSend: function () {
-                        _self.$recharge.attr('disabled', true).text("充值中..");
-                    },
-                    success: function (entry_operation, result) {
-                        entry_operation.hide_loading();
-                        entry_operation.clear();
-                        entry_operation.hide();
-                        if(result.ret_code == 0){
-                            return $('#page-ok').css('display', '-webkit-box').find("#total-money").text(result.margin);
+                    };
+                }else{
+                    data = {
+                        url: "/api/pay/deposit_new/",
+                        data: {
+                            phone: '',
+                            card_no: sort_card,
+                            amount: amount,
+                            gate_id: gate_id
+                        },
+                        beforeSend: function () {
+                            _self.$recharge.attr('disabled', true).text("充值中..");
+                        },
+                        success: function (entry_operation, result) {
+                            entry_operation.hide_loading();
+                            entry_operation.clear();
+                            entry_operation.hide();
+                            if(result.ret_code == 0){
+                                return $('#page-ok').css('display', '-webkit-box').find("#total-money").text(result.margin);
+                            }
+
+                            if(result.ret_code == 30047){
+                                return Deal_ui.show_entry(result.retry_count, function(){
+                                    entry_operation.show();
+                                })
+                            }
+                            if(result.ret_code == 30048){
+                                return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
+                                    window.location = '/weixin/sub_pwd_back/?next=/weixin/sub_recharge/'
+                                })
+                            }
+                            if (result.ret_code > 0) {
+                                return org.ui.alert(result.message);
+                            }
+
+
+                        },
+                        error: function (data) {
+                            if (data.status >= 403) {
+                                org.ui.alert('服务器繁忙，请稍后再试');
+                            }
+                        },
+                        complete: function () {
+                            _self.$recharge.removeAttr('disabled').text("充值");
                         }
 
-                        if(result.ret_code == 30047){
-                            return Deal_ui.show_entry(result.retry_count, function(){
-                                entry_operation.show();
-                            })
-                        }
-                        if(result.ret_code == 30048){
-                            return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
-                                window.location = '/weixin/sub_pwd_back/?next=/weixin/sub_recharge/'
-                            })
-                        }
-                        if (result.ret_code > 0) {
-                            return org.ui.alert(result.message);
-                        }
-
-
-                    },
-                    error: function (data) {
-                        if (data.status >= 403) {
-                            org.ui.alert('服务器繁忙，请稍后再试');
-                        }
-                    },
-                    complete: function () {
-                        _self.$recharge.removeAttr('disabled').text("充值");
                     }
-
                 }
                 org.ui.confirm("充值金额为" + amount, '确认充值', lib._trade_pwd_seach, data);
 
@@ -1469,10 +1579,23 @@ org.recharge = (function (org) {
          * 绑定同卡进出的卡充值
          */
         _rechargeSingleStep: function (operation, data) {
+            var url = '/api/pay/deposit_new/';
+            var json_data = data.data;
+            if(lib.isValidate){
+                json_data = {
+                    phone: '',
+                    vcode: $("input[name=validation].count-input").val(),
+                    order_id: $("input[name=order_id]").val(),
+                    token: $("input[name=token]").val(),
+                    trade_pwd: data.data.trade_pwd,
+                    mode: 'qpay_with_sms'
+                };
+                url = '/api/pay/cnp/dynnum_new/';
+            }
             org.ajax({
                 type: 'POST',
-                url: '/api/pay/deposit_new/',
-                data: data.data,
+                url: url,
+                data: json_data,
                 beforeSend: function () {
                     data.beforeSend && data.beforeSend()
                 },
@@ -1914,6 +2037,8 @@ org.processSecond = (function (org) {
             });
 
             function recharge(check) {
+                var data = {};
+
                 org.ajax({
                     type: 'POST',
                     url: '/api/pay/cnp/dynnum_new/',
