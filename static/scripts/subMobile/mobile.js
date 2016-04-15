@@ -1426,7 +1426,7 @@ org.recharge = (function (org) {
                     } else {
                         clearInterval(intervalId);
                         isTimes = false;
-                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-disable');
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-validation-disable');
                         org.ui.showSign("倒计时失效，请重新获取");
                         //return lib._captcha_refresh();
                     }
@@ -1438,7 +1438,7 @@ org.recharge = (function (org) {
                 amount = amount ? amount : 0;
                 var sort_card = card_no.slice(0, 6) + card_no.slice(-4);
 
-                $that.attr('disabled', 'disabled').addClass('regist-alreay-disable');
+                $that.attr('disabled', 'disabled').addClass('regist-validation-disable');
                 org.ajax({
                     url: '/api/pay/deposit_new/',
                     data: {
@@ -1457,7 +1457,7 @@ org.recharge = (function (org) {
                         if(data.message && data.message!="ok"){
                             clearInterval(intervalId);
                             org.ui.showSign(data.message);
-                            $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-disable');
+                            $that.text('获取验证码').removeAttr('disabled').removeClass('regist-validation-disable');
                         }else{
                             org.ui.showSign('短信已发送，请注意查收！');
                             lib.order_id = data.order_id;
@@ -1469,7 +1469,7 @@ org.recharge = (function (org) {
                     error: function (xhr) {
                         clearInterval(intervalId);
                         isTimes = true;
-                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-disable');
+                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-validation-disable');
                         var result = JSON.parse(xhr.responseText);
                         var str = result ? result.message : "系统异常，请稍后再试";
                         org.ui.showSign(str);
