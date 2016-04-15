@@ -37,26 +37,41 @@
         }
     }
 
+    /*逐个字符*/
     function substring(text){
-        //alert(text);
-        var box_num = $('.transaction-counts .num_1').length;
-        for(var i=text.length; i>=0; i--) {
-            if (text.length - 3 != i) {
+        //alert(text.length);
+
+        var num_length = text.length;
+        if(num_length==13){
+            num_length+=2;
+        }
+        if(num_length==14||num_length==10){
+            num_length+=1;
+        }
+
+        for(var i=num_length; i>=0; i--) {
+            if (num_length - 3 != i) {
                 //num = text.charAt(i);
-                if(text.length - 2 == i||text.length - 7 == i){
+                if(num_length - 7 == i||num_length - 11 == i||num_length - 15 == i){
                     $('.transaction-counts').prepend('<span class="num_2"></span>');
-
+                    //alert(i);
                 }else{
+                    if(num_length - 2 == i){
+                        $('.transaction-counts').prepend('<span class="num_3"></span>');
+                    }else{
+                        $('.transaction-counts').prepend('<span class="num_1"></span>');
+                    }
 
-                    $('.transaction-counts').prepend('<span class="num_1"></span>');
                 }
 
-                //$('.num_wrap .num_1').eq(box_num).text(num);
-                box_num--;
             }
         }
-        $('.transaction-counts').prepend('<span class="num_1"></span>');
-
+        if(text.length>=7){
+            $('.transaction-counts').prepend('<span class="num_1"></span>');
+            if(text.length!=13&&text.length>10){
+                $('.transaction-counts').prepend('<span class="num_1"></span>');
+            }
+        }
     };
 
     function substring_2(text){
@@ -71,8 +86,18 @@
             }
         }
 
-        //var width = 78*$('.transaction-counts .num_1').length+25*$('.transaction-counts .num_2').length;
-        //$('.transaction-counts').css('margin-left','-'+width/2+'px')
-
     };
+
+    wlb.ready({
+        app: function (mixins) {
+            $('#investmentBtn').on('click',function(){
+                mixins.jumpToManageMoney();
+            })
+        },
+        other: function(){
+            $('#investmentBtn').on('click',function() {
+                window.location.href = '/p2p/list/';
+            })
+        }
+    })
 })(org);
