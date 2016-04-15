@@ -155,7 +155,7 @@ class SendValidationCodeView(APIView):
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
         seccode = request.POST.get(gt.FN_SECCODE, '')
-        status = request.session[gt.GT_STATUS_SESSION_KEY]
+        #status = request.session[gt.GT_STATUS_SESSION_KEY]
 
         if status:
             result = gt.success_validate(challenge, validate, seccode)
@@ -1229,7 +1229,12 @@ class StatisticsInside(APIView):
         yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
             .filter(catalog='取款预冻结').aggregate(Sum('amount'))
         yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
-
+        
+        # 今日充值总额
+        today_deposit = MarginRecord.objects.filter(create_time__gte=today_start) \
+            .filter(catalog='现金存入').aggregate(Sum('amount'))
+        today_deposit_amount = today_deposit['amount__sum'] if today_deposit['amount__sum'] else Decimal('0')
+        
         # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
@@ -1279,6 +1284,7 @@ class StatisticsInside(APIView):
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
             'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
             'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
+            'today_deposit_amount' : today_deposit_amount, # 今日冲值总额
         }
 
         data.update(get_public_statistics())
@@ -1872,10 +1878,10 @@ class GeetestAPIView(APIView):
         self.type = request.POST.get('type', None)
         import time
         if self.type == 'get':
-            #time.sleep(10)
+            # time.sleep(10)
             return self.get_captcha(request)
         if self.type == 'validate':
-            #time.sleep(10)
+            time.sleep(10)
             return self.validate_captcha(request)
 
     def get_captcha(self, request):
