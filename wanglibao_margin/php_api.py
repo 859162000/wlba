@@ -722,18 +722,14 @@ class GetRedPacks(APIView):
     """
     permission_classes = ()
 
+    @csrf_exempt
     def post(self, request):
 
         red_pack_info = dict()
-        period = self.request.POST.get('period', 0)
-        uid = self.request.POST.get('userId', 0)
-        if self.request.user:
-            uid = self.request.user.id
-
-        print '$%^&*('*100
-        print period
-        print uid
-        print self.request.method
+        period = request.POST.get('period', 0)
+        uid = request.POST.get('userId', 0)
+        if request.user.id:
+            uid = request.user.id
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
@@ -742,6 +738,9 @@ class GetRedPacks(APIView):
 
             result = php_redpacks(User.objects.get(pk=uid), device['device_type'], period=period)
             redpacks = result['packages'].get('available', [])
+
+            logger.info('user = {}, devide = {}, period={},  redpacks = {}'.
+                        format(User.objects.get(pk=uid), device['device_type'], period, redpacks))
 
             red_pack_info.update(
                 status=1,
@@ -752,6 +751,8 @@ class GetRedPacks(APIView):
                 status=0,
                 msg=u'authentic error!'
             )
+
+        logger.info('user_id = {}, ret = {}'.format(self.request.user.pk, red_pack_info))
 
         return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))
 

@@ -648,9 +648,9 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
         # 加息券
         # 检测app版本号，小于2.5.2版本不返回加息券列表
         is_show = True
-        if device_type == 'ios' or device_type == 'android':
-            if app_version < "2.5.3":
-                is_show = False
+        # if device_type == 'ios' or device_type == 'android':
+        #     if app_version < "2.5.3":
+        #         is_show = False
         if is_show:
             # 显示加息券, 月利宝可以多次使用加息券
             coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
