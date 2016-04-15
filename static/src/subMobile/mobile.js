@@ -1574,14 +1574,21 @@ org.recharge = (function (org) {
          */
         _rechargeSingleStep: function (operation, data) {
             var url = '/api/pay/deposit_new/';
+            var json_data = data.data;
             if(lib.isValidate){
-                data.data.mode = 'qpay_with_sms';
+                json_data = {
+                    phone: '',
+                    vcode: $("input[name=validation].count-input").val(),
+                    order_id: $("input[name=order_id]").val(),
+                    token: $("input[name=token]").val(),
+                    mode: 'qpay_with_sms'
+                };
                 url = '/api/pay/cnp/dynnum_new/';
             }
             org.ajax({
                 type: 'POST',
                 url: url,
-                data: data.data,
+                data: json_data,
                 beforeSend: function () {
                     data.beforeSend && data.beforeSend()
                 },
