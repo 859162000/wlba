@@ -2735,9 +2735,9 @@ class AprilAwardApi(APIView):
 
         if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
-                week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%W')
+                week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%m_%d')
                 weekranks = pickle.loads(redis_backend()._get(week_top_ranks))
-                week_sum = 'week_sum_' + today.strftime('%Y_%W')
+                week_sum = 'week_sum_' + today.strftime('%%Y_%m_%d')
                 week_sum_amount = pickle.loads(redis_backend()._get(week_sum))
             except:
                 logger.debug("-------------------------------redis read weekranks error")

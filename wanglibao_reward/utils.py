@@ -186,7 +186,8 @@ def updateRedisTopRank():
 
 def getWeekTop10Ranks():
     today = datetime.datetime.now()
-    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1)
+    #计算开始时间从上周六0点开始
+    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
     today_start = local_to_utc(week_frist_day, 'min')
     today_end = local_to_utc(today, 'max')
     top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
@@ -205,7 +206,7 @@ def updateRedisWeekTopRank():
         top_ranks = getWeekTop10Ranks()
         redis = redis_backend()
         today = datetime.datetime.now()
-        week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%W')
+        week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%m_%d')
         redis._set(week_top_ranks, pickle.dumps(top_ranks))
     except Exception,e:
         logger.error("====updateRedisWeekTopRank======="+e.message)
@@ -213,7 +214,7 @@ def updateRedisWeekTopRank():
 
 def getWeekSum():
     today = datetime.datetime.now()
-    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1)
+    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
     today_start = local_to_utc(week_frist_day, 'min')
     today_end = local_to_utc(today, 'max')
     week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).aggregate(Sum('amount'))
@@ -226,7 +227,7 @@ def updateRedisWeekSum():
         top_ranks = getWeekSum()
         redis = redis_backend()
         today = datetime.datetime.now()
-        week_sum = 'week_sum_' + today.strftime('%Y_%W')
+        week_sum = 'week_sum_' + today.strftime('%Y_%m_%d')
         redis._set(week_sum, pickle.dumps(top_ranks))
     except Exception,e:
         logger.error("====updateRedisWeekSum======="+e.message)
@@ -242,7 +243,7 @@ def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
                 # updateRedisTopRank.apply_async()
                 updateRedisTopRank()
                 updateRedisWeekSum()
-                updateRedisWeekTopRank
+                updateRedisWeekTopRank()
 
                 period = product.period
                 if product.pay_method.startswith(u'日计息'):
