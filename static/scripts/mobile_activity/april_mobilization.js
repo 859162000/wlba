@@ -225,16 +225,23 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         },
         success: function (data) {
             var result = data.weekranks;
-            var str = '',sty = '',icon = '';
+            var str = '',sty = '',icon = '',coupon='';
             substring(data.week_sum_amount);
             $.each(result,function(i,o){
                 if(i <= 2){
                     sty ='red';
                     icon = 'icon'+ (i+1)
+                    if(i == 1){
+                        coupon = '5张百元加油卡+2张星美电影票';
+                    }else if(i == 2){
+                        coupon = '3张百元加油卡+2张星美电影票';
+                    }else{
+                        coupon = '2张百元加油卡+2张星美电影票';
+                    }
                 }else{
-                    sty ='';
+                    sty ='';coupon='1张百元加油卡+2张星美电影票'
                 }
-                str+='<tr class='+ sty +'><td><span class='+ icon +'>'+ (i+1) +'</span>'+o.phone.substring(0,3)+'****' +o.phone.substr(o.phone.length-4) +'</td><td class="tl">'+ fmoney(o.amount__sum) +' 元</td><td>'+ o.coupon +'</td></tr>'
+                str+='<tr class='+ sty +'><td><span class='+ icon +'>'+ (i+1) +'</span>'+o.phone.substring(0,3)+'****' +o.phone.substr(o.phone.length-4) +'</td><td class="tl">'+ fmoney(o.amount__sum) +' 元</td><td>'+ coupon +'</td></tr>'
             })
             $('#list').append(str);
 
