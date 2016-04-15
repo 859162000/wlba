@@ -329,9 +329,8 @@ org.ui = (function () {
                 $('.confirm-cancel').on('click', function (e) {
                     $('.confirm-warp').hide();
                 })
-                $('.confirm-certain').on('click', function (e) {
+                $('.confirm-certain').unbind("click").on('click', function (e) {
                     $('.confirm-warp').hide();
-
                     if (callback) {
                         callbackData ? callback(callbackData) : callback();
                     }
@@ -1538,7 +1537,7 @@ org.recharge = (function (org) {
          */
         _rechargeThe_one_card: function () {
             var _self = this;
-            _self.$recharge.on('click', function () {
+            _self.$recharge.unbind('click').on('click', function () {
                 var
                     card_no = _self.data.no,
                     gate_id = _self.data.bank.gate_id,
@@ -1549,9 +1548,9 @@ org.recharge = (function (org) {
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
                 }
-                if(lib.order_id === "" && lib.token === ""){
-                    return org.ui.showSign('请先获取验证码');
-                }
+                //if(lib.order_id === "" && lib.token === ""){
+                //    return org.ui.showSign('请先获取验证码');
+                //}
 
                 var data = {
                     url: "/api/pay/deposit_new/",
@@ -2385,7 +2384,7 @@ org.trade_back = (function (org) {
             e.stopPropagation();
         });
 
-        this.$input.on('input', function(){
+        this.$input.unbind('input').on('input', function(){
             $('.circle').hide();
             _self.decide('input')
         });
