@@ -1320,6 +1320,7 @@ class MessageView(TemplateView):
                     message.read_status = data[index]['read_status']
                     message.message_text.title = data[index]['title']
                     message.message_text.content = data[index]['content']
+                    message.message_text.created_at = int(data[index]['created_at'])
                     index += 1
 
         messages_list = []
@@ -1374,7 +1375,7 @@ class MessageDetailAPIView(APIView):
             if message_id == 0:
                 url = settings.PHP_INSIDE_MESSAGE_READ_ALL
             response = requests.post(url,
-                                     data={'uid': 80990, 'mid': message_id})
+                                     data={'uid': request.user.id, 'mid': message_id})
             resp = response.json()
             if resp['code'] == 'success':
                 result.update(ret_code=resp['data'], message=resp['des'])
