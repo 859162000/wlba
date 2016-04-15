@@ -403,6 +403,7 @@ $(function(){
                         $(".zlyc .yzc_txt").show();
                         $(".zlyc .ermts").hide();
                         document.getElementById("car_audio").pause();
+                        $(".m").hide();
                     }else{
                         $(".blank").show();
                         $(".yz_tc").show();
@@ -431,6 +432,7 @@ $(function(){
         }
         function lqjl(param){
             document.getElementById("car_audio").pause();
+            $(".m").hide();
             $.ajax({
                 type:"post",
                 url:"/api/activity/happy_monkey/",
