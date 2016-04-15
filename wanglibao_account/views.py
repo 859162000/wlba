@@ -2782,7 +2782,7 @@ class BiSouYiRegisterApi(APIView):
 
                     start_time = timezone.localtime(timezone.now())
                     end_time = start_time + datetime.timedelta(seconds=599)
-                    oauth_data['token'] = response_data['access_token']
+                    oauth_data['token'] = access_token
                     oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
                     oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
                     oauth_data['status'] = 1
@@ -2807,6 +2807,80 @@ class BiSouYiRegisterApi(APIView):
 
         logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiRegisterView(TemplateView):
+
+    template_name = ''
+
+    def post(self):
+        form = BiSouYiRegisterForm(self.request.session, action='register')
+        oauth_data = {
+            'pcode': settings.BISOUYI_PCODE,
+            'status': 0,
+        }
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                if user:
+                    user = self.request.user
+                    access_token = utils.long_token()
+                    account = form.get_account()
+                    user.access_token = access_token
+                    user.account = account
+                    channel_code = form.cleaned_data['channel_code']
+
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(self.request).all_processors_for_user_register(user, channel_code)
+
+                    device = utils.split_ua(self.request)
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    auth_user = authenticate(identifier=phone, password=password)
+                    auth_login(self.request, auth_user)
+
+                    start_time = timezone.localtime(timezone.now())
+                    end_time = start_time + datetime.timedelta(seconds=599)
+                    oauth_data['token'] = access_token
+                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['status'] = 1
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                        'next_url': form.get_other(),
+                    }
+                else:
+                    response_data = {
+                        'ret_code': 10012,
+                        'message': u'用户创建失败',
+                        'next_url': settings.SITE_URL,
+                    }
+            else:
+                response_data = {
+                    'ret_code': 10011,
+                    'message': u'无效签名',
+                    'next_url': settings.SITE_URL,
+                }
+        else:
+            response_data = {
+                'ret_code': 10010,
+                'message': form.errors.values()[0][0],
+                'next_url': settings.SITE_URL,
+            }
+
+        response_data['oauth_data'] = json.dumps(oauth_data)
+
+        logger.info("BiSouYiRegisterView process result: %s" % response_data['message'])
+        return response_data
 
 
 class BiSouYiLoginApi(APIView):

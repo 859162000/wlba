@@ -62,7 +62,8 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView,
                              GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, BiSouYiRegisterApi, BiSouYiLoginApi)
+from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, BiSouYiRegisterApi, BiSouYiLoginApi,
+                                     BiSouYiRegisterView)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
                                     QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, FetchAirportServiceReward)
@@ -371,6 +372,8 @@ urlpatterns += patterns(
     '',
     # 新用户注册
     url(r'^bisouyi/register/$', BiSouYiRegisterApi.as_view()),
+    # 新用户一键注册接口
+    url(r'^bisouyi/one_key_register/$', BiSouYiRegisterView.as_view()),
     # 老用户登录
     url(r'^bisouyi/login/$', BiSouYiLoginApi.as_view()),
 )
