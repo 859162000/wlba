@@ -123,19 +123,20 @@ urlpatterns += patterns(
     url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
     url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
     url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
+    url(r'^hby_reward/$', activity_views.GetContinueActionReward.as_view()),
 
 )
 #活动页面
 urlpatterns += patterns(
     '',
-    url(r'^activity/invite/$', fwh_login_required(TemplateView.as_view(template_name="invite_redpacket_get.jade"),login_url='/weixin/sub_login_redirect/'),name='fwh_invite'),
+    url(r'activity/si_bind_login/$', activity_views.WechatShareInviteBindTemplate.as_view(template_name="invite_redpacket_bind.jade")),
+    url(r'^activity/invite/$', fwh_login_required(activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),login_url='/weixin/activity/si_bind_login/'),name='fwh_invite'),
 
 )
 #h5活动页面
 urlpatterns += patterns(
     '',
-    url(r'^activity/share/$', TemplateView.as_view(template_name="invite_redpacket_index.jade"), name='weixin_share'),
-    url(r'^activity/bind/$', TemplateView.as_view(template_name="invite_redpacket_bind.jade"), name='weixin_share'),
+    url(r'^activity/share/$', activity_views.WechatShareTemplate.as_view(template_name="invite_redpacket_index.jade"), name='weixin_share'),
     url(r'^activity/get/$', TemplateView.as_view(template_name="invite_redpacket_get.jade"), name='weixin_share'),
     url(r'^activity/code/$', TemplateView.as_view(template_name="invite_redpacket_code.jade"), name='weixin_share'),
 )
