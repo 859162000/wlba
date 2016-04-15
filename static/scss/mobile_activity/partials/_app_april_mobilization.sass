@@ -1,11 +1,16 @@
+body
+
 .mobilization-box
-  max-height: 9999rem
-  background: url(/static/imgs/mobile_activity/app_april_mobilization/bg.jpg) repeat-x
+  background: #c6d560
+  height: 100%
+  width: 100%
+  max-height: 99999999px
   .banner
     width: 100%
   .c-box
     padding: 0 .5rem
     overflow: hidden
+    //max-height: 99999999rem
     .activity
       position: relative
       text-align: center
@@ -97,7 +102,7 @@
       .reward-left
         -webkit-box-flex: 1
         background: #f7f7f7
-        width: 8.35rem
+        width: 8.5rem
         li
           text-indent: 10%
         li:nth-child(odd)
@@ -166,6 +171,7 @@
       padding-top: .5rem
       .num_1
         background: url(/static/imgs/mobile_activity/app_april_mobilization/num1.png)  center no-repeat
+        background-size: cover
         width: 1rem
         height: 1.275rem
         display: inline-block
@@ -177,7 +183,8 @@
         font-weight: bold
       .num_2,.num_3
         background: url(/static/imgs/mobile_activity/app_april_mobilization/num2.png)  center no-repeat
-        width: 1rem
+        background-size: cover
+        width: .5rem
         height: 1.275rem
         display: inline-block
         background-size: cover
@@ -185,6 +192,9 @@
         vertical-align: middle
       .num_3
         background: url(/static/imgs/mobile_activity/app_april_mobilization/num3.png)  center no-repeat
+        background-size: cover
+        width: .5rem
+        height: 1rem
     .ranking-list
       background: #a8ba3f
       padding: .35rem .5rem
@@ -271,8 +281,6 @@
     bottom: 0
     text-align: center
     width: 100%
-    background: #000
-    opacity: .8
     padding: .5rem 0
     img
       width: 89%

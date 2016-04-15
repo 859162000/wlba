@@ -204,9 +204,8 @@ org.ui = (function () {
                 $('.confirm-cancel').on('click', function (e) {
                     $('.confirm-warp').hide();
                 })
-                $('.confirm-certain').on('click', function (e) {
+                $('.confirm-certain').unbind("click").on('click', function (e) {
                     $('.confirm-warp').hide();
-
                     if (callback) {
                         callbackData ? callback(callbackData) : callback();
                     }
@@ -1255,8 +1254,11 @@ org.recharge = (function (org) {
         _check_form: function(res){
             var $amount = $("input[name=amount]"),
                 $validation = $("input[name=validation]"),
-                $submit = $("#recharge");
+                $submit = $("#recharge"),
+                $phoneBtn = $('.request-check'),
+                isTimes = false;
 
+            var limitMenoy = res.bank.bank_limit.second_one;
             if(!lib.isValidate){
                 $submit.removeAttr("disabled");
                 return;
@@ -1270,9 +1272,20 @@ org.recharge = (function (org) {
                 ]
             });
 
+            //充值金额
+            $amount.on("input", function(){
+                var self = $(this);
+                if(self.val()*1 > limitMenoy){
+                    org.ui.showSign("该银行单笔限额5万元");
+                    $phoneBtn.attr('disabled',"true").removeClass('regist-alreay-request').addClass("regist-validation-disable");
+                }else if(isTimes){
+                    $phoneBtn.attr('disabled',"true").removeClass('regist-alreay-request').addClass("regist-validation-disable");
+                }else{
+                    $phoneBtn.removeAttr('disabled');
+                }
+            });
             //手机验证码
-            $('.request-check').on('click', function () {
-
+            $phoneBtn.on('click', function () {
                 var $that = $(this), //保存指针
                     count = 60,  //60秒倒计时
                     intervalId; //定时器
@@ -1282,11 +1295,14 @@ org.recharge = (function (org) {
                 //倒计时
                 var timerFunction = function () {
                     if (count >= 1) {
+                        isTimes = true;
                         count--;
                         return $that.text(count + '秒后可重发');
                     } else {
                         clearInterval(intervalId);
-                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        isTimes = false;
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-validation-disable');
+                        org.ui.showSign("倒计时失效，请重新获取");
                         //return lib._captcha_refresh();
                     }
                 };
@@ -1297,7 +1313,7 @@ org.recharge = (function (org) {
                 amount = amount ? amount : 0;
                 var sort_card = card_no.slice(0, 6) + card_no.slice(-4);
 
-                $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
+                $that.attr('disabled', 'disabled').addClass('regist-validation-disable');
                 org.ajax({
                     url: '/api/pay/deposit_new/',
                     data: {
@@ -1316,7 +1332,7 @@ org.recharge = (function (org) {
                         if(data.message && data.message!="ok"){
                             clearInterval(intervalId);
                             org.ui.showSign(data.message);
-                            $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                            $that.text('获取验证码').removeAttr('disabled').removeClass('regist-validation-disable');
                         }else{
                             org.ui.showSign('短信已发送，请注意查收！');
                             lib.order_id = data.order_id;
@@ -1327,9 +1343,11 @@ org.recharge = (function (org) {
                     },
                     error: function (xhr) {
                         clearInterval(intervalId);
-                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                        isTimes = true;
+                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-validation-disable');
                         var result = JSON.parse(xhr.responseText);
-                        org.ui.showSign(result.message);
+                        var str = result ? result.message : "系统异常，请稍后再试";
+                        org.ui.showSign(str);
                         //lib._captcha_refresh();
                     }
                 });
@@ -1395,17 +1413,21 @@ org.recharge = (function (org) {
          */
         _rechargeThe_one_card: function () {
             var _self = this;
-            _self.$recharge.on('click', function () {
+            _self.$recharge.unbind('click').on('click', function () {
                 var
                     card_no = _self.data.no,
                     gate_id = _self.data.bank.gate_id,
                     amount = _self.$amount.val() * 1;
-
+                var $this = $(this);
                 var sort_card = card_no.slice(0, 6) + card_no.slice(-4);
 
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
                 }
+                //if(lib.order_id === "" && lib.token === ""){
+                //    return org.ui.showSign('请先获取验证码');
+                //}
+
                 var data = {
                     url: "/api/pay/deposit_new/",
                     data: {
@@ -1415,9 +1437,10 @@ org.recharge = (function (org) {
                         gate_id: gate_id
                     },
                     beforeSend: function () {
-                        _self.$recharge.attr('disabled', true).text("充值中..");
+                        $this.attr('disabled', true).text("充值中..");
                     },
                     success: function (entry_operation, result) {
+                        $('body').append("<div>"+ JSON.stringify(result) +"</div>");
                         entry_operation.hide_loading();
                         entry_operation.clear();
                         entry_operation.hide();
@@ -1445,7 +1468,7 @@ org.recharge = (function (org) {
                         }
                     },
                     complete: function () {
-                        _self.$recharge.removeAttr('disabled').text("充值");
+                        $this.removeAttr('disabled').text("立即充值");
                     }
                 };
                 if(lib.isValidate) {
@@ -2237,7 +2260,7 @@ org.trade_back = (function (org) {
             e.stopPropagation();
         });
 
-        this.$input.on('input', function(){
+        this.$input.unbind('input').on('input', function(){
             $('.circle').hide();
             _self.decide('input')
         });

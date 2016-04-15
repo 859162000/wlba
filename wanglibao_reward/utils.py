@@ -18,7 +18,8 @@ from wanglibao_redis.backend import redis_backend
 from misc.models import Misc
 import logging
 import pickle
-
+from decimal import Decimal
+from weixin.util import getMiscValue
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -186,7 +187,8 @@ def updateRedisTopRank():
 
 def getWeekTop10Ranks():
     today = datetime.datetime.now()
-    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1)
+    #计算开始时间从上周六0点开始
+    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
     today_start = local_to_utc(week_frist_day, 'min')
     today_end = local_to_utc(today, 'max')
     top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
@@ -205,34 +207,49 @@ def updateRedisWeekTopRank():
         top_ranks = getWeekTop10Ranks()
         redis = redis_backend()
         today = datetime.datetime.now()
-        week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%W')
+        week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%m_%d')
         redis._set(week_top_ranks, pickle.dumps(top_ranks))
     except Exception,e:
         logger.error("====updateRedisWeekTopRank======="+e.message)
     return top_ranks
 
 def getWeekSum():
-    today = datetime.datetime.now()
-    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1)
-    today_start = local_to_utc(week_frist_day, 'min')
-    today_end = local_to_utc(today, 'max')
-    week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).aggregate(Sum('amount'))
-    amount_week_sum = week_sum['amount__sum'] if week_sum['amount__sum'] else Decimal('0')
-    return amount_week_sum
+    amount_week_sum = 0
+    try:
+        today = datetime.datetime.now()
+        week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
+        today_start = local_to_utc(week_frist_day, 'min')
+        today_end = local_to_utc(today, 'max')
+        week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).aggregate(Sum('amount'))
+        amount_week_sum = week_sum['amount__sum'] if week_sum['amount__sum'] else Decimal('0')
+    except:
+        logger.error("====updateRedisWeekTopRank======="+e.message)
+    return amount_week_sum 
+
 
 def updateRedisWeekSum():
-    top_ranks = []
+    top_ranks = 0
     try:
         top_ranks = getWeekSum()
         redis = redis_backend()
         today = datetime.datetime.now()
-        week_sum = 'week_sum_' + today.strftime('%Y_%W')
+        week_sum = 'week_sum_' + today.strftime('%Y_%m_%d')
         redis._set(week_sum, pickle.dumps(top_ranks))
     except Exception,e:
         logger.error("====updateRedisWeekSum======="+e.message)
     return top_ranks
 
 def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
+    try:
+        status = int(getMiscValue('april_reward').get('status',0))
+        if status==1:
+            updateRedisWeekSum()
+            updateRedisWeekTopRank()
+    except Exception, e:
+        logger.error("===========processMarchAwardAfterP2pBuy==================="+e.message)
+
+
+def processMarchAwardAfterP2pBuy_March(user, product_id, order_id, amount):
     try:
         product = P2PProduct.objects.filter(id=product_id).get()
         if product:
@@ -241,8 +258,6 @@ def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
             if rank_activity and not rank_activity.is_stopped and rank_activity.start_at<=utc_now and rank_activity.end_at>=utc_now:
                 # updateRedisTopRank.apply_async()
                 updateRedisTopRank()
-                updateRedisWeekSum()
-                updateRedisWeekTopRank
 
                 period = product.period
                 if product.pay_method.startswith(u'日计息'):
