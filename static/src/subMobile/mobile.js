@@ -1416,6 +1416,39 @@ org.recharge = (function (org) {
                             token: lib.token,
                             amount: amount,
                             mode: 'qpay_with_sms'
+                        },
+                        beforeSend: function () {
+                            _self.$recharge.attr('disabled', true).text("充值中..");
+                        },
+                        success: function (entry_operation, result) {
+                            entry_operation.hide_loading();
+                            entry_operation.clear();
+                            entry_operation.hide();
+                            if(result.ret_code == 0){
+                                return $('#page-ok').css('display', '-webkit-box').find("#total-money").text(result.margin);
+                            }
+
+                            if(result.ret_code == 30047){
+                                return Deal_ui.show_entry(result.retry_count, function(){
+                                    entry_operation.show();
+                                })
+                            }
+                            if(result.ret_code == 30048){
+                                return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
+                                    window.location = '/weixin/sub_pwd_back/?next=/weixin/sub_recharge/'
+                                })
+                            }
+                            if (result.ret_code > 0) {
+                                return org.ui.alert(result.message);
+                            }
+                        },
+                        error: function (data) {
+                            if (data.status >= 403) {
+                                org.ui.alert('服务器繁忙，请稍后再试');
+                            }
+                        },
+                        complete: function () {
+                            _self.$recharge.removeAttr('disabled').text("充值");
                         }
                     };
                 }else{
