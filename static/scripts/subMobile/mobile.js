@@ -1552,6 +1552,7 @@ org.recharge = (function (org) {
                 if(lib.order_id === "" && lib.token === ""){
                     return org.ui.showSign('请先获取验证码');
                 }
+                $this.attr('disabled', true).text("充值中..");
                 var data = {
                     url: "/api/pay/deposit_new/",
                     data: {
