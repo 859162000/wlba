@@ -65,7 +65,8 @@ class WechatUserDailyReward(models.Model):
     status = models.BooleanField(default=False, verbose_name=u'是否成功')
 
     class Meta:
-        unique_together = (("w_user", "create_date"),)  # 联合唯一索引
+        unique_together = (("w_user", "create_date"), ("w_user", "user", "create_date"))  # 联合唯一索引
+        ordering = '-create_date',
 
 
 
