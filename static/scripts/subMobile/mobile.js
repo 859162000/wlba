@@ -1471,7 +1471,8 @@ org.recharge = (function (org) {
                         isTimes = true;
                         $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
                         var result = JSON.parse(xhr.responseText);
-                        org.ui.showSign(result.message);
+                        var str = result ? result.message : "系统异常，请稍后再试";
+                        org.ui.showSign(str);
                         //lib._captcha_refresh();
                     }
                 });
