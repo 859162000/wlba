@@ -214,16 +214,21 @@ def updateRedisWeekTopRank():
     return top_ranks
 
 def getWeekSum():
-    today = datetime.datetime.now()
-    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
-    today_start = local_to_utc(week_frist_day, 'min')
-    today_end = local_to_utc(today, 'max')
-    week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).aggregate(Sum('amount'))
-    amount_week_sum = week_sum['amount__sum'] if week_sum['amount__sum'] else Decimal('0')
-    return amount_week_sum
+    amount_week_sum = 0
+    try:
+        today = datetime.datetime.now()
+        week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
+        today_start = local_to_utc(week_frist_day, 'min')
+        today_end = local_to_utc(today, 'max')
+        week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).aggregate(Sum('amount'))
+        amount_week_sum = week_sum['amount__sum'] if week_sum['amount__sum'] else Decimal('0')
+    except:
+        logger.error("====updateRedisWeekTopRank======="+e.message)
+    return amount_week_sum 
+
 
 def updateRedisWeekSum():
-    top_ranks = []
+    top_ranks = 0
     try:
         top_ranks = getWeekSum()
         redis = redis_backend()

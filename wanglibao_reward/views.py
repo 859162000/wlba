@@ -2650,15 +2650,12 @@ class MarchAwardTemplate(TemplateView):
         # yesterday_end = local_to_utc(yesterday, 'max')
         # yesterday_start = local_to_utc(yesterday, 'min')
         ranks = []
-        weekranks = []
-        week_sum_amount = []
         chances = 0
         user = self.request.user
         yesterday = datetime.datetime.now() -datetime.timedelta(1)
         yesterday_end = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
         yesterday_end = local_to_utc(yesterday_end, "")
         # yesterday_start = local_to_utc(yesterday, 'min')
-        today = datetime.datetime.now()
 
         if rank_activity and (not rank_activity.is_stopped) and rank_activity.start_at<= utc_now and rank_activity.end_at>=utc_now:
             try:
@@ -2712,26 +2709,22 @@ class AprilAwardApi(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request):
-        rank_activity = Activity.objects.filter(code='march_awards').first()
-        utc_now = timezone.now()
         weekranks = []
         week_sum_amount = []
         today = datetime.datetime.now()
-        
-        try:
-            status = int(getMiscValue('april_reward').get('status',0))
-            if status==1:
+        status = int(getMiscValue('april_reward').get('status',0))
+        if status==1:
+            try:
                 week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%m_%d')
                 weekranks = pickle.loads(redis_backend()._get(week_top_ranks))
-                week_sum = 'week_sum_' + today.strftime('%%Y_%m_%d')
+                week_sum = 'week_sum_' + today.strftime('%Y_%m_%d')
                 week_sum_amount = pickle.loads(redis_backend()._get(week_sum))
-                
-                if not weekranks:
-                    weekranks = updateRedisWeekTopRank()
-                if not week_sum_amount:
-                    week_sum_amount = updateRedisWeekSum()                
-        except:
-            logger.debug("-------------------------------redis read weekranks error")
+            except:
+                logger.debug("-------------------------------redis read weekranks error")
+            if not weekranks:
+                weekranks = updateRedisWeekTopRank()
+            if not week_sum_amount:
+                week_sum_amount = updateRedisWeekSum()
         
         return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,})
 
