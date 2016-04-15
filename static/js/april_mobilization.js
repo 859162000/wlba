@@ -107,7 +107,7 @@
                                 }else if(i==3){
                                     rankingList.push(['<tr class="third">'].join(''));
                                 }
-                                rankingList.push(['<td class="one"><span class="ico"></span><span class="phone">'+json_one.phone+'</span></td><td class="two">'+number+'元</td><td class="three">'].join(''));
+                                rankingList.push(['<td class="one"><span class="ico"></span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">'].join(''));
                                 if(i==1){
                                     rankingList.push(['5张百元加油卡+2张星美电影票</td></tr>'].join(''));
                                 }else if(i==2){
@@ -116,7 +116,7 @@
                                     rankingList.push(['2张百元加油卡+2张星美电影票</td></tr>'].join(''));
                                 }
                             }else{
-                                rankingList.push(['<tr><td class="one"><span class="ico">'+i+'</span><span class="phone">'+json_one.phone+'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                                rankingList.push(['<tr><td class="one"><span class="ico">'+i+'</span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
                             }
 
                         }else{
