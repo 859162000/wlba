@@ -384,8 +384,8 @@ class WechatShareInviteBindTemplate(TemplateView):
     template_name = ""
 
     def get_context_data(self, **kwargs):
-
-        return {}
+        next = self.request.GET.get('next')
+        return {"next":next}
 
     def dispatch(self, request, *args, **kwargs):
         self.openid = self.request.session.get('openid')
@@ -424,24 +424,30 @@ class WechatInviteTemplate(TemplateView):
         w_daily_reward = WechatUserDailyReward.objects.filter(w_user=w_user).first()
         reward_text = ""
         reward_type = ""
-        if w_daily_reward and w_daily_reward.reward_type == "redpack":
-            redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
-            if redpack_event.rtype == 'interest_coupon':
-                reward_text = "%s%%"%redpack_event.amount
-            if redpack_event.rtype == 'percent':
-                reward_text = "%s%%"%redpack_event.amount
-            if redpack_event.rtype == 'direct':
-                reward_text = "%s元"%int(redpack_event.amount)
-            reward_type = redpack_event.rtype
-        if w_daily_reward and w_daily_reward.reward_type == "experience_gold":
-            experience_event = ExperienceEvent.objects.filter(pk=w_daily_reward.experience_gold_id).first()
-            reward_text = "%s元"%int(experience_event.amount)
-            reward_type = w_daily_reward.reward_type
+        fetched = False
+        if w_daily_reward and w_daily_reward.status:
+            fetched = True
+            if w_daily_reward.reward_type == "redpack":
+                redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
+                if redpack_event.rtype == 'interest_coupon':
+                    reward_text = "%s%%"%redpack_event.amount
+                if redpack_event.rtype == 'percent':
+                    reward_text = "%s%%"%redpack_event.amount
+                if redpack_event.rtype == 'direct':
+                    reward_text = "%s元"%int(redpack_event.amount)
+                reward_type = redpack_event.rtype
+            if w_daily_reward.reward_type == "experience_gold":
+                experience_event = ExperienceEvent.objects.filter(pk=w_daily_reward.experience_gold_id).first()
+                reward_text = "%s元"%int(experience_event.amount)
+                reward_type = w_daily_reward.reward_type
+            #todo yaoqingleduoshaoren huodetiyanjin
         return {
+            "fetched":fetched,
+            "fetched_txt":"某年某天已经领取了300元红包",
             "reward_text":reward_text,
             "reward_type":reward_type,
             "is_bind": True if w_user.user else False,
-            settings.SHARE_INVITE_KEY: self.request.GET.get(settings.SHARE_INVITE_KEY, "")
+            "qr_code_url":"",
         }
 
     def dispatch(self, request, *args, **kwargs):
