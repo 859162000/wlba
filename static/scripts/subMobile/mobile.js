@@ -1403,6 +1403,18 @@ org.recharge = (function (org) {
                 if($that.hasClass("regist-validation-disable")){
                     return;
                 }
+                //倒计时
+                var timerFunction = function () {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text(count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        //return lib._captcha_refresh();
+                    }
+                };
+
                 var card_no = res.no,
                     gate_id = res.bank.gate_id,
                     amount = $amount.val() * 1;
@@ -1421,7 +1433,7 @@ org.recharge = (function (org) {
                         mode: 'vcode_for_qpay'
                     },
                     type: 'POST',
-                    before: function(){
+                    beforeSend: function(){
                         $that.text('发送中……');
                     },
                     success: function(data){
@@ -1434,6 +1446,7 @@ org.recharge = (function (org) {
                             lib.order_id = data.order_id;
                             lib.token = data.token;
                             timerFunction();
+                            intervalId = setInterval(timerFunction, 1000);
                         }
                     },
                     error: function (xhr) {
@@ -1444,19 +1457,7 @@ org.recharge = (function (org) {
                         //lib._captcha_refresh();
                     }
                 });
-                //倒计时
-                var intervalId;
-                var timerFunction = function () {
-                    if (count >= 1) {
-                        count--;
-                        return $that.text(count + '秒后可重发');
-                    } else {
-                        clearInterval(intervalId);
-                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
-                        //return lib._captcha_refresh();
-                    }
-                };
-                intervalId = setInterval(timerFunction, 1000);
+
             });
 
         },
@@ -1538,6 +1539,7 @@ org.recharge = (function (org) {
                             vcode: $("input[name=validation].count-input").val(),
                             order_id: lib.order_id,
                             token: lib.token,
+                            amount: amount,
                             mode: 'qpay_with_sms'
                         }
                     };
