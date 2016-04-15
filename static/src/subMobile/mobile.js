@@ -1232,7 +1232,6 @@ org.recharge = (function (org) {
     var lib = {
         $recharge: $('button[name=submit]'),
         $amount: $("input[name='amount']"),
-        $vcode: $('input[name=vcode]'),
         $card_no: $("input[name='card_no']"),
         $recharge_body: $('.recharge-main'),
         $load: $(".recharge-loding"),
@@ -1242,6 +1241,8 @@ org.recharge = (function (org) {
         $bank_name: $(".bank-txt-name"),
         data: null,
         isValidate: false,
+        order_id: '',
+        token: '',
         init: function () {
             lib.the_one_card();
             lib._close_alt($(".continue-rechare"));
@@ -1295,11 +1296,18 @@ org.recharge = (function (org) {
                         mode: 'vcode_for_qpay'
                     },
                     type: 'POST',
+                    before: function(){
+                        $that.text('发送中……');
+                    },
                     success: function(data){
                         if(data.message && data.message!="ok"){
                             clearInterval(intervalId);
                             org.ui.showSign(data.message);
                             $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                        }else{
+                            org.ui.showSign('短信已发送，请注意查收！');
+                            lib.order_id = data.order_id;
+                            lib.token = data.token;
                         }
                     },
                     error: function (xhr) {
@@ -1395,50 +1403,66 @@ org.recharge = (function (org) {
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
                 }
+                var data = {};
+                if(lib.isValidate){
+                    data = {
+                        url: '/api/pay/cnp/dynnum_new/',
+                        data: {
+                            phone: '',
+                            vcode: $("input[name=validation].count-input").val(),
+                            order_id: lib.order_id,
+                            token: lib.token,
+                            trade_pwd: data.data.trade_pwd,
+                            mode: 'qpay_with_sms'
+                        },
 
-                var data = {
-                    data: {
-                        phone: '',
-                        card_no: sort_card,
-                        amount: amount,
-                        gate_id: gate_id
-                    },
-                    beforeSend: function () {
-                        _self.$recharge.attr('disabled', true).text("充值中..");
-                    },
-                    success: function (entry_operation, result) {
-                        entry_operation.hide_loading();
-                        entry_operation.clear();
-                        entry_operation.hide();
-                        if(result.ret_code == 0){
-                            return $('#page-ok').css('display', '-webkit-box').find("#total-money").text(result.margin);
+                    };
+                }else{
+                    data = {
+                        url: "/api/pay/deposit_new/",
+                        data: {
+                            phone: '',
+                            card_no: sort_card,
+                            amount: amount,
+                            gate_id: gate_id
+                        },
+                        beforeSend: function () {
+                            _self.$recharge.attr('disabled', true).text("充值中..");
+                        },
+                        success: function (entry_operation, result) {
+                            entry_operation.hide_loading();
+                            entry_operation.clear();
+                            entry_operation.hide();
+                            if(result.ret_code == 0){
+                                return $('#page-ok').css('display', '-webkit-box').find("#total-money").text(result.margin);
+                            }
+
+                            if(result.ret_code == 30047){
+                                return Deal_ui.show_entry(result.retry_count, function(){
+                                    entry_operation.show();
+                                })
+                            }
+                            if(result.ret_code == 30048){
+                                return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
+                                    window.location = '/weixin/sub_pwd_back/?next=/weixin/sub_recharge/'
+                                })
+                            }
+                            if (result.ret_code > 0) {
+                                return org.ui.alert(result.message);
+                            }
+
+
+                        },
+                        error: function (data) {
+                            if (data.status >= 403) {
+                                org.ui.alert('服务器繁忙，请稍后再试');
+                            }
+                        },
+                        complete: function () {
+                            _self.$recharge.removeAttr('disabled').text("充值");
                         }
 
-                        if(result.ret_code == 30047){
-                            return Deal_ui.show_entry(result.retry_count, function(){
-                                entry_operation.show();
-                            })
-                        }
-                        if(result.ret_code == 30048){
-                            return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
-                                window.location = '/weixin/sub_pwd_back/?next=/weixin/sub_recharge/'
-                            })
-                        }
-                        if (result.ret_code > 0) {
-                            return org.ui.alert(result.message);
-                        }
-
-
-                    },
-                    error: function (data) {
-                        if (data.status >= 403) {
-                            org.ui.alert('服务器繁忙，请稍后再试');
-                        }
-                    },
-                    complete: function () {
-                        _self.$recharge.removeAttr('disabled').text("充值");
                     }
-
                 }
                 org.ui.confirm("充值金额为" + amount, '确认充值', lib._trade_pwd_seach, data);
 
@@ -1451,24 +1475,6 @@ org.recharge = (function (org) {
             });
         },
         _trade_pwd_seach: function(post_data){
-            //if(lib.isValidate){
-            //    org.ajax({
-            //        url: '/api/pay/cnp/dynnum_new/',
-            //        type: 'post',
-            //        data: {
-            //            phone: '',
-            //            vcode: $("input[name=validation].count-input").val(),
-            //            order_id: $("input[name=order_id]").val(),
-            //            token: $("input[name=token]").val(),
-            //            set_the_one_card: true,
-            //            mode: 'qpay_with_sms'
-            //        },
-            //        success: function(result){
-            //            result.trade_pwd_is_set ? lib._trade_pws_operation(true, post_data): lib._trade_pws_operation(false, post_data);
-            //        }
-            //    })
-            //    return;
-            //}
             org.ajax({
                 url: '/api/profile/',
                 type: 'GET',
