@@ -12,9 +12,9 @@
                 if(i <= 2){
                     sty ='red';
                     icon = 'icon'+ (i+1)
-                    if(i == 1){
+                    if(i == 0){
                         coupon = '5张百元加油卡+2张星美电影票';
-                    }else if(i == 2){
+                    }else if(i == 1){
                         coupon = '3张百元加油卡+2张星美电影票';
                     }else{
                         coupon = '2张百元加油卡+2张星美电影票';
