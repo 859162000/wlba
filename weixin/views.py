@@ -1676,15 +1676,17 @@ class GenerateInviteQRSceneTicket(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request):
         original_id = request.GET.get('original_id')
-        inviter_id = request.GET.get('inviter_id')
+        inviter_phone = request.GET.get('fp', "")
         channel_code = request.GET.get('code')
-        if not original_id or not inviter_id or not inviter_id.isdigit() or not channel_code:
+        if not original_id or not inviter_phone or not channel_code:
             return Response({'errcode':-1, 'errmsg':"-1"})
+        inviter_phone = base64.b64encode(inviter_phone+"=")[0:-1]
+        inviter_profile = WanglibaoUserProfile.objects.filter(phone=inviter_phone).first()
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
         channel = WeiXinChannel.objects.filter(code=channel_code).first()
         if channel:
-            scene_id = inviter_id + str(channel.digital_code)
+            scene_id = inviter_profile.user.id + str(channel.digital_code)
             scene_id = int(scene_id)
         # print int(request.user.id)
         qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
