@@ -1405,6 +1405,8 @@ org.recharge = (function (org) {
                     $phoneBtn.attr('disabled',"true").removeClass('regist-alreay-request').addClass("regist-validation-disable");
                 }else if(isTimes){
                     $phoneBtn.attr('disabled',"true").removeClass('regist-alreay-request').addClass("regist-validation-disable");
+                }else{
+                    $phoneBtn.removeAttr('disabled');
                 }
             });
             //手机验证码
