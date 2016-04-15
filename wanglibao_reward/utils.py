@@ -18,7 +18,7 @@ from wanglibao_redis.backend import redis_backend
 from misc.models import Misc
 import logging
 import pickle
-
+from decimal import Decimal
 
 logger = logging.getLogger('wanglibao_reward')
 
