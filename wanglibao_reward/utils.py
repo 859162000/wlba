@@ -19,6 +19,7 @@ from misc.models import Misc
 import logging
 import pickle
 from decimal import Decimal
+from weixin.util import getMiscValue
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -235,6 +236,16 @@ def updateRedisWeekSum():
 
 def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
     try:
+        status = int(getMiscValue('april_reward').get('status',0))
+        if status==1:
+            updateRedisWeekSum()
+            updateRedisWeekTopRank()
+    except Exception, e:
+        logger.error("===========processMarchAwardAfterP2pBuy==================="+e.message)
+
+
+def processMarchAwardAfterP2pBuy_March(user, product_id, order_id, amount):
+    try:
         product = P2PProduct.objects.filter(id=product_id).get()
         if product:
             rank_activity = Activity.objects.filter(code='march_awards').first()
@@ -242,8 +253,6 @@ def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
             if rank_activity and not rank_activity.is_stopped and rank_activity.start_at<=utc_now and rank_activity.end_at>=utc_now:
                 # updateRedisTopRank.apply_async()
                 updateRedisTopRank()
-                updateRedisWeekSum()
-                updateRedisWeekTopRank()
 
                 period = product.period
                 if product.pay_method.startswith(u'日计息'):
