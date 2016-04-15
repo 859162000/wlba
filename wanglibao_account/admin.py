@@ -259,7 +259,7 @@ class BindingAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         # 如果渠道为迅雷用户则执行用户回调补发
-        if obj.detect_callback is True and obj.btype == ('xunlei9', 'mxunlei'):
+        if obj.detect_callback is True and obj.btype in ('xunlei9', 'mxunlei'):
             obj.detect_callback = False
             order_list = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
             if order_list.exists():
