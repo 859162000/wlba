@@ -1565,7 +1565,7 @@ org.recharge = (function (org) {
                         $this.attr('disabled', true).text("充值中..");
                     },
                     success: function (entry_operation, result) {
-                        $('body').append("<div>"+ result +"</div>");
+                        $('body').append("<div>"+ JSON.stringify(result) +"</div>");
                         entry_operation.hide_loading();
                         entry_operation.clear();
                         entry_operation.hide();
