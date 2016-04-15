@@ -1581,6 +1581,7 @@ org.recharge = (function (org) {
                     vcode: $("input[name=validation].count-input").val(),
                     order_id: $("input[name=order_id]").val(),
                     token: $("input[name=token]").val(),
+                    trade_pwd: data.data.trade_pwd,
                     mode: 'qpay_with_sms'
                 };
                 url = '/api/pay/cnp/dynnum_new/';
