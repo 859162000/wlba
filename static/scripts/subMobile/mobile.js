@@ -1380,7 +1380,7 @@ org.recharge = (function (org) {
             var $amount = $("input[name=amount]"),
                 $validation = $("input[name=validation]"),
                 $submit = $("#recharge");
-
+            var limitMenoy = res.bank.bank_limit.second_one;
             if(!lib.isValidate){
                 $submit.removeAttr("disabled");
                 return;
@@ -1394,9 +1394,16 @@ org.recharge = (function (org) {
                 ]
             });
 
+            //充值金额
+            $amount.on("input", function(){
+                var self = $(this);
+                if(self.val()*1 > limitMenoy){
+                    org.ui.showSign("该银行单笔限额5万元");
+                    $('.request-check').attr('disabled',"true").removeClass('regist-alreay-request').addClass("regist-validation-disable");
+                }
+            });
             //手机验证码
             $('.request-check').on('click', function () {
-
                 var $that = $(this), //保存指针
                     count = 60,  //60秒倒计时
                     intervalId; //定时器
@@ -1524,7 +1531,7 @@ org.recharge = (function (org) {
                     card_no = _self.data.no,
                     gate_id = _self.data.bank.gate_id,
                     amount = _self.$amount.val() * 1;
-
+                var $this = $(this);
                 var sort_card = card_no.slice(0, 6) + card_no.slice(-4);
 
                 if (amount == 0 || !amount) {
@@ -1539,7 +1546,7 @@ org.recharge = (function (org) {
                         gate_id: gate_id
                     },
                     beforeSend: function () {
-                        _self.$recharge.attr('disabled', true).text("充值中..");
+                        $this.attr('disabled', true).text("充值中..");
                     },
                     success: function (entry_operation, result) {
                         entry_operation.hide_loading();
@@ -1569,7 +1576,7 @@ org.recharge = (function (org) {
                         }
                     },
                     complete: function () {
-                        _self.$recharge.removeAttr('disabled').text("充值");
+                        _self.$recharge.removeAttr('disabled').text("立即充值");
                     }
                 };
                 if(lib.isValidate) {
@@ -1582,6 +1589,12 @@ org.recharge = (function (org) {
                         amount: amount,
                         mode: 'qpay_with_sms'
                     };
+                    data.beforeSend = function(){
+                        if(lib.order_id === "" && lib.token === ""){
+                            return org.ui.showSign('请先获取验证码');
+                        }
+                        $this.attr('disabled', true).text("充值中..");
+                    }
                 }
                 org.ui.confirm("充值金额为" + amount, '确认充值', lib._trade_pwd_seach, data);
 
