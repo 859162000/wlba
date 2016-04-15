@@ -1305,6 +1305,7 @@ class MessageView(TemplateView):
                     message.read_status = data[index]['read_status']
                     message.message_text.title = data[index]['title']
                     message.message_text.content = data[index]['content']
+                    message.message_text.created_at = int(data[index]['created_at'])
                     index += 1
 
         messages_list = []
