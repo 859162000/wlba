@@ -9,6 +9,7 @@ from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import renderers
 from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wanglibao import settings
@@ -739,9 +740,6 @@ class GetRedPacks(APIView):
             result = php_redpacks(User.objects.get(pk=uid), device['device_type'], period=period)
             redpacks = result['packages'].get('available', [])
 
-            logger.info('user = {}, devide = {}, period={},  redpacks = {}'.
-                        format(User.objects.get(pk=uid), device['device_type'], period, redpacks))
-
             red_pack_info.update(
                 status=1,
                 redpacks=redpacks
@@ -752,9 +750,9 @@ class GetRedPacks(APIView):
                 msg=u'authentic error!'
             )
 
-        logger.info('user_id = {}, ret = {}'.format(self.request.user.pk, red_pack_info))
+        return Response(red_pack_info)
 
-        return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))
+        # return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))
 
 
 class SendRedPacks(APIView):
