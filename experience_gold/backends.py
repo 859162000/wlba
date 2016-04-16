@@ -13,9 +13,10 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from wanglibao_rest.utils import split_ua, decide_device
-from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortization, ExperienceEvent
+from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortization, ExperienceEvent, \
+    ExperiencePurchaseLockRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.models import P2PRecord
+# from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class ExperienceBuyAPIView(APIView):
         now = timezone.now()
         device = split_ua(request)
         device_type = decide_device(device['device_type'])
+        purchase_record = 'experience_purchase'
 
         experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
         if not experience_product:
@@ -46,14 +48,30 @@ class ExperienceBuyAPIView(APIView):
 
         # 查询用户符合条件的理财金记录
         with transaction.atomic(savepoint=True):
+            # 锁表,主要用来锁定体验金投资时的动作
+            purchase_lock_record = ExperiencePurchaseLockRecord.objects.select_for_update().\
+                filter(user=user, purchase_code=purchase_record).first()
+
+            if not purchase_lock_record:
+                # 没有记录时创建一条
+                try:
+                    purchase_lock_record = ExperiencePurchaseLockRecord.objects.create(
+                        user=user, purchase_code=purchase_record, purchase_times=1)
+                except Exception:
+                    logger.exception("Error: experience purchase err, user: %s, phone: %s" % (
+                        user.id, user.wanglibaouserprofile.phone))
+                    return Response({'ret_code': 30003, 'message': u'体验金投资失败,请重试'})
+
             experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False) \
                 .filter(event__invalid=False, event__available_at__lt=now, event__unavailable_at__gt=now)\
-                .select_for_update()
+                .select_related('event')
 
+            records_ids = ''
             if experience_record:
                 for record in experience_record:
                     event = record.event
                     total_amount += event.amount
+                    records_ids += str(record.id) + ','
 
                     record.apply = True
                     record.apply_amount = event.amount
@@ -79,6 +97,10 @@ class ExperienceBuyAPIView(APIView):
                     amortization.term_date = term[6] - timedelta(days=1)
 
                     amortization.save()
+
+                # 更新当前的一组流水id
+                purchase_lock_record.description = records_ids
+                purchase_lock_record.save()
 
                 term_date = amortization.term_date
                 interest = amortization.interest
