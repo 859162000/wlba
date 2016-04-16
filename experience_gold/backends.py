@@ -99,7 +99,7 @@ class ExperienceBuyAPIView(APIView):
                     amortization.save()
 
                 # 更新当前的一组流水id
-                purchase_lock_record.purchase_times = purchase_lock_record.purchase_times + 1
+                purchase_lock_record.purchase_times += 1
                 purchase_lock_record.description = records_ids
                 purchase_lock_record.save()
 
