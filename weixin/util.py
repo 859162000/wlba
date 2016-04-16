@@ -55,6 +55,16 @@ if not FWH_LOGIN_URL:
     get_fwh_login_url()
 
 
+def get_weixin_code_url(url):
+    m = Misc.objects.filter(key='weixin_qrcode_info').first()
+    if m and m.value:
+        info = json.loads(m.value)
+        if isinstance(info, dict) and info.get("fwh"):
+            original_id = info.get("fwh")
+            account = WeixinAccounts.getByOriginalId(original_id)
+            return BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=urllib.quote(url), state=original_id)
+
+
 def redirectToJumpPage(message, next=None):
     url = reverse('jump_page')+'?message=%s'% message
     if next:

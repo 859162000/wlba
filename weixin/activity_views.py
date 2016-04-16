@@ -8,6 +8,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.template import Template, Context
 from django.contrib.auth import login as auth_login, logout
+from django.core.urlresolvers import reverse
 import logging
 import base64,urllib
 import datetime
@@ -28,7 +29,7 @@ from tasks import sentCustomerMsg
 from wanglibao_invite.utils import getWechatDailyReward
 from wanglibao_invite.models import WechatUserDailyReward
 from weixin.models import WeixinAccounts
-from weixin.util import redirectToJumpPage, getOrCreateWeixinUser
+from weixin.util import redirectToJumpPage, getOrCreateWeixinUser, get_weixin_code_url
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import WeChatException
 from experience_gold.models import ExperienceEvent
@@ -444,7 +445,9 @@ class WechatInviteTemplate(TemplateView):
         fetched_date = ""
         is_bind = False
         invite_experience_amount = 0
-
+        userprofile = self.request.user.wanglibaouserprofile
+        share_url = settings.CALLBACK_HOST + reverse("hby_weixin_share") + "?%s=%s&%s=%s"%(settings.SHARE_INVITE_KEY, base64.b64encode(userprofile.phone+"="), settings.PROMO_TOKEN_QUERY_STRING, "hby")
+        share_url = get_weixin_code_url(share_url)
         if w_user:
             is_bind = True if w_user.user else False
             w_daily_reward = WechatUserDailyReward.objects.filter(w_user=w_user, create_date=today).first()
@@ -476,6 +479,8 @@ class WechatInviteTemplate(TemplateView):
             "is_bind": is_bind,
             "friend_num":friend_num,
             "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
+            "share_url":share_url,
         }
 
     def dispatch(self, request, *args, **kwargs):
@@ -492,6 +497,12 @@ class WechatShareTemplate(TemplateView):
         fetched_date = ""
         friend_num = 0
         invite_experience_amount = 0
+        fphone = self.request.session.get(settings.SHARE_INVITE_KEY, None)
+        inviter_head_url = ""
+        if fphone:
+            friend_profile = WanglibaoUserProfile.objects.filter(phone=fphone).first()
+            f_w_user = WeixinUser.objects.filter(openid=friend_profile.user).first()
+            inviter_head_url = f_w_user.headimgurl
 
         w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
         if self.request.user.is_authenticated():
@@ -531,6 +542,7 @@ class WechatShareTemplate(TemplateView):
             "is_bind": self.request.user.is_authenticated(),
             "friend_num":friend_num,
             "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
         }
 
     def dispatch(self, request, *args, **kwargs):

@@ -130,13 +130,13 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'activity/si_bind_login/$', activity_views.WechatShareInviteBindTemplate.as_view(template_name="invite_redpacket_bind.jade")),
-    url(r'^activity/invite/$', fwh_login_required(activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),login_url='/weixin/activity/si_bind_login/'),name='fwh_invite'),
+    url(r'^activity/invite/$', fwh_login_required(activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),login_url='/weixin/activity/si_bind_login/'),name='hby_weixin_invite'),
 
 )
 #h5活动页面
 urlpatterns += patterns(
     '',
-    url(r'^activity/share/$', activity_views.WechatShareTemplate.as_view(template_name="invite_redpacket_index.jade"), name='weixin_share'),
+    url(r'^activity/share/$', activity_views.WechatShareTemplate.as_view(template_name="invite_redpacket_index.jade"), name='hby_weixin_share'),
     url(r'^activity/get/$', TemplateView.as_view(template_name="invite_redpacket_get.jade"), name='weixin_share'),
     url(r'^activity/code/$', TemplateView.as_view(template_name="invite_redpacket_code.jade"), name='weixin_share'),
 )

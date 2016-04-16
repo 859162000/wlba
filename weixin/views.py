@@ -68,7 +68,7 @@ from experience_gold.backends import SendExperienceGold
 from wanglibao_profile.models import WanglibaoUserProfile
 from weixin.tasks import detect_product_biding, sentTemplate
 from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_scene_record, process_user_daily_action, getMiscValue
-from weixin.util import FWH_UNBIND_URL, filter_emoji
+from weixin.util import FWH_UNBIND_URL, filter_emoji, get_weixin_code_url
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_redis.backend import redis_backend
 # from wanglibao_invite.models import WechatInviteRelation
@@ -492,7 +492,8 @@ class WeixinJoinView(View):
             # WechatInviteRelation.objects.get_or_create(inviter=inviter, w_user_invited=w_user)
             articles = share_invite_fwh_config["articles"][channel_digital_code]
             for article in articles:
-                article['url'] = settings.CALLBACK_HOST + article['url'].format(fp=base64.b64encode(profile.phone+"=")[0:-1])
+                article['url'] = settings.CALLBACK_HOST + article['url'].format(fp=base64.b64encode(profile.phone+"="))
+                article['url'] = get_weixin_code_url(article['url'])
             reply = create_reply(articles, self.msg)
         else:
             rs, txt = bindUser(w_user, user)
