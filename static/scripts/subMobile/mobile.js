@@ -3058,6 +3058,57 @@ org.redpacket = (function(org){
             share_alt.on("click",function(){
                 $(this).hide();
             });
+
+            //打开红包雨
+            $("div.js-open-redpacket").on("click", function(){
+                var self = $(this);
+                if(self.prop("disabeld")){
+                    return;
+                }
+                org.ajax({
+                    url: '/weixin/fetch_hby_reward/',
+                    type: 'post',
+                    data: '',
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.prop("disabeld",true).text("正在提交……");
+                    },
+                    success: function (data) {
+                        if(data.ret_code != 0){
+                            org.ui.alert(data.msg);
+                            return;
+                        }
+                        window.location.reload();
+                    },
+                    error: function () {
+                        alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.prop("disabeld",false).text("打开红包雨");
+                    }
+
+                });
+            });
+            (function(){
+                var is_bind = $("input.is_bind").val(),
+                    fphone = $("input.fphone").val(),
+                    original_id = $("input.original_id").val(),
+                    weixin_channel = $("input.weixin_channel_code").val();
+                if(is_bind) return;
+                org.ajax({
+                    url: '/weixin/api/generate/qr_invite_scene_ticket/',
+                    type: 'get',
+                    data: {
+                        'original_id': original_id,
+                        'fp': fphone,
+                        'code': weixin_channel
+                    },
+                    dataType: 'json',
+                    success: function(data){
+                        console.log(data);
+                    }
+                });
+            })();
         },
         shareFn: function(){
             var html = '<div class="invite-share-ok">' +
@@ -3136,15 +3187,12 @@ org.redpacket_bind = (function(org){
         },
         _checkFrom: function () {
             var $phone = lib.$bind_box.find("input.tel-inp"),
-                $captcha = lib.$bind_box.find('input.captcha-inp'),
-                $captcha_0 = lib.$bind_box.find("input[name=captcha_0]"),
                 $submit = lib.$bind_box.find('button.js-bind-btn');
 
             org.ui.focusInput({
                 submit: $submit,
                 inputList: [
-                    {target: $phone, required: true},
-                    {target: $captcha, required: true}
+                    {target: $phone, required: true}
                 ],
                 submitStyle: {
                     'disabledBg': '#cbcbcb',
@@ -3154,22 +3202,34 @@ org.redpacket_bind = (function(org){
 
 
             $submit.on("click", function(){
-                var isSubmit = true;
-                var $phoneNamber = $.trim($phone.val());
-                $.each([$phone, $captcha], function(i, t){
-                    var name = t.attr('name'),
-                        val = t.val();
-                    var fun = lib.check_validate()[name] ? lib.check_validate()[name] : lib.check_validate()['isEmpty'];
-                    if(!fun(val)){
-                        return isSubmit = false;
+                var $phoneNamber = $.trim($phone.val()),
+                    self = $(this);
+
+                if(!lib.check_validate()['identifier']($phoneNamber)){
+                    return false;
+                }
+                org.ajax({
+                    url: '/api/user_exists/'+$phoneNamber+'/',
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.attr("disabled",true).text("提交中……").css("background","#cbcbcb");
+                    },
+                    success: function (data) {
+                        lib.$bind_box.hide();
+                        if(data.existing){
+                            lib.redpacket_login($phoneNamber);
+                        }else{
+                            lib.redpacket_regist($phoneNamber);
+                        }
+                    },
+                    error: function (xhr) {
+                        org.ui.alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.removeAttr("disabled").text("下一步").css("background","rgb(219, 73, 63)");
                     }
                 });
-                if(!isSubmit) return false;
-
-                lib.$bind_box.hide();
-
-                //lib.redpacket_login($phoneNamber);
-                lib.redpacket_regist($phoneNamber);
             });
         },
         redpacket_login: function(tel){//登录
@@ -3188,8 +3248,30 @@ org.redpacket_bind = (function(org){
                 }
             });
             $submit.on("click",function(){
-                if(!lib.check_validate().password($pwd.val())) return;
-                console.log("ok");
+                var pwdVal = $pwd.val(),
+                    self = $(this);
+                if(!lib.check_validate().password(pwdVal)) return;
+                org.ajax({
+                    url: '/weixin/api/fwh_login/',
+                    type: 'post',
+                    data: {
+                        'identifier': tel,
+                        'password': $.trim(pwdVal)
+                    },
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.attr("disabled",true).text("正在登录……").css("background","#cbcbcb");
+                    },
+                    success: function (data) {
+                        console.log(data);
+                    },
+                    error: function (xhr) {
+                        org.ui.alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.removeAttr("disabled").text("登录并绑定微信").css("background","rgb(219, 73, 63)");
+                    }
+                });
             });
         },
         redpacket_regist: function(tel){//注册
@@ -3275,23 +3357,31 @@ org.redpacket_bind = (function(org){
                     }
                 });
                 if(!isSubmit) return false;
+                org.ajax({
+                    url: '/api/user_exists/'+$phoneNamber+'/',
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.attr("disabled",true).text("提交中……").css("background","#cbcbcb");
+                    },
+                    success: function (data) {
+                        lib.$bind_box.hide();
+                        if(data.existing){
+                            lib.redpacket_login($phoneNamber);
+                        }else{
+                            lib.redpacket_regist($phoneNamber);
+                        }
 
-                console.log("ok");
+                    },
+                    error: function (xhr) {
+                        org.ui.alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.removeAttr("disabled").text("注册并绑定服务号").css("background","rgb(219, 73, 63)");
+                    }
+                });
             });
         }
-    };
-    return {
-        init: lib.init
-    }
-})(org);
-
-//红包雨　登录/注册
-org.redpacket_set = (function(org){
-    var lib = {
-        init: function(){
-
-        },
-
     };
     return {
         init: lib.init

@@ -15,15 +15,9 @@ html.service-redpacket-grey
             .phone
           input(type="tel", autocomplete="off", placeholder="请输入手机号", name="identifier", data-icon="wx-input-icon", data-target2="inp-icon-box", data-target="identifier-edit", data-val="icon-show", data-empty="").wx-input-main.tel-inp
           .form-edit-icon.identifier-edit
-        .wx-input-public
-          .wx-input-icon.inp-icon-box
-            .captcha
-          input(type="tel", autocomplete="off", placeholder="请输入计算结果", name="captcha_1", data-icon="wx-input-icon", data-target2="inp-icon-box", data-other="wx-validation-btn").wx-input-main.captcha-inp
-          input(type="hidden", name="captcha_0")
-          .wx-validation
-            img(src="", alt="", width="100%", height="100%")#captcha.captcha-img
+
       .service-btn-box
-        button(type="submit", disabled="true").service-login-btn.js-bind-btn 身份认证同时绑定微信
+        button(type="submit", disabled="true").service-login-btn.js-bind-btn 下一步
 
     .invite-login.js-invite-login(style="display:none")
       .mian-protome.mt20 输入密码，登录186****8908账户
@@ -39,6 +33,13 @@ html.service-redpacket-grey
     .invite-regist.js-invite-regist(style="display:none")
       .mian-protome.mt20 输入密码，登录186****8908账户
       .input-box
+        .wx-input-public
+          .wx-input-icon.inp-icon-box
+            .captcha
+          input(type="tel", autocomplete="off", placeholder="请输入计算结果", name="captcha_1", data-icon="wx-input-icon", data-target2="inp-icon-box", data-other="wx-validation-btn").wx-input-main.captcha-inp
+          input(type="hidden", name="captcha_0")
+          .wx-validation
+            img(src="", alt="", width="100%", height="100%")#captcha.captcha-img
         .wx-input-public
           .wx-input-icon.inp-icon-box
             .captcha

@@ -182,7 +182,8 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_invite.models import InviteRelation
 def createInvite(friend_phone, user):
     profile = WanglibaoUserProfile.objects.filter(phone=friend_phone).first()
-    InviteRelation.objects.get_or_create(user=user, inviter=profile.user)
+    if profile.user != user:
+        InviteRelation.objects.get_or_create(user=user, inviter=profile.user)
 
 def getAccountInfo(user):
 

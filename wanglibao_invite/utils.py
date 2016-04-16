@@ -35,7 +35,7 @@ def getWechatDailyReward(openid):
     share_invite_config = getMiscValue("redpack_rain_award_config")
     # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'371': [0,20],'372': [0,30], '373': [0,40], '374': [0,10]},
     # "new_old_map":{"371":380,"372":381,"373":382,"374":383},"base_experience_amount":200000}
-    redpack_data = {'1': [0, 20], '2': [0, 30], '3': [0, 40], '4': [0, 10]}# share_invite_config["daily_rewards"]
+    redpack_data = share_invite_config["daily_rewards"]
     reward_types = share_invite_config['reward_types']
     redpack_id = getRandomRedpackId(redpack_data)
     redpack_type = reward_types[redpack_data[redpack_id][0]]
@@ -48,18 +48,19 @@ def getWechatDailyReward(openid):
         }
     )
     if daily_reward.status:
-        return -1, ""
+        return -1, "", 0
     user = w_user.user
     if not user:
-        return -1, ""
+        return -1, "", 0
     return sendDailyReward(user, daily_reward.id, save_point=True)
 
 
 def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False):
     with transaction.atomic(savepoint=save_point):
         daily_reward = WechatUserDailyReward.objects.select_for_update().get(id=daily_reward_id)
+        amount = 0
         if daily_reward.status:
-            return -1, ""
+            return -1, "", 0
         if daily_reward.reward_type == "redpack":
             share_invite_config = getMiscValue("redpack_rain_award_config")
             # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'371': [0,20],'372': [0,30], '373': [0,40], '374': [0,10]},
@@ -73,21 +74,23 @@ def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False)
             redpack_event = RedPackEvent.objects.get(id=daily_reward.redpack_id)
             status, msg, record = give_activity_redpack_for_hby(user, redpack_event, 'h5')
             if not status:
-                return -1, msg
+                return -1, msg, amount
 
             start_time, end_time = get_start_end_time(redpack_event.auto_extension, redpack_event.auto_extension_days,
                                                           record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
             _send_message_for_hby(user, redpack_event, end_time)
             daily_reward.redpack_record_id = record.id
+            amount = redpack_event.amount
         if daily_reward.reward_type == "experience_gold":
             experience_record_id, experience_event = SendExperienceGold(user).send(pk=daily_reward.experience_gold_id)
             if not experience_record_id:
-                return -1, ""
+                return -1, "", amount
             daily_reward.experience_gold_record_id = experience_record_id
+            amount = experience_event.amount
         daily_reward.user = user
         daily_reward.status = True
         daily_reward.save()
-        return 0, "ok"
+        return 0, "ok", amount
 
 # def sendInviteReward(user):
 #     # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'1': [0,20],'2': [0,30], '3': [0,40], '4': [0,10]}
