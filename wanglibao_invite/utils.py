@@ -42,9 +42,10 @@ def getWechatDailyReward(openid):
     daily_reward, _ = WechatUserDailyReward.objects.get_or_create(
         create_date=today,
         w_user=w_user,
-        reward_type=redpack_type,#pei zhi
-        # action_type="redpack_rain",#pei zhi
-        redpack_id=int(redpack_id),
+        defaults={
+            'reward_type' : redpack_type,
+            'redpack_id' : int(redpack_id),
+        }
     )
     if daily_reward.status:
         return -1, ""
