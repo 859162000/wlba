@@ -38,7 +38,7 @@ class ExperienceBuyAPIView(APIView):
         now = timezone.now()
         device = split_ua(request)
         device_type = decide_device(device['device_type'])
-        purchase_record = 'experience_purchase'
+        purchase_code = 'experience_purchase'
 
         experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
         if not experience_product:
@@ -50,13 +50,13 @@ class ExperienceBuyAPIView(APIView):
         with transaction.atomic(savepoint=True):
             # 锁表,主要用来锁定体验金投资时的动作
             purchase_lock_record = ExperiencePurchaseLockRecord.objects.select_for_update().\
-                filter(user=user, purchase_code=purchase_record).first()
+                filter(user=user, purchase_code=purchase_code).first()
 
             if not purchase_lock_record:
                 # 没有记录时创建一条
                 try:
                     purchase_lock_record = ExperiencePurchaseLockRecord.objects.create(
-                        user=user, purchase_code=purchase_record, purchase_times=1)
+                        user=user, purchase_code=purchase_code, purchase_times=1)
                 except Exception:
                     logger.exception("Error: experience purchase err, user: %s, phone: %s" % (
                         user.id, user.wanglibaouserprofile.phone))
