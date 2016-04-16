@@ -3138,7 +3138,11 @@ org.redpacket_bind = (function(org){
                         self.attr("disabled",true).text("正在登录……").css("background","#cbcbcb");
                     },
                     success: function (data) {
-                        console.log(data);
+                        if(data.re_code != 0){
+                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                        }else{
+                            window.location.href = $("input.next-url").val();
+                        }
                     },
                     error: function (xhr) {
                         org.ui.alert("系统繁忙，请稍后再试");

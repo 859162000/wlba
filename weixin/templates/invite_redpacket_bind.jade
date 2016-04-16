@@ -5,6 +5,7 @@ html.service-redpacket-grey
     title 活动登录
     include include/service_head.jade
   body.service-redpacket-login
+    input(type="hidden", name="next", class="next-url", value="{{ next }}")
     .logo-leo.mt70
       img(src="/static/imgs/sub_weixin/redpack_activity/iconfont_logo4@2x.png")
     .invite-bind.js-invite-bind
