@@ -34,6 +34,7 @@ from wechatpy.exceptions import WeChatException
 from experience_gold.models import ExperienceEvent
 from .forms import OpenidAuthenticationForm
 from wanglibao_invite.models import InviteRelation, UserExtraInfo
+from wanglibao_profile.models import WanglibaoUserProfile
 
 
 logger = logging.getLogger("weixin")
@@ -425,48 +426,60 @@ class FetchWechatHBYReward(APIView):
         ret_code, msg = getWechatDailyReward(openid)
         return Response({"ret_code": ret_code, "data": msg})
 
-class WechatInviteTecmplate(TemplateView):
+class WechatInviteTemplate(TemplateView):
     template_name = ""
     def get_context_data(self, **kwargs):
         today = datetime.datetime.today()
         w_user = WeixinUser.objects.filter(openid=self.request.user).first()
-        w_daily_reward = WechatUserDailyReward.objects.filter(w_user=w_user, create_date=today).first()
+        fphone = self.request.session.get(settings.SHARE_INVITE_KEY, None)
+        inviter_head_url = ""
+        if fphone:
+            friend_profile = WanglibaoUserProfile.objects.filter(phone=fphone).first()
+            f_w_user = WeixinUser.objects.filter(openid=friend_profile.user).first()
+            inviter_head_url = f_w_user.headimgurl
+        friend_num=0
         reward_text = ""
         reward_type = ""
         fetched = False
         fetched_date = ""
-        if w_daily_reward and w_daily_reward.status:
-            fetched = True
-            if w_daily_reward.reward_type == "redpack":
-                redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
-                if redpack_event.rtype == 'interest_coupon':
-                    reward_text = "%s%%"%redpack_event.amount
-                if redpack_event.rtype == 'percent':
-                    reward_text = "%s%%"%redpack_event.amount
-                if redpack_event.rtype == 'direct':
-                    reward_text = "%s元"%int(redpack_event.amount)
-                reward_type = redpack_event.rtype
-            if w_daily_reward.reward_type == "experience_gold":
-                experience_event = ExperienceEvent.objects.filter(pk=w_daily_reward.experience_gold_id).first()
-                reward_text = "%s元"%int(experience_event.amount)
-                reward_type = w_daily_reward.reward_type
-        friend_num = InviteRelation.objects.filter(inviter=self.request.user).counts()
+        is_bind = False
         invite_experience_amount = 0
-        extro_info = UserExtraInfo.objects.filter(inviter=self.request.user).first()
-        if extro_info:
-            invite_experience_amount = extro_info.invite_experience_amount
+
+        if w_user:
+            is_bind = True if w_user.user else False
+            w_daily_reward = WechatUserDailyReward.objects.filter(w_user=w_user, create_date=today).first()
+            if w_daily_reward and w_daily_reward.status:
+                fetched = True
+                if w_daily_reward.reward_type == "redpack":
+                    redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
+                    if redpack_event.rtype == 'interest_coupon':
+                        reward_text = "%s%%"%redpack_event.amount
+                    if redpack_event.rtype == 'percent':
+                        reward_text = "%s%%"%redpack_event.amount
+                    if redpack_event.rtype == 'direct':
+                        reward_text = "%s元"%int(redpack_event.amount)
+                    reward_type = redpack_event.rtype
+                if w_daily_reward.reward_type == "experience_gold":
+                    experience_event = ExperienceEvent.objects.filter(pk=w_daily_reward.experience_gold_id).first()
+                    reward_text = "%s元"%int(experience_event.amount)
+                    reward_type = w_daily_reward.reward_type
+            friend_num = InviteRelation.objects.filter(inviter=self.request.user).count()
+
+            extro_info = UserExtraInfo.objects.filter(user=self.request.user).first()
+            if extro_info:
+                invite_experience_amount = extro_info.invite_experience_amount
         return {
             "fetched":fetched,
             "fetched_date":fetched_date,
             "reward_text":reward_text,
             "reward_type":reward_type,
-            "is_bind": True if w_user.user else False,
+            "is_bind": is_bind,
             "friend_num":friend_num,
             "invite_experience_amount":invite_experience_amount,
         }
 
     def dispatch(self, request, *args, **kwargs):
-        return super(WechatInviteTecmplate, self).dispatch(request, *args, **kwargs)
+        return super(WechatInviteTemplate, self).dispatch(request, *args, **kwargs)
 
 class WechatShareTemplate(TemplateView):
     template_name = ""
@@ -482,7 +495,7 @@ class WechatShareTemplate(TemplateView):
 
         w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
         if self.request.user.is_authenticated():
-            friend_num = InviteRelation.objects.filter(inviter=self.request.user).counts()
+            friend_num = InviteRelation.objects.filter(inviter=self.request.user).count()
             extro_info = UserExtraInfo.objects.filter(inviter=self.request.user).first()
             if extro_info:
                 invite_experience_amount = extro_info.invite_experience_amount
