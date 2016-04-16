@@ -1337,3 +1337,11 @@ else:
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
     PUSH_COOP_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/push_coop_token/'
     COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
+
+
+if ENV == ENV_PRODUCTION:
+    SITE_URL = 'https://www.wanglibao.com'
+elif ENV == ENV_STAGING:
+    SITE_URL = 'https://staging.wanglibao.com'
+elif ENV == ENV_DEV:
+    SITE_URL = 'http://127.0.0.1:8000'

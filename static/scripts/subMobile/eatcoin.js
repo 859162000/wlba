@@ -44,6 +44,7 @@ window.alert = function(name){
 }
 
 $(function(){
+
     var box = $('#box');
     box.css('width',window.innerWidth);
     box.css('height',window.innerHeight);
@@ -333,23 +334,7 @@ $(function(){
             $(window).scrollTop(0);
         }, 0);*/
         //IOS下自动播放背景音乐
-        document.getElementById('car_audio').play();
-        document.addEventListener("WeixinJSBridgeReady", function () {
-            WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
-                document.getElementById('car_audio').play();
-            });
-        }, false);
-        var cunt = 0;
-        var progress = setInterval(function () {
-            $(".loaded").css("background-size", cunt * 10 + "%" + " " + "100%");
-            if (cunt == 11) {
-                clearInterval(progress);
-                $(".loadding_page").hide();
-                $(".start_page").show();
-            }else{
-                cunt++;
-            }
-        }, 500);
+
 
         document.addEventListener("touchmove",function(e){
             e.preventDefault();
@@ -405,13 +390,20 @@ $(function(){
             var total = $(".jbsl").text();
             if($(".iphone input").is(":hidden")){
                 var param={"total":total};
-                lqjl(param);
+                lqjl(param)
             }else{
+
                 var phone = $(".iphone input").val();
                 if(phone && /^1[2|3|4|5|8|7|]\d{9}$/.test(phone)){
                     var param = {"total":total,"phone":phone};
                     if(isRegister(phone)){
-                        lqjl(param);
+                        $(".lq").hide();
+                        $(".zlyc").show();
+                        $(".zlyc .txt").hide();
+                        $(".zlyc .yzc_txt").show();
+                        $(".zlyc .ermts").hide();
+                        document.getElementById("car_audio").pause();
+                        $(".m").hide();
                     }else{
                         $(".blank").show();
                         $(".yz_tc").show();
@@ -439,6 +431,8 @@ $(function(){
             })
         }
         function lqjl(param){
+            document.getElementById("car_audio").pause();
+            $(".m").hide();
             $.ajax({
                 type:"post",
                 url:"/api/activity/happy_monkey/",
@@ -453,6 +447,8 @@ $(function(){
                         //alert("每个用户一天只能领取一次奖励");
                         $(".lq").hide();
                         $(".zlyc").show();
+                        $(".zlyc .yzc_txt").hide();
+                        $(".zlyc txt").show();
                     }else{
                         alert(data.message);
                     }

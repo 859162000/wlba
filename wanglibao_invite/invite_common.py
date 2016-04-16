@@ -14,7 +14,7 @@ class ShareInviteRegister(object):
 
         fphone = self.request.GET.get(self.share_invite_key, None)
         if fphone:
-            self.request.session[self.share_invite_key] = fphone
+            self.request.session[self.share_invite_key] = base64.b64decode(fphone + '=')[0:-1]
 
     def clear_session(self):
         self.request.session.pop(self.share_invite_key, None)
@@ -36,8 +36,7 @@ class ShareInviteRegister(object):
             return
         fphone = self.request.session.get(settings.SHARE_INVITE_KEY, None)
         if fphone:
-            freind_phone = base64.b64decode(fphone + '=')
-            createInvite(freind_phone, self.request.user)
+            createInvite(fphone, self.request.user)
             self.request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
 
 
