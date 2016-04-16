@@ -427,13 +427,14 @@ class FetchWechatHBYReward(APIView):
 
 class WechatInviteTecmplate(TemplateView):
     template_name = ""
-
     def get_context_data(self, **kwargs):
+        today = datetime.datetime.today()
         w_user = WeixinUser.objects.filter(openid=self.request.user).first()
-        w_daily_reward = WechatUserDailyReward.objects.filter(w_user=w_user).first()
+        w_daily_reward = WechatUserDailyReward.objects.filter(w_user=w_user, create_date=today).first()
         reward_text = ""
         reward_type = ""
         fetched = False
+        fetched_date = ""
         if w_daily_reward and w_daily_reward.status:
             fetched = True
             if w_daily_reward.reward_type == "redpack":
@@ -456,7 +457,7 @@ class WechatInviteTecmplate(TemplateView):
             invite_experience_amount = extro_info.invite_experience_amount
         return {
             "fetched":fetched,
-            "fetched_txt":"某年某天已经领取了300元红包",
+            "fetched_date":fetched_date,
             "reward_text":reward_text,
             "reward_type":reward_type,
             "is_bind": True if w_user.user else False,
@@ -478,23 +479,23 @@ class WechatShareTemplate(TemplateView):
         fetched_date = ""
         friend_num = 0
         invite_experience_amount = 0
+
+        w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
         if self.request.user.is_authenticated():
             friend_num = InviteRelation.objects.filter(inviter=self.request.user).counts()
             extro_info = UserExtraInfo.objects.filter(inviter=self.request.user).first()
             if extro_info:
                 invite_experience_amount = extro_info.invite_experience_amount
-            w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
-        else:
-            w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, status=False).first()
-            qr_code_url = ""
-        if not w_daily_reward:
-            fetched = False
-        else:
-            if w_daily_reward.create_date!=today:
-                fetched = False
-            else:
+            if w_daily_reward and w_daily_reward.status:
                 fetched = True
-            fetched_date = w_daily_reward.create_date
+        else:
+            if w_daily_reward:
+                fetched = True
+            else:
+                fetched = False
+                w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, status=False).first()
+                if w_daily_reward:
+                    fetched_date = w_daily_reward.create_date
 
         if w_daily_reward and w_daily_reward.reward_type == "redpack":
             redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
