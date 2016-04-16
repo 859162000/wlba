@@ -56,7 +56,7 @@ class ExperienceBuyAPIView(APIView):
                 # 没有记录时创建一条
                 try:
                     purchase_lock_record = ExperiencePurchaseLockRecord.objects.create(
-                        user=user, purchase_code=purchase_code, purchase_times=1)
+                        user=user, purchase_code=purchase_code, purchase_times=0)
                 except Exception:
                     logger.exception("Error: experience purchase err, user: %s, phone: %s" % (
                         user.id, user.wanglibaouserprofile.phone))
@@ -99,6 +99,7 @@ class ExperienceBuyAPIView(APIView):
                     amortization.save()
 
                 # 更新当前的一组流水id
+                purchase_lock_record.purchase_times = purchase_lock_record.purchase_times + 1
                 purchase_lock_record.description = records_ids
                 purchase_lock_record.save()
 
@@ -203,7 +204,7 @@ class SendExperienceGold(object):
                     "title": title,
                     "content": content,
                     "mtype": "activity"
-                })
+                }, queue='celery02')
                 return record.id, experience_event
 
     def get_amount(self):
