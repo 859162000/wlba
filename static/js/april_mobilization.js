@@ -86,6 +86,7 @@
         }
 
 
+
         function ajax_data(){
             $.ajax({
                 url: '/api/april_reward/fetch/',
@@ -93,30 +94,32 @@
                 success: function (json) {
                     substring(json.week_sum_amount);
 
+
                     var rankingList = [];
                     var json_one;
-                    for(var i=1; i<json.weekranks.length; i++){
+                    for(var i=0; i<json.weekranks.length; i++){
                         json_one = json.weekranks[i];
                         if(json_one!=''){
                             var number = fmoney(json_one.amount__sum, 0);
-                            if(i<=3){
-                                if(i==1){
+                            if(i<3){
+                                if(i==0){
                                     rankingList.push(['<tr class="first">'].join(''));
-                                }else if(i==2){
+                                }else if(i==1){
                                     rankingList.push(['<tr class="second">'].join(''));
-                                }else if(i==3){
+                                }else if(i==2){
                                     rankingList.push(['<tr class="third">'].join(''));
                                 }
                                 rankingList.push(['<td class="one"><span class="ico"></span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">'].join(''));
-                                if(i==1){
+                                if(i==0){
                                     rankingList.push(['5张百元加油卡+2张星美电影票</td></tr>'].join(''));
-                                }else if(i==2){
+                                }else if(i==1){
                                     rankingList.push(['3张百元加油卡+2张星美电影票</td></tr>'].join(''));
-                                }else if(i==3){
+                                }else if(i==2){
                                     rankingList.push(['2张百元加油卡+2张星美电影票</td></tr>'].join(''));
                                 }
                             }else{
-                                rankingList.push(['<tr><td class="one"><span class="ico">'+i+'</span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                                var i_num = i+1;
+                                rankingList.push(['<tr><td class="one"><span class="ico">'+i_num+'</span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
                             }
 
                         }else{
@@ -138,25 +141,39 @@
 
         /*逐个字符*/
         function substring(text){
-            //alert(text);
-            var box_num = $('.num_wrap .num_1').length;
-            for(var i=text.length; i>=0; i--) {
-                if (text.length - 3 != i) {
+            //alert(text.length);
+
+            var num_length = text.length;
+            if(num_length==13){
+                num_length+=2;
+            }
+            if(num_length==14||num_length==10){
+                num_length+=1;
+            }
+
+            for(var i=num_length; i>=0; i--) {
+                if (num_length - 3 != i) {
                     //num = text.charAt(i);
-                    if(text.length - 2 == i||text.length - 7 == i){
+                    if(num_length - 7 == i||num_length - 11 == i||num_length - 15 == i){
                         $('.num_wrap').prepend('<span class="num_2"></span>');
-
+                        //alert(i);
                     }else{
+                        if(num_length - 2 == i){
+                            $('.num_wrap').prepend('<span class="num_3"></span>');
+                        }else{
+                            $('.num_wrap').prepend('<span class="num_1"></span>');
+                        }
 
-                        $('.num_wrap').prepend('<span class="num_1"></span>');
                     }
 
-                    //$('.num_wrap .num_1').eq(box_num).text(num);
-                    box_num--;
                 }
             }
-            $('.num_wrap').prepend('<span class="num_1"></span>');
-
+            if(text.length>=7){
+                $('.num_wrap').prepend('<span class="num_1"></span>');
+                if(text.length!=13&&text.length>10){
+                    $('.num_wrap').prepend('<span class="num_1"></span>');
+                }
+            }
         };
 
         function substring_2(text){
