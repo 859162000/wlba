@@ -53,16 +53,34 @@
             type: 'post',
             success: function (data1) {
                 h5_user_static = data1.login;
-                if(h5_user_static){
-                    $('span#zero').hide();
-                    $('span#chance_num').css('display','inline-block');
-                }else{
-                    $('span#chance_num').hide();
-                    $('span#zero').css('display','inline-block');
+                $('#button_link').click(function(){
+                    if(h5_user_static){
+                        $('.popup_box').show();
+                    }else{
+                        window.location.href = '/accounts/login/?next=/activity/august_phone/'
+                    }
+                })
 
-                }
             }
         })
+
+        $('#show_button').on('click',function(){
+            var ele = $('#show_list');
+
+            if (!ele.hasClass('list_down')){
+                $('#show_list').slideDown('fast');
+                ele.addClass('list_down');
+                $('#show_button').addClass('open');
+            }else{
+                $('#show_list').slideUp('fast');
+                ele.removeClass('list_down');
+                $('#show_button').removeClass('open');
+            }
+        })
+
+        $('.popup_button').click(function(){
+            $('.popup_box').hide();
+        });
 
 
     })
