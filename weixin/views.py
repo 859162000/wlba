@@ -51,6 +51,8 @@ import traceback
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.db import transaction, IntegrityError
+from django.template.loader import get_template
+from django.template import TemplateDoesNotExist
 from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
@@ -143,7 +145,7 @@ class WeixinJoinView(View):
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
-        logger.debug("entering post=============================/weixin/join/%s"%fromUserName)
+        logger.debug("fromUserName:%s; MsgType:%s; Event:%s; EventKey:%s"%(fromUserName, msg._data.get('MsgType', "=="), msg._data.get('Event', "=="), msg._data.get('EventKey', "==")))
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
         w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
         user = w_user.user
@@ -368,16 +370,18 @@ class WeixinJoinView(View):
         # 累计签到：{{keyword3.DATA}}
 
             if ret_code == 1:
-                reply = -1
-                sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                    "openid":weixin_user.openid,
-                    "template_id":SIGN_IN_TEMPLATE_ID,
-                    "first":reply_msg%(u"今日你已签到", experience_amount),
-                    "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
-                    "keyword2":"%s天" % daily_record.continue_days,
-                    "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
-                })},
-                                                queue='celery02')
+                txt = "今日你已签到，连续签到可获得更多奖励，记得明天再来哦！"
+                reply = create_reply(txt, self.msg)
+                # reply = -1
+                # sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                #     "openid":weixin_user.openid,
+                #     "template_id":SIGN_IN_TEMPLATE_ID,
+                #     "first":reply_msg%(u"今日你已签到", experience_amount),
+                #     "keyword1":timezone.localtime(daily_record.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                #     "keyword2":"%s天" % daily_record.continue_days,
+                #     "keyword3":"%s天" % UserDailyActionRecord.objects.filter(user=user, action_type=u'sign_in').count()
+                # })},
+                #                                 queue='celery02')
             elif ret_code == 0:
                 reply = -1
                 sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
@@ -548,6 +552,48 @@ class WeixinLogin(TemplateView):
             }
 
 
+class WeixinCoopLogin(TemplateView):
+    template_name = 'weixin_login.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinCoopLogin, self).get_context_data(**kwargs)
+        code = self.request.GET.get('code')
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            tp_name = 'weixin_login_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
+
+        if code:
+            account_id = self.request.GET.get('state')
+            try:
+                account = Account.objects.get(pk=account_id)
+            except Account.DoesNotExist:
+                return HttpResponseNotFound()
+
+            try:
+                oauth = WeChatOAuth(account.app_id, account.app_secret)
+                res = oauth.fetch_access_token(code)
+                account.oauth_access_token = res.get('access_token')
+                account.oauth_access_token_expires_in = res.get('expires_in')
+                account.oauth_refresh_token = res.get('refresh_token')
+                account.save()
+                WeixinUser.objects.get_or_create(openid=res.get('openid'))
+                context['openid'] = res.get('openid')
+            except WeChatException, e:
+                pass
+        next = self.request.GET.get('next', '')
+        next = urllib.unquote(next.encode('utf-8'))
+        return {
+            'context': context,
+            'next': next
+            }
+
+
 class WeixinRegister(TemplateView):
     template_name = 'weixin_regist_new.jade'
 
@@ -576,14 +622,19 @@ class WeixinRegister(TemplateView):
 
 
 class WeixinCoopRegister(TemplateView):
-    template_name = 'service_regist_bjs.jade'
+    template_name = 'weixin_regist_new.jade'
 
     def get_context_data(self, **kwargs):
         token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
 
         if token:
-            token = token
+            tp_name = 'service_regist_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
         elif token_session:
             token = token_session
         else:
@@ -886,6 +937,16 @@ class P2PListView(TemplateView):
     template_name = 'weixin_list.jade'
 
     def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            tp_name = 'weixin_list_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
+
         p2p_products = []
 
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
@@ -1389,7 +1450,6 @@ class AuthorizeCode(APIView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
         else:
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
-        logger.debug("---------------------------AuthorizeCode::oauth.authorize_url==%s"%oauth.authorize_url)
         return redirect(oauth.authorize_url)
 
 
@@ -1399,7 +1459,6 @@ class AuthorizeUser(APIView):
         account_id = self.request.GET.get('state', "0")
         try:
             account = None
-            logger.debug("AuthorizeUser---------------------------%s, path:::%s"%(account_id, request.get_full_path()))
             weixin_account = WeixinAccounts.getByOriginalId(account_id)
             if weixin_account:
                 account = weixin_account.db_account
@@ -1450,7 +1509,6 @@ class AuthorizeUser(APIView):
                 if save_user:
                     w_user.save()
             except IntegrityError, e:
-                logger.debug("=========================并发了====")
                 logger.debug(traceback.format_exc())
 
             appendkeys = []

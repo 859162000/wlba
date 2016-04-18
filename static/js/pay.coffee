@@ -22,34 +22,9 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
       userStatus()
 
   userStatus = () ->
-    if $('#id-is-valid').attr('data-type') == 'qiye'
-      if $('#id-is-valid').val() == 'False'
-        $.ajax {
-          url: '/qiye/profile/exists/'
-          data: {
-          }
-          type: 'GET'
-        }
-        .done (data)->
-          if data.ret_code == 10000
-            $.ajax {
-              url: '/qiye/profile/get/'
-              data: {
-              }
-              type: 'GET'
-            }
-            .done (data)->
-              if data.data.status != '审核通过'
-                $('.verifyHref').attr('href','/qiye/profile/edit/')
-        .fail (data)->
-          $('.verifyHref').attr('href','/qiye/info/')
-
-        $('#id-validate').modal()
-        return
-    else
-      if $('#id-is-valid').val() == 'False'
-        $('#id-validate').modal()
-        return
+    if $('#id-is-valid').val() == 'False'
+      $('#id-validate').modal()
+      return
 
   $.validator.addMethod 'morethan100', (value, element)->
     return Number(value) >= 100

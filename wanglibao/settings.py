@@ -137,6 +137,7 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
+    'wanglibao_geetest',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -619,10 +620,10 @@ CELERYBEAT_SCHEDULE = {
     },
 
     #add by guoya: 希财网渠道数据定时推送
-    'xicai_send_data': {
-        'task': 'wanglibao_account.tasks.xicai_send_data_task',
-        'schedule': timedelta(hours=1),
-    },
+    # 'xicai_send_data': {
+    #     'task': 'wanglibao_account.tasks.xicai_send_data_task',
+    #     'schedule': timedelta(hours=1),
+    # },
 
     #add by zhanghe: PC端WEB首页统计数据
     'pc_index_data': {
@@ -638,7 +639,7 @@ CELERYBEAT_SCHEDULE = {
     #add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
     'lottery_set_status': {
         'task': 'wanglibao_lottery.tasks.lottery_set_status',
-        'schedule': crontab(minute=0, hour=5)
+        'schedule': crontab(minute=20, hour=5)
     },
 
     #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
@@ -670,13 +671,13 @@ CELERYBEAT_SCHEDULE = {
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
         'task': 'wanglibao_redpack.tasks.update_virtual_earning',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=30, hour=0)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
-    'zhongjin_send_data': {
-        'task': 'wanglibao_account.tasks.zhongjin_post_task',
-        'schedule': timedelta(hours=1),
-    },
+    # 'zhongjin_send_data': {
+    #     'task': 'wanglibao_account.tasks.zhongjin_post_task',
+    #     'schedule': timedelta(hours=1),
+    # },
     # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
     'rongtu_send_data': {
         'task': 'wanglibao_account.tasks.rongtu_post_task',
@@ -685,13 +686,13 @@ CELERYBEAT_SCHEDULE = {
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
-        'schedule': crontab(minute=0, hour=3)
+        'schedule': crontab(minute=30, hour=3)
     },
 
     # by Zhoudong 定期检查没有投资的新用户, 提醒投资
     'invested_status_task_check': {
         'task': 'marketing.tools.check_invested_status',
-        'schedule': crontab(minute=0, hour=10),
+        'schedule': crontab(minute=15, hour=10),
     },
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
@@ -704,10 +705,10 @@ CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute=0, hour=11),
     },
     # 定期向渠道中心推送标的信息
-    'p2p_product_push_to_coop': {
-        'task': 'wanglibao_p2p.tasks.coop_product_push',
-        'schedule': timedelta(minutes=5),
-    },
+    # 'p2p_product_push_to_coop': {
+    #     'task': 'wanglibao_p2p.tasks.coop_product_push',
+    #     'schedule': timedelta(hours=1),
+    # },
     # 每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
@@ -1224,13 +1225,23 @@ else:
 # 比搜益
 BISOUYI_CHANNEL_CODE = 'bisouyi'
 if ENV == ENV_PRODUCTION:
-    BISOUYI_AES_KEY = ''
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = ''
+    BISOUYI_PCODE = '10002'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 else:
-    BISOUYI_AES_KEY = ''
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
     BISOUYI_SIGN_KEY = ''
     BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
+    BISOUYI_PCODE = '10002'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
@@ -1253,8 +1264,7 @@ SUIT_CONFIG = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
-# REDIS_PASSWORD = 'wanglibank_redis'
-REDIS_PASSWORD = ''
+REDIS_PASSWORD = 'wanglibank_redis'
 
 # CACHES = {
 #     'default': {
@@ -1323,3 +1333,11 @@ else:
     COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
     PUSH_COOP_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/push_coop_token/'
     COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
+
+
+if ENV == ENV_PRODUCTION:
+    SITE_URL = 'https://www.wanglibao.com'
+elif ENV == ENV_STAGING:
+    SITE_URL = 'https://staging.wanglibao.com'
+elif ENV == ENV_DEV:
+    SITE_URL = 'http://127.0.0.1:8000'

@@ -53,7 +53,7 @@ webpackJsonp([4],[
 	                canGetPage = true;
 	            },
 	            error: function error() {
-	                alert('Ajax error!');
+	                (0, _ui.Alert)('Ajax error!');
 	            },
 	            complete: function complete() {
 	                $('.load-text').html('点击查看更多项目');
@@ -82,16 +82,15 @@ webpackJsonp([4],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        callback();
 	    });
 	};
 
@@ -102,7 +101,7 @@ webpackJsonp([4],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];

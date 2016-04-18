@@ -1,16 +1,3 @@
-require.config
-  paths:
-    jquery: 'lib/jquery.min'
-    underscore: 'lib/underscore-min'
-    tools: 'lib/modal.tools'
-    "jquery.validate": 'lib/jquery.validate.min'
-    'jquery.modal': 'lib/jquery.modal.min'
-    ddslick: 'lib/jquery.ddslick'
-
-  shims:
-    "jquery.validate": ['jquery']
-    "ddslick": ['jquery']
-  urlArgs: 'v=20160310'
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
   isFirst = true
@@ -188,46 +175,13 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
       tip = '您的投资金额为:' + $('input[name=amount]').val() + '元'
       tool.modalAlert({title: '温馨提示', msg: tip, callback_ok: ()->
-        if $('#id-is-valid').attr('data-type') == 'qiye'
-          $.ajax {
-            url: '/qiye/profile/exists/'
-            data: {
-            }
-            type: 'GET'
-          }
-          .done (data)->
-            if data.ret_code == 10000
-              $.ajax {
-                url: '/qiye/profile/get/'
-                data: {
-                }
-                type: 'GET'
-              }
-              .done (data)->
-                if data.data.status != '审核通过'
-                  tool.modalAlert({
-                    title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
-                      window.location.href = '/qiye/profile/edit/'
-                  })
-                else
-                  purchaseFun()
-          .fail (data)->
-            result = JSON.parse(data.responseText)
-            if(result.ret_code != 20001)
-              tool.modalAlert({
-                title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
-                  window.location.href = '/qiye/info/'
-              })
-            else
-              purchaseFun()
+        if $('#id-is-valid').val() == 'False'
+          tool.modalAlert({
+            title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
+              window.location.href = '/accounts/id_verify/'
+          })
         else
-          if $('#id-is-valid').val() == 'False'
-            tool.modalAlert({
-              title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
-                window.location.href = '/accounts/id_verify/'
-            })
-          else
-            purchaseFun()
+          purchaseFun()
       })
   purchaseFun = () ->
     product = $('input[name=product]').val()

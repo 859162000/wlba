@@ -16,6 +16,8 @@ module.exports = {
     entry: {
         login: path.resolve(JS_PATH, 'login'),
         regist: path.resolve(JS_PATH, 'regist'),
+        login_bsy: path.resolve(JS_PATH, 'login_bsy'),
+        regist_bsy: path.resolve(JS_PATH, 'regist_bsy'),
         list: path.resolve(JS_PATH, 'list'),
         detail: path.resolve(JS_PATH, 'detail'),
         buy: path.resolve(JS_PATH, 'buy'),

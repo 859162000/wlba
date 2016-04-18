@@ -10,6 +10,7 @@ from django.core.paginator import PageNotAnInteger
 from amortization_plan import MatchingPrincipalAndInterest, MonthlyInterest, QuarterlyInterest, \
         DisposablePayOff, DailyInterest, DailyInterestMonthly
 from wanglibao_margin.models import Margin
+from wanglibao_buy.models import FundHoldInfo
 
 
 def checksum(hash_list):
@@ -166,6 +167,14 @@ def get_user_margin(user_id):
         margin['invest'] = float(margin['invest'])
         margin['uninvested'] = float(margin['uninvested'])
         margin['uninvested_freeze'] = float(margin['uninvested_freeze'])
+
+        fund_hold_info = FundHoldInfo.objects.filter(user_id=user_id)
+        fund_total_asset = 0
+        if fund_hold_info.exists():
+            for hold_info in fund_hold_info:
+                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+        margin['other_amount'] = float(fund_total_asset)
     else:
         margin = None
 
@@ -191,7 +200,22 @@ def get_p2p_equity(user_id, product_id):
         equity['unpaid_principal'] = float(unpaid_principal)
         if equity['confirm_at']:
             equity['confirm_at'] = equity['confirm_at'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            equity.pop('confirm_at')
     else:
         equity = None
 
     return equity
+
+
+class GlobalVar(object):
+    first_product_push_to_coop = False
+
+    @staticmethod
+    def set_push_status(value):
+        GlobalVar.first_product_push_to_coop = value
+
+    @staticmethod
+    def get_push_status():
+        return GlobalVar.first_product_push_to_coop
+

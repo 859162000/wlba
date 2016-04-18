@@ -9,8 +9,22 @@
     });
     var login = false;
 
-    var chance_num;
-    var card_no;
+    $('.banner_main .view').on('click',function(){
+        var ele = $('#banenr .slide_bottom');
+        var curHeight = ele.height();
+        var autoHeight = ele.css('height', 'auto').height();
+		$('.banner_main .view').addClass('view_activate');
+		ele.height(curHeight).animate({height: autoHeight},500);
+
+    });
+
+	$('#banenr .slide_bottom .bottom_arrow').click(function(){
+		var ele = $('#banenr .slide_bottom');
+        var curHeight = ele.height();
+		$('.banner_main .view').removeClass('view_activate');
+		ele.height(curHeight).animate({height: 0},500);
+	});
+
 
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
@@ -31,12 +45,12 @@
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://staging.wanglibao.com/',
-			shareName = '春日总动员',
-			shareImg = host + '/static/imgs/mobile_activity/app_spring_mobilization/300x300.jpg',
-			shareLink = host + 'weixin_activity/spring_reward/',
-			shareMainTit = '春日总动员',
-			shareBody = '万份豪礼倾情送，全民来抢乐出游！';
+		var host = 'https://www.wanglibao.com/',
+			shareName = '网利宝会员初体验',
+			shareImg = host + '/static/imgs/mobile_activity/app_wangli_vip/300x300.jpg',
+			shareLink = host + 'activity/app_wangli_vip/',
+			shareMainTit = '网利宝会员初体验',
+			shareBody = '多种特权接入中，总有一款适合你！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -46,7 +60,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '春日总动员',
+			title: '网利宝会员初体验',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -58,7 +72,4 @@
 			imgUrl: shareImg
 		})
 	})
-
-
-
 })(org);

@@ -1,28 +1,50 @@
-getCookie = function(name) {
-    var cookie, cookieValue, cookies, i;
-    cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        cookies = document.cookie.split(";");
-        i = 0;
-        while (i < cookies.length) {
-            cookie = $.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+var csrfSafeMethod, getCookie, sameOrigin,
+    getCookie = function (name) {
+        var cookie, cookieValue, cookies, i;
+        cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            cookies = document.cookie.split(";");
+            i = 0;
+            while (i < cookies.length) {
+                cookie = $.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+                i++;
             }
-            i++;
         }
-    }
-    return cookieValue;
+        return cookieValue;
+    };
+csrfSafeMethod = function (method) {
+    return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+};
+sameOrigin = function (url) {
+    var host, origin, protocol, sr_origin;
+    host = document.location.host;
+    protocol = document.location.protocol;
+    sr_origin = "//" + host;
+    origin = protocol + sr_origin;
+    return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
 };
 $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        //if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
             xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-        //}
+        }
     }
 });
+window.alert = function(name){
+    var iframe = document.createElement("IFRAME");
+    iframe.style.display="none";
+    iframe.setAttribute("src", 'data:text/plain,');
+    document.documentElement.appendChild(iframe);
+    window.frames[0].window.alert(name);
+    iframe.parentNode.removeChild(iframe);
+}
+
 $(function(){
+
     var box = $('#box');
     box.css('width',window.innerWidth);
     box.css('height',window.innerHeight);
@@ -31,12 +53,12 @@ $(function(){
     var ca=document.getElementById("canvas");//获取画布元素
     var ctx=ca.getContext("2d");//设定画布为2d展示
     var bj1=new Image();//定义背景对象
-    var player=new Image();//定义人的对象
+    var player=new Image();//定义猴子的对象
     var tu=new Array();//定义金币的对象
     bj1.src="/static/imgs/sub_weixin/eatcoin/bj.png";//为背景设置图片
-    player.src="/static/imgs/sub_weixin/eatcoin/monkeyPending.gif";//为人物设置图片
-    var playerWidth =window.innerWidth*0.347;//285;//*B;//人物的宽度
-    var playerHeight =window.innerHeight*0.325;//*B;//人物的高度
+    player.src="/static/imgs/sub_weixin/eatcoin/monkeyPending.gif";//为猴子设置图片
+    var playerWidth =window.innerWidth*0.347;//猴子的宽度
+    var playerHeight =window.innerHeight*0.325;//猴子的高度
     var h=20;
     var sudu = 30;
     var zl=100;
@@ -74,10 +96,7 @@ $(function(){
             type:"get",
             async:false,
             url:"/api/user_exists/"+phone+"/",
-            dataType:"json",
-            //success:function(data){
-            //    return data.existing;
-            //}
+            dataType:"json"
         }).done(function(data){
             isreg = data.existing;
         });
@@ -85,17 +104,23 @@ $(function(){
     }
     function chansheng(){
         if(shi%h==0){
-            for(var j=2*chi;j<2*(chi+1);j++){
-                //alert("@@@")
+            for(var j=chi;j<chi+1;j++){
                 tu[j]=new object();
                 var i=zh_x[Math.round(Math.random()*1)];
-                if(j==2*chi+1)
-                {
-                    while(Math.abs(i-tu[2*chi].x)<30){
-                        i=zh_x[Math.round(Math.random()*1)];
-                    }
+
+                if(chi%5==0){
+                    tu[j].image.src = "/static/imgs/sub_weixin/eatcoin/bomb.gif";
+                    tu[j].q = 2;
+                    tu[j+1]=new object();
+                    tu[j+1].image.src="/static/imgs/sub_weixin/eatcoin/jinbi.png";
+                    tu[j+1].q = 1;
+                    chi++;
+                }else{
+                    tu[j].image.src="/static/imgs/sub_weixin/eatcoin/jinbi.png";
+                    tu[j].q = 1;
                 }
-                var k=Math.round(Math.random()*zl);
+
+                /*var k=Math.round(Math.random()*zl);
                 if(k < 80){
                     tu[j].image.src="/static/imgs/sub_weixin/eatcoin/jinbi.png";
                     tu[j].q = 1;
@@ -109,7 +134,7 @@ $(function(){
                             tu[j].q = 1;
                         }
                     }
-               }
+                }*/
                 tu[j].x=i;
                 tu[j].y=-100;
                 var tu1 = tu[j];
@@ -140,14 +165,14 @@ $(function(){
                         $(".logo").show();
                         var jl = $(".number").text()
                         $(".jbsl").text(jl);
-                        if(jl>=0&&jl<=5){
+                        if(jl>=0&&jl<=20){
                             jp = "66元";
-                        }else if(jl>=6&&jl<=10){
+                        }else if(jl>=21&&jl<=40){
                             jp = "166元";
-                        }else if(jl>=11&&jl<=15){
+                        }else if(jl>=41&&jl<=60){
                             jp = "566元";
-                        }else if(jl>=16){
-                            jp = "666元";
+                        }else if(jl>=61){
+                            jp = "866元";
                         }
                         var conten = "我用幸运猴接了"+$(".number").html()+"个金币，快来试试你能接多少个吧！";
                         fxApi(conten);
@@ -224,7 +249,7 @@ $(function(){
         var djs = setInterval(function(){
             if(js>1) {
                 js--;
-                $(".djs").find("span").text(js)
+                $(".djs").text(js)
             }else{
                 clearInterval(djs);
                 $(".blank").hide();
@@ -240,8 +265,8 @@ $(function(){
         },1000)
     }
     function fxApi(conten){
-        var winHot = window.location.href;
-        var link = winHot;
+        var winHot = window.location.protocol+"//"+window.location.host;
+        var link = window.location.href;
         var img = winHot+"/static/imgs/sub_weixin/eatcoin/wx_logo.jpg";
         var tit = "天降福利 幸运来袭";
         wx.onMenuShareAppMessage({
@@ -252,38 +277,38 @@ $(function(){
             type: 'link', // 分享类型,music、video或link，不填默认为link
             dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+               //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
         wx.onMenuShareTimeline({
             title: tit, // 分享标题
-            link: winHot, // 分享链接
+            link: link, // 分享链接
             imgUrl: img, // 分享图标
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+                //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
         wx.onMenuShareQQ({
             title: tit, // 分享标题
             desc: conten, // 分享描述
-            link:winHot, // 分享链接
+            link:link, // 分享链接
             imgUrl: img, // 分享图标
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+                //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
@@ -293,41 +318,27 @@ $(function(){
             link: link, // 分享链接
             imgUrl: img, // 分享图标
             success: function () {
-                alert("分享成功")
+                //alert("分享成功")
                 // 用户确认分享后执行的回调函数
             },
             cancel: function () {
-                alert("分享已取消")
+                //alert("分享已取消")
                 // 用户取消分享后执行的回调函数
             }
         });
     }
-    $(document).ready(function(){
-        setTimeout(function(){
-            $(window).scrollTop(1);
-        },0);
-        document.getElementById('car_audio').play();
-        document.addEventListener("WeixinJSBridgeReady", function () {
-            WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
-                document.getElementById('car_audio').play();
-            });
-        }, false);
-        var cunt = 0;
-        var imgNum=$("img").length;
-        $("img").load(function(){
-            if (!--imgNum) {
-                var progress = setInterval(function () {
-                    cunt++;
-                    $(".loaded").css("background-size", cunt * 10 + "%" + " " + "100%");
-                    if (cunt == 11) {
-                        clearInterval(progress);
-                        $(".loadding_page").hide();
-                        $(".start_page").show();
-                    }
-                }, 100);
-            }
-        });
+    $(document).ready(function() {
 
+        //document.body.scrollTop = 100;
+        /*setInterval(function () {
+            $(window).scrollTop(0);
+        }, 0);*/
+        //IOS下自动播放背景音乐
+
+
+        document.addEventListener("touchmove",function(e){
+            e.preventDefault();
+        },false);
         $(".again_btn").bind("click",function(){
             $(".reward_page").hide();
             $("#box").show();
@@ -341,7 +352,7 @@ $(function(){
             fs = 0;
             h = 20;
             sudu = 30;
-            $(".djs span").text(3);
+            $(".djs").text(3);
             start();
         });
 
@@ -369,21 +380,36 @@ $(function(){
             $(".logo").hide();
             start();
         });
-
+        $(".blank").click(function(){
+            if(!$(".fxts").is(":hidden")){
+                $(this).hide();
+                $(".fxts").hide();
+            }
+        })
         $(".get_reward_btn").bind("click",function(){
             var total = $(".jbsl").text();
             if($(".iphone input").is(":hidden")){
                 var param={"total":total};
-                lqjl(param);
+                lqjl(param)
             }else{
+
                 var phone = $(".iphone input").val();
-                if(phone && /^1[3|4|5|8|7|]\d{9}$/.test(phone)){
+                if(phone && /^1[2|3|4|5|8|7|]\d{9}$/.test(phone)){
                     var param = {"total":total,"phone":phone};
                     if(isRegister(phone)){
-                        lqjl(param);
+                        $(".lq").hide();
+                        $(".zlyc").show();
+                        $(".zlyc .txt").hide();
+                        $(".zlyc .yzc_txt").show();
+                        $(".zlyc .ermts").hide();
+                        document.getElementById("car_audio").pause();
+                        $(".m").hide();
                     }else{
                         $(".blank").show();
                         $(".yz_tc").show();
+                        $(".phone input").val(phone);
+                        $(".input_yzm input").val("");
+                        $(".srdx input").val("");
                         sxyzm();
                     }
                 } else{
@@ -395,7 +421,7 @@ $(function(){
         function sxyzm(){
             $.ajax({
                 type:"get",
-                url:"/anti/captcha/refresh",
+                url:"/anti/captcha/refresh/",
                 data:{key:new Date().getTime()},
                 dataType:"json",
                 success:function(data){
@@ -405,6 +431,8 @@ $(function(){
             })
         }
         function lqjl(param){
+            document.getElementById("car_audio").pause();
+            $(".m").hide();
             $.ajax({
                 type:"post",
                 url:"/api/activity/happy_monkey/",
@@ -416,7 +444,11 @@ $(function(){
                         $(".fx").show();
                         $(".blank").hide();
                     }else if(data.ret_code=1001){
-                        alert("每个用户一天只能领取一次奖励");
+                        //alert("每个用户一天只能领取一次奖励");
+                        $(".lq").hide();
+                        $(".zlyc").show();
+                        $(".zlyc .yzc_txt").hide();
+                        $(".zlyc txt").show();
                     }else{
                         alert(data.message);
                     }
@@ -426,21 +458,45 @@ $(function(){
         $(".sx").click(function(){
             sxyzm();
         });
+        var djs;
         $(".hqdx input").click(function(){
             $(this).attr("disabled","disabled");
             $(this).css("background-image","url(/static/imgs/sub_weixin/eatcoin/un_get_note.png)");
+            var dxsj = 60;
             var phone = $(".yz_tc .phone input").val();
             var param = {"captcha_0":$(".img_yzm img").attr("key"),"captcha_1":$(".input_yzm input").val()};
+            $(this).hide().siblings().show();
+            var self = this
+            djs = setInterval(function(){
+                if(dxsj==1){
+                    $(self).removeAttr("disabled");
+                    $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
+                    $(self).show().siblings().hide();
+                    $(self).siblings().text("60秒后重发");
+                    clearInterval(djs);
+                }else{
+                    dxsj--
+                    $(self).siblings().text(dxsj+"秒后重发");
+                }
+
+            },1000)
             $.ajax({
                 type:"post",
                 url:"/api/phone_validation_code/register/"+phone+"/",
                 data:param,
                 dataType:"json",
                 success:function(data){
-                    //console.log(data);
+
                 },
-                error:function(data){
-                    alert(eval("(" + data.responseText+ ")").message);
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    alert(new Function('return '+XMLHttpRequest.responseText)().message);
+                    sxyzm();
+                    $(".input_yzm input").val();
+                    $(self).removeAttr("disabled");
+                    $(self).css("background-image","url(/static/imgs/sub_weixin/eatcoin/get_note.png)");
+                    $(self).show().siblings().hide();
+                    $(self).siblings().text("60秒后重发");
+                    clearInterval(djs);
                 }
             })
         })
@@ -501,6 +557,8 @@ $(function(){
         $(".yz_tc .close").click(function(){
             $(".blank").hide();
             $(this).parent().hide();
+            clearInterval(djs);
+            $(".hqdx input").show().siblings().hide().text("60秒后重发")
         })
         window.addEventListener('orientationchange', function(event){
             if( window.orientation == 90 || window.orientation == -90 ) {
@@ -529,3 +587,4 @@ $(function(){
         })
     })
 });
+

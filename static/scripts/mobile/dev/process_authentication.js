@@ -1,4 +1,4 @@
-webpackJsonp([7],[
+webpackJsonp([8],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -85,18 +85,18 @@ webpackJsonp([7],[
 	            });
 	        }).then(function (result) {
 	            console.log('success');
-	            if (!result.validate == 'true') return alert('认证失败，请重试');
-	            alert("实名认证成功!", function () {
+	            if (!result.validate == 'true') return (0, _ui.Alert)('认证失败，请重试');
+	            (0, _ui.Alert)("实名认证成功!", function () {
 	                return window.location.href = '/weixin/regist/second/';
 	            });
 	        }).catch(function (xhr) {
 	            var result = JSON.parse(xhr.responseText);
 	            if (result.error_number == 8) {
-	                alert(result.message, function () {
+	                (0, _ui.Alert)(result.message, function () {
 	                    window.location.href = '/weixin/list/';
 	                });
 	            } else {
-	                return alert(result.message);
+	                return (0, _ui.Alert)(result.message);
 	            }
 	        });
 	    });
@@ -120,16 +120,15 @@ webpackJsonp([7],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        callback();
 	    });
 	};
 
@@ -140,7 +139,7 @@ webpackJsonp([7],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -277,7 +276,9 @@ webpackJsonp([7],[
 	            //不等于空
 	            if (!isEmpty) {
 	                if (icon != '') target.siblings('.' + icon).addClass('active');
-	                if (othericon != '') $('.' + othericon).removeAttr('disabled');
+	                if (othericon != '') {
+	                    $('.' + othericon).removeAttr('disabled');
+	                }
 	                if (operation != '') target.siblings('.' + operation).show();
 	            }
 	        }
@@ -379,7 +380,7 @@ webpackJsonp([7],[
 	    phone: function phone(str) {
 	        var phone = parseInt($.trim(str)),
 	            error = '请输入正确的手机号',
-	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0123456789])[0-9]{8}$/);
 
 	        if (re.test(phone)) {
 	            return [true, ''];
@@ -387,9 +388,8 @@ webpackJsonp([7],[
 	        return [false, error];
 	    },
 	    password: function password(str) {
-	        var error = '密码为6-20位数字/字母/符号/区分大小写',
-	            re = new RegExp(/^\d{6,20}$/);
-	        if (re.test($.trim(str))) {
+	        var error = '密码为6-20位数字/字母/符号/区分大小写';
+	        if (6 <= $.trim(str).length && $.trim(str).length <= 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];

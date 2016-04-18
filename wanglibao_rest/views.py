@@ -46,11 +46,10 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid,
-                                  get_coop_access_token, push_coop_access_token)
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
-from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1, safe_id
+from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
@@ -67,8 +66,8 @@ from weixin.models import WeixinUser
 from weixin.util import bindUser
 from wanglibao.views import landpage_view
 import urllib
-from wanglibao_account.cooperation import get_uid_for_coop
-from .forms import OauthUserRegisterForm, BiSouYiRegisterForm
+from wanglibao_geetest.geetest import GeetestLib
+from .forms import OauthUserRegisterForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 
 
@@ -129,10 +128,15 @@ class SendValidationCodeView(APIView):
             descrpition: if...else(line98~line101)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -141,6 +145,23 @@ class SendValidationCodeView(APIView):
         return Response({
                             'message': message
                         }, status=status)
+
+
+    def validate_captcha(self, request):
+        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        #status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
 
 
 class TestSendRegisterValidationCodeView(APIView):
@@ -180,6 +201,7 @@ class SendRegisterValidationCodeView(APIView):
             descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
             return Response({"message": u"该手机号已经被注册，不能重复注册", 
@@ -189,7 +211,10 @@ class SendRegisterValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -198,6 +223,24 @@ class SendRegisterValidationCodeView(APIView):
         # 仅在用户注册时使用
         status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({'message': message, "type": "validation"}, status=status)
+
+    def validate_captcha(self, request):
+        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
+
+
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
@@ -897,13 +940,7 @@ class HasValidationAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({
-                "ret_code": 0,
-                "message": u"您已认证通过",
-                "name": profile.name,
-                "id_number": "%s************%s" % (profile.id_number[:3], profile.id_number[-3:]),
-                "id_valid_time": profile.id_valid_time if not profile.id_valid_time else redpack_backends.local_transform_str(profile.id_valid_time)
-            })
+            return Response({"ret_code": 0, "message": u"您已认证通过"})
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
@@ -1192,7 +1229,12 @@ class StatisticsInside(APIView):
         yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
             .filter(catalog='取款预冻结').aggregate(Sum('amount'))
         yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
-
+        
+        # 今日充值总额
+        today_deposit = MarginRecord.objects.filter(create_time__gte=today_start) \
+            .filter(catalog='现金存入').aggregate(Sum('amount'))
+        today_deposit_amount = today_deposit['amount__sum'] if today_deposit['amount__sum'] else Decimal('0')
+        
         # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
@@ -1242,6 +1284,7 @@ class StatisticsInside(APIView):
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
             'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
             'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
+            'today_deposit_amount' : today_deposit_amount, # 今日冲值总额
         }
 
         data.update(get_public_statistics())
@@ -1771,14 +1814,14 @@ class OauthUserRegisterApi(APIView):
                             "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
                         })
 
-                        # 处理第三方渠道的用户信息
-                        CoopRegister(request).all_processors_for_user_register(user, channel_code)
-
                         tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                         coop_register_processor = getattr(rest_utils, 'process_%s_register' % channel_code.lower(), None)
                         if coop_register_processor:
                             response_data = coop_register_processor(request, user, phone, client_id, channel_code)
+
+                            # 处理第三方渠道的用户信息
+                            CoopRegister(request).all_processors_for_user_register(user, channel_code)
                         else:
                             response_data = {
                                 'ret_code': 50001,
@@ -1824,70 +1867,79 @@ class OauthUserRegisterApi(APIView):
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
-class BiSouYiRegisterApi(APIView):
+class GeetestAPIView(APIView):
     permission_classes = ()
 
-    def get(self, request):
-        form = BiSouYiRegisterForm(self.request.session)
-        if form.is_valid():
-            if form.check_sign():
-                phone = form.get_phone()
-                password = generate_random_password(6)
-                user = create_user(phone, password, "")
-                if user:
-                    auth_user = authenticate(identifier=phone, password=password)
-                    auth_login(request, auth_user)
+    def __init__(self):
+        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+        self.key = '6b5129633547f5b0c0967b4c65193b0c'
 
-                    send_messages.apply_async(kwargs={
-                        "phones": [phone, ],
-                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
-                    })
+    def post(self, request):
+        self.type = request.POST.get('type', None)
+        import time
+        if self.type == 'get':
+            # time.sleep(10)
+            return self.get_captcha(request)
+        if self.type == 'validate':
+            time.sleep(10)
+            return self.validate_captcha(request)
 
-                    client_id = form.cleaned_data['client_id']
-                    channel_code = form.cleaned_data['channel_code']
-                    token = form.get_token()
+    def get_captcha(self, request):
+        user_id = random.randint(1,100)
+        gt = GeetestLib(self.id, self.key)
+        status = gt.pre_process()
+        request.session[gt.GT_STATUS_SESSION_KEY] = status
+        request.session["user_id"] = user_id
+        response_str = gt.get_response_str()
+        return HttpResponse(response_str)
 
-                    # 处理第三方渠道的用户信息
-                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
-
-                    device = split_ua(request)
-                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
-
-                    tid = get_uid_for_coop(user.id)
-                    ret_data = push_coop_access_token(phone, client_id, tid, settings.BISOUYI_COOP_KEY, token)
-                    message = ret_data['message']
-                else:
-                    message = u'用户创建失败'
+    def validate_captcha(self, request):
+        resp = {"result":'error'}
+        if request.method == "POST":
+            gt = GeetestLib(self.id, self.key)
+            challenge = request.POST.get(gt.FN_CHALLENGE, '')
+            validate = request.POST.get(gt.FN_VALIDATE, '')
+            seccode = request.POST.get(gt.FN_SECCODE, '')
+            status = request.session[gt.GT_STATUS_SESSION_KEY]
+            user_id = request.session["user_id"]
+            if status:
+                result = gt.success_validate(challenge, validate, seccode)
             else:
-                message = u'无效签名'
-        else:
-            message = form.errors.values()[0][0]
-
-        logger.info("BiSouYiRegisterApi process result: %s" % message)
-        return HttpResponseRedirect('/')
+                result = gt.failback_validate(challenge, validate, seccode)
+            result = "success" if result else "fail"
+            resp = {"result":result}
+            print 'result:', result
+            return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
+        return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
 
 
 class ActivityUserInfoUploadApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = ActivityUserInfoForm(request.POST)
-        if form.is_valid():
-            user_info = ActivityUserInfo()
-            user_info.name = form.cleaned_data['name']
-            user_info.phone = form.cleaned_data['phone']
-            user_info.address = form.cleaned_data['address']
-            user_info.is_wlb_phone = form.check_wlb_phone()
-            user_info.save()
-            response_data = {
-                'ret_code': 10000,
-                'message': 'success',
-            }
+        activity_end_time = datetime.datetime.strptime('2016-04-7 23:59:59', "%Y-%m-%d %H:%M:%S")
+        if activity_end_time > timezone.now():
+            form = ActivityUserInfoForm(request.POST)
+            if form.is_valid():
+                user_info = ActivityUserInfo()
+                user_info.name = form.cleaned_data['name']
+                user_info.phone = form.cleaned_data['phone']
+                user_info.address = form.cleaned_data['address']
+                user_info.is_wlb_phone = form.check_wlb_phone()
+                user_info.save()
+                response_data = {
+                    'ret_code': 10000,
+                    'message': 'success',
+                }
+            else:
+                response_data = {
+                    'ret_code': 10001,
+                    'message': form.errors
+                }
         else:
             response_data = {
-                'ret_code': 10001,
-                'message': form.errors
+                'ret_code': 20001,
+                'message': u'活动已结束'
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-

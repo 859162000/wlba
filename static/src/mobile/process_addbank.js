@@ -1,9 +1,9 @@
-import { signModel } from './mixins/ui'
+import { Alert, Confirm, signModel } from './mixins/ui'
 import { check } from './mixins/from_validation'
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, getQueryStringByName } from './mixins/api'
-import { Simple_validation } from './mixins/simple_validation.js'
-import { limit} from './mixins/bank_limit.js'
+import { Simple_validation } from './mixins/simple_validation'
+import { limit } from './mixins/bank_limit'
 
 (() => {
 
@@ -43,26 +43,6 @@ import { limit} from './mixins/bank_limit.js'
     });
 //---------------初始化操作end---------
 
-    //验证短信码所需表单
-    const checkOperation_validation = () => {
-        return new Promise((resolve, reject) => {
-            function checkOperation() {
-                const checklist = [
-                    {type: 'isEmpty', value: $bank.val()},
-                    {type: 'bankCard', value: $bankcard.val()},
-                    {type: 'phone', value: $bankphone.val()}
-                ];
-                return check(checklist);
-            }
-
-            const [isThrough, sign]  = checkOperation();
-            if (isThrough) return resolve('验证成功');
-
-            signModel(sign);
-            return console.log('验证失败');
-        })
-    }
-
     //验证表单
     const checkOperation_submit = () => {
         return new Promise((resolve, reject) => {
@@ -96,8 +76,8 @@ import { limit} from './mixins/bank_limit.js'
 
     //获取银行卡
     const fetch_banklist = (callback) => {
-        if(localStorage.getItem('bank1')){
-            const content = JSON.parse(localStorage.getItem('bank'));
+        if(localStorage.getItem('bank_update')){
+            const content = JSON.parse(localStorage.getItem('bank_update'));
             $bank.append(appendBanks(content));
             return callback && callback(content)
 
@@ -109,11 +89,11 @@ import { limit} from './mixins/bank_limit.js'
                     if (results.ret_code === 0) {
                         const content = JSON.stringify(results.banks);
                         $bank.append(appendBanks(results.banks));
-                        window.localStorage.setItem('bank', content);
-                        return callback && callback(content)
+                        window.localStorage.setItem('bank_update', content);
+                        return callback && callback(results.banks)
 
                     } else {
-                        return alert(results.message);
+                        return Alert(results.message);
                     }
                 },
                 error (data) {
@@ -123,7 +103,7 @@ import { limit} from './mixins/bank_limit.js'
         }
     }
 
-    fetch_banklist(banklist => {
+    fetch_banklist( (banklist) => {
         limit.getInstance({
             target: $('.limit-bank-item'),
             limit_data: banklist
@@ -163,7 +143,7 @@ import { limit} from './mixins/bank_limit.js'
             .then((result) =>{
                 var check_recharge = $(this).attr('data-recharge')
                 if(check_recharge == 'true'){
-                    confirm("充值金额为" + $money.val(), '确认充值', recharge, {firstRecharge: true});
+                    Confirm("充值金额为" + $money.val(), '确认充值', recharge, {firstRecharge: true});
                 }else{
                     recharge({firstRecharge: false})
                 }
@@ -195,7 +175,7 @@ import { limit} from './mixins/bank_limit.js'
             },
             success (data) {
                 if (data.ret_code > 0) {
-                    return alert(data.message);
+                    return Alert(data.message);
                 } else {
                     $(".error-sign").remove();
                     if(check.firstRecharge){
@@ -203,7 +183,7 @@ import { limit} from './mixins/bank_limit.js'
                     }else{
                         const next_url = getQueryStringByName('next'),
                             next = next_url == '' ? '/weixin/list/' : next_url;
-                        return alert('绑卡成功！', ()=>{
+                        return Alert('绑卡成功！', ()=>{
                             window.location.href = next;
                         });
                     }
@@ -212,7 +192,7 @@ import { limit} from './mixins/bank_limit.js'
             },
             error (result){
                 var data = JSON.parse(result.responseText);
-                return alert(data.detail);
+                return Alert(data.detail);
             },
             complete () {
                 if(check.firstRecharge){

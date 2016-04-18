@@ -125,7 +125,6 @@ class Account(models.Model):
         :param lang: Preferred language code, optional
         :return: JSON data
         """
-        logger.debug("-get_user_info**********************app_id:%s,app_secret:%s"%(self.app_id, self.app_secret))
         access_token = self.access_token
         client = WeChatClient(self.app_id, self.app_secret)
         return client._get(
@@ -332,8 +331,6 @@ class WeixinAccounts(object):
     def getByOriginalId(cls, original_id):
         if not cls.data:
             cls.append_account()
-        logger.debug("original_id::%s"%original_id)
-        logger.debug("cls.data::%s"%cls.data)
         for key, account_info in cls.data.items():
             if account_info['id'].strip() == original_id.strip():
                 return cls(key)
@@ -607,7 +604,9 @@ class SeriesActionActivityRule(models.Model):
                                如需要多个ID则用英文逗号隔开,如:1,2,3')
 
     reward = models.CharField(u'奖品类型名称', max_length=200, blank=True,
-                              help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
+                              help_text=u'奖品类型名称一定要和奖品中的类型保持一致，\n'
+                                        u'否则会导致无法发放奖品,如需要多个奖品则用英文逗号隔开,如:1,2,3;\n'
+                                        u'如果配置了多个奖品，会依次遍历，只会发放一个还存在的奖励')
 
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\

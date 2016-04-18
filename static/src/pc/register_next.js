@@ -74,23 +74,24 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
     })
 
     /*获取银行列表*/
-    $.ajax({
-        type: 'POST',
-        url : '/api/bank/list_new/',
-        data : {
-        },
-        success:function(data){
-            var html = '',str='';
-            $.each(data.banks,function(i,o){
-               html+='<option value='+ o.gate_id +'>'+ o.name +'</option>'
-               str+='<p tag='+ o.gate_id +'>首次限额'+ o.first_one +'/单笔限额'+ o.second_one +'/日限额'+ o.second_day +'</p>'
-            })
-            $('.bankPop').append(str);
-            $('.select_bank').append(html);
-        },
-        error:function(xhr){
-        }
-    })
+    if($('.select_bank').length > 0) {
+        $.ajax({
+            type: 'POST',
+            url: '/api/bank/list_new/',
+            data: {},
+            success: function (data) {
+                var html = '', str = '';
+                $.each(data.banks, function (i, o) {
+                    html += '<option value=' + o.gate_id + '>' + o.name + '</option>'
+                    str += '<p tag=' + o.gate_id + '>首次限额' + o.first_one + '/单笔限额' + o.second_one + '/日限额' + o.second_day + '</p>'
+                })
+                $('.bankPop').append(str);
+                $('.select_bank').append(html);
+            },
+            error: function (xhr) {
+            }
+        })
+    }
 
 
     /*实名认证*/

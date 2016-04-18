@@ -43,7 +43,8 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
+from wanglibao_account.utils import (detect_identifier_type, create_user, generate_contract, update_coop_order,
+                                     generate_bisouyi_content, generate_bisouyi_sign)
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.serializers import UserSerializer
@@ -70,7 +71,7 @@ from wanglibao_activity.models import Activity
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
-from wanglibao_account.utils import get_client_ip
+from wanglibao_account.utils import get_client_ip, generate_random_password
 # import requests
 from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct, ExperienceEvent
@@ -78,8 +79,9 @@ from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
-from wanglibao_account.forms import verify_captcha
+from wanglibao_account.forms import verify_captcha, BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_account.tasks import common_callback_for_post
 
 
 logger = logging.getLogger(__name__)
@@ -2217,7 +2219,10 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = json.loads(request.POST)
+                if channel_code == 'zgdx':
+                    params = json.loads(request.body)
+                else:
+                    params = request.POST
                 request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
@@ -2670,3 +2675,289 @@ class MarginRecordsAPIView(APIView):
         res = margin_records(request)
         return Response(res)
 
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def user_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return res
+
+    form = authentication_form(request, data=request.POST)
+    if form.is_valid():
+        auth_login(request, form.get_user())
+
+        if request.POST.has_key('remember_me'):
+            request.session.set_expiry(604800)
+        else:
+            request.session.set_expiry(1800)
+
+        response_data = messenger('success', user=request.user)
+        response_data['ret_code'] = 10000
+    else:
+        response_data = messenger(form.errors)
+        response_data['ret_code'] = 10001
+
+    return response_data
+
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def user_register(request):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return res
+
+    channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+    form = EmailOrPhoneRegisterForm(request.POST)
+    if form.is_valid():
+        nickname = form.cleaned_data['nickname']
+        password = form.cleaned_data['password']
+        identifier = form.cleaned_data['identifier']
+        invitecode = form.cleaned_data['invitecode']
+        user_type = form.cleaned_data.get('user_type', '0')
+
+        if request.POST.get('IGNORE_PWD', '') and not password:
+            password = generate_random_password(6)
+
+        user = create_user(identifier, password, nickname, user_type)
+        if user:
+            auth_user = authenticate(identifier=identifier, password=password)
+
+            auth.login(request, auth_user)
+
+            device = utils.split_ua(request)
+
+            if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
+                tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+            #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
+            if request.POST.get('IGNORE_PWD', ''):
+                send_messages.apply_async(kwargs={
+                    "phones": [identifier, ],
+                    "messages": [u'您已成功注册网利宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                })
+
+            account_backends.set_source(request, auth_user)
+
+            response_data = messenger('success', user=request.user)
+            response_data['ret_code'] = 10000
+        else:
+            response_data = messenger(u'用户创建失败')
+            response_data['ret_code'] = 10002
+    else:
+        response_data = messenger(form.errors)
+        response_data['ret_code'] = 10001
+
+    return response_data
+
+
+class BiSouYiRegisterApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        form = BiSouYiRegisterForm(self.request.session, action='register')
+        oauth_data = {
+            'pcode': settings.BISOUYI_PCODE,
+            'status': 0,
+        }
+        if form.is_valid():
+            if form.check_sign():
+                response_data = user_register(request)
+                if int(response_data['ret_code']) == 10000:
+                    user = request.user
+                    access_token = utils.long_token()
+                    account = form.get_account()
+                    user.access_token = access_token
+                    user.account = account
+                    channel_code = form.cleaned_data['channel_code']
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(request).all_processors_for_user_register(user, channel_code)
+
+                    start_time = timezone.localtime(timezone.now())
+                    end_time = start_time + datetime.timedelta(seconds=599)
+                    oauth_data['token'] = access_token
+                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['status'] = 1
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                        'next_url': form.get_other(),
+                    }
+            else:
+                response_data = {
+                    'ret_code': 10011,
+                    'message': u'无效签名',
+                }
+        else:
+            response_data = {
+                'ret_code': 10010,
+                'message': form.errors.values()[0][0],
+            }
+
+        response_data['oauth_data'] = json.dumps(oauth_data)
+
+        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiRegisterView(TemplateView):
+
+    template_name = 'one_key_register_bisouyi.jade'
+
+    def get_context_data(self, **kwargs):
+        form = BiSouYiRegisterForm(self.request.session, action='register')
+        oauth_data = {
+            'pcode': settings.BISOUYI_PCODE,
+            'status': 0,
+        }
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                if user:
+                    access_token = utils.long_token()
+                    account = form.get_account()
+                    user.access_token = access_token
+                    user.account = account
+                    channel_code = form.cleaned_data['channel_code']
+
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(self.request).all_processors_for_user_register(user, channel_code)
+
+                    device = utils.split_ua(self.request)
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    auth_user = authenticate(identifier=phone, password=password)
+                    auth_login(self.request, auth_user)
+
+                    start_time = timezone.localtime(timezone.now())
+                    end_time = start_time + datetime.timedelta(seconds=599)
+                    oauth_data['token'] = access_token
+                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['status'] = 1
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                        'next_url': form.get_other(),
+                    }
+                else:
+                    response_data = {
+                        'ret_code': 10012,
+                        'message': u'用户创建失败',
+                        'next_url': settings.SITE_URL,
+                    }
+            else:
+                response_data = {
+                    'ret_code': 10011,
+                    'message': u'无效签名',
+                    'next_url': settings.SITE_URL,
+                }
+        else:
+            response_data = {
+                'ret_code': 10010,
+                'message': form.errors.values()[0][0],
+                'next_url': settings.SITE_URL,
+            }
+
+        response_data['oauth_data'] = json.dumps(oauth_data)
+
+        logger.info("BiSouYiRegisterView process result: %s" % response_data['message'])
+        return response_data
+
+
+class BiSouYiLoginApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        form = BiSouYiRegisterForm(self.request.session)
+        p_code = settings.BISOUYI_PCODE
+        oauth_data = {
+            'pcode': p_code,
+            'status': 0,
+        }
+        if form.is_valid():
+            if form.check_sign():
+                response_data = user_login(request)
+                if int(response_data['ret_code']) == 10000:
+                    user = request.user
+                    phone = form.get_phone()
+                    account = form.get_account()
+                    client_id = form.cleaned_data['client_id']
+                    channel_code = form.cleaned_data['channel_code']
+                    access_token = utils.long_token()
+
+                    content_data = {
+                        'pcode': p_code,
+                        'token': access_token,
+                        'yaccount': phone,
+                        'jaccount': account,
+                        'mobile': phone,
+                        'type': 0,
+                        'tstatus': 1,
+                    }
+
+                    content = generate_bisouyi_content(content_data)
+
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'cid': client_id,
+                        'sign': generate_bisouyi_sign(content),
+                    }
+
+                    # 授权回调
+                    common_callback_for_post.apply_async(
+                        kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL,
+                                'params': json.dumps(content_data),
+                                'channel': channel_code, 'headers': headers})
+
+                    start_time = timezone.localtime(timezone.now())
+                    end_time = start_time + datetime.timedelta(seconds=599)
+                    oauth_data['token'] = access_token
+                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    oauth_data['status'] = 1
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                        'next_url': form.get_other(),
+                    }
+
+                    user_phone = user.wanglibaouserprofile.phone
+                    if phone != user_phone:
+                        logger.warning("BiSouYiRegisterApi query phone[%s] not eq user phone[%s]" % (phone, user_phone))
+            else:
+                response_data = {
+                    'ret_code': 10011,
+                    'message': u'无效签名',
+                }
+        else:
+            response_data = {
+                'ret_code': 10010,
+                'message': form.errors.values()[0][0],
+            }
+
+        response_data['oauth_data'] = json.dumps(oauth_data)
+        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

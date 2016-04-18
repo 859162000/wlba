@@ -48,10 +48,10 @@ from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank
+from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank, updateRedisWeekTopRank, updateRedisWeekSum
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import  WeChatException
@@ -863,6 +863,7 @@ class RewardDistributer(object):
         self.Processor = {
             ThanksGivenRewardDistributer: ('all',),
             XingMeiRewardDistributer: ('all',),
+            KongGangRewardDistributer:('all',),
         }
 
     @property
@@ -881,6 +882,93 @@ class RewardDistributer(object):
     def processor_for_distribute(self):
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
+
+
+class KongGangRewardDistributer(RewardDistributer):
+    def __init__(self, request, kwargs):
+        super(KongGangRewardDistributer, self).__init__(request, kwargs)
+        self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
+        self.user = kwargs['user']
+        self.token = 'kgyx'
+
+    def distribute(self):
+        cip_reward = Reward.objects.filter(type='CIP专用安检通道服务', is_used=False).first()
+        wait_reward = Reward.objects.filter(type='尊贵休息室服务', is_used=False).first()
+        all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
+
+        send_reward = None
+        if  self.amount>=500 and self.amount<5000:
+            send_reward = cip_reward
+        if  self.amount>=5000 and self.amount<10000:
+            send_reward = wait_reward or cip_reward
+        if  self.amount>=10000:
+            send_reward = all_reward or wait_reward or cip_reward
+        if send_reward:
+            try:
+                WanglibaoActivityReward.objects.create(
+                        activity='kgyx',
+                        order_id=self.order_id,
+                        user=self.user,
+                        p2p_amount=self.amount,
+                        reward=send_reward,
+                        has_sent=False,
+                        left_times=1,
+                        join_times=1)
+            except Exception:
+                logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
+        else: #所有奖品已经发完了
+            return
+
+class KongGangAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(XunleiActivityAPIView, self).__init__()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity='kgyx').first()
+            if not join_record:
+                join_record = WanglibaoRewardJoinRecord.objects.create(
+                    user=request.user,
+                    activity='kgyx',
+                    remain_chance=1,
+                )
+
+            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx', has_sent=False).first()
+            if reward:
+                reward.has_sent=True
+                reward.left_time=0
+                send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                           u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                           u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
+                           u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
+                send_messages.apply_async(kwargs={
+                    "phones": [request.user.wanglibaouserprofile.phone, ],
+                    "message": send_msg,
+                })
+
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": request.user.id,
+                    "title": u"空港易行优惠服务",
+                    "content": send_msg,
+                    "mtype": "activity"
+                })
+                reward.save()
+            join_record.save()
+        json_to_response = {
+            'ret_code': 0,
+            'message': u'奖品已经发放'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class XingMeiRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
@@ -2652,7 +2740,7 @@ class MarchAwardTemplate(TemplateView):
         ranks = []
         chances = 0
         user = self.request.user
-        yesterday = datetime.datetime.now()-datetime.timedelta(1)
+        yesterday = datetime.datetime.now() -datetime.timedelta(1)
         yesterday_end = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
         yesterday_end = local_to_utc(yesterday_end, "")
         # yesterday_start = local_to_utc(yesterday, 'min')
@@ -2701,7 +2789,32 @@ class MarchAwardTemplate(TemplateView):
            "top_ranks":ranks,
            "award_list":award_list,
             }
+    
+class AprilAwardApi(APIView):
+    """
+    四月活动
+    """
+    permission_classes = (AllowAny, )
 
+    def post(self, request):
+        weekranks = []
+        week_sum_amount = []
+        today = datetime.datetime.now()
+        status = int(getMiscValue('april_reward').get('status',0))
+        if status==1:
+            try:
+                week_top_ranks = 'week_top_ranks_' + today.strftime('%Y_%m_%d')
+                weekranks = pickle.loads(redis_backend()._get(week_top_ranks))
+                week_sum = 'week_sum_' + today.strftime('%Y_%m_%d')
+                week_sum_amount = pickle.loads(redis_backend()._get(week_sum))
+            except:
+                logger.debug("-------------------------------redis read weekranks error")
+            if not weekranks:
+                weekranks = updateRedisWeekTopRank()
+            if not week_sum_amount:
+                week_sum_amount = updateRedisWeekSum()
+        
+        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,})
 
 class FetchMarchAwardAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -2767,17 +2880,18 @@ class FetchMarchAwardAPI(APIView):
 
 class AirportServiceRewardTemplate(TemplateView):
     def get_context_data(self, **kwargs):
-        # airport_service_reward = getMiscValue("airport_service_reward")
-        # rule_ids = airport_service_reward['rule_ids']
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
+        airport_service_reward = getMiscValue("airport_service_reward")
+        rule_ids = airport_service_reward['rule_ids']
         return {
-            "rule_ids":[1,2,3]
+            "rule_ids":rule_ids
             }
 
 class FetchAirportServiceReward(APIView):
     authentication_classes = (IsAuthenticated, )
 
     def post(self, request):
-        # airport_service_reward = {"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         rule_id = request.DATA.get('rule_id', "").strip()
         if not rule_id or not rule_id.isdigit():
             return Response({"ret_code":-1, "message":""})
@@ -2815,18 +2929,20 @@ class FetchAirportServiceReward(APIView):
         if user_ib and user_channel.code==activity.channel:
             is_new = True
 
-        reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
-        if reward_record and reward_record.status:
-            return Response({"ret_code": -1, "message": "您已领取奖励过~"})
+
         if is_new:
             if not user_ib.bought_at:
-                return Response({"ret_code": -1, "message": "您还没有投资，快去投资吧~"})
+                return Response({"ret_code":-2, "message": "您还没有投资，快去投资吧~"})
             first_buy = P2PRecord.objects.filter(user=user).order_by('create_time').first()
-            if first_buy.amount <new_min_amount:
+            if first_buy.amount <5000:
                 return Response({"ret_code": -1, "message": "首次投资不足金额~"})
+            return Response({"ret_code": -1, "message": "奖品只能获得一份~"})
         else:
             if activity_rule.is_invite_in_date:
                 return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+            reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
+            if reward_record and reward_record.status:
+                return Response({"ret_code": -1, "message": "您已领取奖励过~"})
             p2precord = P2PRecord.objects.filter(user=user,
                                              create_time__gte=activity.start_at,
                                              amount__gte=old_min_amount,
@@ -2857,4 +2973,3 @@ class FetchAirportServiceReward(APIView):
                 "mtype": "activity"
             })
             return Response({"ret_code": 0, "message": "奖品领取成功"})
-

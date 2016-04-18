@@ -1,4 +1,4 @@
-webpackJsonp([6],[
+webpackJsonp([7],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -45,11 +45,11 @@ webpackJsonp([6],[
 	    });
 	    //---------------初始化操作end---------
 
-	    //验证短信码所需表单
-	    var checkOperation_validation = function checkOperation_validation() {
+	    //验证表单
+	    var checkOperation_submit = function checkOperation_submit() {
 	        return new Promise(function (resolve, reject) {
 	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }];
+	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }, { type: 'isEmpty', value: $validation.val() }];
 	                return (0, _from_validation.check)(checklist);
 	            }
 
@@ -59,28 +59,6 @@ webpackJsonp([6],[
 
 	            var isThrough = _checkOperation2[0];
 	            var sign = _checkOperation2[1];
-
-	            if (isThrough) return resolve('验证成功');
-
-	            (0, _ui.signModel)(sign);
-	            return console.log('验证失败');
-	        });
-	    };
-
-	    //验证表单
-	    var checkOperation_submit = function checkOperation_submit() {
-	        return new Promise(function (resolve, reject) {
-	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $bank.val() }, { type: 'bankCard', value: $bankcard.val() }, { type: 'phone', value: $bankphone.val() }, { type: 'isEmpty', value: $validation.val() }];
-	                return (0, _from_validation.check)(checklist);
-	            }
-
-	            var _checkOperation3 = checkOperation();
-
-	            var _checkOperation4 = _slicedToArray(_checkOperation3, 2);
-
-	            var isThrough = _checkOperation4[0];
-	            var sign = _checkOperation4[1];
 
 	            if (isThrough) return resolve('验证成功');
 
@@ -100,8 +78,8 @@ webpackJsonp([6],[
 
 	    //获取银行卡
 	    var fetch_banklist = function fetch_banklist(callback) {
-	        if (localStorage.getItem('bank1')) {
-	            var content = JSON.parse(localStorage.getItem('bank'));
+	        if (localStorage.getItem('bank_update')) {
+	            var content = JSON.parse(localStorage.getItem('bank_update'));
 	            $bank.append(appendBanks(content));
 	            return callback && callback(content);
 	        } else {
@@ -112,10 +90,10 @@ webpackJsonp([6],[
 	                    if (results.ret_code === 0) {
 	                        var _content = JSON.stringify(results.banks);
 	                        $bank.append(appendBanks(results.banks));
-	                        window.localStorage.setItem('bank', _content);
-	                        return callback && callback(_content);
+	                        window.localStorage.setItem('bank_update', _content);
+	                        return callback && callback(results.banks);
 	                    } else {
-	                        return alert(results.message);
+	                        return (0, _ui.Alert)(results.message);
 	                    }
 	                },
 	                error: function error(data) {
@@ -159,7 +137,7 @@ webpackJsonp([6],[
 	        checkOperation_submit().then(function (result) {
 	            var check_recharge = $(_this).attr('data-recharge');
 	            if (check_recharge == 'true') {
-	                confirm("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
+	                (0, _ui.Confirm)("充值金额为" + $money.val(), '确认充值', recharge, { firstRecharge: true });
 	            } else {
 	                recharge({ firstRecharge: false });
 	            }
@@ -186,7 +164,7 @@ webpackJsonp([6],[
 	            },
 	            success: function success(data) {
 	                if (data.ret_code > 0) {
-	                    return alert(data.message);
+	                    return (0, _ui.Alert)(data.message);
 	                } else {
 	                    $(".error-sign").remove();
 	                    if (check.firstRecharge) {
@@ -196,7 +174,7 @@ webpackJsonp([6],[
 	                            var next_url = (0, _api.getQueryStringByName)('next'),
 	                                next = next_url == '' ? '/weixin/list/' : next_url;
 	                            return {
-	                                v: alert('绑卡成功！', function () {
+	                                v: (0, _ui.Alert)('绑卡成功！', function () {
 	                                    window.location.href = next;
 	                                })
 	                            };
@@ -208,7 +186,7 @@ webpackJsonp([6],[
 	            },
 	            error: function error(result) {
 	                var data = JSON.parse(result.responseText);
-	                return alert(data.detail);
+	                return (0, _ui.Alert)(data.detail);
 	            },
 	            complete: function complete() {
 	                if (check.firstRecharge) {
@@ -238,16 +216,15 @@ webpackJsonp([6],[
 	 * @param text 文字说明
 	 * @param callback 回调函数
 	 */
-	window.alert = function (text, callback) {
+	var Alert = exports.Alert = function Alert(text, callback) {
 
 	    var $alert = $('.wx-alert'),
 	        $button = $('.wx-submit');
-
 	    $alert.css('display', '-webkit-box').find('.wx-text').text(text);
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback && callback();
+	        callback();
 	    });
 	};
 
@@ -258,7 +235,7 @@ webpackJsonp([6],[
 	 * @param callback  回调函数
 	 * @param callbackData 回调函数的数据
 	 */
-	window.confirm = function (title) {
+	var Confirm = exports.Confirm = function Confirm(title) {
 	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
 	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
@@ -395,7 +372,9 @@ webpackJsonp([6],[
 	            //不等于空
 	            if (!isEmpty) {
 	                if (icon != '') target.siblings('.' + icon).addClass('active');
-	                if (othericon != '') $('.' + othericon).removeAttr('disabled');
+	                if (othericon != '') {
+	                    $('.' + othericon).removeAttr('disabled');
+	                }
 	                if (operation != '') target.siblings('.' + operation).show();
 	            }
 	        }
@@ -497,7 +476,7 @@ webpackJsonp([6],[
 	    phone: function phone(str) {
 	        var phone = parseInt($.trim(str)),
 	            error = '请输入正确的手机号',
-	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0123456789])[0-9]{8}$/);
 
 	        if (re.test(phone)) {
 	            return [true, ''];
@@ -505,9 +484,8 @@ webpackJsonp([6],[
 	        return [false, error];
 	    },
 	    password: function password(str) {
-	        var error = '密码为6-20位数字/字母/符号/区分大小写',
-	            re = new RegExp(/^\d{6,20}$/);
-	        if (re.test($.trim(str))) {
+	        var error = '密码为6-20位数字/字母/符号/区分大小写';
+	        if (6 <= $.trim(str).length && $.trim(str).length <= 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];
@@ -790,7 +768,6 @@ webpackJsonp([6],[
 	        _createClass(Limit, [{
 	            key: "_style",
 	            value: function _style(limit_data) {
-	                limit_data = JSON.parse(limit_data);
 	                var string_list = '';
 	                for (var i = 0; i < limit_data.length; i++) {
 	                    string_list += "<div class='limit-bank-list'>";
@@ -817,15 +794,6 @@ webpackJsonp([6],[
 	                    return money = amount.replace('000', '') + '千';
 	                }
 	            }
-	            //
-	            //show(){
-	            //    this.target.show()
-	            //}
-	            //
-	            //hide(){
-	            //    this.target.hide()
-	            //}
-
 	        }]);
 
 	        return Limit;

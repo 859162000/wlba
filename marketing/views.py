@@ -60,7 +60,7 @@ from wanglibao_account import message as inside_message
 from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
-from marketing.utils import get_user_channel_record
+from marketing.utils import get_user_channel_record, utype_is_mobile, utype_is_app
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -2697,44 +2697,49 @@ class HappyMonkeyAPIView(APIView):
     def post(self, request):
         self.token = 'happy_monkey'
         rewards = {
-            (0, 5): 'happy_monkey_66',
-            (6, 10): 'happy_monkey_166',
-            (11, 15): 'happy_monkey_566',
-            (16, 100000000): 'happy_monkey_666'
+            (0, 20): u'幸福猴66元体验金',
+            (21, 40): u'幸福猴166元体验金',
+            (41, 60): u'幸福猴566元体验金',
+            (61, 100000000): u'幸福猴866元体验金'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
         # 是否是登录用户
         if not request.user.is_authenticated():
-            if phone and user:
-                pass
-            else:
-                to_json_response = {
-                    'ret_code': 1000,
-                    'message': u'用户没有登录',
-                }
-                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        today = time.strftime("%Y-%m-%d", time.localtime())
-        user = user.user if user else request.user
-        #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(create_at=today, channel=self.token, user=user).last()
-        if reward and today == str(reward.create_at)[:10]:
             to_json_response = {
-                'ret_code': 1001,
-                'message': u'每一个用户,一天只能玩一次',
+                'ret_code': 1000,
+                'message': u'用户没有登录',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        today = (datetime.now()+timedelta(hours=-8)).strftime("%Y-%m-%d")
+        user = user.user if user else request.user
 
         #今天用户没有玩过
         with transaction.atomic():
             logger.debug('enter transaction atomic')
             join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.token).first()
             if not join_record:
-                join_record = WanglibaoRewardJoinRecord.objects.create(
-                    user=user,
-                    activity_code=self.token,
-                    remain_chance=1)
+                try:
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code=self.token,
+                        remain_chance=1)
+                except Exception:
+                    to_json_response = {
+                        'ret_code': 1001,
+                        'message': u'每一个用户,一天只能玩一次',
+                    }
+                    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            #今天用户已经玩过了
+            reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
+            if reward and today == str(reward.create_at)[:10]:
+                to_json_response = {
+                    'ret_code': 1001,
+                    'message': u'每一个用户,一天只能玩一次',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
             total = int(request.POST.get('total', None))
             exp_name = ''
@@ -2742,9 +2747,10 @@ class HappyMonkeyAPIView(APIView):
                 if total>=key[0] and total<=key[1]:
                     exp_name = value
 
+            exp_gold=ExperienceEvent.objects.filter(name=exp_name).first()
             reward = ActivityReward.objects.create(
                 user=user,
-                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                experience=exp_gold,
                 channel=self.token,
                 create_at=today,
                 left_times=0,
@@ -2753,6 +2759,7 @@ class HappyMonkeyAPIView(APIView):
             SendExperienceGold(user).send(reward.experience.id)
             join_record.remain_chance = 0
             join_record.save()
+
             to_json_response = {
                 'ret_code': 0,
                 'type':exp_name,
@@ -3194,3 +3201,19 @@ class CustomerAccount2015ApiView(APIView):
 
         resp = {"error_code":error_code, "error_message":error_message, "account":account_dict}
         return HttpResponse(json.dumps(resp, sort_keys=True), content_type='application/json')
+
+
+class OpenHouseApiView(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        is_mobile = utype_is_mobile(self.request)
+        if is_mobile:
+            self.template_name = 'app_open_house.jade'
+        else:
+            self.template_name = 'open_house.jade'
+
+        if utype_is_app(self.request):
+            self.template_name = 'h5_open_house.jade'
+
+        return {}
