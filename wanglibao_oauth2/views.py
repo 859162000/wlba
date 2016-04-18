@@ -140,43 +140,34 @@ class AccessTokenOauthView(APIView):
         token = data.get('access_token', None)
         client_id = data.get('client_id', '')
         user_id = data.get('user_id', '')
-        utc_timestamp = data.get('time', '')
         sign = data.get('sign', None)
         channel = data.get('channel', '')
         logger.info("enter AccessTokenOauthView with data: %s" % data)
-        if token and client_id and user_id and utc_timestamp and sign and channel:
+        if token and client_id and user_id and sign and channel:
             key = getattr(settings, '%s_OAUTH_KEY' % channel.upper(), None)
             if key:
                 try:
-                    if (int(get_utc_timestamp()) - int(utc_timestamp)) <= 120000:
-                        if sign == generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
-                            access_token = AccessToken.objects.filter(Q(token=token) &
-                                                                      (Q(expires__gte=now()) |
-                                                                       Q(client__token_expire_switch=False)))
-                            if access_token.exists():
-                                utc_timestamp = get_utc_timestamp()
-                                response_data = {
-                                    'user_id': user_id,
-                                    'client_id': client_id,
-                                    'time': utc_timestamp,
-                                    'sign': generate_oauth2_sign(user_id, client_id, int(utc_timestamp)-50, key),
-                                    'ret_code': 10000,
-                                    'message': 'success',
-                                }
-                            else:
-                                response_data = {
-                                    'ret_code': 10003,
-                                    'message': u'token不存在',
-                                }
+                    if sign == generate_oauth2_sign(user_id, client_id, key):
+                        access_token = AccessToken.objects.filter(Q(token=token) &
+                                                                  (Q(expires__gte=now()) |
+                                                                   Q(client__token_expire_switch=False)))
+                        if access_token.exists():
+                            response_data = {
+                                'user_id': user_id,
+                                'client_id': client_id,
+                                'sign': generate_oauth2_sign(user_id, client_id, key),
+                                'ret_code': 10000,
+                                'message': 'success',
+                            }
                         else:
                             response_data = {
-                                'ret_code': 10004,
-                                'message': u'无效签名',
+                                'ret_code': 10003,
+                                'message': u'token不存在',
                             }
                     else:
                         response_data = {
-                            'ret_code': 10002,
-                            'message': u'无效时间戳',
+                            'ret_code': 10004,
+                            'message': u'无效签名',
                         }
                 except Exception, e:
                     logger.info("AccessTokenOauthView raise error: %s" % e)
