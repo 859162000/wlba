@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
 from wanglibao_reward.models import WanglibaoActivityReward
 from experience_gold.models import ExperienceEvent
+from experience_gold.backends import SendExperienceGold
 from weixin.models import WeixinAccounts
 import qrcode
 import hashlib
@@ -744,44 +745,44 @@ class FUBARegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
         if binding and p2p_record.order_id == int(order_id):
             # 根据支付方式判定周期是否为1月以上标的
-            pay_method = p2p_record.product.pay_method
-            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-                # 如果首次投资金额大于或等于5000则回调
-                if p2p_record.amount >= 5000:
-                    # 如果结算时间过期了则不执行回调
-                    earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-                    if earliest_settlement_time:
-                        earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                        current_time = datetime.datetime.now()
-                        # 如果上次访问的时间是在30天前则不更新访问时间
-                        if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                            return
+            # pay_method = p2p_record.product.pay_method
+            # if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+            # 如果首次投资金额大于或等于5000则回调
+            if p2p_record.amount >= 5000:
+                # 如果结算时间过期了则不执行回调
+                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
+                if earliest_settlement_time:
+                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                    current_time = datetime.datetime.now()
+                    # 如果上次访问的时间是在30天前则不更新访问时间
+                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                        return
 
-                    order_id = p2p_record.order_id
-                    goodsprice = 100
-                    # goodsname 提供固定值，固定值自定义，但不能为空
-                    goodsname = u"名称:网利宝,类型:产品标,周期:1月"
-                    sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-                    status = u"首单【%s元：已付款】" % p2p_record.amount
-                    params = {
-                        'action': 'create',
-                        'planid': self.coop_id,
-                        'order': order_id,
-                        'goodsmark': '1',
-                        'goodsprice': goodsprice,
-                        'goodsname': goodsname,
-                        'sig': sig,
-                        'status': status,
-                        'uid': binding.bid,
-                    }
-                    common_callback.apply_async(
-                        kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-                    # 记录开始结算时间
-                    if not binding.extra:
-                        # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
-                        if earliest_settlement_time:
-                            binding.extra = earliest_settlement_time
-                            binding.save()
+                order_id = p2p_record.order_id
+                goodsprice = 100
+                # goodsname 提供固定值，固定值自定义，但不能为空
+                goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+                sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+                status = u"首单【%s元：已付款】" % p2p_record.amount
+                params = {
+                    'action': 'create',
+                    'planid': self.coop_id,
+                    'order': order_id,
+                    'goodsmark': '1',
+                    'goodsprice': goodsprice,
+                    'goodsname': goodsname,
+                    'sig': sig,
+                    'status': status,
+                    'uid': binding.bid,
+                }
+                common_callback.apply_async(
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+                # 记录开始结算时间
+                if not binding.extra:
+                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                    if earliest_settlement_time:
+                        binding.extra = earliest_settlement_time
+                        binding.save()
 
 
 class YunDuanRegister(CoopRegister):
@@ -1290,6 +1291,38 @@ class JuChengRegister(CoopRegister):
                     "mtype": "activity"
                 })
 
+class HappyMonkeyRegister(CoopRegister):
+    def __init__(self, request):
+        super(HappyMonkeyRegister, self).__init__(request)
+        self.c_code = 'fwhyx'
+        self.invite_code = 'fwhyx'
+        self.token = 'happy_monkey'
+        self.request = request
+
+    def register_call_back(self, user):
+        rewards = {
+            (0, 20): u'幸福猴66元体验金',
+            (21, 40): u'幸福猴166元体验金',
+            (41, 60): u'幸福猴566元体验金',
+            (61, 100000000): u'幸福猴866元体验金'
+        }
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        total = self.request.POST.get('total', None)
+        exp_name = ''
+        for key, value in rewards.items():
+            if total>=key[0] and total<=key[1]:
+                exp_name = value
+
+        reward = ActivityReward.objects.create(
+                user=user,
+                experience=ExperienceEvent.objects.filter(name=exp_name).first(),
+                channel=self.token,
+                create_at=today,
+                left_times=0,
+                join_times=1,)
+
+        SendExperienceGold(self.request.user).send(reward.experience.id)
+
 
 class WeixinRedpackRegister(CoopRegister):
     def __init__(self, request):
@@ -1693,10 +1726,12 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister, XunleiMobileRegister, XingMeiRegister]
+                          YZCJRegister, RockFinanceRegister,
+                          XunleiMobileRegister, XingMeiRegister,
+                          HappyMonkeyRegister]
 
-#######################第三方用户查询#####################
 
+# ######################第三方用户查询#####################
 class CoopQuery(APIView):
     """
     第三方用户查询api

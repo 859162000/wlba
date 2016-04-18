@@ -671,10 +671,10 @@ CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute=30, hour=1)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
-    'zhongjin_send_data': {
-        'task': 'wanglibao_account.tasks.zhongjin_post_task',
-        'schedule': timedelta(hours=1),
-    },
+    # 'zhongjin_send_data': {
+    #     'task': 'wanglibao_account.tasks.zhongjin_post_task',
+    #     'schedule': timedelta(hours=1),
+    # },
     # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
     'rongtu_send_data': {
         'task': 'wanglibao_account.tasks.rongtu_post_task',
