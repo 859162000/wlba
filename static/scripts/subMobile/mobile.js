@@ -1617,7 +1617,6 @@ org.recharge = (function (org) {
             });
         },
         _trade_pwd_seach: function(post_data){
-            alert(post_data.url+",,_trade_pwd_seach");
             org.ajax({
                 url: '/api/profile/',
                 type: 'GET',
