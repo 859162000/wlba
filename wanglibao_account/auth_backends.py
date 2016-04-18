@@ -110,13 +110,11 @@ class CoopAccessTokenBackend(ModelBackend):
             logger.info("user[%s] enter oauth_token_login with client_id[%s] token[%s]" % (phone, client_id, token))
             user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
             if user:
-                utc_timestamp = get_current_utc_timestamp()
-                sign = generate_oauth2_sign(user.id, client_id, utc_timestamp, settings.CHANNEL_CENTER_OAUTH_KEY)
+                sign = generate_oauth2_sign(user.id, client_id, settings.CHANNEL_CENTER_OAUTH_KEY)
                 data = {
                     'user_id': user.id,
                     'client_id': client_id,
                     'access_token': token,
-                    'time': utc_timestamp,
                     'sign': sign,
                     'channel': 'base'
                 }
@@ -131,18 +129,13 @@ class CoopAccessTokenBackend(ModelBackend):
                             sign = result["sign"]
                             user_id = result["user_id"]
                             client_id = result["client_id"]
-                            utc_timestamp = result["time"]
-                            if (int(get_current_utc_timestamp()) - int(utc_timestamp)) <= 120:
-                                local_sign = generate_oauth2_sign(user_id, client_id,
-                                                                  int(utc_timestamp) - 50,
-                                                                  settings.CHANNEL_CENTER_OAUTH_KEY)
-                                if local_sign == sign:
-                                    active_user = user
-                                    message = 'success'
-                                else:
-                                    message = u'无效签名'
+                            local_sign = generate_oauth2_sign(user_id, client_id,
+                                                              settings.CHANNEL_CENTER_OAUTH_KEY)
+                            if local_sign == sign:
+                                active_user = user
+                                message = 'success'
                             else:
-                                message = u'无效时间戳'
+                                message = u'无效签名'
                     else:
                         logger.info("oauth_token_login connected status code[%s]" % res.status_code)
                         message = res.text
