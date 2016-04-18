@@ -170,6 +170,9 @@ webpackJsonp([12],[
 	                                    window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/';
 	                                });
 	                            }
+	                            if (result.ret_code === 3) {
+	                                return (0, _ui.Alert)('单卡超过单笔支付限额 ');
+	                            }
 	                            if (result.ret_code > 0) {
 	                                return (0, _ui.Alert)(result.message);
 	                            }

@@ -156,6 +156,9 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                                     window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/'
                                 })
                             }
+                            if(result.ret_code === 3){
+                                return Alert('单卡超过单笔支付限额 ');
+                            }
                             if (result.ret_code > 0) {
                                 return Alert(result.message);
                             }
