@@ -76,7 +76,7 @@ class PHPSendSMS(SMSBackEnd):
         post_data_json = json.dumps(post_data)
 
         headers = {'content-type': 'application/json'}
-        response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers, timeout=2.0)
+        response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers, timeout=1.0)
 
         status_code = response.status_code
         try:
