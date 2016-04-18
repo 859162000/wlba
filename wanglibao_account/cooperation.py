@@ -1913,7 +1913,7 @@ class BaJinSheRegister(CoopRegister):
             else:
                 req_data = self.request.REQUEST
 
-        print "bajinshe request url[%s] params[%s]" % (self.request.get_full_path(), req_data)
+        logger.info("bajinshe request url[%s] params[%s]" % (self.request.get_full_path(), req_data))
 
         channel_code = self.get_channel_code_from_request()
         channel_phone = req_data.get(self.external_channel_phone_key, None)
