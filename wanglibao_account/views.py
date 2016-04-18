@@ -2814,7 +2814,7 @@ class BiSouYiRegisterApi(APIView):
 
 class BiSouYiRegisterView(TemplateView):
 
-    template_name = ''
+    template_name = 'one_key_register_bisouyi.jade'
 
     def post(self):
         form = BiSouYiRegisterForm(self.request.session, action='register')
