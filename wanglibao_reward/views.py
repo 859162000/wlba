@@ -2973,4 +2973,3 @@ class FetchAirportServiceReward(APIView):
                 "mtype": "activity"
             })
             return Response({"ret_code": 0, "message": "奖品领取成功"})
-
