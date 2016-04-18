@@ -3285,6 +3285,8 @@ org.redpacket_bind = (function(org){
                 $submit = lib.$regist_box.find("button.js-regist-btn"),
                 $validate = lib.$regist_box.find("input.validate_inp"),
                 $pwd = lib.$regist_box.find("input.first-pwd"),
+                $captcha_0 = lib.$regist_box.find("input[name=captcha_0]"),
+                $captcha_1 = lib.$regist_box.find("input[name=captcha_1]"),
                 $getValidate = lib.$regist_box.find('button.wx-validation-btn');
             //注册协议
             lib.$regist_box.find(".agreement").on("click", function(e){
@@ -3307,11 +3309,22 @@ org.redpacket_bind = (function(org){
                 submit: $submit,
                 inputList: [
                     {target: $validate, required: true},
+                    {target: $captcha_1, required: true},
                     {target: $pwd, required: true}
                 ],
                 submitStyle: {
                     'disabledBg': '#cbcbcb',
                     'activeBg': '#DB493F'
+                }
+            });
+            org.ui.focusInput({
+                submit: $getValidate,
+                inputList: [
+                    {target: $captcha_1, required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': 'none',
+                    'activeBg': 'none'
                 }
             });
 
@@ -3326,6 +3339,10 @@ org.redpacket_bind = (function(org){
                 org.ajax({
                     url: '/api/phone_validation_code/register/' + tel + '/',
                     type: 'POST',
+                    data: {
+                        captcha_0: $captcha_0.val(),
+                        captcha_1: $captcha_1.val()
+                    },
                     error: function (xhr) {
                         clearInterval(intervalId);
                         var result = JSON.parse(xhr.responseText);
@@ -3351,7 +3368,8 @@ org.redpacket_bind = (function(org){
 
             //提交
             $submit.on("click", function(){
-                var isSubmit = true;
+                var isSubmit = true,
+                    self = $(this);
                 $.each([$validate, $pwd], function(i, t){
                     var name = t.attr('name'),
                         val = t.val();
@@ -3362,20 +3380,28 @@ org.redpacket_bind = (function(org){
                 });
                 if(!isSubmit) return false;
                 org.ajax({
-                    url: '/api/user_exists/'+$phoneNamber+'/',
-                    type: 'get',
+                    url: '/api/register/',
+                    type: 'POST',
+                    data: {
+                        'identifier': tel,
+                        'password': $pwd.val(),
+                        'captcha_0': $captcha_0.val(),
+                        'captcha_1': $captcha_1.val(),
+                        'validate_code': $validate.val(),
+                        'register_channel': 'fwh',
+                        'IGNORE_PWD': 1
+                    },
                     dataType: 'json',
                     beforeSend: function (xhr, settings) {
                         self.attr("disabled",true).text("提交中……").css("background","#cbcbcb");
                     },
                     success: function (data) {
-                        lib.$bind_box.hide();
-                        if(data.existing){
-                            lib.redpacket_login($phoneNamber);
+                        if(data.re_code != 0){
+                            org.ui.showSign(data.message);
+                            $submit.text('注册并绑定服务号');
                         }else{
-                            lib.redpacket_regist($phoneNamber);
+                            window.location.href = $("input.next-url").val();
                         }
-
                     },
                     error: function (xhr) {
                         org.ui.alert("系统繁忙，请稍后再试");
