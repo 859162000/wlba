@@ -1439,7 +1439,7 @@ org.recharge = (function (org) {
                         $this.attr('disabled', true).text("充值中..");
                     },
                     success: function (entry_operation, result) {
-                        $('body').append("<div>"+ JSON.stringify(result) +"</div>");
+                        org.ui.alert("success:"+result.ret_code);
                         entry_operation.hide_loading();
                         entry_operation.clear();
                         entry_operation.hide();
@@ -1517,7 +1517,6 @@ org.recharge = (function (org) {
                     done : function(pwd){
                         entry_operation.show_loading();
                         post_data.data.trade_pwd = pwd;
-                        org.ui.alert("test,输入交易密码");
                         lib._rechargeSingleStep(entry_operation,post_data)
 
                     }
@@ -1598,7 +1597,6 @@ org.recharge = (function (org) {
          * 绑定同卡进出的卡充值
          */
         _rechargeSingleStep: function (operation, data) {
-            org.ui.alert("test11＋交易密码后");
             org.ajax({
                 type: 'POST',
                 url: data.url,
@@ -1607,6 +1605,7 @@ org.recharge = (function (org) {
                     data.beforeSend && data.beforeSend()
                 },
                 success: function (results) {
+                    org.ui.alert("test11＋交易密码后");
                     data.success && data.success(operation, results)
                 },
                 error: function (results) {
