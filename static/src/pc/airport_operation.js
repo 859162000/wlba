@@ -10,7 +10,17 @@
         }
     })
     require(['jquery'],function($){
-        alert(1)
+        $(".tz_btn").on("click",function(){
+            $.ajax({
+                type: "post",
+                url: "/api/airport_reward/fetch/",
+                dataType: 'json',
+                success: function(data){
+                    console.log(data)
+                }
+            })
+        })
+
     })
 
 

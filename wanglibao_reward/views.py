@@ -2767,10 +2767,10 @@ class FetchMarchAwardAPI(APIView):
 
 class AirportServiceRewardTemplate(TemplateView):
     def get_context_data(self, **kwargs):
-        airport_service_reward = getMiscValue("airport_service_reward")
-        rule_ids = airport_service_reward['rule_ids']
+        # airport_service_reward = getMiscValue("airport_service_reward")
+        # rule_ids = airport_service_reward['rule_ids']
         return {
-            "rule_ids":rule_ids
+            "rule_ids":[1,2,3]
             }
 
 class FetchAirportServiceReward(APIView):
