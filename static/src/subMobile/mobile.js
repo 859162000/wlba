@@ -1516,6 +1516,7 @@ org.recharge = (function (org) {
                     done : function(pwd){
                         entry_operation.show_loading();
                         post_data.data.trade_pwd = pwd;
+                        org.ui.alert("test");
                         lib._rechargeSingleStep(entry_operation,post_data)
 
                     }
