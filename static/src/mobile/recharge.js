@@ -36,6 +36,11 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
         const auto = new Automatic({
             submit: $submit,
             checklist: autolist,
+            done() {
+                if(timeIntervalId){
+                    $validate_operation.attr('disabled', true);
+                }
+            }
         });
         auto.operationClear();
     }

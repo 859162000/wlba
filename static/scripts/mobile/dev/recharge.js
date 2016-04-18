@@ -43,7 +43,12 @@ webpackJsonp([12],[
 
 	        var auto = new _automatic_detection.Automatic({
 	            submit: $submit,
-	            checklist: autolist
+	            checklist: autolist,
+	            done: function done() {
+	                if (timeIntervalId) {
+	                    $validate_operation.attr('disabled', true);
+	                }
+	            }
 	        });
 	        auto.operationClear();
 	    };
