@@ -1621,7 +1621,6 @@ org.recharge = (function (org) {
                 url: '/api/profile/',
                 type: 'GET',
                 success: function(result){
-                    org.ui.alert("交易密码前");
                     result.trade_pwd_is_set ? lib._trade_pws_operation(true, post_data): lib._trade_pws_operation(false, post_data);
                 }
             })
@@ -1730,7 +1729,6 @@ org.recharge = (function (org) {
                     data.beforeSend && data.beforeSend()
                 },
                 success: function (results) {
-                    org.ui.alert("test11＋交易密码后");
                     data.success && data.success(operation, results)
                 },
                 error: function (results) {
