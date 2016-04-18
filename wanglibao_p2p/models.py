@@ -44,7 +44,7 @@ class P2PProduct(models.Model):
 
     limit_per_user = models.FloatField(u'单用户购买限额(0-1的系数)*', default=1)
 
-    warrant_company = models.CharField(u'担保公司', max_length=64, blank=False)
+    warrant_company = models.CharField(u'担保公司', max_length=64, null=True, blank=False)
 
     flow_time = models.DateTimeField(u'流标时间', default=now(), null=True, blank=True, db_index=True)
 
