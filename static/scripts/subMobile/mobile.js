@@ -326,10 +326,10 @@ org.ui = (function () {
                 $('.confirm-certain').text(certainName);
                 $('.confirm-warp').show();
 
-                $('.confirm-cancel').on('click', function (e) {
+                $('.confirm-cancel').off("click").on('click', function (e) {
                     $('.confirm-warp').hide();
                 })
-                $('.confirm-certain').unbind("click").on('click', function (e) {
+                $('.confirm-certain').off("click").on('click', function (e) {
                     $('.confirm-warp').hide();
                     if (callback) {
                         callbackData ? callback(callbackData) : callback();
@@ -1537,7 +1537,7 @@ org.recharge = (function (org) {
          */
         _rechargeThe_one_card: function () {
             var _self = this;
-            _self.$recharge.unbind('click').on('click', function () {
+            _self.$recharge.off('click').on('click', function () {
                 var
                     card_no = _self.data.no,
                     gate_id = _self.data.bank.gate_id,
@@ -1548,9 +1548,9 @@ org.recharge = (function (org) {
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
                 }
-                //if(lib.order_id === "" && lib.token === ""){
-                //    return org.ui.showSign('请先获取验证码');
-                //}
+                if(lib.order_id === "" && lib.token === ""){
+                    return org.ui.showSign('请先获取验证码');
+                }
 
                 var data = {
                     url: "/api/pay/deposit_new/",
@@ -1617,10 +1617,12 @@ org.recharge = (function (org) {
             });
         },
         _trade_pwd_seach: function(post_data){
+            alert(post_data.url+",,_trade_pwd_seach");
             org.ajax({
                 url: '/api/profile/',
                 type: 'GET',
                 success: function(result){
+                    org.ui.alert("交易密码前");
                     result.trade_pwd_is_set ? lib._trade_pws_operation(true, post_data): lib._trade_pws_operation(false, post_data);
                 }
             })
@@ -1641,7 +1643,7 @@ org.recharge = (function (org) {
                     done : function(pwd){
                         entry_operation.show_loading();
                         post_data.data.trade_pwd = pwd;
-                        org.ui.alert("test");
+                        org.ui.alert("test,输入交易密码");
                         lib._rechargeSingleStep(entry_operation,post_data)
 
                     }
@@ -1722,6 +1724,7 @@ org.recharge = (function (org) {
          * 绑定同卡进出的卡充值
          */
         _rechargeSingleStep: function (operation, data) {
+            org.ui.alert("test11＋交易密码后");
             org.ajax({
                 type: 'POST',
                 url: data.url,
@@ -2385,7 +2388,7 @@ org.trade_back = (function (org) {
             e.stopPropagation();
         });
 
-        this.$input.unbind('input').on('input', function(){
+        this.$input.off('input').on('input', function(){
             $('.circle').hide();
             _self.decide('input')
         });
