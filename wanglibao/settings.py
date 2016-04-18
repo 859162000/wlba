@@ -617,10 +617,10 @@ CELERYBEAT_SCHEDULE = {
     },
 
     #add by guoya: 希财网渠道数据定时推送
-    'xicai_send_data': {
-        'task': 'wanglibao_account.tasks.xicai_send_data_task',
-        'schedule': timedelta(hours=1),
-    },
+    # 'xicai_send_data': {
+    #     'task': 'wanglibao_account.tasks.xicai_send_data_task',
+    #     'schedule': timedelta(hours=1),
+    # },
 
     #add by zhanghe: PC端WEB首页统计数据
     'pc_index_data': {
@@ -683,7 +683,7 @@ CELERYBEAT_SCHEDULE = {
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
-        'schedule': crontab(minute=0, hour=3)
+        'schedule': crontab(minute=30, hour=3)
     },
 
     # by Zhoudong 定期检查没有投资的新用户, 提醒投资
