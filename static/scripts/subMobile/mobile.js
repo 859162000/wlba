@@ -1641,7 +1641,6 @@ org.recharge = (function (org) {
                     done : function(pwd){
                         entry_operation.show_loading();
                         post_data.data.trade_pwd = pwd;
-                        org.ui.alert("test");
                         lib._rechargeSingleStep(entry_operation,post_data)
 
                     }
@@ -1722,6 +1721,7 @@ org.recharge = (function (org) {
          * 绑定同卡进出的卡充值
          */
         _rechargeSingleStep: function (operation, data) {
+            org.ui.alert("test11");
             org.ajax({
                 type: 'POST',
                 url: data.url,
