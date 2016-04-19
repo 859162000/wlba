@@ -1,4 +1,4 @@
-$(function(){
+$(function(org){
      var sixlis = document.getElementById("six_lis"),
          audio = document.getElementById("audios"),
          audiobtn = document.getElementById("audio");
@@ -38,11 +38,11 @@ $(function(){
 	});
 	wx.ready(function(){
 		var host = 'https://staging.wanglibao.com/',
-			shareName = '网利宝影像投资节送福利喽',
-			shareImg = host + '/static/imgs/mobile_activity/app_august_phone/300x300.jpg',
-			shareLink = host + 'weixin_activity/app_august_phone/',
-			shareMainTit = '网利宝影像投资节送福利喽',
-			shareBody = '全民福利 火速领取';
+			shareName = '从容出行 尊贵定制',
+			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
+			shareLink = host + 'weixin_activity/app_airport_operation/',
+			shareMainTit = '从容出行 尊贵定制',
+			shareBody = '网利宝携手空港易行狂撒出行卡';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -52,7 +52,7 @@ $(function(){
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝影像投资节送福利喽',
+			title: '从容出行 尊贵定制',
 			link : shareLink,
 			imgUrl: shareImg
 		})
