@@ -3,6 +3,8 @@
 
 import logging
 import requests
+import StringIO
+import traceback
 from wanglibao.celery import app
 from .models import CallbackRecord
 
@@ -63,9 +65,13 @@ def common_callback(channel, url, params, req_action=1, headers=None, order_id=N
             ret_parser = LOCAL_VAR[ret_parser]
             ret_parser(ret, channel, order_id)
 
-    except Exception, e:
+    except:
+        # 创建内存文件对象
+        fp = StringIO.StringIO()
+        traceback.print_exc(file=fp)
+        message = fp.getvalue()
         logger.info(" {'%s callback':'failed to connect'} " % channel)
-        logger.info(e)
+        logger.info(message)
         ret = None
 
     return ret
