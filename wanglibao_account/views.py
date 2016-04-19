@@ -1347,6 +1347,8 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
             if form.is_valid():
+                # 用户的登录次数,存储在session中,用户登录成功后,清零用户的登录次数
+                request.session.set('login_verified_times_%s' % (request.POST.get('identifier')), 0)
                 auth_login(request, form.get_user())
 
                 if request.POST.has_key('remember_me'):
@@ -1355,7 +1357,19 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                     request.session.set_expiry(1800)
                 return HttpResponse(messenger('done', user=request.user))
             else:
-                return HttpResponseForbidden(messenger(form.errors))
+                # 用户的登录次数失败后,处理对应的session
+                if not request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
+                    verified_times = request.session.get("login_verified_times_%s" % (request.POST.get('identifier')), 0)
+                    if verified_times >= 2:
+                        json_response = {
+                            'ret_code': '7001',
+                            'message': u'错误登录次数超过两次'
+                        }
+                        return HttpResponse(json.dumps(json_response), content_type='application/json')
+                    else:
+                        request.session.set('login_verified_times_%s' % (request.POST.get('identifier')), verified_times+1)
+                else:
+                    return HttpResponseForbidden(messenger(form.errors))
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
@@ -2814,9 +2828,9 @@ class BiSouYiRegisterApi(APIView):
 
 class BiSouYiRegisterView(TemplateView):
 
-    template_name = ''
+    template_name = 'one_key_register_bisouyi.jade'
 
-    def post(self):
+    def get_context_data(self, **kwargs):
         form = BiSouYiRegisterForm(self.request.session, action='register')
         oauth_data = {
             'pcode': settings.BISOUYI_PCODE,
@@ -2828,7 +2842,6 @@ class BiSouYiRegisterView(TemplateView):
                 password = generate_random_password(6)
                 user = create_user(phone, password, "")
                 if user:
-                    user = self.request.user
                     access_token = utils.long_token()
                     account = form.get_account()
                     user.access_token = access_token

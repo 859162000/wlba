@@ -66,7 +66,7 @@ from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, 
                                      BiSouYiRegisterView)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, FetchAirportServiceReward, AprilAwardApi)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, FetchAirportServiceReward, AprilAwardApi, KongGangAPIView)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -292,6 +292,7 @@ urlpatterns += patterns(
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
     url(r'^geetest/$', GeetestAPIView.as_view()),
     url(r'^airport_reward/fetch/$', FetchAirportServiceReward.as_view()),
+    url(r'^activity/konggang/$', KongGangAPIView.as_view()),
 )
 
 # app端改版新接口

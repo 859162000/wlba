@@ -149,8 +149,8 @@ def process_for_fuba_landpage(request, channel_code):
             redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
-def generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
-    sign = hashlib.md5(str(user_id) + client_id + str(utc_timestamp) + key).hexdigest()
+def generate_oauth2_sign(user_id, client_id, key):
+    sign = hashlib.md5(str(user_id) + client_id + key).hexdigest()
     return sign
 
 

@@ -43,7 +43,12 @@ webpackJsonp([12],[
 
 	        var auto = new _automatic_detection.Automatic({
 	            submit: $submit,
-	            checklist: autolist
+	            checklist: autolist,
+	            done: function done() {
+	                if (timeIntervalId) {
+	                    $validate_operation.attr('disabled', true);
+	                }
+	            }
 	        });
 	        auto.operationClear();
 	    };
@@ -157,7 +162,7 @@ webpackJsonp([12],[
 	                        success: function success(result) {
 
 	                            if (result.ret_code == 0) {
-	                                return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(result.amount);
+	                                return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(result.amount + '元');
 	                            }
 
 	                            if (result.ret_code == 30047) {
@@ -169,6 +174,9 @@ webpackJsonp([12],[
 	                                return _trade_validation.Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试', function () {
 	                                    window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/';
 	                                });
+	                            }
+	                            if (result.ret_code === 3) {
+	                                return (0, _ui.Alert)('单卡超过单笔支付限额 ');
 	                            }
 	                            if (result.ret_code > 0) {
 	                                return (0, _ui.Alert)(result.message);
@@ -191,6 +199,12 @@ webpackJsonp([12],[
 
 	                    if (need_validation_for_qpay) {
 	                        //需要短信
+	                        if (!order_data) {
+	                            operation.loadingHide();
+	                            operation.destroy();
+	                            operation.layoutHide();
+	                            return (0, _ui.signModel)('请获取短信码');
+	                        }
 	                        options.data = {
 	                            phone: '',
 	                            vcode: $validate_code.val(),
@@ -327,42 +341,15 @@ webpackJsonp([12],[
 	            data: options.data,
 	            beforeSend: function beforeSend() {
 	                options.beforeSend && options.beforeSend();
-	                //$submit.attr('disabled', true).text("充值中..");
 	            },
 	            success: function success(result) {
-
 	                options.success && options.success(result);
-	                //trade_operation.loadingHide();
-	                //trade_operation.destroy();
-	                //trade_operation.layoutHide();
-	                //if(result.ret_code == 0){
-	                //    return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(result.amount);
-	                //}
-	                //
-	                //if(result.ret_code == 30047){
-	                //    return Deal_ui.show_entry(result.retry_count, function(){
-	                //        trade_operation.layoutShow();
-	                //    })
-	                //}
-	                //if(result.ret_code == 30048){
-	                //    return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
-	                //        window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/'
-	                //    })
-	                //}
-	                //if (result.ret_code > 0) {
-	                //    return Alert(result.message);
-	                //}
 	            },
 	            error: function error(data) {
 	                options.error && options.error(data);
-
-	                //if (data.status >= 403) {
-	                //    Alert('服务器繁忙，请稍后再试');
-	                //}
 	            },
 	            complete: function complete() {
 	                options.complete && options.complete(trade_operation);
-	                //$submit.removeAttr('disabled').text("充值");
 	            }
 	        });
 	    };
@@ -874,7 +861,7 @@ webpackJsonp([12],[
 	        key: 'createInput',
 	        value: function createInput() {
 	            var HASH = this.hash();
-	            var input_body = '<input type=\'tel\' name=' + HASH + ' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
+	            var input_body = '<input type=\'tel\' name=' + HASH + ' style=\'opacity:0;\' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
 	            this.$layout.append(input_body);
 	            this.$input = $('#' + HASH);
 	        }

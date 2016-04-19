@@ -863,6 +863,7 @@ class RewardDistributer(object):
         self.Processor = {
             ThanksGivenRewardDistributer: ('all',),
             XingMeiRewardDistributer: ('all',),
+            KongGangRewardDistributer:('all',),
         }
 
     @property
@@ -881,6 +882,93 @@ class RewardDistributer(object):
     def processor_for_distribute(self):
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
+
+
+class KongGangRewardDistributer(RewardDistributer):
+    def __init__(self, request, kwargs):
+        super(KongGangRewardDistributer, self).__init__(request, kwargs)
+        self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
+        self.user = kwargs['user']
+        self.token = 'kgyx'
+
+    def distribute(self):
+        cip_reward = Reward.objects.filter(type='CIP专用安检通道服务', is_used=False).first()
+        wait_reward = Reward.objects.filter(type='尊贵休息室服务', is_used=False).first()
+        all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
+
+        send_reward = None
+        if  self.amount>=500 and self.amount<5000:
+            send_reward = cip_reward
+        if  self.amount>=5000 and self.amount<10000:
+            send_reward = wait_reward or cip_reward
+        if  self.amount>=10000:
+            send_reward = all_reward or wait_reward or cip_reward
+        if send_reward:
+            try:
+                WanglibaoActivityReward.objects.create(
+                        activity='kgyx',
+                        order_id=self.order_id,
+                        user=self.user,
+                        p2p_amount=self.amount,
+                        reward=send_reward,
+                        has_sent=False,
+                        left_times=1,
+                        join_times=1)
+            except Exception:
+                logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
+        else: #所有奖品已经发完了
+            return
+
+class KongGangAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(XunleiActivityAPIView, self).__init__()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity='kgyx').first()
+            if not join_record:
+                join_record = WanglibaoRewardJoinRecord.objects.create(
+                    user=request.user,
+                    activity='kgyx',
+                    remain_chance=1,
+                )
+
+            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx', has_sent=False).first()
+            if reward:
+                reward.has_sent=True
+                reward.left_time=0
+                send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                           u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                           u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
+                           u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
+                send_messages.apply_async(kwargs={
+                    "phones": [request.user.wanglibaouserprofile.phone, ],
+                    "message": send_msg,
+                })
+
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": request.user.id,
+                    "title": u"空港易行优惠服务",
+                    "content": send_msg,
+                    "mtype": "activity"
+                })
+                reward.save()
+            join_record.save()
+        json_to_response = {
+            'ret_code': 0,
+            'message': u'奖品已经发放'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class XingMeiRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
@@ -2885,4 +2973,3 @@ class FetchAirportServiceReward(APIView):
                 "mtype": "activity"
             })
             return Response({"ret_code": 0, "message": "奖品领取成功"})
-
