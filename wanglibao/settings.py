@@ -41,8 +41,15 @@ ENV_DEV = 'debug'
 ENV_PRODUCTION = 'production'
 ENV_PREPRODUCTION = 'pre'
 ENV_STAGING = 'staging'
+ENV_ALPHA = 'alpha'
 
 ENV = ENV_DEV
+
+# Add by hb on 2016-04-19 for Support Alpha-Deploy
+ENV_ALPHA_DEPLOY = False
+if ENV == ENV_ALPHA:
+    ENV == "staging"
+    ENV_ALPHA_DEPLOY = True
 
 if ENV != ENV_DEV:
     DEBUG = False
@@ -183,6 +190,16 @@ if LOCAL_MYSQL:
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
         #'HOST': '192.168.1.242',
+    }
+
+# Add by hb on 2016-04-19 for Deploy-Aplpha
+if ENV_ALPHA_DEPLOY:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wanglibao',
+        'USER': 'wanglibao',
+        'PASSWORD': 'wanglibank',
+        'HOST': '192.168.20.236',
     }
 
 import sys
