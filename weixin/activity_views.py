@@ -417,7 +417,8 @@ class WechatInviteTemplate(TemplateView):
         if fphone:
             friend_profile = WanglibaoUserProfile.objects.filter(phone=fphone).first()
             f_w_user = WeixinUser.objects.filter(user=friend_profile.user).first()
-            inviter_head_url = f_w_user.headimgurl
+            if f_w_user:
+                inviter_head_url = f_w_user.headimgurl
             fphone = base64.b64decode(fphone + '=')[0:-1]
         friend_num=0
         reward_text = ""
@@ -520,7 +521,8 @@ class WechatShareTemplate(TemplateView):
         if fphone:
             friend_profile = WanglibaoUserProfile.objects.filter(phone=fphone).first()
             f_w_user = WeixinUser.objects.filter(user=friend_profile.user).first()
-            inviter_head_url = f_w_user.headimgurl
+            if f_w_user:
+                inviter_head_url = f_w_user.headimgurl
             fphone = base64.b64decode(fphone + '=')[0:-1]
 
         w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
