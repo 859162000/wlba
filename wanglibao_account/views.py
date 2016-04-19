@@ -1343,6 +1343,7 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
         return json.dumps(res)
 
     if request.method == "POST":
+        client_ip = request.META['HTTP_X_FORWARDED_FOR'] if request.META.get('HTTP_X_FORWARDED_FOR', None) else request.META.get('HTTP_X_REAL_IP', None)
 
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
@@ -1350,6 +1351,7 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
             if form.is_valid():
                 # 用户的登录次数,存储在session中,用户登录成功后,清零用户的登录次数
                 request.session['login_verified_times_%s' % (request.POST.get('identifier'))] = 0
+                request.session['login_verified_ips_%s' % (client_ip, )] = 0
                 auth_login(request, form.get_user())
 
                 if request.POST.has_key('remember_me'):
@@ -1361,16 +1363,28 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                 # 用户的登录次数失败后,处理对应的session
                 if request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
                     verified_times = request.session.get("login_verified_times_%s" % (request.POST.get('identifier')), 0)
+                    verified_ips = request.session.get("login_verified_ips_%s" % (client_ip,), 0)
                     if verified_times >= 2:
                         json_response = {
                             'ret_code': '7001',
                             'message': u'错误登录次数超过两次'
                         }
                         request.session['login_verified_times_%s' % (request.POST.get('identifier'))] = verified_times+1
+                        request.session['login_verified_ips_%s' % (client_ip,)] = verified_ips+1
                         return HttpResponse(json.dumps(json_response), content_type='application/json')
                     else:
+
                         request.session['login_verified_times_%s' % (request.POST.get('identifier'))] = verified_times+1
-                        return HttpResponseForbidden(messenger(form.errors))
+                        request.session['login_verified_ips_%s' % (client_ip,)] = verified_ips+1
+                        if verified_ips >= 5:
+                            json_response = {
+                                'ret_code': '7001',
+                                'message': u'IP错误登录次数超过五次'
+                            }
+                            return HttpResponse(json.dumps(json_response), content_type='application/json')
+                        else:
+                            return HttpResponseForbidden(messenger(form.errors))
+
                 else:
                     return HttpResponseForbidden(messenger(form.errors))
         else:
