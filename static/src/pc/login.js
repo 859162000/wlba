@@ -2,13 +2,13 @@ require.config({
     paths: {
         'jquery.placeholder': 'lib/jquery.placeholder',
         'csrf' : 'model/csrf',
-        'jquery.cookie': 'lib/jquery.cookie'
+        //'jquery.cookie': 'lib/jquery.cookie'
     },
     shim: {
         'jquery.placeholder': ['jquery']
     }
 });
-require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,placeholder) {
+require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
     //-------------初始化----------//
     pageInitFun = function(){
         //文本框的得到和失去光标
@@ -67,6 +67,7 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                         array = captchaObj.getValidate();
                         $('#captcha-status').val('true');
                         type == 'regist' ? checkCodeIsNoFun() : null;
+                        type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
                     });
                     captchaObj.onFail(function(){
                         $('#captcha-status').val(captchaObj.getValidate())
@@ -78,6 +79,7 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                     captchaObj.getValidate();
                 })
                 $('#check-tag').val('false');
+                $('#loginSubmit').removeClass('disabled');
             },
             error: function(XMLHttpRequest,status){
                 type == 'regist' ? $('.captcha-box1').show() : $('.captcha-box').hide();
@@ -86,13 +88,14 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                    $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
                    $('#registerSMSCode').val('');
                 }
-
+                $('#loginSubmit').removeClass('disabled');
             }
         });
     }
     //极验二次验证
     fastTestTwo = function(fun,type){
         if($('#captcha-status').val() == 'true') {
+            type=='login' ? $('#loginSubmit').addClass('disabled') : $('#registerSubmit').addClass('submitFormStyleNo')
             $.ajax({
                 type: 'POST',
                 url: '/api/geetest/',
@@ -106,6 +109,7 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                 }
             }).success(function (data) {
                 fun();
+                type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
             }).error(function (xhr) {
                 if(type=='login'){
                     fun();
@@ -116,6 +120,7 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                     $('.captcha-box1').show();$('.captcha-box').hide();
                     $('#check-tag').val('');
                 }
+                type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
             })
         }else{
             $('.loginError').text('图片验证码错误');
@@ -300,33 +305,36 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
         })
         //alert($.cookie("counts"))
         //设置cookie
-        if ($.cookie("counts") == null || $.cookie("counts") == 'null') {
-            var o = {name: "counts", value: 0},
-                str = JSON.stringify(o);
-            $.cookie("counts", str, { path: '/'});
-        }else{
-            var str = $.cookie("counts"),
-                o = JSON.parse(str);
-            if(o.value >= 2){
-                fastTestOne('login');
-            }
-        }
+        //if ($.cookie("counts") == null || $.cookie("counts") == 'null') {
+        //    var o = {name: "counts", value: 0},
+        //        str = JSON.stringify(o);
+        //    $.cookie("counts", str, { path: '/'});
+        //}else{
+        //    var str = $.cookie("counts"),
+        //        o = JSON.parse(str);
+        //    if(o.value >= 2){
+        //        fastTestOne('login');
+        //    }
+        //}
         //刷新图片验证码
         $('#loginRefresh').on('click',function(){
             imgCodeRe('loginForm')
         })
         //提交登录表单
         $('#loginSubmit').on('click',function(){
-            if(checkMobileFun('loginForm') && checkPwdFun('loginForm')){
-                if($('#check-tag').val() == 'false'){
-                    fastTestTwo(loginSubmitFun,'login');
-                }else{
-                    loginSubmitFun();
+            if(!$(this).hasClass('disabled')){
+                if(checkMobileFun('loginForm') && checkPwdFun('loginForm')){
+                    if($('#check-tag').val() == 'false'){
+                        fastTestTwo(loginSubmitFun,'login');
+                    }else{
+                        loginSubmitFun();
+                    }
                 }
             }
         })
         //登录
         var loginSubmitFun = function(){
+            $('#loginSubmit').addClass('disabled');
             if($('#remember_me').is(':checked')){
                 var remember_me = 'remember_me';
             }
@@ -338,30 +346,42 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
                     password: $('#loginPwd').val(),
                     remember_me: remember_me
                 }
-            }).done(function () {
-                var o = {name: "counts", value: 0},
-                str = JSON.stringify(o);
-                $.cookie("counts", str, { path: '/'});
-                var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
-                window.location.href = next;
-            }).fail(function (xhr) {
-                var str1 = $.cookie("counts");
-                if (($.cookie("counts") != null) && ($.cookie("counts") != 'null')) {
-                    var o1 = JSON.parse(str1),
-                        clickCount = o1.value + 1,
-                        o = {name: "counts", value: clickCount},
-                        str = JSON.stringify(o);
-                    $.cookie("counts", str, { path: '/'});
-                    if (clickCount == 2) {
-                        fastTestOne('login');
+            }).done(function (xhr) {
+                //var o = {name: "counts", value: 0},
+                //str = JSON.stringify(o);
+                //$.cookie("counts", str, { path: '/'});
+                //xhr.ret_code == '7001' ? fastTestOne('login') : null ;
+                if(xhr.ret_code == '7001'){
+                    if($('#check-tag').val() == '') {
+                        fastTestOne('login')
                     }
+                    if (xhr.message != undefined) {
+                        $('#loginForm').find('.loginError').text(xhr.message);
+                    }
+                }else{
+                    var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                    window.location.href = next;
                 }
+                $('#loginSubmit').removeClass('disabled');
+            }).fail(function (xhr) {
+                //var str1 = $.cookie("counts");
+                //if (($.cookie("counts") != null) && ($.cookie("counts") != 'null')) {
+                //    var o1 = JSON.parse(str1),
+                //        clickCount = o1.value + 1,
+                //        o = {name: "counts", value: clickCount},
+                //        str = JSON.stringify(o);
+                //    $.cookie("counts", str, { path: '/'});
+                //    if (clickCount == 2) {
+                //        fastTestOne('login');
+                //    }
+                //}
                 var result = JSON.parse(xhr.responseText);
                 if (result.message.__all__ != undefined) {
                     $('#loginForm').find('.loginError').text(result.message.__all__[0]);
                 } else if (result.message.captcha != undefined) {
                     $('#loginForm').find('.loginError').text(result.message.captcha[0]);
                 }
+                $('#loginSubmit').removeClass('disabled');
             });
         }
     }
@@ -447,7 +467,7 @@ require(['jquery','jquery.placeholder', 'jquery.cookie', 'csrf'], function( $ ,p
         var btnSelf = $('#registerSubmit'),error = $('#registerForm').find('.loginError');
         $('#registerSubmit').on('click',function(){
             var btnSelf = $(this);
-            if (!btnSelf.hasClass('.submitFormStyleNo')) {
+            if (!btnSelf.hasClass('submitFormStyleNo')) {
                 if($('#check-tag').val() == 'false'){
                     if (checkMobileFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
                         if ($("#agreement").is(':checked')) {
