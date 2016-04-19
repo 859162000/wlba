@@ -2264,7 +2264,8 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
-                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister]
+                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
+                          ZhaoXiangGuanRegister]
 
 
 # ######################第三方用户查询#####################

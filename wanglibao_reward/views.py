@@ -1002,7 +1002,7 @@ class ZhaoXiangGuanAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        super(XunleiActivityAPIView, self).__init__()
+        super(ZhaoXiangGuanAPIView, self).__init__()
 
     def post(self, request):
         if not request.user.is_authenticated():
