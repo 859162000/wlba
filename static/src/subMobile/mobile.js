@@ -287,11 +287,11 @@ org.ui = (function () {
             });
 
             //用户名一键清空
-            $('.identifier-edit').on('click', function (e) {
+            $('.identifier-edit').off("click").on('click', function (e) {
                 $(this).siblings().val('').trigger('input');
             });
             //密码隐藏显示
-            $('.password-handle').on('click', function () {
+            $('.password-handle').off("click").on('click', function () {
                 if ($(this).hasClass('hide-password')) {
                     $(this).addClass('show-password').removeClass('hide-password');
                     $(this).siblings().attr('type', 'text');
@@ -3026,6 +3026,8 @@ org.redpacket_bind = (function(org){
             lib.$captcha_img.on('click', function () {
                 lib._captcha_refresh();
             });
+            var winH = window.innerHeight;
+            $("body.service-redpacket-login").css("min-height",winH);
         },
         _captcha_refresh: function () {
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();

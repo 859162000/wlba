@@ -138,8 +138,6 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^activity/share/$', activity_views.WechatShareTemplate.as_view(template_name="invite_redpacket_index.jade"), name='hby_weixin_share'),
-    url(r'^activity/get/$', TemplateView.as_view(template_name="invite_redpacket_get.jade"), name='weixin_share'),
-    url(r'^activity/code/$', TemplateView.as_view(template_name="invite_redpacket_code.jade"), name='weixin_share'),
 )
 # 微信管理后台
 urlpatterns += patterns(
