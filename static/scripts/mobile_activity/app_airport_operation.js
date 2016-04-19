@@ -218,7 +218,27 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;(function(org) {
-    var h5_user_static;
+	var sixlis = document.getElementById("six_lis"),
+         audio = document.getElementById("audios"),
+         audiobtn = document.getElementById("audio");
+     var ss = 1;
+     $('#sec').fullpage();
+     sixlis.addEventListener("touchstart",function(){
+          $(this).next().slideToggle();
+      },false)
+     audiobtn.addEventListener("click",function(){
+          if(ss == 1){
+              $(this).addClass("audio_off");
+              audio.pause();
+              ss = 2;
+          }else{
+              audio.play();
+              $(this).removeClass("audio_off");
+              ss = 1;
+          }
+     },false);
+
+	var h5_user_static;
     org.ajax({
         url: '/api/user_login/',
         type: 'post',
@@ -227,24 +247,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     });
     var login = false;
-
-    $('.banner_main .view').on('click',function(){
-        var ele = $('#banenr .slide_bottom');
-        var curHeight = ele.height();
-        var autoHeight = ele.css('height', 'auto').height();
-		$('.banner_main .view').addClass('view_activate');
-		ele.height(curHeight).animate({height: autoHeight},500);
-
-    });
-
-	$('#banenr .slide_bottom .bottom_arrow').click(function(){
-		var ele = $('#banenr .slide_bottom');
-        var curHeight = ele.height();
-		$('.banner_main .view').removeClass('view_activate');
-		ele.height(curHeight).animate({height: 0},500);
-	});
-
-
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
@@ -264,12 +266,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
-			shareName = '网利宝会员初体验',
-			shareImg = host + '/static/imgs/mobile_activity/app_wangli_vip/300x300.jpg',
-			shareLink = host + 'activity/app_wangli_vip/',
-			shareMainTit = '网利宝会员初体验',
-			shareBody = '多种特权接入中，总有一款适合你！';
+		var host = 'https://staging.wanglibao.com/',
+			shareName = '从容出行 尊贵定制',
+			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
+			shareLink = host + 'weixin_activity/app_airport_operation/',
+			shareMainTit = '从容出行 尊贵定制',
+			shareBody = '网利宝携手空港易行狂撒出行卡';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -279,7 +281,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝会员初体验',
+			title: '从容出行 尊贵定制',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -291,4 +293,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			imgUrl: shareImg
 		})
 	})
+
 })(org);
+
+

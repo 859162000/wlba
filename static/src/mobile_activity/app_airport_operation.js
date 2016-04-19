@@ -1,6 +1,5 @@
-$(function(org){
-
-     var sixlis = document.getElementById("six_lis"),
+(function(org) {
+	var sixlis = document.getElementById("six_lis"),
          audio = document.getElementById("audios"),
          audiobtn = document.getElementById("audio");
      var ss = 1;
@@ -75,6 +74,7 @@ $(function(org){
 			imgUrl: shareImg
 		})
 	})
-});
+
+})(org);
 
 
