@@ -25,7 +25,10 @@ html.service-redpacket-bg1
             .cloud-btm
             .main-box
               //（您于x月x日获得）
-              .price-b-tit 恭喜您获得
+              if fetched_date
+                .price-b-tit 您于{{ fetched_date }}获得
+              else
+                .price-b-tit 恭喜您获得
               .price-box {{ reward_text }}
               .price-tit 现金红包
               .share-promote 分享给好友，可以获得更多奖励
