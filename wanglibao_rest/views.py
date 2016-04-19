@@ -366,6 +366,17 @@ class RegisterAPIView(DecryptParmsAPIView):
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
+        try:
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh':
+                openid = request.session.get('openid')
+                if openid:
+                    ShareInviteRegister(request).process_for_register(request.user, openid)
+                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                    bindUser(w_user, request.user)
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
@@ -416,17 +427,7 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-        try:
-            register_channel = request.DATA.get('register_channel', '').strip()
-            if register_channel and register_channel == 'fwh':
-                openid = request.session.get('openid')
-                if openid:
-                    ShareInviteRegister(request).process_for_register(request.user, openid)
-                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
-                    bindUser(w_user, request.user)
 
-        except Exception, e:
-            logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:

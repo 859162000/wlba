@@ -472,9 +472,9 @@ class WechatInviteTemplate(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.openid = self.request.session.get('openid')
+        code = request.GET.get('code', "")
+        state = request.GET.get('state', "")
         if not self.openid:
-            code = request.GET.get('code')
-            state = request.GET.get('state')
             error_msg = ""
             if code and state:
                 try:
@@ -494,8 +494,8 @@ class WechatInviteTemplate(TemplateView):
         else:
             self.w_user = WeixinUser.objects.filter(openid=self.openid).first()
         if not self.w_user.user:
-            next_uri=reverse("hby_weixin_invite")
-            return redirectToJumpPage("", next=settings.CALLBACK_HOST + reverse("si_bind_login")+"?next=%s"%(settings.CALLBACK_HOST+next_uri))
+            next_uri=reverse("hby_weixin_invite")+"?code=%s&state=%s"%(code, state)
+            return redirectToJumpPage("", next=settings.CALLBACK_HOST + reverse("si_bind_login")+"?next=%s"%urllib.quote(settings.CALLBACK_HOST+next_uri))
         if request.user.is_authenticated():
             if self.w_user.user==request.user:
                 return super(WechatInviteTemplate, self).dispatch(request, *args, **kwargs)
