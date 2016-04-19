@@ -2954,6 +2954,7 @@ org.redpacket = (function(org){
                             return;
                         }
                         window.location.reload();
+                        _getCode();
                     },
                     error: function () {
                         alert("系统繁忙，请稍后再试");
@@ -2964,7 +2965,7 @@ org.redpacket = (function(org){
 
                 });
             });
-            (function(){
+            function _getCode(){
                 var is_bind = $("input.is_bind").val(),
                     fphone = $("input.fphone").val(),
                     original_id = $("input.original_id").val(),
@@ -2981,9 +2982,10 @@ org.redpacket = (function(org){
                     dataType: 'json',
                     success: function(data){
                         console.log(data);
+                        $("#js-share-sign").attr("src", data.qrcode_url);
                     }
                 });
-            })();
+            }
         },
         shareFn: function(){
             var html = '<div class="invite-share-ok">' +
