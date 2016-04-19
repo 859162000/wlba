@@ -94,7 +94,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
     //极验二次验证
     fastTestTwo = function(fun,type){
         if($('#captcha-status').val() == 'true') {
-            $('#loginSubmit').addClass('disabled');
+            type=='login' ? $('#loginSubmit').addClass('disabled') : $('#registerSubmit').addClass('submitFormStyleNo')
             $.ajax({
                 type: 'POST',
                 url: '/api/geetest/',
@@ -108,7 +108,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                 }
             }).success(function (data) {
                 fun();
-                $('#loginSubmit').removeClass('disabled');
+                type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
             }).error(function (xhr) {
                 if(type=='login'){
                     fun();
@@ -119,7 +119,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                     $('.captcha-box1').show();$('.captcha-box').hide();
                     $('#check-tag').val('');
                 }
-                $('#loginSubmit').removeClass('disabled');
+                type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
             })
         }else{
             $('.loginError').text('图片验证码错误');
@@ -466,7 +466,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
         var btnSelf = $('#registerSubmit'),error = $('#registerForm').find('.loginError');
         $('#registerSubmit').on('click',function(){
             var btnSelf = $(this);
-            if (!btnSelf.hasClass('.submitFormStyleNo')) {
+            if (!btnSelf.hasClass('submitFormStyleNo')) {
                 if($('#check-tag').val() == 'false'){
                     if (checkMobileFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
                         if ($("#agreement").is(':checked')) {
