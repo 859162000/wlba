@@ -924,7 +924,7 @@ class KongGangAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        super(XunleiActivityAPIView, self).__init__()
+        super(KongGangAPIView, self).__init__()
 
     def post(self, request):
         if not request.user.is_authenticated():
@@ -935,11 +935,11 @@ class KongGangAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         with transaction.atomic():
-            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity='kgyx').first()
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code='kgyx').first()
             if not join_record:
                 join_record = WanglibaoRewardJoinRecord.objects.create(
                     user=request.user,
-                    activity='kgyx',
+                    activity_code='kgyx',
                     remain_chance=1,
                 )
 
