@@ -600,13 +600,10 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 CELERY_QUEUES = {
-                "celery":  {"exchange": "celery",
-                              "routing_key": "celery"},
-                "celery01": {"exchange": "celery01",
-                              "routing_key": "celery01"},
-                "celery02": {"exchange": "celery02",
-                              "routing_key": "celery02"},
-                }
+    "celery": {"exchange": "celery", "routing_key": "celery"},
+    "celery01": {"exchange": "celery01", "routing_key": "celery01"},
+    "celery02": {"exchange": "celery02", "routing_key": "celery02"},
+}
 
 from datetime import timedelta, datetime
 
@@ -633,30 +630,30 @@ CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute=0, hour=16),
     },
 
-    #add by guoya: 希财网渠道数据定时推送
+    # add by guoya: 希财网渠道数据定时推送
     # 'xicai_send_data': {
     #     'task': 'wanglibao_account.tasks.xicai_send_data_task',
     #     'schedule': timedelta(hours=1),
     # },
 
-    #add by zhanghe: PC端WEB首页统计数据
+    # add by zhanghe: PC端WEB首页统计数据
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
         'schedule': crontab(minute=10, hour=0),
     },
 
-    #add by lili: 全民佣金收入短信/站内信每日定时发送
+    # add by lili: 全民佣金收入短信/站内信每日定时发送
     'all_invite_earning_data': {
         'task': 'marketing.tools.send_income_message_sms',
         'schedule': crontab(minute=0, hour=20)
     },
-    #add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
-    'lottery_set_status': {
-        'task': 'wanglibao_lottery.tasks.lottery_set_status',
-        'schedule': crontab(minute=0, hour=5)
-    },
+    # add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
+    # 'lottery_set_status': {
+    #     'task': 'wanglibao_lottery.tasks.lottery_set_status',
+    #     'schedule': crontab(minute=20, hour=5)
+    # },
 
-    #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
+    # add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
     # 'handle_delay_time_data': {
     #     'task': 'wanglibao_anti.tasks.handle_delay_time_data',
     #     'schedule': timedelta(minutes=3)
