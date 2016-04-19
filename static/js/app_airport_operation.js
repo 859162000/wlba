@@ -1,4 +1,4 @@
-$(function(){
+$(function(org){
      var sixlis = document.getElementById("six_lis"),
          audio = document.getElementById("audios"),
          audiobtn = document.getElementById("audio");
@@ -17,7 +17,53 @@ $(function(){
               $(this).removeClass("audio_off");
               ss = 1;
           }
-     },false)
+     },false);
+
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+	org.ajax({
+		type : 'GET',
+		url : '/weixin/api/jsapi_config/',
+		dataType : 'json',
+		success : function(data) {
+			//请求成功，通过config注入配置信息,
+			wx.config({
+				debug: false,
+				appId: data.appId,
+				timestamp: data.timestamp,
+				nonceStr: data.nonceStr,
+				signature: data.signature,
+				jsApiList: jsApiList
+			});
+		}
+	});
+	wx.ready(function(){
+		var host = 'https://staging.wanglibao.com/',
+			shareName = '从容出行 尊贵定制',
+			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
+			shareLink = host + 'weixin_activity/app_airport_operation/',
+			shareMainTit = '从容出行 尊贵定制',
+			shareBody = '网利宝携手空港易行狂撒出行卡';
+		//分享给微信好友
+		org.onMenuShareAppMessage({
+			title: shareMainTit,
+			desc: shareBody,
+			link: shareLink,
+			imgUrl: shareImg
+		});
+		//分享给微信朋友圈
+		org.onMenuShareTimeline({
+			title: '从容出行 尊贵定制',
+			link : shareLink,
+			imgUrl: shareImg
+		})
+		//分享给QQ
+		org.onMenuShareQQ({
+			title: shareMainTit,
+			desc: shareBody,
+			link : shareLink,
+			imgUrl: shareImg
+		})
+	})
 });
 
 

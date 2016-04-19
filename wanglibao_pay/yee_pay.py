@@ -705,6 +705,7 @@ class YeeShortPay:
 
             pay_info.bank = card.bank
             pay_info.card_no = card.no
+            pay_info.phone_for_card = input_phone
             
             #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
             cards_info = pay_info.bank.cards_info.split(',')
