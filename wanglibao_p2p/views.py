@@ -730,28 +730,44 @@ class RepaymentAPIView(APIView):
         else:
             penal_interest = Decimal(penal_interest)
 
-        id = request.POST.get('id')
+        product_id = request.POST.get('id')
 
-        p2p = P2PProduct.objects.filter(pk=id)
-        p2p = p2p[0]
-
-        from dateutil import parser
-        flag_date = parser.parse(repayment_date)
+        if not product_id or not repayment_date:
+            result = {
+                'errno': 1,
+            }
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
         try:
-            payment = PrepaymentHistory(p2p, flag_date)
             if repayment_now == '1':
-                record = payment.prepayment(penal_interest, repayment_type, flag_date)
+                # 将提前还款的代码放入后台任务中执行
+                from .tasks import p2p_prepayment
+                p2p_prepayment.apply_async(kwargs={
+                    'product_id': product_id,
+                    'penal_interest': penal_interest,
+                    'repayment_type': repayment_type,
+                    'flag_date': repayment_date,
+                })
+                result = {
+                    'errno': 0,
+                    # 'errmessage': u'提前还款任务已提交,请等待任务完成后查看标的状态'
+                }
+                # record = payment.prepayment(penal_interest, repayment_type, flag_date)
             else:
+                from dateutil import parser
+                
+                flag_date = parser.parse(repayment_date)
+                p2p = P2PProduct.objects.filter(pk=product_id).first()
+                payment = PrepaymentHistory(p2p, flag_date)
                 record = payment.get_product_repayment(Decimal(0), repayment_type, flag_date)
 
-            result = {
+                result = {
                     'errno': 0,
                     'principal': record.principal,
                     'interest': record.interest,
                     'penal_interest': record.penal_interest,
                     'date': repayment_date
-                    }
+                }
         except PrepaymentException:
             result = {
                     'errno': 1,

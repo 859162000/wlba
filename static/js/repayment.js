@@ -32,7 +32,8 @@ $(function() {
             dataType: 'json'
         }).done(function(data) {
             if(data.errno == 0) {
-                alert(['提前还款成功，本金：', data.principal, '利息：', data.interest, '罚息：', data.penalinterest].join(''));
+                //alert(['提前还款成功，本金：', data.principal, '利息：', data.interest, '罚息：', data.penalinterest].join(''));
+                alert('提前还款任务已提交，请等待任务完成后查看标的状态');
                 location.href = '../p2plist'
             } else {
                 alert('不能提前还款，请检查还款计划');
