@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from common.utils import product_period_to_days
 from common.tools import get_utc_timestamp, utc_to_local_timestamp
 from common.tasks import common_callback
+from common.models import CallbackRecord
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -540,10 +541,14 @@ class BaJinSheCallback(CoopCallback):
 
     def register_call_back(self, user_id, order_id, total_asset=0, p2p_margin=0, base_data=None):
         super(BaJinSheCallback, self).register_call_back(user_id, order_id)
+        user = User.objects.get(pk=user_id)
+        if order_id:
+            order_id = '%s_0001' % order_id
+        else:
+            order_id = '%s_0001' % user_id
+
         if not base_data:
-            utc_timestamp = get_utc_timestamp()
-            query_id = '%s_%s' % (utc_timestamp, '0001')
-            data = get_bajinshe_base_data(query_id)
+            data = get_bajinshe_base_data(order_id)
         else:
             data = base_data
 
@@ -562,15 +567,21 @@ class BaJinSheCallback(CoopCallback):
 
             data['tran'] = [act_data]
 
+            call_back_record = CallbackRecord()
+            call_back_record.user = user
+            call_back_record.order_id = order_id
+            call_back_record.callback_to = self.c_code
+            call_back_record.description = u'账户推送'
+            call_back_record.save()
+
             common_callback.apply_async(
                 kwargs={'channel': self.c_code, 'url': self.register_call_back_url,
-                        'params': json.dumps(data), 'headers': self.headers})
+                        'params': json.dumps(data), 'headers': self.headers,
+                        'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
 
     def recharge_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).recharge_call_back(user_id, order_id)
-        utc_timestamp = get_utc_timestamp()
-        query_id = '%s_%s' % (utc_timestamp, '0002')
-        data = get_bajinshe_base_data(query_id)
+        data = get_bajinshe_base_data(order_id)
         bid = get_tid_for_coop(user_id)
         if data and bid:
             margin_record = MarginRecord.objects.filter(user_id=user_id, order_id=order_id).first()
@@ -591,65 +602,26 @@ class BaJinSheCallback(CoopCallback):
 
                 data['tran'] = [act_data]
 
+                call_back_record = CallbackRecord()
+                call_back_record.user = user
+                call_back_record.order_id = order_id
+                call_back_record.callback_to = self.c_code
+                call_back_record.description = u'充值回调'
+                call_back_record.save()
+
                 common_callback.apply_async(
                     kwargs={'channel': self.c_code, 'url': self.transaction_call_back_url,
-                            'params': json.dumps(data), 'headers': self.headers})
+                            'params': json.dumps(data), 'headers': self.headers,
+                            'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
 
                 # 推送账户数据
                 p2p_margin = user.margin.margin
                 total_asset = get_user_p2p_total_asset(user)
                 self.register_call_back(user_id, order_id, total_asset, p2p_margin)
 
-    # def purchase_record_call_back(self, user_id, order_id, bid, data):
-    #     logger.info("%s enter purchase_record_call_back with user[%s] order_id[%s]" % (self.channel.code,
-    #                                                                                    user_id, order_id))
-    #     p2p_record = P2PRecord.objects.filter(user_id=user_id, order_id=order_id, catalog=u'申购').first()
-    #     if p2p_record:
-    #         period = p2p_record.product.period
-    #         pay_method = p2p_record.product.pay_method
-    #         if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-    #             period_type = 1
-    #         else:
-    #             period_type = 2
-    #
-    #         if pay_method == u'等额本息':
-    #             profit_methods = 3
-    #         elif pay_method == u'按月付息':
-    #             profit_methods = 1
-    #         elif pay_method == u'到期还本付息':
-    #             profit_methods = 2
-    #         else:
-    #             profit_methods = 11
-    #
-    #         act_data = {
-    #             # 'calendar': timezone.localtime(user_amo.settlement_time).strftime('%Y%m%d%H%M%S'),
-    #             # 'income': user_amo.interest,
-    #             # 'principal': user_amo.principal,
-    #             # 'incomeState': 2,
-    #             'investmentPid': p2p_record.order_id,
-    #             'bingdingUid': bid,
-    #             'usn': get_user_phone_for_coop(user_id),
-    #             'money': float(p2p_record.amount),
-    #             'period': period,
-    #             'periodType': period_type,
-    #             'productPid': p2p_record.product.id,
-    #             'productName': p2p_record.product.name,
-    #             'productType': 2,
-    #             'profitMethods': profit_methods,
-    #             'apr': p2p_record.product.expected_earning_rate,
-    #             'state': 1,
-    #             'purchases': timezone.localtime(p2p_record.create_time).strftime('%Y%m%d%H%M%S'),
-    #         }"""需要IP鉴权"""
-    #         data['tran'] = [act_data]
-    #         # 异步回调
-    #         bajinshe_callback.apply_async(
-    #             kwargs={'data': json.dumps(data), 'url': self.purchase_call_back_url})
-
     def purchase_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).purchase_call_back(user_id, order_id)
-        utc_timestamp = get_utc_timestamp()
-        query_id = '%s_%s' % (utc_timestamp, '0003')
-        base_data = get_bajinshe_base_data(query_id)
+        base_data = get_bajinshe_base_data(order_id)
         data = copy.deepcopy(base_data)
         bid = get_tid_for_coop(user_id)
         if data and bid:
@@ -671,9 +643,17 @@ class BaJinSheCallback(CoopCallback):
 
                 data['tran'] = [act_data]
 
+                call_back_record = CallbackRecord()
+                call_back_record.user = user
+                call_back_record.order_id = order_id
+                call_back_record.callback_to = self.c_code
+                call_back_record.description = u'投资回调'
+                call_back_record.save()
+
                 common_callback.apply_async(
                     kwargs={'channel': self.c_code, 'url': self.transaction_call_back_url,
-                            'params': json.dumps(data), 'headers': self.headers})
+                            'params': json.dumps(data), 'headers': self.headers,
+                            'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
 
                 # 推送账户数据
                 p2p_margin = user.margin.margin
@@ -737,70 +717,90 @@ class BaJinSheCallback(CoopCallback):
 
     def amortization_push(self, user_amo):
         super(BaJinSheCallback, self).amortization_push(user_amo)
-        if (not user_amo.settled and user_amo.term == 1) or user_amo.settled:
-            utc_timestamp = get_utc_timestamp()
-            order_id = '%s_%s' % (utc_timestamp, '0005')
-            data = get_bajinshe_base_data(order_id)
-            bid = get_tid_for_coop(user_amo.user_id)
-            if data and bid:
-                user = User.objects.filter(pk=user_amo.user_id).select_related('margin').first()
-                product = user_amo.product
-                period = product.period
-                pay_method = product.pay_method
-                if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-                    period_type = 1
-                else:
-                    period_type = 2
-
-                if pay_method == u'等额本息':
-                    profit_methods = 3
-                elif pay_method == u'按月付息':
-                    profit_methods = 1
-                elif pay_method == u'到期还本付息':
-                    profit_methods = 2
-                else:
-                    profit_methods = 11
-
-                act_data_list = list()
-                equity = P2PEquity.objects.filter(user=user, product=product).first()
-                user_phone = get_user_phone_for_coop(user_amo.user_id)
-                get_amortize_arg = {
-                    'product': product,
-                    'equity': equity,
-                    'bid': bid,
-                    'user_phone': user_phone,
-                    'period': period,
-                    'period_type': period_type,
-                    'profit_methods': profit_methods,
-                }
+        user_amos = UserAmortization.objects.filter(product=user_amo.product, user_id=user_amo.user_id)
+        if user_amo.settled or user_amos.count() == user_amo.terms:
+            if (not user_amo.settled and user_amo.term == 1) or user_amo.settled:
                 if user_amo.settled:
-                    get_amortize_arg['user_amo'] = user_amo
-                    get_amortize_arg['income_state'] = 2
-                    if user_amo.term == user_amo.terms:
-                        get_amortize_arg['state'] = 1
-                    else:
-                        get_amortize_arg['state'] = 0
-                    act_data = self.get_amortize_data(**get_amortize_arg)
-                    act_data_list.append(act_data)
+                    order_id = '%s_0005_%s' % (user_amo.user_id, user_amo.id)
                 else:
-                    user_amos = UserAmortization.objects.filter(user_id=user_amo.user_id, product=product)
-                    for user_amo in user_amos:
+                    order_id = '%s_0006_%s' % (user_amo.user_id, user_amo.id)
+
+                data = get_bajinshe_base_data(order_id)
+                bid = get_tid_for_coop(user_amo.user_id)
+                if data and bid:
+                    user = User.objects.filter(pk=user_amo.user_id).select_related('margin').first()
+                    product = user_amo.product
+                    period = product.period
+                    pay_method = product.pay_method
+                    if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                        period_type = 1
+                    else:
+                        period_type = 2
+
+                    if pay_method == u'等额本息':
+                        profit_methods = 3
+                    elif pay_method == u'按月付息':
+                        profit_methods = 1
+                    elif pay_method == u'到期还本付息':
+                        profit_methods = 2
+                    else:
+                        profit_methods = 11
+
+                    act_data_list = list()
+                    equity = P2PEquity.objects.filter(user=user, product=product).first()
+                    user_phone = get_user_phone_for_coop(user_amo.user_id)
+                    get_amortize_arg = {
+                        'product': product,
+                        'equity': equity,
+                        'bid': bid,
+                        'user_phone': user_phone,
+                        'period': period,
+                        'period_type': period_type,
+                        'profit_methods': profit_methods,
+                    }
+                    term_mark = list()
+                    if user_amo.settled:
                         get_amortize_arg['user_amo'] = user_amo
-                        get_amortize_arg['state'] = 5
-                        get_amortize_arg['income_state'] = 1
+                        get_amortize_arg['income_state'] = 2
+                        if user_amo.term == user_amo.terms:
+                            get_amortize_arg['state'] = 1
+                        else:
+                            get_amortize_arg['state'] = 0
                         act_data = self.get_amortize_data(**get_amortize_arg)
                         act_data_list.append(act_data)
+                    else:
+                        for user_amo in user_amos:
+                            term_mark.append(str(user_amo.term))
+                            get_amortize_arg['user_amo'] = user_amo
+                            get_amortize_arg['state'] = 5
+                            get_amortize_arg['income_state'] = 1
+                            act_data = self.get_amortize_data(**get_amortize_arg)
+                            act_data_list.append(act_data)
 
-                data['tran'] = act_data_list
+                    data['tran'] = act_data_list
 
-                common_callback.apply_async(
-                    kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
-                            'params': json.dumps(data), 'headers': self.headers})
+                    call_back_record = CallbackRecord()
+                    call_back_record.user = user
+                    call_back_record.order_id = order_id
+                    call_back_record.callback_to = self.c_code
 
-                # 推送账户数据
-                p2p_margin = user.margin.margin
-                total_asset = get_user_p2p_total_asset(user)
-                self.register_call_back(user_amo.user_id, order_id, total_asset, p2p_margin)
+                    if user_amo.settled:
+                        call_back_record.description = u'产品:%s %d期还款回调' % (product.id, user_amo.term)
+                    else:
+                        term_mark = u','.join(term_mark)
+                        call_back_record.description = u'产品:%s %s期满标回调' % (product.id, term_mark)
+
+                    call_back_record.save()
+
+                    common_callback.apply_async(
+                        kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
+                                'params': json.dumps(data), 'headers': self.headers,
+                                'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
+
+                    # 推送账户数据
+                    p2p_margin = user.margin.margin
+                    total_asset = get_user_p2p_total_asset(user)
+                    self.register_call_back(user_amo.user_id, order_id, total_asset, p2p_margin)
 
 
 class RenRenLiCallback(CoopCallback):
@@ -867,11 +867,20 @@ class RenRenLiCallback(CoopCallback):
             if bid and data:
                 act_data = self.get_purchase_data(p2p_record)
                 if act_data:
+                    user = User.objects.get(pk=p2p_record.user_id)
                     data['Data'] = json.dumps([act_data])
+
+                    call_back_record = CallbackRecord()
+                    call_back_record.user = user
+                    call_back_record.order_id = order_id
+                    call_back_record.callback_to = self.c_code
+                    call_back_record.description = u'投资回调'
+                    call_back_record.save()
 
                     common_callback.apply_async(
                         kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
-                                'params': data})
+                                'params': data, 'order_id': order_id,
+                                'ret_parser': 'renrenli_callback_ret_parser'})
             else:
                 logger.info("renrenli get_amotize_data failed with bid[%s] data[%s]" % (bid, data))
 
@@ -886,11 +895,13 @@ class BiSouYiCallback(CoopCallback):
         self.coop_key = settings.BAJINSHE_COOP_KEY
         self.register_call_back_url = settings.BAJINSHE_ACCOUNT_PUSH_URL
 
-    def register_call_back(self, user_id, order_id, total_asset=0, p2p_margin=0, base_data=None):
+    def register_call_back(self, user_id, order_id=None, total_asset=0, p2p_margin=0, base_data=None):
         super(BiSouYiCallback, self).register_call_back(user_id, order_id)
         binding = Binding.objects.filter(user_id=user_id).select_related('channel').first()
         access_token = AccessToken.objects.filter(user_id=user_id).first()
         if access_token and binding and binding.b_account:
+            order_id = order_id or '%s_0001' % user_id
+            user = User.objects.get(pk=user_id)
             phone = get_user_phone_for_coop(user_id)
             account = binding.b_account
             access_token = access_token.token
@@ -905,13 +916,22 @@ class BiSouYiCallback(CoopCallback):
                 'tstatus': 1,
             }
 
-            bisouyi_callback(settings.BISOUYI_OATUH_PUSH_URL, content_data, self.c_code)
+            call_back_record = CallbackRecord()
+            call_back_record.user = user
+            call_back_record.order_id = order_id
+            call_back_record.callback_to = self.c_code
+            call_back_record.description = u'授权推送'
+            call_back_record.save()
+
+            bisouyi_callback(settings.BISOUYI_OATUH_PUSH_URL, content_data,
+                             self.c_code, order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
 
     def purchase_call_back(self, user_id, order_id):
         super(BiSouYiCallback, self).purchase_call_back(user_id, order_id)
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购',
                                               order_id=order_id).select_related('product').first()
         if p2p_record:
+            user = User.objects.get(pk=user_id)
             product = p2p_record.product
             pay_method = product.pay_method
             period = product_period_to_days(pay_method, product.period)
@@ -937,7 +957,15 @@ class BiSouYiCallback(CoopCallback):
                 'bstatus': 1,
             }
 
-            bisouyi_callback(settings.BISOUYI_PURCHASE_PUSH_URL, content_data, self.c_code, async_callback=False)
+            call_back_record = CallbackRecord()
+            call_back_record.user = user
+            call_back_record.order_id = order_id
+            call_back_record.callback_to = self.c_code
+            call_back_record.description = u'投资推送'
+            call_back_record.save()
+
+            bisouyi_callback(settings.BISOUYI_PURCHASE_PUSH_URL, content_data, self.c_code, async_callback=False,
+                             order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
 
             p2p_equity = P2PEquity.objects.filter(product=product, user_id=user_id).first()
             if p2p_equity:
@@ -952,51 +980,81 @@ class BiSouYiCallback(CoopCallback):
                     'bstatus': 1,
                 }
 
-                bisouyi_callback(settings.BISOUYI_ORDER_RELATION_PUSH_URL, content_data, self.c_code)
+                order_id = str(order_id) + '_' + str(p2p_equity.id)
+
+                call_back_record = CallbackRecord()
+                call_back_record.user = user
+                call_back_record.order_id = order_id
+                call_back_record.callback_to = self.c_code
+                call_back_record.description = u'投资订单关联推送'
+                call_back_record.save()
+
+                bisouyi_callback(settings.BISOUYI_ORDER_RELATION_PUSH_URL, content_data, self.c_code,
+                                 order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
 
     def amortization_push(self, user_amo):
         super(BiSouYiCallback, self).amortization_push(user_amo)
-        product = user_amo.product
-        user_id = user_amo.user_id
-        p2p_equity = P2PEquity.objects.filter(product=user_amo.product, user_id=user_amo.user_id).first()
-        if p2p_equity:
-            user_phone = get_user_phone_for_coop(user_amo.user_id)
-            if user_amo.settled:
-                content_data = {
-                    'pcode': settings.BISOUYI_PCODE,
-                    'sn': p2p_equity.id,
-                    'ocode': product.id,
-                    'yaccount': get_user_phone_for_coop(user_id),
-                    'bdate': timezone.localtime(user_amo.settlement_time).strftime('%Y-%m-%d %H:%M:%S'),
-                    'bmoney': user_amo.get_total_amount,
-                    'ostatus': 1,
-                    'pstatus': 1,
-                }
+        user_amos = UserAmortization.objects.filter(product=user_amo.product, user_id=user_amo.user_id)
+        if user_amo.settled or user_amos.count() == user_amo.terms:
+            product = user_amo.product
+            user_id = user_amo.user_id
+            p2p_equity = P2PEquity.objects.filter(product=user_amo.product, user_id=user_amo.user_id).first()
+            if p2p_equity:
+                user = User.objects.get(pk=user_amo.user_id)
+                user_phone = get_user_phone_for_coop(user_amo.user_id)
+                content_data = {}
+                if user_amo.settled:
+                    content_data = {
+                        'pcode': settings.BISOUYI_PCODE,
+                        'sn': p2p_equity.id,
+                        'ocode': product.id,
+                        'yaccount': get_user_phone_for_coop(user_id),
+                        'bdate': timezone.localtime(user_amo.settlement_time).strftime('%Y-%m-%d %H:%M:%S'),
+                        'bmoney': user_amo.get_total_amount,
+                        'ostatus': 1,
+                        'pstatus': 1,
+                    }
 
-                if user_amo.term == user_amo.terms:
-                    content_data['bstatus'] = 4
+                    if user_amo.term == user_amo.terms:
+                        content_data['bstatus'] = 4
+                    else:
+                        content_data['bstatus'] = 2
                 else:
-                    content_data['bstatus'] = 2
+                    user_amo = user_amos.filter(term=1).first()
+                    if user_amo:
+                        last_user_amo = user_amos.filter(term=user_amo.terms).first()
+                        if last_user_amo:
+                            content_data = {
+                                'pcode': settings.BISOUYI_PCODE,
+                                'sn': p2p_equity.id,
+                                'ocode': product.id,
+                                'yaccount': user_phone,
+                                'sdate': timezone.localtime(user_amo.created_time).strftime('%Y-%m-%d %H:%M:%S'),
+                                'edate': timezone.localtime(last_user_amo.term_date).strftime('%Y-%m-%d %H:%M:%S'),
+                                'ostatus': 1,
+                                'pstatus': 1,
+                                'bstatus': 1,
+                            }
 
-                bisouyi_callback(settings.BISOUYI_ON_INTEREST_PUSH_URL, content_data, self.c_code)
-            else:
-                if int(user_amo.term) == 1:
-                    last_user_amo = UserAmortization.objects.filter(user_id=user_id, product=product,
-                                                                    term=user_amo.terms).first()
-                    if last_user_amo:
-                        content_data = {
-                            'pcode': settings.BISOUYI_PCODE,
-                            'sn': p2p_equity.id,
-                            'ocode': product.id,
-                            'yaccount': user_phone,
-                            'sdate': timezone.localtime(user_amo.created_time).strftime('%Y-%m-%d %H:%M:%S'),
-                            'edate': timezone.localtime(last_user_amo.term_date).strftime('%Y-%m-%d %H:%M:%S'),
-                            'ostatus': 1,
-                            'pstatus': 1,
-                            'bstatus': 1,
-                        }
+                if content_data:
+                    if user_amo.settled:
+                        order_id = '%s_0005_%s' % (user_amo.user_id, user_amo.id)
+                        url = settings.BISOUYI_PURCHASE_REFUND_PUSH_URL
+                        call_back_des = u'产品:%s %d期还款回调' % (product.id, user_amo.term)
+                    else:
+                        order_id = '%s_0006_%s' % (user_amo.user_id, user_amo.id)
+                        url = settings.BISOUYI_ON_INTEREST_PUSH_URL
+                        call_back_des = u'产品:%s 起息回调' % product.id
 
-                        bisouyi_callback(settings.BISOUYI_ON_INTEREST_PUSH_URL, content_data, self.c_code)
+                    call_back_record = CallbackRecord()
+                    call_back_record.user = user
+                    call_back_record.order_id = order_id
+                    call_back_record.callback_to = self.c_code
+                    call_back_record.description = call_back_des
+                    call_back_record.save()
+
+                    bisouyi_callback(url, content_data, self.c_code,
+                                     order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
 
 
 # 第三方回调通道

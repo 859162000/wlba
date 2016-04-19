@@ -170,7 +170,7 @@ def get_renrenli_base_data(channel_code):
     return data
 
 
-def bisouyi_callback(url, content_data, channel_code, async_callback=True):
+def bisouyi_callback(url, content_data, channel_code, async_callback=True, order_id=None, ret_parser=''):
     content = generate_bisouyi_content(content_data)
 
     headers = {
@@ -184,7 +184,9 @@ def bisouyi_callback(url, content_data, channel_code, async_callback=True):
     if async_callback:
         common_callback.apply_async(
             kwargs={'channel': channel_code, 'url': url,
-                    'params': json.dumps(data), 'headers': headers})
+                    'params': json.dumps(data), 'headers': headers,
+                    'order_id': order_id, 'ret_parser': ret_parser})
     else:
         common_callback(channel=channel_code, url=url,
-                        params=json.dumps(data), headers=headers)
+                        params=json.dumps(data), headers=headers,
+                        order_id=order_id, ret_parser=ret_parser)

@@ -87,6 +87,7 @@ INSTALLED_APPS = (
     'south',
     'registration',
 
+    'common',
     'marketing',
     'wanglibao_account',
     'wanglibao_p2p',

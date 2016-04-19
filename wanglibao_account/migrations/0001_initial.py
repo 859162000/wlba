@@ -9,18 +9,18 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'UserThreeOrder'
-        db.create_table(u'wanglibao_account_userthreeorder', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('order_on', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Channels'])),
-            ('third_order_id', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-            ('request_no', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
-            ('result_code', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
-            ('msg', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('answer_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'wanglibao_account', ['UserThreeOrder'])
+        # db.create_table(u'wanglibao_account_userthreeorder', (
+        #     (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+        #     ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+        #     ('order_on', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Channels'])),
+        #     ('third_order_id', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
+        #     ('request_no', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
+        #     ('result_code', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
+        #     ('msg', self.gf('django.db.models.fields.CharField')(max_length=255, blank=True)),
+        #     ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        #     ('answer_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+        # ))
+        # db.send_create_signal(u'wanglibao_account', ['UserThreeOrder'])
 
         # Adding model 'Binding'
         db.create_table(u'wanglibao_account_binding', (
@@ -37,7 +37,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         # Deleting model 'UserThreeOrder'
-        db.delete_table(u'wanglibao_account_userthreeorder')
+        # db.delete_table(u'wanglibao_account_userthreeorder')
 
         # Deleting model 'Binding'
         db.delete_table(u'wanglibao_account_binding')
@@ -106,18 +106,18 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
-        u'wanglibao_account.userthreeorder': {
-            'Meta': {'object_name': 'UserThreeOrder'},
-            'answer_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'msg': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'order_on': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['marketing.Channels']"}),
-            'request_no': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
-            'result_code': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'third_order_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
-        }
+        # u'wanglibao_account.userthreeorder': {
+        #     'Meta': {'object_name': 'UserThreeOrder'},
+        #     'answer_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+        #     'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+        #     u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+        #     'msg': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+        #     'order_on': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['marketing.Channels']"}),
+        #     'request_no': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
+        #     'result_code': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
+        #     'third_order_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
+        #     'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+        # }
     }
 
     complete_apps = ['wanglibao_account']
