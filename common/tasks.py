@@ -48,7 +48,7 @@ def common_callback(channel, url, params, req_action=1, headers=None, order_id=N
     logger.info("Enter %s_callback task===>>>" % channel)
 
     try:
-        logger.info(params)
+        logger.info("callback_order_id[%s] with params[%s]" % (order_id, params))
 
         if req_action == 1:
             if headers:
@@ -64,7 +64,6 @@ def common_callback(channel, url, params, req_action=1, headers=None, order_id=N
         if ret and ret.status_code == 200 and ret_parser:
             ret_parser = LOCAL_VAR[ret_parser]
             ret_parser(ret, channel, order_id)
-
     except:
         # 创建内存文件对象
         fp = StringIO.StringIO()
