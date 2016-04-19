@@ -9,7 +9,7 @@
             'jquery.model': ["jquery"]
         }
     })
-    require(['jquery'],function($, re){
+    require(['jquery'],function($,re){
 
         var csrfSafeMethod, getCookie, sameOrigin,
         getCookie = function (name) {
@@ -48,19 +48,37 @@
           }
       });
 
+        var h5_user_static;
+        $.ajax({
+            url: '/api/user_login/',
+            type: 'post',
+            success: function(data1) {
+                h5_user_static = data1.login;
+            }
+        });
+        var login = false;
 
 
-        $(".tz_btn").on("click",function(){
-            $.ajax({
-                type: "post",
-                url: "/api/activity/konggang/",
-                dataType: 'json',
-                success: function(data){
-                    console.log(data)
-                }
-            })
+        $(".tz_btn,.air_btns").on("click",function(){
+            if(h5_user_static){
+                $.ajax({
+                    type: "post",
+                    url: "/api/activity/konggang/",
+                    dataType: 'json',
+                    success: function(data){
+                        $('.popup_box .main .text').text(''+data.message+'');
+                        $('.popup_box').show();
+                        console.log(data)
+                    }
+                })
+            }else{
+                window.location.href = '/accounts/login/?next=/activity/airport_operation/'
+            }
+
         })
-
+        $('.popup_box .popup_button').click(function(){
+            $('.popup_box').hide();
+        });
     })
 
 
