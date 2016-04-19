@@ -3398,7 +3398,7 @@ org.redpacket_bind = (function(org){
                         self.attr("disabled",true).text("提交中……").css("background","#cbcbcb");
                     },
                     success: function (data) {
-                        if(data.re_code != 0){
+                        if(data.ret_code != 0){
                             org.ui.showSign(data.message);
                             $submit.text('注册并绑定服务号');
                         }else{
