@@ -2828,9 +2828,9 @@ class BiSouYiRegisterApi(APIView):
 
 class BiSouYiRegisterView(TemplateView):
 
-    template_name = ''
+    template_name = 'one_key_register_bisouyi.jade'
 
-    def post(self):
+    def get_context_data(self, **kwargs):
         form = BiSouYiRegisterForm(self.request.session, action='register')
         oauth_data = {
             'pcode': settings.BISOUYI_PCODE,
@@ -2842,7 +2842,6 @@ class BiSouYiRegisterView(TemplateView):
                 password = generate_random_password(6)
                 user = create_user(phone, password, "")
                 if user:
-                    user = self.request.user
                     access_token = utils.long_token()
                     account = form.get_account()
                     user.access_token = access_token

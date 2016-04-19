@@ -200,6 +200,8 @@ def get_p2p_equity(user_id, product_id):
         equity['unpaid_principal'] = float(unpaid_principal)
         if equity['confirm_at']:
             equity['confirm_at'] = equity['confirm_at'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            equity.pop('confirm_at')
     else:
         equity = None
 

@@ -326,10 +326,10 @@ org.ui = (function () {
                 $('.confirm-certain').text(certainName);
                 $('.confirm-warp').show();
 
-                $('.confirm-cancel').on('click', function (e) {
+                $('.confirm-cancel').off("click").on('click', function (e) {
                     $('.confirm-warp').hide();
                 })
-                $('.confirm-certain').unbind("click").on('click', function (e) {
+                $('.confirm-certain').off("click").on('click', function (e) {
                     $('.confirm-warp').hide();
                     if (callback) {
                         callbackData ? callback(callbackData) : callback();
@@ -1537,7 +1537,7 @@ org.recharge = (function (org) {
          */
         _rechargeThe_one_card: function () {
             var _self = this;
-            _self.$recharge.unbind('click').on('click', function () {
+            _self.$recharge.off('click').on('click', function () {
                 var
                     card_no = _self.data.no,
                     gate_id = _self.data.bank.gate_id,
@@ -1548,9 +1548,9 @@ org.recharge = (function (org) {
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
                 }
-                //if(lib.order_id === "" && lib.token === ""){
-                //    return org.ui.showSign('请先获取验证码');
-                //}
+                if(lib.order_id === "" && lib.token === ""){
+                    return org.ui.showSign('请先获取验证码');
+                }
 
                 var data = {
                     url: "/api/pay/deposit_new/",
@@ -1564,7 +1564,7 @@ org.recharge = (function (org) {
                         $this.attr('disabled', true).text("充值中..");
                     },
                     success: function (entry_operation, result) {
-                        $('body').append("<div>"+ JSON.stringify(result) +"</div>");
+                        //org.ui.alert("success:"+result.ret_code);
                         entry_operation.hide_loading();
                         entry_operation.clear();
                         entry_operation.hide();
@@ -2384,7 +2384,7 @@ org.trade_back = (function (org) {
             e.stopPropagation();
         });
 
-        this.$input.unbind('input').on('input', function(){
+        this.$input.off('input').on('input', function(){
             $('.circle').hide();
             _self.decide('input')
         });

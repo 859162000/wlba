@@ -164,11 +164,11 @@ class PrepaymentHistory(object):
                         logger.debug(("user:%s====提前还款==微信模板=="%user.id)+traceback.format_exc())
                 except Exception, e:
                     logger.debug(("=====提前还款===="+traceback.format_exc()))
-                # 发短信
-                send_messages.apply_async(kwargs={
-                    "phones": phone_list,
-                    "messages": message_list
-                })
+            # 发短信
+            send_messages.apply_async(kwargs={
+                "phones": phone_list,
+                "messages": message_list
+            })
         return product_record
 
     def get_product_amortization(self, payment_date):
