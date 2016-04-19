@@ -61,7 +61,7 @@ def common_callback(channel, url, params, req_action=1, headers=None, order_id=N
         logger.info('%s callback url: %s' % (channel, ret.url))
         logger.info('callback return: %s' % ret.text)
 
-        if ret and ret.status_code == 200:
+        if ret and ret.status_code == 200 and ret_parser:
             ret_parser = LOCAL_VAR[ret_parser]
             ret_parser(ret, channel, order_id)
 
