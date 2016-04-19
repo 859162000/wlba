@@ -41,12 +41,13 @@ ENV_DEV = 'debug'
 ENV_PRODUCTION = 'production'
 ENV_PREPRODUCTION = 'pre'
 ENV_STAGING = 'staging'
+ENV_ALPHA = 'alpha'
 
 ENV = ENV_DEV
 
 # Add by hb on 2016-04-19 for Support Alpha-Deploy
 ENV_ALPHA_DEPLOY = False
-if ENV == "alpha":
+if ENV == ENV_ALPHA:
     ENV == "staging"
     ENV_ALPHA_DEPLOY = True
 
