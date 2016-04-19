@@ -53,7 +53,7 @@
         $(".tz_btn").on("click",function(){
             $.ajax({
                 type: "post",
-                url: "/api/airport_reward/fetch/",
+                url: "/api/activity/konggang/",
                 dataType: 'json',
                 success: function(data){
                     console.log(data)
