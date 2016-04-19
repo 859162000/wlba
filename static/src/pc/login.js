@@ -45,6 +45,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
     //极验一次验证
     var array= {};
     fastTestOne = function(type){
+        type=='login' ? $('#loginSubmit').addClass('disabled') : $('#registerSubmit').addClass('submitFormStyleNo')
         $.ajax({
             type: 'POST',
             url: '/api/geetest/',
@@ -80,6 +81,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                 })
                 $('#check-tag').val('false');
                 $('#loginSubmit').removeClass('disabled');
+                type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
             },
             error: function(XMLHttpRequest,status){
                 type == 'regist' ? $('.captcha-box1').show() : $('.captcha-box').hide();
@@ -89,6 +91,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                    $('#registerSMSCode').val('');
                 }
                 $('#loginSubmit').removeClass('disabled');
+                type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
             }
         });
     }
