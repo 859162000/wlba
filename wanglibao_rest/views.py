@@ -367,13 +367,13 @@ class RegisterAPIView(DecryptParmsAPIView):
             auth_login(request, auth_user)
 
         try:
+            openid = request.session.get('openid')
             register_channel = request.DATA.get('register_channel', '').strip()
-            if register_channel and register_channel == 'fwh':
-                openid = request.session.get('openid')
-                if openid:
-                    ShareInviteRegister(request).process_for_register(request.user, openid)
-                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
-                    bindUser(w_user, request.user)
+            if register_channel and register_channel == 'fwh' and openid:
+                ShareInviteRegister(request).process_for_register(request.user, openid)
+                w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                bindUser(w_user, request.user)
+                request.session['openid'] = openid
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
 

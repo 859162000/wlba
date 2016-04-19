@@ -114,6 +114,7 @@ class WXLoginAPI(APIView):
                     rs, txt = bindUser(weixin_user, user)
                     if rs == 0:
                         auth_login(request, user)
+                        request.session['openid'] = openid
                         request.session.set_expiry(1800)
                         data = {'re_code':0,'nickname': user.wanglibaouserprofile.nick_name}
                     else:

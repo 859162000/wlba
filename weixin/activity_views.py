@@ -494,7 +494,7 @@ class WechatInviteTemplate(TemplateView):
         else:
             self.w_user = WeixinUser.objects.filter(openid=self.openid).first()
         if not self.w_user.user:
-            next_uri=reverse("hby_weixin_invite")+"?code=%s&state=%s"%(code, state)
+            next_uri=reverse("hby_weixin_invite")
             return redirectToJumpPage("", next=settings.CALLBACK_HOST + reverse("si_bind_login")+"?next=%s"%urllib.quote(settings.CALLBACK_HOST+next_uri))
         if request.user.is_authenticated():
             if self.w_user.user==request.user:
