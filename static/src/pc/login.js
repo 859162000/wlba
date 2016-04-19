@@ -67,6 +67,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                         array = captchaObj.getValidate();
                         $('#captcha-status').val('true');
                         type == 'regist' ? checkCodeIsNoFun() : null;
+                        type=='login' ? $('#loginSubmit').removeClass('disabled') : $('#registerSubmit').removeClass('submitFormStyleNo');
                     });
                     captchaObj.onFail(function(){
                         $('#captcha-status').val(captchaObj.getValidate())
