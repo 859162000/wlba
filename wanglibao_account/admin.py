@@ -1,8 +1,8 @@
-# coding=utf-8
+# encoding: utf8
 
 from django.contrib import admin
 from django.contrib.auth.models import User
-from wanglibao_account.models import Binding
+from .models import Binding
 
 
 def user_unicode(self):
