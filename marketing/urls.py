@@ -7,6 +7,7 @@ from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
 from wanglibao_activity.views import PcActivityAreaView, ActivityAreaApi
+from weixin.common.decorators import fwh_login_required
 
 urlpatterns = patterns(
     '',
@@ -129,7 +130,7 @@ urlpatterns += patterns(
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
     url(r'^app_open_house/$', TemplateView.as_view(template_name="app_open_house.jade")),
     url(r'^h5_open_house/$', TemplateView.as_view(template_name="h5_open_house.jade")),
-    url(r'^app_airport_operation/$', TemplateView.as_view(template_name="app_airport_operation.jade")),
+    url(r'^app_airport_operation/$', fwh_login_required(TemplateView.as_view(template_name="app_airport_operation.jade"))),
 
 
     url(r'^app_eight_gift_two/$', TemplateView.as_view(template_name="app_eight_gift_two.jade")),
