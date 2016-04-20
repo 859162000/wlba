@@ -3051,11 +3051,11 @@ org.redpacket = (function(org){
             lib.shareOk();
         },
         _getCode: function(){
-            org.ui.alert("_getCode");
             var is_bind = $("input.is_bind").val(),
                 fphone = $("input.fphone").val(),
                 original_id = $("input.original_id").val(),
                 weixin_channel = $("input.weixin_channel_code").val();
+            var imgDom = $("#js-share-sign");
             if(is_bind=="False" && $(".redpacket-index").length < 1){
                 org.ajax({
                     url: '/weixin/api/generate/qr_invite_scene_ticket/',
@@ -3067,11 +3067,10 @@ org.redpacket = (function(org){
                     },
                     dataType: 'json',
                     success: function(data){
-                        console.log(data);
                         if(data.qrcode_url){
-                            $("#js-share-sign").attr("src", data.qrcode_url);
+                            imgDom.attr("src", data.qrcode_url);
                         }
-
+                        imgDom.show();
                     }
                 });
             }

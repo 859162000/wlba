@@ -419,7 +419,7 @@ class WechatInviteTemplate(TemplateView):
             f_w_user = WeixinUser.objects.filter(user=friend_profile.user).first()
             if f_w_user:
                 inviter_head_url = f_w_user.headimgurl
-            fphone = base64.b64decode(fphone + '=')[0:-1]
+            fphone = base64.b64encode(fphone + '=')
         friend_num=0
         reward_text = ""
         reward_type = ""
@@ -523,7 +523,7 @@ class WechatShareTemplate(TemplateView):
             f_w_user = WeixinUser.objects.filter(user=friend_profile.user).first()
             if f_w_user:
                 inviter_head_url = f_w_user.headimgurl
-            fphone = base64.b64decode(fphone + '=')[0:-1]
+            fphone = base64.b64encode(fphone+"=")
 
         w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
         if self.request.user.is_authenticated():
@@ -565,7 +565,7 @@ class WechatShareTemplate(TemplateView):
             "friend_num":friend_num,
             "invite_experience_amount":invite_experience_amount,
             "inviter_head_url":inviter_head_url,
-            "fphone":fphone,
+            "fphone": fphone,
             "original_id":weixin_qrcode_info.get("fwh",""),
             "weixin_channel_code":"hby",
         }
