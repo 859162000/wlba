@@ -3050,6 +3050,7 @@ org.redpacket = (function(org){
             lib.shareOk();
         },
         _getCode: function(){
+            org.ui.alert("_getCode");
             var is_bind = $("input.is_bind").val(),
                 fphone = $("input.fphone").val(),
                 original_id = $("input.original_id").val(),
@@ -3066,6 +3067,7 @@ org.redpacket = (function(org){
                 dataType: 'json',
                 success: function(data){
                     console.log(data);
+                    org.ui.alert("data.qrcode_url");
                     $("#js-share-sign").attr("src", data.qrcode_url);
                 }
             });
@@ -3081,7 +3083,7 @@ org.redpacket = (function(org){
             });
 
             //打开红包雨
-            var openBtn = false;
+            var isBind = false;
             $("div.js-open-redpacket").on("click", function(){
                 var self = $(this);
                 if(self.prop("disabeld")){
@@ -3101,6 +3103,7 @@ org.redpacket = (function(org){
                             org.ui.alert(data.msg);
                             return;
                         }
+                        isBind = data.is_bind;
                         openBtn = true;
                         window.location.reload();
                     },
@@ -3113,7 +3116,7 @@ org.redpacket = (function(org){
 
                 });
             });
-            if(openBtn){
+            if(!isBind){
                 lib._getCode();
             }
         },
