@@ -190,7 +190,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        #'HOST': '192.168.1.242',
+        'HOST': '192.168.1.242',
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -606,6 +606,7 @@ CELERY_QUEUES = {
     "celery": {"exchange": "celery", "routing_key": "celery"},
     "celery01": {"exchange": "celery01", "routing_key": "celery01"},
     "celery02": {"exchange": "celery02", "routing_key": "celery02"},
+    "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
 }
 
 from datetime import timedelta, datetime
@@ -1224,15 +1225,19 @@ else:
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
 if ENV == ENV_PRODUCTION:
+    BAJINSHE_CLIENT_ID = '7cbb6aeb381b780edfa2'
     BAJINSHE_COOP_KEY = ''
 else:
+    BAJINSHE_CLIENT_ID = '7cbb6aeb381b780edfa2'
     BAJINSHE_COOP_KEY = '4762c2c53ed701597c1d6cf3b409ff87c3f04f98'
 
 # 人人利
 RENRENLI_CHANNEL_CODE = 'renrenli'
 if ENV == ENV_PRODUCTION:
+    RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
     RENRENLI_COOP_KEY = ''
 else:
+    RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
     RENRENLI_COOP_KEY = 'wanglibaorrl'
 
 
