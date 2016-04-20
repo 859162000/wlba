@@ -944,8 +944,15 @@ class KongGangAPIView(APIView):
                     remain_chance=1,
                 )
 
-            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx', has_sent=False).first()
-            if reward:
+            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
+            if reward == None:
+                json_to_response = {
+                    'ret_code': 1002,
+                    'message': u'用户没有抽奖机会'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+            if reward.has_sent == False:
                 reward.has_sent=True
                 reward.left_time=0
                 send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
@@ -964,13 +971,19 @@ class KongGangAPIView(APIView):
                     "mtype": "activity"
                 })
                 reward.save()
-            join_record.save()
-        json_to_response = {
-            'ret_code': 0,
-            'message': u'奖品已经发放'
-        }
-        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-    
+                join_record.save()
+                json_to_response = {
+                    'ret_code': 0,
+                    'message': u'奖品发放成功'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            else:
+                json_to_response = {
+                    'ret_code': 1003,
+                    'message': u'奖品已经发放'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
     
 class ZhaoXiangGuanRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
