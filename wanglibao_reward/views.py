@@ -864,6 +864,7 @@ class RewardDistributer(object):
             ThanksGivenRewardDistributer: ('all',),
             XingMeiRewardDistributer: ('all',),
             KongGangRewardDistributer:('all',),
+            ZhaoXiangGuanRewardDistributer:('all',),
         }
 
     @property
@@ -924,7 +925,7 @@ class KongGangAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        super(XunleiActivityAPIView, self).__init__()
+        super(KongGangAPIView, self).__init__()
 
     def post(self, request):
         if not request.user.is_authenticated():
@@ -935,11 +936,11 @@ class KongGangAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         with transaction.atomic():
-            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity='kgyx').first()
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code='kgyx').first()
             if not join_record:
                 join_record = WanglibaoRewardJoinRecord.objects.create(
                     user=request.user,
-                    activity='kgyx',
+                    activity_code='kgyx',
                     remain_chance=1,
                 )
 
@@ -959,6 +960,82 @@ class KongGangAPIView(APIView):
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": request.user.id,
                     "title": u"空港易行优惠服务",
+                    "content": send_msg,
+                    "mtype": "activity"
+                })
+                reward.save()
+            join_record.save()
+        json_to_response = {
+            'ret_code': 0,
+            'message': u'奖品已经发放'
+        }
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+    
+    
+class ZhaoXiangGuanRewardDistributer(RewardDistributer):
+    def __init__(self, request, kwargs):
+        super(ZhaoXiangGuanRewardDistributer, self).__init__(request, kwargs)
+        self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
+        self.user = kwargs['user']
+        self.token = 'sy'
+
+    def distribute(self):
+        send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
+        if send_reward:
+            try:
+                WanglibaoActivityReward.objects.create(
+                        activity='sy',
+                        order_id=self.order_id,
+                        user=self.user,
+                        p2p_amount=self.amount,
+                        reward=send_reward,
+                        has_sent=False,
+                        left_times=1,
+                        join_times=1)
+            except Exception:
+                logger.debug('user:%s, order_id:%s,p2p_amount:%s,影像投资节优惠码发奖报错')
+        else: #所有奖品已经发完了
+            return
+
+class ZhaoXiangGuanAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(ZhaoXiangGuanAPIView, self).__init__()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity='sy').first()
+            if not join_record:
+                join_record = WanglibaoRewardJoinRecord.objects.create(
+                    user=request.user,
+                    activity='sy',
+                    remain_chance=1,
+                )
+
+            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='sy', has_sent=False).first()
+            if reward:
+                reward.has_sent=True
+                reward.left_time=0
+                send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
+                           u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
+                           u'感谢您的参与！【网利科技】' % (reward.reward.content)
+                send_messages.apply_async(kwargs={
+                    "phones": [request.user.wanglibaouserprofile.phone, ],
+                    "message": send_msg,
+                })
+
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": request.user.id,
+                    "title": u"影像投资节优惠码",
                     "content": send_msg,
                     "mtype": "activity"
                 })

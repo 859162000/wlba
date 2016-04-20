@@ -1273,6 +1273,57 @@ class KongGangRegister(CoopRegister):
                 else: #所有奖品已经发完了
                     join_record.save()
                     return
+                
+class ZhaoXiangGuanRegister(CoopRegister):
+    def __init__(self, request):
+        super(ZhaoXiangGuanRegister, self).__init__(request)
+        self.c_code = 'sy'
+        self.invite_code = 'sy'
+
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            with transaction.atomic():
+                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
+                if not join_record:
+                    join_record = join_record.objects.create(
+                        user=user,
+                        activity_code=self.c_code
+                    )
+                send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
+                if send_reward:
+                    try:
+                        ActivityReward.objects.create(
+                                activity='sy',
+                                order_id=order_id,
+                                user=user,
+                                p2p_amount=p2p_record.amount,
+                                reward=send_reward,
+                                has_sent=True,
+                                left_times=0,
+                                join_times=0)
+                        send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
+                                   u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
+                           u'感谢您的参与！【网利科技】' % (reward.reward.content)
+                        send_messages.apply_async(kwargs={
+                            "phones": [user.wanglibaouserprofile.phone, ],
+                            "message": send_msg,
+                        })
+
+                        inside_message.send_one.apply_async(kwargs={
+                            "user_id": user.id,
+                            "title": u"影像投资节优惠码",
+                            "content": send_msg,
+                            "mtype": "activity"
+                        })
+                    except Exception:
+                        logger.debug('user:%s, order_id:%s,p2p_amount:%s,影像投资节优惠码发奖报错')
+                    join_record.save()
+                else: #所有奖品已经发完了
+                    join_record.save()
+                    return
 
 class RockFinanceRegister(CoopRegister):
     def __init__(self, request):
@@ -2213,7 +2264,8 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
-                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister]
+                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
+                          ZhaoXiangGuanRegister]
 
 
 # ######################第三方用户查询#####################

@@ -377,7 +377,7 @@ def check_unavailable_3_days():
             }
         }
     # 功能推送id: 1
-    PHPSendSMS().send_sms(rule_id=1, data_messages=data_messages)
+    PHPSendSMS().send_sms(rule_id=1, data_messages=data_messages, timeout=20)
 
 
 @app.task
@@ -409,7 +409,7 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
         i += 1
 
     # 功能推送id: 2
-    PHPSendSMS().send_sms(rule_id=2, data_messages=data_messages)
+    PHPSendSMS().send_sms(rule_id=2, data_messages=data_messages, timeout=20)
 
     # phones_list = []
     # for user in users:
