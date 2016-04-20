@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Sum, Q
 from django.utils import timezone
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.authtoken.models import Token
 from user_agents import parse
 
@@ -40,6 +41,12 @@ def set_cookie(response, key, value, hours_expire=1, domain=settings.SESSION_COO
     """
     expires = datetime.datetime.now() + datetime.timedelta(hours=hours_expire)
     response.set_cookie(key, value, expires=expires, domain=domain)
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+
+    def enforce_csrf(self, request):
+        return  # To not perform the csrf check previously happening
 
 
 class PhpRedisBackend(object):

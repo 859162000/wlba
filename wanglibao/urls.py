@@ -19,7 +19,7 @@ from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
     YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
     AssignmentBuyFail, GetUnreadMgsNum, YueLiBaoBuyStatus, AssignmentBuyStatus, GetUserUnreadMgsNum, GetRedPacks, \
-    SendRedPacks, GetAPPUser, CheckAppTradePassword
+    SendRedPacks, GetAPPUser, CheckAppTradePassword, GetAjaxRedPacks
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -205,6 +205,7 @@ urlpatterns += patterns(
     url(r'^php/trade_password/$', CheckTradePassword.as_view(), name='php_trade_password'),
     url(r'^php/app/trade_password/$', CheckAppTradePassword.as_view(), name='php_app_trade_password'),
     url(r'^php/redpacks/list/$', GetRedPacks.as_view(), name='php_unused_redpacks'),
+    url(r'^php/redpacks/ajax/list/$', GetAjaxRedPacks.as_view(), name='php_unused_redpacks_ajax'),
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
     url(r'^php/yue/fail/$', YueLiBaoBuyFail.as_view(), name='php_buy_yuelibao_fail'),

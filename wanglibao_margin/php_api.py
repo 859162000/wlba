@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import renderers
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,7 +18,7 @@ from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
-    calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore
+    calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore, CsrfExemptSessionAuthentication
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -717,8 +718,9 @@ class AssignmentBuyFail(APIView):
 
 class GetRedPacks(APIView):
     """
-    http请求方式: get
+    http请求方式: post
     http://xxxxxx.com/php/redpacks/list/
+    period = int()
     :return: status = 1  成功, status = 0 失败 .
     """
     permission_classes = ()
@@ -729,8 +731,56 @@ class GetRedPacks(APIView):
         red_pack_info = dict()
         period = request.POST.get('period', 0)
         uid = request.POST.get('userId', 0)
+
         if request.user.id:
             uid = request.user.id
+
+        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
+
+        # if self.request.user.pk and int(self.request.user.pk) == int(uid):
+        # 去掉登录验证, 方便PHP
+        if period and uid:
+            device = utils.split_ua(self.request)
+
+            result = php_redpacks(User.objects.get(pk=uid), device['device_type'], period=period)
+            redpacks = result['packages'].get('available', [])
+
+            red_pack_info.update(
+                status=1,
+                redpacks=redpacks
+            )
+        else:
+            red_pack_info.update(
+                status=0,
+                msg=u'authentic error!'
+            )
+
+        return Response(red_pack_info)
+
+        # return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))
+
+
+class GetAjaxRedPacks(APIView):
+    """
+    http请求方式: post
+    http://xxxxxx.com/php/redpacks/ajax/list/
+    period = int()
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+
+    @csrf_exempt
+    def post(self, request):
+
+        red_pack_info = dict()
+        period = request.POST.get('period', 0)
+        uid = request.POST.get('userId', 0)
+
+        if request.user.id:
+            uid = request.user.id
+
+        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
