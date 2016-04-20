@@ -59,21 +59,30 @@
         var login = false;
 
 
-        $(".tz_btn,.air_btns").on("click",function(){
-            if(h5_user_static){
-                $.ajax({
-                    type: "post",
-                    url: "/api/activity/konggang/",
-                    dataType: 'json',
-                    success: function(data){
-                        $('.popup_box .main .text').text(''+data.message+'');
+        $(".air_btns").on("click",function(){
+
+            $.ajax({
+                type: "post",
+                url: "/api/activity/konggang/",
+                dataType: 'json',
+                success: function(data){
+                    if(data.ret_code=='1000'){
+                        window.location.href = '/accounts/login/?next=/activity/airport_operation/'
+                    }else if(data.ret_code=='1002'){
+                        $('.popup_box .main .textairport').text(data.message);
                         $('.popup_box').show();
-                        console.log(data)
+                    }else if(data.ret_code=='0'){
+                        $('.popup_box .main .textairport').text(data.message);
+                        $('.popup_box').show();
+                    }else if(data.ret_code=='1003'){
+                        $('.popup_box .main .textairport').text(data.message);
+                        $('.popup_box').show();
                     }
-                })
-            }else{
-                window.location.href = '/accounts/login/?next=/activity/airport_operation/'
-            }
+
+                    //console.log(data)
+                }
+            })
+
 
         })
         $('.popup_box .popup_button').click(function(){

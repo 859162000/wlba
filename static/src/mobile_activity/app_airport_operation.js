@@ -1,23 +1,29 @@
 (function(org) {
-	var sixlis = document.getElementById("six_lis"),
-         audio = document.getElementById("audios"),
-         audiobtn = document.getElementById("audio");
-     var ss = 1;
+
+
+	var sixlis = document.getElementById("six_lis");
+
      $('#sec').fullpage();
      sixlis.addEventListener("touchstart",function(){
           $(this).next().slideToggle();
       },false)
-     audiobtn.addEventListener("click",function(){
-          if(ss == 1){
-              $(this).addClass("audio_off");
-              audio.pause();
-              ss = 2;
-          }else{
-              audio.play();
-              $(this).removeClass("audio_off");
-              ss = 1;
-          }
-     },false);
+
+
+    var mp3 = document.getElementById("audios"),play = $('#audio');
+    play.on('click', function (e) {
+        if (mp3.paused) {
+            mp3.play();
+            $('#audio').removeClass("audio_off");
+        } else {
+            mp3.pause();
+            $('#audio').addClass("audio_off");
+        }
+    });
+
+    mp3.play();
+    $(document).one('touchstart', function () {
+        mp3.play();
+    });
 
 	var h5_user_static;
     org.ajax({
@@ -73,7 +79,39 @@
 			link : shareLink,
 			imgUrl: shareImg
 		})
-	})
+	});
+
+	$('.six_btn').on("click",function(){
+
+            org.ajax({
+                type: "post",
+                url: "/api/activity/konggang/",
+                dataType: 'json',
+                success: function(data){
+                    if(data.ret_code=='1000'){
+                        window.location.href = '/accounts/login/?next=/activity/app_airport_operation/'
+                    }else if(data.ret_code=='1002'){
+                        $('.popup_box .main .textairport').text(''+data.message+'');
+                        $('.popup_box').show();
+                    }else if(data.ret_code=='0'){
+                        $('.popup_box .main .textairport').text(''+data.message+'');
+                        $('.popup_box').show();
+                    }else if(data.ret_code=='1003'){
+                        $('.popup_box .main .textairport').text(''+data.message+'');
+                        $('.popup_box').show();
+                    }
+
+                    //console.log(data)
+                }
+            })
+
+
+        })
+        $('.popup_box .popup_button').click(function(){
+            $('.popup_box').hide();
+        });
+
+
 
 })(org);
 
