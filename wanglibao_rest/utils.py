@@ -16,6 +16,7 @@ from wanglibao_redis.backend import redis_backend
 from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
+from marketing.models import IntroducedBy
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 
@@ -239,6 +240,12 @@ def get_coop_binding_for_phone(channel_code, phone):
     return Binding.objects.filter(btype=channel_code, user__wanglibaouserprofile__phone=phone).first()
 
 
+def get_introduce_by_for_phone(phone, channel_code):
+    introduce_by = IntroducedBy.objects.filter(user__wanglibaouserprofile__phone=phone,
+                                               channel__code=channel_code).first()
+    return introduce_by
+
+
 def has_register_for_phone(phone):
     return WanglibaoUserProfile.objects.filter(phone=phone).exists()
 
@@ -354,37 +361,39 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
     return response_data
 
 
-def process_bajinshe_user_exists(user, binding, sign_is_ok):
-    is_bjs_user = False
+def process_bajinshe_user_exists(user, introduce_by, sign_is_ok):
     if sign_is_ok:
-        if binding and user:
-            is_bjs_user = True
+        if introduce_by and user:
             response_data = {
                 'ret_code': 10000,
                 'message': u'该号已注册',
+                'invitation_code': 'bajinshe',
+                'user_id': get_uid_for_coop(user.id),
+                'ext': '',
             }
-
         elif not user:
             response_data = {
                 'ret_code': 10000,
                 'message': u'该号未注册',
+                'invitation_code': '',
+                'user_id': '',
+                'ext': '',
             }
         else:
             response_data = {
                 'ret_code': 10000,
                 'message': u'该号已注册，非本渠道用户',
+                'invitation_code': 'bajinshe',
+                'user_id': get_uid_for_coop(user.id),
+                'ext': '',
             }
     else:
         response_data = {
             'ret_code': 10008,
             'message': u'无效签名',
+            'invitation_code': '',
+            'user_id': '',
+            'ext': '',
         }
-
-    response_data['invitation_code'] = ''
-    response_data['user_id'] = ''
-    response_data['ext'] = ''
-    if is_bjs_user:
-        response_data['user_id'] = binding.bid
-        response_data['invitation_code'] = binding.channel.code
 
     return response_data
