@@ -9,7 +9,8 @@ require.config({
     }
 });
 require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
-    var statusV = 0
+    var statusV = 0;
+    $('#check-tag').val('');
     //-------------初始化----------//
     pageInitFun = function(){
         //文本框的得到和失去光标
