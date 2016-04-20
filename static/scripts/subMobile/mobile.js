@@ -3047,6 +3047,7 @@ org.redpacket = (function(org){
     var lib = {
         init: function(){
             lib._checkFrom();
+            lib._getCode();
             lib.shareOk();
         },
         _getCode: function(){
@@ -3055,22 +3056,25 @@ org.redpacket = (function(org){
                 fphone = $("input.fphone").val(),
                 original_id = $("input.original_id").val(),
                 weixin_channel = $("input.weixin_channel_code").val();
-            if(is_bind) return;
-            org.ajax({
-                url: '/weixin/api/generate/qr_invite_scene_ticket/',
-                type: 'get',
-                data: {
-                    'original_id': original_id,
-                    'fp': fphone,
-                    'code': weixin_channel
-                },
-                dataType: 'json',
-                success: function(data){
-                    console.log(data);
-                    org.ui.alert("data.qrcode_url");
-                    $("#js-share-sign").attr("src", data.qrcode_url);
-                }
-            });
+            if(is_bind=="False" && $(".redpacket-index").length < 1){
+                org.ajax({
+                    url: '/weixin/api/generate/qr_invite_scene_ticket/',
+                    type: 'get',
+                    data: {
+                        'original_id': original_id,
+                        'fp': fphone,
+                        'code': weixin_channel
+                    },
+                    dataType: 'json',
+                    success: function(data){
+                        console.log(data);
+                        if(data.qrcode_url){
+                            $("#js-share-sign").attr("src", data.qrcode_url);
+                        }
+
+                    }
+                });
+            }
         },
         _checkFrom: function () {
             var share_alt = $("section.redpacket-share-alt");
@@ -3083,7 +3087,6 @@ org.redpacket = (function(org){
             });
 
             //打开红包雨
-            var isBind = false;
             $("div.js-open-redpacket").on("click", function(){
                 var self = $(this);
                 if(self.prop("disabeld")){
@@ -3103,7 +3106,6 @@ org.redpacket = (function(org){
                             org.ui.alert(data.msg);
                             return;
                         }
-                        isBind = data.is_bind;
                         openBtn = true;
                         window.location.reload();
                     },
@@ -3116,9 +3118,6 @@ org.redpacket = (function(org){
 
                 });
             });
-            if(!isBind){
-                lib._getCode();
-            }
         },
         shareFn: function(){
             var html = '<div class="invite-share-ok">' +
