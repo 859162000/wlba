@@ -205,6 +205,11 @@ urlpatterns += patterns(
     url(r'weixin_activity/', include('wanglibao_reward.urls')),
 )
 
+# 分享邀请用户
+urlpatterns += patterns(
+    '',
+    url(r'share_invite/', include('wanglibao_invite.urls'))
+)
 if settings.DEBUG:
     import debug_toolbar
 

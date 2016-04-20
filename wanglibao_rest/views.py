@@ -63,12 +63,13 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
-from weixin.util import bindUser
+from weixin.util import bindUser, createInvite
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
+from wanglibao_invite.invite_common import ShareInviteRegister
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -365,6 +366,17 @@ class RegisterAPIView(DecryptParmsAPIView):
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
+        try:
+            openid = request.session.get('openid')
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh' and openid:
+                ShareInviteRegister(request).process_for_register(request.user, openid)
+                w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                bindUser(w_user, request.user)
+                request.session['openid'] = openid
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
@@ -415,15 +427,7 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-        try:
-            register_channel = request.DATA.get('register_channel', '').strip()
-            if register_channel and register_channel == 'fwh':
-                openid = request.session.get('openid')
-                if openid:
-                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
-                    bindUser(w_user, request.user)
-        except Exception, e:
-            logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:

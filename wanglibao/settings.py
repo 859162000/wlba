@@ -144,6 +144,7 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
+    'wanglibao_invite',
     'wanglibao_geetest',
 )
 
@@ -190,7 +191,8 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
+
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -946,6 +948,9 @@ PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
 PROMO_TOKEN_USER_KEY = 'tid'
 
+SHARE_INVITE_KEY = "fwh_fp"
+
+
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 # CAPTCHA_CHALLENGE_FUNCT = 'wanglibao.helpers.random_char_challenge'
@@ -1315,8 +1320,8 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST = 'https://staging.wanglibao.com'
+    WEIXIN_CALLBACK_URL = "https://staging.wanglibao.com"
+    CALLBACK_HOST = "https://staging.wanglibao.com"
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
