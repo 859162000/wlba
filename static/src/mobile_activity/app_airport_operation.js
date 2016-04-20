@@ -73,7 +73,39 @@
 			link : shareLink,
 			imgUrl: shareImg
 		})
-	})
+	});
+
+	$('.six_btn').on("click",function(){
+
+            $.ajax({
+                type: "post",
+                url: "/api/activity/konggang/",
+                dataType: 'json',
+                success: function(data){
+                    if(data.ret_code='1000'){
+                        window.location.href = '/accounts/login/?next=/activity/app_airport_operation/'
+                    }else if(data.ret_code='1002'){
+                        $('.popup_box .main .text').text(''+data.message+'');
+                        $('.popup_box').show();
+                    }else if(data.ret_code='0'){
+                        $('.popup_box .main .text').text(''+data.message+'');
+                        $('.popup_box').show();
+                    }else if(data.ret_code='1003'){
+                        $('.popup_box .main .text').text(''+data.message+'');
+                        $('.popup_box').show();
+                    }
+
+                    //console.log(data)
+                }
+            })
+
+
+        })
+        $('.popup_box .popup_button').click(function(){
+            $('.popup_box').hide();
+        });
+
+
 
 })(org);
 
