@@ -1334,15 +1334,16 @@ def verified_user_login(phone, ip, action=None):
     from wanglibao_account.models import GeetestModifiedTimes
     phone_times = 'login_verified_phone_times_%s' % (phone,)
     ip_times = 'login_verified_ip_times_%s' % (ip,)
-    phone_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
-    if not phone_record:
-        try:
-            phone_record = GeetestModifiedTimes.objects.create(
-                identified=phone_times,
-                times=0)
-        except Exception:
-            logger.debug('极验验证手机验证次数创建数据记录失败')
     with transaction.atomic():
+        phone_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+        if not phone_record:
+            try:
+                phone_record = GeetestModifiedTimes.objects.create(
+                    identified=phone_times,
+                    times=0)
+            except Exception:
+                logger.debug('极验验证手机验证次数创建数据记录失败')
+
         if action == 'reset':
             phone_record.times = 0
             phone_verified_times = 0
@@ -1352,15 +1353,16 @@ def verified_user_login(phone, ip, action=None):
             phone_record.times = phone_verified_times + 1
             phone_record.save()
 
-    ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
-    if not ip_record:
-        try:
-            ip_record = GeetestModifiedTimes.objects.create(
-                    identified=ip_times,
-                    times=0)
-        except Exception:
-            logger.debug('极验验证手机验证次数创建数据记录失败')
     with transaction.atomic():
+        ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+        if not ip_record:
+            try:
+                ip_record = GeetestModifiedTimes.objects.create(
+                        identified=ip_times,
+                        times=0)
+            except Exception:
+                logger.debug('极验验证手机验证次数创建数据记录失败')
+
         if action == 'reset':
             ip_record.times = 0
             ip_record.save()
@@ -1371,10 +1373,10 @@ def verified_user_login(phone, ip, action=None):
             ip_record.save()
 
     if phone_verified_times >= 2:
-        return False, u'同一用户输入用户名或密码错误2次以上'
+        return False, u'用户名或密码错误2次以上'
     if ip_verified_times >= 5:
-        return False, u'同一IP联系登录次数失败5次以上'
-    return True
+        return False, u'同一IP失败5次以上'
+    return True, 'success'
 
 @sensitive_post_parameters()
 @csrf_protect
