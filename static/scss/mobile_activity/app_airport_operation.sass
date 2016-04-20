@@ -20,6 +20,10 @@ html,body
 .li1
     background: url("/static/imgs/mobile_activity/app_airport_operation/login.jpg") no-repeat
     background-size: cover
+    @media screen and (max-height: 568px)
+        background-size: 100% 100%
+    @media screen and (max-device-height: 568px)
+        background-size: 100% 100%
 .li2
     background: #ffffff
     @extend .flex
@@ -69,6 +73,10 @@ html,body
 .li3
     background: url("/static/imgs/mobile_activity/app_airport_operation/three.jpg") no-repeat
     background-size: cover
+    @media screen and (max-height: 568px)
+        background-size: 100% 100%
+    @media screen and (max-device-height: 568px)
+        background-size: 100% 100%
 .three_text
     width: 100%
     height: auto
@@ -110,15 +118,27 @@ html,body
 .li4
     background: url("/static/imgs/mobile_activity/app_airport_operation/four.jpg") no-repeat
     background-size: cover
+    @media screen and (max-height: 568px)
+        background-size: 100% 100%
+    @media screen and (max-device-height: 568px)
+        background-size: 100% 100%
 .four_text
     padding-left: 20%
 .li5
     background: url("/static/imgs/mobile_activity/app_airport_operation/five.jpg") no-repeat
     background-size: cover
+    @media screen and (max-height: 568px)
+        background-size: 100% 100%
+    @media screen and (max-device-height: 568px)
+        background-size: 100% 100%
 .li6
     background: url("/static/imgs/mobile_activity/app_airport_operation/six.jpg") no-repeat
     background-size: cover
     padding: 2rem
+    @media screen and (max-height: 568px)
+        background-size: 100% 100%
+    @media screen and (max-device-height: 568px)
+        background-size: 100% 100%
     span
         width: .775rem
         height: .125rem
@@ -144,7 +164,7 @@ html,body
                 display: none
 
 
-.six_btn
+.li6 span.six_btn
     width: 7rem
     height: 2rem
     background: $colorea
@@ -155,6 +175,7 @@ html,body
     line-height: 2rem
     display: block
     margin: .8rem auto 0 auto
+
 .indicate
     width: 2.3rem
     height: 1rem
@@ -245,12 +266,13 @@ html,body
         border-radius: 1rem
         z-index: 99
         padding-bottom: 0.25rem
-        .text
+        .textairport
             width: 100%
             text-align: center
             line-height: 0.6rem
             font-size: 0.5rem
             padding: 0.75rem 0 0.5rem
+            max-height: 9999px
         .popup_button
             width: 30%
             height: 0.75rem
@@ -258,7 +280,7 @@ html,body
             text-align: center
             margin: 0 auto 0.5rem
             display: block
-            background: #ed2b4e
+            background: #e0531a
             border-radius: 0.25rem
             color: #fff
             font-size: 0.5rem

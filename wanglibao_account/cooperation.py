@@ -2016,7 +2016,16 @@ class BaJinSheRegister(CoopRegister):
         :param user:
         :return:
         """
-        pass
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and len(channel_user) <= bid_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            # FixMe, 继承此类，需注意bid逻辑
+            binding.bid = channel_user or get_uid_for_coop(user.id)
+            binding.save()
 
     def validate_call_back(self, user):
         channel = get_user_channel_record(user.id)
@@ -2253,6 +2262,24 @@ class BiSouYiRegister(BaJinSheRegister):
         self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.channel_content_key, None)
         self.request.session.pop(self.internal_channel_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        channel_account = getattr(user, 'account', '')
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and channel_account and len(channel_user) <= bid_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user or get_uid_for_coop(user.id)
+            binding.extra = channel_account
+            binding.save()
 
 
 # 注册第三方通道

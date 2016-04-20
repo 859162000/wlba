@@ -51,7 +51,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                                   TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
                                   InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
                                   BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi,
-                                  ActivityUserInfoUploadApi, GeetestAPIView)
+                                  ActivityUserInfoUploadApi, GeetestAPIView, AccessUserExistsApi, BiSouYiUserExistsApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -372,10 +372,18 @@ urlpatterns += patterns(
 # 比搜益接口
 urlpatterns += patterns(
     '',
+    # 比搜益判断手机号是否已经绑定渠道或被注册
+    url(r'^bisouyi/exists/$', BiSouYiUserExistsApi.as_view()),
     # 新用户注册
     url(r'^bisouyi/register/$', BiSouYiRegisterApi.as_view()),
     # 新用户一键注册接口
     url(r'^bisouyi/one_key_register/$', BiSouYiRegisterView.as_view()),
     # 老用户登录
     url(r'^bisouyi/login/$', BiSouYiLoginApi.as_view()),
+)
+
+# 判断手机号是否已经绑定渠道或被注册
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/exists/$', AccessUserExistsApi.as_view()),
 )
