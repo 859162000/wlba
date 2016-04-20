@@ -658,7 +658,7 @@ class BaJinSheCallback(CoopCallback):
                 # 推送账户数据
                 p2p_margin = user.margin.margin
                 total_asset = get_user_p2p_total_asset(user)
-                self.register_call_back(user_id, order_id, total_asset, p2p_margin)
+                self.register_call_back(user_id, order_id, total_asset=total_asset, p2p_margin=p2p_margin)
 
     def get_amortize_data(self, **kwargs):
         user_amo = kwargs['user_amo']

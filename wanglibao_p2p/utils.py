@@ -63,13 +63,12 @@ def get_user_p2p_total_asset(user):
 
     unpayed_principle = 0
     for equity in p2p_equities:
-        if equity.confirm:
-            unpayed_principle += equity.unpaid_principal  # 待收本金
+        unpayed_principle += equity.unpaid_principal  # 待收本金
 
     p2p_margin = user.margin.margin  # P2P余额
     p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
     p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
-    other_amount = user.margin.other_amount  # P2P待收本金
+    other_amount = user.margin.other_amount  # P2P基金
     p2p_unpayed_principle = unpayed_principle  # P2P待收本金
 
     p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle + other_amount
