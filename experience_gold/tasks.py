@@ -5,13 +5,14 @@ import logging
 from datetime import datetime, timedelta
 from django.db import transaction
 from django.utils import timezone
-from models import ExperienceAmortization
+from models import ExperienceAmortization, ExperiencePurchaseLockRecord
 from marketing.utils import local_to_utc
 from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
+from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +33,22 @@ def experience_repayment_plan():
     with transaction.atomic():
         phone_list = list()
         message_list = list()
-        amortizations = ExperienceAmortization.objects.filter(settled=False).filter(term_date__lt=end).select_for_update()
-        for amo in amortizations:
+        # 锁定指定的临时用户[274947] 12000000001
+        purchase_code = 'experience_settled'
+        user = User.objects.filter(pk=274947).first()
 
+        settled_lock_record = ExperiencePurchaseLockRecord.objects.select_for_update().\
+            filter(user=user, purchase_code=purchase_code).first()
+        if not settled_lock_record:
+            # 没有记录时创建一条
+            try:
+                ExperiencePurchaseLockRecord.objects.create(
+                    user=user, purchase_code=purchase_code, purchase_times=1, description=u'体验金回款锁表用')
+            except Exception:
+                logger.exception("Error: experience settled err, user: %s, phone: 12000000001" % user.id)
+
+        amortizations = ExperienceAmortization.objects.filter(settled=False).filter(term_date__lt=end)
+        for amo in amortizations:
             try:
                 amo.settled = True
                 amo.settlement_time = timezone.now()
