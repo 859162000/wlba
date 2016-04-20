@@ -863,8 +863,8 @@ class RewardDistributer(object):
         self.Processor = {
             ThanksGivenRewardDistributer: ('all',),
             XingMeiRewardDistributer: ('all',),
-            KongGangRewardDistributer:('all',),
-            ZhaoXiangGuanRewardDistributer:('all',),
+            KongGangRewardDistributer:('kgyx',),
+            ZhaoXiangGuanRewardDistributer:('ys',),
         }
 
     @property
@@ -876,7 +876,7 @@ class RewardDistributer(object):
     def processors(self):
         processor = []
         for key, value in self.Processor.items():
-            if self.activity in value:
+            if key().token in value:
                 processor.append(key)
         return processor
 
@@ -899,12 +899,10 @@ class KongGangRewardDistributer(RewardDistributer):
         all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
         send_reward = None
-        if  self.amount>=500 and self.amount<5000:
-            send_reward = cip_reward
-        if  self.amount>=5000 and self.amount<10000:
-            send_reward = wait_reward or cip_reward
-        if  self.amount>=10000:
-            send_reward = all_reward or wait_reward or cip_reward
+        if  self.amount>=15000 and self.amount<20000:
+            send_reward = wait_reward
+        if  self.amount>=20000:
+            send_reward = all_reward or wait_reward
         if send_reward:
             try:
                 WanglibaoActivityReward.objects.create(
