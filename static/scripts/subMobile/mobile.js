@@ -3049,6 +3049,27 @@ org.redpacket = (function(org){
             lib._checkFrom();
             lib.shareOk();
         },
+        _getCode: function(){
+            var is_bind = $("input.is_bind").val(),
+                fphone = $("input.fphone").val(),
+                original_id = $("input.original_id").val(),
+                weixin_channel = $("input.weixin_channel_code").val();
+            if(is_bind) return;
+            org.ajax({
+                url: '/weixin/api/generate/qr_invite_scene_ticket/',
+                type: 'get',
+                data: {
+                    'original_id': original_id,
+                    'fp': fphone,
+                    'code': weixin_channel
+                },
+                dataType: 'json',
+                success: function(data){
+                    console.log(data);
+                    $("#js-share-sign").attr("src", data.qrcode_url);
+                }
+            });
+        },
         _checkFrom: function () {
             var share_alt = $("section.redpacket-share-alt");
             //分享　引导
@@ -3060,6 +3081,7 @@ org.redpacket = (function(org){
             });
 
             //打开红包雨
+            var openBtn = false;
             $("div.js-open-redpacket").on("click", function(){
                 var self = $(this);
                 if(self.prop("disabeld")){
@@ -3075,11 +3097,11 @@ org.redpacket = (function(org){
                     },
                     success: function (data) {
                         if(data.ret_code != 0){
-                            org.ui.alert(data.msg);
+                            org.ui.alert(JSON.stringify(data)+","+data.msg);
                             return;
                         }
+                        openBtn = true;
                         window.location.reload();
-                        _getCode();
                     },
                     error: function () {
                         alert("系统繁忙，请稍后再试");
@@ -3090,26 +3112,8 @@ org.redpacket = (function(org){
 
                 });
             });
-            function _getCode(){
-                var is_bind = $("input.is_bind").val(),
-                    fphone = $("input.fphone").val(),
-                    original_id = $("input.original_id").val(),
-                    weixin_channel = $("input.weixin_channel_code").val();
-                if(is_bind) return;
-                org.ajax({
-                    url: '/weixin/api/generate/qr_invite_scene_ticket/',
-                    type: 'get',
-                    data: {
-                        'original_id': original_id,
-                        'fp': fphone,
-                        'code': weixin_channel
-                    },
-                    dataType: 'json',
-                    success: function(data){
-                        console.log(data);
-                        $("#js-share-sign").attr("src", data.qrcode_url);
-                    }
-                });
+            if(openBtn){
+                lib._getCode();
             }
         },
         shareFn: function(){
