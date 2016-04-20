@@ -1963,7 +1963,7 @@ class AccessUserExistsApi(APIView):
             coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
             sign_is_ok = coop_sign_check()
             coop_exists_processor = getattr(rest_utils, 'process_%s_user_exists' % channel_code.lower(), None)
-            response_data = coop_exists_processor(user, introduce_by, sign_is_ok)
+            response_data = coop_exists_processor(user, introduce_by, phone, sign_is_ok)
         else:
             response_data = {
                 'ret_code': 10020,

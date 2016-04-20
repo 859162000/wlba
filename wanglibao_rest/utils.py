@@ -361,7 +361,7 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
     return response_data
 
 
-def process_bajinshe_user_exists(user, introduce_by, sign_is_ok):
+def process_bajinshe_user_exists(user, introduce_by, phone, sign_is_ok):
     if sign_is_ok:
         if introduce_by and user:
             response_data = {
@@ -369,7 +369,6 @@ def process_bajinshe_user_exists(user, introduce_by, sign_is_ok):
                 'message': u'该号已注册',
                 'invitation_code': 'bajinshe',
                 'user_id': get_uid_for_coop(user.id),
-                'ext': '',
             }
         elif not user:
             response_data = {
@@ -377,7 +376,6 @@ def process_bajinshe_user_exists(user, introduce_by, sign_is_ok):
                 'message': u'该号未注册',
                 'invitation_code': '',
                 'user_id': '',
-                'ext': '',
             }
         else:
             response_data = {
@@ -385,7 +383,6 @@ def process_bajinshe_user_exists(user, introduce_by, sign_is_ok):
                 'message': u'该号已注册，非本渠道用户',
                 'invitation_code': 'bajinshe',
                 'user_id': get_uid_for_coop(user.id),
-                'ext': '',
             }
     else:
         response_data = {
@@ -393,7 +390,9 @@ def process_bajinshe_user_exists(user, introduce_by, sign_is_ok):
             'message': u'无效签名',
             'invitation_code': '',
             'user_id': '',
-            'ext': '',
         }
+
+    response_data['ext'] = ''
+    response_data['usn'] = phone
 
     return response_data
