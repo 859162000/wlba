@@ -1330,6 +1330,51 @@ class MessageDetailAPIView(APIView):
         result = inside_message.sign_read(request.user, message_id)
         return Response(result)
 
+def verified_user_login(phone, ip, action=None):
+    from wanglibao_account.models import GeetestModifiedTimes
+    phone_times = 'login_verified_phone_times_%s' % (phone,)
+    ip_times = 'login_verified_ip_times_%s' % (ip,)
+    phone_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+    if not phone_record:
+        try:
+            phone_record = GeetestModifiedTimes.objects.create(
+                identified=phone_times,
+                times=0)
+        except Exception:
+            logger.debug('极验验证手机验证次数创建数据记录失败')
+    with transaction.atomic():
+        if action == 'reset':
+            phone_record.times = 0
+            phone_verified_times = 0
+            phone_record.save()
+        else:
+            phone_verified_times = phone_record.times
+            phone_record.times = phone_verified_times + 1
+            phone_record.save()
+
+    ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+    if not ip_record:
+        try:
+            ip_record = GeetestModifiedTimes.objects.create(
+                    identified=ip_times,
+                    times=0)
+        except Exception:
+            logger.debug('极验验证手机验证次数创建数据记录失败')
+    with transaction.atomic():
+        if action == 'reset':
+            ip_record.times = 0
+            ip_record.save()
+            ip_verified_times = 0
+        else:
+            ip_verified_times = ip_record.times
+            ip_record.times = ip_verified_times + 1
+            ip_record.save()
+
+    if phone_verified_times >= 2:
+        return False, u'同一用户输入用户名或密码错误2次以上'
+    if ip_verified_times >= 5:
+        return False, u'同一IP联系登录次数失败5次以上'
+    return True
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -1350,8 +1395,7 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
             identifier = request.POST.get('identifier', None)
             if form.is_valid():
                 # 用户的登录次数,存储在session中,用户登录成功后,清零用户的登录次数
-                request.session['login_verified_times_%s' % (request.POST.get('identifier'))] = 0
-                request.session['login_verified_ips_%s' % (client_ip, )] = 0
+                verified_user_login(identifier, client_ip, 'reset')
                 auth_login(request, form.get_user())
 
                 if request.POST.has_key('remember_me'):
@@ -1362,29 +1406,15 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
             else:
                 # 用户的登录次数失败后,处理对应的session
                 if request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
-                    verified_times = request.session.get("login_verified_times_%s" % (request.POST.get('identifier')), 0)
-                    verified_ips = request.session.get("login_verified_ips_%s" % (client_ip,), 0)
-                    if verified_times >= 2:
+                    result, msg = verified_user_login(identifier, client_ip)
+                    if not result:
                         json_response = {
                             'ret_code': '7001',
-                            'message': u'错误登录次数超过两次'
+                            'message': msg
                         }
-                        request.session['login_verified_times_%s' % (request.POST.get('identifier'))] = verified_times+1
-                        request.session['login_verified_ips_%s' % (client_ip,)] = verified_ips+1
                         return HttpResponse(json.dumps(json_response), content_type='application/json')
                     else:
-
-                        request.session['login_verified_times_%s' % (request.POST.get('identifier'))] = verified_times+1
-                        request.session['login_verified_ips_%s' % (client_ip,)] = verified_ips+1
-                        if verified_ips >= 5:
-                            json_response = {
-                                'ret_code': '7001',
-                                'message': u'IP错误登录次数超过五次'
-                            }
-                            return HttpResponse(json.dumps(json_response), content_type='application/json')
-                        else:
-                            return HttpResponseForbidden(messenger(form.errors))
-
+                        return HttpResponseForbidden(messenger(form.errors))
                 else:
                     return HttpResponseForbidden(messenger(form.errors))
         else:
