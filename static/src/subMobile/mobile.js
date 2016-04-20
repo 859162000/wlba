@@ -2945,7 +2945,6 @@ org.redpacket = (function(org){
                         if(data.qrcode_url){
                             imgDom.attr("src", data.qrcode_url);
                         }
-                        imgDom.show();
                     }
                 });
             }
