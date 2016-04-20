@@ -25,7 +25,7 @@ from wanglibao.settings import ENV, ENV_PRODUCTION
 import logging
 import hashlib
 import pytz
-from M2Crypto.EVP import Cipher
+#from M2Crypto.EVP import Cipher
 import urllib
 from .models import UserThreeOrder
 import requests
