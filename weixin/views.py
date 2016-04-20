@@ -1678,26 +1678,29 @@ class GenerateInviteQRSceneTicket(APIView):
         original_id = request.GET.get('original_id')
         inviter_phone = request.GET.get('fp', "")
         channel_code = request.GET.get('code')
-        if not original_id or not inviter_phone or not channel_code:
+        if not original_id  or not channel_code:
             return Response({'errcode':-1, 'errmsg':"-1"})
-        inviter_phone = base64.b64decode(inviter_phone + '=')[0:-1]#base64.b64encode(inviter_phone+"=")[0:-1]
-        inviter_profile = WanglibaoUserProfile.objects.filter(phone=inviter_phone).first()
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
-        channel = WeiXinChannel.objects.filter(code=channel_code).first()
-        if channel:
-            scene_id = str(inviter_profile.user.id) + str(channel.digital_code)
-            scene_id = int(scene_id)
-            # print int(request.user.id)
-            qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
-            # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
-            try:
-                rs = client.qrcode.create(qrcode_data)
-                qrcode_url = client.qrcode.get_url(rs.get('ticket'))
-            except WeChatException,e:
-                logger.debug("'errcode':%s, 'errmsg':%s"%(e.errcode, e.errmsg))
-                return Response({'errcode':e.errcode, 'errmsg':e.errmsg, "qrcode_url":weixin_account.qrcode_url})
-        return Response({'qrcode_url':qrcode_url})
+        if inviter_phone:
+            inviter_phone = base64.b64decode(inviter_phone + '=')[0:-1]#base64.b64encode(inviter_phone+"=")[0:-1]
+            inviter_profile = WanglibaoUserProfile.objects.filter(phone=inviter_phone).first()
+
+            channel = WeiXinChannel.objects.filter(code=channel_code).first()
+            if channel:
+                scene_id = str(inviter_profile.user.id) + str(channel.digital_code)
+                scene_id = int(scene_id)
+                # print int(request.user.id)
+                qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
+                # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
+                try:
+                    rs = client.qrcode.create(qrcode_data)
+                    qrcode_url = client.qrcode.get_url(rs.get('ticket'))
+                except WeChatException,e:
+                    logger.debug("'errcode':%s, 'errmsg':%s"%(e.errcode, e.errmsg))
+                    return Response({'errcode':e.errcode, 'errmsg':e.errmsg, "qrcode_url":weixin_account.qrcode_url})
+                return Response({'qrcode_url':qrcode_url})
+        return Response({'errcode':-1, 'errmsg':"inviter_phone is null or channel not exist", "qrcode_url":weixin_account.qrcode_url})
 
 
 class GenerateQRLimitSceneTicket(APIView):
