@@ -2952,7 +2952,7 @@ class BiSouYiLoginApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = BiSouYiRegisterForm(self.request.session)
+        form = BiSouYiRegisterForm(self.request.session, action='login')
         p_code = settings.BISOUYI_PCODE
         oauth_data = {
             'pcode': p_code,
