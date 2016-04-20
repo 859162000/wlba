@@ -218,25 +218,31 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;(function(org) {
-	var sixlis = document.getElementById("six_lis"),
-         audio = document.getElementById("audios"),
-         audiobtn = document.getElementById("audio");
-     var ss = 1;
+
+
+	var sixlis = document.getElementById("six_lis");
+
      $('#sec').fullpage();
      sixlis.addEventListener("touchstart",function(){
           $(this).next().slideToggle();
       },false)
-     audiobtn.addEventListener("click",function(){
-          if(ss == 1){
-              $(this).addClass("audio_off");
-              audio.pause();
-              ss = 2;
-          }else{
-              audio.play();
-              $(this).removeClass("audio_off");
-              ss = 1;
-          }
-     },false);
+
+
+    var mp3 = document.getElementById("audios"),play = $('#audio');
+    play.on('click', function (e) {
+        if (mp3.paused) {
+            mp3.play();
+            $('#audio').removeClass("audio_off");
+        } else {
+            mp3.pause();
+            $('#audio').addClass("audio_off");
+        }
+    });
+
+    mp3.play();
+    $(document).one('touchstart', function () {
+        mp3.play();
+    });
 
 	var h5_user_static;
     org.ajax({
@@ -296,7 +302,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	$('.six_btn').on("click",function(){
 
-            $.ajax({
+            org.ajax({
                 type: "post",
                 url: "/api/activity/konggang/",
                 dataType: 'json',

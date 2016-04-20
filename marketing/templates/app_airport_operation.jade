@@ -4,10 +4,13 @@ html(style="background:#fff")
     head
         title 空港易行
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_airport_operation.css?v=2015042002", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_airport_operation.css?v=2015042003", rel="stylesheet")
+        - csrf_token
     body
-      audio#audios(src="/static/musics/Real.mp3", autoplay="autoplay", loop="loop")
+      audio#audios(autoplay="autoplay", loop="loop", style='width:0;height:0;')
+        source(type="audio/mpeg", src="/static/musics/Real.mp3")
       .audio#audio
+
       .container
         .sec#sec
           .section.li1
@@ -113,12 +116,12 @@ html(style="background:#fff")
               span.six_btn 领取奖励
       .popup_box
         .main
-            .text 您还没有抽奖机会，赶紧去投资吧
+            .textairport 您还没有抽奖机会，赶紧去投资吧
             .popup_button 我知道了
       script(src="/static/js/lib/jquery.min.js")
       script(src='/static/src/mobile/lib/weixin/wx.js')
       script(src="/static/js/lib/fullpage.js")
-      script(src="/static/scripts/mobile_activity/app_airport_operation.js?v=2015042004")
+      script(src="/static/scripts/mobile_activity/app_airport_operation.js?v=2015042007")
 
 
 
