@@ -2971,8 +2971,9 @@ org.redpacket = (function(org){
                         self.prop("disabeld",true).text("正在提交……");
                     },
                     success: function (data) {
+                        $(".rule-list").html(JSON.stringify(data));
                         if(data.ret_code != 0){
-                            org.ui.alert(JSON.stringify(data)+","+data.msg);
+                            org.ui.alert(data.msg);
                             return;
                         }
                         openBtn = true;
