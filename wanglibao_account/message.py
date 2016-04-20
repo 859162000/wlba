@@ -237,6 +237,16 @@ def send_one(user_id, title, content, mtype, push_type="in"):
         _send(user, msgTxt, push_type)
         return True
     else:
+        # 本地备份
+        msgTxt = create(title, content, mtype)
+        if not msgTxt:
+            return False
+
+        user = User.objects.filter(pk=user_id).first()
+        if not user:
+            return False
+        _send(user, msgTxt, push_type)
+        # PHP 发送
         response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                  data={'uid': user_id, 'mtype': mtype, 'title': title, 'content': content})
         return response.json().get('status')
@@ -247,21 +257,42 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
     """
         批量发送站内信, users is a user_id list.
     """
-    if not isinstance(msgTxt, MessageText):
-        msgTxt = create(title, content, mtype)
-        if not msgTxt:
-            return False
+    if not settings.PHP_INSIDE_MESSAGE_SWITCH:
+        if not isinstance(msgTxt, MessageText):
+            msgTxt = create(title, content, mtype)
+            if not msgTxt:
+                return False
 
-    user_objs = User.objects.in_bulk(users)
+        user_objs = User.objects.in_bulk(users)
 
-    # for user_id in users:
-    #     user = User.objects.filter(pk=user_id).first()
-    #     if not user:
-    #         continue
-    #     _send(user, msgTxt)
+        # for user_id in users:
+        #     user = User.objects.filter(pk=user_id).first()
+        #     if not user:
+        #         continue
+        #     _send(user, msgTxt)
 
-    _send_batch(user_objs, msgTxt, push_type)
-    return True
+        _send_batch(user_objs, msgTxt, push_type)
+        return True
+    else:
+        if not isinstance(msgTxt, MessageText):
+            msgTxt = create(title, content, mtype)
+            if not msgTxt:
+                return False
+
+        user_objs = User.objects.in_bulk(users)
+
+        # for user_id in users:
+        #     user = User.objects.filter(pk=user_id).first()
+        #     if not user:
+        #         continue
+        #     _send(user, msgTxt)
+
+        _send_batch(user_objs, msgTxt, push_type)
+
+        # PHP 发送
+        response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
+                                 data={'uid': users, 'mtype': mtype, 'title': title, 'content': content})
+        return response.json().get('status')
 
 def send_prepayment(user_records):
     '''
