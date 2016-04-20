@@ -162,6 +162,7 @@ class AccountTemplate(TemplateView):
         info = getMiscValue("fwh_cfg_info")
         fetch_experience_url = info.get('fetch_experience_url', "").strip()
         fetch_coupon_url = info.get("fetch_coupon_url", "").strip()
+        share_invite_url = info.get("share_invite_url", "").strip()
         if not fetch_coupon_url.startswith("http"):
             if not fetch_coupon_url.startswith("/"):
                 fetch_coupon_url=settings.CALLBACK_HOST + "/" + fetch_coupon_url
@@ -172,6 +173,11 @@ class AccountTemplate(TemplateView):
                 fetch_experience_url=settings.CALLBACK_HOST + "/" + fetch_experience_url
             else:
                 fetch_experience_url=settings.CALLBACK_HOST + fetch_experience_url
+        if not share_invite_url.startswith("http"):
+            if not share_invite_url.startswith("/"):
+                share_invite_url=settings.CALLBACK_HOST + "/" + share_invite_url
+            else:
+                share_invite_url=settings.CALLBACK_HOST + share_invite_url
         result = list_redpack(self.request.user, 'all', 'all', 0, 'all')
         seg = SendExperienceGold(self.request.user)
         experience_amount = seg.get_amount()
@@ -183,6 +189,7 @@ class AccountTemplate(TemplateView):
             'margin': account_info['p2p_margin'],
             'fetch_experience_url':fetch_experience_url,
             'fetch_coupon_url':fetch_coupon_url,
+            "share_invite_url":share_invite_url,
             'coupon_num':len(result["packages"]['unused']),
             'experience_amount':experience_amount
         }
