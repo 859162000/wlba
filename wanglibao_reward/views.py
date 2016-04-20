@@ -993,6 +993,26 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                         has_sent=False,
                         left_times=1,
                         join_times=1)
+                
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='sy', has_sent=False).first()
+                if reward:
+                    reward.has_sent=True
+                    reward.left_time=0
+                    send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
+                               u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
+                               u'感谢您的参与！【网利科技】' % (reward.reward.content)
+                    send_messages.apply_async(kwargs={
+                        "phones": [request.user.wanglibaouserprofile.phone, ],
+                        "message": send_msg,
+                    })
+    
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": request.user.id,
+                        "title": u"影像投资节优惠码",
+                        "content": send_msg,
+                        "mtype": "activity"
+                    })
+                reward.save()                
             except Exception:
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,影像投资节优惠码发奖报错')
         else: #所有奖品已经发完了
