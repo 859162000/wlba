@@ -46,7 +46,7 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha, BiSouYiRegisterForm
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid, get_coop_binding_for_phone)
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid, get_introduce_by_for_phone)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
@@ -1959,11 +1959,11 @@ class AccessUserExistsApi(APIView):
         if form.is_valid():
             phone = form.cleaned_data['phone']
             user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-            binding = get_coop_binding_for_phone(channel_code, phone)
+            introduce_by = get_introduce_by_for_phone(phone, channel_code)
             coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
             sign_is_ok = coop_sign_check()
-            coop_register_processor = getattr(rest_utils, 'process_%s_user_exists' % channel_code.lower(), None)
-            response_data = coop_register_processor(user, binding, sign_is_ok)
+            coop_exists_processor = getattr(rest_utils, 'process_%s_user_exists' % channel_code.lower(), None)
+            response_data = coop_exists_processor(user, introduce_by, sign_is_ok)
         else:
             response_data = {
                 'ret_code': 10020,
