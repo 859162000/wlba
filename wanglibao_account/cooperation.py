@@ -1296,7 +1296,7 @@ class ZhaoXiangGuanRegister(CoopRegister):
                 if send_reward:
                     try:
                         ActivityReward.objects.create(
-                                activity='kgyx',
+                                activity='sy',
                                 order_id=order_id,
                                 user=user,
                                 p2p_amount=p2p_record.amount,
