@@ -352,3 +352,39 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
     }
 
     return response_data
+
+
+def process_bajinshe_user_exists(user, binding, sign_is_ok):
+    is_bjs_user = False
+    if sign_is_ok:
+        if binding and user:
+            is_bjs_user = True
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号已注册',
+            }
+
+        elif not user:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号未注册',
+            }
+        else:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号已注册，非本渠道用户',
+            }
+    else:
+        response_data = {
+            'ret_code': 10008,
+            'message': u'无效签名',
+        }
+
+    response_data['invitation_code'] = ''
+    response_data['user_id'] = ''
+    response_data['ext'] = ''
+    if is_bjs_user:
+        response_data['user_id'] = binding.bid
+        response_data['invitation_code'] = binding.channel.code
+
+    return response_data

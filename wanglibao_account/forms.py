@@ -524,32 +524,35 @@ class BiSouYiRegisterForm(forms.Form):
                 if 'mobile' in content_data:
                     phone = str(content_data['mobile'])
                     if detect_identifier_type(phone) == 'phone':
-                        users = User.objects.filter(wanglibaouserprofile__phone=phone)
-                        if not users.exists() or self.action != 'register':
-                            if 'other' in content_data:
-                                if 'account' in content_data:
-                                    if self.action == 'login':
-                                        if 'token' not in content_data:
-                                            raise forms.ValidationError(
-                                                code=10020,
-                                                message=u'content没有包含token'
-                                            )
-                                    return content, content_data
+                        if self.action != 'select':
+                            users = User.objects.filter(wanglibaouserprofile__phone=phone)
+                            if not users.exists() or self.action != 'register':
+                                if 'other' in content_data:
+                                    if 'account' in content_data:
+                                        if self.action == 'login':
+                                            if 'token' not in content_data:
+                                                raise forms.ValidationError(
+                                                    code=10020,
+                                                    message=u'content没有包含token'
+                                                )
+                                        return content, content_data
+                                    else:
+                                        raise forms.ValidationError(
+                                            code=10019,
+                                            message=u'content没有包含account'
+                                        )
                                 else:
                                     raise forms.ValidationError(
-                                        code=10019,
-                                        message=u'content没有包含account'
+                                        code=10018,
+                                        message=u'content没有包含other'
                                     )
                             else:
                                 raise forms.ValidationError(
-                                    code=10018,
-                                    message=u'content没有包含other'
+                                    code=10017,
+                                    message=u'该手机号已被抢注'
                                 )
                         else:
-                            raise forms.ValidationError(
-                                code=10017,
-                                message=u'该手机号已被抢注'
-                            )
+                            return content, content_data
                     else:
                         raise forms.ValidationError(
                             code=10014,

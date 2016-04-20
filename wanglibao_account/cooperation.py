@@ -2102,7 +2102,8 @@ class BaJinSheRegister(CoopRegister):
             data = dict(base_data, **act_data)
 
             coop_callback_for_post.apply_async(
-                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code},
+                queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
     def recharge_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
