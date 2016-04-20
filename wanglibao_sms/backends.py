@@ -59,7 +59,7 @@ class ManDaoSMSBackEnd(SMSBackEnd):
 
         url = settings.SMS_MANDAO_URL
 
-        #if len(phones) > 1 and len(messages) == 1:
+        # if len(phones) > 1 and len(messages) == 1:
         if len(phones) > 1 and len(messages) > 1:
             url = settings.SMS_MANDAO_MULTICAST_URL
         try:
@@ -92,7 +92,7 @@ class ManDaoSMSBackEnd(SMSBackEnd):
                 'msgfmt': ''
             }
 
-        response = requests.post(url, params)
+        response = requests.post(url, params, timeout=5)
 
         status_code = 200
         message = None
@@ -226,7 +226,7 @@ class VoiceCodeVerify(object):
             self.voice_uid, self.voice_pwd, mobile, msgid, msg
         )
 
-        response = requests.post(url)
+        response = requests.post(url, timeout=5)
 
         if response.status_code != 200:
             response_status = response.status_code
