@@ -24,7 +24,7 @@ from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
 from wanglibao_account.utils import generate_coop_base_data
-from wanglibao_account.tasks import common_callback_for_post
+from wanglibao_account.tasks import coop_call_back
 from marketing.utils import get_user_channel_record
 from django.conf import settings
 from wanglibao_p2p.utility import get_user_margin, get_p2p_equity, GlobalVar
@@ -285,8 +285,9 @@ def coop_product_push(product_id=None):
             'products': json.dumps(product_list)
         }
         data = dict(base_data, **act_data)
-        common_callback_for_post.apply_async(
-            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_products_push'})
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
 
 @app.task
@@ -308,9 +309,9 @@ def coop_amortizations_push(amortizations, product_id):
             'amortizations': json.dumps(amortization_list)
         }
         data = dict(base_data, **act_data)
-        common_callback_for_post.apply_async(
-            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_amos_push'})
-
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
 # 只在程序初始化时执行
 if GlobalVar.get_push_status() is False:

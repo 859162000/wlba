@@ -3008,7 +3008,7 @@ class BiSouYiLoginApi(APIView):
 
                     user_phone = user.wanglibaouserprofile.phone
                     if phone != user_phone:
-                        logger.warning("BiSouYiRegisterApi query phone[%s] not eq user phone[%s]" % (phone, user_phone))
+                        logger.warning("BiSouYiLoginApi query phone[%s] not eq user phone[%s]" % (phone, user_phone))
             else:
                 response_data = {
                     'ret_code': 10011,

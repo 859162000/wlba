@@ -340,3 +340,8 @@ def coop_callback_for_post(url, params, channel):
     except Exception, e:
         logger.info(" {'%s callback':'failed to connect'} " % channel)
         logger.info(e)
+
+
+@app.task
+def coop_call_back(params):
+    pass
