@@ -50,20 +50,23 @@
     padding-right: .75rem
   .recharge-all-show
     margin-bottom: 2rem
+    padding: 0 0.75rem
+    background: #fff
     .recharge-max
       color: #ff4c2e
       font-size: $font-size10
       padding: 0 0.75rem
       margin-top: 0.25rem
+    .request-check
+      height: 1.5rem
+      line-height: 1.5rem
   .recharge-count
     display: -webkit-box
     -webkit-box-align: center
     height: 2.2rem
     font-size: $font-size12
     color: $color-grey-989898
-    background: #fff
-    text-align: center
-
+    border-bottom: 1px solid #e8e8e8
     .count-txt-left
       width: 4rem
     .count-input
@@ -78,11 +81,16 @@
       &::-webkit-input-placeholder
         color: $color-grey-b6b6b6
     .count-txt-right
+      text-align: right
       width: 2.2rem
     .recharge-select
       color: $color-grey-b6b6b6
       background: url("/static/imgs/mobile/select_icon.png") no-repeat right center #fff
       background-size: .9rem
+    .validation-btn
+      width: auto
+      button
+        padding: 0 0.5rem
   .value-submit
     padding: 0 0.5rem
   .recharge-btn
@@ -98,7 +106,8 @@
     border: 0
     &:active
       box-shadow: $active-shadow
-
+    &:disabled
+      background: rgba(219, 73, 63, 0.5)
   .binding-bank-href
     margin-bottom: 1rem
     color: $color-4e7cda
