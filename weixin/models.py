@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import datetime
 import collections
-
+import logging
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -15,7 +15,8 @@ from wanglibao.fields import JSONFieldUtf8
 from .common.wechat import gen_token
 from wechatpy.client import WeChatClient
 from wechatpy.client.api.qrcode import WeChatQRCode
-import logging
+
+from wanglibao_p2p.models import FINANCES
 
 
 
@@ -429,11 +430,13 @@ class SubscribeService(models.Model):
     SERVICE_TYPES = (
         (0, u'月标上线通知'),
         (1, u'天标上线通知'),
+        (2, u'融资类型通知')
     )
     key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
     describe = models.CharField(u'服务描述', max_length=256)
     type = models.IntegerField(u'类型', default=0, choices=SERVICE_TYPES)
     num_limit = models.IntegerField(u'数值限制', default=0)
+    finance_type = models.CharField(u'融资类型', choices=FINANCES, null=True, max_length=32)
     channel = models.CharField(u'从哪里订阅的服务', choices=CHANNELS, max_length=32)
     is_open = models.BooleanField(u'是否开启服务', default=False)
 
