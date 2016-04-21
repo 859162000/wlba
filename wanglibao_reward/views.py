@@ -929,7 +929,7 @@ class KongGangAPIView(APIView):
         if not request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
-                'message': u'用户没有登录'
+                'message': u'您还没有登陆，登陆后再去领取'
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -946,7 +946,7 @@ class KongGangAPIView(APIView):
             if reward == None:
                 json_to_response = {
                     'ret_code': 1002,
-                    'message': u'用户没有抽奖机会'
+                    'message': u'您不满足领取条件，满额投资后再来领取吧！'
                 }
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -972,7 +972,7 @@ class KongGangAPIView(APIView):
                 join_record.save()
                 json_to_response = {
                     'ret_code': 0,
-                    'message': u'奖品发放成功'
+                    'message': u'奖品发放成功，请查看网利宝站内信'
                 }
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
             else:
