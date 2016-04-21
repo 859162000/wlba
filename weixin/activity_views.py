@@ -411,7 +411,7 @@ class WechatInviteTemplate(TemplateView):
     template_name = ""
     def get_context_data(self, **kwargs):
         today = datetime.datetime.today()
-        w_user = WeixinUser.objects.filter(user=self.request.user).first()
+        # w_user = WeixinUser.objects.filter(user=self.request.user).first()
         fphone = self.request.session.get(settings.SHARE_INVITE_KEY, "")
         inviter_head_url = ""
         if fphone:
@@ -430,9 +430,9 @@ class WechatInviteTemplate(TemplateView):
         userprofile = self.request.user.wanglibaouserprofile
         share_url = settings.CALLBACK_HOST + reverse("hby_weixin_share") + "?%s=%s&%s=%s"%(settings.SHARE_INVITE_KEY, base64.b64encode(userprofile.phone+"="), settings.PROMO_TOKEN_QUERY_STRING, "hby")
         share_url = get_weixin_code_url(share_url)
-        if w_user:
-            is_bind = True if w_user.user else False
-            w_daily_reward = WechatUserDailyReward.objects.filter(w_user=w_user, create_date=today).first()
+        if self.w_user:
+            is_bind = True if self.w_user.user else False
+            w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
             if w_daily_reward and w_daily_reward.status:
                 fetched = True
                 if w_daily_reward.reward_type == "redpack":
