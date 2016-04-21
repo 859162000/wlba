@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import is_check_id_verify
@@ -22,11 +23,12 @@ from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
 from wanglibao_p2p.common import get_p2p_list
-from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser, getMiscValue
+from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser, getMiscValue, get_weixin_code_url
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_redpack.backends import list_redpack
 from experience_gold.backends import SendExperienceGold
+import base64
 
 logger = logging.getLogger("weixin")
 
@@ -177,7 +179,9 @@ class AccountTemplate(TemplateView):
             if not share_invite_url.startswith("/"):
                 share_invite_url=settings.CALLBACK_HOST + "/" + share_invite_url
             else:
-                share_invite_url=settings.CALLBACK_HOST + share_invite_url
+                share_invite_url = settings.CALLBACK_HOST + share_invite_url
+            share_invite_url = get_weixin_code_url(share_invite_url)
+
         result = list_redpack(self.request.user, 'all', 'all', 0, 'all')
         seg = SendExperienceGold(self.request.user)
         experience_amount = seg.get_amount()
