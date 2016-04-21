@@ -894,7 +894,6 @@ class KongGangRewardDistributer(RewardDistributer):
         self.token = 'kgyx'
 
     def distribute(self):
-        cip_reward = Reward.objects.filter(type='CIP专用安检通道服务', is_used=False).first()
         wait_reward = Reward.objects.filter(type='尊贵休息室服务', is_used=False).first()
         all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
