@@ -91,6 +91,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
+logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class RegisterView(RegistrationView):
@@ -1294,7 +1295,7 @@ class MessageView(TemplateView):
         if not listtype or listtype not in ("read", "unread", "all"):
             listtype = 'all'
 
-        if not settings.PHP_INSIDE_MESSAGE_SWITCH:
+        if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
             if listtype == "unread":
                 messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
                     '-message_text__created_at')
@@ -1304,9 +1305,9 @@ class MessageView(TemplateView):
             else:
                 messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
 
-        if settings.PHP_INSIDE_MESSAGE_SWITCH:
+        else:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
-                                     data={'uid': self.request.user.id, 'read_status': listtype})
+                                     data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
             resp = response.json()
             if resp['code'] == 'success':
                 count = len(resp['data'])
@@ -1367,20 +1368,7 @@ class MessageDetailAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, message_id):
-        if not settings.PHP_INSIDE_MESSAGE_SWITCH:
-            result = inside_message.sign_read(request.user, message_id)
-        else:
-            result = dict()
-            url = settings.PHP_INSIDE_MESSAGE_READ
-            if message_id == 0:
-                url = settings.PHP_INSIDE_MESSAGE_READ_ALL
-            response = requests.post(url,
-                                     data={'uid': request.user.id, 'mid': message_id})
-            resp = response.json()
-            if resp['code'] == 'success':
-                result.update(ret_code=resp['data'], message=resp['des'])
-            else:
-                result.update(ret_code=resp['data'], message=resp['des'])
+        result = inside_message.sign_read(request.user, message_id)
 
         return Response(result)
 
@@ -1637,7 +1625,9 @@ def login_for_redirect(request, template_name='registration/login.html',
     """
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if redirect_to.startswith('base64'):
+        logger.info('yuelibao!!!!!!!!!!!!!!!')
         redirect_to = base64.b64decode(redirect_to[6:])
+        logger.info('redirect to {}'.format(redirect_to))
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)

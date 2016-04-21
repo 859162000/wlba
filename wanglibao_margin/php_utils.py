@@ -579,7 +579,7 @@ def get_unread_msgs(user_id):
     ret = dict()
     if not user_id:
         return {}
-    if not settings.PHP_INSIDE_MESSAGE_SWITCH:
+    if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
         try:
             unread_num = Message.objects.filter(target_user=user_id, read_status=False, notice=True).count()
             ret.update(status=1, unread_num=unread_num)
