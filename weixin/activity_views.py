@@ -454,7 +454,21 @@ class WechatInviteTemplate(TemplateView):
             if extro_info:
                 invite_experience_amount = extro_info.invite_experience_amount
         weixin_qrcode_info = getMiscValue("weixin_qrcode_info")
-        print '--------------------------share_url::',share_url
+        logger.debug('--------------------------share_url::',share_url)
+        logger.debug('-----------------------------------',{
+            "fetched":fetched,
+            "fetched_date":fetched_date,
+            "reward_text":reward_text,
+            "reward_type":reward_type,
+            "is_bind": is_bind,
+            "friend_num":friend_num,
+            "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
+            "share_url":share_url,
+            "fphone":fphone,
+            "original_id":weixin_qrcode_info.get("fwh", ""),
+            "weixin_channel_code":"hby",
+        })
         return {
             "fetched":fetched,
             "fetched_date":fetched_date,
