@@ -149,9 +149,8 @@ class SendValidationCodeView(APIView):
 
 
     def validate_captcha(self, request):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
+        self.id = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+        self.key = '5956b4295f85efaa686e281ed08497d2'
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -226,9 +225,8 @@ class SendRegisterValidationCodeView(APIView):
         return Response({'message': message, "type": "validation"}, status=status)
 
     def validate_captcha(self, request):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
+        self.id = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+        self.key = '5956b4295f85efaa686e281ed08497d2'
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -1875,8 +1873,8 @@ class GeetestAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+        self.id = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+        self.key = '5956b4295f85efaa686e281ed08497d2'
 
     def post(self, request):
         self.type = request.POST.get('type', None)
