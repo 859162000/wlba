@@ -21,8 +21,6 @@ import djcelery
 
 djcelery.setup_loader()
 
-djcelery.setup_loader()
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CERT_DIR = os.path.join(BASE_DIR, "certificate")
@@ -168,8 +166,6 @@ LANGUAGE_CODE = 'zh-cn'
 TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -402,16 +398,22 @@ SWAGGER_SETTINGS = {
 # Celery configuration
 
 # Now since the rabbitmq installed in localhost, we use guest
-BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
+if ENV == ENV_PRODUCTION:
+    # FixMe,　修改正式环境broker host addr.
+    BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
+elif ENV == ENV_STAGING:
+    BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@192.168.1.242//')
+else:
+    BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
-
+CELERY_DEFAULT_QUEUE = 'coop_celery'
 CELERY_QUEUES = {
-    "celery": {"exchange": "celery",
-               "routing_key": "celery"},
+    # "celery": {"exchange": "celery", "routing_key": "celery"},
+    "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
 }
 
 from datetime import timedelta

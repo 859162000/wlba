@@ -48,6 +48,8 @@ class P2PProduct(models.Model):
 
     flow_time = models.DateTimeField(u'流标时间', default=now(), null=True, blank=True, db_index=True)
 
+    sync_id = models.FloatField(u'同步id(时间戳)', default=0)
+
     def save(self, *args, **kwargs):
         if self.status == u'流标':
             self.flow_time = now()
@@ -150,6 +152,7 @@ class P2PEquity(models.Model):
     confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
     unpaid_principal = models.DecimalField(u'P2P待收本金', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    sync_id = models.FloatField(u'同步id(时间戳)', default=0)
 
     class Meta:
         unique_together = (('user', 'product'),)

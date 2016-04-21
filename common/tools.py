@@ -127,3 +127,11 @@ def deserialize_instance(model, data={}):
                 pass
         setattr(ret, k, v)
     return ret
+
+
+def parase_form_error(form_errors):
+    response_data = {
+        'ret_code': 50003,
+        'message': form_errors.values()[0][0]
+    }
+    return response_data

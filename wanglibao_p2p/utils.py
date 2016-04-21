@@ -10,31 +10,44 @@ from .forms import P2PEquityForm
 
 
 def save_to_p2p_equity(req_data):
-    equity = req_data.get("equity", '')
-    if equity:
-        equity = json.loads(equity)
-        equity['created_at'] = str_to_utc(equity['created_at'])
-        if 'confirm_at' in equity:
-            equity['confirm_at'] = str_to_utc(equity['confirm_at'])
+    equity = json.loads(req_data["equity"])
+    equity['created_at'] = str_to_utc(equity['created_at'])
+    if 'confirm_at' in equity:
+        equity['confirm_at'] = str_to_utc(equity['confirm_at'])
 
-        equity_instance = P2PEquity.objects.filter(pk=equity['id']).first()
-        if equity_instance:
+    sync_id = req_data["sync_id"]
+    equity['sync_id'] = sync_id
+    equity_instance = P2PEquity.objects.filter(pk=equity['id']).first()
+    if equity_instance:
+        if sync_id >= equity_instance.sync_id:
             equity_form = P2PEquityForm(equity, instance=equity_instance)
-        else:
-            equity_form = P2PEquityForm(equity)
-
-        if equity_form.is_valid():
-            if equity_instance:
+            if equity_form.is_valid():
                 equity_form.save()
+                response_data = {
+                    'ret_code': 10000,
+                    'message': 'success',
+                }
             else:
-                user = User.objects.get(pk=equity['user'])
-                equity['user'] = user
-                p2p_product = P2PProduct.objects.get(pk=equity['product'])
-                equity['product'] = p2p_product
-                equity_instance = P2PEquity()
-                for k, v in equity.iteritems():
-                    setattr(equity_instance, k, v)
-                equity_instance.save()
+                response_data = {
+                    'ret_code': 50003,
+                    'message': equity_form.errors.values()[0][0],
+                }
+        else:
+            response_data = {
+                'ret_code': 10114,
+                'message': u'小于当前p2p_equity的sync_id[%s]' % equity_instance.sync_id,
+            }
+    else:
+        equity_form = P2PEquityForm(equity)
+        if equity_form.is_valid():
+            user = User.objects.get(pk=equity['user'])
+            equity['user'] = user
+            p2p_product = P2PProduct.objects.get(pk=equity['product'])
+            equity['product'] = p2p_product
+            equity_instance = P2PEquity()
+            for k, v in equity.iteritems():
+                setattr(equity_instance, k, v)
+            equity_instance.save()
 
             response_data = {
                 'ret_code': 10000,
@@ -45,11 +58,6 @@ def save_to_p2p_equity(req_data):
                 'ret_code': 50003,
                 'message': equity_form.errors.values()[0][0],
             }
-    else:
-        response_data = {
-            'ret_code': 10112,
-            'message': u'缺少equity参数',
-        }
 
     return response_data
 
