@@ -933,6 +933,30 @@ class KongGangAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+        key = 'konggang'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'活动还未开始,请耐心等待'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
         with transaction.atomic():
             join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code='kgyx').first()
             if not join_record:
