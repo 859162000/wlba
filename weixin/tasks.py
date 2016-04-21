@@ -69,11 +69,11 @@ def detect_product_biding(product_id):
             rate_desc = "%s%%"%product.expected_earning_rate
         if is_day_product:
             day_service = SubscribeService.objects.filter(channel='weixin', is_open=True, type=1).first()
-
-            sub_records = SubscribeRecord.objects.filter(service=day_service, status=True).all()
-            for sub_record in sub_records:
-                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
-                    _sendProductToUser(sub_record.w_user.openid, day_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+            if day_service:
+                sub_records = SubscribeRecord.objects.filter(service=day_service, status=True).all()
+                for sub_record in sub_records:
+                    if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                        _sendProductToUser(sub_record.w_user.openid, day_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
 
         else:
             services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
@@ -83,6 +83,17 @@ def detect_product_biding(product_id):
                     for sub_record in sub_records:
                         if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
                             _sendProductToUser(sub_record.w_user.openid, service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+
+        finance_service = SubscribeService.objects.filter(channel='weixin', finance_type=product.types.fiance_type, is_open=True, type=2).first()
+        if finance_service:
+            sub_records = SubscribeRecord.objects.filter(service=finance_service, status=True).all()
+            for sub_record in sub_records:
+                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                    _sendProductToUser(sub_record.w_user.openid, finance_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+
+
+
+
 
 
 @app.task
