@@ -289,6 +289,7 @@ def send_one(user_id, title, content, mtype, push_type="in"):
     """
         给某个人发送站内信（需要推送时也在这里写）
     """
+    logger.info('going to send message ! user_id = {}'.format(user_id))
     if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
         msgTxt = create(title, content, mtype)
         if not msgTxt:
@@ -342,6 +343,7 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
     """
         批量发送站内信, users is a user_id list.
     """
+    logger.info('going to send message ! user_ids = {}'.format(users))
     if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
         if not isinstance(msgTxt, MessageText):
             msgTxt = create(title, content, mtype)
