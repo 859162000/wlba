@@ -1354,14 +1354,14 @@ def verified_user_login(phone, ip, action=None):
             phone_record.save()
 
     with transaction.atomic():
-        ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+        ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=ip_times).first()
         if not ip_record:
             try:
                 ip_record = GeetestModifiedTimes.objects.create(
                         identified=ip_times,
                         times=0)
             except Exception:
-                logger.debug('极验验证手机验证次数创建数据记录失败')
+                logger.debug('极验验证IP验证次数创建数据记录失败')
 
         if action == 'reset':
             ip_record.times = 0
