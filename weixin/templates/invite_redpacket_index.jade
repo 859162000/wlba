@@ -9,6 +9,7 @@ html.service-redpacket-bg1
     input(type="hidden", name='fphone', class='fphone', value='{{ fphone|safe }}')
     input(type="hidden", name='original_id', class='original_id', value='{{ original_id }}')
     input(type="hidden", name='weixin_channel_code', class='weixin_channel_code', value='{{ weixin_channel_code }}')
+    input(type="hidden", name='share_url', class="share_url", value="{{ share_url }}")
     .top-tit
       .top-photo
         if inviter_head_url
@@ -73,4 +74,4 @@ html.service-redpacket-bg1
         p 4.活动规则活动规则活动规则活动规则活动规则
 
     script(src='/static/src/subMobile/lib/weixin/jweixin-1.0.0.js')
-    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?20160421")
+    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?2016042101")
