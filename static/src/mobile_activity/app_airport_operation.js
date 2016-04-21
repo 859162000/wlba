@@ -89,7 +89,7 @@
                 dataType: 'json',
                 success: function(data){
                     if(data.ret_code=='1000'){
-                        window.location.href = '/accounts/login/?next=/activity/app_airport_operation/'
+                        window.location.href = '/weixin/login/?next=/activity/app_airport_operation/'
                     }else if(data.ret_code=='1002'){
                         $('.popup_box .main .textairport').text(''+data.message+'');
                         $('.popup_box').show();
@@ -104,8 +104,6 @@
                     //console.log(data)
                 }
             })
-
-
         })
         $('.popup_box .popup_button').click(function(){
             $('.popup_box').hide();
