@@ -87,6 +87,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
+logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class RegisterView(RegistrationView):
@@ -1279,7 +1280,7 @@ class MessageView(TemplateView):
         if not listtype or listtype not in ("read", "unread", "all"):
             listtype = 'all'
 
-        if not settings.PHP_INSIDE_MESSAGE_SWITCH:
+        if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
             if listtype == "unread":
                 messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
                     '-message_text__created_at')
@@ -1289,9 +1290,9 @@ class MessageView(TemplateView):
             else:
                 messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
 
-        if settings.PHP_INSIDE_MESSAGE_SWITCH:
+        else:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
-                                     data={'uid': self.request.user.id, 'read_status': listtype})
+                                     data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
             resp = response.json()
             if resp['code'] == 'success':
                 count = len(resp['data'])
