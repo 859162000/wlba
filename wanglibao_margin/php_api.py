@@ -485,16 +485,19 @@ class YueLiBaoCancel(APIView):
 
                     # 增加回退红包接口
                     result = php_redpack_restore(product.id, product_id, product.amount_source, user)
-                    logger.info(u'流标返回红包. month_product_id = {}\n'.format(product_id))
+                    logger.info(u'判断是否有红包, month_product_id = {}'.format(product_id))
                     # 用户红包金额退回
-                    buyer_keeper.redpack_return(result['deduct'],
-                                                description=u"月利宝id=%s流标 红包退回%s元" % (product_id, result['deduct']))
+                    if result['ret_code'] != -1:
+                        logger.info(u'使用过红包. result = {}, result["ret_code"] = {}'.format(result, result['ret_code']))
+                        buyer_keeper.redpack_return(result['deduct'],
+                                                    description=u"月利宝id=%s流标 红包退回%s元" % (product_id, result['deduct']))
 
                     status = 1 if record else 0
                     msg_list.append({'token': product.token, 'status': status})
 
             ret.update(status=1,
                        msg=msg_list)
+            logger.info(u'month_product_id = {}, 流标成功\n'.format(product_id))
         except Exception, e:
             logger.debug(u'month_product_id = {}, 流标失败: {}\n'.format(product_id, str(e)))
             ret.update(status=0,
