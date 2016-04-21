@@ -496,7 +496,7 @@ class YueLiBaoCancel(APIView):
             ret.update(status=1,
                        msg=msg_list)
         except Exception, e:
-            logger.info(u'month_product_id = {}, 流标失败: {}\n'.format(product_id, str(e)))
+            logger.debug(u'month_product_id = {}, 流标失败: {}\n'.format(product_id, str(e)))
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
@@ -755,9 +755,49 @@ class GetRedPacks(APIView):
                 msg=u'authentic error!'
             )
 
-        return Response(red_pack_info)
+        return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))
 
-        # return HttpResponse(renderers.JSONRenderer().render(red_pack_info, 'application/json'))
+
+class GetIOSRedPacks(APIView):
+    """
+    http请求方式: post
+    http://xxxxxx.com/php/redpacks/list/
+    period = int()
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+
+        red_pack_info = dict()
+        period = request.POST.get('period', 0)
+        uid = request.POST.get('userId', 0)
+
+        if request.user.id:
+            uid = request.user.id
+
+        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
+
+        # if self.request.user.pk and int(self.request.user.pk) == int(uid):
+        # 去掉登录验证, 方便PHP
+        if period and uid:
+            device = utils.split_ua(self.request)
+
+            result = php_redpacks(User.objects.get(pk=uid), device['device_type'], period=period)
+            redpacks = result['packages'].get('available', [])
+
+            red_pack_info.update(
+                status=1,
+                redpacks=redpacks
+            )
+        else:
+            red_pack_info.update(
+                status=0,
+                msg=u'authentic error!'
+            )
+
+        return Response(red_pack_info)
 
 
 class GetAjaxRedPacks(APIView):
