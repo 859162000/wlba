@@ -68,14 +68,8 @@
                 success: function(data){
                     if(data.ret_code=='1000'){
                         window.location.href = '/accounts/login/?next=/activity/airport_operation/'
-                    }else if(data.ret_code=='1002'){
-                        $('.popup_box .main .textairport').text(data.message);
-                        $('.popup_box').show();
-                    }else if(data.ret_code=='0'){
-                        $('.popup_box .main .textairport').text(data.message);
-                        $('.popup_box').show();
-                    }else if(data.ret_code=='1003'){
-                        $('.popup_box .main .textairport').text(data.message);
+                    }else if(data.ret_code=='1002'||data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
+                        $('.popup_box .main .textairport').text(''+data.message+'');
                         $('.popup_box').show();
                     }
 

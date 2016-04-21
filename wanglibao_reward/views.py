@@ -929,7 +929,31 @@ class KongGangAPIView(APIView):
         if not request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
-                'message': u'用户没有登录'
+                'message': u'您还没有登陆，登陆后再去领取'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        key = 'konggang'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'活动还未开始,请耐心等待'
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -946,7 +970,7 @@ class KongGangAPIView(APIView):
             if reward == None:
                 json_to_response = {
                     'ret_code': 1002,
-                    'message': u'用户没有抽奖机会'
+                    'message': u'您不满足领取条件，满额投资后再来领取吧！'
                 }
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -972,7 +996,7 @@ class KongGangAPIView(APIView):
                 join_record.save()
                 json_to_response = {
                     'ret_code': 0,
-                    'message': u'奖品发放成功'
+                    'message': u'奖品发放成功，请查看网利宝站内信'
                 }
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
             else:

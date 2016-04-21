@@ -85,12 +85,12 @@ class ExperienceAmortization(models.Model):
     product = models.ForeignKey(ExperienceProduct, related_name='experience_product_subs')
     user = models.ForeignKey(User)
     term = models.IntegerField(u'还款期数')
-    term_date = models.DateTimeField(u'还款时间')
+    term_date = models.DateTimeField(u'还款时间', db_index=True)
 
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
 
-    settled = models.BooleanField(u'已结算', default=False)
+    settled = models.BooleanField(u'已结算', default=False, db_index=True)
     settlement_time = models.DateTimeField(u'结算时间', auto_now=False, null=True, blank=True)
 
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
