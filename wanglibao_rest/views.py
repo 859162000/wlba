@@ -70,7 +70,7 @@ from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 from wanglibao_invite.invite_common import ShareInviteRegister
-
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -149,8 +149,8 @@ class SendValidationCodeView(APIView):
 
 
     def validate_captcha(self, request):
-        self.id = 'bd59bf5a6833bab697fbc2bcc1f962d7'
-        self.key = '5956b4295f85efaa686e281ed08497d2'
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -225,8 +225,8 @@ class SendRegisterValidationCodeView(APIView):
         return Response({'message': message, "type": "validation"}, status=status)
 
     def validate_captcha(self, request):
-        self.id = 'bd59bf5a6833bab697fbc2bcc1f962d7'
-        self.key = '5956b4295f85efaa686e281ed08497d2'
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -1873,8 +1873,8 @@ class GeetestAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        self.id = 'bd59bf5a6833bab697fbc2bcc1f962d7'
-        self.key = '5956b4295f85efaa686e281ed08497d2'
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
 
     def post(self, request):
         self.type = request.POST.get('type', None)
