@@ -19,6 +19,7 @@ def count_msg(params, user):
     """
         计算消息条数
     """
+    logger.info('in count message!!!!!!')
     listtype = params.get("listtype", "").strip()
     if not listtype or listtype not in ("read", "unread", "all"):
         return {"ret_code":30071, "message":"参数输入错误"}
@@ -35,12 +36,14 @@ def count_msg(params, user):
         #            not in (select message_text_id from wanglibao_account_message where user_id=%s) and a.mtype in (%s)' % (user.id, actitype)).count()
         return {"ret_code": 0, "message": "ok", "count": count}
     else:
+        logger.info('in PHP_INSIDE_MESSAGE_SWITCH != 1')
         try:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                      data={'uid': user.id, 'read_status': listtype}, timeout=3)
             resp = response.json()
             if resp['code'] == 'success':
                 count = len(resp['data'])
+                return {"ret_code": 0, "message": "ok", "count": count}
             else:
                 return {"ret_code": 10001, "message": "failed", "count": -1}
         except Exception, e:
@@ -86,7 +89,7 @@ def list_msg(params, user):
             index = 0
             for message in messages:
                 message.id = data[index]['id']
-                message.read_status = data[index]['read_status']
+                message.read_status = True if data[index]['read_status'] == str(1) else False
                 message.message_text.title = data[index]['title']
                 message.message_text.content = data[index]['content']
                 message.message_text.created_at = int(data[index]['created_at'])
