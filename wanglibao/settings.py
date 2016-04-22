@@ -403,7 +403,7 @@ if ENV == ENV_PRODUCTION:
     # FixMe,　修改正式环境broker
     BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
 elif ENV == ENV_STAGING:
-    BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@192.168.1.242//')
+    BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.1.242:5672/wanglibao')
 else:
     BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
 
