@@ -511,7 +511,7 @@ class BiSouYiRegisterForm(forms.Form):
         content = self.cleaned_data['content']
         try:
             ase = Aes()
-            decrypt_text = ase.decrypt(settings.BISOUYI_AES_KEY, content)
+            decrypt_text = ase.decrypt(settings.BISOUYI_AES_KEY, content, mode='ECB')
             content_data = json.loads(decrypt_text)
         except Exception, e:
             logger.info("BiSouYiRegisterForm clean_content raise error: %s" % e)
