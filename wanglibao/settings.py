@@ -449,6 +449,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_sms.log',
             'formatter': 'verbose'
         },
+        'wanglibao_inside_messages': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/inside_messages.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -536,6 +542,10 @@ LOGGING = {
             'handlers': ['file', 'console'],
             'level': 'DEBUG'
         },
+        'wanglibao_inside_messages': {
+            'handlers': ['file', 'wanglibao_inside_messages'],
+            'level': 'DEBUG',
+        },
     }
 }
 
@@ -608,7 +618,7 @@ CELERY_QUEUES = {
     "celery": {"exchange": "celery", "routing_key": "celery"},
     "celery01": {"exchange": "celery01", "routing_key": "celery01"},
     "celery02": {"exchange": "celery02", "routing_key": "celery02"},
-    "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
+    # "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
 }
 
 from datetime import timedelta, datetime
@@ -1290,6 +1300,17 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = 'wanglibank_redis'
 
+PHP_REDIS_HOST = '192.168.20.241'
+PHP_REDIS_PORT = 6379
+PHP_REDIS_DB = 0
+PHP_REDIS_PASSWORD = 'wanglibao_ylb.com'
+
+if ENV == ENV_PRODUCTION:
+    PHP_REDIS_HOST = '10.172.83.189'
+    PHP_REDIS_PORT = 6379
+    PHP_REDIS_DB = 0
+    PHP_REDIS_PASSWORD = 'wanglibao_ylb.com'
+
 # CACHES = {
 #     'default': {
 #         'BACKEND': 'redis_cache.RedisCache',
@@ -1370,5 +1391,36 @@ if ENV == ENV_PRODUCTION:
     GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
     GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'
 else:
-    GEETEST_ID = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-    GEETEST_KEY = '6b5129633547f5b0c0967b4c65193b0c'
+    GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+    GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'
+    #GEETEST_ID = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
+    #GEETEST_KEY = '6b5129633547f5b0c0967b4c65193b0c'
+
+# settings for PHP
+PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
+
+# 控制发送站内信的地方, PHP消息中心还是主站.
+# 1 -------> 主站自己发
+# 2 -------> 主站发, 然后通知消息中心也发一份
+# 3 -------> 测试成功后, 站内信功能转交给消息中心
+PHP_INSIDE_MESSAGE_SWITCH = 2
+
+# PHP 发送站内信地址
+PHP_SEND_INSIDE_MESSAGE = "http://192.168.20.248/message.php/message/inside"
+# PHP 查询未读数量
+PHP_UNREAD_MESSAGES_COUNT = "http://192.168.20.248/message.php/message/count"
+# PHP 站内信显示
+PHP_INSIDE_MESSAGES_LIST = "http://192.168.20.248/message.php/message/list"
+# PHP 读站内信
+PHP_INSIDE_MESSAGE_READ = 'http://192.168.20.248/message.php/message'
+PHP_INSIDE_MESSAGE_READ_ALL = 'http://192.168.20.248/message.php/message/0'
+
+if ENV == ENV_PRODUCTION:
+    PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+    PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'
+    PHP_SEND_INSIDE_MESSAGE = "http://123.57.146.238/message.php/message/inside"
+    PHP_UNREAD_MESSAGES_COUNT = "http://123.57.146.238/message.php/message/count"
+    PHP_INSIDE_MESSAGES_LIST = "http://123.57.146.238/message.php/message/list"
+    PHP_INSIDE_MESSAGE_READ = 'http://123.57.146.238/message.php/message'
+    PHP_INSIDE_MESSAGE_READ_ALL = 'http://123.57.146.238/message.php/message/0'
