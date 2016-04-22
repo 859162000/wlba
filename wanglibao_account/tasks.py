@@ -344,4 +344,5 @@ def coop_callback_for_post(url, params, channel):
 
 @app.task
 def coop_call_back(params):
+    # 此任务由渠道中心平台处理
     pass
