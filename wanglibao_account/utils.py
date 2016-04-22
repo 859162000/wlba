@@ -843,6 +843,7 @@ def generate_coop_base_data(act):
         'time': utc_timestamp,
         'act': act,
         'channel': channel,
+        'sync_id': float(time.time()),
     }
     return data
 

@@ -618,7 +618,7 @@ CELERY_QUEUES = {
     "celery": {"exchange": "celery", "routing_key": "celery"},
     "celery01": {"exchange": "celery01", "routing_key": "celery01"},
     "celery02": {"exchange": "celery02", "routing_key": "celery02"},
-    "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
+    # "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
 }
 
 from datetime import timedelta, datetime
