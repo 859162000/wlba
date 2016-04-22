@@ -1225,7 +1225,7 @@ class KongGangRegister(CoopRegister):
             with transaction.atomic():
                 join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
                 if not join_record:
-                    join_record = join_record.objects.create(
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
                         user=user,
                         activity_code=self.c_code
                     )
