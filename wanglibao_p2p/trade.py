@@ -246,28 +246,33 @@ class P2POperator(object):
         Automatic().auto_trade()
 
     @classmethod
-    #@transaction.commit_manually
+    # @transaction.commit_manually
     def preprocess_for_settle(cls, product):
         cls.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
-        if product.status != u'满标已打款':
-            raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
+
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
-            amo_keeper = AmortizationKeeper(product, order_id=order.id)
+            # 重新查询并锁定产品记录
+            product_lock = P2PProduct.objects.select_for_update().get(pk=product.id)
 
+            if product_lock.status != u'满标已打款':
+                raise P2PException(u'产品状态(%s)不是(满标已打款)' % product_lock.status)
+
+            amo_keeper = AmortizationKeeper(product_lock, order_id=order.id)
+
+            # 生成用户还款计划
             amo_keeper.generate_amortization_plan(savepoint=False)
 
             # for equity in product.equities.all():
             #     EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
             # EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
 
-            product = P2PProduct.objects.get(pk=product.id)
-            product.status = u'满标待审核'
-            product.make_loans_time = timezone.now()
-            product.save()
+            product_lock.status = u'满标待审核'
+            product_lock.make_loans_time = timezone.now()
+            product_lock.save()
 
     @classmethod
     def settle(cls, product):

@@ -321,15 +321,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 if (data.ph == '') {
                     login = false;
                     $('#button_link').click(function() {
-                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_august_phone/'});
+                        mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
                     });
 
                 } else {
                     connect(data);
-
                     login = true;
                     $('#button_link').click(function() {
-
+                        mixins.jumpToManageMoney();
                     });
                 }
 
@@ -339,9 +338,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
             $('#button_link').click(function() {
                 if(h5_user_static) {
-                    $('.popup_box').show();
+                    window.location.href = '/weixin/list/?promo_token=sy'
                 }else {
-                    window.location.href = '/weixin/login/?next=/activity/app_august_phone/'
+                    window.location.href = '/weixin/login/?next=/weixin/list/?promo_token=sy'
                 }
             })
             //console.log('其他场景的业务逻辑');
