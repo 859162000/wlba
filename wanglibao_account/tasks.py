@@ -32,9 +32,10 @@ LOCAL_VAR = locals()
 
 
 @app.task
-def process_amortize(amortizations, product_id):
+def process_amortize(amortizations, product_id, sync_id):
     user_amo_list = list()
     for amo in amortizations:
+        amo['sync_id'] = sync_id
         user_id = amo.get('user_id')
         term = amo.get('term')
         amo_instance = UserAmortization.objects.filter(user_id=user_id, product_id=product_id, term=term).first()
@@ -90,9 +91,9 @@ def process_recharge_callback(req_data):
                 if channel:
                     CoopCallback(channel).process_all_callback(user_id, 'recharge', pay_info.order_id)
         else:
-            response_data = parase_form_error(pay_info_form.errors)
+            response_data = parase_form_error(pay_info_form)
     else:
-        response_data = parase_form_error(margin_record_form.errors)
+        response_data = parase_form_error(margin_record_form)
 
     return response_data
 
@@ -124,9 +125,9 @@ def process_purchase_callback(req_data):
             else:
                 response_data = save_margin_response_data
         else:
-            response_data = parase_form_error(p2p_record_form.errors)
+            response_data = parase_form_error(p2p_record_form)
     else:
-        response_data = parase_form_error(margin_record_form.errors)
+        response_data = parase_form_error(margin_record_form)
 
     return response_data
 
@@ -144,7 +145,7 @@ def process_bind_card_callback(req_data):
         }
         # FixMe,异步回调给第三方
     else:
-        response_data = parase_form_error(form.errors)
+        response_data = parase_form_error(form)
 
     return response_data
 
@@ -168,7 +169,7 @@ def process_validate_callback(req_data):
         }
         # FixMe,异步回调给第三方
     else:
-        response_data = parase_form_error(form.errors)
+        response_data = parase_form_error(form)
 
     return response_data
 
@@ -178,32 +179,26 @@ def process_withdraw_callback(req_data):
 
 
 def process_amortizations_push_callback(req_data):
-    product_id = req_data.get('product_id')
-    amortizations = req_data.get('amortizations')
-    if product_id and amortizations:
-        try:
-            p2p_product = P2PProduct.objects.get(pk=product_id)
-        except P2PProduct.DoesNotExist:
-            p2p_product = None
+    product_id = req_data['product_id']
+    sync_id = req_data["sync_id"]
+    try:
+        p2p_product = P2PProduct.objects.get(pk=product_id)
+    except P2PProduct.DoesNotExist:
+        p2p_product = None
 
-        if p2p_product:
-            amortizations = json.loads(amortizations)
-            process_amortize.apply_async(
-                kwargs={'amortizations': amortizations, 'product_id': product_id})
+    if p2p_product:
+        amortizations = json.loads(req_data['amortizations'])
+        process_amortize.apply_async(
+            kwargs={'amortizations': amortizations, 'product_id': product_id, 'sync_id': sync_id})
 
-            response_data = {
-                'ret_code': 10000,
-                'message': 'success',
-            }
-        else:
-            response_data = {
-                'ret_code': 10051,
-                'message': u'无效产品id',
-            }
+        response_data = {
+            'ret_code': 10000,
+            'message': 'success',
+        }
     else:
         response_data = {
-            'ret_code': 50002,
-            'message': u'非法请求',
+            'ret_code': 10051,
+            'message': u'无效产品id',
         }
 
     return response_data

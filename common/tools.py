@@ -129,9 +129,13 @@ def deserialize_instance(model, data={}):
     return ret
 
 
-def parase_form_error(form_errors):
+def parase_form_error(form):
+    errors = ['%s==>%s' % (k, v.as_text()) for k, v in form.errors.iteritems()]
+    errors_des = ', '.join(errors)
+
     response_data = {
         'ret_code': 50003,
-        'message': form_errors.values()[0][0]
+        'message': '%s is invalid: %s' % (form.__class__.__name__, errors_des),
     }
+
     return response_data
