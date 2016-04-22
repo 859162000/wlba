@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/august_phone.css?v=2015041801")
+        link(rel="stylesheet",href="/static/styles/pc_activity/august_phone.css?v=2015042201")
         - csrf_token
     body(style="background:#ffd200")
         include global/g_nav
@@ -41,7 +41,7 @@ html.no-js(lang="en-gb")
                             dd 账户投资任意金额成功
                         img.show_1(src='/static/imgs/pc_activity/august_phone/adopt_raiders_img_2.png')
                     .clear
-                    .button.clear#button_link 投资领取奖励
+                    a.button.clear#button_link(href='/p2p/list/') 投资领取奖励
                     .small_title
                         span#show_button 玩转新手福利
                     .text_box#show_list
@@ -118,13 +118,9 @@ html.no-js(lang="en-gb")
                 .main_footer
                     p.text_1 八月照相馆出品
                     p.text_2 CHRISTMAS IN AUGUST PRODUCT SHALL NOT BE REPRODUCED COPIED WITHOUT PERMISSION.<br>ENCOUNTER ENCOUNTER LOVE IN AUGUST
-            .popup_box
-                .main
-                    .text 活动已结束
-                    .popup_button 我知道了
-                .popup_bg
+
 //include global/g_footer
 script.
-    require(['/static/js/august_phone.js?v=2015041801'])
+    require(['/static/js/august_phone.js?v=2015042201'])
 
                                                                     

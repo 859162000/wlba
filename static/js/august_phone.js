@@ -53,14 +53,6 @@
             type: 'post',
             success: function (data1) {
                 h5_user_static = data1.login;
-                $('#button_link').click(function(){
-                    if(h5_user_static){
-                        $('.popup_box').show();
-                    }else{
-                        window.location.href = '/accounts/login/?next=/activity/august_phone/'
-                    }
-                })
-
             }
         })
 
@@ -78,9 +70,7 @@
             }
         })
 
-        $('.popup_button').click(function(){
-            $('.popup_box').hide();
-        });
+
 
 
     })
