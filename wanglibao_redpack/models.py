@@ -43,6 +43,7 @@ class RedPackEvent(models.Model):
         ('day', u'日'),
         ('day_gte', u'日及以上'),
     ), blank=True)
+    p2p_id = models.IntegerField(default=0, verbose_name=u"P2P标id,数字格式")
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
