@@ -58,7 +58,7 @@
                     if(h5_user_static) {
                         window.location.href = '/p2p/list/?promo_token=sy'
                     }else {
-                        window.location.href = '/weixin/login/?next=/p2p/list/?promo_token=sy'
+                        window.location.href = '/accounts/login/?next=/p2p/list/?promo_token=sy'
                     }
                 })
             }
