@@ -340,7 +340,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 if(h5_user_static) {
                     window.location.href = '/weixin/list/?promo_token=sy'
                 }else {
-                    window.location.href = '/weixin/login/?next=/activity/app_august_phone/?promo_token=sy'
+                    window.location.href = '/weixin/login/?next=/weixin/list/?promo_token=sy'
                 }
             })
             //console.log('其他场景的业务逻辑');
