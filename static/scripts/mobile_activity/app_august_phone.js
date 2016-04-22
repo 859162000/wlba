@@ -328,7 +328,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
             $('#button_link').click(function() {
 
-                window.location.href = '/weixin/list/'
+                window.location.href = '/weixin/list/?promo_token=sy'
 
             })
             //console.log('其他场景的业务逻辑');
