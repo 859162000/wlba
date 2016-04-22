@@ -83,9 +83,11 @@ from wanglibao_account.forms import verify_captcha, BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.tasks import common_callback_for_post
 
+import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
+logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class RegisterView(RegistrationView):
@@ -1278,14 +1280,34 @@ class MessageView(TemplateView):
         if not listtype or listtype not in ("read", "unread", "all"):
             listtype = 'all'
 
-        if listtype == "unread":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
-                '-message_text__created_at')
-        elif listtype == "read":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by(
-                '-message_text__created_at')
+        if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+            if listtype == "unread":
+                messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
+                    '-message_text__created_at')
+            elif listtype == "read":
+                messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by(
+                    '-message_text__created_at')
+            else:
+                messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
+
         else:
-            messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
+            response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
+                                     data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
+            resp = response.json()
+            if resp['code'] == 'success':
+                count = len(resp['data'])
+                data = resp['data']
+                messages = Message.objects.all()[:count]
+
+                # 把 data 的数据 赋值都展示的messages 对象
+                index = 0
+                for message in messages:
+                    message.id = data[index]['id']
+                    message.read_status = data[index]['read_status']
+                    message.message_text.title = data[index]['title']
+                    message.message_text.content = data[index]['content']
+                    message.message_text.created_at = int(data[index]['created_at'])
+                    index += 1
 
         messages_list = []
         messages_list.extend(messages)
@@ -3008,7 +3030,7 @@ class BiSouYiLoginApi(APIView):
 
                     user_phone = user.wanglibaouserprofile.phone
                     if phone != user_phone:
-                        logger.warning("BiSouYiRegisterApi query phone[%s] not eq user phone[%s]" % (phone, user_phone))
+                        logger.warning("BiSouYiLoginApi query phone[%s] not eq user phone[%s]" % (phone, user_phone))
             else:
                 response_data = {
                     'ret_code': 10011,

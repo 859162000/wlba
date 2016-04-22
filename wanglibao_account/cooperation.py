@@ -59,7 +59,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback, coop_callback_for_post, common_callback_for_post
+                                    xunleivip_callback, coop_callback_for_post, coop_call_back
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -2035,16 +2035,18 @@ class BaJinSheRegister(CoopRegister):
         data['name'] = user.wanglibaouserprofile.name
         data['id_number'] = user.wanglibaouserprofile.id_number
         data['id_valid_time'] = user.wanglibaouserprofile.id_valid_time.strftime('%Y-%m-%d %H:%M:%S')
-        coop_callback_for_post.apply_async(
-            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
     def binding_card_call_back(self, user):
         channel = get_user_channel_record(user.id)
         logger.info("%s-Enter binding_card_call_back for user[%s]" % (channel.code, user.id))
         data = generate_coop_base_data('bind_card')
         data['user_id'] = user.id
-        coop_callback_for_post.apply_async(
-            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
     def register_call_back(self, user):
         client_id = self.channel_client_id
@@ -2073,20 +2075,6 @@ class BaJinSheRegister(CoopRegister):
             else:
                 logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
 
-            # base_data = generate_coop_base_data('register')
-            # act_data = {
-            #     'client_id': client_id,
-            #     'bid': self.channel_user,
-            #     'phone': user.wanglibaouserprofile.phone,
-            #     'btype': self.channel_code,
-            #     'user_id': user.id,
-            #     'access_token': getattr(user, 'access_token', ''),
-            #     'account': getattr(user, 'account', ''),
-            # }
-            # data = dict(base_data, **act_data)
-            # common_callback_for_post.apply_async(
-            #     kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
-
     def purchase_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
         logger.info("%s-Enter purchase_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
@@ -2110,8 +2098,9 @@ class BaJinSheRegister(CoopRegister):
             }
             data = dict(base_data, **act_data)
 
-            coop_callback_for_post.apply_async(
-                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+            coop_call_back.apply_async(
+                kwargs={'params': data},
+                queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
     def recharge_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
@@ -2153,8 +2142,9 @@ class BaJinSheRegister(CoopRegister):
             }
             data = dict(base_data, **act_data)
 
-            coop_callback_for_post.apply_async(
-                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+            coop_call_back.apply_async(
+                kwargs={'params': data},
+                queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
 
 class RenRenLiRegister(BaJinSheRegister):
@@ -2162,7 +2152,7 @@ class RenRenLiRegister(BaJinSheRegister):
         super(RenRenLiRegister, self).__init__(request)
         self.c_code = 'renrenli'
         self.external_channel_client_id_key = 'Cust_id'
-        self.external_channel_user_key = 'Phone'
+        self.external_channel_phone_key = 'Phone'
         self.internal_channel_phone_key = 'phone'
         self.external_channel_sign_key = 'Sign'
         self.internal_channel_sign_key = 'sign'
@@ -2174,6 +2164,7 @@ class RenRenLiRegister(BaJinSheRegister):
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
         channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
+        channel_phone = self.request.REQUEST.get(self.external_channel_phone_key, None)
         client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
         access_token = self.request.REQUEST.get(self.external_channel_access_token_key, None)
         sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
@@ -2184,7 +2175,9 @@ class RenRenLiRegister(BaJinSheRegister):
 
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
-            self.request.session[self.internal_channel_phone_key] = channel_user
+
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
 
         if client_id:
             self.request.session[self.internal_channel_client_id_key] = client_id

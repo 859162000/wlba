@@ -1012,7 +1012,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
         self.amount = kwargs['amount']
         self.order_id = kwargs['order_id']
         self.user = kwargs['user']
-        self.token = 'sy'
+        self.token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
     def distribute(self):
         send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
