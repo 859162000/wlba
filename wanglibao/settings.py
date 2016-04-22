@@ -45,7 +45,8 @@ ENV_PRODUCTION = 'production'
 ENV_PREPRODUCTION = 'pre'
 ENV_STAGING = 'staging'
 
-ENV = ENV_DEV
+# ENV = ENV_DEV
+ENV = ENV_STAGING
 
 if ENV != ENV_DEV:
     DEBUG = False
@@ -399,7 +400,7 @@ SWAGGER_SETTINGS = {
 
 # Now since the rabbitmq installed in localhost, we use guest
 if ENV == ENV_PRODUCTION:
-    # FixMe,　修改正式环境broker host addr.
+    # FixMe,　修改正式环境broker
     BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
 elif ENV == ENV_STAGING:
     BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@192.168.1.242//')
