@@ -36,6 +36,7 @@ from experience_gold.models import ExperienceEvent
 from .forms import OpenidAuthenticationForm
 from wanglibao_invite.models import InviteRelation, UserExtraInfo
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_invite.invite_common import ShareInviteRegister
 
 
 logger = logging.getLogger("weixin")
@@ -454,6 +455,7 @@ class WechatInviteTemplate(TemplateView):
             if extro_info:
                 invite_experience_amount = extro_info.invite_experience_amount
         weixin_qrcode_info = getMiscValue("weixin_qrcode_info")
+        ShareInviteRegister(self.request).clear_session()
         logger.debug('--------------------------share_url::'+share_url)
         logger.debug('-----------------------------------%s'%{
             "fetched":fetched,
@@ -570,6 +572,7 @@ class WechatShareTemplate(TemplateView):
             reward_text = "%s元"%int(experience_event.amount)
             reward_type = w_daily_reward.reward_type
         weixin_qrcode_info = getMiscValue("weixin_qrcode_info")
+        ShareInviteRegister(self.request).clear_session()
         return {
             "fetched":fetched,
             "fetched_date":fetched_date,
@@ -608,7 +611,6 @@ class WechatShareTemplate(TemplateView):
                 return redirectToJumpPage(error_msg)
         else:
             self.w_user =WeixinUser.objects.filter(openid=self.openid).first()
-
         if self.w_user and self.w_user.user:
             if request.user.is_authenticated():
                 if self.w_user.user == request.user:
