@@ -53,6 +53,14 @@
             type: 'post',
             success: function (data1) {
                 h5_user_static = data1.login;
+
+                $('#button_link').click(function() {
+                    if(h5_user_static) {
+                        window.location.href = '/p2p/list/?promo_token=sy'
+                    }else {
+                        window.location.href = '/weixin/login/?next=/p2p/list/?promo_token=sy'
+                    }
+                })
             }
         })
 
