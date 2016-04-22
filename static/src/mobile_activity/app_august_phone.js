@@ -99,18 +99,30 @@
             }
 			mixins.shareData({title: '网利宝影像投资节送福利喽', content: '全民福利 火速领取'});
             mixins.sendUserInfo(function(data) {
-                $('#button_link').click(function() {
-                    mixins.jumpToManageMoney();
-                });
+                if (data.ph == '') {
+                    login = false;
+                    $('#button_link').click(function() {
+                        mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
+                    });
+
+                } else {
+                    connect(data);
+                    login = true;
+                    $('#button_link').click(function() {
+                        mixins.jumpToManageMoney();
+                    });
+                }
 
             })
         },
         other: function() {
 
             $('#button_link').click(function() {
-
-                window.location.href = '/weixin/list/?promo_token=sy'
-
+                if(h5_user_static) {
+                    window.location.href = '/weixin/list/?promo_token=sy'
+                }else {
+                    window.location.href = '/weixin/login/?next=/activity/app_august_phone/?promo_token=sy'
+                }
             })
             //console.log('其他场景的业务逻辑');
 
