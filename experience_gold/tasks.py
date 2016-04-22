@@ -69,7 +69,7 @@ def experience_repayment_plan():
                 user_profile.name,
                 amo_tmp.product.name,
                 amo_tmp.product.period,
-                amo_tmp.settlement_time,
+                timezone.now(),
                 amo_tmp.interest
             )
             inside_message.send_one.apply_async(kwargs={
