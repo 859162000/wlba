@@ -864,7 +864,7 @@ def generate_random_password(length):
 def generate_bisouyi_content(data):
     data = json.dumps(data)
     ase = Aes()
-    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data)
+    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data, mode='ECB')
     return encrypt_text
 
 
