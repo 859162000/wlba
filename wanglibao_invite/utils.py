@@ -42,6 +42,10 @@ def getWechatDailyReward(openid):
     yestoday = (datetime.datetime.now()-datetime.timedelta(days=1)).date()
     if WechatUserDailyReward.objects.filter(create_date=yestoday, w_user=w_user, status=False).exists():
         return -1, "不绑定服务号只能领取一天", 0
+    user = w_user.user
+    if user:
+        if WechatUserDailyReward.objects.filter(create_date=today, user=user, status=True).exists():
+            return -1, "绑定手机号今天已经领取过", 0
     daily_reward, _ = WechatUserDailyReward.objects.get_or_create(
         create_date=today,
         w_user=w_user,
@@ -51,10 +55,10 @@ def getWechatDailyReward(openid):
         }
     )
     if daily_reward.status:
-        return -1, "已经领取过", 0
-    user = w_user.user
+        return -1, "微信号今天已经领取过", 0
     if not user:
-        return 0, "", 0
+        return 0, "ok", 0
+
     return sendDailyReward(user, daily_reward.id, save_point=True)
 
 

@@ -114,7 +114,7 @@ org.mmIndex = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=maimai1',
+                        url: '/api/register/?promo_token=blued',
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),
