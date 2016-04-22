@@ -119,7 +119,7 @@ class PrepaymentHistory(object):
                 # 提前还款金额 = 本金 + 利息 + 罚息 + 加息
                 amo_amount = user_record.principal + user_record.interest + \
                     user_record.penal_interest + user_record.coupon_interest
-                user = user_amortization.user
+                user = user_record.user
                 user_profile = user.wanglibaouserprofile
                 phone_list.append(user_profile.phone)
                 message_list.append(messages.product_prepayment(user_profile.name,
@@ -133,7 +133,7 @@ class PrepaymentHistory(object):
                 except Exception:
                     logger.exception("==提前还款==活动检测==")
                     logger.debug("提前还款, user: {}, principal: {}, product_id: {}".format(
-                        user_amortization.user, user_record.principal, product.id
+                        user, user_record.principal, product.id
                     ))
                 try:
                     # 提前还款站内信
