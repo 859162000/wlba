@@ -1204,6 +1204,7 @@ class KongGang1Register(CoopRegister):
                             "mtype": "activity"
                         })
                         send_reward.is_used = True
+                        send_reward.save()
                     except Exception:
                         logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
                     join_record.save()
@@ -1269,6 +1270,7 @@ class KongGangRegister(CoopRegister):
                             "mtype": "activity"
                         })
                         send_reward.is_used = True
+                        send_reward.save()
                     except Exception:
                         logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
                     join_record.save()
