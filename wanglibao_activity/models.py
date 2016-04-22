@@ -65,6 +65,8 @@ MSG_TYPE = (
 SHARE_TYPE = (
     ('both', u'邀请人和被邀请人双方共享'),
     ('inviter', u'邀请人独自获得'),
+    ('wxshare_both', u'移动分享邀请的 邀请人和被邀请人双方共享'),
+    ('wxshare_inviter', u'移动分享邀请的 邀请人独自获得'),
 )
 WX_TEMPLATE_CHOICE = (
     ('first_bind', u'首次绑定微信'),

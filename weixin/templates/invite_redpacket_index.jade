@@ -1,0 +1,109 @@
+//-load formatters
+doctype html
+html.service-redpacket-bg1
+  head
+    title 红包花雨季
+    meta(charset="utf-8")
+    meta(name="format-detection" content="telephone=no,email=no")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    script.
+      (function () {
+        var b = navigator.userAgent;
+        ipad = b.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+        iphone = !ipad && b.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+        uc = navigator.userAgent.indexOf("UCBrowser") > -1 ? true : false;
+        ios = ipad || iphone;
+        var d = 1, a = 1, c;
+        if (ios) {
+          if (window.devicePixelRatio >= 2) {
+            d *= 1;
+            a *= 1
+          }
+        } else {
+          if (uc) {
+            if (window.devicePixelRatio >= 2) {
+              d *= 1;
+              a *= 1
+            }
+          }
+        }
+        c = '<meta name="viewport" content="initial-scale=' + d + ", maximum-scale=" + d + ", minimum-scale=" + d + ', width=device-width, user-scalable=no" />';
+        document.write(c);
+        document.documentElement.style.fontSize = 20 * a + "px"
+      })();
+    link(href="/static/styles/sub_weixin/sub_weixin.css?v=20160303102", rel="stylesheet")
+
+    - csrf_token
+  body.service-redpack-activity
+    input(type="hidden", name='is_bind', class='is_bind', value='{{ is_bind }}')
+    input(type="hidden", name='fphone', class='fphone', value='{{ fphone|safe }}')
+    input(type="hidden", name='original_id', class='original_id', value='{{ original_id }}')
+    input(type="hidden", name='weixin_channel_code', class='weixin_channel_code', value='{{ weixin_channel_code }}')
+    input(type="hidden", name='share_url', class="share_url", value="{{ share_url }}")
+    .top-tit
+      .top-photo
+        if inviter_head_url
+          imgUrl = inviter_head_url
+        else
+          imgUrl = "/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png"
+        img(src="{{ imgUrl }}")
+      .top-tit 红包雨天天下 接多少看自己
+    if fetched
+      if is_bind
+        .redpacket-money
+          .redpacket.redpacket-get
+            .cloud-top
+            .cloud-btm
+            .main-box
+              //（您于x月x日获得）
+              .price-b-tit 恭喜您获得
+              .price-box.js-reward-price {{ reward_text }}
+              .price-tit 现金红包
+              .share-promote 分享给好友，可以获得更多奖励
+              .price-btn.js-share-btn.mt70 分享给好友
+          .redpacket-get-list
+            .list-box
+              .list-box-item
+                .list-item
+                  span.l-tit 注册邀请：
+                  span.b-tit <span class="bb-tit">{{ friend_num }}<span>人
+                .list-item
+                  span.l-tit 获得体验金：
+                  span.b-tit.y-color <span class="bb-tit">{{ invite_experience_amount }}<span>元
+          section.redpacket-share-alt
+            img(src="/static/imgs/sub_weixin/redpack_activity/share_sign.png",style="width: 8rem;").share-sign
+      else
+        .redpacket.redpacket-code
+          .cloud-top
+          .cloud-btm
+          .main-box
+            //（您于x月x日获得）
+            if fetched_date
+              .price-b-tit 您于{{ fetched_date }}获得
+            else
+              .price-b-tit 恭喜您获得
+            .price-box.js-reward-price {{ reward_text }}
+            .price-tit 现金红包
+            .share-promote 长按二维码，每天领取现金红包
+            .price-code.mt20
+              img(src="/static/imgs/sub_weixin/redpack_activity/loader.gif")#js-share-sign
+    else
+      .redpacket.redpacket-index
+        .cloud-top
+        .cloud-btm
+        .main-box
+          .price-box 1~10000元
+          .price-tit 现金红包
+          .price-btn.js-open-redpacket 打开红包雨
+
+    .activity-rule
+      .rule-tit 活动规则
+      .rule-list
+        p 1.活动规则活动规则活动规则活动规则
+        p 2.活动规则活动规则活动规则活动规则活动规则
+        p 3.活动规则活动规则活动规则活动规则活动规则
+        p 4.活动规则活动规则活动规则活动规则活动规则
+
+    script(src='/static/src/subMobile/lib/weixin/jweixin-1.0.0.js')
+    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?2016042104")

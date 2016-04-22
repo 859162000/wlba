@@ -308,14 +308,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 dataType: 'json',
                 success: function(data){
                     if(data.ret_code=='1000'){
-                        window.location.href = '/accounts/login/?next=/activity/app_airport_operation/'
-                    }else if(data.ret_code=='1002'){
-                        $('.popup_box .main .textairport').text(''+data.message+'');
-                        $('.popup_box').show();
-                    }else if(data.ret_code=='0'){
-                        $('.popup_box .main .textairport').text(''+data.message+'');
-                        $('.popup_box').show();
-                    }else if(data.ret_code=='1003'){
+                        window.location.href = '/weixin/login/?next=/activity/app_airport_operation/'
+                    }else if(data.ret_code=='1002'||data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
                         $('.popup_box .main .textairport').text(''+data.message+'');
                         $('.popup_box').show();
                     }
@@ -323,8 +317,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     //console.log(data)
                 }
             })
-
-
         })
         $('.popup_box .popup_button').click(function(){
             $('.popup_box').hide();

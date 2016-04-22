@@ -26,7 +26,9 @@ from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from weixin.models import WeixinUser
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 from weixin.tasks import sentTemplate
+from weixin.util import getMiscValue
 from wanglibao_reward.models import WanglibaoActivityReward
+from wanglibao_invite.models import InviteRelation, UserExtraInfo
 logger = logging.getLogger(__name__)
 
 
@@ -308,6 +310,17 @@ def _check_introduced_by(user, start_dt, is_invite_in_date):
     else:
         return None
 
+def _check_wx_share_introduced_by(user, start_dt, is_invite_in_date):
+    if is_invite_in_date:
+        ib = InviteRelation.objects.filter(user=user, created_at__gt=start_dt).first()
+    else:
+        ib = InviteRelation.objects.filter(user=user).first()
+
+    if ib:
+        return ib.inviter
+    else:
+        return None
+
 
 def _check_introduced_by_product(user):
     ib = IntroducedBy.objects.filter(user=user).first()
@@ -500,20 +513,29 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_fu
     now = timezone.now()
     if rule.send_type == 'sys_auto':
         # do send
-        if rule.share_type != 'inviter':
+        if rule.share_type not in ('inviter', 'wxshare_inviter'):
             _send_reward(user, rule, rtype, reward_name, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
+
     else:
         # 只记录不发信息
-        if rule.share_type != 'inviter':
+        if rule.share_type not in ('inviter', 'wxshare_inviter'):
             _save_activity_record(rule, user, 'only_record', reward_name, False, is_full)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _save_activity_record(rule, user_introduced_by, 'only_record', reward_name, True, is_full)
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
 
 
 def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None, amount=0):
@@ -584,21 +606,29 @@ def _send_gift_phonefare(user, rule, amount, is_full):
 def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full):
     """ 活动中发送的红包使用规则里边配置的模板，其他的使用系统原有的模板。 """
     if rule.send_type == 'sys_auto':
-        if rule.share_type != 'inviter':
+        if rule.share_type not in ('inviter', 'wxshare_inviter'):
             _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             #logger.info("user_introduced_by %s" % user_introduced_by)
             if user_introduced_by:
                 _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_introduced_by, amount)
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_introduced_by, amount)
+
     else:
-        if rule.share_type != 'inviter':
+        if rule.share_type not in ('inviter', 'wxshare_inviter'):
             _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
-
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
     # add by hb for debug
@@ -683,22 +713,30 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
 def _send_gift_experience(user, rule, rtype, experience_id, device_type, amount, is_full):
     """ 活动中发送的理财金使用规则里边配置的模板，其他的使用系统原有的模板。 """
     if rule.send_type == 'sys_auto':
-        if rule.share_type != 'inviter':
+        if rule.share_type not in ('inviter', 'wxshare_inviter'):
             _give_activity_experience_new(user, rtype, experience_id, device_type, rule, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_introduced_by, amount)
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_introduced_by, amount, check_wx_share_invite_max=True)
     else:
-        if rule.share_type != 'inviter':
+        if rule.share_type not in ('inviter', 'wxshare_inviter'):
             _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
             if user_introduced_by:
                 _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
+        if rule.share_type == 'wxshare_both' or rule.share_type == 'wxshare_inviter':
+            user_introduced_by = _check_wx_share_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
 
 
-def _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_ib=None, amount=0):
+def _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_ib=None, amount=0, check_wx_share_invite_max=False):
     """ rule: get message template """
     now = timezone.now()
     if user_ib:
@@ -735,10 +773,22 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
 
             give_pf = experience_event.give_platform
             if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
+                extro_info = None
+                if user_ib and check_wx_share_invite_max and rtype=='register':
+                    extro_info, _ = UserExtraInfo.objects.get_or_create(user=user_ib)
+                    share_invite_config = getMiscValue("redpack_rain_award_config")
+                    # {"reward_types":["redpack", "experience_gold"], "daily_rewards":{'371': [0,20],'372': [0,30], '373': [0,40], '374': [0,10]},
+                    # "new_old_map":{"371":380,"372":381,"373":382,"374":383},"base_experience_amount":200000}
+                    if extro_info.invite_experience_amount >= int(share_invite_config.get("base_experience_amount", 0)):
+                        return
                 record = ExperienceEventRecord()
                 record.event = experience_event
                 record.user = this_user
                 record.save()
+                #移动分享邀请，邀请者获得的 注册体验金 有最大限额
+                if extro_info:
+                    extro_info.invite_experience_amount += experience_event.amount
+                    extro_info.save()
                 if user_ib:
                     _send_message_sms(user, rule, user_ib, None, amount)
                 else:

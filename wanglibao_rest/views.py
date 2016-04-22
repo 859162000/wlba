@@ -63,13 +63,14 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
-from weixin.util import bindUser
+from weixin.util import bindUser, createInvite
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
-
+from wanglibao_invite.invite_common import ShareInviteRegister
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -148,9 +149,8 @@ class SendValidationCodeView(APIView):
 
 
     def validate_captcha(self, request):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -225,9 +225,8 @@ class SendRegisterValidationCodeView(APIView):
         return Response({'message': message, "type": "validation"}, status=status)
 
     def validate_captcha(self, request):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -365,6 +364,17 @@ class RegisterAPIView(DecryptParmsAPIView):
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
+        try:
+            openid = request.session.get('openid')
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh' and openid:
+                ShareInviteRegister(request).process_for_register(request.user, openid)
+                w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                bindUser(w_user, request.user)
+                request.session['openid'] = openid
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
@@ -415,15 +425,7 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-        try:
-            register_channel = request.DATA.get('register_channel', '').strip()
-            if register_channel and register_channel == 'fwh':
-                openid = request.session.get('openid')
-                if openid:
-                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
-                    bindUser(w_user, request.user)
-        except Exception, e:
-            logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
@@ -1871,8 +1873,8 @@ class GeetestAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
 
     def post(self, request):
         self.type = request.POST.get('type', None)

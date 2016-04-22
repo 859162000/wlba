@@ -51,10 +51,17 @@ class ContractTemplate(models.Model):
     def __unicode__(self):
         return self.name
 
-
+FINANCES = (
+    (u"产融通", u"产融通"),
+    (u"黄金精选", u"黄金精选"),
+    (u"房稳赚", u"房稳赚"),
+    (u"好车盈", u"好车盈"),
+    (u"银行优选", u"银行优选"),
+)
 class ProductType(models.Model):
     name = models.CharField(u'分类名称', max_length=60)
     description = models.TextField(verbose_name=u'描述', blank=True)
+    fiance_type = models.CharField(u'融资类型', choices=FINANCES, default=u"产融通", max_length=32)
     priority = models.IntegerField(verbose_name=u'优先级*', default=0, help_text=u'越大越优先', blank=False)
 
     class Meta:
@@ -666,6 +673,7 @@ class UserAmortization(models.Model):
     class Meta:
         verbose_name_plural = u'用户还款计划'
         ordering = ['user', 'term']
+        unique_together = (("product_amortization", "user"),)  # 联合唯一索引
 
     def __unicode__(self):
         return u'分期%s 用户%s 本金%s 利息%s' % (self.product_amortization, self.user, self.principal, self.interest)
@@ -1010,18 +1018,19 @@ def generate_amortization_plan(sender, instance, **kwargs):
         instance.save()
 
 
-def process_after_money_paided(product):
-    if product.status == u'满标已打款':
-        from celery.execute import send_task
-        send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
-            'product_id': product.id
-        })
+# 注释保存标的时发送生成用户还款计划的任务, 2016-04-22, by lili
+# def process_after_money_paided(product):
+#     if product.status == u'满标已打款':
+#         from celery.execute import send_task
+#         send_task("wanglibao_p2p.tasks.process_paid_product", kwargs={
+#             'product_id': product.id
+#         })
 
 
 def post_save_process(sender, instance, **kwargs):
     generate_amortization_plan(sender, instance, **kwargs)
     next_step(sender, instance, **kwargs)
-    process_after_money_paided(instance)
+    # process_after_money_paided(instance)
 
 
 post_save.connect(post_save_process, sender=P2PProduct, dispatch_uid="generate_amortization_plan")

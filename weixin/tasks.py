@@ -14,25 +14,29 @@ from weixin.models import SubscribeRecord, SubscribeService, WeixinUser, WeixinA
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
 from weixin.util import sendTemplate, getMiscValue
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
+from wanglibao_invite.tasks import processShareInviteDailyReward
 
 
 @app.task
-def bind_ok(openid, is_first_bind):
+def bind_ok(openid, is_first_bind, new_registed=False):
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+    user = weixin_user.user
     if is_first_bind:
         from wanglibao_activity.backends import check_activity
-        check_activity(weixin_user.user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
+        check_activity(user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
     else:
         sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                                     "openid":weixin_user.openid,
                                     "template_id":BIND_SUCCESS_TEMPLATE_ID,
                                     "name1":"",
-                                    "name2":weixin_user.user.wanglibaouserprofile.phone,
+                                    "name2":user.wanglibaouserprofile.phone,
                                     "time":now_str,
                                         })},
                                     queue='celery02'
                                     )
+    processShareInviteDailyReward.apply_async(
+            kwargs={'openid': openid, 'user_id': user.id, "new_registed":new_registed})
 
 @app.task
 def detect_product_biding(product_id):
@@ -65,11 +69,11 @@ def detect_product_biding(product_id):
             rate_desc = "%s%%"%product.expected_earning_rate
         if is_day_product:
             day_service = SubscribeService.objects.filter(channel='weixin', is_open=True, type=1).first()
-
-            sub_records = SubscribeRecord.objects.filter(service=day_service, status=True).all()
-            for sub_record in sub_records:
-                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
-                    _sendProductToUser(sub_record.w_user.openid, day_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+            if day_service:
+                sub_records = SubscribeRecord.objects.filter(service=day_service, status=True).all()
+                for sub_record in sub_records:
+                    if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                        _sendProductToUser(sub_record.w_user.openid, day_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
 
         else:
             services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
@@ -79,6 +83,17 @@ def detect_product_biding(product_id):
                     for sub_record in sub_records:
                         if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
                             _sendProductToUser(sub_record.w_user.openid, service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+
+        finance_service = SubscribeService.objects.filter(channel='weixin', finance_type=product.types.fiance_type, is_open=True, type=2).first()
+        if finance_service:
+            sub_records = SubscribeRecord.objects.filter(service=finance_service, status=True).all()
+            for sub_record in sub_records:
+                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                    _sendProductToUser(sub_record.w_user.openid, finance_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+
+
+
+
 
 
 @app.task

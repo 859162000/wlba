@@ -205,6 +205,7 @@ urlpatterns += patterns(
     url(r'weixin_activity/', include('wanglibao_reward.urls')),
 )
 
+
 if settings.DEBUG:
     import debug_toolbar
 

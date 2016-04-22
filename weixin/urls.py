@@ -66,6 +66,7 @@ urlpatterns = patterns(
     url(r'api/account/wx_getinfo/$', views.GetUserInfo.as_view(), name='weixin_get_account_user_info'),
     url(r'api/generate/qr_limit_scene_ticket/$', views.GenerateQRLimitSceneTicket.as_view(), name='generate_qr_limit_scene_ticket'),#生成永久二维码
     url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),#生成临时二维码
+    url(r'api/generate/qr_invite_scene_ticket/$', views.GenerateInviteQRSceneTicket.as_view(), name='qr_invite_scene_ticket'),#生成邀请二维码
 
     #
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
@@ -122,6 +123,21 @@ urlpatterns += patterns(
     url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
     url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
     url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
+    url(r'^fetch_hby_reward/$', activity_views.FetchWechatHBYReward.as_view()),
+
+)
+#活动页面
+urlpatterns += patterns(
+    '',
+    url(r'activity/si_bind_login/$', activity_views.WechatShareInviteBindTemplate.as_view(template_name="invite_redpacket_bind.jade"), name="si_bind_login"),
+    # url(r'^activity/invite/$', fwh_login_required(activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),login_url='/weixin/activity/si_bind_login/'),name='hby_weixin_invite'),
+    url(r'^activity/invite/$', activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),name='hby_weixin_invite'),
+
+)
+#h5活动页面
+urlpatterns += patterns(
+    '',
+    url(r'^activity/share/$', activity_views.WechatShareTemplate.as_view(template_name="invite_redpacket_index.jade"), name='hby_weixin_share'),
 )
 # 微信管理后台
 urlpatterns += patterns(
