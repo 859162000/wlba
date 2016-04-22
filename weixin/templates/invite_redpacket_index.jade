@@ -57,11 +57,8 @@ html.service-redpacket-bg1
             .cloud-btm
             .main-box
               //（您于x月x日获得）
-              if fetched_date
-                .price-b-tit 您于{{ fetched_date }}获得
-              else
-                .price-b-tit 恭喜您获得
-              .price-box {{ reward_text }}
+              .price-b-tit 恭喜您获得
+              .price-box.js-reward-price {{ reward_text }}
               .price-tit 现金红包
               .share-promote 分享给好友，可以获得更多奖励
               .price-btn.js-share-btn.mt70 分享给好友
@@ -81,7 +78,11 @@ html.service-redpacket-bg1
           .cloud-top
           .cloud-btm
           .main-box
-            .price-b-tit 恭喜您获得
+            //（您于x月x日获得）
+            if fetched_date
+              .price-b-tit 您于{{ fetched_date }}获得
+            else
+              .price-b-tit 恭喜您获得
             .price-box.js-reward-price {{ reward_text }}
             .price-tit 现金红包
             .share-promote 长按二维码，每天领取现金红包
@@ -105,4 +106,4 @@ html.service-redpacket-bg1
         p 4.活动规则活动规则活动规则活动规则活动规则
 
     script(src='/static/src/subMobile/lib/weixin/jweixin-1.0.0.js')
-    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?2016042103")
+    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?2016042104")
