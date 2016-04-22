@@ -1013,6 +1013,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
         self.order_id = kwargs['order_id']
         self.user = kwargs['user']
         self.token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+        self.request = request
 
     def distribute(self):
         send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
@@ -1028,7 +1029,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                         left_times=1,
                         join_times=1)
                 
-                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='sy', has_sent=False).first()
+                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
                 if reward:
                     reward.has_sent=True
                     reward.left_time=0
@@ -1036,12 +1037,12 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                                u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
                                u'感谢您的参与！【网利科技】' % (reward.reward.content)
                     send_messages.apply_async(kwargs={
-                        "phones": [request.user.wanglibaouserprofile.phone, ],
+                        "phones": [self.request.user.wanglibaouserprofile.phone, ],
                         "message": send_msg,
                     })
     
                     inside_message.send_one.apply_async(kwargs={
-                        "user_id": request.user.id,
+                        "user_id": self.request.user.id,
                         "title": u"影像投资节优惠码",
                         "content": send_msg,
                         "mtype": "activity"
