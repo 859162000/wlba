@@ -45,8 +45,8 @@ ENV_PRODUCTION = 'production'
 ENV_PREPRODUCTION = 'pre'
 ENV_STAGING = 'staging'
 
-# ENV = ENV_DEV
-ENV = ENV_STAGING
+ENV = ENV_DEV
+# ENV = ENV_STAGING
 
 if ENV != ENV_DEV:
     DEBUG = False
@@ -194,6 +194,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'publish/static')
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 
 # The request rate for some apis
 request_rate = '2/minute'
@@ -405,7 +411,9 @@ if ENV == ENV_PRODUCTION:
 elif ENV == ENV_STAGING:
     BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.1.242:5672/wanglibao')
 else:
-    BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
+    # FixMe,　修改测试环境broker　URL, 如果DEBUG is False, 需添加静态文件配置，否则后台管理页面无法加载
+    # BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
+    BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.1.242:5672/wanglibao')
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
