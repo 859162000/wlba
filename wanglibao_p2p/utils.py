@@ -71,6 +71,7 @@ def get_user_p2p_total_asset(user):
 
     unpayed_principle = 0
     for equity in p2p_equities:
+        # if equity.confirm:
         unpayed_principle += equity.unpaid_principal  # 待收本金
 
     p2p_margin = user.margin.margin  # P2P余额

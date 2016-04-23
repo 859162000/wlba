@@ -3,6 +3,7 @@
 import logging
 from decimal import Decimal
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -151,10 +152,32 @@ class P2PEquity(models.Model):
     confirm = models.BooleanField(u'确认成功', default=False)
     confirm_at = models.DateTimeField(u'份额确认时间', null=True, blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True, null=True)
-    unpaid_principal = models.DecimalField(u'P2P待收本金', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    # unpaid_principal = models.DecimalField(u'P2P待收本金', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     sync_id = models.FloatField(u'同步id(时间戳)', default=0)
 
     class Meta:
         unique_together = (('user', 'product'),)
         verbose_name_plural = u'用户持仓'
         ordering = ('-created_at',)
+
+    def __get_amortizations(self, settled_only=False):
+        if settled_only:
+            amortizations = UserAmortization.objects.filter(user=self.user, product=self.product,
+                                                            settled=True)
+        else:
+            amortizations = UserAmortization.objects.filter(user=self.user, product=self.product)
+        return amortizations
+
+    @property
+    def paid_principal(self):
+        if not self.confirm:
+            return Decimal('0')
+        paid_amos = self.__get_amortizations(settled_only=True)
+        if not paid_amos:
+            return Decimal('0')
+        paid_principal = paid_amos.aggregate(Sum('principal'))['principal__sum']
+        return paid_principal
+
+    @property
+    def unpaid_principal(self):
+        return self.equity - self.paid_principal
