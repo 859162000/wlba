@@ -287,7 +287,7 @@ class WeixinJoinView(View):
                 for sub_service in sub_services:
                     txt += ("【" + sub_service.key + "】" + sub_service.describe + '\n')
 
-                sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
+                sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True, service__is_open=True)
                 if sub_records.exists():
                     txt += u'已经订阅的项目：\n'
                     sub_records = sub_records.order_by('service').all()

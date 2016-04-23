@@ -1,0 +1,136 @@
+
+@mixin clearfix
+  &:before,
+  &:after
+    content: ""
+    display: table
+  &:after
+    clear: both
+
+
+.channel-banner
+  display: block
+  width: 100%
+  height: auto
+
+
+
+.channel-submit,.channel-goback
+  button
+    +submit(rem(90), #fff, #DB493F)
+
+
+
+.channel-logo
+  width: rem(132)
+  height: auto
+  margin: 0 auto
+  padding: 1rem 0
+
+.channel-form
+  .cl-input-line
+    width: 100%
+    height: 1px
+    background: #eee
+
+  .cl-input
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    padding: .25rem rem(25)
+    font-size: .75rem
+
+
+
+  .cl-input-body
+    -webkit-appearance: none
+    display: block
+    -webkit-box-flex: 1
+    border: 0
+    padding: .4rem 0 .4rem .1rem
+
+
+    &::-webkit-input-placeholder
+      color: #bbb
+      font-size: .75rem
+
+
+  .right-layout
+    width: rem(220)
+    height: rem(70)
+    line-height: rem(70)
+    font-size: 0.75rem
+    border-radius: .2rem
+    text-align: center
+  .captcha-warp
+    @extend .right-layout
+    overflow: hidden
+    img
+      display: block
+      width: 100%
+      height: 100%
+  .validation
+    @extend .right-layout
+    -webkit-appearance: none
+    color: #fff
+    background: #50B143
+    border: 0
+    &:disabled
+      background: #ccc
+
+  .cl-icon
+    width: 2.2rem
+    height: 1.775rem
+    background-size: 1rem
+  .icon-phone
+    background: url("/static/imgs/mobile/channel_register/icon_phone.png") no-repeat center
+  .icon-code
+    background: url("/static/imgs/mobile/channel_register/icon_code.png") no-repeat center
+  .icon-math
+    background: url("/static/imgs/mobile/channel_register/icon_math.png") no-repeat center
+    background-size: rem(39)
+  .icon-psw
+    background: url("/static/imgs/mobile/channel_register/icon_psw.png") no-repeat center
+  .icon-token
+    background: url("/static/imgs/mobile/channel_register/icon_token.png") no-repeat center
+
+.padding-warp-small
+  padding: 0 rem(25)
+.channel-protocol
+  margin: .5rem 0
+
+
+.channel-propagate
+  padding: 0 0.5rem
+  overflow: hidden
+  margin-bottom: 1.2rem
+  ul
+    +clearfix
+  li 
+    float: left
+    text-align: center
+    width: 50%
+    margin-top: 1.2rem
+  h4 
+    color: #666
+    font-size: 0.7rem
+    margin: 0.5rem 0
+    
+  p 
+    color: #9b9b9b
+    font-size: 0.6rem  
+  span 
+    display: block
+    width: 3.25rem
+    height: 3.25rem
+    margin: 0 auto
+    background-size: 100%
+
+  .pro-believe
+    background: url("/static/imgs/mobile/channel_register/believe.png") no-repeat center
+  .pro-authority
+    background: url("/static/imgs/mobile/channel_register/authority.png") no-repeat center
+  .pro-safe
+    background: url("/static/imgs/mobile/channel_register/safe.png") no-repeat center
+  .pro-finance
+    background: url("/static/imgs/mobile/channel_register/finance.png") no-repeat center

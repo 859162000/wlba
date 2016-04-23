@@ -1203,6 +1203,8 @@ class KongGang1Register(CoopRegister):
                             "content": send_msg,
                             "mtype": "activity"
                         })
+                        send_reward.is_used = True
+                        send_reward.save()
                     except Exception:
                         logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
                     join_record.save()
@@ -1225,7 +1227,7 @@ class KongGangRegister(CoopRegister):
             with transaction.atomic():
                 join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
                 if not join_record:
-                    join_record = join_record.objects.create(
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
                         user=user,
                         activity_code=self.c_code
                     )
@@ -1258,7 +1260,7 @@ class KongGangRegister(CoopRegister):
                                    u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (send_reward.type, send_reward.content)
                         send_messages.apply_async(kwargs={
                             "phones": [user.wanglibaouserprofile.phone, ],
-                            "message": send_msg,
+                            "message": [send_msg,],
                         })
 
                         inside_message.send_one.apply_async(kwargs={
@@ -1267,6 +1269,8 @@ class KongGangRegister(CoopRegister):
                             "content": send_msg,
                             "mtype": "activity"
                         })
+                        send_reward.is_used = True
+                        send_reward.save()
                     except Exception:
                         logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
                     join_record.save()
@@ -1309,7 +1313,7 @@ class ZhaoXiangGuanRegister(CoopRegister):
                                    u'感谢您的参与！【网利科技】' % (send_reward.content)
                         send_messages.apply_async(kwargs={
                             "phones": [user.wanglibaouserprofile.phone, ],
-                            "message": send_msg,
+                            "message": [send_msg, ],
                         })
 
                         inside_message.send_one.apply_async(kwargs={

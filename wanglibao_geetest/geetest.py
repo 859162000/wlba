@@ -20,7 +20,7 @@ class GeetestLib(object):
 
     GT_STATUS_SESSION_KEY = "gt_server_status"
 
-    API_URL = "http://api.geetest_error.com"
+    API_URL = "http://api.geetest.com"
     REGISTER_HANDLER = "/register.php"
     VALIDATE_HANDLER = "/validate.php"
 

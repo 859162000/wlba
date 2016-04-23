@@ -40,12 +40,11 @@ def getWechatDailyReward(openid):
     redpack_id = getRandomRedpackId(redpack_data)
     redpack_type = reward_types[redpack_data[redpack_id][0]]
     yestoday = (datetime.datetime.now()-datetime.timedelta(days=1)).date()
-    if WechatUserDailyReward.objects.filter(create_date=yestoday, w_user=w_user, status=False).exists():
-        return -1, "不绑定服务号只能领取一天", 0
     user = w_user.user
-    if user:
-        if WechatUserDailyReward.objects.filter(create_date=today, user=user, status=True).exists():
-            return -1, "绑定手机号今天已经领取过", 0
+    if user and WechatUserDailyReward.objects.filter(create_date=today, user=user, status=True).exists():
+        return -1, "绑定手机号今天已经领取过", 0
+    if not user and WechatUserDailyReward.objects.filter(create_date=yestoday, w_user=w_user, status=False).exists():
+        return -1, "不绑定服务号只能领取一天", 0
     daily_reward, _ = WechatUserDailyReward.objects.get_or_create(
         create_date=today,
         w_user=w_user,
