@@ -24,7 +24,6 @@ urlpatterns = patterns(
     url(r'^coop_regist/$', views.WeixinCoopRegister.as_view(), name="weixin_coop_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
-    #url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
     url(r'^regist/second/$', login_required(views.WeixinRegisterBindCard.as_view(), login_url='/weixin/login/'), name='weixin_regist_bind_card'),
     url(r'^regist/three/$', TemplateView.as_view(template_name="weixin_registProcess_three.jade")),
 
@@ -116,6 +115,14 @@ urlpatterns = patterns(
                                           ),name='sub_checkIn'),
     url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
 
+)
+
+
+#渠道注册落地页
+urlpatterns += patterns(
+    '',
+    url(r'^channel_register/$', TemplateView.as_view(template_name="channel_register.jade")),
+    url(r'^channel_register/success$', TemplateView.as_view(template_name="channel_register_success.jade"))
 )
 #活动api
 urlpatterns += patterns(
