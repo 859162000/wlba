@@ -533,7 +533,11 @@ class CoopCallback(object):
                     call_back_processor = getattr(channel_processor(channel), '%s_call_back' % act.lower(), None)
                     call_back_processor(user_id, order_id)
                 except Exception, e:
-                    logger.info("%s raise error: %s" % (channel_processor.__name__, e))
+                    # 创建内存文件对象
+                    fp = StringIO.StringIO()
+                    traceback.print_exc(file=fp)
+                    message = fp.getvalue()
+                    logger.info("%s raise error: %s" % (channel_processor.__name__, message))
             else:
                 logger.info("coop callback not found processor matched for user[%s]" % user_id)
         else:
