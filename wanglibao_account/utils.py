@@ -179,14 +179,16 @@ def bisouyi_callback(url, content_data, channel_code, async_callback=True, order
         'sign': generate_bisouyi_sign(content),
     }
 
-    data = {'content': content}
+    data = json.dumps({'content': content})
 
     if async_callback:
         common_callback.apply_async(
             kwargs={'channel': channel_code, 'url': url,
-                    'params': json.dumps(data), 'headers': headers,
+                    'params': data, 'headers': headers,
                     'order_id': order_id, 'ret_parser': ret_parser})
     else:
         common_callback(channel=channel_code, url=url,
-                        params=json.dumps(data), headers=headers,
+                        params=data, headers=headers,
                         order_id=order_id, ret_parser=ret_parser)
+
+    return headers, data

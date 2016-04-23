@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def generate_bisouyi_content(data):
     data = json.dumps(data)
     ase = Aes()
-    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data)
+    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data, mode_tag='ECB')
     return encrypt_text
 
 

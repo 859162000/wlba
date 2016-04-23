@@ -20,6 +20,7 @@ def bajinshe_callback_ret_parser(ret, channel, order_id=None):
         if call_back_record:
             call_back_record.result_code = ret_data.get('code')
             call_back_record.result_msg = ret_data.get('msg')
+            call_back_record.result_errors = ret_data.get('errors')
             call_back_record.save()
 
 

@@ -418,6 +418,7 @@ class CoopCallback(object):
     第三方用户数据回调api
     """
     def __init__(self, channel=None):
+        self.c_code = None
         self.channel = channel
         # 渠道提供给我们的秘钥
         self.coop_id = None
@@ -473,6 +474,22 @@ class CoopCallback(object):
         :return:
         """
         logger.info("%s enter amortization_push with user_amortization[%s]" % (self.channel.code, user_amo.id))
+
+    def save_to_callback_record(self, data):
+        """
+        渠道用户回调记录
+        """
+        data['callback_to'] = self.c_code
+        data['request_data'] = json.dumps(data['request_data'])
+        request_headers = data.get('request_headers', None)
+        if request_headers:
+            data['request_headers'] = json.dumps(request_headers)
+
+        call_back_record = CallbackRecord()
+        for k, v in data.iteritems():
+            setattr(call_back_record, k, v)
+
+        call_back_record.save()
 
     def get_channel_processor(self, channel_code):
         """
@@ -566,18 +583,26 @@ class BaJinSheCallback(CoopCallback):
             }
 
             data['tran'] = [act_data]
+            data = json.dumps(data)
 
-            call_back_record = CallbackRecord()
-            call_back_record.user = user
-            call_back_record.order_id = order_id
-            call_back_record.callback_to = self.c_code
-            call_back_record.description = u'账户推送'
-            call_back_record.save()
+            ret_parser = 'bajinshe_callback_ret_parser'
+            call_back_record_data = {
+                'user': user,
+                'order_id': order_id,
+                'description': u'账户推送',
+                'request_url': self.register_call_back_url,
+                'request_data': data,
+                'request_headers': self.headers,
+                'request_action': 1,
+                'ret_parser': ret_parser,
+            }
+
+            self.save_to_callback_record(call_back_record_data)
 
             common_callback.apply_async(
                 kwargs={'channel': self.c_code, 'url': self.register_call_back_url,
-                        'params': json.dumps(data), 'headers': self.headers,
-                        'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
+                        'params': data, 'headers': self.headers,
+                        'order_id': order_id, 'ret_parser': ret_parser})
 
     def recharge_call_back(self, user_id, order_id):
         super(BaJinSheCallback, self).recharge_call_back(user_id, order_id)
@@ -601,18 +626,26 @@ class BaJinSheCallback(CoopCallback):
                 }
 
                 data['tran'] = [act_data]
+                data = json.dumps(data)
 
-                call_back_record = CallbackRecord()
-                call_back_record.user = user
-                call_back_record.order_id = order_id
-                call_back_record.callback_to = self.c_code
-                call_back_record.description = u'充值回调'
-                call_back_record.save()
+                ret_parser = 'bajinshe_callback_ret_parser'
+                call_back_record_data = {
+                    'user': user,
+                    'order_id': order_id,
+                    'description': u'充值回调',
+                    'request_url': self.transaction_call_back_url,
+                    'request_data': data,
+                    'request_headers': self.headers,
+                    'request_action': 1,
+                    'ret_parser': ret_parser,
+                }
+
+                self.save_to_callback_record(call_back_record_data)
 
                 common_callback.apply_async(
                     kwargs={'channel': self.c_code, 'url': self.transaction_call_back_url,
-                            'params': json.dumps(data), 'headers': self.headers,
-                            'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
+                            'params': data, 'headers': self.headers,
+                            'order_id': order_id, 'ret_parser': ret_parser})
 
                 # 推送账户数据
                 p2p_margin = user.margin.margin
@@ -642,18 +675,26 @@ class BaJinSheCallback(CoopCallback):
                 }
 
                 data['tran'] = [act_data]
+                data = json.dumps(data)
 
-                call_back_record = CallbackRecord()
-                call_back_record.user = user
-                call_back_record.order_id = order_id
-                call_back_record.callback_to = self.c_code
-                call_back_record.description = u'投资回调'
-                call_back_record.save()
+                ret_parser = 'bajinshe_callback_ret_parser'
+                call_back_record_data = {
+                    'user': user,
+                    'order_id': order_id,
+                    'description': u'投资回调',
+                    'request_url': self.transaction_call_back_url,
+                    'request_data': data,
+                    'request_headers': self.headers,
+                    'request_action': 1,
+                    'ret_parser': ret_parser,
+                }
+
+                self.save_to_callback_record(call_back_record_data)
 
                 common_callback.apply_async(
                     kwargs={'channel': self.c_code, 'url': self.transaction_call_back_url,
-                            'params': json.dumps(data), 'headers': self.headers,
-                            'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
+                            'params': data, 'headers': self.headers,
+                            'order_id': order_id, 'ret_parser': ret_parser})
 
                 # 推送账户数据
                 p2p_margin = user.margin.margin
@@ -778,24 +819,32 @@ class BaJinSheCallback(CoopCallback):
                             act_data_list.append(act_data)
 
                     data['tran'] = act_data_list
+                    data = json.dumps(data)
 
-                    call_back_record = CallbackRecord()
-                    call_back_record.user = user
-                    call_back_record.order_id = order_id
-                    call_back_record.callback_to = self.c_code
-
+                    ret_parser = 'bajinshe_callback_ret_parser'
                     if user_amo.settled:
-                        call_back_record.description = u'产品:%s %d期还款回调' % (product.id, user_amo.term)
+                        description = u'产品:%s %d期还款回调' % (product.id, user_amo.term)
                     else:
                         term_mark = u','.join(term_mark)
-                        call_back_record.description = u'产品:%s %s期满标回调' % (product.id, term_mark)
+                        description = u'产品:%s %s期满标回调' % (product.id, term_mark)
 
-                    call_back_record.save()
+                    call_back_record_data = {
+                        'user': user,
+                        'order_id': order_id,
+                        'description': description,
+                        'request_url': self.purchase_call_back_url,
+                        'request_data': data,
+                        'request_headers': self.headers,
+                        'request_action': 1,
+                        'ret_parser': ret_parser,
+                    }
+
+                    self.save_to_callback_record(call_back_record_data)
 
                     common_callback.apply_async(
                         kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
-                                'params': json.dumps(data), 'headers': self.headers,
-                                'order_id': order_id, 'ret_parser': 'bajinshe_callback_ret_parser'})
+                                'params': data, 'headers': self.headers,
+                                'order_id': order_id, 'ret_parser': ret_parser})
 
                     # 推送账户数据
                     p2p_margin = user.margin.margin
@@ -870,17 +919,23 @@ class RenRenLiCallback(CoopCallback):
                     user = User.objects.get(pk=p2p_record.user_id)
                     data['Data'] = json.dumps([act_data])
 
-                    call_back_record = CallbackRecord()
-                    call_back_record.user = user
-                    call_back_record.order_id = order_id
-                    call_back_record.callback_to = self.c_code
-                    call_back_record.description = u'投资回调'
-                    call_back_record.save()
+                    ret_parser = 'renrenli_callback_ret_parser'
+                    call_back_record_data = {
+                        'user': user,
+                        'order_id': order_id,
+                        'description': u'投资回调',
+                        'request_url': self.purchase_call_back_url,
+                        'request_data': data,
+                        'request_action': 1,
+                        'ret_parser': ret_parser,
+                    }
+
+                    self.save_to_callback_record(call_back_record_data)
 
                     common_callback.apply_async(
                         kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
                                 'params': data, 'order_id': order_id,
-                                'ret_parser': 'renrenli_callback_ret_parser'})
+                                'ret_parser': ret_parser})
             else:
                 logger.info("renrenli get_amotize_data failed with bid[%s] data[%s]" % (bid, data))
 
@@ -916,15 +971,23 @@ class BiSouYiCallback(CoopCallback):
                 'tstatus': 1,
             }
 
-            call_back_record = CallbackRecord()
-            call_back_record.user = user
-            call_back_record.order_id = order_id
-            call_back_record.callback_to = self.c_code
-            call_back_record.description = u'授权推送'
-            call_back_record.save()
+            url = settings.BISOUYI_OATUH_PUSH_URL
+            ret_parser = 'bisouyi_callback_ret_parser'
+            headers, data = bisouyi_callback(url, content_data, self.c_code,
+                                             order_id=order_id, ret_parser=ret_parser)
 
-            bisouyi_callback(settings.BISOUYI_OATUH_PUSH_URL, content_data,
-                             self.c_code, order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
+            call_back_record_data = {
+                'user': user,
+                'order_id': order_id,
+                'description': u'授权推送',
+                'request_url': url,
+                'request_data': data,
+                'request_headers': headers,
+                'request_action': 1,
+                'ret_parser': ret_parser,
+            }
+
+            self.save_to_callback_record(call_back_record_data)
 
     def purchase_call_back(self, user_id, order_id):
         super(BiSouYiCallback, self).purchase_call_back(user_id, order_id)
@@ -957,15 +1020,23 @@ class BiSouYiCallback(CoopCallback):
                 'bstatus': 1,
             }
 
-            call_back_record = CallbackRecord()
-            call_back_record.user = user
-            call_back_record.order_id = order_id
-            call_back_record.callback_to = self.c_code
-            call_back_record.description = u'投资推送'
-            call_back_record.save()
+            ret_parser = 'bisouyi_callback_ret_parser'
+            url = settings.BISOUYI_PURCHASE_PUSH_URL
+            headers, data = bisouyi_callback(url, content_data, self.c_code, async_callback=False,
+                                             order_id=order_id, ret_parser=ret_parser)
 
-            bisouyi_callback(settings.BISOUYI_PURCHASE_PUSH_URL, content_data, self.c_code, async_callback=False,
-                             order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
+            call_back_record_data = {
+                'user': user,
+                'order_id': order_id,
+                'description': u'投资推送',
+                'request_url': url,
+                'request_data': data,
+                'request_headers': headers,
+                'request_action': 1,
+                'ret_parser': ret_parser,
+            }
+
+            self.save_to_callback_record(call_back_record_data)
 
             p2p_equity = P2PEquity.objects.filter(product=product, user_id=user_id).first()
             if p2p_equity:
@@ -981,16 +1052,23 @@ class BiSouYiCallback(CoopCallback):
                 }
 
                 order_id = str(order_id) + '_' + str(p2p_equity.id)
+                url = settings.BISOUYI_ORDER_RELATION_PUSH_URL
+                ret_parser = 'bisouyi_callback_ret_parser'
+                headers, data = bisouyi_callback(url, content_data, self.c_code,
+                                                 order_id=order_id, ret_parser=ret_parser)
 
-                call_back_record = CallbackRecord()
-                call_back_record.user = user
-                call_back_record.order_id = order_id
-                call_back_record.callback_to = self.c_code
-                call_back_record.description = u'投资订单关联推送'
-                call_back_record.save()
+                call_back_record_data = {
+                    'user': user,
+                    'order_id': order_id,
+                    'description': u'投资订单关联推送',
+                    'request_url': url,
+                    'request_data': data,
+                    'request_headers': headers,
+                    'request_action': 1,
+                    'ret_parser': ret_parser,
+                }
 
-                bisouyi_callback(settings.BISOUYI_ORDER_RELATION_PUSH_URL, content_data, self.c_code,
-                                 order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
+                self.save_to_callback_record(call_back_record_data)
 
     def amortization_push(self, user_amo):
         super(BiSouYiCallback, self).amortization_push(user_amo)
@@ -1046,15 +1124,22 @@ class BiSouYiCallback(CoopCallback):
                         url = settings.BISOUYI_ON_INTEREST_PUSH_URL
                         call_back_des = u'产品:%s 起息回调' % product.id
 
-                    call_back_record = CallbackRecord()
-                    call_back_record.user = user
-                    call_back_record.order_id = order_id
-                    call_back_record.callback_to = self.c_code
-                    call_back_record.description = call_back_des
-                    call_back_record.save()
+                    ret_parser = 'bisouyi_callback_ret_parser'
+                    headers, data = bisouyi_callback(url, content_data, self.c_code, order_id=order_id,
+                                                     ret_parser=ret_parser)
 
-                    bisouyi_callback(url, content_data, self.c_code,
-                                     order_id=order_id, ret_parser='bisouyi_callback_ret_parser')
+                    call_back_record_data = {
+                        'user': user,
+                        'order_id': order_id,
+                        'description': call_back_des,
+                        'request_url': url,
+                        'request_data': data,
+                        'request_headers': headers,
+                        'request_action': 1,
+                        'ret_parser': ret_parser,
+                    }
+
+                    self.save_to_callback_record(call_back_record_data)
 
 
 # 第三方回调通道
