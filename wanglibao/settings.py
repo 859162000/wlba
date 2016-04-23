@@ -1387,14 +1387,9 @@ elif ENV == ENV_STAGING:
 elif ENV == ENV_DEV:
     SITE_URL = 'http://127.0.0.1:8000'
 
-if ENV == ENV_PRODUCTION:
-    GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
-    GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'
-else:
-    GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
-    GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'
-    #GEETEST_ID = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-    #GEETEST_KEY = '6b5129633547f5b0c0967b4c65193b0c'
+#极验验证 KEY及ID设置
+GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'
 
 # settings for PHP
 PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'

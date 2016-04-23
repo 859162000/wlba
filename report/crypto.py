@@ -34,9 +34,10 @@ class Rsa(object):
 class Aes(object):
 
     @classmethod
-    def encrypt(cls, key, plain_text):
+    def encrypt(cls, key, plain_text, mode='CBC'):
+        mode = getattr(AES, 'MODE_%s' % mode.upper())
         iv = '\0' * 16
-        cryptor = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
+        cryptor = AES.new(key=key, mode=mode, IV=iv)
         padding = '\0'
         length = 16
         count = plain_text.count('')
@@ -50,12 +51,14 @@ class Aes(object):
         return base64.b64encode(cipher_text)
 
     @classmethod
-    def decrypt(cls, key, text):
+    def decrypt(cls, key, text, mode='CBC'):
+        mode = getattr(AES, 'MODE_%s' % mode.upper())
         iv = '\0' * 16
-        cryptor = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
+        cryptor = AES.new(key=key, mode=mode, IV=iv)
         text = base64.b64decode(text)
         plain_text = cryptor.decrypt(text)
         return plain_text.rstrip("\0")
+
 
 class AesForApp(object):
     # the block size for the cipher object; must be 16, 24, or 32 for AES
