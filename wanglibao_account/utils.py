@@ -862,9 +862,10 @@ def generate_random_password(length):
 
 
 def generate_bisouyi_content(data):
-    data = json.dumps(data)
+    data = unicode(json.dumps(data), 'unicode_escape').encode('utf-8')
+    key = unicode(settings.BISOUYI_AES_KEY, 'unicode_escape').encode('utf-8')
     ase = Aes()
-    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data, mode='ECB')
+    encrypt_text = ase.encrypt(key, data, mode_tag='ECB')
     return encrypt_text
 
 
