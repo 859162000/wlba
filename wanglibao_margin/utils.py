@@ -10,9 +10,7 @@ def save_to_margin(req_data):
     margin = json.loads(req_data["margin"])
     sync_id = req_data["sync_id"]
     margin['sync_id'] = sync_id
-    user_id = margin['user_id']
-    margin['user'] = user_id
-    margin.pop('user_id', None)
+    user_id = margin['user']
     margin_instance = Margin.objects.filter(user_id=user_id).first()
     if margin_instance:
         if sync_id >= margin_instance.sync_id:
