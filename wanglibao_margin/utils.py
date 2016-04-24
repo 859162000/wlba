@@ -10,7 +10,10 @@ def save_to_margin(req_data):
     margin = json.loads(req_data["margin"])
     sync_id = req_data["sync_id"]
     margin['sync_id'] = sync_id
-    margin_instance = Margin.objects.filter(user_id=margin['user']).first()
+    user_id = margin['user_id']
+    margin['user'] = user_id
+    margin.pop('user_id', None)
+    margin_instance = Margin.objects.filter(user_id=user_id).first()
     if margin_instance:
         if sync_id >= margin_instance.sync_id:
             margin_form = MarginForm(margin, instance=margin_instance)
@@ -33,7 +36,7 @@ def save_to_margin(req_data):
     else:
         margin_form = MarginForm(margin)
         if margin_form.is_valid():
-            user = User.objects.get(pk=margin['user'])
+            user = User.objects.get(pk=user_id)
             margin['user'] = user
             margin_instance = Margin()
             for k, v in margin.iteritems():

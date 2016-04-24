@@ -115,7 +115,8 @@ def process_purchase_callback(req_data):
         margin_record = margin_record_form.save()
         p2p_record["margin_record"] = margin_record.id
         p2p_record["create_time"] = str_to_utc(p2p_record["create_time"])
-        p2p_record['user'] = p2p_record.get('user_id')
+        p2p_record['user'] = p2p_record['user_id']
+        p2p_record.pop('user_id', None)
         p2p_record_form = P2PRecordForm(p2p_record)
         if p2p_record_form.is_valid():
             p2p_record = p2p_record_form.save()
@@ -123,10 +124,9 @@ def process_purchase_callback(req_data):
             save_equity_response_data = save_to_p2p_equity(req_data)
             if save_margin_response_data['ret_code'] == 10000:
                 if save_equity_response_data['ret_code'] == 10000:
-                    user_id = p2p_record.user_id
-                    channel = get_user_channel_record(user_id)
+                    channel = get_user_channel_record(user.id)
                     if channel:
-                        CoopCallback(channel).process_all_callback(user_id, 'purchase', p2p_record.order_id)
+                        CoopCallback(channel).process_all_callback(user.id, 'purchase', p2p_record.order_id)
                     response_data = save_equity_response_data
                 else:
                     response_data = save_equity_response_data
