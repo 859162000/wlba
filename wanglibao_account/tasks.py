@@ -107,8 +107,9 @@ def process_recharge_callback(req_data):
 def process_purchase_callback(req_data):
     margin_record = json.loads(req_data["margin_record"])
     margin_record["create_time"] = str_to_utc(margin_record["create_time"])
-    user = User.objects.get(pk=margin_record['user_id'])
-    margin_record['user'] = user
+    user_id = margin_record['user_id']
+    margin_record.pop('user_id', None)
+    margin_record['user'] = user_id
     margin_record_form = MarginRecordForm(margin_record)
     if margin_record_form.is_valid():
         p2p_record = json.loads(req_data["p2p_record"])
@@ -124,9 +125,9 @@ def process_purchase_callback(req_data):
             save_equity_response_data = save_to_p2p_equity(req_data)
             if save_margin_response_data['ret_code'] == 10000:
                 if save_equity_response_data['ret_code'] == 10000:
-                    channel = get_user_channel_record(user.id)
+                    channel = get_user_channel_record(user_id)
                     if channel:
-                        CoopCallback(channel).process_all_callback(user.id, 'purchase', p2p_record.order_id)
+                        CoopCallback(channel).process_all_callback(user_id, 'purchase', p2p_record.order_id)
                     response_data = save_equity_response_data
                 else:
                     response_data = save_equity_response_data
