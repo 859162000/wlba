@@ -17,6 +17,8 @@ class Migration(SchemaMigration):
             ('invest', self.gf('django.db.models.fields.DecimalField')(default='0.00', max_digits=20, decimal_places=2)),
             ('uninvested', self.gf('django.db.models.fields.DecimalField')(default='0.00', max_digits=20, decimal_places=2)),
             ('uninvested_freeze', self.gf('django.db.models.fields.DecimalField')(default='0.00', max_digits=20, decimal_places=2)),
+            ('other_amount', self.gf('django.db.models.fields.DecimalField')(default='0.00', max_digits=20, decimal_places=2)),
+            ('sync_id', self.gf('django.db.models.fields.FloatField')(default=0)),
         ))
         db.send_create_signal(u'wanglibao_margin', ['Margin'])
 
@@ -24,12 +26,12 @@ class Migration(SchemaMigration):
         db.create_table(u'wanglibao_margin_marginrecord', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('catalog', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('user_id', self.gf('django.db.models.fields.IntegerField')(max_length=50)),
+            ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.SET_NULL)),
             ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
             ('margin_current', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
-            ('description', self.gf('django.db.models.fields.CharField')(default=u'', max_length=1000)),
+            ('description', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_margin', ['MarginRecord'])
 
@@ -84,6 +86,8 @@ class Migration(SchemaMigration):
             'freeze': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
             'invest': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
             'margin': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
+            'other_amount': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
+            'sync_id': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'uninvested': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
             'uninvested_freeze': ('django.db.models.fields.DecimalField', [], {'default': "'0.00'", 'max_digits': '20', 'decimal_places': '2'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'}),
@@ -94,11 +98,11 @@ class Migration(SchemaMigration):
             'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'catalog': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'margin_current': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
-            'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'user_id': ('django.db.models.fields.IntegerField', [], {'max_length': '50'})
+            'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
         }
     }
 

@@ -575,7 +575,7 @@ class BaJinSheCallback(CoopCallback):
 
         bid = get_tid_for_coop(user_id)
         if data and bid:
-            pre_total_interest = UserAmortization.objects.filter(user_id=user_id,
+            pre_total_interest = UserAmortization.objects.filter(user=user,
                                                                  settled=True
                                                                  ).aggregate(Sum('interest'))['interest__sum'] or 0
             act_data = {
@@ -735,7 +735,7 @@ class BaJinSheCallback(CoopCallback):
 
         reward_data_list = list()
         if user_amo.settled and int(user_amo.term) > 1:
-            user_amos = UserAmortization.objects.filter(product=product, user_id=user_amo.user_id).order_by('term')
+            user_amos = UserAmortization.objects.filter(product=product, user=user_amo.user).order_by('term')
             for user_amo in user_amos:
                 reward_data = {
                     'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
@@ -762,7 +762,7 @@ class BaJinSheCallback(CoopCallback):
 
     def amortization_push(self, user_amo):
         super(BaJinSheCallback, self).amortization_push(user_amo)
-        user_amos = UserAmortization.objects.filter(product=user_amo.product, user_id=user_amo.user_id)
+        user_amos = UserAmortization.objects.filter(product=user_amo.product, user=user_amo.user)
         if user_amo.settled or user_amos.count() == user_amo.terms:
             if (not user_amo.settled and user_amo.term == 1) or user_amo.settled:
                 if user_amo.settled:
@@ -1076,7 +1076,7 @@ class BiSouYiCallback(CoopCallback):
 
     def amortization_push(self, user_amo):
         super(BiSouYiCallback, self).amortization_push(user_amo)
-        user_amos = UserAmortization.objects.filter(product=user_amo.product, user_id=user_amo.user_id)
+        user_amos = UserAmortization.objects.filter(product=user_amo.product, user=user_amo.user)
         if user_amo.settled or user_amos.count() == user_amo.terms:
             product = user_amo.product
             user_id = user_amo.user_id

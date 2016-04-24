@@ -70,22 +70,29 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
-    'wanglibao',
-    'registration_defaults',
-    'suit',
     'django.contrib.admin',
     'django_extensions',
-    'reversion',
 
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_swagger',
+
+    'registration_defaults',
+    'suit',
+    'reversion',
     'drf_wrapper',
     'import_export',
-
     'south',
     'registration',
+    'widget_tweaks',
+    'mathfilters',
+    'raven.contrib.django.raven_compat',
+    'djcelery',  # Use django orm as the backend
+    'djsupervisor',
+    'adminplus',
+    'daterange_filter',
 
+    'wanglibao',
     'common',
     'marketing',
     'wanglibao_account',
@@ -95,15 +102,6 @@ INSTALLED_APPS = (
     'wanglibao_pay',
     'wanglibao_margin',
     'wanglibao_oauth2',
-
-    'widget_tweaks',
-    'mathfilters',
-
-    'raven.contrib.django.raven_compat',
-    'djcelery',  # Use django orm as the backend
-    'djsupervisor',
-    'adminplus',
-    'daterange_filter',
 )
 
 MIDDLEWARE_CLASSES = (

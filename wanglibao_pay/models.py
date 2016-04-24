@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.contrib.auth.models import User
 from wanglibao_margin.models import MarginRecord
 
 
@@ -17,7 +18,7 @@ class PayInfo(models.Model):
     total_amount = models.DecimalField(u'总金额', max_digits=20, decimal_places=2, default=0)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     status = models.CharField(u'状态', max_length=15)
-    user_id = models.IntegerField(u'用户id', max_length=50, db_index=True)
+    user = models.ForeignKey(User)
     order_id = models.IntegerField(u'支付流水号', blank=True, null=True, db_index=True)
     margin_record = models.ForeignKey(MarginRecord, verbose_name=u'账户资金记录', blank=True, null=True)
 

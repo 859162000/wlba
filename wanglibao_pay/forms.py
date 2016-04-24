@@ -62,7 +62,6 @@ class PayInfoForm(forms.ModelForm):
     total_amount = forms.DecimalField(label=u'总金额', error_messages={'required': u'请输入总金额'})
     create_time = forms.DateTimeField(label=u'创建时间', error_messages={'required': u'请输入创建时间'})
     status = forms.CharField(label=u'状态', error_messages={'required': u'请输入状态'})
-    user_id = forms.IntegerField(label=u'用户id', error_messages={'required': u'请输入用户id'})
     order_id = forms.IntegerField(label=u'支付流水号', error_messages={'required': u'请输入支付流水号'})
 
     class Meta:

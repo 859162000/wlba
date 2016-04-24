@@ -117,7 +117,7 @@ class P2PRecord(models.Model):
 
 class UserAmortization(models.Model):
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
-    user_id = models.IntegerField(u'用户id', max_length=50, db_index=True)
+    user = models.ForeignKey(User)
     term = models.IntegerField(u'还款期数')
     terms = models.IntegerField(u'还款总期数')
     term_date = models.DateTimeField(u'还款时间')
@@ -136,7 +136,7 @@ class UserAmortization(models.Model):
     class Meta:
         verbose_name = u'用户还款计划'
         verbose_name_plural = u'用户还款计划'
-        ordering = ['user_id', 'term']
+        ordering = ['user', 'term']
 
     def __unicode__(self):
         return u'用户%s 本金%s 利息%s' % (self.user, self.principal, self.interest)
@@ -162,7 +162,7 @@ class P2PEquity(models.Model):
 
     def __get_amortizations(self, settled_only=False):
         if settled_only:
-            amortizations = UserAmortization.objects.filter(user_id=self.user, product=self.product,
+            amortizations = UserAmortization.objects.filter(user=self.user, product=self.product,
                                                             settled=True)
         else:
             amortizations = UserAmortization.objects.filter(user=self.user, product=self.product)

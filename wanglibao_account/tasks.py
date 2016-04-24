@@ -5,6 +5,7 @@ import json
 import logging
 import StringIO
 import traceback
+from django.contrib.auth.models import User
 from common.tools import now, str_to_utc, parase_form_error
 from wanglibao.celery import app
 from marketing.utils import get_user_channel_record
@@ -36,8 +37,8 @@ def process_amortize(amortizations, product_id, sync_id):
     user_amo_list = list()
     for amo in amortizations:
         amo['sync_id'] = sync_id
-        user_id = amo.get('user_id')
-        term = amo.get('term')
+        user_id = amo['user']
+        term = amo['term']
         amo_instance = UserAmortization.objects.filter(user_id=user_id, product_id=product_id, term=term).first()
         if amo_instance:
             amo['settlement_time'] = str_to_utc(amo['settlement_time'])
@@ -50,6 +51,8 @@ def process_amortize(amortizations, product_id, sync_id):
             if amo_instance:
                 user_amo = user_amo_form.save()
             else:
+                user = User.objects.get(pk=user_id)
+                amo['user'] = user
                 p2p_product = P2PProduct.objects.get(pk=amo['product'])
                 amo['product'] = p2p_product
                 user_amo = UserAmortization()
@@ -75,21 +78,24 @@ def process_recharge_callback(req_data):
 
     margin_record = json.loads(margin_record)
     margin_record["create_time"] = str_to_utc(margin_record["create_time"])
+    user = User.objects.get(pk=margin_record['user_id'])
+    margin_record['user'] = user
     margin_record_form = MarginRecordForm(margin_record)
     if margin_record_form.is_valid():
         pay_info = json.loads(pay_info)
         margin_record = margin_record_form.save()
         pay_info["margin_record"] = margin_record.id
         pay_info["create_time"] = str_to_utc(pay_info["create_time"])
+        user = User.objects.get(pk=pay_info['user'])
+        pay_info['user'] = user
         pay_info_form = PayInfoForm(pay_info)
         if pay_info_form.is_valid():
             pay_info = pay_info_form.save()
             response_data = save_to_margin(req_data)
             if response_data['ret_code'] == 10000:
-                user_id = pay_info.user_id
-                channel = get_user_channel_record(user_id)
+                channel = get_user_channel_record(user.id)
                 if channel:
-                    CoopCallback(channel).process_all_callback(user_id, 'recharge', pay_info.order_id)
+                    CoopCallback(channel).process_all_callback(user.id, 'recharge', pay_info.order_id)
         else:
             response_data = parase_form_error(pay_info_form)
     else:
@@ -101,6 +107,8 @@ def process_recharge_callback(req_data):
 def process_purchase_callback(req_data):
     margin_record = json.loads(req_data["margin_record"])
     margin_record["create_time"] = str_to_utc(margin_record["create_time"])
+    user = User.objects.get(pk=margin_record['user_id'])
+    margin_record['user'] = user
     margin_record_form = MarginRecordForm(margin_record)
     if margin_record_form.is_valid():
         p2p_record = json.loads(req_data["p2p_record"])

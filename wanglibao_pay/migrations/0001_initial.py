@@ -20,8 +20,8 @@ class Migration(SchemaMigration):
             ('total_amount', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=20, decimal_places=2)),
             ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('status', self.gf('django.db.models.fields.CharField')(max_length=15)),
-            ('user_id', self.gf('django.db.models.fields.IntegerField')(max_length=50)),
-            ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('order_id', self.gf('django.db.models.fields.IntegerField')(db_index=True, null=True, blank=True)),
             ('margin_record', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_margin.MarginRecord'], null=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_pay', ['PayInfo'])
@@ -74,10 +74,10 @@ class Migration(SchemaMigration):
             'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'catalog': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '1000'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'margin_current': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
-            'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL'})
         },
         u'wanglibao_pay.payinfo': {
@@ -89,11 +89,11 @@ class Migration(SchemaMigration):
             'management_amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
             'management_fee': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
             'margin_record': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_margin.MarginRecord']", 'null': 'True', 'blank': 'True'}),
-            'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'order_id': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '15'}),
             'total_amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '20', 'decimal_places': '2'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '5'}),
-            'user_id': ('django.db.models.fields.IntegerField', [], {'max_length': '50'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
             'uuid': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'})
         }
     }

@@ -13,18 +13,32 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('callback_to', self.gf('django.db.models.fields.CharField')(max_length=30, db_index=True)),
-            ('order_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=50, db_index=True)),
-            ('third_order_id', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
+            ('order_id', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
+            ('third_order_id', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=50, null=True, blank=True)),
             ('result_code', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
             ('result_msg', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('result_errors', self.gf('django.db.models.fields.TextField')(max_length=500, null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('answer_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('request_url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('request_data', self.gf('django.db.models.fields.TextField')(max_length=1000, null=True, blank=True)),
+            ('request_headers', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
+            ('request_action', self.gf('django.db.models.fields.CharField')(default=1, max_length=2)),
+            ('ret_parser', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
+            ('extra', self.gf('django.db.models.fields.CharField')(default='', max_length=200, blank=True)),
+            ('re_callback', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'common', ['CallbackRecord'])
 
+        # Adding unique constraint on 'CallbackRecord', fields ['callback_to', 'order_id']
+        db.create_unique(u'common_callbackrecord', ['callback_to', 'order_id'])
+
 
     def backwards(self, orm):
+        # Removing unique constraint on 'CallbackRecord', fields ['callback_to', 'order_id']
+        db.delete_unique(u'common_callbackrecord', ['callback_to', 'order_id'])
+
         # Deleting model 'CallbackRecord'
         db.delete_table(u'common_callbackrecord')
 
@@ -60,16 +74,24 @@ class Migration(SchemaMigration):
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
         u'common.callbackrecord': {
-            'Meta': {'object_name': 'CallbackRecord'},
+            'Meta': {'unique_together': "(('callback_to', 'order_id'),)", 'object_name': 'CallbackRecord'},
             'answer_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'callback_to': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_index': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'extra': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'order_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50', 'db_index': 'True'}),
+            'order_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
+            're_callback': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'request_action': ('django.db.models.fields.CharField', [], {'default': '1', 'max_length': '2'}),
+            'request_data': ('django.db.models.fields.TextField', [], {'max_length': '1000', 'null': 'True', 'blank': 'True'}),
+            'request_headers': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'request_url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'result_code': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
+            'result_errors': ('django.db.models.fields.TextField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
             'result_msg': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'third_order_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
+            'ret_parser': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
+            'third_order_id': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '50', 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'contenttypes.contenttype': {
