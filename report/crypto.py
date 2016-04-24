@@ -36,9 +36,11 @@ class Aes(object):
     def __init__(self):
         self.BS = AES.block_size
 
-        self.pad_for_ecb = lambda s: s + (self.BS - len(s) % self.BS) * chr(self.BS - len(s) % self.BS)
+    def pad_for_ecb(self, plain_text):
+        return plain_text + (self.BS - len(plain_text) % self.BS) * chr(self.BS - len(plain_text) % self.BS)
 
-        self.unpad_for_ecb = lambda s: s[0:-ord(s[-1])]
+    def unpad_for_ecb(self, plain_text):
+        return plain_text[0:-ord(plain_text[-1])]
 
     def pad_for_cbc(self, plain_text):
         padding = '\0'
@@ -57,6 +59,7 @@ class Aes(object):
 
     def encrypt(self, key, plain_text, mode_tag='CBC'):
         mode = getattr(AES, 'MODE_%s' % mode_tag.upper())
+        # add other if, perhapse the mode need IV args
         if mode_tag.upper() == 'CBC':
             iv = '\0' * self.BS
             cryptor = AES.new(key=key, mode=mode, IV=iv)
