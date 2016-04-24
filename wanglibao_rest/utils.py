@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def generate_bisouyi_content(data):
-    data = unicode(json.dumps(data)).encode('utf-8')
-    key = unicode(settings.BISOUYI_AES_KEY).encode('utf-8')
+    data = unicode(json.dumps(data), 'unicode_escape').encode('utf-8')
+    key = unicode(settings.BISOUYI_AES_KEY, 'unicode_escape').encode('utf-8')
     ase = Aes()
     encrypt_text = ase.encrypt(key, data, mode_tag='ECB')
     return encrypt_text
