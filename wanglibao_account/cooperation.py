@@ -2125,7 +2125,7 @@ class BaJinSheRegister(CoopRegister):
                 'management_amount': float(pay_info.management_amount),
                 'total_amount': float(pay_info.total_amount),
                 'status': pay_info.status,
-                'user_id': pay_info.user.id,
+                'user': pay_info.user.id,
                 'order_id': pay_info.order.id,
                 'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
