@@ -57,7 +57,7 @@ class Aes(object):
     def unpad_for_cbc(self, plain_text):
         return plain_text.rstrip("\0")
 
-    def encrypt(self, key, plain_text, mode_tag='CBC'):
+    def get_cryptor(self, key, mode_tag):
         mode = getattr(AES, 'MODE_%s' % mode_tag.upper())
         # add other if, perhapse the mode need IV args
         if mode_tag.upper() == 'CBC':
@@ -66,19 +66,17 @@ class Aes(object):
         else:
             cryptor = AES.new(key=key, mode=mode)
 
+        return cryptor
+
+    def encrypt(self, key, plain_text, mode_tag='CBC'):
+        cryptor = self.get_cryptor(key, mode_tag)
         pad = getattr(self, 'pad_for_%s' % mode_tag.lower())
         plain_text = pad(plain_text)
         cipher_text = cryptor.encrypt(plain_text)
         return base64.b64encode(cipher_text)
 
     def decrypt(self, key, text, mode_tag='CBC'):
-        mode = getattr(AES, 'MODE_%s' % mode_tag.upper())
-        if mode_tag.upper() == 'CBC':
-            iv = '\0' * self.BS
-            cryptor = AES.new(key=key, mode=mode, IV=iv)
-        else:
-            cryptor = AES.new(key=key, mode=mode)
-
+        cryptor = self.get_cryptor(key, mode_tag)
         text = base64.b64decode(text)
         plain_text = cryptor.decrypt(text)
         unpad = getattr(self, 'unpad_for_%s' % mode_tag.lower())
