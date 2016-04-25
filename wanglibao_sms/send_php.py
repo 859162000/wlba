@@ -8,11 +8,15 @@ import requests
 import logging
 from hashlib import md5
 from datetime import datetime
+from django.conf import settings
 
 logger = logging.getLogger('wanglibao_sms')
 
 # PHP_SMS_HOST = 'http://101.200.149.172/index.php?s=/node_push/send.html'
-PHP_SMS_HOST = 'http://101.200.149.172/api.php?route=/send'
+if settings.ENV == settings.ENV_PRODUCTION:
+    PHP_SMS_HOST = 'http://101.200.149.172/api.php?route=/send'
+else:
+    PHP_SMS_HOST = 'http://192.168.20.245/api.php?route=/send'
 # PHP_SMS_HOST = 'http://haopeiwen.dev.wanglibao.com/wanglibao_push/index.php?s=/node_push/send.html'
 PHP_AUTH_ID = 'admin'
 PHP_AUTH_KEY = '192006250b4c09247ec02edce69f6a2d'
