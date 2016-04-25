@@ -32,13 +32,13 @@ html(style='background:#fff;')
 
       .cl-input
         .cl-icon.icon-psw
-        input(type='tel', name='password', placeholder= '请设置密码', autocomplete='off').cl-input-body
+        input(type='password', name='password', placeholder= '请设置密码', autocomplete='off').cl-input-body
 
       .cl-input-line
 
       .cl-input
         .cl-icon.icon-token
-        input(type='tel', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', autocomplete='off').cl-input-body
+        input(type='text', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', autocomplete='off').cl-input-body
         input(type="hidden", name="token", id="token", value="{{token}}")
       .cl-input-line
 

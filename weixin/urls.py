@@ -123,7 +123,7 @@ urlpatterns += patterns(
     '',
     url(r'^channel_register/$', views.ChannelRegister.as_view(), name="weixin_register"),
     #url(r'^channel_register/$', TemplateView.as_view(template_name="channel_register.jade")),
-    url(r'^channel_register_success$', TemplateView.as_view(template_name="channel_register_success.jade"))
+    url(r'^channel_register_success/$', TemplateView.as_view(template_name="channel_register_success.jade"))
 )
 #活动api
 urlpatterns += patterns(
