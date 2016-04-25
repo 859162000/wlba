@@ -15,6 +15,14 @@ logger = logging.getLogger(__name__)
 
 
 class P2PProduct(models.Model):
+    CATEGORY_CHOICES = {
+        u'普通': 0,
+        u'证大速贷': 1,
+        u'票据': 2,
+        u'新手标': 3,
+        u'酒仙众筹标': 4
+    }
+
     version = models.CharField(max_length=50)
     category = models.CharField(u'产品类别*', max_length=16, default=u'普通')
     types = models.CharField(u"产品分类(新)", max_length=50, null=True, blank=True)
@@ -75,6 +83,10 @@ class P2PProduct(models.Model):
     @property
     def get_h5_url(self):
         return '/weixin/view/buy/%s' % self.id
+
+    @property
+    def get_category_num(self):
+        return self.CATEGORY_CHOICES.get(self.category, 0)
 
     class Meta:
         verbose_name = u'P2P产品'
