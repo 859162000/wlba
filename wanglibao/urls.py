@@ -13,10 +13,10 @@ from wanglibao.views import IndexView, SecurityView, PartnerView
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
     ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView, \
     Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
-from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
-from wanglibao_cash.views import CashHomeView, CashDetailView
-from wanglibao_fund.views import FundDetailView, FundProductsView
-from wanglibao_portfolio.views import PortfolioHomeView
+# from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
+# from wanglibao_cash.views import CashHomeView, CashDetailView
+# from wanglibao_fund.views import FundDetailView, FundProductsView
+# from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
 from wanglibao_banner.views import (HiringView, AboutView, CompanyView, TeamView, MilestoneView,
@@ -27,8 +27,8 @@ from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDate
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
 from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
     AppShareViewSuccess, AppShareViewError, RockFinanceQRCodeView
-from wanglibao_activity.decorators import decorator_include
-from wanglibao_activity.decorators import wap_activity_manage
+# from wanglibao_activity.decorators import decorator_include
+# from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
 from wanglibao_sms.views import ArriveRate
 
@@ -42,24 +42,24 @@ urlpatterns = patterns(
     url(r'^pc_guide/', TemplateView.as_view(template_name="pc_guide.jade")),
     url(r'^favicon.ico', RedirectView.as_view(url="/static/favicon.ico")),
 
-    url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
+    # url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
 
-    url(r'^trust/', include('trust.urls')),
-    url(r'^financing/home/', FinancingHomeView.as_view(), name="financing_home"),
-    url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
-    url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
+    # url(r'^trust/', include('trust.urls')),
+    # url(r'^financing/home/', FinancingHomeView.as_view(), name="financing_home"),
+    # url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
+    # url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
 
-    url(r'^fund/products/', FundProductsView.as_view(), name="fund_home"),
-    url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
+    # url(r'^fund/products/', FundProductsView.as_view(), name="fund_home"),
+    # url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
 
-    url(r'^cash/products/', CashHomeView.as_view(), name="cash_home"),
-    url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
+    # url(r'^cash/products/', CashHomeView.as_view(), name="cash_home"),
+    # url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
 
     url(r'^p2p/', include('wanglibao_p2p.urls')),
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 
-    url(r'^docs/', include('rest_framework_swagger.urls')),
+    # url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^help/', include('wanglibao_help.urls')),
     url(r'^mobile/', include('wanglibao_mobile.urls')),
@@ -68,7 +68,7 @@ urlpatterns = patterns(
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
-    url(r'^shumi/', include('shumi_backend.urls')),
+    # url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
     url(r'app/', include('wanglibao_app.urls')),
 
@@ -83,7 +83,7 @@ urlpatterns = patterns(
     url(r'^milestone/', MilestoneView.as_view(), name="milestone"),
     url(r'^responsibility/', ResponsibilityView.as_view(), name="responsibility"),
     url(r'^contact_us/', ContactView.as_view(), name="contact_us"),
-    url(r'^directorate/', DirectorateView.as_view(), name="directorate"),
+    # url(r'^directorate/', DirectorateView.as_view(), name="directorate"),
     url(r'^news/list', NewsListView.as_view(), name="news_list"),
     url(r'^news/detail/(?P<id>\d+)', NewsDetailView.as_view(), name="news_detail"),
     # url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
