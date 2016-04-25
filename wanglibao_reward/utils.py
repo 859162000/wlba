@@ -188,12 +188,13 @@ def updateRedisTopRank():
 
 
 def getWeekTop10Ranks():
-    today = datetime.datetime.now()
+    #today = datetime.datetime.now()
     #计算开始时间从上周六0点开始
-    week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
+    #week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
+    week_frist_day = getWeekBeginDay()
     today_start = local_to_utc(week_frist_day, 'min')
-    today_end = local_to_utc(today, 'max')
-    top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
+    #today_end = local_to_utc(today, 'max')
+    top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
     uids = [rank['user'] for rank in top_ranks]
     userprofiles = WanglibaoUserProfile.objects.filter(user__in=uids).all()
     for rank in top_ranks:
@@ -218,16 +219,25 @@ def updateRedisWeekTopRank():
 def getWeekSum():
     amount_week_sum = 0
     try:
-        today = datetime.datetime.now()
-        week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
+        #today = datetime.datetime.now()
+        #week_frist_day = today + datetime.timedelta(days=-int(today.strftime('%u'))+1-2)
+        week_frist_day = getWeekBeginDay()
         today_start = local_to_utc(week_frist_day, 'min')
-        today_end = local_to_utc(today, 'max')
-        week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).aggregate(Sum('amount'))
+        #today_end = local_to_utc(today, 'max')
+        #week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start, create_time__lte=today_end).aggregate(Sum('amount'))
+        week_sum = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start).aggregate(Sum('amount'))
         amount_week_sum = week_sum['amount__sum'] if week_sum['amount__sum'] else Decimal('0')
-    except:
+    except Exception,e:
         logger.error("====updateRedisWeekTopRank======="+e.message)
     return amount_week_sum 
 
+def getWeekBeginDay():
+    today = datetime.datetime.now()
+    delta_days = int(today.strftime('%u')) - 6
+    if delta_days<0:
+        delta_days = delta_days + 7
+    week_frist_day = today - datetime.timedelta(days=delta_days)
+    return week_frist_day
 
 def updateRedisWeekSum():
     top_ranks = 0
