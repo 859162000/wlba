@@ -35,6 +35,7 @@ html,body
         padding: 0
         @extend .flex
         flex-direction: row
+        display: inline-block
         dt
             width: 70%
             height: 100%
@@ -46,6 +47,10 @@ html,body
             @extend .flex
             align-items: center
             justify-content: center
+            float: left
+            display: block
+            position: relative
+            height: 100%
             h3
                 span
                     font-size: .8rem
@@ -59,7 +64,9 @@ html,body
         dt
             background: url("/static/imgs/mobile_activity/app_airport_operation/brief1.jpg") no-repeat
             background-size: 100% auto
-            order: 2
+            //order: 2
+            float: right
+            display: block
     dl.start_center
         dt
             background: url("/static/imgs/mobile_activity/app_airport_operation/brief2.jpg") no-repeat
