@@ -1,4 +1,4 @@
-webpackJsonp([9],[
+webpackJsonp([3],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -14,29 +14,73 @@ webpackJsonp([9],[
 
 	var _from_validation = __webpack_require__(6);
 
+	var _images_validation = __webpack_require__(8);
+
 	(function () {
 
 	    var $submit = $('button[type=submit]'),
-	        $name = $('input[name=name]'),
-	        $idcard = $('input[name=idcard]');
+	        $identifier = $('input[name=identifier]'),
+	        $captcha_1 = $('input[name=captcha_1]'),
+	        $captcha_0 = $('input[name=captcha_0]'),
+	        $validate_code = $('input[name=validate_code]'),
+	        $password = $('input[name=password]'),
+	        $invite_code = $('input[name=invite_code]'),
+	        $agreement = $('input[name=agreement]'),
+	        $captcha = $('#captcha'),
+	        $validate_operation = $('button[name=validate_operation]'),
+	        $token = $('#token');
 
 	    //---------------初始化操作start---------
-	    var autolist = [{ target: $name, required: true }, { target: $idcard, required: true }];
+	    var autolist = [{ target: $identifier, required: true }, { target: $captcha_1, required: true }, { target: $validate_code, required: true }, { target: $password, required: true }, { target: $invite_code, required: false }];
 	    //自动检查
 	    var auto = new _automatic_detection.Automatic({
 	        submit: $submit,
-	        checklist: autolist
+	        checklist: autolist,
+	        otherlist: [{ target: $agreement, required: true }],
+	        done: function done() {
+	            if (validClass.status()) {
+	                $validate_operation.attr('disabled', true);
+	            }
+	        }
 	    });
 	    auto.operationClear();
+	    auto.operationPassword();
 	    //---------------初始化操作end---------
 
-	    //---------------login操作start---------
+	    //短信验证码
+	    var validClass = (0, _images_validation.validation)($identifier, $captcha_0, $captcha_1, $captcha);
+	    validClass.render();
+	    //---------------注册操作start---------
+	    //用户协议
+	    $("#agreement").on('click', function () {
+	        $(this).toggleClass('agreement');
+	        $(this).hasClass('agreement') ? $agreement.attr('checked', 'checked') : $agreement.removeAttr('checked');
+	        $identifier.trigger('input');
+	    });
+	    //显示协议
+	    var $showXiyi = $('.xieyi-btn'),
+	        $cancelXiyi = $('.cancel-xiyie'),
+	        $protocolDiv = $('.regist-protocol-div');
+	    $showXiyi.on('click', function (event) {
+	        event.preventDefault();
+	        $protocolDiv.css('display', 'block');
+	        setTimeout(function () {
+	            $protocolDiv.css('top', '0%');
+	        }, 0);
+	    });
+	    //关闭协议
+	    $cancelXiyi.on('click', function () {
+	        $protocolDiv.css('top', '100%');
+	        setTimeout(function () {
+	            $protocolDiv.css('display', 'none');
+	        }, 200);
+	    });
 
 	    //验证表单
 	    var checkOperation = function checkOperation() {
 	        return new Promise(function (resolve, reject) {
 	            function checkOperation() {
-	                var checklist = [{ type: 'isEmpty', value: $name.val() }, { type: 'idCard', value: $idcard.val() }];
+	                var checklist = [{ type: 'phone', value: $identifier.val() }, { type: 'isEmpty', value: $captcha_1.val() }, { type: 'isEmpty', value: $validate_code.val() }, { type: 'password', value: $password.val() }];
 	                return (0, _from_validation.check)(checklist);
 	            }
 
@@ -53,54 +97,66 @@ webpackJsonp([9],[
 	            return console.log('验证失败');
 	        });
 	    };
-	    //认证
-	    var authentication = function authentication(url, postdata) {
+
+	    //注册
+	    function register(url) {
+	        var invite_val = $.trim($invite_code.val());
 	        return new Promise(function (resolve, reject) {
 	            (0, _api.ajax)({
-	                type: 'POST',
 	                url: url,
-	                data: postdata,
-	                beforeSend: function beforeSend() {
-	                    $submit.attr('disabled', true).text("认证中，请等待...");
+	                type: 'POST',
+	                data: {
+	                    'identifier': $identifier.val(),
+	                    'password': $password.val(),
+	                    'captcha_0': $captcha_0.val(),
+	                    'captcha_1': $captcha_1.val(),
+	                    'validate_code': $validate_code.val(),
+	                    'invite_code': invite_val === "" ? $token.val() : invite_val,
+	                    'invite_phone': ''
 	                },
-	                success: function success(result) {
-	                    resolve(result);
+	                beforeSend: function beforeSend() {
+	                    $submit.text('注册中,请稍等...').attr('disabled', 'true');
+	                },
+	                success: function success(data) {
+	                    resolve(data);
 	                },
 	                error: function error(xhr) {
 	                    reject(xhr);
 	                },
 	                complete: function complete() {
-	                    $submit.removeAttr('disabled').text("实名认证");
+	                    $submit.text('立即注册 ｜ 领取奖励').removeAttr('disabled');
 	                }
 	            });
 	        });
-	    };
+	    }
 
 	    $submit.on('click', function () {
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
-	            return authentication('/api/id_validate/', {
-	                name: $name.val(),
-	                id_number: $idcard.val()
-	            });
+	            return register('/api/register/');
 	        }).then(function (result) {
-	            console.log('success');
-	            if (!result.validate == 'true') return (0, _ui.Alert)('认证失败，请重试');
-	            (0, _ui.Alert)("实名认证成功!", function () {
-	                return window.location.href = '/weixin/regist/second/';
-	            });
+	            console.log('register success');
+	            if (result.ret_code === 0) {
+	                (0, _ui.Alert)('注册成功', function () {
+	                    var next = (0, _api.getQueryStringByName)('next') == '' ? '/weixin/channel_register_success/' : (0, _api.getQueryStringByName)('next');
+	                    next = (0, _api.getQueryStringByName)('mobile') == '' ? next : next + '&mobile=' + (0, _api.getQueryStringByName)('mobile');
+	                    next = (0, _api.getQueryStringByName)('serverId') == '' ? next : next + '&serverId=' + (0, _api.getQueryStringByName)('serverId');
+	                    window.location.href = next;
+	                });
+	            }
+	            if (result.ret_code > 0) {
+	                (0, _ui.signModel)(result.message);
+	            }
 	        }).catch(function (xhr) {
 	            var result = JSON.parse(xhr.responseText);
-	            if (result.error_number == 8) {
-	                (0, _ui.Alert)(result.message, function () {
-	                    window.location.href = '/weixin/list/';
-	                });
+	            if (xhr.status === 429) {
+	                (0, _ui.signModel)('系统繁忙，请稍候重试');
 	            } else {
-	                return (0, _ui.Alert)(result.message);
+	                (0, _ui.signModel)(result.message);
 	            }
 	        });
 	    });
-	    //---------------login操作end---------
+	    //---------------注册操作end---------
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
@@ -454,6 +510,169 @@ webpackJsonp([9],[
 	        }
 	        return [false, error];
 	    }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 7 */,
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.validation = undefined;
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _api = __webpack_require__(3);
+
+	var _ui = __webpack_require__(2);
+
+	var _from_validation = __webpack_require__(6);
+
+	var validation = exports.validation = function validation($phone, $captcha_0, $captcha_1, $captcha) {
+
+	    var timeIntervalId = null;
+	    var $validate_operation = $('button[name=validate_operation]');
+
+	    //获取图像验证码
+	    function validation() {
+	        var url = '/captcha/refresh/?v=' + new Date().getTime();
+	        $.get(url, function (result) {
+	            $captcha.attr('src', result['image_url']);
+	            $captcha_0.val(result['key']);
+	        });
+	    }
+
+	    validation();
+
+	    //图像验证码
+	    $captcha.on('click', function () {
+	        validation();
+	    });
+
+	    function render() {
+	        //验证表单
+	        var checkOperation = function checkOperation(phone) {
+	            return new Promise(function (resolve, reject) {
+	                function checkOperation() {
+	                    var checklist = [{ type: 'phone', value: phone }];
+	                    return (0, _from_validation.check)(checklist);
+	                }
+
+	                var _checkOperation = checkOperation();
+
+	                var _checkOperation2 = _slicedToArray(_checkOperation, 2);
+
+	                var isThrough = _checkOperation2[0];
+	                var sign = _checkOperation2[1];
+
+	                if (isThrough) return resolve('验证成功');
+
+	                return reject(sign);
+	            });
+	        };
+
+	        //获取短信验证码
+	        function fetchValidation(phone, captcha_0, captcha_1) {
+	            return new Promise(function (resolve, reject) {
+	                (0, _api.ajax)({
+	                    url: '/api/phone_validation_code/' + phone + '/',
+	                    data: {
+	                        captcha_0: captcha_0,
+	                        captcha_1: captcha_1
+	                    },
+	                    type: 'POST',
+	                    beforeSend: function beforeSend() {
+	                        $validate_operation.attr('disabled', 'disabled').text('发送中..');
+	                    },
+	                    success: function success() {
+	                        resolve('短信已发送，请注意查收！');
+	                    },
+
+	                    error: function error(xhr) {
+	                        var result = JSON.parse(xhr.responseText);
+	                        $validate_operation.removeAttr('disabled').text('获取验证码');
+	                        clearInterval(timeIntervalId);
+	                        timeIntervalId = null;
+	                        validation();
+	                        return reject(result.message);
+	                    }
+	                });
+	            });
+	        }
+
+	        //倒计时
+	        function timerFunction(count) {
+	            return new Promise(function (resolve, reject) {
+	                var timerFunction = function timerFunction() {
+	                    if (count > 1) {
+	                        count--;
+	                        return $validate_operation.text(count + '秒后可重发');
+	                    } else {
+	                        clearInterval(timeIntervalId);
+	                        timeIntervalId = null;
+	                        $validate_operation.text('重新获取').removeAttr('disabled');
+	                        validation();
+	                        return reject('倒计时失效，请重新获取');
+	                    }
+	                };
+	                timerFunction();
+	                return timeIntervalId = setInterval(timerFunction, 1000);
+	            });
+	        }
+
+	        //短信验证码
+
+	        $validate_operation.on('click', function () {
+	            var phone = $phone.val(),
+	                captcha_0 = $captcha_0.val(),
+	                captcha_1 = $captcha_1.val();
+	            chained(phone, captcha_0, captcha_1);
+	        });
+
+	        function chained(phone, captcha_0, captcha_1) {
+	            /**
+	             * 所有的逻辑在这里，获取短信验证码的时候，先检查手机号是否符合，
+	             * 成功后 fetchValidation（发送短信请求）
+	             * 成功后 timerFunction（倒计时）
+	             */
+	            checkOperation(phone).then(function () {
+	                console.log('验证成功');
+	                return fetchValidation(phone, captcha_0, captcha_1);
+	            }).then(function (message) {
+	                (0, _ui.signModel)(message);
+	                console.log('短信发送成功');
+	                var count = 60;
+	                return timerFunction(count);
+	            }).catch(function (message) {
+	                (0, _ui.signModel)(message);
+	            });
+	        }
+	    }
+
+	    function destory() {
+	        if (timeIntervalId) {
+	            clearInterval(timeIntervalId);
+	            $validate_operation.removeAttr('disabled').text('获取验证码');
+	        }
+	    }
+
+	    function status() {
+	        if (timeIntervalId) {
+	            return true;
+	        }
+	        return false;
+	    }
+	    return {
+	        render: render, //初始化定时器
+	        status: status, //定时器的状态
+	        destory: destory, //销毁定时器
+	        validation: validation //暴露出短信接口
+	    };
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 

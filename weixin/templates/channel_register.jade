@@ -60,18 +60,35 @@ html(style='background:#fff;')
       .profit-people
         .profit-people-icon.profit-icon
         .profit-people-num.profit-text
-          |已有
-          span.blue 147
-          |万智慧投资人选择
+          if site_data
+            people_num = str(site_data['p2p_register_number'])
+            people_len = len(people_num)
+            people_str = '万'
+            if people_len > 4
+              people = people_num[0: -4]
+            else
+              people = people_num
+              people_str = '人'
+            |已有
+            span.blue {{people}}
+            |{{people_str}}智慧投资人选择
 
       .profit-money
         .profit-money-icon.profit-icon
         .profit-money-num.profit-text
-          |共投资
-          span.blue 53
-          |亿
-          span.blue 5393
-          |万
+          if site_data
+            money_num = str(int(site_data['p2p_amount']))
+            money_len  = len(money_num)
+
+            |共投资
+            if money_len > 8
+              million = money_num[0: -8]
+              span.blue {{million}}
+              |亿
+            if money_len > 4
+              wan = money_num[-8: -4]
+              span.blue {{wan}}
+              |万
     .channel-title-warp
       .channel-list-title 优质产品选择多
 
@@ -120,5 +137,5 @@ html(style='background:#fff;')
     include include/ui_model/mobile_errorsign
     include include/ui_model/mobile_alert
     //include include/tracking
-    script(src='/static/scripts/mobile/pro/vendor.zepto.js?v=2016040416')
-    script(src='/static/scripts/mobile/pro/regist.js?v=2016040416')
+    script(src='/static/scripts/mobile/pro/vendor.zepto.js?v=201604025')
+    script(src='/static/scripts/mobile/pro/z_channel_register.js?v=201604025')
