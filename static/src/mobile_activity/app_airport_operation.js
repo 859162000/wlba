@@ -3,7 +3,9 @@
 
 	var sixlis = document.getElementById("six_lis");
 
-     $('#sec').fullpage();
+     $('#sec').fullpage({
+         scrollingSpeed: 700
+     });
      sixlis.addEventListener("touchstart",function(){
           $(this).next().slideToggle();
       },false)

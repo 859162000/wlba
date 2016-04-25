@@ -222,7 +222,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	var sixlis = document.getElementById("six_lis");
 
-     $('#sec').fullpage();
+     $('#sec').fullpage({
+         scrollingSpeed: 700
+     });
      sixlis.addEventListener("touchstart",function(){
           $(this).next().slideToggle();
       },false)
