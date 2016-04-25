@@ -72,12 +72,9 @@
                         $('.popup_box .main .textairport').text(''+data.message+'');
                         $('.popup_box').show();
                     }
-
                     //console.log(data)
                 }
             })
-
-
         })
         $('.popup_box .popup_button').click(function(){
             $('.popup_box').hide();
