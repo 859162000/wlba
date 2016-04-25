@@ -30,7 +30,7 @@
 /******/ 	// "0" means "already loaded"
 /******/ 	// Array means "loading", array contains callbacks
 /******/ 	var installedChunks = {
-/******/ 		16:0
+/******/ 		17:0
 /******/ 	};
 
 /******/ 	// The require function
@@ -76,7 +76,7 @@
 /******/ 			script.charset = 'utf-8';
 /******/ 			script.async = true;
 
-/******/ 			script.src = __webpack_require__.p + "" + chunkId + "." + ({"0":"bankOneCard","1":"buy","2":"calculator","3":"detail","4":"list","5":"login","6":"login_bsy","7":"process_addbank","8":"process_authentication","9":"received_all","10":"received_detail","11":"received_month","12":"recharge","13":"regist","14":"regist_bsy","15":"trade_retrieve"}[chunkId]||chunkId) + ".js";
+/******/ 			script.src = __webpack_require__.p + "" + chunkId + "." + ({"0":"bankOneCard","1":"buy","2":"calculator","3":"channel_register","4":"detail","5":"list","6":"login","7":"login_bsy","8":"process_addbank","9":"process_authentication","10":"received_all","11":"received_detail","12":"received_month","13":"recharge","14":"regist","15":"regist_bsy","16":"trade_retrieve"}[chunkId]||chunkId) + ".js";
 /******/ 			head.appendChild(script);
 /******/ 		}
 /******/ 	};

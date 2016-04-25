@@ -1,4 +1,4 @@
-webpackJsonp([3],{
+webpackJsonp([4],{
 
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
@@ -7,7 +7,7 @@ webpackJsonp([3],{
 
 	var _api = __webpack_require__(3);
 
-	var _wx_share = __webpack_require__(8);
+	var _wx_share = __webpack_require__(9);
 
 	(function () {
 	    /**
@@ -126,7 +126,7 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 8:
+/***/ 9:
 /***/ function(module, exports) {
 
 	'use strict';

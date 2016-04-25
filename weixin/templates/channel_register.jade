@@ -3,9 +3,9 @@ html(style='background:#fff;')
   head
     include include/weixin_head.jade
   body
+    a(name='top')
     img(src='/static/imgs/mobile/channel_register/banner.jpg').channel-banner
-
-    .channel-form(name='top')
+    .channel-form
       .cl-input-line
 
       .cl-input
@@ -32,19 +32,18 @@ html(style='background:#fff;')
 
       .cl-input
         .cl-icon.icon-psw
-        input(type='tel', name='password', placeholder= '请设置密码', autocomplete='off').cl-input-body
+        input(type='password', name='password', placeholder= '请设置密码', autocomplete='off').cl-input-body
 
       .cl-input-line
 
       .cl-input
         .cl-icon.icon-token
-        input(type='tel', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', autocomplete='off').cl-input-body
+        input(type='text', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', autocomplete='off').cl-input-body
         input(type="hidden", name="token", id="token", value="{{token}}")
       .cl-input-line
 
     .regist-safe
       span 账户资金安全由阳光保险承保
-
     .padding-warp-small
       .channel-submit
         button(type="submit", disabled=true) 立即注册 ｜ 领取奖励
@@ -61,18 +60,34 @@ html(style='background:#fff;')
       .profit-people
         .profit-people-icon.profit-icon
         .profit-people-num.profit-text
-          |已有
-          span.blue 147
-          |万智慧投资人选择
+          if site_data
+            people_num = str(site_data['p2p_register_number'])
+            people_len = len(people_num)
+            people_str = '万'
+            if people_len > 4
+              people = people_num[0: -4]
+            else
+              people = people_num
+              people_str = '人'
+            span.blue {{people}}
+            |{{people_str}}智慧投资人选择
 
       .profit-money
         .profit-money-icon.profit-icon
         .profit-money-num.profit-text
-          |共投资
-          span.blue 53
-          |亿
-          span.blue 5393
-          |万
+          if site_data
+            money_num = str(int(site_data['p2p_amount']))
+            money_len  = len(money_num)
+
+            |共投资
+            if money_len > 8
+              million = money_num[0: -8]
+              span.blue {{million}}
+              |亿
+            if money_len > 4
+              wan = money_num[-8: -4]
+              span.blue {{wan}}
+              |万
     .channel-title-warp
       .channel-list-title 优质产品选择多
 
@@ -120,6 +135,6 @@ html(style='background:#fff;')
         include include/weixin_xieyiFixed
     include include/ui_model/mobile_errorsign
     include include/ui_model/mobile_alert
-    //include include/tracking
-    script(src='/static/scripts/mobile/pro/vendor.zepto.js?v=2016040416')
-    script(src='/static/scripts/mobile/pro/regist.js?v=2016040416')
+    include include/tracking
+    script(src='/static/scripts/mobile/pro/vendor.zepto.js?v=201604025')
+    script(src='/static/scripts/mobile/pro/channel_register.js?v=201604025')

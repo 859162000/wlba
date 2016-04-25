@@ -19,7 +19,7 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^coop_login/$', views.WeixinCoopLogin.as_view(), name='weixin_coop_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
-    url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
+    #url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^coop_regist/$', views.WeixinCoopRegister.as_view(), name="weixin_coop_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
@@ -121,8 +121,9 @@ urlpatterns = patterns(
 #渠道注册落地页
 urlpatterns += patterns(
     '',
-    url(r'^channel_register/$', TemplateView.as_view(template_name="channel_register.jade")),
-    url(r'^channel_register_success$', TemplateView.as_view(template_name="channel_register_success.jade"))
+    url(r'^channel_register/$', views.ChannelRegister.as_view(), name="weixin_register"),
+    #url(r'^channel_register/$', TemplateView.as_view(template_name="channel_register.jade")),
+    url(r'^channel_register_success/$', TemplateView.as_view(template_name="channel_register_success.jade"))
 )
 #活动api
 urlpatterns += patterns(
