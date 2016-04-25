@@ -48,7 +48,7 @@ ENV = ENV_DEV
 # Add by hb on 2016-04-19 for Support Alpha-Deploy
 ENV_ALPHA_DEPLOY = False
 if ENV == ENV_ALPHA:
-    ENV == "staging"
+    ENV = "staging"
     ENV_ALPHA_DEPLOY = True
 
 if ENV != ENV_DEV:
