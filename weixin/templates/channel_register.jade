@@ -3,15 +3,14 @@ html(style='background:#fff;')
   head
     include include/weixin_head.jade
   body
+    a(name='top')
     img(src='/static/imgs/mobile/channel_register/banner.jpg').channel-banner
-
     .channel-form
       .cl-input-line
 
       .cl-input
         .cl-icon.icon-phone
         input(type='tel', name='identifier', placeholder= '请输入手机号', autocomplete='off').cl-input-body
-
 
       .cl-input-line
 
@@ -55,7 +54,44 @@ html(style='background:#fff;')
           input(type='checkbox',name='agreement', checked=true)
         span.xieyi-btn 同意网利宝注册协议
         a(href="/weixin/login/").regist-for-login 立即登录
+    .channel-title-warp
+      .channel-list-title 稳健收益赢信任
 
+    .profit-num-layout
+      .profit-people
+        .profit-people-icon.profit-icon
+        .profit-people-num.profit-text
+          |已有
+          span.blue 147
+          |万智慧投资人选择
+
+      .profit-money
+        .profit-money-icon.profit-icon
+        .profit-money-num.profit-text
+          |共投资
+          span.blue 53
+          |亿
+          span.blue 5393
+          |万
+    .channel-title-warp
+      .channel-list-title 优质产品选择多
+
+    .channer-profit-layout
+      .profit-layout-main
+        .profit-layout-head 定期理财
+        .profit-layout-cont
+          .cont-num
+            span.num 7.5
+            i.per %
+            span.line
+            span.num 13
+            i.per %
+          .cont-dec 年化收益
+
+    .channel-title-warp
+      .channel-list-title.title-margin-none 保驾护航担忧少
+
+    .padding-warp-small
       section.channel-propagate
         ul
           mixin li(imgName, title, bodyTxt1, bodyTxt2)
@@ -64,11 +100,26 @@ html(style='background:#fff;')
               h4=title
               p=bodyTxt1
               p=bodyTxt2
-          +li('pro-believe', '信赖', 'IDG资本A轮投资', '100%本息保障')
+          +li('pro-believe', '信赖', 'IDG资本A轮投资', '足额抵押物保障')
           +li('pro-authority', '权威', 'A股百亿上市公司', '鸿利光电投资入股')
           +li('pro-safe', '安全', '账户资金安全', '由阳光保险承保')
           +li('pro-finance', '高收益', '37倍银行活期收益', '100元起投0手续')
+
+    .padding-warp-small
       .channel-goback
-        button(type="button" ) 注册享惊喜
+        a(href='#top') 注册享惊喜
       .channel-logo
         img(src='/static/imgs/mobile/channel_register/logo.png')
+    //协议内容
+    section.regist-protocol-div
+      header.xieyi-head
+        hgroup 注册协议
+        a(href="javascript:void(0)").cancel-xiyie
+          span 返回
+      article.xieyi-cont
+        include include/weixin_xieyiFixed
+    include include/ui_model/mobile_errorsign
+    include include/ui_model/mobile_alert
+    //include include/tracking
+    script(src='/static/scripts/mobile/pro/vendor.zepto.js?v=2016040416')
+    script(src='/static/scripts/mobile/pro/regist.js?v=2016040416')
