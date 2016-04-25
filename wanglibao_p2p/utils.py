@@ -158,7 +158,7 @@ def generate_bisouyi_product_data(product, action):
             'ourl': settings.WLB_URL + product.get_h5_url,
             'type': 2,
             'attribute': _attribute,
-            'category': product.category,
+            'category': product.get_category_num,
             'name': product.name[:100],
             'bidmoney': float(product.total_amount),
             'rate': product.expected_earning_rate,
