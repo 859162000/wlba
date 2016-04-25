@@ -1,4 +1,4 @@
-jade-load formatters
+-load formatters
 -load mathfilters
 doctype html
 html.no-js(lang="en-gb")
@@ -148,7 +148,7 @@ html.no-js(lang="en-gb")
                         dd 3、第三周（4月30日 0:00-5月6日 23:59），单周交易额突破一亿，活动期间累计三周都有投资用户得到一张2%加息券，参与2周投资用户得到一张1.5%加息券，只有本周参与投资用户得到1%加息券。
 
                     .all_text_1 全站交易额
-                    .all_text_2 16年4月16日零点至今
+                    .all_text_2!='<span id="act_time">16年4月16日</span>零点至今'
                     .num_wrap
                         //.num_1
                         //.num_1
@@ -180,7 +180,7 @@ html.no-js(lang="en-gb")
                                     td.one 第一周（4月16日 - 4月22日）
                                     td.two 突破1亿
                                     td.three 1%
-                                    td.four 待加息
+                                    td.four 已加息
                                 tr
                                     td.one 第二周（4月23日 - 4月29日）
                                     td.two 突破1亿
@@ -203,7 +203,7 @@ html.no-js(lang="en-gb")
                     .ranking_main_2
                         .list_wrap
                             .list_main
-                                .title_box 第一周用户投资排行榜（每逢半点更新）
+                                .title_box!='<span id="act_week">第一周</span>用户投资排行榜（每逢半点更新）'
                                 table
                                     thead
                                         tr
@@ -212,7 +212,7 @@ html.no-js(lang="en-gb")
                                             th.three 获得福利
                                     tbody
                                         //
-                                        //tr.first∂ç
+                                        //tr.first
                                         //    td.one
                                         //        span.ico
                                         //        span.phone 139 XXXX 2453
@@ -245,14 +245,12 @@ html.no-js(lang="en-gb")
                             .line_left
                             .line_right
                             p
-                                a(href='#') >第一周奖励发放记录
-                            p
-                                a(href='#') >第一周奖励发放记录
+                                a(href='https://www.wanglibao.com/announcement/detail/626/') >第一周奖励发放记录
 
                 .footer_bottom
                     a.button_link.button_link_3(href='/p2p/list/') 投资领奖品
         include global/g_footer
 script.
-    require(['/static/js/april_mobilization.js?v=2016041504'])
+    require(['/static/js/april_mobilization.js?v=2016042502'])
 
                                                                     
