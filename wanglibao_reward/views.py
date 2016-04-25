@@ -60,6 +60,8 @@ from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 from wanglibao_redis.backend import redis_backend
 from weixin.util import getMiscValue
+from wanglibao_reward.utils import getWeekBeginDay
+import time
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -2896,8 +2898,16 @@ class AprilAwardApi(APIView):
                 weekranks = updateRedisWeekTopRank()
             if not week_sum_amount:
                 week_sum_amount = updateRedisWeekSum()
-        
-        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,})
+        week_frist_day = getWeekBeginDay()
+        week_number = ''
+        t = time.strptime("2016 - 04 - 30", "%Y - %m - %d")
+        y,m,d = t[0:3]
+        if today>=datetime.datetime(y,m,d):
+            week_number = '最后一周'
+        else:
+            week_number = '第二周'
+        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,
+                         "week_frist_day":week_frist_day.strftime('%y年%m月%d日'),"week_number":week_number,})
 
 class FetchMarchAwardAPI(APIView):
     permission_classes = (IsAuthenticated, )
