@@ -247,6 +247,38 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     });
 
     //领取加息券
+    $("button.js-receive").on("touchstart", function(){
+        var $ok = $("div.alt-ok"),
+            $tit = $ok.find("div.alt-tit");
+        var self = $(this);
+        self.attr("disabled", true).text("正在提交……");
+        org.ajax({
+            type: "post",
+            url: "/api/activity/newusergift/",
+            dataType: 'json',
+            success: function(data){
+                if(data.ret_code === 0){
+                    $ok.css("display","-webkit-box");
+                    $tit.html('领取加息特权成功～<br />请前往[账户]-[理财券]中查看');
+                }else if(data.ret_code === 1){
+                    $ok.css("display","-webkit-box");
+                    $tit.html(data.message);
+                }else{
+                    $("div.alt-error").css("display","-webkit-box").find(".alt-tit").html(data.message);
+                }
+            },
+            error: function(xml){
+                if(xml.status === 403){
+                    alert("您还没有登录，请先登录");
+                }else{
+                    alert("系统繁忙，请稍候再试");
+                }
+            },
+            complete: function () {
+                self.removeAttr("disabled").text("领取加息特权");
+            }
+        });
+    });
 
     //音乐
     var audioBox = document.getElementById("js-audio"),
@@ -262,7 +294,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $t.addClass("audio-close");
         }
     });
-
 
 
     wlb.ready({
