@@ -163,7 +163,7 @@ def generate_bisouyi_product_data(product, action):
             'bidmoney': float(product.total_amount),
             'rate': product.expected_earning_rate,
             'period': period,
-            'unit': u'1天',
+            'unit': 1,
             'progress': product.completion_rate,
             'rdate': product.publish_time.strftime("%Y-%m-%d %H:%M:%S"),
             'edate': product.end_time.strftime("%Y-%m-%d %H:%M:%S"),
