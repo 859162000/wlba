@@ -8,6 +8,8 @@
             var result = data.weekranks;
             var str = '',sty = '',icon = '',coupon='';
             substring(data.week_sum_amount);
+            $('.transaction-time span').text(data.week_frist_day);
+            $('#week_number span').text(data.week_number)
             $.each(result,function(i,o){
                 if(i <= 2){
                     sty ='red';
