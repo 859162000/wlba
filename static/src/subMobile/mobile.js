@@ -3006,9 +3006,10 @@ org.redpacket = (function(org){
         },
         shareOk: function(){
             var url = $("input.share_url").val(),
-                price = $(".js-reward-price").text()*1;
-            price = price ? price : "X";
-            var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url+'', shareMainTit:'网利宝红包花雨季，我今天接了'+ price +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
+                price = $(".js-reward-price").text();
+            var num = price.substring(0,price.length-1)*1;
+            var pnum = num ? num : "X";
+            var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ pnum +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
             org.detail.share(share, true);
         }
     }

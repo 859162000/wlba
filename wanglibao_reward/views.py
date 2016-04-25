@@ -60,6 +60,8 @@ from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 from wanglibao_redis.backend import redis_backend
 from weixin.util import getMiscValue
+from wanglibao_reward.utils import getWeekBeginDay
+import time
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -1012,7 +1014,8 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
         self.amount = kwargs['amount']
         self.order_id = kwargs['order_id']
         self.user = kwargs['user']
-        self.token = 'sy'
+        self.token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+        self.request = request
 
     def distribute(self):
         send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
@@ -1028,7 +1031,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                         left_times=1,
                         join_times=1)
                 
-                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='sy', has_sent=False).first()
+                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
                 if reward:
                     reward.has_sent=True
                     reward.left_time=0
@@ -1036,12 +1039,12 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                                u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
                                u'感谢您的参与！【网利科技】' % (reward.reward.content)
                     send_messages.apply_async(kwargs={
-                        "phones": [request.user.wanglibaouserprofile.phone, ],
+                        "phones": [self.request.user.wanglibaouserprofile.phone, ],
                         "message": send_msg,
                     })
     
                     inside_message.send_one.apply_async(kwargs={
-                        "user_id": request.user.id,
+                        "user_id": self.request.user.id,
                         "title": u"影像投资节优惠码",
                         "content": send_msg,
                         "mtype": "activity"
@@ -2895,8 +2898,16 @@ class AprilAwardApi(APIView):
                 weekranks = updateRedisWeekTopRank()
             if not week_sum_amount:
                 week_sum_amount = updateRedisWeekSum()
-        
-        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,})
+        week_frist_day = getWeekBeginDay()
+        week_number = ''
+        t = time.strptime("2016 - 04 - 30", "%Y - %m - %d")
+        y,m,d = t[0:3]
+        if today>=datetime.datetime(y,m,d):
+            week_number = '最后一周'
+        else:
+            week_number = '第二周'
+        return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,
+                         "week_frist_day":week_frist_day.strftime('%y年%m月%d日'),"week_number":week_number,})
 
 class FetchMarchAwardAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -3055,3 +3066,74 @@ class FetchAirportServiceReward(APIView):
                 "mtype": "activity"
             })
             return Response({"ret_code": 0, "message": "奖品领取成功"})
+
+class NewUserRewardTemplate(TemplateView):
+    def get_context_data(self, **kwargs):
+
+        return {
+
+            }
+
+class FetchNewUserReward(APIView):
+    """
+    尊贵新人礼
+    """
+    authentication_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        activity = Activity.objects.filter(code='newgift').first()
+        utc_now = timezone.now()
+        if activity.is_stopped:
+            return Response({"ret_code": -1, "message":"活动已经截止"})
+        if activity.start_at < utc_now:
+            return Response({"ret_code": -1, "message":"活动还未开始"})
+        if activity.end_at < utc_now:
+            return Response({"ret_code": -1, "message":"活动已经结束"})
+
+        activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True).all()
+        device = split_ua(self.request)
+        device_type = device['device_type']
+        redpack_txts = []
+        events = []
+        records = []
+        gift_record = ActivityRewardRecord.objects.get_or_create(user=self.request.user, activity_code='newgift')
+        if gift_record.status:
+            return Response({"ret_code":1, "message":"已经领过了"})
+        with transaction.atomic():
+            gift_record = ActivityRewardRecord.objects.select_for_update().get(id=gift_record.id)
+            if gift_record.status:
+                return Response({"ret_code":1, "message":"已经领过了"})
+        for activity_rule in activity_rules:
+            if activity_rule.gift_type == "redpack":
+                redpack_record_ids = ""
+                redpack_ids = activity_rule.redpack.split(',')
+                for redpack_id in redpack_ids:
+                    redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                    if not redpack_event:
+                        return Response({"ret_code":5,"message":'QMBanquetRewardAPI post redpack_event not exist'})
+                    status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, redpack_event, device_type)
+                    if not status:
+                        return Response({"ret_code":6,"message":messege})
+                    redpack_text = "None"
+                    if redpack_event.rtype == 'interest_coupon':
+                        redpack_text = "%s%%加息券"%redpack_event.amount
+                    if redpack_event.rtype == 'percent':
+                        redpack_text = "%s%%百分比红包"%redpack_event.amount
+                    if redpack_event.rtype == 'direct':
+                        redpack_text = "%s元红包"%int(redpack_event.amount)
+                    redpack_txts.append(redpack_text)
+                    redpack_record_ids += (str(record.id) + ",")
+                    events.append(redpack_event)
+                    records.append(record)
+                gift_record.redpack_record_ids = redpack_record_ids
+            if activity_rule.gift_type == "experience_gold":
+                experience_record_ids = ""
+                experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+                if not experience_record_id:
+                    return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
+                redpack_txts.append('%s元体验金'%int(experience_event.amount))
+                experience_record_ids += (str(experience_record_id) + ",")
+                gift_record.experience_record_ids = experience_record_ids
+        gift_record.activity_code = self.activity.code
+        gift_record.activity_code_time = timezone.now()
+        gift_record.save()

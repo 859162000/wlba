@@ -71,6 +71,8 @@ from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser,
 from weixin.util import FWH_UNBIND_URL, filter_emoji, get_weixin_code_url
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_redis.backend import redis_backend
+from misc.views import MiscRecommendProduction
+from marketing.utils import pc_data_generator
 # from wanglibao_invite.models import WechatInviteRelation
 
 logger = logging.getLogger("weixin")
@@ -287,7 +289,7 @@ class WeixinJoinView(View):
                 for sub_service in sub_services:
                     txt += ("【" + sub_service.key + "】" + sub_service.describe + '\n')
 
-                sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
+                sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True, service__is_open=True)
                 if sub_records.exists():
                     txt += u'已经订阅的项目：\n'
                     sub_records = sub_records.order_by('service').all()
@@ -648,6 +650,41 @@ class WeixinRegister(TemplateView):
             'phone': phone,
             'next' : next
         }
+
+class ChannelRegister(TemplateView):
+    template_name = 'channel_register.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = 'weixin'
+
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        next = self.request.GET.get('next', '')
+        return {
+            'token': token,
+            'channel': channel,
+            'next': next,
+            'site_data': site_data
+        }
+
 
 
 class WeixinCoopRegister(TemplateView):

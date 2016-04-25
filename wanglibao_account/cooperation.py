@@ -59,7 +59,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback, coop_callback_for_post, common_callback_for_post
+                                    xunleivip_callback, coop_callback_for_post, coop_call_back
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -1188,13 +1188,13 @@ class KongGang1Register(CoopRegister):
                                 has_sent=True,
                                 left_times=0,
                                 join_times=0)
-                        send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                        send_msg = u'尊敬的贵宾客户，恭喜您获得%s,' \
                                    u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                                    u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                                    u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (send_reward.type, send_reward.content)
                         send_messages.apply_async(kwargs={
-                            "phones": [user.wanglibaouserprofile.phone, ],
-                            "message": send_msg,
+                            "phones": [user.id, ],
+                            "message": [send_msg, ],
                         })
 
                         inside_message.send_one.apply_async(kwargs={
@@ -1203,6 +1203,8 @@ class KongGang1Register(CoopRegister):
                             "content": send_msg,
                             "mtype": "activity"
                         })
+                        send_reward.is_used = True
+                        send_reward.save()
                     except Exception:
                         logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
                     join_record.save()
@@ -1225,7 +1227,7 @@ class KongGangRegister(CoopRegister):
             with transaction.atomic():
                 join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
                 if not join_record:
-                    join_record = join_record.objects.create(
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
                         user=user,
                         activity_code=self.c_code
                     )
@@ -1256,9 +1258,10 @@ class KongGangRegister(CoopRegister):
                                    u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                                    u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                                    u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (send_reward.type, send_reward.content)
+                        logger.debug("空港易行短信内容:%s, user_id:%s" % (send_msg, user.id))
                         send_messages.apply_async(kwargs={
-                            "phones": [user.wanglibaouserprofile.phone, ],
-                            "message": send_msg,
+                            "phones": [user.id, ],
+                            "message": [send_msg,],
                         })
 
                         inside_message.send_one.apply_async(kwargs={
@@ -1267,6 +1270,8 @@ class KongGangRegister(CoopRegister):
                             "content": send_msg,
                             "mtype": "activity"
                         })
+                        send_reward.is_used = True
+                        send_reward.save()
                     except Exception:
                         logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
                     join_record.save()
@@ -1309,7 +1314,7 @@ class ZhaoXiangGuanRegister(CoopRegister):
                                    u'感谢您的参与！【网利科技】' % (send_reward.content)
                         send_messages.apply_async(kwargs={
                             "phones": [user.wanglibaouserprofile.phone, ],
-                            "message": send_msg,
+                            "message": [send_msg, ],
                         })
 
                         inside_message.send_one.apply_async(kwargs={
@@ -2035,16 +2040,18 @@ class BaJinSheRegister(CoopRegister):
         data['name'] = user.wanglibaouserprofile.name
         data['id_number'] = user.wanglibaouserprofile.id_number
         data['id_valid_time'] = user.wanglibaouserprofile.id_valid_time.strftime('%Y-%m-%d %H:%M:%S')
-        coop_callback_for_post.apply_async(
-            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
     def binding_card_call_back(self, user):
         channel = get_user_channel_record(user.id)
         logger.info("%s-Enter binding_card_call_back for user[%s]" % (channel.code, user.id))
         data = generate_coop_base_data('bind_card')
         data['user_id'] = user.id
-        coop_callback_for_post.apply_async(
-            kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
     def register_call_back(self, user):
         client_id = self.channel_client_id
@@ -2073,20 +2080,6 @@ class BaJinSheRegister(CoopRegister):
             else:
                 logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
 
-            # base_data = generate_coop_base_data('register')
-            # act_data = {
-            #     'client_id': client_id,
-            #     'bid': self.channel_user,
-            #     'phone': user.wanglibaouserprofile.phone,
-            #     'btype': self.channel_code,
-            #     'user_id': user.id,
-            #     'access_token': getattr(user, 'access_token', ''),
-            #     'account': getattr(user, 'account', ''),
-            # }
-            # data = dict(base_data, **act_data)
-            # common_callback_for_post.apply_async(
-            #     kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
-
     def purchase_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
         logger.info("%s-Enter purchase_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
@@ -2110,8 +2103,9 @@ class BaJinSheRegister(CoopRegister):
             }
             data = dict(base_data, **act_data)
 
-            coop_callback_for_post.apply_async(
-                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+            coop_call_back.apply_async(
+                kwargs={'params': data},
+                queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
     def recharge_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
@@ -2132,7 +2126,7 @@ class BaJinSheRegister(CoopRegister):
                 'management_amount': float(pay_info.management_amount),
                 'total_amount': float(pay_info.total_amount),
                 'status': pay_info.status,
-                'user_id': pay_info.user.id,
+                'user': pay_info.user.id,
                 'order_id': pay_info.order.id,
                 'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
@@ -2153,8 +2147,9 @@ class BaJinSheRegister(CoopRegister):
             }
             data = dict(base_data, **act_data)
 
-            coop_callback_for_post.apply_async(
-                kwargs={'url': self.call_back_url, 'params': data, 'channel': self.c_code})
+            coop_call_back.apply_async(
+                kwargs={'params': data},
+                queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
 
 class RenRenLiRegister(BaJinSheRegister):
@@ -2162,7 +2157,7 @@ class RenRenLiRegister(BaJinSheRegister):
         super(RenRenLiRegister, self).__init__(request)
         self.c_code = 'renrenli'
         self.external_channel_client_id_key = 'Cust_id'
-        self.external_channel_user_key = 'Phone'
+        self.external_channel_phone_key = 'Phone'
         self.internal_channel_phone_key = 'phone'
         self.external_channel_sign_key = 'Sign'
         self.internal_channel_sign_key = 'sign'
@@ -2174,6 +2169,7 @@ class RenRenLiRegister(BaJinSheRegister):
     def save_to_session(self):
         channel_code = self.get_channel_code_from_request()
         channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
+        channel_phone = self.request.REQUEST.get(self.external_channel_phone_key, None)
         client_id = self.request.REQUEST.get(self.external_channel_client_id_key, None)
         access_token = self.request.REQUEST.get(self.external_channel_access_token_key, None)
         sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
@@ -2184,7 +2180,9 @@ class RenRenLiRegister(BaJinSheRegister):
 
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
-            self.request.session[self.internal_channel_phone_key] = channel_user
+
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
 
         if client_id:
             self.request.session[self.internal_channel_client_id_key] = client_id
