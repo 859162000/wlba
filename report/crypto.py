@@ -33,13 +33,18 @@ class Rsa(object):
 
 class Aes(object):
 
-    @classmethod
-    def encrypt(cls, key, plain_text, mode='CBC'):
-        mode = getattr(AES, 'MODE_%s' % mode.upper())
-        iv = '\0' * 16
-        cryptor = AES.new(key=key, mode=mode, IV=iv)
+    def __init__(self):
+        self.BS = AES.block_size
+
+    def pad_for_ecb(self, plain_text):
+        return plain_text + (self.BS - len(plain_text) % self.BS) * chr(self.BS - len(plain_text) % self.BS)
+
+    def unpad_for_ecb(self, plain_text):
+        return plain_text[0:-ord(plain_text[-1])]
+
+    def pad_for_cbc(self, plain_text):
         padding = '\0'
-        length = 16
+        length = self.BS
         count = plain_text.count('')
         if count < length:
             add = (length - count) + 1
@@ -47,17 +52,36 @@ class Aes(object):
         elif count > length:
             add = (length - (count % length)) + 1
             plain_text += (padding * add)
+        return plain_text
+
+    def unpad_for_cbc(self, plain_text):
+        return plain_text.rstrip("\0")
+
+    def get_cryptor(self, key, mode_tag):
+        mode = getattr(AES, 'MODE_%s' % mode_tag.upper())
+        # add other if, perhapse the mode need IV args
+        if mode_tag.upper() == 'CBC':
+            iv = '\0' * self.BS
+            cryptor = AES.new(key=key, mode=mode, IV=iv)
+        else:
+            cryptor = AES.new(key=key, mode=mode)
+
+        return cryptor
+
+    def encrypt(self, key, plain_text, mode_tag='CBC'):
+        cryptor = self.get_cryptor(key, mode_tag)
+        pad = getattr(self, 'pad_for_%s' % mode_tag.lower())
+        plain_text = pad(plain_text)
         cipher_text = cryptor.encrypt(plain_text)
         return base64.b64encode(cipher_text)
 
-    @classmethod
-    def decrypt(cls, key, text, mode='CBC'):
-        mode = getattr(AES, 'MODE_%s' % mode.upper())
-        iv = '\0' * 16
-        cryptor = AES.new(key=key, mode=mode, IV=iv)
+    def decrypt(self, key, text, mode_tag='CBC'):
+        cryptor = self.get_cryptor(key, mode_tag)
         text = base64.b64decode(text)
         plain_text = cryptor.decrypt(text)
-        return plain_text.rstrip("\0")
+        unpad = getattr(self, 'unpad_for_%s' % mode_tag.lower())
+        plain_text = unpad(plain_text)
+        return plain_text
 
 
 class AesForApp(object):
