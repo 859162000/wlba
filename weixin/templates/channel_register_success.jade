@@ -6,3 +6,22 @@ html
     title 注册送福利
     include include/weixin_head.jade
   body
+    .channel-reg-su-banner
+      img(src='/static/imgs/mobile/channel_register/su_banner.jpg').channel-banner
+    .channel-reg-award
+      .award-layout
+        .award-icon.award-icon-gold
+        .award-text 28888元体验金
+
+      .award-layout
+        .award-icon.award-icon-redpack
+        .award-text 50元现金红包
+
+    .padding-warp-small
+      .channel-goback
+        a(href='/weixin/regist/first/') 完善信息使用奖励
+
+      a(href='/weixin/list').channel-index.award-text 浏览首页
+      .channel-logo
+        img(src='/static/imgs/mobile/channel_register/logo.png')
+
