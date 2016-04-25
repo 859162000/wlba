@@ -310,11 +310,12 @@ def coop_amortizations_push(amortizations, product_id):
     amortization_list = list()
     amo_terms = ProductAmortization.objects.filter(product_id=product_id).count()
     for amo in amortizations:
-        channel = get_user_channel_record(amo["user_id"])
+        user_id = amo["user"]
+        channel = get_user_channel_record(user_id)
         if channel:
             amo['terms'] = amo_terms
-            amo['margin'] = json.dumps(get_user_margin(amo["user_id"]))
-            amo['equity'] = json.dumps(get_p2p_equity(amo["user_id"], product_id))
+            amo['margin'] = json.dumps(get_user_margin(user_id))
+            amo['equity'] = json.dumps(get_p2p_equity(user_id, product_id))
             amortization_list.append(amo)
 
     if amortization_list:

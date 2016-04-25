@@ -395,7 +395,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 settled_sub_amos.append({
                     'id': sub_amo.id,
                     'product': product.id,
-                    'user_id': sub_amo.user.id,
+                    'user': sub_amo.user.id,
                     'term': sub_amo.term,
                     'settled': sub_amo.settled,
                     'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
@@ -640,7 +640,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 settled_sub_amos.append({
                     'id': sub_amo.id,
-                    'user_id': sub_amo.user.id,
+                    'user': sub_amo.user.id,
                     'product': product.id,
                     'term': sub_amo.term,
                     'settled': sub_amo.settled,

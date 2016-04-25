@@ -1188,13 +1188,13 @@ class KongGang1Register(CoopRegister):
                                 has_sent=True,
                                 left_times=0,
                                 join_times=0)
-                        send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                        send_msg = u'尊敬的贵宾客户，恭喜您获得%s,' \
                                    u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                                    u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                                    u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (send_reward.type, send_reward.content)
                         send_messages.apply_async(kwargs={
-                            "phones": [user.wanglibaouserprofile.phone, ],
-                            "message": send_msg,
+                            "phones": [user.id, ],
+                            "message": [send_msg, ],
                         })
 
                         inside_message.send_one.apply_async(kwargs={
@@ -1258,8 +1258,9 @@ class KongGangRegister(CoopRegister):
                                    u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                                    u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                                    u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (send_reward.type, send_reward.content)
+                        logger.debug("空港易行短信内容:%s" % send_msg)
                         send_messages.apply_async(kwargs={
-                            "phones": [user.wanglibaouserprofile.phone, ],
+                            "phones": [user.id, ],
                             "message": [send_msg,],
                         })
 
@@ -2125,7 +2126,7 @@ class BaJinSheRegister(CoopRegister):
                 'management_amount': float(pay_info.management_amount),
                 'total_amount': float(pay_info.total_amount),
                 'status': pay_info.status,
-                'user_id': pay_info.user.id,
+                'user': pay_info.user.id,
                 'order_id': pay_info.order.id,
                 'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
