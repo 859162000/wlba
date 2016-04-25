@@ -220,7 +220,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;$(function(){
     var mySwiper = new Swiper ('#swiper-container', {
       direction: 'vertical',
-      loop: false
+      loop: false,
+      onSlideChangeStart:function(){
+        if(mySwiper.activeIndex == 3){
+             $('#next-box').hide()
+         }else{
+            $('#next-box').show()
+        }
+      }
     });
 
     window.onload = function() {
@@ -228,7 +235,34 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $(".page-loading").hide();
             $("#swiper-container .swiper-wrapper,#next-box").show();
         }, 1000);
-    }
+        alert($(window).width());
+    };
+
+    //弹层
+    $("div.js-close").on("touchstart", function(){
+        $(this).parents(".page-alt").hide();
+    });
+    //规则
+    $("div.js-rule").on("touchstart", function(){
+        $("div.alt-rule").css("display","-webkit-box");
+    });
+
+    //领取加息券
+
+    //音乐
+    var audioBox = document.getElementById("js-audio"),
+        audioDom = audioBox.getElementsByTagName("audio")[0];
+    $(audioBox).on("touchstart", function(){
+        var $t = $(this);
+        console.log(audioDom.paused);
+        if(audioDom.paused){
+            audioDom.play();
+            $t.removeClass("audio-close");
+        }else{
+            audioDom.pause();
+            $t.addClass("audio-close");
+        }
+    });
 
     var weiURL = '/weixin/api/jsapi_config/';
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
@@ -267,13 +301,26 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             title: shareMainTit,
             link : shareLink,
             imgUrl: shareImg
-        })
+        });
         //分享给QQ
         org.onMenuShareQQ({
             title: shareMainTit,
             desc: shareBody,
             link : shareLink,
             imgUrl: shareImg
-        })
+        });
+    });
+
+    wlb.ready({
+        app: function(mixins){
+            //mixins.loginApp()
+            document.getElementById('refresh').onclick= function(){
+                window.location.reload();
+            }
+            mixins.shareData({title: "网利宝,是一种生活方式", content: "2015，你的收益如何？让他们来跟你分享下，投资创造美好生活的心得吧~"});
+        },
+        other: function(){
+
+        }
     })
-})
+});
