@@ -764,96 +764,95 @@ class BaJinSheCallback(CoopCallback):
         super(BaJinSheCallback, self).amortization_push(user_amo)
         user_amos = UserAmortization.objects.filter(product=user_amo.product, user=user_amo.user)
         if user_amo.settled or user_amos.count() == user_amo.terms:
-            if (not user_amo.settled and user_amo.term == 1) or user_amo.settled:
-                if user_amo.settled:
-                    order_id = '%s_0005_%s' % (user_amo.user_id, user_amo.id)
+            if user_amo.settled:
+                order_id = '%s_0005_%s' % (user_amo.user_id, user_amo.id)
+            else:
+                order_id = '%s_0006_%s' % (user_amo.user_id, user_amo.id)
+
+            data = get_bajinshe_base_data(order_id)
+            bid = get_tid_for_coop(user_amo.user_id)
+            if data and bid:
+                user = User.objects.filter(pk=user_amo.user_id).select_related('margin').first()
+                product = user_amo.product
+                period = product.period
+                pay_method = product.pay_method
+                if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                    period_type = 1
                 else:
-                    order_id = '%s_0006_%s' % (user_amo.user_id, user_amo.id)
+                    period_type = 2
 
-                data = get_bajinshe_base_data(order_id)
-                bid = get_tid_for_coop(user_amo.user_id)
-                if data and bid:
-                    user = User.objects.filter(pk=user_amo.user_id).select_related('margin').first()
-                    product = user_amo.product
-                    period = product.period
-                    pay_method = product.pay_method
-                    if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-                        period_type = 1
+                if pay_method == u'等额本息':
+                    profit_methods = 3
+                elif pay_method == u'按月付息':
+                    profit_methods = 1
+                elif pay_method == u'到期还本付息':
+                    profit_methods = 2
+                else:
+                    profit_methods = 11
+
+                act_data_list = list()
+                equity = P2PEquity.objects.filter(user=user, product=product).first()
+                user_phone = get_user_phone_for_coop(user_amo.user_id)
+                get_amortize_arg = {
+                    'product': product,
+                    'equity': equity,
+                    'bid': bid,
+                    'user_phone': user_phone,
+                    'period': period,
+                    'period_type': period_type,
+                    'profit_methods': profit_methods,
+                }
+                term_mark = list()
+                if user_amo.settled:
+                    get_amortize_arg['user_amo'] = user_amo
+                    get_amortize_arg['income_state'] = 2
+                    if user_amo.term == user_amo.terms:
+                        get_amortize_arg['state'] = 1
                     else:
-                        period_type = 2
-
-                    if pay_method == u'等额本息':
-                        profit_methods = 3
-                    elif pay_method == u'按月付息':
-                        profit_methods = 1
-                    elif pay_method == u'到期还本付息':
-                        profit_methods = 2
-                    else:
-                        profit_methods = 11
-
-                    act_data_list = list()
-                    equity = P2PEquity.objects.filter(user=user, product=product).first()
-                    user_phone = get_user_phone_for_coop(user_amo.user_id)
-                    get_amortize_arg = {
-                        'product': product,
-                        'equity': equity,
-                        'bid': bid,
-                        'user_phone': user_phone,
-                        'period': period,
-                        'period_type': period_type,
-                        'profit_methods': profit_methods,
-                    }
-                    term_mark = list()
-                    if user_amo.settled:
+                        get_amortize_arg['state'] = 0
+                    act_data = self.get_amortize_data(**get_amortize_arg)
+                    act_data_list.append(act_data)
+                else:
+                    for user_amo in user_amos:
+                        term_mark.append(str(user_amo.term))
                         get_amortize_arg['user_amo'] = user_amo
-                        get_amortize_arg['income_state'] = 2
-                        if user_amo.term == user_amo.terms:
-                            get_amortize_arg['state'] = 1
-                        else:
-                            get_amortize_arg['state'] = 0
+                        get_amortize_arg['state'] = 5
+                        get_amortize_arg['income_state'] = 1
                         act_data = self.get_amortize_data(**get_amortize_arg)
                         act_data_list.append(act_data)
-                    else:
-                        for user_amo in user_amos:
-                            term_mark.append(str(user_amo.term))
-                            get_amortize_arg['user_amo'] = user_amo
-                            get_amortize_arg['state'] = 5
-                            get_amortize_arg['income_state'] = 1
-                            act_data = self.get_amortize_data(**get_amortize_arg)
-                            act_data_list.append(act_data)
 
-                    data['tran'] = act_data_list
-                    data = json.dumps(data)
+                data['tran'] = act_data_list
+                data = json.dumps(data)
 
-                    ret_parser = 'bajinshe_callback_ret_parser'
-                    if user_amo.settled:
-                        description = u'产品:%s %d期还款回调' % (product.id, user_amo.term)
-                    else:
-                        term_mark = u','.join(term_mark)
-                        description = u'产品:%s %s期满标回调' % (product.id, term_mark)
+                ret_parser = 'bajinshe_callback_ret_parser'
+                if user_amo.settled:
+                    description = u'产品:%s %d期还款回调' % (product.id, user_amo.term)
+                else:
+                    term_mark = u','.join(term_mark)
+                    description = u'产品:%s %s期满标回调' % (product.id, term_mark)
 
-                    call_back_record_data = {
-                        'user': user,
-                        'order_id': order_id,
-                        'description': description,
-                        'request_url': self.purchase_call_back_url,
-                        'request_data': data,
-                        'request_headers': self.headers,
-                        'request_action': 1,
-                        'ret_parser': ret_parser,
-                    }
+                call_back_record_data = {
+                    'user': user,
+                    'order_id': order_id,
+                    'description': description,
+                    'request_url': self.purchase_call_back_url,
+                    'request_data': data,
+                    'request_headers': self.headers,
+                    'request_action': 1,
+                    'ret_parser': ret_parser,
+                }
 
-                    self.save_to_callback_record(call_back_record_data)
+                self.save_to_callback_record(call_back_record_data)
 
-                    common_callback.apply_async(
-                        kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
-                                'params': data, 'headers': self.headers,
-                                'order_id': order_id, 'ret_parser': ret_parser})
+                common_callback.apply_async(
+                    kwargs={'channel': self.c_code, 'url': self.purchase_call_back_url,
+                            'params': data, 'headers': self.headers,
+                            'order_id': order_id, 'ret_parser': ret_parser})
 
-                    # 推送账户数据
-                    p2p_margin = user.margin.margin
-                    total_asset = get_user_p2p_total_asset(user)
-                    self.register_call_back(user_amo.user_id, order_id, total_asset, p2p_margin)
+                # 推送账户数据
+                p2p_margin = user.margin.margin
+                total_asset = get_user_p2p_total_asset(user)
+                self.register_call_back(user_amo.user_id, order_id, total_asset, p2p_margin)
 
 
 class RenRenLiCallback(CoopCallback):
@@ -1150,4 +1149,5 @@ class BiSouYiCallback(CoopCallback):
 coop_callback_processor = {
     'bajinshe': 'BaJinSheCallback',
     'renrenli': 'RenRenLiCallback',
+    'bisouyi': 'BiSouYiCallback',
 }
