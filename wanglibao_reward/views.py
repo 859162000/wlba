@@ -863,8 +863,6 @@ class RewardDistributer(object):
         self.request = request
         self.kwargs = kwargs
         self.Processor = {
-            ThanksGivenRewardDistributer: ('all',),
-            XingMeiRewardDistributer: ('all',),
             KongGangRewardDistributer:('kgyx',),
             ZhaoXiangGuanRewardDistributer:('ys',),
         }
@@ -878,11 +876,11 @@ class RewardDistributer(object):
     def processors(self):
         processor = []
         for key, value in self.Processor.items():
-            if key().token in value:
-                processor.append(key)
+            processor.append(key)
         return processor
 
     def processor_for_distribute(self):
+        logger.debug('processor: %s' % (self.processors))
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
 
@@ -900,9 +898,9 @@ class KongGangRewardDistributer(RewardDistributer):
         all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
         send_reward = None
-        if  self.amount>=15000 and self.amount<20000:
+        if  self.amount>=10000 and self.amount<15000:
             send_reward = wait_reward
-        if  self.amount>=20000:
+        if  self.amount>=15000:
             send_reward = all_reward or wait_reward
         if send_reward:
             try:
@@ -915,6 +913,9 @@ class KongGangRewardDistributer(RewardDistributer):
                         has_sent=False,
                         left_times=1,
                         join_times=1)
+                send_reward.is_used=True
+                send_reward.save()
+
             except Exception:
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
         else: #所有奖品已经发完了
@@ -969,11 +970,19 @@ class KongGangAPIView(APIView):
 
             reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
             if reward == None:
-                json_to_response = {
-                    'ret_code': 1002,
-                    'message': u'您不满足领取条件，满额投资后再来领取吧！'
-                }
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                noused = Reward.objects.filter(type__in=('尊贵休息室服务', '贵宾全套出岗服务'), is_used=False).count()
+                if noused == 0:
+                    json_to_response = {
+                        'ret_code': 1005,
+                        'message': u'亲,您来晚了;奖品已经发完了！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    json_to_response = {
+                        'ret_code': 1002,
+                        'message': u'您不满足领取条件，满额投资后再来领取吧！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
             if reward.has_sent == False:
                 reward.has_sent=True
@@ -3068,3 +3077,81 @@ class FetchAirportServiceReward(APIView):
                 "mtype": "activity"
             })
             return Response({"ret_code": 0, "message": "奖品领取成功"})
+
+
+class FetchNewUserReward(APIView):
+    """
+    尊贵新人礼
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        activity = Activity.objects.filter(code='newgift').first()
+        utc_now = timezone.now()
+        if activity.is_stopped:
+            return Response({"ret_code": -1, "message":"活动已经截止"})
+        if activity.start_at > utc_now:
+            return Response({"ret_code": -1, "message":"活动还未开始"})
+        if activity.end_at < utc_now:
+            return Response({"ret_code": -1, "message":"活动已经结束"})
+
+        activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True).all()
+        device = split_ua(self.request)
+        device_type = device['device_type']
+        redpack_txts = []
+        events = []
+        records = []
+        p2precord = P2PRecord.objects.filter(create_time__gte=activity.start_at, create_time__lt=activity.end_at, user=request.user, catalog=u'申购').first()
+        if p2precord:
+            return Response({"ret_code": 1, "message": "抱歉，您不符合领取条件哦~"})
+        gift_record, _ = ActivityRewardRecord.objects.get_or_create(user=self.request.user, activity_code=activity.code)
+        if gift_record.status:
+            return Response({"ret_code": 1, "message": "您已领取过该奖励，不要太贪心哦"})
+        with transaction.atomic():
+            gift_record = ActivityRewardRecord.objects.select_for_update().get(id=gift_record.id)
+            if gift_record.status:
+                return Response({"ret_code": 1, "message": "您已领取过该奖励，不要太贪心哦"})
+            for activity_rule in activity_rules:
+                if activity_rule.gift_type == "redpack":
+                    redpack_record_ids = ""
+                    redpack_ids = activity_rule.redpack.split(',')
+                    for redpack_id in redpack_ids:
+                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                        if not redpack_event:
+                            return Response({"ret_code":-1, "message":'优惠券不存在'})
+                        status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, redpack_event, device_type)
+                        if not status:
+                            return Response({"ret_code":6,"message":messege})
+                        redpack_text = "None"
+                        if redpack_event.rtype == 'interest_coupon':
+                            redpack_text = "%s%%加息券"%redpack_event.amount
+                        if redpack_event.rtype == 'percent':
+                            redpack_text = "%s%%百分比红包"%redpack_event.amount
+                        if redpack_event.rtype == 'direct':
+                            redpack_text = "%s元红包"%int(redpack_event.amount)
+                        redpack_txts.append(redpack_text)
+                        redpack_record_ids += (str(record.id) + ",")
+                        events.append(redpack_event)
+                        records.append(record)
+                    gift_record.redpack_record_ids = redpack_record_ids
+                if activity_rule.gift_type == "experience_gold":
+                    experience_record_ids = ""
+                    experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+                    if not experience_record_id:
+                        return Response({"ret_code": 6, "message": '体验金不存在'})
+                    redpack_txts.append('%s元体验金'%int(experience_event.amount))
+                    experience_record_ids += (str(experience_record_id) + ",")
+                    gift_record.experience_record_ids = experience_record_ids
+            gift_record.status=True
+            gift_record.save()
+            try:
+                idx = 0
+                for event in events:
+                    record = records[idx]
+                    idx += 1
+                    start_time, end_time = redpack_backends.get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                                  record.created_at, event.available_at, event.unavailable_at)
+                    redpack_backends._send_message_for_hby(request.user, event, end_time)
+            except Exception, e:
+                logger.debug(traceback.format_exc())
+        return Response({"ret_code": 0, "message": "奖励发放成功，请前往【账户】-【理财券】查看"})

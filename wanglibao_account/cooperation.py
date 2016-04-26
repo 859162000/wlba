@@ -2134,7 +2134,7 @@ class BaJinSheRegister(CoopRegister):
             margin_record_data = {
                 'catalog': margin_record.catalog,
                 'order_id': margin_record.order_id,
-                'user_id': margin_record.user.id,
+                'user': margin_record.user.id,
                 'amount': float(margin_record.amount),
                 'margin_current': float(margin_record.margin_current),
                 'description': margin_record.description,
