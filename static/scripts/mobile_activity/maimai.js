@@ -235,6 +235,24 @@ org.mmIndex = (function(org){
             lib.listen();
             $(document.body).trigger('from:captcha');
         },
+         _confirm: function (title, certainName, callback, callbackData) {
+            if ($('.confirm-warp').length > 0) {
+                $('.confirm-text').text(title);
+                $('.confirm-certain').text(certainName);
+                $('.confirm-warp').show();
+
+                $('.confirm-cancel').on('click', function (e) {
+                    $('.confirm-warp').hide();
+                })
+                $('.confirm-certain').on('click', function (e) {
+                    $('.confirm-warp').hide();
+
+                    if (callback) {
+                        callbackData ? callback(callbackData) : callback();
+                    }
+                })
+            }
+        },
         checkfilter:function(num){
             var
                 _self = this,
@@ -315,25 +333,14 @@ org.mmIndex = (function(org){
                 if(!lib.checkState) return
 
                 var ops = {};
+                var token = $('input[name=token]').val();
+
                 _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
-                    ops = {
-                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimai1',
-                        type: 'POST',
-                        success: function(data){
-                            if(data.ret_code == 0){
-                                window.location.href = '/activity/maimai_success/?state=1'
-                            }else if(data.ret_code === 1000){
-                                window.location.href = '/activity/maimai_success/?state=0'
-                            }
-                        },
-                        complete:function(){
-                            lib.$submit.removeAttr('disabled').html('领 取');
-                        }
-                    }
+                    _self._alert('您已注册过网利宝！')
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=blued',
+                        url: '/api/register/?promo_token='+token,
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),
@@ -421,7 +428,10 @@ org.mmIndex = (function(org){
 
             function callback (data){
                 if(data.existing){
-                    lib.$submit.removeAttr('disabled');
+                    _self._confirm('您已经是我们的老用户，立即去理财！', '确定', function(){
+                        window.location.href= '/weixin/list/'
+                    })
+                    $(document.body).trigger('from:error',['您已经是我们的老用户', true, false]);
                     _self.$body_h.css({'height': '0'});
                     _self.$phone.attr('data-existing', true);
                 }else{
