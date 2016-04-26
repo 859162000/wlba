@@ -11,6 +11,10 @@ html
       .video-js .vjs-big-play-button {line-height: 3em; height: 3em; border-radius: 1.5em;}
       .video-js .vjs-big-play-button { margin-top: -1.5em; }
       .vjs-big-play-button:before{font-size: 2em;}
+    <!--[if IE]>
+    style.
+      .vjs-big-play-button:before{font-size: 1em;}
+    <![endif]-->
   body
     - with '新手指引' as activeItem
     include global/g_nav

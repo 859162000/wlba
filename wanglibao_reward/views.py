@@ -1030,7 +1030,10 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
         send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
         if send_reward:
             try:
-                WanglibaoActivityReward.objects.create(
+                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
+                if reward:
+                    return
+                reward = WanglibaoActivityReward.objects.create(
                         activity='sy',
                         order_id=self.order_id,
                         user=self.user,
@@ -1039,8 +1042,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                         has_sent=False,
                         left_times=1,
                         join_times=1)
-                
-                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
+                #reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
                 if reward:
                     reward.has_sent=True
                     reward.left_time=0
