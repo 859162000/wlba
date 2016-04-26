@@ -22,6 +22,9 @@ def sync_pay_result():
     today_start = get_default_timezone().localize(datetime(today.year, today.month, today.day))
     five_min_before = get_default_timezone().localize(today - timedelta(minutes=5))
     # todo test performance
+    # todo transaction
+    # todo email
+    # todo log
     pay_infos = PayInfo.objects.filter(type='D')\
                                .filter(channel__in=['kuaipay', 'yeepay_bind'])\
                                .filter(create_time__gte=today_start, create_time__lte=five_min_before)\

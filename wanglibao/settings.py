@@ -41,6 +41,7 @@ ENV_DEV = 'debug'
 ENV_PRODUCTION = 'production'
 ENV_PREPRODUCTION = 'pre'
 ENV_STAGING = 'staging'
+ENV_ALPHA = 'alpha'
 
 ENV = ENV_DEV
 
@@ -185,12 +186,12 @@ if LOCAL_MYSQL:
 
 import sys
 
-if 'test' in sys.argv:
-    SOUTH_TESTS_MIGRATE = False
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/db.sqlite3'
-    }
+# if 'test' in sys.argv:
+    # SOUTH_TESTS_MIGRATE = False
+    # DATABASES['default'] = {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': '/tmp/db.sqlite3'
+    # }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/

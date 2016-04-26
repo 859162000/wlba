@@ -496,23 +496,25 @@ class YeeProxyPayCallbackMessageTest(TestCase):
         self.assertEqual(0.01, float(pay_message.amount))
         self.assertEqual(1925745, pay_message.order_id)
 
-def test_query_trx():
-    pay_info_ids = (('# kuai fail', 1932529),
-            ('# kuai success', 1934059),
-            ('# kuai proceeding', 1931489),
-            ('# kuai not exist', 1929872),
-            ('# yeepay fail', 1934019),
-            ('# yeepay success', 1934017),
-            ('# yeepay proceeding', 1934015),
-            ('# yeepay not exist', 1768494))
+# def test_query_trx():
+class QueryTrxTest(SimpleTestCase):
+    def test_query_trx(self):
+        pay_info_ids = (('# kuai fail', 1932529),
+                ('# kuai success', 1934059),
+                ('# kuai proceeding', 1931489),
+                ('# kuai not exist', 1929872),
+                ('# yeepay fail', 1934019),
+                ('# yeepay success', 1934017),
+                ('# yeepay proceeding', 1934015),
+                ('# yeepay not exist', 1768494))
 
-    for msg, pay_info_id  in pay_info_ids:
-        res = query_trx(pay_info_id)
-        print msg
-        print res
+        for msg, pay_info_id  in pay_info_ids:
+            res = query_trx(pay_info_id)
+            print msg
+            print res
 
-if __name__ == '__main__':
-    test_query_trx()
+# if __name__ == '__main__':
+    # test_query_trx()
 
 
 
