@@ -1418,3 +1418,8 @@ if ENV == ENV_PRODUCTION:
     PHP_INSIDE_MESSAGES_LIST = "http://123.57.146.238/message.php/message/list"
     PHP_INSIDE_MESSAGE_READ = 'http://123.57.146.238/message.php/message'
     PHP_INSIDE_MESSAGE_READ_ALL = 'http://123.57.146.238/message.php/message/0'
+
+if ENV == ENV_PRODUCTION:
+    INNER_IP = ("182.92.179.24", "10.171.37.235")
+else:
+    INNER_IP = ("192.168.1.20",)

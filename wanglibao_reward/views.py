@@ -863,8 +863,6 @@ class RewardDistributer(object):
         self.request = request
         self.kwargs = kwargs
         self.Processor = {
-            ThanksGivenRewardDistributer: ('all',),
-            XingMeiRewardDistributer: ('all',),
             KongGangRewardDistributer:('kgyx',),
             ZhaoXiangGuanRewardDistributer:('ys',),
         }
@@ -878,11 +876,11 @@ class RewardDistributer(object):
     def processors(self):
         processor = []
         for key, value in self.Processor.items():
-            if key().token in value:
-                processor.append(key)
+            processor.append(key)
         return processor
 
     def processor_for_distribute(self):
+        logger.debug('processor: %s' % (self.processors))
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
 
@@ -915,6 +913,9 @@ class KongGangRewardDistributer(RewardDistributer):
                         has_sent=False,
                         left_times=1,
                         join_times=1)
+                send_reward.is_used=True
+                send_reward.save()
+
             except Exception:
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
         else: #所有奖品已经发完了
