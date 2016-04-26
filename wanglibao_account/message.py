@@ -305,6 +305,7 @@ def send_one(user_id, title, content, mtype, push_type="in"):
         return True
     elif settings.PHP_INSIDE_MESSAGE_SWITCH == 2:
         # 本地备份
+        logger.info('inside message args, title = {}, content = {}, mtype = {}'.format(title, content, mtype))
         msgTxt = create(title, content, mtype)
         if not msgTxt:
             return False

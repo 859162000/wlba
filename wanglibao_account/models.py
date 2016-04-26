@@ -117,6 +117,7 @@ message_type = (
     ("coupon", u"加息奖励"),
     # 增加PHP站内信类型
     ("apply_success", u"债权转让申请成功"),
+    ("get_back_success", u"债权转让下架成功"),
     ("transfer_success", u"债权转让成功"),
     ("transfer_accomplish", u"债权转让完成"),
 )
