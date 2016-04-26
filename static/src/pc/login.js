@@ -9,7 +9,7 @@ require.config({
     }
 });
 require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
-    var statusV = 0;
+    var statusV = 0, handler = {};
     $('#check-tag').val('');
     //-------------初始化----------//
     pageInitFun = function(){
@@ -64,7 +64,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                     offline: !data.success
                 }
                 $('.captcha-box').show();
-                initGeetest(config, function (captchaObj) {
+                handler = function (captchaObj) {
                     captchaObj.appendTo("#captcha-box");
                     captchaObj.onSuccess(function () {
                         array = captchaObj.getValidate();
@@ -80,7 +80,8 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                         type == 'regist' ? checkCodeIsNoFun() : null;
                     })
                     captchaObj.getValidate();
-                })
+                }
+                initGeetest(config, handler);
                 $('#check-tag').val('false');
                 statusV = 0;
             },
@@ -160,6 +161,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
         }else{
            loginError.text('');
            checkStatus = true;
+           statusV = 0;
         }
         return checkStatus;
     }
@@ -367,6 +369,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                     var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
                     window.location.href = next;
                 }
+                $('.gt_refresh_tips').click();$('#loginPwd').val('').focus();statusV = 0;
             }).fail(function (xhr) {
                 //var str1 = $.cookie("counts");
                 //if (($.cookie("counts") != null) && ($.cookie("counts") != 'null')) {
