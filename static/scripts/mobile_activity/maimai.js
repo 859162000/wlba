@@ -235,6 +235,24 @@ org.mmIndex = (function(org){
             lib.listen();
             $(document.body).trigger('from:captcha');
         },
+         _confirm: function (title, certainName, callback, callbackData) {
+            if ($('.confirm-warp').length > 0) {
+                $('.confirm-text').text(title);
+                $('.confirm-certain').text(certainName);
+                $('.confirm-warp').show();
+
+                $('.confirm-cancel').on('click', function (e) {
+                    $('.confirm-warp').hide();
+                })
+                $('.confirm-certain').on('click', function (e) {
+                    $('.confirm-warp').hide();
+
+                    if (callback) {
+                        callbackData ? callback(callbackData) : callback();
+                    }
+                })
+            }
+        },
         checkfilter:function(num){
             var
                 _self = this,
@@ -319,7 +337,7 @@ org.mmIndex = (function(org){
 
                 _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
-                    alert('您已注册过网利宝！')
+                    _self._alert('您已注册过网利宝！')
                 }else{
                     ops = {
                         url: '/api/register/?promo_token='+token,
@@ -410,6 +428,9 @@ org.mmIndex = (function(org){
 
             function callback (data){
                 if(data.existing){
+                    _self._confirm('您已经是我们的老用户，立即去理财！', '确定', function(){
+                        window.location.href= '/weixin/list/'
+                    })
                     $(document.body).trigger('from:error',['您已经是我们的老用户', true, false]);
                     _self.$body_h.css({'height': '0'});
                     _self.$phone.attr('data-existing', true);
