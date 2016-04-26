@@ -59,7 +59,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback, coop_callback_for_post, coop_call_back
+                                    xunleivip_callback, common_callback_for_post, coop_call_back
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -2283,46 +2283,50 @@ class JiaXiHZRegister(CoopRegister):
     def __init__(self, request):
         super(JiaXiHZRegister, self).__init__(request)
         self.c_code = 'jiaxihz'
-        # self.coop_key = YZCJ_COOP_KEY
-        # self.call_back_url = YZCJ_CALL_BACK_URL
+        self.coop_id = settings.JXHZ_COOP_KEY
+        self.coop_key = settings.JXHZ_COOP_KEY
+        self.call_back_url = settings.JXHZ_CALL_BACK_URL
 
     def purchase_call_back(self, user, order_id):
-        pass
-        # binding = Binding.objects.filter(user_id=user.id).first()
-        # p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购'
-        #                                       ).select_related('product').order_by('create_time').first()
-        #
-        # # 判断是否已绑定并且首次投资
-        # if binding and p2p_record and p2p_record.order_id == int(order_id):
-        #     # 判断投资金额是否大于1000
-        #     pay_amount = int(p2p_record.amount)
-        #     if pay_amount >= 1000:
-        #         invest_time = p2p_record.create_time
-        #         period = p2p_record.product.period
-        #         pay_method = p2p_record.product.pay_method
-        #
-        #         # 根据支付方式判定标周期的单位（天/月）,如果是单位为月则转换为天
-        #         if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-        #             period = (invest_time + relativedelta(months=period) - invest_time).days
-        #
-        #         sign = hashlib.md5(str(p2p_record.order_id) + str(binding.bid) +
-        #                            str(period) + str(pay_amount) + self.coop_key).hexdigest()
-        #
-        #         params = {
-        #             'oid': p2p_record.order_id,
-        #             'tid': binding.bid,
-        #             'time': timezone.localtime(invest_time).strftime('%Y%m%d%H%M%S'),
-        #             'procuctId': p2p_record.product_id,
-        #             'interval': period,
-        #             'investment': pay_amount,
-        #             'phone': get_phone_for_coop(user.id),
-        #             'IdNum': '',
-        #             'sign': sign,
-        #         }
-        #
-        #         # 异步回调
-        #         common_callback.apply_async(
-        #             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+        p2p_record = P2PRecord.objects.filter(
+            user=user, catalog=u'申购'
+        ).select_related('product').order_by('create_time').last()
+
+        if p2p_record:
+            product = p2p_record.product
+            phone = WanglibaoUserProfile.objects.get(user=user).phone
+            rate = product.expected_earning_rate / 100
+            invest_time = p2p_record.create_time
+            invest_time = timezone.localtime(invest_time).strftime('%Y-%m-%d %H:%M:%S')
+
+            # 根据支付方式判定标周期的单位（天/月）
+            pay_method = product.pay_method
+            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                period_type = 2
+            else:
+                period_type = 1
+
+            data = (
+                ['platform', self.coop_id],
+                ['title', product.name],
+                ['number', product.id],
+                ['mobile', phone],
+                ['money', p2p_record.amount],
+                ['rate', rate],
+                ['investAt', invest_time],
+                ['deadlineType', period_type],
+                ['deadline', product.period],
+                ['key', self.coop_key],
+            )
+
+            data_encode = '&'.join([k + '=' + str(v) for k, v in data])
+            sign = hashlib.md5(data_encode).hexdigest()
+            params = dict(data)
+            params['sign'] = sign
+
+            # 异步回调
+            common_callback_for_post.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
 # 注册第三方通道
@@ -2335,7 +2339,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          ZhaoXiangGuanRegister]
+                          ZhaoXiangGuanRegister, JiaXiHZRegister]
 
 
 # ######################第三方用户查询#####################
