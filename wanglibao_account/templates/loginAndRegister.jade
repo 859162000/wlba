@@ -50,15 +50,12 @@ html
                         li
                             i.icon.iconfont.icon-key
                             input#loginPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                        li.loginError.loginErrorNew(style='display:none')
                         li.captcha-box(style="display:none")
                             #captcha-box
                             input(type="hidden")#captcha-status
                             input(type="hidden")#check-tag
-                        li.baoxian
-                            em.bao-icon
-                            span 账户资金安全由阳光保险承保
                         li.login-submit
-                            .loginError
                             if user.is_authenticated and user.wanglibaouserprofile.frozen
                                 .submitFormStyle.disabled(style="background-color:#999999") 账户已冻结
                             else
@@ -68,6 +65,9 @@ html
                                 input#remember_me.checkboxStyle(type="checkbox", name="remember_me" )
                                 | 一周内自动登录
                             a(href='/accounts/password/reset/identifier/').findPwd 忘记密码？
+                        li.baoxian
+                            em.bao-icon
+                            span 账户资金安全由阳光保险承保
     include global/g_footer
     script.
-      require(["/static/src/pc/login.js?v=20160420"])
+      require(["/static/src/pc/login.js?v=20160426"])

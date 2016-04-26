@@ -1372,9 +1372,13 @@ def verified_user_login(phone, ip, action=None):
             ip_record.save()
 
     if phone_verified_times >= 2:
-        return False, u'用户名或密码错误2次以上'
+        # Modify by hb on 2016-04-26
+        #return False, u'用户名或密码错误2次以上'
+        return False, u'用户名或密码错误，请拖动图形验证'
     if ip_verified_times >= 5:
-        return False, u'同一IP失败5次以上'
+        # Modify by hb on 2016-04-26
+        #return False, u'同一IP失败5次以上'
+        return False, u'用户名或密码错误，请拖动图形验证。'
     return True, 'success'
 
 @sensitive_post_parameters()
