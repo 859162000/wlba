@@ -118,7 +118,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                 if(type=='login'){
                     fun();
                 }else{
-                    $('.loginError').text('图片验证码错误');
+                    $('.loginError').show().text('图片验证码错误');
                     $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
                     $('#registerSMSCode').val('');
                     $('.captcha-box1').show();$('.captcha-box').hide();
@@ -127,7 +127,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                 statusV = 0;
             })
         }else{
-            $('.loginError').text('图片验证码错误');
+            $('.loginError').show().text('图片验证码错误');
             return;
         }
     }
@@ -137,10 +137,10 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
     checkMobileFun = function(form){
         var checkStatus = false,form =$('#'+form),self = $.trim(form.find('.checkMobile').val());
         if(! checkMobile(self)){
-            form.find('.loginError').text('请输入正确手机号');
+            form.find('.loginError').show().text('请输入正确手机号');
             checkStatus = false;
         }else{
-            form.find('.loginError').text('');
+            form.find('.loginError').hide().text('');
             checkStatus = true;
         }
         return checkStatus;
@@ -150,16 +150,16 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
         var loginError = $('#'+form).find('.loginError');
         var checkStatus = false,self = $.trim($('#'+form).find('.checkPwd').val());
         if(self == ''){
-           loginError.text('请输入密码');
+           loginError.show().text('请输入密码');
            checkStatus = false;
         }else if(self.length < 6){
-           loginError.text('密码最少6位');
+           loginError.show().text('密码最少6位');
            checkStatus = false;
         }else if(self.length > 20){
-           loginError.text('密码最多20位');
+           loginError.show().text('密码最多20位');
            checkStatus = false;
         }else{
-           loginError.text('');
+           loginError.hide().text('');
            checkStatus = true;
            statusV = 0;
         }
@@ -177,10 +177,10 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
             str = '图片';
         }
         if(self == '') {
-            $('#'+form).find('.loginError').text('请输入'+ str +'验证码');
+            $('#'+form).find('.loginError').show().text('请输入'+ str +'验证码');
             checkStatus = false;
         }else{
-            $('#'+form).find('.loginError').text('');
+            $('#'+form).find('.loginError').hide().text('');
             checkStatus = true;
         }
         return checkStatus;
@@ -219,7 +219,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
         }).fail(function(xhr) {
             getCodeBtn.removeClass('getCodeBtnTrue').addClass('buttonGray');
             var result = JSON.parse(xhr.responseText);
-            $('#registerForm').find('.loginError').text(result.message)
+            $('#registerForm').find('.loginError').show().text(result.message)
         });
     }
     //短信验证
@@ -260,7 +260,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
         }).fail(function(xhr) {
             clearInterval(intervalId);
             var result = JSON.parse(xhr.responseText);
-            $('#registerForm').find('.loginError').text(result.message);
+            $('#registerForm').find('.loginError').show().text(result.message);
             imgCodeRe('registerForm');
             $('#registerCode').val('').focus();
             $('.getCodeBtn').addClass('buttonGray').removeClass('getCodeBtnTrue');
@@ -363,7 +363,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                         //statusV = 0;
                     }
                     if (xhr.message != undefined) {
-                        $('#loginForm').find('.loginError').text(xhr.message);
+                        $('#loginForm').find('.loginError').show().text(xhr.message);
                     }
                 }else{
                     var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
@@ -384,11 +384,11 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                 //}
                 var result = JSON.parse(xhr.responseText);
                 if (result.message.__all__ != undefined) {
-                    $('#loginForm').find('.loginError').text(result.message.__all__[0]);
+                    $('#loginForm').find('.loginError').show().text(result.message.__all__[0]);
                 } else if (result.message.captcha != undefined) {
-                    $('#loginForm').find('.loginError').text(result.message.captcha[0]);
+                    $('#loginForm').find('.loginError').show().text(result.message.captcha[0]);
                 }
-                statusV = 0;
+                statusV = 0;$('#loginPwd').val('').focus();statusV = 0;
             });
         }
     }
@@ -478,19 +478,19 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                 if($('#check-tag').val() == 'false'){
                     if (checkMobileFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
                         if ($("#agreement").is(':checked')) {
-                            error.text('');statusV = 1;
+                            error.hide().text('');statusV = 1;
                             $('#check-tag').val() == 'falses' ?  submitRegist() : fastTestTwo(submitRegist);
                         } else {
-                            error.text('请查看网利宝注册协议');
+                            error.show().text('请查看网利宝注册协议');
                         }
                     }
                 }else{
                     if (checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
                         if ($("#agreement").is(':checked')) {
-                            error.text('');statusV = 1;
+                            error.hide().text('');statusV = 1;
                             submitRegist();
                         } else {
-                            error.text('请查看网利宝注册协议');
+                            error.show().text('请查看网利宝注册协议');
                         }
                     }
                 }
@@ -523,13 +523,13 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
             }).fail(function (xhr) {
                 var result = JSON.parse(xhr.responseText);
                 if (result.message.invitecode != undefined) {
-                    error.text(result.message.invitecode)
+                    error.show().text(result.message.invitecode)
                 } else if (result.message.identifier != undefined) {
-                    error.text(result.message.identifier)
+                    error.show().text(result.message.identifier)
                 } else if (result.message.captcha_1 != undefined) {
-                    error.text(result.message.captcha_1)
+                    error.show().text(result.message.captcha_1)
                 } else {
-                    error.text(result.message.validate_code)
+                    error.show().text(result.message.validate_code)
                 }
                 statusV = 0;
             });
