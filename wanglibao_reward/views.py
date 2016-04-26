@@ -994,7 +994,7 @@ class KongGangAPIView(APIView):
                 logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
                 send_messages.apply_async(kwargs={
                     "phones": [request.user.wanglibaouserprofile.phone, ],
-                    "messages": [u'恭喜您获得空港易行活动奖励', ],
+                    "messages": [send_msg, ],
                 })
 
                 inside_message.send_one.apply_async(kwargs={
