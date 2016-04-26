@@ -1319,6 +1319,7 @@ class MessageView(TemplateView):
                 for message in messages:
                     message.id = data[index]['id']
                     message.read_status = data[index]['read_status']
+                    message.message_text.mtype = data[index]['mtype']
                     message.message_text.title = data[index]['title']
                     message.message_text.content = data[index]['content']
                     message.message_text.created_at = int(data[index]['created_at'])
