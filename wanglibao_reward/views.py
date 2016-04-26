@@ -1065,6 +1065,34 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,影像投资节优惠码发奖报错')
         else: #所有奖品已经发完了
             return
+        
+class ZhaoXiangGuanAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(ZhaoXiangGuanAPIView, self).__init__()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
+        if reward:
+            json_to_response = {
+                'ret_code': 1,
+                'message': u'奖品已经发放'
+            }
+        else:
+            json_to_response = {
+                'ret_code': 0,
+                'message': u'奖品未发放'
+            }            
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
 
 class XingMeiRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
