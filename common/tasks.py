@@ -5,6 +5,7 @@ import logging
 import requests
 import StringIO
 import traceback
+from common.tools import now
 from wanglibao.celery import app
 from .models import CallbackRecord
 
@@ -21,6 +22,7 @@ def bajinshe_callback_ret_parser(ret, channel, order_id=None):
             call_back_record.result_code = ret_data.get('code')
             call_back_record.result_msg = ret_data.get('msg')
             call_back_record.result_errors = ret_data.get('errors')
+            call_back_record.answer_at = now()
             call_back_record.save()
 
 
@@ -31,6 +33,7 @@ def renrenli_callback_ret_parser(ret, channel, order_id=None):
         if call_back_record:
             call_back_record.result_code = ret_data.get('Code')
             call_back_record.result_msg = ret_data.get('Tip')
+            call_back_record.answer_at = now()
             call_back_record.save()
 
 
@@ -41,6 +44,7 @@ def bisouyi_callback_ret_parser(ret, channel, order_id=None):
         if call_back_record:
             call_back_record.result_code = ret_data.get('code')
             call_back_record.result_msg = ret_data.get('message')
+            call_back_record.answer_at = now()
             call_back_record.save()
 
 
