@@ -993,7 +993,7 @@ class KongGangAPIView(APIView):
                            u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
                 send_messages.apply_async(kwargs={
                     "phones": [request.user.wanglibaouserprofile.phone, ],
-                    "message": u'恭喜您获得空港易行活动奖励',
+                    "message": [u'恭喜您获得空港易行活动奖励', ],
                 })
 
                 inside_message.send_one.apply_async(kwargs={
