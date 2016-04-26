@@ -70,7 +70,7 @@ def getWechatDailyReward(openid):
     return sendDailyReward(user, daily_reward.id, save_point=True)
 
 
-def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False, check_today=True):
+def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False, isbind=True):
     # today = datetime.datetime.today()
     with transaction.atomic(savepoint=save_point):
         daily_reward = WechatUserDailyReward.objects.select_for_update().get(id=daily_reward_id)
@@ -107,6 +107,10 @@ def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False,
                     return -1, "体验金活动不存在", amount
                 daily_reward.experience_gold_record_id = experience_record_id
                 amount = experience_event.amount
+            if isbind:
+                daily_reward.desc="绑定发放"
+            else:
+                daily_reward.desc="领取发放"
             daily_reward.user = user
             daily_reward.status = True
         daily_reward.save()
