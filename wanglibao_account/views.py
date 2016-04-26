@@ -81,6 +81,7 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha
 from wanglibao_profile.models import WanglibaoUserProfile
 
+import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -1328,6 +1329,53 @@ class MessageDetailAPIView(APIView):
         result = inside_message.sign_read(request.user, message_id)
         return Response(result)
 
+def verified_user_login(phone, ip, action=None):
+    from wanglibao_account.models import GeetestModifiedTimes
+    phone_times = 'login_verified_phone_times_%s' % (phone,)
+    ip_times = 'login_verified_ip_times_%s' % (ip,)
+    with transaction.atomic():
+        phone_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+        if not phone_record:
+            try:
+                phone_record = GeetestModifiedTimes.objects.create(
+                    identified=phone_times,
+                    times=0)
+            except Exception:
+                logger.debug('极验验证手机验证次数创建数据记录失败')
+
+        if action == 'reset':
+            phone_record.times = 0
+            phone_verified_times = 0
+            phone_record.save()
+        else:
+            phone_verified_times = phone_record.times
+            phone_record.times = phone_verified_times + 1
+            phone_record.save()
+
+    with transaction.atomic():
+        ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=ip_times).first()
+        if not ip_record:
+            try:
+                ip_record = GeetestModifiedTimes.objects.create(
+                        identified=ip_times,
+                        times=0)
+            except Exception:
+                logger.debug('极验验证IP验证次数创建数据记录失败')
+
+        if action == 'reset':
+            ip_record.times = 0
+            ip_record.save()
+            ip_verified_times = 0
+        else:
+            ip_verified_times = ip_record.times
+            ip_record.times = ip_verified_times + 1
+            ip_record.save()
+
+    if phone_verified_times >= 2:
+        return False, u'用户名或密码错误2次以上'
+    if ip_verified_times >= 5:
+        return False, u'同一IP失败5次以上'
+    return True, 'success'
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -1341,10 +1389,14 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
         return json.dumps(res)
 
     if request.method == "POST":
+        client_ip = request.META['HTTP_X_FORWARDED_FOR'] if request.META.get('HTTP_X_FORWARDED_FOR', None) else request.META.get('HTTP_X_REAL_IP', None)
 
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
+            identifier = request.POST.get('identifier', None)
             if form.is_valid():
+                # 用户的登录次数,存储在session中,用户登录成功后,清零用户的登录次数
+                verified_user_login(identifier, client_ip, 'reset')
                 auth_login(request, form.get_user())
 
                 if request.POST.has_key('remember_me'):
@@ -1353,7 +1405,19 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                     request.session.set_expiry(1800)
                 return HttpResponse(messenger('done', user=request.user))
             else:
-                return HttpResponseForbidden(messenger(form.errors))
+                # 用户的登录次数失败后,处理对应的session
+                if request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
+                    result, msg = verified_user_login(identifier, client_ip)
+                    if not result:
+                        json_response = {
+                            'ret_code': '7001',
+                            'message': msg
+                        }
+                        return HttpResponse(json.dumps(json_response), content_type='application/json')
+                    else:
+                        return HttpResponseForbidden(messenger(form.errors))
+                else:
+                    return HttpResponseForbidden(messenger(form.errors))
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:

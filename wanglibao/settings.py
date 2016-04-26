@@ -144,6 +144,7 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
+    'wanglibao_geetest',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -1284,3 +1285,14 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
+
+if ENV == ENV_PRODUCTION:
+    SITE_URL = 'https://www.wanglibao.com'
+elif ENV == ENV_STAGING:
+    SITE_URL = 'https://staging.wanglibao.com'
+elif ENV == ENV_DEV:
+    SITE_URL = 'http://127.0.0.1:8000'
+
+#极验验证 KEY及ID设置
+GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'

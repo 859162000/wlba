@@ -28,7 +28,7 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, RepaymentAPIView
 from wanglibao_pay.third_pay import  TheOneCardAPIView
-from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
+from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView,
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
@@ -49,7 +49,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, CoopPvApi, ActivityUserInfoUploadApi)
+                            BidHasBindingForChannel, CoopPvApi, ActivityUserInfoUploadApi, GeetestAPIView)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -287,6 +287,7 @@ urlpatterns += patterns(
     url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view()),
     url(r'^april_reward/fetch/$', AprilAwardApi.as_view()),  #四月活动
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
+    url(r'^geetest/$', GeetestAPIView.as_view()),
 )
 
 # app端改版新接口

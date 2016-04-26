@@ -65,8 +65,9 @@ import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
 import urllib
+from wanglibao_geetest.geetest import GeetestLib
 from wanglibao_profile.forms import ActivityUserInfoForm
-
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -112,10 +113,15 @@ class SendValidationCodeView(APIView):
             descrpition: if...else(line98~line101)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -124,6 +130,22 @@ class SendValidationCodeView(APIView):
         return Response({
                             'message': message
                         }, status=status)
+
+
+    def validate_captcha(self, request):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        #status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
 
 
 class TestSendRegisterValidationCodeView(APIView):
@@ -163,6 +185,7 @@ class SendRegisterValidationCodeView(APIView):
             descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
             return Response({"message": u"该手机号已经被注册，不能重复注册", 
@@ -172,7 +195,10 @@ class SendRegisterValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -181,6 +207,23 @@ class SendRegisterValidationCodeView(APIView):
         # 仅在用户注册时使用
         status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({'message': message, "type": "validation"}, status=status)
+
+    def validate_captcha(self, request):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
+
+
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
@@ -1722,6 +1765,50 @@ class CoopPvApi(APIView):
 
             logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
             return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class GeetestAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+
+    def post(self, request):
+        self.type = request.POST.get('type', None)
+        import time
+        if self.type == 'get':
+            return self.get_captcha(request)
+        if self.type == 'validate':
+            return self.validate_captcha(request)
+
+    def get_captcha(self, request):
+        user_id = random.randint(1,100)
+        gt = GeetestLib(self.id, self.key)
+        status = gt.pre_process()
+        request.session[gt.GT_STATUS_SESSION_KEY] = status
+        request.session["user_id"] = user_id
+        response_str = gt.get_response_str()
+        return HttpResponse(response_str)
+
+    def validate_captcha(self, request):
+        resp = {"result":'error'}
+        if request.method == "POST":
+            gt = GeetestLib(self.id, self.key)
+            challenge = request.POST.get(gt.FN_CHALLENGE, '')
+            validate = request.POST.get(gt.FN_VALIDATE, '')
+            seccode = request.POST.get(gt.FN_SECCODE, '')
+            status = request.session[gt.GT_STATUS_SESSION_KEY]
+            user_id = request.session["user_id"]
+            if status:
+                result = gt.success_validate(challenge, validate, seccode)
+            else:
+                result = gt.failback_validate(challenge, validate, seccode)
+            result = "success" if result else "fail"
+            resp = {"result":result}
+            print 'result:', result
+            return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
+        return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
 
 
 class ActivityUserInfoUploadApi(APIView):

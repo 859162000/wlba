@@ -1,58 +1,17 @@
 require.config({
     paths: {
-        'jquery.placeholder': 'lib/jquery.placeholder'
+        'jquery.placeholder': 'lib/jquery.placeholder',
+        'csrf' : 'model/csrf',
+        //'jquery.cookie': 'lib/jquery.cookie'
     },
     shim: {
         'jquery.placeholder': ['jquery']
     }
 });
-require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
-    var  csrfSafeMethod, getCookie,sameOrigin,
-    getCookie = function(name) {
-        var cookie, cookieValue, cookies, i;
-        cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            cookies = document.cookie.split(";");
-            i = 0;
-            while (i < cookies.length) {
-              cookie = $.trim(cookies[i]);
-              if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-              }
-              i++;
-            }
-        }
-        return cookieValue;
-    };
-    csrfSafeMethod = function(method) {
-        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-    };
-    sameOrigin = function(url) {
-        var host, origin, protocol, sr_origin;
-        host = document.location.host;
-        protocol = document.location.protocol;
-        sr_origin = "//" + host;
-        origin = protocol + sr_origin;
-        return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-    };
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-              xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-            }
-        }
-    });
-
-    _getQueryStringByName = function(name){
-            var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
-             if(result == null || result.length < 1){
-                 return '';
-             }
-             return result[1];
-    }
-
-    //初始化
+require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
+    var statusV = 0;
+    $('#check-tag').val('');
+    //-------------初始化----------//
     pageInitFun = function(){
         //文本框的得到和失去光标
         $('.placeholderInput').placeholder();
@@ -83,7 +42,96 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         });
     }
     pageInitFun();
+    //-------------初始化END----------//
 
+    //极验一次验证
+    var array= {};
+    fastTestOne = function(type){
+        statusV = 1;
+        $.ajax({
+            type: 'POST',
+            url: '/api/geetest/',
+            dataType: 'json',
+            timeout: 5000,
+            data:{
+                type : 'get'
+            },
+            success: function (data) {
+                var config = {
+                    gt: data.gt,
+                    challenge: data.challenge,
+                    product: "float",
+                    offline: !data.success
+                }
+                $('.captcha-box').show();
+                initGeetest(config, function (captchaObj) {
+                    captchaObj.appendTo("#captcha-box");
+                    captchaObj.onSuccess(function () {
+                        array = captchaObj.getValidate();
+                        $('#captcha-status').val('true');
+                        type == 'regist' ? checkCodeIsNoFun() : null;
+                        statusV = 0;
+                    });
+                    captchaObj.onFail(function(){
+                        $('#captcha-status').val(captchaObj.getValidate())
+                    });
+                    captchaObj.onRefresh(function(){
+                        $('#captcha-status').val('');
+                        type == 'regist' ? checkCodeIsNoFun() : null;
+                    })
+                    captchaObj.getValidate();
+                })
+                $('#check-tag').val('false');
+                statusV = 0;
+            },
+            error: function(XMLHttpRequest,status){
+                type == 'regist' ? $('.captcha-box1').show() : $('.captcha-box').hide();
+                $('#check-tag').val('falses');
+               if(type == 'regist'){
+                   $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+                   $('#registerSMSCode').val('');
+                }
+                statusV = 0;
+            }
+        });
+    }
+    //极验二次验证
+    fastTestTwo = function(fun,type){
+        if($('#captcha-status').val() == 'true') {
+            statusV = 1;
+            $.ajax({
+                type: 'POST',
+                url: '/api/geetest/',
+                dataType: 'json',
+                timeout: 5000,
+                data: {
+                    type: 'validate',
+                    geetest_validate: array.geetest_validate,
+                    geetest_seccode: array.geetest_seccode,
+                    geetest_challenge: array.geetest_challenge
+                }
+            }).success(function (data) {
+                fun();
+                statusV = 0;
+            }).error(function (xhr) {
+                if(type=='login'){
+                    fun();
+                }else{
+                    $('.loginError').text('图片验证码错误');
+                    $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+                    $('#registerSMSCode').val('');
+                    $('.captcha-box1').show();$('.captcha-box').hide();
+                    $('#check-tag').val('');
+                }
+                statusV = 0;
+            })
+        }else{
+            $('.loginError').text('图片验证码错误');
+            return;
+        }
+    }
+
+    //-------------表单验证----------//
     //验证手机号
     checkMobileFun = function(form){
         var checkStatus = false,form =$('#'+form),self = $.trim(form.find('.checkMobile').val());
@@ -121,7 +169,8 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         if(re == 're'){
             var self = $.trim($('#'+form).find('#registerSMSCode').val());
             str = '短信';
-        }else{
+        }
+        else{
             var self = $.trim($('#'+form).find('.checkCode').val());
             str = '图片';
         }
@@ -148,73 +197,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         });
     }
 
-    //登录模块初始化
-    loginInitFun = function(){
-        $('#loginMobile').on('blur',function() {
-            checkMobileFun('loginForm');
-        })
-        $('#loginPwd').on('blur',function() {
-            checkPwdFun('loginForm');
-        })
+    //-------------表单验证END----------//
 
-        //提交登录表单
-        $('#loginSubmit').on('click',function(){
-            if(checkMobileFun('loginForm') && checkPwdFun('loginForm')){
-                if($('#remember_me').is(':checked')){
-                    var remember_me = 'remember_me';
-                }
-                $.ajax({
-                  url: '/accounts/login/ajax/',
-                  type: "POST",
-                  data: {
-                      identifier : $('#loginMobile').val(),
-                      password : $('#loginPwd').val(),
-                      remember_me : remember_me
-                  }
-                }).done(function() {
-                    $.ajax({
-                      url: '/qiye/profile/exists/',
-                      type: "GET",
-                      data: {
-                      }
-                    }).done(function(data) {
-                        if(data.ret_code == 10000){
-                            $.ajax({
-                              url: '/qiye/profile/get/',
-                              type: "GET",
-                              data: {
-                              }
-                            }).done(function(data) {
-                                if(data.data.status == '审核通过'){
-                                     window.location.href = '/accounts/home/';
-                                }else{
-                                    window.location.href = '/qiye/profile/edit/';
-                                }
-                            })
-                        }
-                    }).fail(function(data){
-                        var result = JSON.parse(data.responseText);
-                        if(result.ret_code == 20001){
-                            var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
-                            window.location.href = next;
-                        }else{
-                            window.location.href = '/qiye/info/';
-                        }
-                    })
 
-                }).fail(function(xhr) {
-                    var result = JSON.parse(xhr.responseText);
-                    if(result.message.__all__ != undefined){
-                        $('#loginForm').find('.loginError').text(result.message.__all__[0]);
-                    }else if(result.message.captcha != undefined){
-                        $('#loginForm').find('.loginError').text(result.message.captcha[0]);
-                    }
-                    imgCodeRe('loginForm');
-                    $('#loginCode').val('');
-                });
-            }
-        })
-    }
     //验证图片验证码
     checkImgCodeFun = function(getCodeBtn){
         var phoneNumber = $.trim($("#registerMobile").val());
@@ -235,19 +220,22 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             $('#registerForm').find('.loginError').text(result.message)
         });
     }
+    //短信验证
     checkSEMFun = function(){
         var count, element, intervalId, phoneNumber, timerFunction;
         element = $('.getCodeBtnTrue');
         phoneNumber = $.trim($("#registerMobile").val());
         var captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
         var captcha_1 = $('#registerForm').find('#registerCode').val();
+        if($('#check-tag').val() == 'false'){
+            datas = 'type=geetest'+'&geetest_validate='+array.geetest_validate+'&geetest_seccode='+array.geetest_seccode+'&geetest_challenge='+array.geetest_challenge;
+        }else{
+            datas = 'captcha_0='+captcha_0+'&captcha_1='+captcha_1;
+        }
         $.ajax({
             url: "/api/phone_validation_code/register/" + phoneNumber + "/",
             type: "POST",
-            data: {
-                captcha_0: captcha_0,
-                captcha_1: captcha_1
-            }
+            data: datas
         }).done(function() {
             count = 60;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
@@ -276,6 +264,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             $('.getCodeBtn').addClass('buttonGray').removeClass('getCodeBtnTrue');
         });
     }
+    //语音验证码
     setVoidCodeFun = function(){
         var element = $('.voice');
         return $.ajax({
@@ -307,7 +296,107 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             }
         });
     }
+
+
+    //-------------登录模块初始化-------------//
+    loginInitFun = function(){
+        $('#loginMobile').on('blur',function() {
+            checkMobileFun('loginForm');
+        })
+        $('#loginPwd').on('blur',function() {
+            checkPwdFun('loginForm');
+        })
+        //alert($.cookie("counts"))
+        //设置cookie
+        //if ($.cookie("counts") == null || $.cookie("counts") == 'null') {
+        //    var o = {name: "counts", value: 0},
+        //        str = JSON.stringify(o);
+        //    $.cookie("counts", str, { path: '/'});
+        //}else{
+        //    var str = $.cookie("counts"),
+        //        o = JSON.parse(str);
+        //    if(o.value >= 2){
+        //        fastTestOne('login');
+        //    }
+        //}
+        //刷新图片验证码
+        $('#loginRefresh').on('click',function(){
+            imgCodeRe('loginForm')
+        })
+        //提交登录表单
+        $('#loginSubmit').on('click',function(){
+            if(statusV == 0){
+                statusV = 1;
+                if(checkMobileFun('loginForm') && checkPwdFun('loginForm')){
+                    if($('#check-tag').val() == 'false'){
+                        fastTestTwo(loginSubmitFun,'login');
+                    }else{
+                        loginSubmitFun();
+                    }
+                }
+            }
+        })
+        //登录
+        var loginSubmitFun = function(){
+            statusV = 1;
+            if($('#remember_me').is(':checked')){
+                var remember_me = 'remember_me';
+            }
+            $.ajax({
+                url: '/accounts/login/ajax/',
+                type: "POST",
+                data: {
+                    identifier: $('#loginMobile').val(),
+                    password: $('#loginPwd').val(),
+                    remember_me: remember_me
+                }
+            }).done(function (xhr) {
+                //var o = {name: "counts", value: 0},
+                //str = JSON.stringify(o);
+                //$.cookie("counts", str, { path: '/'});
+                //xhr.ret_code == '7001' ? fastTestOne('login') : null ;
+                if(xhr.ret_code == '7001'){
+                    if($('#check-tag').val() == '') {
+                        fastTestOne('login')
+                        //statusV = 0;
+                    }
+                    if (xhr.message != undefined) {
+                        $('#loginForm').find('.loginError').text(xhr.message);
+                    }
+                }else{
+                    var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                    window.location.href = next;
+                }
+            }).fail(function (xhr) {
+                //var str1 = $.cookie("counts");
+                //if (($.cookie("counts") != null) && ($.cookie("counts") != 'null')) {
+                //    var o1 = JSON.parse(str1),
+                //        clickCount = o1.value + 1,
+                //        o = {name: "counts", value: clickCount},
+                //        str = JSON.stringify(o);
+                //    $.cookie("counts", str, { path: '/'});
+                //    if (clickCount == 2) {
+                //        fastTestOne('login');
+                //    }
+                //}
+                var result = JSON.parse(xhr.responseText);
+                if (result.message.__all__ != undefined) {
+                    $('#loginForm').find('.loginError').text(result.message.__all__[0]);
+                } else if (result.message.captcha != undefined) {
+                    $('#loginForm').find('.loginError').text(result.message.captcha[0]);
+                }
+                statusV = 0;
+            });
+        }
+    }
+    //-------------登录模块初始化END-------------//
+
+
+
+    //-------------注册模块初始化-------------//
     registerInitFun = function(){
+        //极验一次验证
+        fastTestOne('regist')
        //密码type
         $('.pwdStatus').on('click',function(){
             var self = $(this);
@@ -325,12 +414,22 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         })
         //注册手机号验证
         $('#registerMobile').on('keyup',function() {
+            checkCodeIsNoFun();
+        })
+
+        checkCodeIsNoFun = function(){
             if(checkMobileFun('registerForm')){
-                $('#registerCode').val() != '' ? $('.getCodeBtn').removeClass('buttonGray').addClass('getCodeBtnTrue') : $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+                //$('#registerCode').val() != '' ? $('.getCodeBtn').removeClass('buttonGray').addClass('getCodeBtnTrue') : $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+                if($('#captcha-status').val() == 'false' || $('#captcha-status').val() == ''){
+                    $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
+                }else{
+                    $('.getCodeBtn').removeClass('buttonGray').addClass('getCodeBtnTrue');
+                }
             }else{
                 $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
             }
-        })
+        }
+
         //注册密码验证
         $('.registerPwd').on('blur',function() {
             checkPwdFun('registerForm');
@@ -369,71 +468,40 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             setVoidCodeFun()
         })
         //提交注册表单
+        var btnSelf = $('#registerSubmit'),error = $('#registerForm').find('.loginError');
         $('#registerSubmit').on('click',function(){
             var btnSelf = $(this);
-            if(!btnSelf.hasClass('.submitFormStyleNo')) {
-                if (!$('.login-form').hasClass('qiyeLogin')) {
-                    var error = $('#registerForm').find('.loginError');
-                    if (checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
+            if (statusV == 0) {
+                if($('#check-tag').val() == 'false'){
+                    if (checkMobileFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
                         if ($("#agreement").is(':checked')) {
-                            error.text('');
-                            var identifier, captcha_0, captcha_1, password, validate_code, invitecode;
-                            identifier = $('#registerMobile').val();
-                            captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
-                            captcha_1 = $('#registerForm').find('#registerCode').val();
-                            password = $('.registerPwd').val();
-                            validate_code = $('#registerSMSCode').val();
-                            invitecode = $('#invitecode').val();
-                            btnSelf.addClass('submitFormStyleNo');
-                            $.ajax({
-                                url: '/accounts/register/ajax/',
-                                type: "POST",
-                                data: {
-                                    identifier: identifier,
-                                    captcha_0: captcha_0,
-                                    captcha_1: captcha_1,
-                                    password: password,
-                                    validate_code: validate_code,
-                                    invitecode: invitecode
-                                }
-                            }).done(function () {
-                                var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
-                                window.location.href = next;
-
-                            }).fail(function (xhr) {
-                                var result = JSON.parse(xhr.responseText);
-                                if (result.message.invitecode != undefined) {
-                                    error.text(result.message.invitecode)
-                                } else if (result.message.identifier != undefined) {
-                                    error.text(result.message.identifier)
-                                } else if (result.message.captcha_1 != undefined) {
-                                    error.text(result.message.captcha_1)
-                                } else {
-                                    error.text(result.message.validate_code)
-                                }
-                                btnSelf.removeClass('submitFormStyleNo')
-                            });
+                            error.text('');statusV = 1;
+                            $('#check-tag').val() == 'falses' ?  submitRegist() : fastTestTwo(submitRegist);
                         } else {
                             error.text('请查看网利宝注册协议');
                         }
                     }
-                } else {
-                    qiyeLoginFun();
+                }else{
+                    if (checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
+                        if ($("#agreement").is(':checked')) {
+                            error.text('');statusV = 1;
+                            submitRegist();
+                        } else {
+                            error.text('请查看网利宝注册协议');
+                        }
+                    }
                 }
             }
-
         })
-    }
-    qiyeLoginFun = function(){
-        var error = $('#registerForm').find('.loginError');
-        if (checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm', 're')) {
-            error.text('');
-            var identifier, captcha_0, captcha_1, password, validate_code;
-            identifier = $('#registerMobile').val();
-            captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
-            captcha_1 = $('#registerForm').find('#registerCode').val();
-            password = $('.registerPwd').val();
-            validate_code = $('#registerSMSCode').val();
+
+        //注册
+        var submitRegist = function(){
+            var identifier = $('#registerMobile').val(),
+                captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val(),
+                captcha_1 = $('#registerForm').find('#registerCode').val(),
+                password = $('.registerPwd').val(),
+                validate_code = $('#registerSMSCode').val(),
+                invitecode = $('#invitecode').val();
             $.ajax({
                 url: '/accounts/register/ajax/',
                 type: "POST",
@@ -443,10 +511,10 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                     captcha_1: captcha_1,
                     password: password,
                     validate_code: validate_code,
-                    user_type: '3'
+                    invitecode: invitecode
                 }
             }).done(function () {
-                var next = _getQueryStringByName('next') == '' ? '/qiye/info/' : _getQueryStringByName('next');
+                var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
                 window.location.href = next;
 
             }).fail(function (xhr) {
@@ -460,8 +528,10 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 } else {
                     error.text(result.message.validate_code)
                 }
+                statusV = 0;
             });
         }
     }
+    //-------------登录模块初始化END-------------//
     $('.i-mod-content').hasClass('curr') ? loginInitFun() : registerInitFun();
 });
