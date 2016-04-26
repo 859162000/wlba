@@ -217,115 +217,140 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;;(function(org){
-    org.ajax({
-        url: '/api/april_reward/fetch/',
-        type: 'post',
-        data: {
-        },
-        success: function (data) {
-            var result = data.weekranks;
-            var str = '',sty = '',icon = '',coupon='';
-            substring(data.week_sum_amount);
-            $('.transaction-time span').text(data.week_frist_day);
-            $('#week_number span').text(data.week_number)
-            $.each(result,function(i,o){
-                if(i <= 2){
-                    sty ='red';
-                    icon = 'icon'+ (i+1)
-                    if(i == 0){
-                        coupon = '5张百元加油卡+2张星美电影票';
-                    }else if(i == 1){
-                        coupon = '3张百元加油卡+2张星美电影票';
-                    }else{
-                        coupon = '2张百元加油卡+2张星美电影票';
-                    }
-                }else{
-                    sty ='';coupon='1张百元加油卡+2张星美电影票'
-                }
-                str+='<tr class='+ sty +'><td><span class='+ icon +'>'+ (i+1) +'</span>'+o.phone.substring(0,3)+'****' +o.phone.substr(o.phone.length-4) +'</td><td class="tl">'+ fmoney(o.amount__sum) +' 元</td><td>'+ coupon +'</td></tr>'
-            })
-            $('#list').append(str);
+;$(function(){
+    var mySwiper = new Swiper ('#swiper-container', {
+      direction: 'vertical',
+      loop: false,
+      onSlideChangeStart:function(){
+        if(mySwiper.activeIndex == 3){
+             $('#next-box').hide()
+         }else{
+            $('#next-box').show()
+        }
+      }
+    });
 
-            substring_2(data.week_sum_amount);
-        }
-    })
-    function fmoney(s, n) {
-        n = n > 0 && n <= 20 ? n : 2;
-        s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";
-        var l = s.split(".")[0].split("").reverse();
-        t = "";
-        for (i = 0; i < l.length; i++) {
-            t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
-        }
-        if(n == 0){
-            return t.split("").reverse().join("");
+    window.onload = function() {
+        window.setTimeout(function(){
+            $(".page-loading").hide();
+            $("#swiper-container .swiper-wrapper,#next-box").show();
+        }, 1000);
+    };
+
+    //弹层
+    $("div.js-close").on("touchstart", function(){
+        $(this).parents(".page-alt").hide();
+    });
+    //规则
+    $("div.js-rule").on("touchstart", function(){
+        $("div.alt-rule").css("display","-webkit-box");
+    });
+
+    //领取加息券
+    $("button.js-receive").on("touchstart", function(){
+        var $ok = $("div.alt-ok"),
+            $tit = $ok.find("div.alt-tit");
+        var self = $(this);
+        self.attr("disabled", true).text("正在提交……");
+        org.ajax({
+            type: "post",
+            url: "/api/activity/newusergift/",
+            dataType: 'json',
+            success: function(data){
+                if(data.ret_code === 0){
+                    $ok.css("display","-webkit-box");
+                    $tit.html('领取加息特权成功～<br />请前往[账户]-[理财券]中查看');
+                }else if(data.ret_code === 1){
+                    $ok.css("display","-webkit-box");
+                    $tit.html(data.message);
+                }else{
+                    $("div.alt-error").css("display","-webkit-box").find(".alt-tit").html(data.message);
+                }
+            },
+            error: function(xml){
+                if(xml.status === 403){
+                    alert("您还没有登录，请先登录");
+                }else{
+                    alert("系统繁忙，请稍候再试");
+                }
+            },
+            complete: function () {
+                self.removeAttr("disabled").text("领取加息特权");
+            }
+        });
+    });
+
+    //音乐
+    var audioBox = document.getElementById("js-audio"),
+        audioDom = audioBox.getElementsByTagName("audio")[0];
+    $(audioBox).on("touchstart", function(){
+        var $t = $(this);
+        console.log(audioDom.paused);
+        if(audioDom.paused){
+            audioDom.play();
+            $t.removeClass("audio-close");
         }else{
-            return t.split("").reverse().join("");
+            audioDom.pause();
+            $t.addClass("audio-close");
         }
-    }
+    });
 
-    /*逐个字符*/
-    function substring(text){
-        //alert(text.length);
-
-        var num_length = text.length;
-        if(num_length==13){
-            num_length+=2;
-        }
-        if(num_length==14||num_length==10){
-            num_length+=1;
-        }
-
-        for(var i=num_length; i>=0; i--) {
-            if (num_length - 3 != i) {
-                //num = text.charAt(i);
-                if(num_length - 7 == i||num_length - 11 == i||num_length - 15 == i){
-                    $('.transaction-counts').prepend('<span class="num_2"></span>');
-                    //alert(i);
-                }else{
-                    if(num_length - 2 == i){
-                        $('.transaction-counts').prepend('<span class="num_3"></span>');
-                    }else{
-                        $('.transaction-counts').prepend('<span class="num_1"></span>');
-                    }
-
-                }
-
-            }
-        }
-        if(text.length>=7){
-            $('.transaction-counts').prepend('<span class="num_1"></span>');
-            if(text.length!=13&&text.length>10){
-                $('.transaction-counts').prepend('<span class="num_1"></span>');
-            }
-        }
-    };
-
-    function substring_2(text){
-        var num_2;
-        var box_num_2 = $('.transaction-counts .num_1').length;
-        var box_num_3 = $('.transaction-counts .num_2').length;
-        for(var i=text.length;i>=0;i--) {
-            if (text.length - 3 != i) {
-                num_2 = text.charAt(i);
-                $('.transaction-counts .num_1').eq(box_num_2).text(num_2);
-                box_num_2--;
-            }
-        }
-
-    };
 
     wlb.ready({
-        app: function (mixins) {
-            $('#investmentBtn').on('click',function(){
-                mixins.jumpToManageMoney();
-            })
+        app: function(mixins){
+            mixins.loginApp();
+            document.getElementById('refresh').onclick= function(){
+                window.location.reload();
+            }
+            mixins.shareData({title: "网利宝,是一种生活方式", content: "2015，你的收益如何？让他们来跟你分享下，投资创造美好生活的心得吧~"});
         },
         other: function(){
-            $('#investmentBtn').on('click',function() {
-                window.location.href = '/p2p/list/';
-            })
+            var weiURL = '/weixin/api/jsapi_config/';
+            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+            org.ajax({
+                type: 'GET',
+                url: weiURL,
+                dataType: 'json',
+                success: function (data) {
+                    //请求成功，通过config注入配置信息,
+                    wx.config({
+                        debug: false,
+                        appId: data.appId,
+                        timestamp: data.timestamp,
+                        nonceStr: data.nonceStr,
+                        signature: data.signature,
+                        jsApiList: jsApiList
+                    });
+                }
+            });
+            wx.ready(function () {
+                var winHost = window.location.href;
+                var host = winHost.substring(0,winHost.indexOf('/activity')),
+                    shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+                    shareLink = host + '/activity/h5_recruit/',
+                    shareMainTit = '极致工作疯狂玩乐，最有“宝”的互联网金融公司',
+                    shareBody = '2016我们一起High，你来不来？';
+                //分享给微信好友
+                 org.onMenuShareAppMessage({
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link: shareLink,
+                    imgUrl: shareImg
+                });
+                //分享给微信朋友圈
+                org.onMenuShareTimeline({
+                    title: shareMainTit,
+                    link : shareLink,
+                    imgUrl: shareImg
+                });
+                //分享给QQ
+                org.onMenuShareQQ({
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link : shareLink,
+                    imgUrl: shareImg
+                });
+            });
         }
     })
-})(org);
+});

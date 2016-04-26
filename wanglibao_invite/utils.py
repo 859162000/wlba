@@ -60,7 +60,6 @@ def getWechatDailyReward(openid):
         defaults={
             'reward_type': redpack_type,
             'redpack_id': int(redpack_id),
-            'user': "",
         }
     )
     if daily_reward.status:

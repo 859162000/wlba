@@ -35,10 +35,10 @@ html,body
         padding: 0
         @extend .flex
         flex-direction: row
+        display: inline-block
         dt
             width: 70%
             height: 100%
-
 
         dd
             width: 30%
@@ -46,7 +46,16 @@ html,body
             @extend .flex
             align-items: center
             justify-content: center
+            float: left
+            display: block
+            position: relative
+            height: 100%
             h3
+                position: absolute
+                top: 50%
+                margin-top: -1.2rem
+                text-align: center
+                width: 100%
                 span
                     font-size: .8rem
                     color: #666666
@@ -59,17 +68,23 @@ html,body
         dt
             background: url("/static/imgs/mobile_activity/app_airport_operation/brief1.jpg") no-repeat
             background-size: 100% auto
-            order: 2
+            //order: 2
+            float: right
+            display: block
     dl.start_center
         dt
             background: url("/static/imgs/mobile_activity/app_airport_operation/brief2.jpg") no-repeat
             background-size: 100% auto
-            order: -1
+            //order: -1
+            float: left
+            display: block
     dl.start_bottom
         dt
             background: url("/static/imgs/mobile_activity/app_airport_operation/brief3.jpg") no-repeat
             background-size: 100% auto
-            order: 2
+            //order: 2
+            float: right
+            display: block
 .li3
     background: url("/static/imgs/mobile_activity/app_airport_operation/three.jpg") no-repeat
     background-size: cover
