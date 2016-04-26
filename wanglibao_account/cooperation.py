@@ -1189,7 +1189,7 @@ class KongGang1Register(CoopRegister):
                                 left_times=0,
                                 join_times=0)
                         send_msg = u'尊敬的贵宾客户，恭喜您获得%s,' \
-                                   u' 服务地址请访问：<a href="www.trvok.com">www.trvok.com</a> www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                                   u' 服务地址请访问：www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                                    u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                                    u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (send_reward.type, send_reward.content)
                         send_messages.apply_async(kwargs={
