@@ -229,6 +229,18 @@ class BiSouYiSession(CoopSessionProcessor):
         channel_user = req_data.get(self.external_channel_user_key, None)
         content = req_data.get(self.channel_content_key, None)
 
+        if not client_id:
+            client_id = self.request.META.get(self.external_channel_client_id_key.upper(), None)
+
+        if not client_id:
+            client_id = self.request.META.get('HTTP_%s' % self.external_channel_client_id_key.upper(), None)
+
+        if not sign:
+            sign = self.request.META.get(self.external_channel_sign_key.upper(), None)
+
+        if not sign:
+            sign = self.request.META.get('HTTP_%s' % self.external_channel_sign_key.upper(), None)
+
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
 

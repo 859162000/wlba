@@ -45,13 +45,13 @@ def bisouyi_callback_ret_parser(ret, channel, order_id=None):
 
 
 @app.task
-def common_callback(channel, url, params, req_action=1, headers=None, order_id=None, ret_parser=''):
+def common_callback(channel, url, params, req_action='POST', headers=None, order_id=None, ret_parser=''):
     logger.info("Enter %s_callback task===>>>" % channel)
 
     try:
         logger.info("callback_order_id[%s] with params[%s]" % (order_id, params))
 
-        if req_action == 1:
+        if req_action == 'POST':
             if headers:
                 ret = requests.post(url, data=params, headers=headers)
             else:
