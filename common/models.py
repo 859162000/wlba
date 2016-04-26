@@ -25,7 +25,7 @@ class CallbackRecord(models.Model):
     request_data = models.TextField(u'请求数据体', max_length=1000, blank=True, null=True)
     request_headers = models.TextField(u'请求数据头部', max_length=255, blank=True, null=True)
     request_action = models.CharField(u'请求动作', max_length=6, default=1, choices=REQUEST_ACT_CHOICE)
-    ret_parser = models.CharField(u'回调URL', max_length=50, blank=True, null=True)
+    ret_parser = models.CharField(u'回调结果解析器', max_length=50, blank=True, null=True)
     extra = models.CharField(max_length=200, default="", blank=True)
     re_callback = models.BooleanField(u"回调补发", default=False)
 

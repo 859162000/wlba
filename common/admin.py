@@ -23,12 +23,16 @@ class CallbackRecordAdmin(admin.ModelAdmin):
             obj.re_callback = False
             headers = obj.request_headers
             headers = json.loads(headers) if headers else headers
-            common_callback(channel=obj.callback_to,
-                            url=obj.request_url,
-                            params=json.loads(obj.request_data),
-                            headers=headers,
-                            order_id=obj.order_id,
-                            ret_parser=obj.ret_parser)
+            common_callback.apply_async(
+                countdown=3,
+                kwargs={'channel': obj.callback_to,
+                        'url': obj.request_url,
+                        'params': json.loads(obj.request_data),
+                        'headers': headers,
+                        'order_id': obj.order_id,
+                        'ret_parser': obj.ret_parser,
+                        }
+            )
 
         obj.save()
 
