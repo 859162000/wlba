@@ -2284,7 +2284,7 @@ class JiaXiHZRegister(CoopRegister):
     def __init__(self, request):
         super(JiaXiHZRegister, self).__init__(request)
         self.c_code = 'jiaxihz'
-        self.coop_id = settings.JXHZ_COOP_KEY
+        self.coop_id = settings.JXHZ_COOP_id
         self.coop_key = settings.JXHZ_COOP_KEY
         self.call_back_url = settings.JXHZ_CALL_BACK_URL
 
@@ -2310,9 +2310,9 @@ class JiaXiHZRegister(CoopRegister):
             data = (
                 ['platform', self.coop_id],
                 ['title', product.name],
-                ['number', product.id],
+                ['number', str(product.id)],
                 ['mobile', phone],
-                ['money', p2p_record.amount],
+                ['money', float(p2p_record.amount)],
                 ['rate', rate],
                 ['investAt', invest_time],
                 ['deadlineType', period_type],
