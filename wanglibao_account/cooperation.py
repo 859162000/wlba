@@ -2230,10 +2230,16 @@ class BiSouYiRegister(BaJinSheRegister):
         client_id = req_data.get(self.external_channel_client_id_key, None)
 
         if not client_id:
-            client_id = self.request.META.get(self.external_channel_client_id_key, None)
+            client_id = self.request.META.get(self.external_channel_client_id_key.upper(), None)
+
+        if not client_id:
+            client_id = self.request.META.get('HTTP_%s' % self.external_channel_client_id_key.upper(), None)
 
         if not sign:
-            sign = self.request.META.get(self.external_channel_sign_key, None)
+            sign = self.request.META.get(self.external_channel_sign_key.upper(), None)
+
+        if not sign:
+            sign = self.request.META.get('HTTP_%s' % self.external_channel_sign_key.upper(), None)
 
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
