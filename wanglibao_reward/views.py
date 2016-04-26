@@ -898,9 +898,9 @@ class KongGangRewardDistributer(RewardDistributer):
         all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
         send_reward = None
-        if  self.amount>=15000 and self.amount<20000:
+        if  self.amount>=10000 and self.amount<15000:
             send_reward = wait_reward
-        if  self.amount>=20000:
+        if  self.amount>=15000:
             send_reward = all_reward or wait_reward
         if send_reward:
             try:
