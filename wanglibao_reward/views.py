@@ -970,11 +970,19 @@ class KongGangAPIView(APIView):
 
             reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
             if reward == None:
-                json_to_response = {
-                    'ret_code': 1002,
-                    'message': u'您不满足领取条件，满额投资后再来领取吧！'
-                }
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                noused = Reward.objects.filter(type__in=('尊贵休息室服务', '贵宾全套出岗服务'), is_used=False).count()
+                if noused == 0:
+                    json_to_response = {
+                        'ret_code': 1005,
+                        'message': u'亲,您来晚了;奖品已经发完了！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    json_to_response = {
+                        'ret_code': 1002,
+                        'message': u'您不满足领取条件，满额投资后再来领取吧！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
             if reward.has_sent == False:
                 reward.has_sent=True
