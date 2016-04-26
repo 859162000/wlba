@@ -15,7 +15,6 @@ from wanglibao_pay.kuai_pay import KuaiShortPay
 from wanglibao_pay.mock_generator import PayMockGenerator
 from wanglibao_pay.models import PayInfo, Card
 from wanglibao_pay.pay import PayOrder, YeeProxyPayCallbackMessage
-from wanglibao_pay.third_pay import query_trx
 
 PAY_RES = Template("""\
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>\
@@ -495,40 +494,4 @@ class YeeProxyPayCallbackMessageTest(TestCase):
         pay_message = YeeProxyPayCallbackMessage().parse_message(request_get_para, 'response')
         self.assertEqual(0.01, float(pay_message.amount))
         self.assertEqual(1925745, pay_message.order_id)
-
-# def test_query_trx():
-class QueryTrxTest(SimpleTestCase):
-    def test_query_trx(self):
-        pay_info_ids = (('# kuai fail', 1932529),
-                ('# kuai success', 1934059),
-                ('# kuai proceeding', 1931489),
-                ('# kuai not exist', 1929872),
-                ('# yeepay fail', 1934019),
-                ('# yeepay success', 1934017),
-                ('# yeepay proceeding', 1934015),
-                ('# yeepay not exist', 1768494))
-
-        for msg, pay_info_id  in pay_info_ids:
-            res = query_trx(pay_info_id)
-            print msg
-            print res
-
-# if __name__ == '__main__':
-    # test_query_trx()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

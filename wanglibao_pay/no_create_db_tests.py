@@ -1,7 +1,11 @@
-# encoding:utf-8
+# tencoding:utf-8
 
 from django.test import SimpleTestCase
 from wanglibao_pay.third_pay import query_trx
+from wanglibao_pay.tasks import sync_pay_result
+from datetime import datetime, timedelta
+from mock import MagicMock
+from django.utils.timezone import get_default_timezone
 
 # tests without create db, command: 
 # python manage.py test wanglibao_pay.no_create_db_tests --testrunner wanglibao.testrunner.NoCreateDBRunner
@@ -22,6 +26,13 @@ class QueryTrxTest(SimpleTestCase):
             print msg
             print res
 
+class TaskSyncPayResultTest(SimpleTestCase):
+
+    def test_sync_pay_result(self):
+        timezone = get_default_timezone()
+        start_time = timezone.localize(datetime(2016,4,21))
+        end_time = timezone.localize(datetime(2016, 4,22))
+        sync_pay_result(start_time, end_time)
 
 
 
