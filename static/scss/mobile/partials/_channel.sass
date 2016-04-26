@@ -131,10 +131,14 @@
   .pro-safe
     background: url("/static/imgs/mobile/channel_register/safe.png") no-repeat center
   .pro-finance
-    background: url("/static/imgs/mobile/channel_register/finance.png") no-repeat center
+    background: url("/static/imgs/mobile/channel_register/profit.png") no-repeat center
     
 .channel-title-warp
   padding: 0 1.6rem
+  margin: 1rem 0
+  @media screen and (max-device-width: 320px)
+    padding: 0 .5rem
+
   .channel-list-title
     background: url("/static/imgs/mobile/channel_register/list_title.jpg") no-repeat center
     background-size: 100%
@@ -142,7 +146,8 @@
     color: #5DB5F2
     font-size: .9rem
     line-height: 3.5
-    margin: 1rem 0
+    @media screen and (max-device-width: 320px)
+      font-size: .75rem
 
 .title-margin-none
   margin:  1rem 0 0 0
