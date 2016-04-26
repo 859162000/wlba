@@ -67,7 +67,7 @@ def getWechatDailyReward(openid):
     if not user:
         return 0, "ok", 0
 
-    return sendDailyReward(user, daily_reward.id, save_point=True)
+    return sendDailyReward(user, daily_reward.id, save_point=True, isbind=False)
 
 
 def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False, isbind=True):
