@@ -64,6 +64,6 @@ def get_sorts_for_activity_show(queryset):
                                        key=lambda asd: asd[0], reverse=False)
             activity_list.extend(sub_activity_list)
 
-        activity_list = (q[1] for q in activity_list)
+        activity_list = [q[1] for q in activity_list]
 
     return activity_list

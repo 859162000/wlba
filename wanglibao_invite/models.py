@@ -63,6 +63,8 @@ class WechatUserDailyReward(models.Model):
     experience_gold_record_id = models.IntegerField(default=0, verbose_name=u'体验金发放流水ID', null=True)
     desc = models.CharField(u'描述', max_length=64, null=True)
     status = models.BooleanField(default=False, verbose_name=u'是否成功')
+    created_at = models.DateTimeField(u'添加时间', default=timezone.now, auto_now_add=True)
+    update_at = models.DateTimeField(u'更新时间', default=timezone.now, auto_now=True)
 
     class Meta:
         unique_together = (("w_user", "create_date"), ("w_user", "user", "create_date"))  # 联合唯一索引

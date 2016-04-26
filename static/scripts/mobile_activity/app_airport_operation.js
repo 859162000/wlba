@@ -222,7 +222,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	var sixlis = document.getElementById("six_lis");
 
-     $('#sec').fullpage();
+     $('#sec').fullpage({
+         scrollingSpeed: 700
+     });
      sixlis.addEventListener("touchstart",function(){
           $(this).next().slideToggle();
       },false)
@@ -300,28 +302,80 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		})
 	});
 
-	$('.six_btn').on("click",function(){
 
-            org.ajax({
-                type: "post",
-                url: "/api/activity/konggang/",
-                dataType: 'json',
-                success: function(data){
-                    if(data.ret_code=='1000'){
-                        window.location.href = '/weixin/login/?next=/activity/app_airport_operation/'
-                    }else if(data.ret_code=='1002'||data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
-                        $('.popup_box .main .textairport').text(''+data.message+'');
-                        $('.popup_box').show();
+
+    $('.popup_box .popup_button').click(function(){
+        $('.popup_box').hide();
+    });
+
+    wlb.ready({
+        app: function(mixins) {
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
                     }
+                })
+            }
+			mixins.shareData({title: '从容出行 尊贵定制', content: '网利宝携手空港易行狂撒出行卡！'});
+            mixins.sendUserInfo(function(data) {
+                $('.six_btn').on("click",function(){
 
-                    //console.log(data)
-                }
+                    org.ajax({
+                        type: "post",
+                        url: "/api/activity/konggang/",
+                        dataType: 'json',
+                        success: function(data){
+                            if(data.ret_code=='1000'){
+                                mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
+                            }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
+                                $('.popup_box .main .textairport').text(''+data.message+'');
+                                $('.popup_box').show();
+                            }else if(data.ret_code=='1002'){
+                                mixins.jumpToManageMoney();
+                            }
+                            //console.log(data)
+                        }
+                    })
+                })
             })
-        })
-        $('.popup_box .popup_button').click(function(){
-            $('.popup_box').hide();
-        });
+        },
+        other: function() {
+            $('.six_btn').on("click",function(){
 
+                org.ajax({
+                    type: "post",
+                    url: "/api/activity/konggang/",
+                    dataType: 'json',
+                    success: function(data){
+                        if(data.ret_code=='1000'){
+                            window.location.href = '/weixin/regist/?next=/weixin/list/'
+                        }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'||data.ret_code=='1005'){
+                            $('.popup_box .main .textairport').text(''+data.message+'');
+                            $('.popup_box').show();
+                        }else if(data.ret_code=='1002'){
+                            window.location.href = '/weixin/list/'
+                        }
+
+                        //console.log(data)
+                    }
+                })
+            })
+
+        }
+    });
 
 
 })(org);

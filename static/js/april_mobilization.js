@@ -92,6 +92,10 @@
                 url: '/api/april_reward/fetch/',
                 type: 'post',
                 success: function (json) {
+
+                    $('#act_time').text(json.week_frist_day);
+                    $('#act_week').text(json.week_number);
+
                     substring(json.week_sum_amount);
 
 
