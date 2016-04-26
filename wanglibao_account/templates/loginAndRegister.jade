@@ -7,52 +7,67 @@ html
     - with '网利宝官网' as title
     include global/g_head
     - endwith
-    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
+    script(src="https://static.geetest.com/static/tools/gt.js")
   body
     include global/g_nav
-    .i-mod-wrap
-        .i-mod-content
-            .i-mod-wrap.loginRegisterLeft.fl
-                .pageAd.mg-t-ssm
-                ul.safeRelevant.tc.mg-t-m.t-d11
-                    li.mr-38
-                        span.safeSpan1
-                        p 账户资金安全
-                          br
-                          | 由
-                          b 阳光保险
-                          | 承保
-                    li.mr-38
-                        span.safeSpan2
-                        p
-                            b 招商银行
-                            br
-                            | 全程监管
-                    li.mg-r-sm
-                        span.safeSpan5
-                        p
-                            b 中信银行
-                            br
-                            | 设立风险准备金账户
-                    li.mg-r-sm
-                        span.safeSpan3
-                        p
-                            b IDG资本
-                            br
-                            | 百亿市值
-                            b A股上市公司
-                            | 入股
-                    li
-                        span.safeSpan4
-                        p 第三方
-                          br
-                          b 100%
-                          | 本息保障
-            .i-mod-wrap.loginRegisterRight.fr.bg-d3
-
-                block loginFormPage
-                block registerFormPage
-
+    .i-mod-wrap.login-box-bg
+        .i-mod-content.curr
+            .wanglibao-partner
+                .partner-box
+                    p.pop 走向人生巅峰，无需等待
+                    .partner-detail
+                        dl.w175
+                            dt.login-icon1
+                            dd
+                                p 账户安全由
+                                p 阳光保险承担
+                        dl
+                            dt.login-icon2
+                            dd
+                                p IT数据风控系统
+                                p 第三方权威征信
+                        dl.w175
+                            dt.login-icon3
+                            dd
+                                p IDG资本
+                                p A股上市公司
+                        //dl
+                            dt.login-icon4
+                            dd
+                                p 第三方
+                                p 100%本息保障
+            form#loginForm.login-form.clearfix(method='post', action='/accounts/login/ajax/')
+                - csrf_token
+                .logonFormDiv
+                    h3.clearfix
+                        span 快速登录
+                        label 没有账号？
+                            a(href='/accounts/register/') 免费注册
+                    ul.loginForm.clearfix
+                        li
+                            i.icon.iconfont.icon-mobile
+                            input#loginMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
+                        li
+                            i.icon.iconfont.icon-key
+                            input#loginPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                        li.captcha-box(style="display:none")
+                            #captcha-box
+                            input(type="hidden")#captcha-status
+                            input(type="hidden")#check-tag
+                        li.baoxian
+                            em.bao-icon
+                            span 账户资金安全由阳光保险承保
+                        li.login-submit
+                            .loginError
+                            if user.is_authenticated and user.wanglibaouserprofile.frozen
+                                .submitFormStyle.disabled(style="background-color:#999999") 账户已冻结
+                            else
+                                .submitFormStyle#loginSubmit 登录
+                        li.find-pwd-remember
+                            label.fl
+                                input#remember_me.checkboxStyle(type="checkbox", name="remember_me" )
+                                | 一周内自动登录
+                            a(href='/accounts/password/reset/identifier/').findPwd 忘记密码？
     include global/g_footer
     script.
-      require(["/static/src/pc/login.js?v=20151120"])
+      require(["/static/src/pc/login.js?v=20160420"])

@@ -143,14 +143,27 @@
     width: 4rem
     text-align: left
   .bank-input
-    -webkit-box-flex: 1
     display: block
+    width: 100%
     height: 100%
     line-height: normal
     text-align: left
     border: 0
     background: #fff
     color: $color-grey-989898
+  .card-warp
+    -webkit-box-flex: 1
+    height: 100%
+    padding-right: .5rem
+  select
+    display: block
+    width: 100%
+    height: 100%
+    -webkit-appearance: none
+    border: 0
+    outline: none
+    background: url("/static/imgs/mobile/detail/buyjiantou.png") no-repeat right center #fff
+    color: #989898
   .bank-txt-name
     line-height: 2.2rem
 
@@ -224,7 +237,17 @@
     text-align: left
     p:first-child
       font-size: $font-size14
-
+.recharge-input
+  -webkit-box-flex: 1
+  width: 100%
+  border: 0
+  display: block
+  font-size: 0.6rem
+  padding: .7rem 0
+  line-height: .7rem
+  color: #989898
+  &::-webkit-input-placeholder
+    color: #ccc
 
 
 

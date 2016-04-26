@@ -11,7 +11,7 @@ from wanglibao_buy.models import FundHoldInfo
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
-from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
+from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew, get_announcement_homepage_list
 from wanglibao_p2p.models import P2PEquity
 from django.core.urlresolvers import reverse
 import re
@@ -181,7 +181,7 @@ class IndexView(TemplateView):
         ]
 
         # 公告 前7个
-        annos = AnnouncementHomepage()[:7]
+        annos = get_announcement_homepage_list(self.request)[:7]
 
         # 总资产
         p2p_total_asset = 0
@@ -214,7 +214,8 @@ class IndexView(TemplateView):
             'announcements': annos,
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
-            'p2p_total_asset': float(p2p_total_asset + fund_total_asset)
+            'p2p_total_asset': float(p2p_total_asset + fund_total_asset),
+            'index': True
         }
 
     def get(self, request, *args, **kwargs):
@@ -254,12 +255,18 @@ class SecurityView(TemplateView):
 
 
 def page_not_found(request):
-    template = loader.get_template('html/404.html')
+    #老的404页面
+    #template = loader.get_template('html/404.html')
+    #新的404页面
+    template = loader.get_template('html/wanglibao_404.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=404)
 
 
 def server_error(request):
-    template = loader.get_template('html/500.html')
+    #老的500页面
+    #template = loader.get_template('html/500.html')
+    #新的500页面
+    template = loader.get_template('html/wanglibao_maintain.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=500)
 
 
@@ -318,3 +325,4 @@ class BaiduFinanceView(ChannelBaseTemplate):
             'today': today
         })
         return context
+

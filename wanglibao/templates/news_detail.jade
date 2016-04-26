@@ -1,21 +1,25 @@
+-load formatters
 doctype html
-- with news.name as title
-include include/head
-- endwith
-if news.keywords
-  meta(name="keywords", content="{{news.keywords}}")
-if news.description
-  meta(name="description", content="{{news.description}}")
-body
-  include global/g_nav
-  .space-vertical-ssm
-  .media-list-container
-    .well
-      .media-list-title
-        h3 媒体报道
-      .media-list-body
-        h3.align-center {{news.name}}
-        .content {{news.content|safe}}
-
-  include global/g_footer
-  include include/tracking
+html
+    head
+        - with news.name as title
+        include global/g_head
+        - endwith
+        meta(name="keywords", content="{{news.keywords}}")
+        meta(name="description", content="{{news.description}}")
+    body
+        include global/g_nav
+        - with '媒体报道' as title
+        include include/about_sidebar
+        - endwith
+        .section
+            .page_nav
+                a(href='/news/list', target="_blank") 媒体报道
+                | >报道详情
+            .media_box.detail_box.clearfix
+                h3 {{news.name}}
+                .media_coverage_time {{news.created_at|date:"Y-m-d H:i"}}
+                .medil_detail {{news.content|safe}}
+        include global/g_footer
+        include include/tracking
+                      

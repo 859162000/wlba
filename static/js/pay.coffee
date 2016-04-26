@@ -19,8 +19,10 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
     $('#' + $(e.target).attr('data-desc-id')).show()
 
   $('#pay').click (e)->
+      userStatus()
+
+  userStatus = () ->
     if $('#id-is-valid').val() == 'False'
-      e.preventDefault()
       $('#id-validate').modal()
       return
 
@@ -51,5 +53,4 @@ require ['jquery', 'jquery.validate', 'lib/modal'], ($, validate, modal)->
       else
         $(this).val parseFloat(value).toFixed(2)
 
-  if $('#id-is-valid').val() == 'False'
-    $('#id-validate').modal()
+  userStatus()

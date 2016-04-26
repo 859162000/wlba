@@ -1,0 +1,38 @@
+extends account_home_base
+- load formatters
+- load mathfilters
+block head
+    include include/head
+block sidebar
+    //- with '账户总览' as activeItem
+    include include/user_center_sidebar
+block main
+    .phone_modify_main_wrap
+        .panel
+            .well
+                .panel-title-bar__no-border
+                    .panel-title 身份信息-短信修改手机号
+                .form_wrap.form_margin
+                    .title_top.title_phone
+                        span.text_1 短信将发送至
+                        span.phone_num {{new_phone}}
+                        span.text_2(style='display:none') 请注意查收
+                    form.form-group.form_left(enctype="multipart/form-data", content_type="multipart/form-data", action="/api/manual_modify/phone/", method="post")
+                        -csrf_token
+                        .box
+                            label 验证码
+                            .box_right
+                                <input class="input_code" type='text' placeholder="请输入验证码" autocomplete="off"/>
+                                <button type="button" class="get_code">获取验证码</button>
+                                .status.status_code
+                                    .true
+                                    .false 验证码错误
+                        .box
+                            label
+                            .box_right
+                                <input class="submit button" type="button" value="下一步"/>
+                                .error_title.error_form
+
+
+    script.
+        require(["/static/js/sms_modify_phone.js?v=2016011902"])

@@ -7,12 +7,13 @@ from django.db import models
 from order.models import Order
 from wanglibao_margin.models import MarginRecord
 from wanglibao_pay.util import get_a_uuid
+from wanglibao_pay import util
 from decimal import Decimal
 
 
 class Bank(models.Model):
     name = models.CharField(verbose_name=u'银行', max_length=32)
-    gate_id = models.CharField(max_length=8, verbose_name=u'gate id')
+    gate_id = models.CharField(max_length=8, unique=True, verbose_name=u'gate id')
     code = models.CharField(max_length=16, verbose_name=u'银行代码')
     limit = models.TextField(blank=True, verbose_name=u'汇付网银银行限额信息')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
@@ -27,6 +28,9 @@ class Bank(models.Model):
     yee_bind_code = models.CharField(max_length=20, verbose_name=u'易宝侧银行代码', blank=True, default="")
     # 提现限额:min_amount=50,max_amount=50000
     withdraw_limit = models.CharField(max_length=500, blank=True, verbose_name=u"银行提现限额", default="")
+    have_company_channel = models.BooleanField(u"是否对公", default=False)
+    cards_info = models.TextField(max_length=10000, default='', blank=True, verbose_name=u'银行卡号识别码')
+
 
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
@@ -64,19 +68,47 @@ class Bank(models.Model):
 
     @classmethod
     def get_bind_channel_banks(cls):
-        return Bank.objects.all().exclude(channel__isnull=True).exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
+        banks = Bank.objects.all().exclude(channel__isnull=True)\
+            .exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True)\
+            .exclude(yee_bind_code__isnull=True).select_related()
+        rs = []
+        for bank in banks:
+            obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
+            if bank.channel == 'kuaipay' and bank.kuai_limit and bank.kuai_code:
+                obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
+            elif bank.channel == 'huifu' and bank.huifu_bind_limit and bank.huifu_bind_code:
+                obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
+            elif bank.channel == 'yeepay' and bank.yee_bind_limit and bank.yee_bind_code:
+                obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
+            else:
+                # 只返回已经有渠道的银行
+                continue
+
+            rs.append(obj)
+        return rs
+
+    @property
+    def bank_limit(self):
+        if self.channel == 'kuaipay' and self.kuai_limit:
+            return util.handle_kuai_bank_limit(self.kuai_limit)
+        elif self.channel == 'huifu' and self.huifu_bind_limit:
+            return util.handle_kuai_bank_limit(self.huifu_bind_limit)
+        elif self.channel == 'yeepay' and self.yee_bind_limit:
+            return util.handle_kuai_bank_limit(self.yee_bind_limit)
 
 class Card(models.Model):
     no = models.CharField(max_length=25, verbose_name=u'卡号', db_index=True)
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
-    add_at = models.DateTimeField(auto_now=True)
+    add_at = models.DateTimeField(auto_now_add=True)
     is_bind_huifu = models.BooleanField(verbose_name=u"是否绑定汇付快捷", default=False)
     is_bind_kuai = models.BooleanField(verbose_name=u"是否绑定快钱快捷", default=False)
     is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
     last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
     yee_bind_id = models.CharField(max_length=50, verbose_name=u'易宝帮卡id', blank=True, default="")
+    # 同卡进出
+    is_the_one_card = models.BooleanField(verbose_name='是否为唯一进出卡片', default=False)
 
     class Meta:
         verbose_name_plural = "银行卡"

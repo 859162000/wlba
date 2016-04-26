@@ -6,13 +6,15 @@ from rest_framework.routers import DefaultRouter
 from trust.views import TrustViewSet, IssuerViewSet
 from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIView,
                             AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
-                            AccountFundAssetAPI,
+                            AccountFundAssetAPI, LoginCounterVerifyAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
                             AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
-                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView)
+                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView, ManualModifyPhoneAPI,
+                            ValidateAccountInfoAPI, SMSModifyPhoneValidateAPI, SMSModifyPhoneAPI,ModifyPhoneValidateCode,
+                            CancelManualModifyPhoneAPI)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -25,27 +27,30 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, RepaymentAPIView
-from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
+from wanglibao_pay.third_pay import  TheOneCardAPIView
+from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView,
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
                             BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
-                            BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView)
+                            BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView, CheckRechargePayinfoView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
-                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
+                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
-                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside)
+                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
+                            BidHasBindingForChannel, CoopPvApi, ActivityUserInfoUploadApi, GeetestAPIView)
+
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -55,9 +60,11 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView,
                              GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
-from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView
+from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView)
+from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
+from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, AprilAwardApi)
+from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
 
@@ -119,6 +126,7 @@ urlpatterns = patterns(
 
     url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
 
+    url(r'^login_verify/$', LoginCounterVerifyAPI.as_view()),
     url(r'^user_login/$', UserHasLoginAPI.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
@@ -142,7 +150,8 @@ urlpatterns = patterns(
     url(r'^bank/list_new/$', BankListNewAPIView.as_view()),
 
     url(r'^id_validate/', IdValidate.as_view()),
-    url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
+    url(r'^has_validate/', HasValidationAPIView.as_view()),
+    # url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),
@@ -170,6 +179,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/delete/$', BindPayDelView.as_view()),
     url(r'^pay/cnp/dynnum/$', BindPayDynNumView.as_view()),
     url(r'^pay/deposit/$', BindPayView.as_view(), name="kuai-deposit-view"),
+    url(r'^pay/check_recharge/$', CheckRechargePayinfoView.as_view()),
 
     # 切换支付渠道重新
     url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
@@ -180,6 +190,8 @@ urlpatterns = patterns(
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', csrf_exempt(KuaiShortPayCallbackView.as_view()), name="kuai-deposit-callback"),
+    # 同卡进出
+    url(r'^pay/the_one_card/$', TheOneCardAPIView.as_view()),
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
@@ -187,6 +199,7 @@ urlpatterns = patterns(
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
+    url(r'^voice/send_voice_code/$', SendVoiceCodeNewAPIView.as_view()),
     url(r'^marketing/tv/$', Statistics.as_view()),
     url(r'^marketing/tv_inside/$', StatisticsInside.as_view()),
     url(r'^p2p/investrecord', InvestRecord.as_view()),
@@ -224,6 +237,12 @@ urlpatterns = patterns(
     url(r'^inner/send_sms/$', InnerSysSendSMS.as_view()),
     url(r'^inner/validate_id/$', InnerSysValidateID.as_view()),
     url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
+    url(r'^manual_modify/vali_acc_info/', ValidateAccountInfoAPI.as_view()),
+    url(r'^manual_modify/phone/', ManualModifyPhoneAPI.as_view()),
+    url(r'^manual_modify/phone_validation_code/(?P<phone>\d{11})/$', ModifyPhoneValidateCode.as_view()),
+    url(r'^manual_modify/cancel/', CancelManualModifyPhoneAPI.as_view()),
+    url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
+    url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
 )
 
 urlpatterns += patterns('',
@@ -261,8 +280,15 @@ urlpatterns += patterns(
     url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
+    url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
+    url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
+    url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
+    url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
+    url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view()),
+    url(r'^april_reward/fetch/$', AprilAwardApi.as_view()),  #四月活动
+    url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
+    url(r'^geetest/$', GeetestAPIView.as_view()),
 )
-
 
 # app端改版新接口
 urlpatterns += patterns(
@@ -283,6 +309,7 @@ urlpatterns += patterns(
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
 
+
 # 理财金接口
 urlpatterns += patterns(
     '',
@@ -293,4 +320,34 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^datacube/$', DataCubeApiView.as_view()),
+)
+
+# 判断bid是否已经绑定渠道
+urlpatterns += patterns(
+    '',
+    url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
+)
+
+#
+urlpatterns += patterns(
+    '',
+    url(r'^account2015/$', CustomerAccount2015ApiView.as_view()),
+)
+
+# 短信发送相关
+urlpatterns += patterns(
+    '',
+    url(r'^sms/', include('wanglibao_sms.urls')),
+)
+
+# 渠道页面pv统计接口
+urlpatterns += patterns(
+    '',
+    url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
+)
+
+# 网利宝开放日活动用户信息上报接口
+urlpatterns += patterns(
+    '',
+    url(r'^activity_user_info/upload/$', ActivityUserInfoUploadApi.as_view()),
 )

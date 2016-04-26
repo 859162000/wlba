@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -281,13 +281,25 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         other: function() {
             $('.code_wrap').show();
 
+            var token = getQueryStringByName('promo_token');
+            if(token == 'hexunjd' || token == 'hexunht'){
+                $('.hexunht').show()
+            }
             $('#take').click(function() {
-                window.location.href = '/activity/experience/mobile/';
+                if(token == 'hexunjd' || token == 'hexunht'){
+                    window.location.href = '/weixin/regist/';
+                }else{
+                    window.location.href = '/activity/experience/mobile/';
+                }
                 //体验金
             });
 
             $('#register').click(function() {
-				window.location.href = '/activity/experience/mobile/';
+                if(token == 'hexunjd' || token == 'hexunht'){
+                    window.location.href = '/weixin/regist/';
+                }else{
+                    window.location.href = '/activity/experience/mobile/';
+                }
             });
             $('#go_user').on('click',
             function() {
@@ -301,6 +313,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     window.location.href = '/weixin/regist/?next=/weixin/list/'
                 }
             });
+
+             function getQueryStringByName(name) {
+                var result = location.search.match(new RegExp('[\?\&]' + name + '=([^\&]+)', 'i'));
+                if (result == null || result.length < 1) {
+                    return '';
+                }
+                return result[1];
+             }
             //console.log('其他场景的业务逻辑');
 
         }

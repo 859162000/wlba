@@ -49,9 +49,10 @@ class ExperienceEvent(models.Model):
         ('p2p_audit', u'满标审核'),
         ('repaid', u'还款'),
         ('weixin_sign_in', u'微信签到'),
+        ('share', u'分享奖励'),
     ), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default=u"全平台", choices=PLATFORM)
-    target_channel = models.CharField(max_length=500, verbose_name=u"渠道", blank=True, default="",
+    target_channel = models.CharField(max_length=1000, verbose_name=u"渠道", blank=True, default="",
                                       help_text=u'不限渠道则留空即可,多个渠道用英文逗号间隔')
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
@@ -84,12 +85,12 @@ class ExperienceAmortization(models.Model):
     product = models.ForeignKey(ExperienceProduct, related_name='experience_product_subs')
     user = models.ForeignKey(User)
     term = models.IntegerField(u'还款期数')
-    term_date = models.DateTimeField(u'还款时间')
+    term_date = models.DateTimeField(u'还款时间', db_index=True)
 
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
 
-    settled = models.BooleanField(u'已结算', default=False)
+    settled = models.BooleanField(u'已结算', default=False, db_index=True)
     settlement_time = models.DateTimeField(u'结算时间', auto_now=False, null=True, blank=True)
 
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
@@ -100,3 +101,15 @@ class ExperienceAmortization(models.Model):
 
     def __unicode__(self):
         return u'用户%s 本金%s 利息%s' % (self.user, self.principal, self.interest)
+
+
+class ExperiencePurchaseLockRecord(models.Model):
+    user = models.ForeignKey(User, db_index=True)
+    purchase_code = models.CharField(u'投资标记', max_length=64, db_index=True, null=False)
+    purchase_times = models.IntegerField(u'投资次数', default=0)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(u'更新时间', auto_now=True)
+    description = models.TextField(u'流水id备注', blank=True)
+
+    class Meta:
+        unique_together = (("user", "purchase_code"),)  # 联合唯一索引

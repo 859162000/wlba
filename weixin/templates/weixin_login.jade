@@ -1,50 +1,44 @@
 -load formatters
 doctype html
-html(style="background: url('/static/imgs/mobile/login/loginback.png');")
-    head
-        include include/weixin_head.jade
-    body
-        header
-            hgroup 登录
-            a(href="/weixin/list/")
-              span 返回
-        .login-top
-            .login-top-top
-            .login-top-main
-                .login-top-circle
-                    img(src="/static/imgs/mobile/login/login.png", alt="").img-one
-                img(src="/static/imgs/mobile/login/loginsize.png", alt="").img-two
-        from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
-            - csrf_token
-            input(name="openid", type="hidden", value="{{ openid }}")
-            input(name="captcha_0", type="hidden", value="")
-            .login-from-one(style="margin-top: 0;")
-                img(src="/static/imgs/mobile/login/loginput1.png", alt="").img-input
-                input(type="tel", name="identifier", placeholder="请输入手机号")
-            .login-from-error
-                .error-identifier(style="display: none; ")
-            .login-from-two
-                img(src="/static/imgs/mobile/login/loginput2.png", alt="").img-input
-                input(type="password", name="password", placeholder="请输入密码")
-            .login-from-error
-                .error-password(style="display: none; ")
-            .login-from-threed
-                .login-from-three
-                    img(src="/static/imgs/mobile/login/loginput3.png", alt="").img-input
-                    input(type="text", name="captcha_1", placeholder="请输入验证码").login-refresh
-                .login-validation
-                    img(src="", alt="", width="100%", height="100%, border-radius: 0.3rem")#captcha
-            .login-from-error
-                .error-captcha(style="display: none;")
-            .login-from-four
-                button(type="submit") 登录
-            .login-footer
-                p.login-left
-                    a(href="/weixin/regist/") 免费注册
-                    //a(href="javascript:void(0)") &nbsp;&nbsp;|&nbsp;&nbsp;
-                    //a(href="#") 忘记密码
-        include include/tracking
-    script(data-init='login', src="/static/scripts/mobile/dist/mobile.js")
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 赚钱哪里好 就在网利宝
+      a(href="javascript:history.go(-1)")
+        span 返回
+        
+        
+    .wx-login-logos
+      .wx-head-red-space
+      .wx-head-logo
+        img(src="/static/imgs/mobile/logo.png")
 
+    .wx-login-warp
+      .wx-input-public.wx-login-input-space
+        .wx-input-icon
+          .phone
+        input(type='tel', name='identifier', placeholder= '请输入手机号', data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-clear-input
 
+      .wx-input-public.wx-login-input-space
+        .wx-input-icon
+          .password
+        input(type='password', name='password', placeholder= '请设置密码',data-icon='wx-input-icon',  autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-hide-password.wx-password-operation
 
+      button(type="submit", disabled=true).wx-login-submit 登录网利宝
+
+      .wx-for-regist-warp
+        if next == ''
+          a(href='/weixin/regist/').wx-for-regist 免费注册
+        else
+          a(href="/weixin/regist/?next={{next}}").wx-for-regist 免费注册
+      .bank-safe
+        span 账户资金安全由平安银行承保    
+
+    include include/ui_model/mobile_errorsign
+    include include/tracking
+    script(src='/static/scripts/mobile/pro/vendor.zepto.js?v=2016040414')
+    script(src='/static/scripts/mobile/pro/login.js?v=2016040414')

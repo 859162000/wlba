@@ -9,8 +9,34 @@ require.config(
 
 require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
-         'model/portfolio', 'tools', 'lib/jquery.number.min',
+         'model/portfolio', 'tools',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
+
+  $('.more_btn').click () ->
+    $('.tableNew').slideToggle()
+
+  $('#showMark').click () ->
+    $('.explain_box').modal()
+    $('.modal').removeClass('modal')
+    $('.explain_box').css('margin-left':'-435px')
+
+  $('.investBtn').click () ->
+    $.ajax {
+      url: '/api/experience/buy/'
+      type: "POST",
+      data: {}
+    }
+    .done (data) ->
+      $('#success').modal()
+      $('#success').find('.close-modal').hide()
+      setInterval( ->
+        $.modal.close()
+        location.reload()
+      ,2000)
+    .fail (data)->
+      console.log(1111)
+
+
   class DataViewModel
     constructor: ->
       self = this
@@ -76,7 +102,7 @@ require ['jquery', 'underscore', 'knockout',
   viewModel = new DataViewModel()
   ko.applyBindings viewModel
 
-###  backend.fundInfo()
+  ###  backend.fundInfo()
   .done (data)->
     totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"])
     $("#total_asset").text($.number(totalAsset, 2))

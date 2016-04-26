@@ -1,0 +1,384 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/wangli_vip.css?v=2016040702")
+        - csrf_token
+    body(style="background:#fff")
+        include global/g_nav
+
+        #body_wrap
+            #banenr
+                .banner_main
+                    .num.num_one 1,000
+                    .num.num_two 10,000
+                    .num.num_three 50,000
+                    .num.num_four 100,000
+                    .num.num_five 500,000
+                    .level.level_one 普通会员
+                    .level.level_two V1会员
+                    .level.level_three V2会员
+                    .level.level_four V3会员
+                    .level.level_five SVIP会员
+                    .view 查看详情
+                .slide_bottom
+                    .main
+                        table
+                            thead
+                                th 级别名称
+                                th 待收本息
+                                th 有效期
+                            tbody
+                                tr
+                                    td 普通会员
+                                    td 投资满1千
+                                    td 终身
+                                tr
+                                    td V1会员
+                                    td 1万≤待收本息<5万
+                                    td 半年
+                                tr
+                                    td V2会员
+                                    td 5万≤待收本息<10万
+                                    td 半年
+                                tr
+                                    td V3会员
+                                    td 10万≤待收本息<50万
+                                    td 半年
+                                tr
+                                    td SVIP会员
+                                    td 50万及以上
+                                    td 半年
+                        dl
+                            dt 会员定级：
+                            dd 完成实名认证并投资满1千元，可以成为网利宝终身会员；
+                            dd VIP和SVIP级别会员则是根据目前在投的定期产品的待收本息金额判断，当普通会员满足升级条件，将于次日升级，享受VIP和SVIP的相应待遇。 
+                        dl.two
+                            dt 会员有效期：
+                            dd 普通会员有效期为终身，VIP和SVIP有效期均为半年，会员有效期内只升级不降级，有效期内升级的新级别，新会员级别有效期仍为半年；
+                            dd 会员到期日次日会根据当前的定期在投的本息金额，重新判断会员级别。
+                        .clear
+                        .bottom_arrow 收起
+            .big_title_1 特权享不停
+            .privilege
+                .privilege_box.privilege_one
+                    .border_top
+                    .main
+                        .title 投资特权
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_1.png")
+                            p 加息月券
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_2.png")
+                            p 会员红包
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_3.png")
+                            p 礼包惊喜
+                        .box.last
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_4.png")
+                            p 会员专享日
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_8.png")
+                            p 续投福利
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_9.png")
+                            p 活动预告
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_10.png")
+                            p 满标T+1计息
+                        .box.last
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_11.png")
+                            p 垫付
+                .privilege_box.privilege_two
+                    .border_top
+                    .main
+                        .title 服务特权
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_5.png")
+                            p 新品体验
+                        .box.last
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_6.png")
+                            p 理财顾问
+                        .box
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_12.png")
+                            p 线上俱乐部
+                        .box.last
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_13.png")
+                            p 线下理财聚会
+                .privilege_box.privilege_three
+                    .border_top
+                    .main
+                        .title 生活特权
+                        .box.last
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_7.png")
+                            p 生日礼包
+                        .box.last
+                            img(src="/static/imgs/pc_activity/wangli_vip/img_icon_14.png")
+                            p 分享有礼
+            .vip_explain
+                .main
+                    .title 会员权益说明
+                    table
+                        thead
+                            th.first 享有特权
+                            th 普通会员
+                            th VIP1
+                            th VIP2
+                            th VIP3
+                            th SVIP
+                        tbody
+                            tr
+                                td 会员红包
+                                td 30元
+                                td 240元
+                                td 480元
+                                td 600元
+                                td 1200元
+                            tr
+                                td 加息月券
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td 0.5 %
+                                td 0.8 %
+                                td 1.0 %
+                                td 1.2 %
+                            tr
+                                td 礼包惊喜
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr
+                                td 会员专享日
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr
+                                td 续投福利
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr
+                                td 活动预告
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr
+                                td 满标t+1计息
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr
+                                td 垫付
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td 优先
+                                td 优先
+                            tr.white
+                                td 新品体验
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td 优先
+                                td 优先
+                            tr.white
+                                td 理财顾问
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr.white
+                                td 线上俱乐部
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr.white
+                                td 线下理财聚会
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_2.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td 贵宾理财沙龙
+                            tr
+                                td 生日礼包
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                            tr
+                                td 分享有礼
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                                td
+                                    img(src="/static/imgs/pc_activity/wangli_vip/table_ico_1.png")
+                    .vip_explain_bottom_text *更多专属特权接入中，敬请期待！
+
+            .privilege_box
+                .privilege_tab
+                    .tab.tab_choose(data-title='#tab_box_one') 投资特权
+                    .tab(data-title='#tab_box_two') 服务特权
+                    .tab.last(data-title='#tab_box_three') 生活特权
+                .privilege_main
+                    .box_main.box_one#tab_box_one
+                        .box
+                            span 1、
+                            .right
+                                p 会员红包：网利宝赠送给会员的现金红包在现有级别有效期内每月1日，按月等份发给用户；用户在上月完成升级的，本月1日收到的将是升级后的红包；红包不叠加，升级后将不会收到升级前的红包。
+                                p 例如：V3会员的会员红包是600元（6个月*100元），4月1日会收到100元现金红包，如果TA在4月30日时投资了40万升级到SVIP，5月1日将收到200元的现金红包；如果TA在1日当天才投的40万，那么收到的还是V3对应的100元现金红包。
+                        .box
+                            span 2、
+                            .right
+                                p 每月加息券：网利宝每月送给VIP和SVIP的专享加息券，以发送当时会员所处的级别为准，每月一张，不定时发送；级别越高，额度越大。
+                                p 例如： V1会员在4月9日当天投资10万，次日升级为V3会员，则会在9日获得V1会员的0.5%专享加息券一张。
+                        .box
+                            span 3、
+                            .right
+                                p 礼包惊喜：VIP和SVIP将会不定期收到，网利宝提供的专属投资礼包，级别越高，礼包越大。
+                        .box
+                            span 4、
+                            .right
+                                p 会员专享日：为网利宝会员打造的专享投资日，具体时间另行通知。
+                        .box
+                            span 5、
+                            .right
+                                p 续投福利：网利宝会员在每笔投资本金按时回款时，收到专享的续投加息券福利。
+                        .box
+                            span 6、
+                            .right
+                                p 活动预告：下载网利宝APP的V3和SVIP，在大型活动之前，将会提前收到活动消息。
+                        .box
+                            span 7、
+                            .right
+                                p 满标t+1计息：满标后第二个自然日计息的权益，从此投资无需再考虑节假日。
+                        .box
+                            span 8、
+                            .right
+                                p 垫付：网利宝为所有用户提供的逾期垫付，坏账垫付保障，一旦遇到此情况，SVIP和V3可享受优先垫付的权利。
+                    .box_main.box_two#tab_box_two
+                        .box
+                            span 1、
+                            .right
+                                p 理财顾问： 为V3和SVIP配备的理财顾问，方便你的理财。
+                        .box
+                            span 2、
+                            .right
+                                p 线上俱乐部：为V3和SVIP提供的线上投资交流俱乐部。
+                        .box
+                            span 3、
+                            .right
+                                p 线下理财聚会：线下聚会不定期举办，V2及以上级别用户将获得优先参与的权利。
+                        .box
+                            span 4、
+                            .right
+                                p 新品体验：会员将有机会提前受邀，体验新产品、新功能、新设计。
+                    .box_main.box_three#tab_box_three
+                        .box
+                            span 1、
+                            .right
+                                p 生日礼包：来自网利宝的生日礼物，根据会员身份证上日期判断生日，生日当天自动发送至会员的账户
+                        .box
+                            span 2、
+                            .right
+                                p 分享有礼：向我们分享，你与网利宝之间的故事，将有机会被选中，发布到网利宝官网和官方渠道，获得精美礼物一份；VIP和SVIP，向我们分享人生大喜事，将有机会获得喜事礼品一份。分享内容请发邮箱：vip@wanglibank.com
+            .question_box
+                .question_main
+                    .title 常见问题
+                    dl
+                        dt 如何由新手变为普通会员？
+                        dd 通过实名认证并投资满1000元可成为网利宝普通会员。
+                    dl
+                        dt 待收本息满足升级标准是否可以立即成为VIP？
+                        dd 定期产品的待收本息，满足升级标准后，将于达到标准之后的次日升级。
+                    dl
+                        dt 会员升级后会收到多少的会员红包？
+                        dd 会员有效期内的每月1日，系统自动发送对应的会员级别红包；用户在1日前升级的，收到的将是升级后的红包，红包不能叠加，升级后将不会收到升级前的红包。 例如：V3会员的会员红包是600元，4月1日收到100元现金红包，如果在4月30日时投资了40万升级到SVIP，5月1日将收到200元的现金红包；如果在1日当天才投的40万，那么收到的还是V3对应的100元现金红包。
+                    dl
+                        dt 礼包惊喜是什么？
+                        dd VIP和SVIP将会不定期收到网利宝提供的专属投资礼包，级别越高，礼包越大，惊喜多多，福利多多。
+            .vip_bottom
+                p 本次会员体系相关内容从2016年4月6日起生效，网利宝运营团队保留上述内容的最终解释权，<br>同时将为会员提供更多更丰富的权益和服务！
+
+                p.small!='如果你对本次会员体系有任何建议和意见，欢迎发送邮件到：<span class="see_red_rule">vip@wanglibank.com</span>'
+
+                p 最后再次感谢每一位会员对网利宝的信任、理解与支持，我们将一如既往地为您提供更安全、更可靠、更专业的理财服务！
+
+                p <br>网利宝运营团队<br>2016年4月5日
+
+        include global/g_footer
+script.
+    require(['/static/js/wangli_vip.js?v=2016004011'])
+

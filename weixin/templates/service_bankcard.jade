@@ -1,0 +1,71 @@
+-load formatters
+doctype html
+html
+  head
+    title 管理银行卡
+    include include/service_head.jade
+  body
+    .bank-main
+      if p2p_cards
+        for card in p2p_cards
+          if is_one
+            if card.is_the_one_card
+              .bank-list
+                .bank-warp
+                  p.bank-name {{card.bank_name}}
+                  p.bank-num {{card.storable_no | bank_card}}
+                .set-bank-true 已绑定
+              //script.
+              //  var i = 5;
+              //  var setFun = setInterval(function(){
+              //    if(i === 0){
+              //      clearInterval(setFun);
+              //      window.location.href = '/weixin/sub_recharge/';
+              //    }else{
+              //      i--;
+              //    }
+              //  },1000);
+          else
+            .bank-list
+              .bank-warp
+                p.bank-name {{card.bank_name}}
+                p.bank-num {{card.storable_no | bank_card}}
+              .set-bank(data-id='{{card.card_id}}', data-name='{{card.bank_name}}', data-no='{{card.storable_no}}') 待绑定
+
+    if user.wanglibaouserprofile.id_is_valid
+      if not is_one
+        .bank-add-btn
+          if recharge
+            a(href="/weixin/sub_regist_second/?next=/weixin/sub_bankcards/")
+              span.btn-icon +
+              span.btn-click 添加银行卡
+          else
+            a(href="/weixin/sub_regist_second/")
+              span.btn-icon +
+              span.btn-click 添加银行卡
+      else
+        .no-authentication-sign
+          a(href="/weixin/sub_list/").authentication-sign-btn#to-invest(style="display:none") 继续投资
+          a(href="/weixin/sub_recharge/").authentication-sign-btn 去充值
+    else
+      .no-authentication-sign 绑定银行卡要先通过实名认证哦
+          a(href="/weixin/sub_regist_first/").authentication-sign-btn 去实名认证
+
+    if p2p_cards
+      if not is_one
+        .take-dec-list
+          p 温馨提示
+          p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
+          p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
+          p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+          p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+
+    .set-bank-sign
+      .set-body-mask
+        .set-body
+          .bank-card-dec 您正在绑定<br><span class='name'>招商银行</span>尾号<span class='no'>0196</span>的银行卡，</br>如果确认绑定该卡，则 该卡将作为您的唯一提现银行卡。
+          .sign-operation
+            .bank-cancel 取消
+            button(type='submit').bank-confirm 立即绑定
+
+    script(data-init='bankOneCard', src="/static/scripts/subMobile/mobile.js?20160105")

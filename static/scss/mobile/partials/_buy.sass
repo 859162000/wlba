@@ -101,20 +101,24 @@
   .redpack-investamount
     @extend .redpack-for-amount
 .buy-snap-up
-  height: 2.45rem
   width: 92%
   margin-left: 4%
-  border-radius: 0.3rem
-  overflow: hidden
   text-align: center
-  color: #FFFFFF
   .snap-up
+    -webkit-appearance: none
     display: block
+    width: 100%
     background: $head-backgroundColor
     line-height: 2.45rem
+    height: 2.45rem
+    border-radius: 0.3rem
     font-size: 0.85rem
+    color: #FFFFFF
+    border: 0
     &:active
       box-shadow: $active-shadow
+    &:disabled
+      background: rgba(219, 73, 63, 0.498039)
   p
     line-height: 2.45rem
     color: #F0EEEE

@@ -2,6 +2,9 @@
 host = rdsohvmt0mrexk7kuxau1.mysql.rds.aliyuncs.com
 port = 3306
 database = wanglibao
-user = wanglibao
-password = wanglibank
+# Modify by hb on 2015-01-08
+#user = wanglibao
+#password = wanglibank
+user = leon2016
+password = aM7rkbryPpC4
 default-charactor-set = utf8

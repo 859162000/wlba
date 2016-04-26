@@ -1,87 +1,90 @@
-.sidebar
-  background: white
-  margin-top: $space-ssm
+.siderbar-div
+  width: 270px
+  float: left
+  .sidebar
+    background: white
+    margin-top: $space-ssm
 
-.sidebar-title
-  padding: 10px 20px
-  color: #9d9d9d
-  font-size: $font-m
+  .sidebar-title
+    padding: 10px 20px
+    color: #9d9d9d
+    font-size: $font-m
 
-.sidebar-item
-  font-size: $font-m
-  line-height: 45px
-  border-top: 1px dotted lightgray
-  padding: 0 20px
-  text-align: left
-  position: relative
+  .sidebar-item
+    font-size: $font-m
+    line-height: 45px
+    border-top: 1px dotted lightgray
+    padding: 0 20px
+    text-align: left
+    position: relative
 
-  &:first-child
-    border-top: 0
+    &:first-child
+      border-top: 0
 
-  &.active
-    border-left: 3px solid $color-pomegranate
-    background: #F9FAF9
+    &.active
+      border-left: 3px solid $color-pomegranate
+      background: #F9FAF9
 
-    >a
-      +link-colors($color-pomegranate, $color-pomegranate)
+      >a
+        +link-colors($color-pomegranate, $color-pomegranate)
+        cursor: pointer
+
+    a
+      +unstyled-link
+      +link-colors(#666, #333)
+      display: block
+      text-align: center
       cursor: pointer
 
-  a
-    +unstyled-link
-    +link-colors(#666, #333)
-    display: block
-    text-align: center
-    cursor: pointer
-
-.sidebar-secondary
-  .sidebar-item
-    a
-      color: #666
-  .sidebar-item
-    &.active
+  .sidebar-secondary
+    .sidebar-item
       a
-        +link-colors($color-pomegranate, $color-pomegranate)
-.sidebar-item span.newGif
-  background: url(/static/images/NEW.gif) no-repeat center
-  position: absolute
-  left: 2px
-  right: 3px
-  width: 30px
-  height: 30px
-  display: inline-block
-  left: 42px
-  top: 7px
-.sidebar-anchor
-  +unstyled-link
-
-.siderbar-div
-  width: 24%
-  float: left
-  overflow: visible
-
-  &:after
-    content: " " /* Older browser do not support empty content */
-    visibility: hidden
-    display: block
-    height: 0
-    clear: both
-
-.sidebar-secondary
-  margin: 0 auto
-  display: none
-
-  .sidebar-item.active
-    border-width: 0px
-    a
-      border-width: 0px
-
-  .sidebar-item
-    border-width: 0px
-    a
-      border-width: 0px
-
-  a
+        color: #666
+    .sidebar-item
+      &.active
+        a
+          +link-colors($color-pomegranate, $color-pomegranate)
+  .sidebar-item span.newGif
+    background: url(/static/images/NEW.gif) no-repeat center
+    position: absolute
+    left: 2px
+    right: 3px
+    width: 30px
+    height: 30px
+    display: inline-block
+    left: 42px
+    top: 7px
+  .sidebar-anchor
     +unstyled-link
-    +link-colors(#666, $color-pomegranate)
-    cursor: pointer
+
+  .siderbar-div
+    width: 24%
+    float: left
+    overflow: visible
+
+    &:after
+      content: " " /* Older browser do not support empty content */
+      visibility: hidden
+      display: block
+      height: 0
+      clear: both
+
+  .sidebar-secondary
+    margin: 0 auto
+    display: none
+
+    .sidebar-item.active
+      border-width: 0px
+      a
+        border-width: 0px
+
+    .sidebar-item
+      border-width: 0px
+      a
+        border-width: 0px
+
+    a
+      +unstyled-link
+      +link-colors(#666, $color-pomegranate)
+      cursor: pointer
 

@@ -43,13 +43,10 @@ class DecryptParmsAPIView(APIView):
                         token_key += settings.APP_DECRYPT_KEY
                 else:
                     self.params[k] = v
-            logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request_params)
             if self.params.get("param", {}):
                 for key, length in self.params.get("param", {}).iteritems():
                     content = self.params.get(key, "")
                     self.params[key] = getDecryptedContent(token_key, content, int(length))
-            logger.debug("===decrypt in wanglibao_rest.common====self.params:%s"%self.params)
         except Exception, e:
-            print e
-            # logger.debug("===decrypt in wanglibao_rest.common====error:%s"%e.message)
+            logger.debug("===decrypt in wanglibao_rest.common====error:%s"%e.message)
 

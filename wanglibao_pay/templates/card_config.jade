@@ -1,0 +1,112 @@
+- load formatters
+doctype html
+
+head
+    script(src="/static/js/lib/jquery.min.js")
+    link( rel="stylesheet", href="/static/css/bootstrap.min.css")
+
+    script.
+        function unbind_card(unbind_button){
+            var user_id = $('.user-id').text();
+            var card_num =
+                $(unbind_button).closest('tr').children('td.card_num').text();
+            var kuai_code_td =
+                $(unbind_button).closest('tr').children('td.kuai_code');
+            if (kuai_code_td.has('select').length > 0){
+                var kuai_code = kuai_code_td.children('select').val()
+            }else {
+                var kuai_code = kuai_code_td.text()
+            }
+            $.get(window.location, {'user_id': user_id, 'card_num': card_num, 'kuai_code':
+                                    kuai_code});
+            window.location.reload();
+        }
+
+    style
+        table {background-color: #F7F3F3}
+body
+    if phone
+        div(style='display:none').user-id {{user_id}}
+        table.table
+            tr 
+                td 网利卡列表
+            tr
+                th 卡号
+                th 银行
+                th 是否绑定快钱
+                th 是否绑定易宝
+                th 是否为同卡
+                th 编辑
+            for card in wangli_cards
+                tr
+                    td {{ card.no }}
+                    td {{ card.bank.name }}
+                    td 
+                        if card.is_bind_kuai 
+                            是
+                        else
+                            否
+                    td 
+                        if card.is_bind_yee 
+                            是
+                        else
+                            否
+                    td 
+                        if card.is_the_one_card 
+                            是
+                        else
+                            否
+                    td
+                        a(href='/PK7wlbQ4Q9KPs9Io_zOpac/wanglibao_pay/card/{{card.id}}/') 编辑
+        table.table
+            tr 
+                td 快钱卡列表
+            tr
+                 th 快钱卡号
+                 th 网利卡号
+                 th 银行
+                 th 银行代码
+                 th 解除绑定
+            for card_num, card in kuai_cards
+                tr
+                    td(class='card_num') {{ card_num }}
+                    if card
+                        td {{ card.no }}
+                        td {{ card.bank.name }}
+                        td(class='kuai_code') {{ card.bank.kuai_code }}
+                    else
+                        td 未知
+                        td 右侧选择银行后点解绑
+                        td(class='kuai_code')
+                            select
+                                for bank_kuai_code, bank_name in banks_info
+                                    option(value=bank_kuai_code) {{ bank_name }}
+                    td 
+                        button(type='button', class='unbind_button',
+                                onclick='unbind_card(this)') 解绑
+        table.table
+            tr 
+                th 易宝卡列表
+            tr
+                th 易宝卡号
+                th 网利卡号
+                th 银行
+            for card_num, card in yee_cards
+                if card
+                    tr
+                        td {{ card_num }}
+                        td {{ card.no }}
+                        td {{ card.bank.name }}
+                else
+                    tr
+                        td {{ card_num }}
+
+    else
+      form(method="GET" action='')
+         .form-row
+            .span3(style="line-height:40px")
+               label 需解绑用户的手机号码
+            .span9-omega
+               input#id_id_number(type='text', name='phone', placeholder='手机号码')
+         .form-row
+            button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询

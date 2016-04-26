@@ -17,6 +17,10 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.views import AdminIdVerificationView, AdminSendMessageView
 from wanglibao.templatetags.formatters import safe_phone_str, safe_name
 from django.forms.models import BaseInlineFormSet
+from wanglibao_account.models import UserSource
+from wanglibao.settings import ENV, ENV_PRODUCTION
+from .backends import get_verify_result
+from .utils import Xunlei9AdminCallback
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_pay.models import PayInfo
 from .utils import xunleivip_generate_sign
@@ -132,13 +136,14 @@ User.__unicode__ = user_unicode
 
 class IdVerificationAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
+    list_display = ('id', 'user', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
     search_fields = ('name', 'id_number')
     list_filter = ('is_valid', )
+    raw_id_fields = ('user', )
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_idverification'):
-            return ('name', 'id_number', 'is_valid', 'created_at',)
+            return ('user', 'name', 'id_number', 'is_valid', 'created_at',)
         return ()
 
     def has_delete_permission(self, request, obj=None):
@@ -153,14 +158,13 @@ class IdVerificationAdmin(admin.ModelAdmin):
             obj.update_verify = False
 
             # 只有生产环境可以实现更新操作
-            # if ENV == ENV_PRODUCTION:
-            verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
-            obj.description = message
-            if verify_result:
-                obj.is_valid = True
-                if _id_photo:
-                    obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
-
+            if ENV == ENV_PRODUCTION:
+                verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
+                obj.description = message
+                if verify_result:
+                    obj.is_valid = True
+                    if _id_photo:
+                        obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
         obj.save()
 
 
@@ -254,7 +258,8 @@ class BindingAdmin(admin.ModelAdmin):
                                   order_prefix)
 
     def save_model(self, request, obj, form, change):
-        if obj.detect_callback is True and obj.btype == 'xunlei9':
+        # 如果渠道为迅雷用户则执行用户回调补发
+        if obj.detect_callback is True and obj.btype in ('xunlei9', 'mxunlei'):
             obj.detect_callback = False
             order_list = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
             if order_list.exists():

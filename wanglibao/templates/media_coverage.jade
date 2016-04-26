@@ -1,0 +1,37 @@
+-load formatters
+doctype html
+html
+  head
+    - with '媒体报道' as title
+    include global/g_head
+    - endwith
+    meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+    meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+  body
+    include global/g_nav
+    - with '媒体报道' as title
+    include include/about_sidebar
+    - endwith
+    .section
+        .media_box.clearfix
+            .media_list
+                for news in news_list
+                    dl.clearfix
+                        dt
+                            a(href="/news/detail/{{news.id}}",target="_blank")
+                                img(src="/media/{{news.image}}", alt="newsimg")
+                        dd.media_title
+                            a(href="/news/detail/{{news.id}}", target="_blank") {{news.name}}
+                        dd.media_content.postion_dd
+                            a.description(href="/news/detail/{{news.id}}",target="_blank") {{news.description}}
+                            a.link(href="/news/detail/{{news.id}}",target="_blank") [详细介绍]
+                        dd.media_time {{news.created_at|date:"Y-m-d H:i"}}
+
+            .pager
+              - with data=news_list uri='/news/list/'
+              include include/pager
+              - endwith
+    script.
+        require(["/static/src/pc/str.js?v=22"])
+    include global/g_footer
+    include include/tracking

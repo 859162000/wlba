@@ -38,18 +38,19 @@
         font-size: $font-xxl
         margin-right: $space-s
       .green
-        color: #aed372
+        color: #e6e6e6
     .follow-img
       display: block
       width: 110px
       height: 110px
-      margin: 0
-    .ft-weibo-dingyue
+      margin-top: 10px
+    .ft-dingyue
       @include footer-sprite(dingyue)
-    .ft-weibo-fuwu
+    .ft-fuwu
       @include footer-sprite(fuwu)
     .ft-weibo
       display: inline-block
+      @include footer-sprite(weibo)
 
   .footer-ex-warp
     float: right
@@ -80,16 +81,18 @@
   +clearfix()
   a
     display: inline-block
+    vertical-align: middle
     width: 140px
     height: 50px
     margin-right: 8px
   .atn-ssl
-    @include footer-sprite(ssl)
+    @include footer-sprite(footer_geotrust)
   .atn-internet
-    @include footer-sprite(internet)
+    @include footer-sprite(internet) 
   .atn-trust
     @include footer-sprite(trust_update)
-
+  .atn-anquan
+    @include footer-sprite(footer_anquan)
 .line-mod1
   padding-top: 13px
 .line-mod2

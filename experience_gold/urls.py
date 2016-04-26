@@ -16,5 +16,7 @@ urlpatterns = patterns(
                        login_url='/accounts/token_login/'), name="experience_token_login"
         ),
     url(r'^experience/(?P<template>(mobile|gold|redirect|nologin))/$', ExperienceGoldView.as_view(), name="experience_gold"),
+
+    url(r'^experience/explain/$', TemplateView.as_view(template_name="experience_explain.jade")),
 )
 

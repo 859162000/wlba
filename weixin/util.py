@@ -3,14 +3,63 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
 from django.template.loader import get_template
-from .models import WeixinAccounts
+from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord, SceneRecord, UserDailyActionRecord
 from wechatpy import WeChatClient
-
+from wechatpy.exceptions import WeChatException
+from misc.models import Misc
+from experience_gold.backends import SendExperienceGold
+from experience_gold.models import ExperienceEvent
+from django.conf import settings
+from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
+import datetime
+from django.db import transaction
+import logging
+import time
+import json
+import urllib
+import re
+import random
 
-def redirectToJumpPage(message):
+
+
+logger = logging.getLogger("weixin")
+
+BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
+FWH_LOGIN_URL = ""
+FWH_REGISTER_URL = ""
+FWH_UNBIND_URL = ""
+
+def get_fwh_login_url(next=None):
+    m = Misc.objects.filter(key='weixin_qrcode_info').first()
+    if m and m.value:
+        info = json.loads(m.value)
+        if isinstance(info, dict) and info.get("fwh"):
+            original_id = info.get("fwh")
+            account = WeixinAccounts.getByOriginalId(original_id)
+            fwh_login_url = settings.CALLBACK_HOST + "/weixin/sub_login/"
+            if next:
+                fwh_login_url += "?next=%s"%urllib.quote(next)
+                return BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
+            fwh_unbind_url = settings.CALLBACK_HOST + "/weixin/unbind/"
+            global FWH_LOGIN_URL
+            FWH_LOGIN_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
+            global FWH_UNBIND_URL
+            FWH_UNBIND_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_unbind_url, state=original_id)
+            return FWH_LOGIN_URL
+
+
+if not FWH_LOGIN_URL:
+    get_fwh_login_url()
+
+
+def redirectToJumpPage(message, next=None):
     url = reverse('jump_page')+'?message=%s'% message
+    if next:
+        return HttpResponseRedirect(next)
+        # url = reverse('jump_page')+'?message=%s&next=%s'% (message, next)
     return HttpResponseRedirect(url)
 
 def sendTemplate(weixin_user, message_template):
@@ -20,6 +69,103 @@ def sendTemplate(weixin_user, message_template):
     client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
                                  top_color=message_template.top_color, data=message_template.data,
                                  url=message_template.url)
+
+
+def getOrCreateWeixinUser(openid, weixin_account):
+    old_subscribe = 0
+    w_user = WeixinUser.objects.filter(openid=openid).first()
+    if w_user and w_user.subscribe:
+        old_subscribe = 1
+    if not w_user:
+        w_user = WeixinUser()
+        w_user.openid = openid
+        w_user.account_original_id = weixin_account.db_account.original_id
+        w_user.save()
+    if w_user.account_original_id != weixin_account.db_account.original_id:
+        w_user.account_original_id = weixin_account.db_account.original_id
+        w_user.save()
+    if not w_user.nickname or not w_user.subscribe or not w_user.subscribe_time:
+        try:
+            user_info = weixin_account.db_account.get_user_info(openid)
+            w_user.nickname = user_info.get('nickname', "")
+            w_user.sex = user_info.get('sex', 0)
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid =  user_info.get('unionid', '')
+            w_user.province = user_info.get('province', '')
+            w_user.subscribe = user_info.get('subscribe', 0)
+            # if not w_user.subscribe_time:
+            w_user.subscribe_time = user_info.get('subscribe_time', 0)
+            w_user.nickname = filter_emoji( w_user.nickname, "*")
+            w_user.save()
+        except WeChatException, e:
+            logger.debug(e.message)
+            pass
+
+    return w_user, old_subscribe
+
+def filter_emoji(desstr,restr=''):
+    '''
+    过滤表情
+    '''
+    try:
+        co = re.compile(u'[\U00010000-\U0010ffff]')
+    except re.error:
+        co = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
+    return co.sub(restr, desstr)
+
+
+def _process_record(w_user, user, type, describe):
+    war = WeiXinUserActionRecord()
+    war.w_user_id = w_user.id
+    war.user_id = user.id
+    war.action_type = type
+    war.action_describe = describe
+    war.create_time = int(time.time())
+    war.save()
+
+
+def _process_scene_record(w_user, scene_str):
+    sr = SceneRecord()
+    sr.openid = w_user.openid
+    sr.scene_str=scene_str
+    sr.create_time = int(time.time())
+    sr.save()
+
+def bindUser(w_user, user):
+    is_first_bind = False
+    if w_user.user:
+        if w_user.user.id==user.id:
+            return 1, u'你已经绑定, 请勿重复绑定'
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+    other_w_user = WeixinUser.objects.filter(user=user, account_original_id=w_user.account_original_id).first()
+    if other_w_user:
+        msg = u"你的手机号[%s]已经绑定微信[%s]"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
+        return 3, msg
+    w_user.user = user
+    w_user.bind_time = int(time.time())
+    w_user.save()
+    _process_record(w_user, user, 'bind', "绑定网利宝")
+
+    if not user.wanglibaouserprofile.first_bind_time:
+        user.wanglibaouserprofile.first_bind_time = w_user.bind_time
+        user.wanglibaouserprofile.save()
+        is_first_bind = True
+    from tasks import bind_ok
+    bind_ok.apply_async(kwargs={
+        "openid": w_user.openid,
+        "is_first_bind":is_first_bind,
+    },
+                        queue='celery01'
+                        )
+    return 0, u'绑定成功'
+
+def unbindUser(w_user, user):
+    w_user.user = None
+    w_user.unbind_time=int(time.time())
+    w_user.save()
+    _process_record(w_user, user, 'unbind', "解除绑定")
 
 def getAccountInfo(user):
 
@@ -76,3 +222,98 @@ def _generate_ajax_template(content, template_name=None):
         template = Template('<div></div>')
 
     return template.render(context)
+
+
+def process_user_daily_action(user, platform="app", action_type=u'sign_in'):
+
+    if action_type not in [u'share', u'sign_in']:
+        return -1, False, None
+    today = datetime.date.today()
+    yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
+    daily_record = UserDailyActionRecord.objects.filter(user=user, create_date=today, action_type=action_type).first()
+    try:
+        if not daily_record:
+            daily_record = UserDailyActionRecord.objects.create(
+                user=user,
+                action_type=action_type
+            )
+        if daily_record.status:
+            return 1, False, daily_record
+        with transaction.atomic():
+            daily_record = UserDailyActionRecord.objects.select_for_update().filter(user=user, create_date=today, action_type=action_type).first()
+            if daily_record.status:
+                return 1, False, daily_record
+            seg = SendExperienceGold(user)
+            if action_type == u'share':
+                experience_event = getSignExperience_gold(give_mode=u"share")
+            else:
+                experience_event = getSignExperience_gold()
+            if experience_event:
+                experience_record_id, experience_event = seg.send(experience_event.id)
+                daily_record.experience_record_id = experience_record_id
+            daily_record.status=True
+            yesterday_record = UserDailyActionRecord.objects.filter(user=user, create_date=yesterday, action_type=action_type).first()
+            continue_days = 1
+            if yesterday_record:
+                continue_days += yesterday_record.continue_days
+            daily_record.continue_days=continue_days
+            daily_record.platform = platform
+            daily_record.save()
+    except IntegrityError, e:
+        return 2, False, daily_record
+    return 0, True, daily_record
+
+
+def getSignExperience_gold(give_mode=u'weixin_sign_in'):
+    now = timezone.now()
+    query_object = ExperienceEvent.objects.filter(invalid=False, give_mode=give_mode,
+                                                      available_at__lt=now, unavailable_at__gt=now)
+    experience_events = query_object.order_by('amount').all()
+    length = len(experience_events)
+    if length > 1:
+        random_int = random.randint(0, length-1)
+        return experience_events[random_int]
+    return None
+
+from wanglibao_redpack.models import RedPackEvent
+def sendContinueRuleReward(activity_rule):
+    if activity_rule.gift_type == "redpack":
+        redpack_record_ids = ""
+        redpack_ids = activity_rule.redpack.split(',')
+        for redpack_id in redpack_ids:
+            redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+            if not redpack_event:
+                return Response({"ret_code":5,"message":'QMBanquetRewardAPI post redpack_event not exist'})
+            status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, redpack_event, device_type)
+            if not status:
+                return Response({"ret_code":6,"message":messege})
+            redpack_text = "None"
+            if redpack_event.rtype == 'interest_coupon':
+                redpack_text = "%s%%加息券"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                redpack_text = "%s%%百分比红包"%redpack_event.amount
+            if redpack_event.rtype == 'direct':
+                redpack_text = "%s元红包"%int(redpack_event.amount)
+            redpack_txts.append(redpack_text)
+            redpack_record_ids += (str(record.id) + ",")
+            events.append(redpack_event)
+            records.append(record)
+        gift_record.redpack_record_ids = redpack_record_ids
+    if activity_rule.gift_type == "experience_gold":
+        experience_record_ids = ""
+        experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+        if not experience_record_id:
+            return Response({"ret_code":6, "message":'QMBanquetRewardAPI post experience_event not exist'})
+        redpack_txts.append('%s元体验金'%int(experience_event.amount))
+        experience_record_ids += (str(experience_record_id) + ",")
+        gift_record.experience_record_ids = experience_record_ids
+    gift_record.activity_code = self.activity.code
+    gift_record.activity_code_time = timezone.now()
+    gift_record.save()
+
+def getMiscValue(key):
+    m = Misc.objects.filter(key=key).first()
+    info = {}
+    if m and m.value:
+        info = json.loads(m.value)
+    return info

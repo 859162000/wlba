@@ -1,6 +1,6 @@
 
 
-.sign-main
+.sign-main,.sign-main-error
   overflow: hidden
   position: fixed
   top: 0
@@ -38,8 +38,18 @@
       display: block
       font-size: $font-size14
       color: $color-4e7cda
+    .next-btn
+      height: 1rem
+      line-height: 1rem
+      margin-top: 0.5rem
     .callban-url
       display: -webkit-box
       a
         -webkit-box-flex: 1
         text-align: center
+
+.sign-main-error
+  .sign-body
+    .sign-tit
+      padding: 0 1rem
+      font-size: 0.8rem

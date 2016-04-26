@@ -4,9 +4,7 @@ from django.utils import timezone
 # Register your models here.
 from wanglibao_pay.models import Bank, PayInfo, Card, WithdrawCard, WithdrawCardRecord, WhiteListCard, BlackListCard
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
-    AdminTransaction
-# , 'channel', 'type'
-
+    AdminTransaction, CardConfigTemplateView
 
 class PayInfoStatusFilter(admin.SimpleListFilter):
     title = u'状态'
@@ -114,13 +112,15 @@ class CardAdmin(admin.ModelAdmin):
         return obj.user.wanglibaouserprofile.phone
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
     def has_add_permission(self, request):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        return [f.name for f in self.model._meta.fields]
+        editable_fields = ['is_bind_kuai', 'is_bind_yee', 'is_the_one_card']
+        return [f.name for f in self.model._meta.fields if f.name not in
+                editable_fields]
 
     get_phone.short_description = u'手机'
 
@@ -176,5 +176,7 @@ admin.site.register_view('pay/withdraw/audit', view=WithdrawTransactions.as_view
 admin.site.register_view('pay/withdraw/rollback', view=WithdrawRollback.as_view(), name=u'提现申请失败回滚页面')
 
 admin.site.register_view('pay/transaction', view=AdminTransaction.as_view(),name=u'交易记录详情')
+
+admin.site.register_view('pay/card/config/', view=CardConfigTemplateView.as_view(), name=u'用户卡管理', urlname='card_config')
 
 

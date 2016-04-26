@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import logging
@@ -13,6 +12,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponseBadRequest
 from django.template.loader import get_template
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -28,6 +28,7 @@ from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.models import IdVerification
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.exceptions import ThirdPayError, ManyCardException, AbnormalCardException
@@ -39,6 +40,7 @@ from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
+from wanglibao_pay.third_pay import TheOneCard
 from wanglibao_pay.third_pay import process_for_bind_card
 from wanglibao_pay.util import get_client_ip, fmt_two_amount
 from wanglibao_pay import util
@@ -59,6 +61,7 @@ from wanglibao_rest import utils as rest_utils
 from weixin.models import WeixinUser
 from wanglibao_rest.common import DecryptParmsAPIView
 from marketing.tools import withdraw_submit_ok
+from misc.models import Misc
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -76,9 +79,14 @@ class BankListView(TemplateView):
         default_bank = Bank.get_deposit_banks().filter(
             name=self.request.user.wanglibaouserprofile.deposit_default_bank_name).first()
 
+        try:
+            bank_num = int(Misc.objects.get(key='pc_bank_num').value)
+        except:
+            bank_num = 16
+        #bank_num = 20
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:14],
+            'banks': Bank.get_deposit_banks()[:bank_num],
             'announcements': AnnouncementAccounts
         })
         return context
@@ -188,6 +196,7 @@ class PayView(TemplateView):
             result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device_type)
         else:
             result = HuifuPay().pre_pay(request)
+
         return self.render_to_response(result)
 
     @method_decorator(csrf_exempt)
@@ -408,13 +417,20 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
+            try:
+                device = split_ua(request)
+            except:
+                device = {'device_type':'pc'}
+            
             name = user.wanglibaouserprofile.name or u'用户'
             withdraw_submit_ok.apply_async(kwargs={
                 "user_id": user.id,
                 "user_name": name,
                 "phone": user.wanglibaouserprofile.phone,
                 "amount": amount,
-                "bank_name": card.bank.name
+                "bank_name": card.bank.name,
+                "order_id": order.id,
+                "device": device
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -513,6 +529,11 @@ class CardViewSet(ModelViewSet):
                                 "message": u"没有找到该银行",
                                 'error_number': ErrorNumber.not_find
                             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # passport user
+        if not request.user.wanglibaouserprofile.id_number[0].isdigit():
+            card.is_bind_yee = True
+            card.is_bind_kuai = True
 
         card.save()
 
@@ -1151,6 +1172,10 @@ class WithdrawAPIView(DecryptParmsAPIView):
 
         # 短信通知添加用户名
         user = request.user
+        try:
+            device = split_ua(request)
+        except:
+            device = {'device_type':'pc'}
         name = user.wanglibaouserprofile.name or u'用户'
         if not result['ret_code']:
             withdraw_submit_ok.apply_async(kwargs={
@@ -1158,7 +1183,9 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "user_name": name,
                 "phone": request.user.wanglibaouserprofile.phone,
                 "amount": result['amount'],
-                "bank_name": result['bank_name']
+                "bank_name": result['bank_name'],
+                "order_id": result['order_id'],
+                "device": device
             })
         return Response(result)
 
@@ -1223,3 +1250,114 @@ class YeeShortPayCallbackView(APIView):
         request.GET = request.DATA
         result = third_pay.yee_callback(request)
         return Response(result)
+
+class UnbindCardTemplateView(TemplateView):
+    """
+    同卡进出，提供给客服的解绑页面
+    """
+    template_name = 'unbind_card.jade'
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone')
+        if not phone:
+            return {'phone': None}
+
+        #解绑
+        profile = WanglibaoUserProfile.objects.get(phone=phone)
+        the_one_card = TheOneCard(profile.user)
+        if self.request.GET.get('unbind'):
+            the_one_card.unbind()
+
+        #返回用户名，电话，身份证，发卡行，卡号，有图像返回图像
+        try:
+            card = the_one_card.get()
+            card_number = card.no
+            bank_name = card.bank.name
+        except:
+            card_number = None
+            bank_name = None
+        try:
+            avatar_url = IdVerification.objects.filter(id_number=profile.id_number).first().id_photo.url
+        except:
+            avatar_url = None
+
+        print avatar_url
+        return {'name': profile.name, 'phone': profile.phone, 'social_id': profile.id_number,
+                'bank_name': bank_name, 'card_number': card_number, 'avatar_url': avatar_url}
+
+
+
+class CheckRechargePayinfoView(APIView):
+    '''检查用户是否成功充值过'''
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        user = request.user
+        pay_info = PayInfo.objects.filter(user=request.user)
+        messages = {}
+        if pay_info.filter(status="成功"):
+            messages['recharge'] = True
+        else:
+            messages['recharge'] = False
+        
+        return Response(json.dumps(messages))
+        
+class CardConfigTemplateView(TemplateView):
+    """
+    管理银行卡，到第三方解绑的页面
+    """
+    template_name = 'card_config.jade'
+    def _get_wangli_card(self, card_num, wangli_cards):
+        for c in wangli_cards:
+            if card_num == c.no[:6] + c.no[-4:]:
+                return (card_num, c)
+        return (card_num, None)
+
+    def _get_wangli_cards(self, card_num_list, wangli_cards):
+        return [self._get_wangli_card(c, wangli_cards) for c in card_num_list] 
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone')
+        # 电话页面 
+        if not phone:
+            return {'phone': None}
+
+        # 解绑快钱卡
+        user_id = self.request.GET.get('user_id')
+        card_num = self.request.GET.get('card_num')
+        kuai_code = self.request.GET.get('kuai_code')
+        if user_id and card_num and kuai_code:
+            third_pay.KuaiShortPay().unbind_card(card_num, kuai_code, user_id)
+        
+        # 显示卡列表
+        profile = WanglibaoUserProfile.objects.get(phone=phone)
+        user = profile.user
+
+        wangli_cards = Card.objects.filter(user=user).all()
+        kuai_cards = third_pay.KuaiShortPay().query_bind_new(user.id)['cards']
+        kuai_cards = self._get_wangli_cards(kuai_cards, wangli_cards)
+        yee_cards = third_pay.YeeShortPay().bind_card_query(user) 
+        yee_cards = [c['card_top'] + c['card_last'] for c in yee_cards['data']['cardlist']]
+        yee_cards = self._get_wangli_cards(yee_cards, wangli_cards)
+        banks_info = [(b.kuai_code, b.name) for b in Bank.objects.all()]
+
+        res = {'user_id': profile.user_id, 'phone': phone, 'name': profile.name, 'wangli_cards': wangli_cards,
+                'kuai_cards': kuai_cards, 'yee_cards': yee_cards, 'banks_info':
+                banks_info}
+        return res
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

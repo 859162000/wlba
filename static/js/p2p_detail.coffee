@@ -1,15 +1,3 @@
-require.config
-  paths:
-    jquery: 'lib/jquery.min'
-    underscore: 'lib/underscore-min'
-    tools: 'lib/modal.tools'
-    "jquery.validate": 'lib/jquery.validate.min'
-    'jquery.modal': 'lib/jquery.modal.min'
-    ddslick: 'lib/jquery.ddslick'
-
-  shims:
-    "jquery.validate": ['jquery']
-    "ddslick": ['jquery']
 
 require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], ($, _, backend, calculator, countdown, tool, modal)->
   isFirst = true
@@ -186,49 +174,56 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         return
 
       tip = '您的投资金额为:' + $('input[name=amount]').val() + '元'
-      tool.modalConfirm({title: '温馨提示', msg: tip, callback_ok: ()->
-        product = $('input[name=product]').val()
-        amount = $('input[name=amount]').val()
-        redpack_id = $('.dd-selected-value').val()
-#        validate_code = $('input[name=validate_code]').val()
-        backend.purchaseP2P {
-          product: product
-          amount: amount
-          redpack: redpack_id
-#          validate_code: validate_code
-        }
-        .done (data)->
-
-          tool.modalAlert({height:'364px', title: '温馨提示', msg: '<a href="/activity/pc_caipiao/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功', callback_ok: ()->
-            if data.category == '酒仙众筹标'
-              window.location.href="/accounts/home/jiuxian/"
-            else
-              window.location.href="/accounts/home"
+      tool.modalAlert({title: '温馨提示', msg: tip, callback_ok: ()->
+        if $('#id-is-valid').val() == 'False'
+          tool.modalAlert({
+            title: '温馨提示', msg: '请先进行实名认证', callback_ok: ()->
+              window.location.href = '/accounts/id_verify/'
           })
-
-        .fail (xhr)->
-          result = JSON.parse xhr.responseText
-          if result.error_number == 1
-            $('.login-modal').trigger('click')
-            return
-          else if result.error_number == 2
-            $('#id-validate').modal()
-            return
-          else if result.error_number == 4 && result.message == "余额不足"
-            tool.modalAlert({btnText:"去充值", title: '温馨提示', msg: result.message, callback_ok: ()->
-              window.location.href = '/pay/banks/'
-            })
-            return
-
-          message = result.message
-          error_message = ''
-          if $.type(message) == 'object'
-            error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
-          else
-            error_message = message
-
-          tool.modalAlert({title: '温馨提示', msg: error_message})
+        else
+          purchaseFun()
       })
+  purchaseFun = () ->
+    product = $('input[name=product]').val()
+    amount = $('input[name=amount]').val()
+    redpack_id = $('.dd-selected-value').val()
+  #        validate_code = $('input[name=validate_code]').val()
+    backend.purchaseP2P {
+      product: product
+      amount: amount
+      redpack: redpack_id
+  #          validate_code: validate_code
+    }
+    .done (data)->
+
+      tool.modalAlert({height:'200px', title: '温馨提示', msg: '份额认购成功', callback_ok: ()->
+        if data.category == '酒仙众筹标'
+          window.location.href="/accounts/home/jiuxian/"
+        else
+          window.location.href="/accounts/home"
+      })
+
+    .fail (xhr)->
+      result = JSON.parse xhr.responseText
+      if result.error_number == 1
+        $('.login-modal').trigger('click')
+        return
+      else if result.error_number == 2
+      else if result.error_number == 4 && result.message == "余额不足"
+        tool.modalAlert({btnText:"去充值", title: '温馨提示', msg: result.message, callback_ok: ()->
+          window.location.href = '/pay/banks/'
+        })
+        return
+
+      message = result.message
+      error_message = ''
+      if $.type(message) == 'object'
+        error_message = _.chain(message).pairs().map((e)->e[1]).flatten().value()
+      else
+        error_message = message
+
+      tool.modalAlert({title: '温馨提示', msg: error_message})
+
 
   $("#get-validate-code-buy").click () ->
     element = this

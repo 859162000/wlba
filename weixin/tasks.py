@@ -9,9 +9,10 @@ from django.conf import settings
 from django.utils import timezone
 import datetime
 
-from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
+from wechatpy import WeChatClient
+from weixin.models import SubscribeRecord, SubscribeService, WeixinUser, WeixinAccounts
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
-from weixin.util import sendTemplate
+from weixin.util import sendTemplate, getMiscValue
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
@@ -64,11 +65,11 @@ def detect_product_biding(product_id):
             rate_desc = "%s%%"%product.expected_earning_rate
         if is_day_product:
             day_service = SubscribeService.objects.filter(channel='weixin', is_open=True, type=1).first()
-
-            sub_records = SubscribeRecord.objects.filter(service=day_service, status=True).all()
-            for sub_record in sub_records:
-                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
-                    _sendProductToUser(sub_record.w_user.openid, day_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+            if day_service:
+                sub_records = SubscribeRecord.objects.filter(service=day_service, status=True).all()
+                for sub_record in sub_records:
+                    if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                        _sendProductToUser(sub_record.w_user.openid, day_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
 
         else:
             services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
@@ -79,13 +80,24 @@ def detect_product_biding(product_id):
                         if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
                             _sendProductToUser(sub_record.w_user.openid, service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
 
+        finance_service = SubscribeService.objects.filter(channel='weixin', finance_type=product.types.fiance_type, is_open=True, type=2).first()
+        if finance_service:
+            sub_records = SubscribeRecord.objects.filter(service=finance_service, status=True).all()
+            for sub_record in sub_records:
+                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                    _sendProductToUser(sub_record.w_user.openid, finance_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+
+
+
+
+
 
 @app.task
 def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):
     w_user = WeixinUser.objects.filter(openid=openid).first()
     product = P2PProduct.objects.get(pk=product_id)
     if w_user and w_user.subscribe==1 and w_user.user and product.status == u'正在招标':
-        url = settings.CALLBACK_HOST + '/weixin/view/detail/%s/'%product_id
+        url = settings.CALLBACK_HOST + '/weixin/sub_detail/detail/%s/'%product_id
         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)
@@ -105,3 +117,19 @@ def sentTemplate(kwargs):
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if w_user and template and w_user.subscribe:
         sendTemplate(w_user, template)
+
+@app.task
+def sentCustomerMsg(txt, openid):
+    fwh_info = getMiscValue("weixin_qrcode_info")
+    original_id = fwh_info.get("fwh")
+    if original_id:
+        weixin_account = WeixinAccounts.getByOriginalId(original_id)
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+        client.message._send_custom_message({
+                                    "touser":openid,
+                                    "msgtype":"text",
+                                    "text":
+                                    {
+                                        "content": txt
+                                    }
+                                }, account="007@wanglibao400")

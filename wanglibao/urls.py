@@ -19,8 +19,9 @@ from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
-from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
-    ResponsibilityView, ContactView, AgreementView, DirectorateView, AgreementAutoView
+from wanglibao_banner.views import (HiringView, AboutView, CompanyView, TeamView, MilestoneView,
+                                    ResponsibilityView, ContactView, AgreementView, DirectorateView,
+                                    AgreementAutoView, DynamicHomeView, DynamicDetailView)
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
@@ -48,11 +49,13 @@ urlpatterns = patterns(
     url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
     url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
 
-    url(r'^fund/products/', FundProductsView.as_view(), name="fund_home"),
-    url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
+    # Comment by hb on 2016-04-25
+    #url(r'^fund/products/', FundProductsView.as_view(), name="fund_home"),
+    #url(r'^fund/detail/(?P<id>\w+)', FundDetailView.as_view(), name="fund_detail"),
 
-    url(r'^cash/products/', CashHomeView.as_view(), name="cash_home"),
-    url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
+    # Comment by hb on 2016-04-25
+    #url(r'^cash/products/', CashHomeView.as_view(), name="cash_home"),
+    #url(r'^cash/detail/(?P<id>\w+)', CashDetailView.as_view(), name="cash_detail"),
 
     url(r'^p2p/', include('wanglibao_p2p.urls')),
 
@@ -73,6 +76,8 @@ urlpatterns = patterns(
 
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', HiringView.as_view(), name="hiring"),
+    url(r'^dynamic/$', DynamicHomeView.as_view(), name="dynamic"),
+    url(r'^dynamic/detail/(?P<id>\d+)/$', DynamicDetailView.as_view(), name="dynamic_detail"),
     url(r'^about/', AboutView.as_view(), name='about'),
     url(r'^company/', CompanyView.as_view(), name="company"),
     url(r'^team/', TeamView.as_view(), name="team"),
@@ -104,6 +109,8 @@ urlpatterns = patterns(
 
     url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
     url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),
+    url(r'^generalize', TemplateView.as_view(template_name="client_generalize.jade")),
+    url(r'^qiye/', include('wanglibao_qiye.urls')),
 )
 
 urlpatterns += patterns(

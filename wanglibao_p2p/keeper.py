@@ -27,7 +27,7 @@ import json
 from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
-
+from wanglibao_profile.models import RepeatPaymentUser, RepeatPaymentUserRecords
 
 
 logger = logging.getLogger(__name__)
@@ -519,6 +519,54 @@ class AmortizationKeeper(KeeperBaseMixin):
                 sub_amo.save()
                 
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
+
+                # 加入重复回款的用户还需要扣回的金额及扣款操作
+                try:
+                    repeat_user = RepeatPaymentUser.objects.select_for_update()\
+                        .filter(user_id=sub_amo.user.id, amount__gt=0).first()
+                    if repeat_user:
+                        repeat_amount = repeat_user.amount
+                        # if repeat_amount > 0:
+                        # 判断是否每天从回款中扣款
+                        is_every_day = True
+                        if not repeat_user.is_every_day:
+                            product_ids = repeat_user.product_ids.split(',')
+                            product_ids = [int(p_id) for p_id in product_ids if p_id.strip() != '']
+                            # 判断当期还款的产品id是否在用户新购标的id中, 不在说明该标不用扣款
+                            if product.id not in product_ids:
+                                is_every_day = False
+
+                        if is_every_day:
+                            # 判断剩余应扣金额是否大于等于本期回款本息之合, 大于等于,则扣本息,否则扣剩余应扣金额
+                            if repeat_amount >= amo_amount:
+                                reduce_amount = amo_amount
+                                reduce_amount_current = repeat_amount - amo_amount  # 剩余应扣金额-本次扣除的本息之合
+                            else:
+                                reduce_amount = repeat_amount
+                                reduce_amount_current = 0
+
+                            print ("repeat_amount: %s, amo_amount: %s, type1:%s, type2:%s" % (
+                                repeat_amount, amo_amount, type(repeat_amount), type(amo_amount)))
+
+                            # 减账户余额
+                            user_margin_keeper.reduce_margin(reduce_amount, u'系统重复回款扣回%s元' % reduce_amount)
+
+                            # 更新剩余应扣金额
+                            repeat_user.amount = reduce_amount_current
+                            repeat_user.save()
+
+                            # 记录扣款流水
+                            repeat_record = RepeatPaymentUserRecords(user_id=sub_amo.user.id,
+                                                                     name=sub_amo.user.wanglibaouserprofile.name,
+                                                                     phone=sub_amo.user.wanglibaouserprofile.phone,
+                                                                     amount=reduce_amount,
+                                                                     amount_current=reduce_amount_current,
+                                                                     description=description)
+                            repeat_record.save()
+                except Exception:
+                    logger.exception('err')
+                    logger.error("用户扣款失败,用户id:[%s], 回款本息合计:[%s]" % (sub_amo.user, amo_amount))
+                    pass
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
                 message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,

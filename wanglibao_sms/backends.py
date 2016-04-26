@@ -2,6 +2,8 @@
 # encoding:utf-8
 
 from django.conf import settings
+import sys
+import urllib
 import time
 import json
 import hashlib
@@ -57,7 +59,7 @@ class ManDaoSMSBackEnd(SMSBackEnd):
 
         url = settings.SMS_MANDAO_URL
 
-        #if len(phones) > 1 and len(messages) == 1:
+        # if len(phones) > 1 and len(messages) == 1:
         if len(phones) > 1 and len(messages) > 1:
             url = settings.SMS_MANDAO_MULTICAST_URL
         try:
@@ -69,8 +71,8 @@ class ManDaoSMSBackEnd(SMSBackEnd):
 
         if ext:
             params = {
-                'sn': settings.SMS_MANDAO_SN_MARKETING,
-                'pwd': settings.SMS_MANDAO_MD5_PWD_MARKETING,
+                'sn': settings.SMS_MANDAO_SN,
+                'pwd': settings.SMS_MANDAO_MD5_PWD,
                 'mobile': phone,
                 'content': text,
                 'ext': ext,
@@ -80,8 +82,8 @@ class ManDaoSMSBackEnd(SMSBackEnd):
             }
         else:
             params = {
-                'sn': settings.SMS_MANDAO_SN,
-                'pwd': settings.SMS_MANDAO_MD5_PWD,
+                'sn': settings.SMS_MANDAO_SN_MARKETING,
+                'pwd': settings.SMS_MANDAO_MD5_PWD_MARKETING,
                 'mobile': phone,
                 'content': text,
                 'ext': '',
@@ -90,7 +92,7 @@ class ManDaoSMSBackEnd(SMSBackEnd):
                 'msgfmt': ''
             }
 
-        response = requests.post(url, params)
+        response = requests.post(url, params, timeout=5)
 
         status_code = 200
         message = None
@@ -182,9 +184,61 @@ class YTXVoice:
                 return 200, content
         return 500, content
 
+
+class VoiceCodeVerify(object):
+    """
+    汇讯群呼语音验证码(快易通)
+    """
+
+    def __init__(self):
+        self.voice_url = settings.VOICE_HX_URL
+        self.voice_uid = settings.VOICE_HX_UID
+        self.voice_pwd = settings.VOICE_HX_PWD
+        self.msg_text = '您的网利宝验证码为 '
+
+    def verify(self, mobile, voice_code, msgid):
+        """
+        :param: url:  http://ip:port/sdk/SMS?cmd=sendvoice&uid=&psw=&mobiles=&msgid=&msg=
+        :return: response_status, response_text:
+            '100': u'发送成功',
+            '101': u'失败',
+            '102': u'验证失败(密码不对)',
+            '103': u'号码有错(接收号码格式错误)',
+            '104': u'内容有错(敏感内容)',
+            '105': u'操作频率过快(每秒十次)',
+            '106': u'限制发送(无条数)',
+            '107': u'参数不全(请查看提交的参数)'
+        """
+        response_params = {
+            '100': u'发送成功',
+            '101': u'发送失败',
+            '102': u'验证失败',
+            '103': u'手机号码错误',
+            '104': u'内容有错',
+            '105': u'操作频率过快',
+            '106': u'限制发送',
+            '107': u'参数不全'
+        }
+        msg_tmp = self.msg_text + ' '.join(str(voice_code))
+        msg = urllib.quote(msg_tmp.decode('UTF-8').encode('gbk'))
+
+        url = self.voice_url + '?cmd=sendvoice&uid={}&psw={}&mobiles={}&msgid={}&msg={}'.format(
+            self.voice_uid, self.voice_pwd, mobile, msgid, msg
+        )
+
+        response = requests.post(url, timeout=5)
+
+        if response.status_code != 200:
+            response_status = response.status_code
+            response_text = u"发送失败"
+        else:
+            response_status = response.text
+            response_text = response_params[str(response.text)]
+
+        return response_status, response_text
+
+
 if __name__ == "__main__":
-    #EmaySMS.register()
-    #EmaySMS.send_messages("18664387989", [u"abcdefg中国李振璟"])
-    EmaySMS.balance()
-    EmaySMS.get_report()
-    #backends.YTXVoice.verify("18637172100", "123456")
+    # EmaySMS.balance()
+    # EmaySMS.get_report()
+    VoiceCodeVerify().verify("15038038823", "123456", "100")

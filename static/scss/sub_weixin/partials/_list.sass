@@ -111,16 +111,15 @@ footer
     display: block
     height: 100%
 
-
 .list-body
   //margin-bottom: 2.95rem
 .list-section
   position: relative
-  margin-bottom: $margin-bottom
+  margin-top: $margin-bottom
   border-top: 1px solid #e8e8e8
   background: #fff
-  &:last-child
-    margin-bottom: 0
+  padding-bottom: 0.95rem
+  border-bottom: 2px solid #e8e8e8
   &:active
     background: $active-color
 .section-head
@@ -141,17 +140,15 @@ footer
     border-bottom-right-radius: .75rem
     border-top-right-radius: .75rem
   .head-tit
-    margin-left: .55rem
+    margin-left: .75rem
     color: $list-titColor
 .section-body
-  display: -webkit-box
   font-size: $body-fontSize
-  border-bottom: 2px solid #e8e8e8
+
   .body-left
-    -webkit-box-flex: 1
     display: -webkit-box
     -webkit-box-align: end
-    padding: 0.53rem 0 0.53rem 0.75rem
+    padding: 0.53rem 0.75rem
   .body-Profit
     -webkit-box-flex: 1
   .profit-cont
@@ -159,6 +156,7 @@ footer
     display: inline-block
   .profit-math
     position: relative
+    color: #FF4C2E
     .profit-num
       font-size: 1.275rem
       line-height: 1.275rem
@@ -168,18 +166,15 @@ footer
   .profit-blue
     .profit-num,.prpfit-add
       color: #f26a6a
-    .profit-sign
-      color: #fac3c3
     .profit-addNum
-      color: #4e7cda
+      color: #2196f3
     .profit-addNumsign
-      color: #abccf7
+      color: #2196f3
   .profit-hui
     .profit-num,.prpfit-add,.profit-addNum
       color: $list-titColor
     .profit-sign,.profit-addNumsign
       color: #989898
-
 
   .profit-tit
     position: relative
@@ -201,7 +196,9 @@ footer
         font-size: 1.05rem
         font-style: normal
         color: $list-titColor
-
+    &.body-price
+      .time-num, .time-tit
+        text-align: right
   .body-right
     width: 4.685rem
     padding: 0 .75rem .5rem 0
@@ -228,6 +225,20 @@ footer
     .btn-grey
       border: 1px solid $protucd-grey
       color: $protucd-grey
+  .body-line-box
+    position: relative
+    height: 0.08rem
+    margin: 0 0.75rem
+    .grey-line, .red-line
+      top: 0
+      left: 0
+      position: absolute
+      height: 100%
+    .grey-line
+      width: 100%
+      background: #eaeaea
+    .red-line
+      background: #FF4C2E
 .progress-broderNormal
   border-bottom: 1px solid #e8e8e8
 .section-progressd
@@ -245,10 +256,64 @@ footer
     margin-bottom: .3rem
   .load
     height: .4rem
-    background: url("/static/imgs/mobile/list/list_down.png") no-repeat center
+    background: url("/static/imgs/sub_weixin/list/list_down.png") no-repeat center
     background-size: 1.1rem
 
-
+//顶部
+.red-btn
+  background: #FF4C2E
+  color: #fff
+  text-align: center
+  +border-radius(0.2rem)
+  display: block
+  padding: 0.5rem 0
+.top-account
+  background: url("/static/imgs/sub_weixin/list/top-bg.png") left bottom repeat-x
+  width: 100%
+  height: 3.625rem
+  color: $color-grey-6b6b6b
+  font-size: $font-size15
+  padding: 0 0.5rem
+  .top-account-box
+    display: -webkit-box
+    -webkit-box-align: center
+    height: 3.35rem
+  .tel-box, .money-box, .rechare-btn-box
+    -webkit-box-flex: 1
+  .red-btn
+    color: #fff
+    font-size: $font-size15
+    padding: 0.4rem 0.2rem
+  .red
+    color: #FF4C2E
+.list-body-none
+  margin-top: 3rem
+  .none-img-box
+    text-align: center
+  .none-tit
+    color: #999
+    font-size: $font-size12
+    line-height: 1rem
+    text-align: center
+    margin-top: 0.8rem
+.none-btn-box
+  display: -webkit-box
+  width: 100%
+  padding: 0 0.25rem
+  margin-top: 2rem
+  a
+    display: block
+    -webkit-box-flex: 1
+    margin: 0 0.25rem
+    font-size: $font-size16
+    padding: 0.5rem 0
+    &.white-btn
+      background: #fff
+      color: $color-db493f
+      +border-radius(0.2rem)
+      text-align: center
+    &.red-btn
+      background: $color-db493f
 
 
 

@@ -36,7 +36,7 @@ from wanglibao_sms.utils import send_validation_code, validate_validation_code, 
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_profile.models import WanglibaoUserProfile, ActivityUserInfo
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
@@ -52,16 +52,22 @@ from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, get_channel_record
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
+from wanglibao_margin.models import MarginRecord
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
 import requests
-
+from weixin.models import WeixinUser
+from weixin.util import bindUser
+import urllib
+from wanglibao_geetest.geetest import GeetestLib
+from wanglibao_profile.forms import ActivityUserInfoForm
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -107,10 +113,15 @@ class SendValidationCodeView(APIView):
             descrpition: if...else(line98~line101)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -119,6 +130,22 @@ class SendValidationCodeView(APIView):
         return Response({
                             'message': message
                         }, status=status)
+
+
+    def validate_captcha(self, request):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        #status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
 
 
 class TestSendRegisterValidationCodeView(APIView):
@@ -143,9 +170,11 @@ class TestSendRegisterValidationCodeView(APIView):
         phone_validate_code_item.save()
         return Response({"ret_code":0, "message":"ok", "vcode":phone_validate_code_item.validate_code})
 
+
 class SendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
+    该接口须要先验证图片验证码
     """
     permission_classes = ()
     # throttle_classes = (UserRateThrottle,)
@@ -156,6 +185,7 @@ class SendRegisterValidationCodeView(APIView):
             descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
             return Response({"message": u"该手机号已经被注册，不能重复注册", 
@@ -165,16 +195,39 @@ class SendRegisterValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
 
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
-        return Response({'message': message, "type":"validation"}, status=status)
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
+        return Response({'message': message, "type": "validation"}, status=status)
+
+    def validate_captcha(self, request):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
+
+
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
+
 
 class WeixinSendRegisterValidationCodeView(APIView):
     """
@@ -199,20 +252,12 @@ class WeixinSendRegisterValidationCodeView(APIView):
                                 "error_number": ErrorNumber.duplicate
                             }, status=400)
 
-        #phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        #if phone_validate_code_item:
-        #    count = phone_validate_code_item.code_send_count
-        #    if count > 6:
-        #        return Response({
-        #                            "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-        #                            "error_number": ErrorNumber.duplicate
-        #                        }, status=400)
-
-        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        # ext=777,为短信通道内部的发送渠道区分标识
+        # 仅在用户注册时使用
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({
                             'message': message
                         }, status=status)
-
 
 
 class RegisterAPIView(DecryptParmsAPIView):
@@ -365,7 +410,15 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-
+        try:
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh':
+                openid = request.session.get('openid')
+                if openid:
+                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                    bindUser(w_user, request.user)
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
@@ -474,9 +527,16 @@ class PushTestView(APIView):
 
 
 class IdValidateAPIView(APIView):
+    """
+    APP端实名认证接口
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({"ret_code": 30056, "message": u"企业用户无法通过此方式认证"})
+
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
         device = split_ua(request)
@@ -487,27 +547,29 @@ class IdValidateAPIView(APIView):
         user = request.user
         profile = WanglibaoUserProfile.objects.filter(user=user).first()
         if profile.id_is_valid:
-            return Response({"ret_code": 30055, "message": u"您已认证通过，请勿重复认证。如有问题，请联系客服 4008-588-066"})
+            return Response({"ret_code": 30055, "message": u"您已认证通过，无需再认证，请重新登录查看最新状态"})
 
         verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
         if verify_counter.count >= 3:
-            return Response({"ret_code": 30052, "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066"})
+            return Response({"ret_code": 30052, "message": u"验证错误次数频繁，请联系客服 4008-588-066"})
 
         id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
         if id_verify_count >= 1:
-            return Response({"ret_code": 30053, "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066"})
+            return Response({"ret_code": 30053, "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066"})
 
         try:
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
         except:
-            return Response({"ret_code": 30054, "message": u"验证失败，拨打客服电话进行人工验证"})
+            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
 
         verify_counter.count = F('count') + 1
         verify_counter.save()
 
         if error or not verify_record.is_valid:
-            return Response({"ret_code": 30054, "message": u"验证失败，拨打客服电话进行人工验证"})
+            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
 
         user.wanglibaouserprofile.id_number = id_number
         user.wanglibaouserprofile.name = name
@@ -525,6 +587,9 @@ class IdValidateAPIView(APIView):
 
 
 class SendVoiceCodeAPIView(APIView):
+    """
+    汇讯群呼(快易通)语音短信验证码接口
+    """
     permission_classes = ()
 
     def post(self, request):
@@ -538,11 +603,11 @@ class SendVoiceCodeAPIView(APIView):
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
         if phone_validate_code_item:
             count = phone_validate_code_item.code_send_count
-            if count >= 6:
+            if count >= 10:
                 return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
 
-            phone_validate_code_item.code_send_count += 1
-            phone_validate_code_item.save()
+                # phone_validate_code_item.code_send_count += 1
+                # phone_validate_code_item.save()
         else:
             now = timezone.now()
             phone_validate_code_item = PhoneValidateCode()
@@ -554,12 +619,65 @@ class SendVoiceCodeAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
-        logger.info("voice_code: %s" % cont)
-        return Response({"ret_code": 0, "message": "ok"})
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
+        return Response({"ret_code": 0, "message": 'ok'})
+
+
+class SendVoiceCodeNewAPIView(APIView):
+    """
+    汇讯群呼(快易通)语音短信验证码接口
+    """
+    # TODO 此接口节后需要优化去掉
+    permission_classes = ()
+
+    def post(self, request):
+        phone_number = request.DATA.get("phone", "").strip()
+        if not phone_number or not phone_number.isdigit():
+            return Response({"ret_code": 30111, "message": u"信息输入不完整"})
+
+        if not re.match("^((13[0-9])|(15[^4,\\D])|(14[5,7])|(17[0,5,9])|(18[^4,\\D]))\\d{8}$", phone_number):
+            return Response({"ret_code": 30112, "message": u"手机号输入有误"})
+
+        # 验证图片验证码
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({"ret_code": 30114, "message": message})
+
+        phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
+        # 语音验证码次数不加1
+        if phone_validate_code_item:
+            count = phone_validate_code_item.code_send_count
+            if count >= 10:
+                return Response({"ret_code": 30113, "message": u"该手机号验证次数过于频繁，请联系客服人工注册"})
+
+            # phone_validate_code_item.code_send_count += 1
+            # phone_validate_code_item.save()
+        else:
+            now = timezone.now()
+            phone_validate_code_item = PhoneValidateCode()
+            validate_code = generate_validate_code()
+            phone_validate_code_item.validate_code = validate_code
+            phone_validate_code_item.phone = phone_number
+            phone_validate_code_item.last_send_time = now
+            phone_validate_code_item.code_send_count = 1
+            phone_validate_code_item.is_validated = False
+            phone_validate_code_item.save()
+
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info(">>>>> voice_response_code: %s, voice_response_msg: %s" % (res_code, res_text))
+        return Response({"ret_code": res_code, "message": res_text})
 
 
 class SendVoiceCodeTwoAPIView(APIView):
+    # TODO 此接口节后需要优化去掉
     permission_classes = ()
     throttle_classes = (UserRateThrottle,)
 
@@ -590,8 +708,11 @@ class SendVoiceCodeTwoAPIView(APIView):
             phone_validate_code_item.is_validated = False
             phone_validate_code_item.save()
 
-        status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
-        logger.info("voice_code2: %s" % cont)
+        # status, cont = backends.YTXVoice.verify(phone_number, phone_validate_code_item.validate_code)
+        res_code, res_text = backends.VoiceCodeVerify().verify(phone_number,
+                                                               phone_validate_code_item.validate_code,
+                                                               phone_validate_code_item.id)
+        logger.info("voice_code2: %s" % res_text)
         return Response({"ret_code": 0, "message": "ok"})
 
 
@@ -644,6 +765,7 @@ class ShareUrlAPIView(APIView):
             body = {}
         return Response({"ret_code": 0, "message": "ok", "data": body})
 
+
 class DepositGateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -669,6 +791,7 @@ class DepositGateAPIView(APIView):
        #             return Response({"ret_code":0, "gate":"yee", "notice":""})
        # else:
        #     return Response({"ret_code":0, "gate":"kuai"})
+
 
 class TopsOfDayView(APIView):
     """
@@ -714,6 +837,7 @@ class TopsOfWeekView(APIView):
 import random
 import operator
 
+
 class TopsOfEaringView(APIView):
     """
         得到全民淘金前十
@@ -750,6 +874,7 @@ class TopsOfEaringView(APIView):
             return Response({"ret_code": -1, "records": list()})
         return Response({"ret_code": 0, "records": records})
 
+
 class TopsOfMonthView(APIView):
     """
     得到某一月的排行榜
@@ -758,6 +883,7 @@ class TopsOfMonthView(APIView):
 
     def post(self, request):
         return Response({"ret_code": 0, "message":"ok"})
+
 
 class UserExisting(APIView):
     permission_classes = ()
@@ -801,10 +927,31 @@ class UserHasLoginAPI(APIView):
         else:
             return Response({"login": True})
 
+
+class HasValidationAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        profile = WanglibaoUserProfile.objects.filter(user=user).first()
+        if profile.id_is_valid:
+            return Response({"ret_code": 0, "message": u"您已认证通过"})
+        else:
+            return Response({"ret_code": 1, "message": u"您没有认证通过"})
+
 class IdValidate(APIView):
+    """
+    PC端实名认证接口
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
 
         form = IdVerificationForm(request, request.POST)
         # 黑客程序就成功
@@ -824,7 +971,7 @@ class IdValidate(APIView):
 
             if request.DATA.get("captcha_1"):
                 return Response({
-                                    "message": u"实名认证成功..",
+                                    "message": u"实名认证成功.",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
@@ -835,25 +982,34 @@ class IdValidate(APIView):
 
             if verify_counter.count >= 3:
                 return Response({
-                                    "message": u"验证次数超过三次，请联系客服进行人工验证 4008-588-066",
+                                    "message": u"验证错误次数频繁，请联系客服 4008-588-066",
                                     "error_number": ErrorNumber.try_too_many_times
                                 }, status=400)
+
+            profile = WanglibaoUserProfile.objects.filter(user=user).first()
+            if profile.id_is_valid:
+                return Response({
+                    "message": u"您已认证通过，无需再认证，请重新登录查看最新状态",
+                    "error_number": ErrorNumber.try_too_many_times
+                })
 
             id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
             if id_verify_count >= 1:
                 return Response({
-                                    "message": u"一个身份证只能绑定一个帐号, 请尝试其他身份证或联系客服 4008-588-066",
+                                    "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=400)
 
             verify_record, error = verify_id(name, id_number)
+            verify_record.user = user
+            verify_record.save()
 
             verify_counter.count = F('count') + 1
             verify_counter.save()
 
             if error or not verify_record.is_valid:
                 return Response({
-                                    "message": u"验证失败，拨打客服电话进行人工验证",
+                                    "message": u"验证失败，请重试或联系客服 4008-588-066",
                                     "error_number": ErrorNumber.unknown_error
                                 }, status=400)
 
@@ -869,7 +1025,7 @@ class IdValidate(APIView):
             # 处理第三方用户实名回调
             CoopRegister(self.request).process_for_validate(user)
 
-            return Response({ "validate": True }, status=200)
+            return Response({"validate": True}, status=200)
 
         else:
             return Response({
@@ -878,33 +1034,39 @@ class IdValidate(APIView):
                             }, status=400)
 
 
-class AdminIdValidate(APIView):
-    permission_classes = (IsAuthenticated,)
+# class AdminIdValidate(APIView):
+#     permission_classes = (IsAuthenticated,)
+#
+#     def post(self, request, *args, **kwargs):
+#         # add by ChenWeiBin@2010105
+#         if request.user.wanglibaouserprofile.utype == '3':
+#             return Response({
+#                 "message": u"企业用户无法通过此方式认证",
+#                 "error_number": 30056,
+#             }, status=400)
+#
+#         phone = request.DATA.get("phone", "")
+#         name = request.DATA.get("name", "")
+#         id_number = request.DATA.get("id_number", "")
+#         verify_record, error = verify_id(name, id_number)
+#
+#         if error:
+#             return Response({
+#                                 "message": u"验证失败",
+#                                 "error_number": ErrorNumber.unknown_error
+#                             }, status=400)
+#
+#         user = User.objects.get(wanglibaouserprofile__phone=phone)
+#         user.wanglibaouserprofile.id_number = id_number
+#         user.wanglibaouserprofile.name = name
+#         user.wanglibaouserprofile.id_is_valid = True
+#         user.wanglibaouserprofile.id_valid_time = timezone.now()
+#         user.wanglibaouserprofile.save()
+#
+#         return Response({
+#                             "validate": True
+#                         }, status=200)
 
-    def post(self, request, *args, **kwargs):
-        phone = request.DATA.get("phone", "").strip()
-        name = request.DATA.get("name", "").strip()
-        id_number = request.DATA.get("id_number", "").strip()
-
-        verify_record, error = verify_id(name, id_number)
-
-        if error:
-            return Response({
-                                "message": u"验证失败",
-                                "error_number": ErrorNumber.unknown_error
-                            }, status=400)
-
-        #user = get_user_model().objects.get(wanglibaouserprofile__phone=phone)
-        user = User.objects.get(wanglibaouserprofile__phone=phone)
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.id_valid_time = timezone.now()
-        user.wanglibaouserprofile.save()
-
-        return Response({
-                            "validate": True
-                        }, status=200)
 
 class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
@@ -916,14 +1078,25 @@ class LoginAPIView(DecryptParmsAPIView):
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
 
+        # add by ChenWeiBin@20160113
+        profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
+        if profile:
+            return Response({"token": "false", "message": u"企业用户请在PC端登录"}, status=400)
+
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+            return Response({"token": "false", "message": u"用户名或密码错误"}, status=400)
         if not user.is_active:
-            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+            return Response({"token": "false", "message": u"用户已被关闭"}, status=400)
         if user.wanglibaouserprofile.frozen:
-            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+            return Response({"token": "false", "message": u"用户已被冻结"}, status=400)
+
+        # 登录成功后将用户的错误登录次数清零
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
 
         push_user_id = request.DATA.get("user_id", "")
         push_channel_id = request.DATA.get("channel_id", "")
@@ -949,6 +1122,7 @@ class LoginAPIView(DecryptParmsAPIView):
         #     token.delete()
         #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
+
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
     permission_classes = ()
@@ -984,6 +1158,7 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
             if device_type == "ios":
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': "false"}, status=status.HTTP_200_OK)
+
 
 def get_public_statistics():
     today = datetime.now()
@@ -1038,6 +1213,22 @@ class StatisticsInside(APIView):
         start_fmt = yesterday_start.strftime('%Y-%m-%d %H:%M:%S')
         end_fmt = today_start.strftime('%Y-%m-%d %H:%M:%S')
 
+        # 每日累计申请提现, Add by hb on 2016-02-03
+        today_utc = local_to_utc(today, 'now')
+        start_withdraw = today_start + timedelta(hours=16)
+        # 当日16点前查询以昨日16点作为起始时间
+        if today_utc < start_withdraw :
+            start_withdraw = yesterday_start + timedelta(hours=16)
+        stop_withdraw = today_utc
+        yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
+            .filter(catalog='取款预冻结').aggregate(Sum('amount'))
+        yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
+        
+        # 今日充值总额
+        today_deposit = MarginRecord.objects.filter(create_time__gte=today_start) \
+            .filter(catalog='现金存入').aggregate(Sum('amount'))
+        today_deposit_amount = today_deposit['amount__sum'] if today_deposit['amount__sum'] else Decimal('0')
+        
         # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
@@ -1056,7 +1247,7 @@ class StatisticsInside(APIView):
         interest_sum = yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else Decimal('0')
 
         # 昨日资金净流入
-        yesterday_inflow = amount_sum_yesterday - principal_sum - interest_sum
+        yesterday_inflow = amount_sum_yesterday - principal_sum
 
         # 今日还款额
         today_repayment_total = (today_repayment['principal__sum'] if today_repayment['principal__sum'] else 0) + \
@@ -1085,7 +1276,9 @@ class StatisticsInside(APIView):
             'today_repayment_total': today_repayment_total,  # 今日还款额
             'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
-            'yesterday_new_amount': yesterday_new_amount  # 昨日新用户投资金额
+            'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
+            'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
+            'today_deposit_amount' : today_deposit_amount, # 今日冲值总额
         }
 
         data.update(get_public_statistics())
@@ -1501,3 +1694,144 @@ class DataCubeApiView(APIView):
             }
 
         return HttpResponse(json.dumps(_response), content_type='application/json')
+
+
+class BidHasBindingForChannel(APIView):
+    """
+    根据bid（第三方用户ID）判断该用户是否已经绑定指定渠道
+    """
+
+    permission_classes = ()
+
+    def get(self, request, channel_code, bid):
+        binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
+        if binding:
+            response_data = {
+                'ret_code': 10001,
+                'message': u'该bid已经绑定'
+            }
+        else:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该bid未绑定'
+            }
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class CoopPvApi(APIView):
+
+    permission_classes = ()
+
+    def get(self, request, channel_code):
+        channel_codes = ('xunlei9', 'mxunlei')
+        if channel_code in channel_codes:
+            req_data = self.request.GET
+            source = req_data.get('source', None)
+            ext = req_data.get('ext', None)
+            ext2 = req_data.get('ext2', None)
+            if source and ext and ext2:
+                coop_pv_url = settings.XUNLEI9_PV_URL
+                data = {
+                    'source': source,
+                    'ext': ext,
+                    'ext2': ext2,
+                }
+                data = urllib.urlencode(data)
+                try:
+                    res = requests.get(url=coop_pv_url, params=data)
+                    res_status_code = res.status_code
+                    if res_status_code != 200:
+                        response_data = {
+                            'ret_code': 10001,
+                            'message': 'failed',
+                        }
+                        logger.info("%s pv api connect failed with status code %s" % (channel_code, res_status_code))
+                    else:
+                        response_data = {
+                            'ret_code': 10000,
+                            'message': 'ok',
+                        }
+                except Exception, e:
+                    response_data = {
+                        'ret_code': 50001,
+                        'message': 'api error',
+                    }
+            else:
+                response_data = {
+                    'ret_code': 50002,
+                    'message': '非法请求',
+                }
+
+            logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
+            return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class GeetestAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+
+    def post(self, request):
+        self.type = request.POST.get('type', None)
+        import time
+        if self.type == 'get':
+            return self.get_captcha(request)
+        if self.type == 'validate':
+            return self.validate_captcha(request)
+
+    def get_captcha(self, request):
+        user_id = random.randint(1,100)
+        gt = GeetestLib(self.id, self.key)
+        status = gt.pre_process()
+        request.session[gt.GT_STATUS_SESSION_KEY] = status
+        request.session["user_id"] = user_id
+        response_str = gt.get_response_str()
+        return HttpResponse(response_str)
+
+    def validate_captcha(self, request):
+        resp = {"result":'error'}
+        if request.method == "POST":
+            gt = GeetestLib(self.id, self.key)
+            challenge = request.POST.get(gt.FN_CHALLENGE, '')
+            validate = request.POST.get(gt.FN_VALIDATE, '')
+            seccode = request.POST.get(gt.FN_SECCODE, '')
+            status = request.session[gt.GT_STATUS_SESSION_KEY]
+            user_id = request.session["user_id"]
+            if status:
+                result = gt.success_validate(challenge, validate, seccode)
+            else:
+                result = gt.failback_validate(challenge, validate, seccode)
+            result = "success" if result else "fail"
+            resp = {"result":result}
+            print 'result:', result
+            return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
+        return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
+
+
+class ActivityUserInfoUploadApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        form = ActivityUserInfoForm(request.POST)
+        if form.is_valid():
+            user_info = ActivityUserInfo()
+            user_info.name = form.cleaned_data['name']
+            user_info.phone = form.cleaned_data['phone']
+            user_info.address = form.cleaned_data['address']
+            user_info.is_wlb_phone = form.check_wlb_phone()
+            user_info.save()
+            response_data = {
+                'ret_code': 10000,
+                'message': 'success',
+            }
+        else:
+            response_data = {
+                'ret_code': 10001,
+                'message': form.errors
+            }
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+

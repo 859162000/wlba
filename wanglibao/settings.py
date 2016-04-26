@@ -45,6 +45,12 @@ ENV_ALPHA = 'alpha'
 
 ENV = ENV_DEV
 
+# Add by hb on 2016-04-19 for Support Alpha-Deploy
+ENV_ALPHA_DEPLOY = False
+if ENV == ENV_ALPHA:
+    ENV = "staging"
+    ENV_ALPHA_DEPLOY = True
+
 if ENV != ENV_DEV:
     DEBUG = False
 
@@ -116,6 +122,7 @@ INSTALLED_APPS = (
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
+    'wanglibao_qiye', #add by wangxiaoqing
     'report',
     'misc',
 
@@ -136,6 +143,8 @@ INSTALLED_APPS = (
     'wanglibao_lottery',
     'daterange_filter',
     'experience_gold',
+    'wanglibao_qiye',
+    'wanglibao_geetest',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -181,17 +190,27 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        #'HOST': '192.168.1.242',
+    }
+
+# Add by hb on 2016-04-19 for Deploy-Aplpha
+if ENV_ALPHA_DEPLOY:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wanglibao',
+        'USER': 'wanglibao',
+        'PASSWORD': 'wanglibank',
+        'HOST': '192.168.20.236',
     }
 
 import sys
 
-# if 'test' in sys.argv:
-    # SOUTH_TESTS_MIGRATE = False
-    # DATABASES['default'] = {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': '/tmp/db.sqlite3'
-    # }
+if 'test' in sys.argv:
+    SOUTH_TESTS_MIGRATE = False
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/tmp/db.sqlite3'
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -215,6 +234,7 @@ AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
+    'weixin.auth_backend.OpenidAuthBackend',
 )
 import django.contrib.auth.backends
 
@@ -419,6 +439,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/experience_gold.log',
             'formatter': 'verbose'
         },
+        'wanglibao_sms': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_sms.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -427,7 +453,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_sms': {
-            'handlers': ['file'],
+            'handlers': ['wanglibao_sms', 'console'],
             'level': 'DEBUG',
         },
         'shumi': {
@@ -575,13 +601,10 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 CELERY_QUEUES = {
-                "celery":  {"exchange": "celery",
-                              "routing_key": "celery"},
-                "celery01": {"exchange": "celery01",
-                              "routing_key": "celery01"},
-                "celery02": {"exchange": "celery02",
-                              "routing_key": "celery02"},
-                }
+    "celery": {"exchange": "celery", "routing_key": "celery"},
+    "celery01": {"exchange": "celery01", "routing_key": "celery01"},
+    "celery02": {"exchange": "celery02", "routing_key": "celery02"},
+}
 
 from datetime import timedelta, datetime
 
@@ -608,65 +631,65 @@ CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute=0, hour=16),
     },
 
-    #add by guoya: 希财网渠道数据定时推送
-    'xicai_send_data': {
-        'task': 'wanglibao_account.tasks.xicai_send_data_task',
-        'schedule': timedelta(hours=1),
-    },
+    # add by guoya: 希财网渠道数据定时推送
+    # 'xicai_send_data': {
+    #     'task': 'wanglibao_account.tasks.xicai_send_data_task',
+    #     'schedule': timedelta(hours=1),
+    # },
 
-    #add by zhanghe: PC端WEB首页统计数据
+    # add by zhanghe: PC端WEB首页统计数据
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
         'schedule': crontab(minute=10, hour=0),
     },
 
-    #add by lili: 全民佣金收入短信/站内信每日定时发送
+    # add by lili: 全民佣金收入短信/站内信每日定时发送
     'all_invite_earning_data': {
         'task': 'marketing.tools.send_income_message_sms',
         'schedule': crontab(minute=0, hour=20)
     },
-    #add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
-    'lottery_set_status': {
-        'task': 'wanglibao_lottery.tasks.lottery_set_status',
-        'schedule': crontab(minute=0, hour=5)
-    },
+    # add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
+    # 'lottery_set_status': {
+    #     'task': 'wanglibao_lottery.tasks.lottery_set_status',
+    #     'schedule': crontab(minute=20, hour=5)
+    # },
 
-    #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
-    'handle_delay_time_data': {
-        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
-        'schedule': timedelta(minutes=3)
-    },
+    # add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
+    # 'handle_delay_time_data': {
+    #     'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+    #     'schedule': timedelta(minutes=3)
+    # },
 
     # by Zhoudong 菜苗上报平台信息.
     'caimiao_platform_post': {
         'task': 'wanglibao_account.tasks.caimiao_platform_post_task',
-        'schedule': crontab(minute=0, hour=0, day_of_month=1)
+        'schedule': crontab(minute=50, hour=0, day_of_month=1)
     },
     # by Zhoudong 菜苗上报标的信息.
     'caimiao_p2p_post': {
         'task': 'wanglibao_account.tasks.caimiao_p2p_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=35, hour=0)
     },
     # by Zhoudong 菜苗上报成交量.
     'caimiao_volumes_post': {
         'task': 'wanglibao_account.tasks.caimiao_volumes_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=40, hour=0)
     },
     # by Zhoudong 菜苗上报网贷评级.
     'caimiao_rating_post': {
         'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=45, hour=0)
     },
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
         'task': 'wanglibao_redpack.tasks.update_virtual_earning',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=30, hour=1)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
-    'zhongjin_send_data': {
-        'task': 'wanglibao_account.tasks.zhongjin_post_task',
-        'schedule': timedelta(hours=1),
-    },
+    # 'zhongjin_send_data': {
+    #     'task': 'wanglibao_account.tasks.zhongjin_post_task',
+    #     'schedule': timedelta(hours=1),
+    # },
     # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
     'rongtu_send_data': {
         'task': 'wanglibao_account.tasks.rongtu_post_task',
@@ -675,7 +698,7 @@ CELERYBEAT_SCHEDULE = {
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
-        'schedule': crontab(minute=0, hour=3)
+        'schedule': crontab(minute=30, hour=3)
     },
 
     # by Zhoudong 定期检查没有投资的新用户, 提醒投资
@@ -688,16 +711,16 @@ CELERYBEAT_SCHEDULE = {
         'task': 'experience_gold.tasks.experience_repayment_plan',
         'schedule': crontab(minute=0, hour=17),
     },
-    # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
-    'sync_pay_result': {
-        'task': 'wanglibao_pay.tasks.sync_pay_result',
-        'schedule': timedelta(minutes=10), 
+    # 定期检查还有3天到期的用户优惠券,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_unavailable_3_days',
+        'schedule': crontab(minute=0, hour=11),
     },
-    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
-    # 'redpack_status_task_check': {
-    #     'task': 'marketing.tools.check_redpack_status',
-    #     'schedule': crontab(minute=0, hour=11),
-    # },
+    #每天发放昨天的排名奖励, by HMM
+    'march_top10_rank_awards': {
+        'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
+        'schedule': crontab(minute=30, hour=0),
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -729,10 +752,20 @@ if ENV == ENV_PRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
+    YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
+    YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
+    YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -770,13 +803,20 @@ elif ENV == ENV_PREPRODUCTION:
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
     YEE_PROXY_PAY_MER_ID = '10012413099'
-    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+    YEE_PROXY_PAY_KEY = 'bddfric103pdtih6d7z0w4zmo7e9ei0kzvtf7l6r8gzx53h390hq1ilpx1d5'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
     YEE_MER_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pub_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "yeepay_pub_key.pem"), "r").read())
+
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
 
     KUAI_PAY_URL = "https://mas.99bill.com:443/"
 
@@ -823,6 +863,13 @@ else:
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'staging_yee_mer_priv_key.pem'), 'r').read())
     YEE_PUB_KEY = RSA.importKey(open(os.path.join(CERT_DIR, "staging_yee_public_key.pem"), "r").read())
 
+    YEE_URL = 'https://ok.yeepay.com/payapi'
+    YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
+    YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
+    YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
+    YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
+
     KUAI_PAY_URL = "https://sandbox.99bill.com:9445"
 
     #KUAI_PAY_URL = "https://sandbox.99bill.com:9445/cnp/purchase"
@@ -838,17 +885,6 @@ else:
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
-
-
-YEE_URL = 'https://ok.yeepay.com/payapi'
-YEE_SHORT_BIND = '%s/api/tzt/invokebindbankcard' % YEE_URL
-YEE_SHORT_BIND_CHECK_SMS = '%s/api/tzt/confirmbindbankcard' % YEE_URL
-YEE_SHORT_BIND_CARD_QUERY = '%s/api/bankcard/bind/list' % YEE_URL
-YEE_SHORT_BIND_PAY_REQUEST = '%s/api/tzt/directbindpay' % YEE_URL
-YEE_SHORT_CALLBACK = '%s/api/pay/cnp/yee/callback/' % CALLBACK_HOST
-YEE_SHORT_QUERY_TRX_RESULT = '%s/api/query/order' %  YEE_URL
-
-
 
 PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
@@ -874,11 +910,26 @@ YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
+# 汇讯群呼语音验证码(快易通)
+VOICE_HX_URL = 'http://i.huixun35.com/sdk/SMS'
+VOICE_HX_UID = '52361'
+VOICE_HX_PWD = 'e10adc3949ba59abbe56e057f20f883e'
+
 # Modify by hb on 2015-11-25 for new id-verify-channel
-#ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+# ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+
+# 用户实名接口v1剩余可用次数 Modify by chenweibin on 2016-03-03
+VALID_V1_TOTAL = 8000
+
+# 用户实名接口v2域名, ws.nciic.org.cn(新), api.nciic.com.cn(旧)
+VERIFY_V2_DOMAIN = 'ws.nciic.org.cn'
+# VERIFY_V2_DOMAIN = 'api.nciic.com.cn'
+
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV1&V2AutoBackEnd'
+# ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+    # ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
     STATIC_FILE_HOST = ''
@@ -916,10 +967,11 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
             ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
             ['TextColor', 'BGColor'], ['Link', 'Unlink', 'Anchor'],
-            ['Image', 'Flash', 'Table', 'HorizontalRule'],
+            ['Image', 'Flash', 'allMedias', 'Table', 'HorizontalRule'],
             ['Smiley', 'SpecialChar'],
         ],
         'toolbar': 'custom',
+        'extraPlugins' : 'allMedias',
     },
     "mini":{
         'entities':False,
@@ -937,16 +989,26 @@ ACCESS_KEY = 'nwogz9MF5VjadUSsuDzDM0lKlTN4BN'
 if ENV == ENV_PRODUCTION:
     OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'
-
+    OSS_PUB_ACCESS_HOST = 'http://wanglifile.oss-cn-beijing.aliyuncs.com'
 else:
     OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
     OSS_BUCKET = 'wanglistaging'
+    OSS_PUB_ACCESS_HOST = 'http://wanglistaging.oss-cn-beijing.aliyuncs.com'
 
 #ISCJDAO = False
 #CJDAOKEY = '1234'
 #RETURN_REGISTER = "http://test.cjdao.com/productbuy/reginfo"
 #RETURN_PURCHARSE_URL = "http://test.cjdao.com/productbuy/saveproduct"
 #POST_PRODUCT_URL = "http://test.cjdao.com/p2p/saveproduct"
+
+
+#往PHP数据中心发送数据接口生产地址和开关
+if ENV == ENV_PRODUCTION:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = True
+else:
+    SEND_PHP_URL = "http://stat.wanglibao.com:10000/actual/dataindex"
+    SEND_PHP_ON_OR_OFF = False
 
 # 天芒
 if ENV == ENV_PRODUCTION:
@@ -1127,15 +1189,29 @@ WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_QUERY_URL = 'http://dynamic.vip.xunlei.com/xljinku/checkOrder'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
+XUNLEIVIP_BIND_CARD_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_bind.php'
+XUNLEIVIP_PURCHASE_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_invest.php'
+XUNLEIVIP_TASK_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_task.php'
 XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+XUNLEI9_PV_URL = 'http://dypay.vip.xunlei.com/user/vipstat/'
+XUNLEI_TASK_AMOUNT = 10000
 
 # 脉脉
+WLB_FOR_MAIMAI1_KEY = '2004'
 MAIMAI1_CHANNEL_CODE = 'maimai1'
 MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
 MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
+
+# 亚洲财经
+WLB_FOR_YZCJ_KEY = '2005'
+YZCJ_COOP_KEY = 'yzcj_2005'
+if ENV == ENV_PRODUCTION:
+    YZCJ_CALL_BACK_URL = 'http://www.asiafinance.cn/wanglibaoBg.jspx'
+else:
+    YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表
@@ -1192,7 +1268,7 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST='https://staging.wanglibao.com'
+    CALLBACK_HOST = 'https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
@@ -1209,3 +1285,14 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
+
+if ENV == ENV_PRODUCTION:
+    SITE_URL = 'https://www.wanglibao.com'
+elif ENV == ENV_STAGING:
+    SITE_URL = 'https://staging.wanglibao.com'
+elif ENV == ENV_DEV:
+    SITE_URL = 'http://127.0.0.1:8000'
+
+#极验验证 KEY及ID设置
+GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'

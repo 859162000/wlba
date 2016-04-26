@@ -1,0 +1,107 @@
+extends account_home_base
+
+-load formatters
+
+block head
+  - with '资料完善' as title
+    include global/g_head
+    link(href="/static/styles/pc/pc.css", rel="stylesheet", type="text/css")
+    link(href="/static/styles/pc/upload.css", rel="stylesheet", type="text/css")
+block sidebar
+  - with '资料完善' as activeItem
+    include include/user_center_sidebar
+
+block main
+    .panel.p2p-record.qiye
+        .qiye-h 企业账户注册
+        form#qiyeForm(action="/qiye/profile/create/", method='post')
+            - csrf_token
+            input(type='hidden',name="business_license")
+            input(type='hidden',name="registration_cert")
+            table
+                tbody
+                    tr
+                        td.td-left 公司名称
+                        td
+                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}")
+                    tr
+                        td.td-left 营业执照
+                        td
+                           .div#yezz
+                           .errorImg.yezzImg(style='display:none') 请添加营业执照
+                    tr
+                        td.td-left 税务登记证
+                        td
+                          .div#swdjz
+                          .errorImg.swdjzImg(style='display:none') 请添加税务登记证
+                    tr
+                        td.td-left 授权负责人
+                        td
+                            input(type='text', name="certigier_name", placeholder="请输入负责人", autocomplete='off', class="required {messages:{required:'请输入负责人'}}" )
+                    tr
+                        td.td-left 负责人电话
+                        td
+                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}" )
+                    tr
+                        td.td-left 手机验证码
+                        td
+                            input(type='text', name="validate_code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}" )
+                            button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                            .row.voice.void.hidden
+                                .span12-omega
+                    tr
+                        td.td-left 公司地址
+                        td
+                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}" )
+
+            .qiye-h.qiye-bank-info 提现银行账户信息
+            table
+                tbody
+                    tr
+                        td.td-left 公司账户名称
+                        td
+                            input(type='text', name="company_account_name", placeholder="请输入账户名称", autocomplete='off', class="required {messages:{required:'请输入账户名称'}}" )
+                    tr
+                        td.td-left 公司账户账号
+                        td
+                            input(type='text', name="company_account", placeholder="请输入帐号", autocomplete='off', class="required isNumber {byteRangeLength:[10,20],messages:{required:'请输入帐号',byteRangeLength:'支持{0}-{1}位字符'}}" )
+                    tr
+                        td.td-left 公司开户行
+                        td
+                            select(name='deposit_bank_province', class="required {messages:{required:'请选择省份'}}" )
+                            select(name='deposit_bank_city', class="required {messages:{required:'请选择市'}}" )
+                    tr
+                        td.td-left 开户行支行
+                        td
+                            input(type='text', name="bank_branch_address", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}" )
+                    tr
+                        td.td-left 所属银行
+                        td
+                            select(name='bank',class="required {messages:{required:'请选择所属银行'}}")
+                                option(value='') 请选择银行卡
+                                for bank in banks
+                                    option(value='{{bank.id}}') {{bank.name}}
+                    tr
+                        td.td-left 交易密码
+                        td
+                            input(type='text',onfocus="this.type='password'", name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {strLength:6,messages:{required:'请输入交易密码',strLength:'请输入{0}个字符'}}")
+            .qiye-btns
+                a(href='javascript:void(0)').save-btn 保存
+                a(href='/').cancel-btn 取消
+
+            #img-code-div2(style="display:none").modalStyle
+                form#img-code-form.img-code-form(method='post', action='')
+                    .form-row
+                        label.img-code-label 请输入验证码：
+                        input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                        input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                        img.captcha.captcha-img(alt="captcha", src="")
+                        button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                    .code-img-error
+                    .clearfix.tc
+                        span.submit-code-img#submit-code-img4 确定
+
+        block script
+        script.
+            require(['/static/src/pc/lib/PCASClass.js','/static/src/pc/qiye.js?v=20151120'])
+

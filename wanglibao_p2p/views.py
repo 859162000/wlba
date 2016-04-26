@@ -5,9 +5,9 @@ from decimal import Decimal
 import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.db.models import Q, Sum
-from django.db import transaction
+# from django.db import transaction
 from django.template import RequestContext
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
@@ -19,10 +19,10 @@ from rest_framework import generics, renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import SiteData
+# from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_account.cooperation import CoopRegister
-from wanglibao_p2p.amortization_plan import get_amortization_plan
+# from wanglibao_account.cooperation import CoopRegister
+# from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
@@ -51,7 +51,7 @@ from django.core.urlresolvers import reverse
 import re
 from celery.execute import send_task
 
-import pickle
+# import pickle
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
@@ -59,6 +59,10 @@ from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_redis.backend import redis_backend
 from .common import get_p2p_list
 from wanglibao.templatetags.formatters import safe_phone_str
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -274,6 +278,7 @@ class PurchaseP2PMobile(DecryptParmsAPIView):
                                 url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
 
                 return Response({
+                    'ret_code': 0,
                     'data': product_info.amount,
                     'share_show': shareShow,
                     'share_url': url,
@@ -481,7 +486,7 @@ class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
@@ -655,6 +660,7 @@ def preview_contract(request, id):
 
     return HttpResponse(generate_contract_preview(productAmortizations, product))
 
+
 def AuditEquityCreateContract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()
     product = equity.product
@@ -692,13 +698,15 @@ class AdminP2PList(TemplateView):
             'p2p_list': p2p_list
             }
 
+
 class AdminPrepayment(TemplateView):
+    """提前还款页面"""
     template_name = 'admin_prepayment.jade'
 
     def get_context_data(self, **kwargs):
-        id = kwargs['id']
-        if id:
-            p2p = P2PProduct.objects.filter(pk=id).select_related('amortizations')
+        pid = kwargs['id']
+        if pid:
+            p2p = P2PProduct.objects.filter(pk=pid).select_related('amortizations')
         if p2p[0].status != u'还款中':
             return {
                     'p2p': None,
@@ -712,8 +720,8 @@ class AdminPrepayment(TemplateView):
             }
 
 
-
 class RepaymentAPIView(APIView):
+    """提前还款"""
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
@@ -726,35 +734,53 @@ class RepaymentAPIView(APIView):
         else:
             penal_interest = Decimal(penal_interest)
 
-        id = request.POST.get('id')
+        product_id = request.POST.get('id')
 
-        p2p = P2PProduct.objects.filter(pk=id)
-        p2p = p2p[0]
-
-        from dateutil import parser
-        flag_date = parser.parse(repayment_date)
+        if not product_id or not repayment_date:
+            result = {
+                'errno': 1,
+            }
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
         try:
-            payment = PrepaymentHistory(p2p, flag_date)
             if repayment_now == '1':
-                record = payment.prepayment(penal_interest, repayment_type, flag_date)
+                # 将提前还款的代码放入后台任务中执行
+                from .tasks import p2p_prepayment
+                p2p_prepayment.apply_async(kwargs={
+                    'product_id': product_id,
+                    'penal_interest': penal_interest,
+                    'repayment_type': repayment_type,
+                    'flag_date': repayment_date,
+                })
+                result = {
+                    'errno': 0,
+                    # 'errmessage': u'提前还款任务已提交,请等待任务完成后查看标的状态'
+                }
+                # record = payment.prepayment(penal_interest, repayment_type, flag_date)
             else:
+                from dateutil import parser
+                
+                flag_date = parser.parse(repayment_date)
+                p2p = P2PProduct.objects.filter(pk=product_id).first()
+                payment = PrepaymentHistory(p2p, flag_date)
                 record = payment.get_product_repayment(Decimal(0), repayment_type, flag_date)
 
-            result = {
+                result = {
                     'errno': 0,
                     'principal': record.principal,
                     'interest': record.interest,
                     'penal_interest': record.penal_interest,
                     'date': repayment_date
-                    }
+                }
         except PrepaymentException:
+            logger.exception(u"还款计划有问题:")
             result = {
                     'errno': 1,
                     'errmessage': u'你的还款计划有问题'
                     }
 
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
 
 def check_invalid_new_user_product(p2p, user):
     """

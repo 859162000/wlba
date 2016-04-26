@@ -1,0 +1,183 @@
+doctype html
+html(style='background:#f5f5f5;height:100%;overflow:hidden;')
+  head
+    title 2015投资记
+    include include/app_header.jade
+  body(style='position: relative;height: 100%;')
+    //.refresh(style='position:fixed;top:0;left:0;padding: .5rem; height:5rem;width:100%;word-wrap: break-word;word-break: normal; background: #ccc;color: #fff;z-index:1220') 刷新
+    .client-loding-warp
+      .client-loading-center
+        .client-loading.swiper-slide-active
+          .loading-animate
+          .loading-aue 数据统计中..等一等！
+    .client-login-alert
+      .login-alert-warp
+        .login-alert-body
+          .login--alert-head
+            img(src='/static/imgs/app/finance/sleep_lion.png')
+            .alert-head-aue 你还没有登录哦，登录获取更多资讯吧
+          .login--alert-opeartion 我知道了
+
+
+    .client-share-model
+        img(src='/static/imgs/app/finance/client_share.png').share-img
+    .client-finance
+      .swiper-container.swiper-container-vertical
+        .swiper-wrapper
+          //第一页
+          .swiper-slide.swiper-first.slide
+            .finance-logo-warp.ele-txt
+              .finance-logo
+            .finance-rocket
+            .finance-stars
+            .finance-lion.ele-ballon
+            img(src='/static/imgs/app/finance/floor.png').finance-floor
+            .finance-page-chicken.ele-txt2 去看看，2015年我在网利宝的那些事儿
+            .touch-next
+          //第二页
+          .swiper-slide.swiper-other.swiper-white.slide
+            .finance-model2
+              .finance-head
+                .star-head
+                .head-title 这一年，我在网利宝
+              .finance-model2-title
+                span.user-name 亲爱的赞赞赞
+              .model2-data-warp
+                .finance-model2-list 您是网利宝第 <i class= 'yellow zc_ranking'></i> 位注册用户
+                .finance-model-dotted(style='padding: .5rem 1rem;')
+                  .dotted-item
+                    .dotted-circle
+                    .dotted-line.ele-line
+                    .dotted-circle
+                .finance-model2-list 投资总额: <i class= 'yellow tz_amount'></i>
+                .finance-model-dotted(style='padding: .5rem 1rem;')
+                  .dotted-item
+                    .dotted-circle
+                    .dotted-line.ele-line
+                    .dotted-circle
+                .finance-model2-list 总收益：<i class= 'yellow income_total'></i><br>(总收益＝投资收益＋活动收益)
+            img(src='/static/imgs/app/finance/earth_lion2_default.png').finance-earth
+            .finance-page-chicken.ele-txt2 回顾我的致富之路
+            .touch-next
+          //第三页
+          .swiper-slide.swiper-other.swiper-white.slide
+            .finance-model3
+              .finance-head
+                .star-head
+                .head-title 土豪致富秘笈
+              .finance-model3-list 秘笈1：要做土豪，必先勤劳
+              .finance-model3-rotate
+                .rotate-item
+                  .item-warp
+                    .model3-circle-icon.ele-rotate
+                    .model3-rotate-text <span class='tz_times'></span>次
+                  .item-dec 全年投资次数
+                .rotate-item
+                  .item-warp
+                    .model3-circle-icon
+                    .model3-rotate-text <span class='tz_avg_times'></span>天
+                  .item-dec 平均投资周期
+              .finance-model-dotted
+                .dotted-item
+                  .dotted-circle
+                  .dotted-line.ele-line
+                  .dotted-circle
+              .finance-model3-list.finance-model3-space 秘笈2：不光勤劳，出手要豪
+              .finance-model3-canvas
+                .finance-canvas-list
+                  .max-finance ¥<span class='tz_max_amount'></span>
+                .finance-canvas-list
+                  canvas(id="canvas-model3")
+              .item-dec.finance-model3-space 单笔投资最大额度，出手豪气超过<span class='tz_max_ranking_percent'></span>%投资人
+            .finance-page-chicken.ele-txt2 分析我的性格色彩，紧抱自己大腿
+            .touch-next
+          //第四页
+          .swiper-slide.swiper-other.swiper-white.slide
+            .finance-model4
+              .finance-head
+                .star-head
+                .head-title.model4-head-name 最爱：长期优选
+              .finance-model4-canvas
+                canvas( id="model4-canvas", height="400", width="400")
+              .finance-model4-data-item
+                .model4-data-list
+                  span.model4-circle.model4-circle-sort
+                  span.data-list-data 短期（标的期限 < 90天）：
+                  sapn.data-sort <span class='tz_sterm_percent'></span>%
+                .model4-data-list
+                  span.model4-circle.model4-circle-mid
+                  span.data-list-data 中期（90≤标的期限 < 180天）：
+                  sapn.data-mid  <span class='tz_mterm_percent'></span>%
+                .model4-data-list
+                  span.model4-circle.model4-circle-long
+                  span.data-list-data 长期（标的期限 ≥ 180天）：
+                  sapn.data-long <span class='tz_lterm_percent'></span>%
+              .finance-model-arithmetic 百分比＝投资区间投资金额／2015总投资额
+              .finance-page-chicken.ele-txt2 做了一年辛苦的菲佣，查看血汗钱
+              .touch-next
+          //第五页
+          .swiper-slide.swiper-other.swiper-white.slide
+            .finance-model5
+              .finance-head
+                .star-head
+                .head-title 全民淘金，赚佣金
+              img(src='/static/imgs/app/finance/model5_lead.png').finance-model5-lead
+              .finance-model-cravat.finance-model-cravat-space
+                .cravat-cue.cravat-cue-detail 茕茕孑立
+                .cravat-icon
+                .cravat-alert.ele-txt 形容全民淘金邀请到的好友很多很热闹得像人才市场一样。
+              .finance-model2-list.model5-space 邀请好友： <i class= 'yellow invite_count'></i>人
+              .finance-model2-list.model5-space 佣金总额： <i class= 'yellow invite_income'></i>元
+              .finance-page-chicken.ele-txt2 其实，劳动所得并不是最重要的
+              .touch-next
+          //第六页
+          .swiper-slide.swiper-other.swiper-white.slide
+            .finance-model6
+              .finance-head
+                .star-head
+                .head-title 重要的不是劳动所得赚多少<br>而是不劳而获薅多少
+              .model6-yangmao
+                .finance-model2-list 一年薅了： <i class= 'yellow income_reward'></i>根羊毛
+                .finance-model-arithmetic 网利宝羊毛汇率：1根羊毛＝1元
+                  .model6-yang-icon.ele-fadeIn
+                  .finance-public-aue 薅羊毛战斗力： <i class= 'yellow sheep-account'></i>
+              .finance-model-bold-text
+                span 尽管如此，还是错过了：<br>
+                span 至少<i class= 'yellow income_hb_expire'></i>根羊毛<br>
+                span 错过<i class= 'yellow income_jxq_expire'></i>%加息机会
+              .finance-mode-btnl-aue.model6-aue-space.ele-txt 分享查看我的荣誉标签
+          //第七页
+          .swiper-slide.swiper-other.swiper-white.slide
+            .finance-model7
+              .finance-head
+                .star-head
+                .head-title 作为网利宝第<i class= 'yellow zc_ranking'></i>位注册用户<br>获封“2015最干净账单”
+            img(src='/static/imgs/app/finance/none_model7_lead.png').model7-lead
+            .finance-model-cravat.finance-model7-cravat-space
+              .cravat-cue 两袖清风，家徒四壁
+            .finance-mode-btnl-aue.ele-txt 分享查看我的荣誉标签
+          //第八页
+          //.swiper-slide.swiper-other.swiper-white
+            .finance-model8
+              .finance-head
+                .star-head
+                .head-title 2015年，我很忙....
+              .finance-last-head 2015年，我婉绝拒了主席的阅兵仪式，推脱了黄教主的婚礼，放弃了饰演梅长苏的机会...因为这一年我真的很忙，我废寝忘食，呕心沥血地在薅网利宝的羊毛。
+              .finance-public-aue 一年，<i class= 'yellow'></i>薅了
+              .finance-last-bold <i class= 'yellow income_reward'></i>根羊毛
+              .finance-model-arithmetic 网利宝羊毛汇率：1根羊毛＝1元
+            .last-layout
+              .finance-mode-btnl-aue.ele-txt 大家一起来薅羊毛
+              .finance-last-message.ele-txt2 来网利宝APP，查看2015年投资记录
+            img(src='/static/imgs/app/finance/earth_lion2_default.png').finance-earth.finance-earth-efault
+
+    // banner javascript
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script(src="/static/src/app/echarts/Chart.min.js")
+    script(src="/static/scripts/component/dist/webview.js?v=2222")
+    script(src='/static/scripts/app/dist/finance.js?v=25228221')
+    script.
+      var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+      document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F55fcf0f3d843f47b4785c7ec44de129c' type='text/javascript'%3E%3C/script%3E"));
+
+               

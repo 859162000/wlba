@@ -13,9 +13,10 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from wanglibao_rest.utils import split_ua, decide_device
-from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortization, ExperienceEvent
+from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortization, ExperienceEvent, \
+    ExperiencePurchaseLockRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_p2p.models import P2PRecord
+# from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class ExperienceBuyAPIView(APIView):
         now = timezone.now()
         device = split_ua(request)
         device_type = decide_device(device['device_type'])
+        purchase_code = 'experience_purchase'
 
         experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
         if not experience_product:
@@ -46,14 +48,30 @@ class ExperienceBuyAPIView(APIView):
 
         # 查询用户符合条件的理财金记录
         with transaction.atomic(savepoint=True):
+            # 锁表,主要用来锁定体验金投资时的动作
+            purchase_lock_record = ExperiencePurchaseLockRecord.objects.select_for_update().\
+                filter(user=user, purchase_code=purchase_code).first()
+
+            if not purchase_lock_record:
+                # 没有记录时创建一条
+                try:
+                    purchase_lock_record = ExperiencePurchaseLockRecord.objects.create(
+                        user=user, purchase_code=purchase_code, purchase_times=0)
+                except Exception:
+                    logger.exception("Error: experience purchase err, user: %s, phone: %s" % (
+                        user.id, user.wanglibaouserprofile.phone))
+                    return Response({'ret_code': 30003, 'message': u'体验金投资失败,请重试'})
+
             experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False) \
                 .filter(event__invalid=False, event__available_at__lt=now, event__unavailable_at__gt=now)\
-                .select_for_update()
+                .select_related('event')
 
+            records_ids = ''
             if experience_record:
                 for record in experience_record:
                     event = record.event
                     total_amount += event.amount
+                    records_ids += str(record.id) + ','
 
                     record.apply = True
                     record.apply_amount = event.amount
@@ -79,6 +97,11 @@ class ExperienceBuyAPIView(APIView):
                     amortization.term_date = term[6] - timedelta(days=1)
 
                     amortization.save()
+
+                # 更新当前的一组流水id
+                purchase_lock_record.purchase_times += 1
+                purchase_lock_record.description = records_ids
+                purchase_lock_record.save()
 
                 term_date = amortization.term_date
                 interest = amortization.interest
@@ -156,8 +179,8 @@ class SendExperienceGold(object):
             # 根据pk发放理财金
             query_object = ExperienceEvent.objects.filter(invalid=False, pk=pk,
                                                           available_at__lt=now, unavailable_at__gt=now)
-            if give_mode:
-                #根据pk & give_mode发放理财金
+            if query_object and give_mode:
+                # 根据pk & give_mode发放理财金
                 query_object = query_object.filter(give_mode=give_mode)
 
             experience_event = query_object.first()
@@ -171,18 +194,18 @@ class SendExperienceGold(object):
 
                 # 发放站内信
                 title = u'参加活动送体验金'
-                content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}元，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
+                content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}元，请进入投资页面尽快投资赚收益吧！" \
                           u"<br/>感谢您对我们的支持与关注!" \
                           u"<br>网利宝".format(experience_event.name,
-                                              decimal.Decimal(str(experience_event.amount)).quantize(decimal.Decimal('.01')),
-                                              experience_event.unavailable_at.strftime("%Y-%m-%d"))
+                                              decimal.Decimal(str(experience_event.amount)).quantize(decimal.Decimal('.01')))
 
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": self.user.id,
                     "title": title,
                     "content": content,
                     "mtype": "activity"
-                })
+                }, queue='celery02')
+                return record.id, experience_event
 
     def get_amount(self):
         now = timezone.now()

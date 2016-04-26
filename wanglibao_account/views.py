@@ -1,6 +1,6 @@
 # encoding: utf-8
 import datetime
-from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
@@ -27,16 +27,18 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
+from django.db import transaction
 from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
-    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,ManualModifyPhoneForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
 from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages as sms_messages
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
@@ -50,7 +52,8 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, \
+    UserThreeOrder, ManualModifyPhoneRecord, SMSModifyPhoneRecord
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -59,7 +62,6 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
-from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
@@ -69,13 +71,17 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
-from wanglibao_account.models import UserThreeOrder
-import requests
+# import requests
 from wanglibao_margin.models import MarginRecord
-from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct, ExperienceEvent
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
+from wanglibao_sms.models import PhoneValidateCode
+from wanglibao_account.forms import verify_captcha
+from wanglibao_profile.models import WanglibaoUserProfile
+
+import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -293,6 +299,7 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
+
 class PasswordCheckView(DecryptParmsAPIView):
     permission_classes = ()
     def post(self, request, **kwargs):
@@ -315,6 +322,7 @@ class PasswordCheckView(DecryptParmsAPIView):
 
         return Response({'token':True, 'message':u'用户认证成功'})
 
+
 class PasswordResetValidateView(TemplateView):
     template_name = 'password_reset_phone.jade'
 
@@ -333,7 +341,8 @@ class PasswordResetGetIdentifierView(TemplateView):
 
             users = None
             if identifier_type == 'email':
-                users = User.objects.filter(email=identifier, is_active=True)
+                return HttpResponse(u"非法请求", status=400)
+                # users = User.objects.filter(email=identifier, is_active=True)
             elif identifier_type == 'phone':
                 users = User.objects.filter(wanglibaouserprofile__phone=identifier,
                                             wanglibaouserprofile__phone_verified=True)
@@ -344,6 +353,18 @@ class PasswordResetGetIdentifierView(TemplateView):
             if len(users) == 0:
                 return HttpResponse(u"找不到该用户", status=400)
             else:
+                try:
+                    # 清除session验证时间
+                    del request.session['phone_validated_time']
+
+                    # 如果session中已经有用户id,则验证已有的和当前提交的是否一致,不一致则认为是非法操作
+                    if request.session['user_to_reset']:
+                        session_user_id = request.session['user_to_reset']
+                        if session_user_id != users[0].id:
+                            return HttpResponse(u"非法请求", status=400)
+                except KeyError:
+                    pass
+
                 view = PasswordResetValidateView()
                 view.request = request
                 # if identifier_type == 'phone':
@@ -363,7 +384,6 @@ class PasswordResetGetIdentifierView(TemplateView):
 
 def send_validation_mail(request, **kwargs):
     user_id = request.session['user_to_reset']
-    #user_email = get_user_model().objects.get(pk=user_id).email
     user_email = User.objects.get(pk=user_id).email
 
     form = PasswordResetForm(data={
@@ -381,7 +401,6 @@ def send_validation_mail(request, **kwargs):
 
 def send_validation_phone_code(request, **kwargs):
     user_id = request.session['user_to_reset']
-    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
     user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
@@ -395,7 +414,6 @@ def validate_phone_code(request):
     logger.info("Enter validate_phone_code")
     validate_code = request.POST['validate_code']
     user_id = request.session['user_to_reset']
-    #user_phone = get_user_model().objects.get(pk=user_id).wanglibaouserprofile.phone
     user_phone = User.objects.get(pk=user_id).wanglibaouserprofile.phone
     phone_number = user_phone.strip()
 
@@ -428,16 +446,24 @@ class ResetPassword(TemplateView):
             return HttpResponse(u'没有用户信息', status=500)
 
         user_id = request.session['user_to_reset']
-        #user = get_user_model().objects.get(pk=user_id)
         user = User.objects.get(pk=user_id)
 
         assert ('phone_validated_time' in request.session)
         last_validated_time = request.session['phone_validated_time']
         assert (last_validated_time != 0)
 
-        if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 30 * 60:
+        # 缩短session失效时间
+        if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 10 * 60:
             user.set_password(password1)
             user.save()
+            
+            # 清除session
+            try:
+                del request.session['phone_validated_time']
+                del request.session['user_to_reset']
+            except KeyError:
+                pass
+
             return HttpResponse(u'密码修改成功', status=200)
 
         else:
@@ -445,7 +471,6 @@ class ResetPassword(TemplateView):
 
 
 class UserViewSet(PaginatedModelViewSet):
-    #model = get_user_model()
     model = User
     serializer_class = UserSerializer
     permission_classes = IsAdminUser,
@@ -498,12 +523,14 @@ class AccountHome(TemplateView):
         experience_amount = 0
         paid_interest = unpaid_interest = 0
 
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
         experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
             .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
         if experience_record.get('event__amount__sum'):
             experience_amount = experience_record.get('event__amount__sum')
 
-        experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
+        experience_amortization = ExperienceAmortization.objects.filter(user=user)\
+            .select_related('product').order_by('-created_time')
         if experience_amortization:
             paid_interest = reduce(lambda x, y: x + y,
                                    [e.interest for e in experience_amortization if e.settled is True], 0)
@@ -515,7 +542,9 @@ class AccountHome(TemplateView):
             'total_experience_amount': total_experience_amount,
             'experience_amount': float(experience_amount),
             'paid_interest': paid_interest,
-            'unpaid_interest': unpaid_interest
+            'unpaid_interest': unpaid_interest,
+            'experience_amortization': experience_amortization,
+            'product': experience_product,
         }
 
         return {
@@ -598,8 +627,17 @@ class AccountHomeAPIView(APIView):
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_week = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, 
+        fund_income_month = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+
+        # 当月免费提现次数
+        fee_config = WithdrawFee().get_withdraw_fee_config()
+        free_times_per_month = int(fee_config['fee']['free_times_per_month'])
+        withdraw_success_count = int(WithdrawFee().get_withdraw_count(user))
+        withdraw_free_count = free_times_per_month - withdraw_success_count
+
+        if withdraw_free_count <= 0:
+            withdraw_free_count = 0
 
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
@@ -619,6 +657,7 @@ class AccountHomeAPIView(APIView):
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
             'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
+            'withdraw_free_count': withdraw_free_count,  # 当月免费提现次数
 
         }
 
@@ -719,14 +758,15 @@ class AccountInviteIncomeAPIView(APIView):
         earning = account_backends.invite_earning(request.user)
         return Response({"ret_code":0, "earning":earning})
 
+
 class AccountInviteHikeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
 
-        hikes = backends.get_hike_nums(request.user)
-        amount = backends.get_hike_amount(request.user)
+        hikes = redpack_backends.get_hike_nums(request.user)
+        amount = redpack_backends.get_hike_amount(request.user)
         thity = ActivityRecord.objects.filter(user=request.user, gift_type='phonefare', msg_type='message').aggregate(Sum('income'))
         if thity['income__sum']:
             callfee = thity['income__sum']
@@ -741,6 +781,7 @@ class AccountInviteHikeAPIView(APIView):
         return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
                         "call_charge":30, "total_hike":"0.1%", "calls":callfee,
                         "amount":amount, "product_id":product_id})
+
 
 class AccountP2PRecordAPI(APIView):
     permission_classes = (IsAuthenticated, )
@@ -1012,6 +1053,7 @@ class AccountTransactionP2P(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+
 class AccountRedPacket(TemplateView):
     template_name = 'redpacket_available.jade'
 
@@ -1023,7 +1065,7 @@ class AccountRedPacket(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'], 0)
+        result = redpack_backends.list_redpack(user, 'all', device['device_type'], 0)
         red_packets = result['packages'].get(status, [])
 
         return {
@@ -1043,7 +1085,7 @@ class AccountCoupon(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
+        result = redpack_backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
         coupons = result['packages'].get(status, [])
 
         return {
@@ -1117,7 +1159,7 @@ class AccountBankCard(TemplateView):
 
         cards = BindBank.objects.filter(user__exact=self.request.user)
         p2p_cards = Card.objects.filter(user__exact=self.request.user)
-        banks = Bank.get_withdraw_banks()
+        banks = Bank.get_bind_channel_banks()
         return {
             "cards": cards,
             'p2p_cards': p2p_cards,
@@ -1152,7 +1194,7 @@ class ResetPasswordAPI(DecryptParmsAPIView):
         identifier_type = detect_identifier_type(identifier)
 
         if identifier_type == 'phone':
-            #user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
+            # user = get_user_model().objects.get(wanglibaouserprofile__phone=identifier)
             user = User.objects.get(wanglibaouserprofile__phone=identifier)
         else:
             return Response({'ret_code': 30003, 'message': u'请输入手机号码'})
@@ -1161,10 +1203,17 @@ class ResetPasswordAPI(DecryptParmsAPIView):
         if status == 200:
             user.set_password(password)
             user.save()
+
+            # 重置密码后将用户的错误登录次数清零
+            user_profile = WanglibaoUserProfile.objects.get(user=user)
+            user_profile.login_failed_count = 0
+            user_profile.login_failed_time = timezone.now()
+            user_profile.save()
+
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
             # Modify by hb on 2015-12-02
-            #return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            # return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
             return Response({'ret_code': 30004, 'message': message})
 
 
@@ -1180,7 +1229,6 @@ class Third_login_back(APIView):
     def get(self, request):
         result = third_login.login_back(request)
         return Response(result)
-
 
 
 class ChangePasswordAPIView(DecryptParmsAPIView):
@@ -1206,11 +1254,17 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
             # Modify by hb 0n 2015-12-02
-            #return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            # return Response({"ret_code": 30044, "message": u"验证码输入错误"})
             return Response({"ret_code": 30044, "message": message})
 
         user.set_password(new_password)
         user.save()
+        # 重置密码后将用户的错误登录次数清零
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        user_profile.login_failed_count = 0
+        user_profile.login_failed_time = timezone.now()
+        user_profile.save()
+
         return Response({'ret_code': 0, 'message': u'修改成功'})
 
 
@@ -1275,6 +1329,53 @@ class MessageDetailAPIView(APIView):
         result = inside_message.sign_read(request.user, message_id)
         return Response(result)
 
+def verified_user_login(phone, ip, action=None):
+    from wanglibao_account.models import GeetestModifiedTimes
+    phone_times = 'login_verified_phone_times_%s' % (phone,)
+    ip_times = 'login_verified_ip_times_%s' % (ip,)
+    with transaction.atomic():
+        phone_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+        if not phone_record:
+            try:
+                phone_record = GeetestModifiedTimes.objects.create(
+                    identified=phone_times,
+                    times=0)
+            except Exception:
+                logger.debug('极验验证手机验证次数创建数据记录失败')
+
+        if action == 'reset':
+            phone_record.times = 0
+            phone_verified_times = 0
+            phone_record.save()
+        else:
+            phone_verified_times = phone_record.times
+            phone_record.times = phone_verified_times + 1
+            phone_record.save()
+
+    with transaction.atomic():
+        ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=ip_times).first()
+        if not ip_record:
+            try:
+                ip_record = GeetestModifiedTimes.objects.create(
+                        identified=ip_times,
+                        times=0)
+            except Exception:
+                logger.debug('极验验证IP验证次数创建数据记录失败')
+
+        if action == 'reset':
+            ip_record.times = 0
+            ip_record.save()
+            ip_verified_times = 0
+        else:
+            ip_verified_times = ip_record.times
+            ip_record.times = ip_verified_times + 1
+            ip_record.save()
+
+    if phone_verified_times >= 2:
+        return False, u'用户名或密码错误2次以上'
+    if ip_verified_times >= 5:
+        return False, u'同一IP失败5次以上'
+    return True, 'success'
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -1288,10 +1389,14 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
         return json.dumps(res)
 
     if request.method == "POST":
+        client_ip = request.META['HTTP_X_FORWARDED_FOR'] if request.META.get('HTTP_X_FORWARDED_FOR', None) else request.META.get('HTTP_X_REAL_IP', None)
 
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
+            identifier = request.POST.get('identifier', None)
             if form.is_valid():
+                # 用户的登录次数,存储在session中,用户登录成功后,清零用户的登录次数
+                verified_user_login(identifier, client_ip, 'reset')
                 auth_login(request, form.get_user())
 
                 if request.POST.has_key('remember_me'):
@@ -1300,7 +1405,19 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                     request.session.set_expiry(1800)
                 return HttpResponse(messenger('done', user=request.user))
             else:
-                return HttpResponseForbidden(messenger(form.errors))
+                # 用户的登录次数失败后,处理对应的session
+                if request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
+                    result, msg = verified_user_login(identifier, client_ip)
+                    if not result:
+                        json_response = {
+                            'ret_code': '7001',
+                            'message': msg
+                        }
+                        return HttpResponse(json.dumps(json_response), content_type='application/json')
+                    else:
+                        return HttpResponseForbidden(messenger(form.errors))
+                else:
+                    return HttpResponseForbidden(messenger(form.errors))
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
@@ -1333,7 +1450,6 @@ def ajax_token_login(request, authentication_form=TokenSecretSignAuthenticationF
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed(["GET"])
-
 
 
 @sensitive_post_parameters()
@@ -1378,6 +1494,7 @@ def ajax_register(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
+                user_type = form.cleaned_data.get('user_type', '0')
 
                 if request.POST.get('IGNORE_PWD', '') and not password:
                     password = generate_random_password(6)
@@ -1385,9 +1502,12 @@ def ajax_register(request):
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
-                user = create_user(identifier, password, nickname)
+                user = create_user(identifier, password, nickname, user_type)
                 if not user:
                     return HttpResponse(messenger('error'))
+
+                if user_type == '3':
+                    invitecode = 'qyzh'
 
                 # 处理第三方渠道的用户信息
                 CoopRegister(request).all_processors_for_user_register(user, invitecode)
@@ -1487,6 +1607,7 @@ class P2PAmortizationAPI(APIView):
             'amortization_amount_interest': float(amortization.interest),  # 利息
             'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
             'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+            'amortization_status': self._check_status(amortization.settled, amortization.settlement_time, amortization.term_date)
         } for amortization in amortizations]
 
         res = {
@@ -1496,6 +1617,15 @@ class P2PAmortizationAPI(APIView):
 
         }
         return Response(res)
+
+    def _check_status(self, settled, settlement_time, term_date):
+        if settled:
+            if settlement_time.strftime('%Y-%m-%d') < term_date.strftime('%Y-%m-%d'):
+                return u'提前回款'
+            else:
+                return u'已回款'
+        else:
+            return u'待回款'
 
 
 @login_required
@@ -1609,16 +1739,19 @@ class IdVerificationView(TemplateView):
             'counter': count
         }
 
-    def form_valid(self, form):
-        user = self.request.user
-
-        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number').strip()
-        user.wanglibaouserprofile.name = form.cleaned_data.get('name').strip()
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.id_valid_time = timezone.now()
-        user.wanglibaouserprofile.save()
-
-        return super(IdVerificationView, self).form_valid(form)
+    # def form_valid(self, form):
+    #     user = self.request.user
+    #     # add by ChenWeiBin@2010105
+    #     if user.wanglibaouserprofile.utype == '3':
+    #         return {"ret_code": 30056, "message": u"企业用户无法通过此方式认证"}
+    #
+    #     user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number').strip()
+    #     user.wanglibaouserprofile.name = form.cleaned_data.get('name').strip()
+    #     user.wanglibaouserprofile.id_is_valid = True
+    #     user.wanglibaouserprofile.id_valid_time = timezone.now()
+    #     user.wanglibaouserprofile.save()
+    #
+    #     return super(IdVerificationView, self).form_valid(form)
 
 
 class AdminIdVerificationView(TemplateView):
@@ -1677,7 +1810,8 @@ class AdminSendMessageView(TemplateView):
             if not user:
                 result = {
                     'phone': phone,
-                    'status': "not exist"
+                    'status': 'not exist',
+                    'message': u"用户不存在"
                 }
                 send_result.append(result)
                 continue
@@ -1692,6 +1826,70 @@ class AdminSendMessageView(TemplateView):
             else:
                 content_result = content
 
+            msg = msg_sms = ''
+            # 发送理财券
+            coupon_ids = request.POST.get("coupon_ids", "")
+            now = timezone.now()
+            if coupon_ids:
+                coupon_ids_list = coupon_ids.split(",")
+                coupon_ids_list = [cid for cid in coupon_ids_list if cid.strip() != ""]
+                if coupon_ids_list:
+                    for coupon_id in coupon_ids_list:
+                        red_pack_event = RedPackEvent.objects.filter(invalid=False, id=coupon_id)\
+                            .filter(give_start_at__lt=now, give_end_at__gt=now).first()
+                        if red_pack_event:
+                            redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
+                            if redpack:
+                                give_pf = red_pack_event.give_platform
+                                if give_pf == "all" or give_pf == 'pc':
+                                    if redpack.token != "":
+                                        redpack.status = "used"
+                                        redpack.save()
+                                    record = RedPackRecord()
+                                    record.user = user
+                                    record.redpack = redpack
+                                    record.change_platform = 'pc'
+                                    record.save()
+                                    msg += u'id:{},成功;'.format(coupon_id)
+                                else:
+                                    msg += u'id:{},失败;'.format(coupon_id)
+                        else:
+                            msg += u'id:{},失败;'.format(coupon_id)
+
+            # 发送体验金
+            experience_ids = request.POST.get("experience_ids", "")
+            if experience_ids:
+                experience_ids_list = experience_ids.split(",")
+                experience_ids_list = [cid for cid in experience_ids_list if cid.strip() != ""]
+                if experience_ids_list:
+                    for experience_id in experience_ids_list:
+                        experience_event = ExperienceEvent.objects.filter(pk=experience_id, invalid=False)\
+                            .filter(available_at__lt=now, unavailable_at__gt=now).first()
+                        if experience_event:
+                            record = ExperienceEventRecord()
+                            record.user = user
+                            record.event = experience_event
+                            record.created_at = now
+                            record.save()
+                            msg += u'id:{},成功;'.format(experience_id)
+                        else:
+                            msg += u'id:{},失败;'.format(experience_id)
+
+            # 发送短信
+            content_sms = request.POST.get("content_sms", "")
+            if content_sms:
+                # 发送短信,功能推送id: 7
+                # 直接发送短信内容
+                from wanglibao_sms.send_php import PHPSendSMS
+                PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content_sms)
+                # send_messages.apply_async(kwargs={
+                #     'phones': [phone],
+                #     'messages': [content_sms + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD],
+                #     'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+                # })
+                msg_sms += u'短信发送成功'
+
+            # 发送站内信
             try:
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
@@ -1702,12 +1900,14 @@ class AdminSendMessageView(TemplateView):
 
                 result = {
                     'phone': "{}, {}".format(phone, code),
-                    'status': 'success'
+                    'status': 'success',
+                    'message': u'站内信发送成功;' + msg + msg_sms
                 }
             except False:
                 result = {
                     'phone': phone,
-                    'status': 'fail'
+                    'status': 'fail',
+                    'message': u'站内信发送失败;' + msg + msg_sms
                 }
 
             send_result.append(result)
@@ -2081,7 +2281,10 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = json.loads(request.POST)
+                if channel_code == 'zgdx':
+                    params = json.loads(request.body)
+                else:
+                    params = request.POST
                 request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
@@ -2133,10 +2336,404 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
+
 class FirstPayResultView(TemplateView):
     template_name = 'register_three.jade'
 
     def get_context_data(self, **kwargs):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
+
+
+class IdentityInformationTemplate(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        modify_phone_state = 0
+        if modify_phone_record:
+            if modify_phone_record.status == u'复审通过':
+                modify_phone_state = 1
+            if modify_phone_record.status in [u'待初审', u'初审待定', u'待复审']:
+                modify_phone_state = 2
+            if modify_phone_record.status in [u"初审驳回", u"复审驳回"]:
+                modify_phone_state = 3
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
+        return {
+            "phone": safe_phone_str(profile.phone),
+            "id_is_valid": profile.id_is_valid,
+            "trade_pwd": profile.trade_pwd != "",
+            "modify_phone_state": modify_phone_state,
+            'name': profile.name,
+            "id_number": profile.id_number,
+            "is_bind_card":is_bind_card
+        }
+
+
+class ValidateAccountInfoTemplate(TemplateView):
+    template_name = ""
+
+    def get_context_data(self, **kwargs):
+        # cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
+        return {
+            'is_bind_card': is_bind_card
+        }
+
+
+class ValidateAccountInfoAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        id_number = request.DATA.get('id_number', "").strip()
+        params = request.DATA
+        data = {}
+        for k,v in params.iteritems():
+            data[k]=v
+        data['identifier']=profile.phone
+        form = LoginAuthenticationNoCaptchaForm(request, data=data)
+        if form.is_valid():
+            if id_number != profile.id_number:
+                return Response({'message':"身份证错误"}, status=400)
+        # 同卡之后要对银行卡号进行验证
+            card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+            if not card.exists():
+                return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+            card_no = request.DATA.get('card_no', "").strip()
+            if not card_no:
+                return Response({'message': "用户需要提供绑定的银行卡号"}, status=400)
+            card = card.first()
+            if card.no != card_no:
+                return Response({'message': "银行卡号输入错误"}, status=400)
+            return Response({'ret_code': 0})
+        message = ""
+        for key, value in form.errors.iteritems():
+            for msg in value:
+                if msg == u"用户名或者密码不正确":
+                    msg = u"密码不正确"
+                message+=msg
+        return Response({"message":message}, status=400)
+
+
+class ModifyPhoneValidateCode(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
+        new_phone_user = User.objects.filter(wanglibaouserprofile__phone=phone_number)
+        if new_phone_user.exists():
+            return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+
+        if not res:
+            return Response({'message': message, "type":"captcha"}, status=403)
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        return Response({'message': message, "type":"validation"}, status=status)
+
+
+class ManualModifyPhoneTemplate(TemplateView):
+    template_name = 'phone_modify_manual.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        form = ManualModifyPhoneForm()
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        if modify_phone_record and modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
+            modify_phone_record = None
+
+        return {
+                'user_name':profile.name,
+                'modify_phone_record':modify_phone_record
+                }
+
+
+class ManualModifyPhoneAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        profile = user.wanglibaouserprofile
+        if not profile.id_is_valid or not profile.id_number:
+            return Response({'message':"还没有实名认证"}, status=400)
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+        form = ManualModifyPhoneForm(self.request.DATA, self.request.FILES)
+        if form.is_valid():
+            id_front_image = form.cleaned_data.get('id_front_image')
+            id_back_image = form.cleaned_data.get('id_back_image')
+            id_user_image = form.cleaned_data.get('id_user_image')
+            card_user_image = form.cleaned_data.get('card_user_image')
+            new_phone = form.cleaned_data['new_phone']
+            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+            if modify_phone_record  and modify_phone_record.status in [u"待初审", u"初审待定", u"待复审"]:
+                return Response({'message': u"您之前申请的人工修改手机号的请求还未处理完毕,请联系网利宝客服"}, status=400)
+            if modify_phone_record and modify_phone_record.status in [u"复审驳回", u"初审驳回"]:
+                modify_phone_record_id = int(self.request.DATA.get('modify_phone_record_id', 0))
+                if modify_phone_record_id != modify_phone_record.id:
+                    return Response({'message': u"申请的人工修改手机号id参数错误"}, status=400)
+                manual_record = modify_phone_record
+            else:
+                manual_record = ManualModifyPhoneRecord()
+            #todo
+            manual_record.user = user
+            manual_record.phone = profile.phone
+            manual_record.new_phone = new_phone
+            manual_record.status = u'待初审'
+            manual_record.save()
+            if id_front_image:
+                id_front_image.name = "%s_%s_%s"%(user.id, manual_record.id, 0)
+                manual_record.id_front_image = id_front_image
+            if id_back_image:
+                id_back_image.name = "%s_%s_%s"%(user.id, manual_record.id, 1)
+                manual_record.id_back_image = id_back_image
+            if id_user_image:
+                id_user_image.name = "%s_%s_%s"%(user.id, manual_record.id, 2)
+                manual_record.id_user_image = id_user_image
+            if card_user_image:
+                card_user_image.name = "%s_%s_%s"%(user.id, manual_record.id, 3)
+                manual_record.card_user_image = card_user_image
+            manual_record.save()
+            msg = "尊敬的%s，您已申请人工审核修改手机号，申请结果将在3个工作日内通过短信发送到本手机，请留意，退订回TD【网利科技】"%profile.name
+            send_messages.apply_async(kwargs={
+                "phones": [new_phone, ],
+                "messages": [msg, ],
+            })
+            return Response({'ret_code': 0})
+        else:
+            message = form.errors
+            for key, value in form.errors.iteritems():
+                message = ",".join(value)
+            return Response({"message":message}, status=400)
+
+
+class CancelManualModifyPhoneAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        profile = user.wanglibaouserprofile
+        if not profile.id_is_valid or not profile.id_number:
+            return Response({'message':"还没有实名认证"}, status=400)
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+        modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+        if not modify_phone_record or modify_phone_record.status not in [u"复审驳回", u"初审驳回"]:
+            return Response({'message':"没有可以取消的申请"}, status=400)
+        modify_phone_record.status = u"取消申请"
+        modify_phone_record.save()
+        return Response({"message": "ok"})
+
+
+class SMSModifyPhoneValidateTemplate(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        is_bind_card = card.exists()
+        return {
+            "phone": profile.phone,
+            'is_bind_card': is_bind_card,
+            }
+
+
+class SMSModifyPhoneValidateAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        profile = user.wanglibaouserprofile
+        validate_code = request.DATA.get('validate_code', "").strip()
+        id_number = request.DATA.get('id_number', "").strip()
+        new_phone = request.DATA.get('new_phone', "").strip()
+
+        if not profile.id_is_valid or not profile.id_number:
+            return Response({'message':"还没有实名认证"}, status=400)
+        if not validate_code or not id_number or not new_phone:
+            return Response({'message':"参数为空"}, status=400)
+        # 同卡之后要对银行卡号进行验证
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+        card_no = request.DATA.get('card_no', "").strip()
+        if not card_no:
+            return Response({'message': "用户需要提供绑定的银行卡号"}, status=400)
+        card = card.first()
+        if card.no != card_no:
+            return Response({'message': "银行卡号输入错误"}, status=400)
+        params = request.DATA
+        data = {}
+        for k,v in params.iteritems():
+            data[k]=v
+        data['identifier']=profile.phone
+        form = LoginAuthenticationNoCaptchaForm(request, data=data)
+        if form.is_valid():
+            if form.get_user()!=user:
+                return Response({'message':"用户错误"}, status=400)
+            status, message = validate_validation_code(profile.phone, validate_code)
+            if status != 200:
+                return Response({'message':message}, status=400)
+            if id_number != profile.id_number:
+                return Response({'message':"身份证错误"}, status=400)
+            new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
+            if new_phone_user:
+                return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+            modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
+            if modify_phone_record and modify_phone_record.status in [u"待初审", u"初审待定", u"待复审", u"复审驳回", u"初审驳回"]:
+                return Response({'message':"你有还未处理结束的人工修改手机号申请，请耐心等待客服处理"}, status=400)
+
+            sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
+            if not sms_modify_record:
+                sms_modify_record = SMSModifyPhoneRecord()
+                sms_modify_record.user = user
+                sms_modify_record.phone = profile.phone
+                sms_modify_record.status = u'短信修改手机号提交'
+                sms_modify_record.new_phone = new_phone
+                sms_modify_record.save()
+            if sms_modify_record.new_phone != new_phone:
+                sms_modify_record.new_phone = new_phone
+                sms_modify_record.save()
+            return Response({"message":'ok'})
+        message = ""
+        for key, value in form.errors.iteritems():
+            for msg in value:
+                if msg == u"用户名或者密码不正确":
+                    msg = u"密码不正确"
+                message+=msg
+        return Response({"message":message}, status=400)
+
+
+class SMSModifyPhoneTemplate(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        profile = user.wanglibaouserprofile
+        new_phone = ""
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, phone=profile.phone, status=u'短信修改手机号提交').first()
+        if sms_modify_record:
+            new_phone = sms_modify_record.new_phone
+
+        return {
+            "new_phone": new_phone,
+            }
+
+
+class SMSModifyPhoneAPI(APIView):
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        user = request.user
+        new_phone = request.DATA.get('new_phone', "").strip()
+        sms_modify_record = SMSModifyPhoneRecord.objects.filter(user=user, new_phone=new_phone, status=u'短信修改手机号提交').first()
+        if not sms_modify_record:
+            return Response({'message':u"还没有短信申请修改手机号"}, status=400)
+        profile = user.wanglibaouserprofile
+        validate_code = request.DATA.get('validate_code', "").strip()
+        if not validate_code:
+            return Response({'message':"验证码不能为空"}, status=400)
+        status, message = validate_validation_code(new_phone, validate_code)
+        if status != 200:
+            return Response({'message':message}, status=400)
+        new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
+        if new_phone_user:
+            return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
+        card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
+        if not card.exists():
+            return Response({'message':"用户需要绑定的银行卡号"}, status=400)
+        with transaction.atomic(savepoint=True):
+            old_phone = profile.phone
+            profile.phone = new_phone
+            profile.save()
+            PhoneValidateCode.objects.filter(phone=old_phone).delete()
+            sms_modify_record.status=u'短信修改手机号成功'
+            sms_modify_record.save()
+            #todo force user login again
+            msg = "尊敬的%s，您已成功修改绑定新手机号，请使用新的手机号进行登陆，密码与原登录密码相同。感谢您的支持。退订回TD【网利科技】"%profile.name
+            send_messages.apply_async(kwargs={
+                "phones": [new_phone, ],
+                "messages": [msg, ],
+            })
+            return Response({'message':'ok'})
+
+
+class LoginCounterVerifyAPI(DecryptParmsAPIView):
+    """
+    登录次数验证,下面4个情况当天错误次数清零处理
+    1、重置登录密码
+    2、登录成功后
+    3、注销登录
+    4、6次机会内验证正确
+    5、第二天清零
+    """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+
+        # from django.db.models import F
+        from wanglibao_profile.models import WanglibaoUserProfile
+
+        now = timezone.now()
+        user = request.user
+        password = self.params.get('password').strip()
+
+        # 密码错误，请重新输入
+        # 错误大于6次, 密码错误频繁，为账户安全建议重置
+        user_profile = WanglibaoUserProfile.objects.get(user=user)
+        failed_count = user_profile.login_failed_count
+        last_failed_time = user_profile.login_failed_time
+
+        if last_failed_time:
+            today_start = local_to_utc(last_failed_time, 'min')
+            today_end = local_to_utc(last_failed_time, 'max')
+        else:
+            today_start = local_to_utc(now, 'min')
+            today_end = local_to_utc(now, 'max')
+
+        if failed_count >= 6 and today_start < now <= today_end:
+            msg = {'ret_code': 80002, 'message': u'密码错误频繁，为账户安全建议重置'}
+        else:
+            if user.check_password(password):
+                user_profile.login_failed_count = 0
+                user_profile.login_failed_time = now
+                user_profile.save()
+                return Response({'ret_code': 0, 'message': 'ok'})
+            else:
+                msg = {'ret_code': 80001, 'message': u'密码错误，请重新输入'}
+
+                if today_start < now <= today_end:
+                    user_profile.login_failed_count = failed_count + 1
+                    user_profile.login_failed_time = now
+                else:
+                    user_profile.login_failed_count = 1
+                    user_profile.login_failed_time = now
+
+                user_profile.save()
+
+        return Response(msg)
+
+
+class MarginRecordsAPIView(APIView):
+    """
+    用户资金账户记录
+    """
+    permission_classes = (IsAuthenticated, )
+
+    @staticmethod
+    def post(request):
+        from wanglibao_margin.margin_record import margin_records
+        res = margin_records(request)
+        return Response(res)
 

@@ -199,6 +199,8 @@ def deploy_mq_action():
             put(StringIO(json_env), 'env.json')
     print yellow("restart mq server")
     with settings(warn_only=True):
+        # kill celery not controlled by supervisord
+        run('for p in `pgrep -P1 celery`;do kill -9 $p;done')
         rs = run("ps aux|grep supervisord|grep -v 'grep'")
         print yellow("view server process and check the process exists")
         if rs.return_code == 0:

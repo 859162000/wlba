@@ -1,5 +1,8 @@
 # encoding:utf-8
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
+from experience_gold.backends import SendExperienceGold
+from experience_gold.models import ExperienceEvent
+from wanglibao_reward.models import WanglibaoRewardJoinRecord
 import base64
 import hashlib
 import os
@@ -26,7 +29,7 @@ from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
-from weixin.base import BaseWeixinTemplate
+from weixin.base import OpenIdBaseAPIView, BaseWeixinTemplate
 from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
@@ -34,6 +37,7 @@ from marketing.tops import Top
 from utils import local_to_utc
 from wanglibao_reward.models import WanglibaoWeixinRelative
 # used for reward
+from wanglibao_profile.models import Account2015
 from weixin.models import WeixinAccounts
 import cStringIO
 from wanglibao_account.utils import FileObject
@@ -59,6 +63,7 @@ from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
@@ -68,6 +73,7 @@ from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
+import re
 import sys
 import time
 from smtplib import SMTP
@@ -81,6 +87,7 @@ from marketing.utils import pc_data_generator
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
+from wanglibao_rest.utils import get_client_ip
 reload(sys)
 
 class YaoView(TemplateView):
@@ -276,6 +283,7 @@ class AppShareViewError(TemplateView):
         except:
             phone = ''
         url = self.request.get_host() + '/aws/?p=' + identifier
+
         return {
             'phone': phone,
             'url': url
@@ -668,7 +676,7 @@ class IntroducedAwardTemplate(TemplateView):
 class NewsListView(TemplateView):
     """ News and Report list page """
 
-    template_name = 'news_new.jade'
+    template_name = 'media_coverage.jade'
 
     def get_context_data(self, **kwargs):
         news = NewsAndReport.objects.filter().order_by('-score', '-created_at')
@@ -2003,11 +2011,13 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_one.jade'
+    template_name = 'xunlei_three.jade'
+    wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
         response_data = {}
-        if not channel_code or channel_code != 'xunlei9':
+        channel_codes = ('xunlei9', 'mxunlei')
+        if not channel_code or channel_code not in channel_codes:
             response_data = {
                 'ret_code': '20001',
                 'message': u'非法请求',
@@ -2036,15 +2046,23 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         return response_data
 
     def get_context_data(self, **kwargs):
-        context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
-
         params = self.request.GET
-        channel_code = params.get('promo_token', '').strip()
         sign = params.get('sign', '').strip()
         _time = params.get('time', '').strip()
         nickname = params.get('nickname', '').strip()
         user_id = params.get('xluserid', '').strip()
+        channel_code = params.get('promo_token', '').strip()
         response_data = self.check_params(channel_code, sign, _time, nickname, user_id)
+
+        self.wx_code = channel_code
+        context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
+
+        device_list = ['android', 'iphone']
+        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
@@ -2069,6 +2087,7 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
 
         context.update(response_data)
         return context
+
 
 class QuickApplyerAPIView(APIView):
     permission_classes = ()
@@ -2563,24 +2582,24 @@ class RewardDistributeAPIView(APIView):
         self.get_redpacks()
 
     def post(self, request):
-        openid = request.DATA.get("openid", "")
-        if None == openid:
-            to_json_response = {
-                'ret_code': 3010,
-                'message': u'openid 没有传入',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        w_user = WeixinUser.objects.filter(openid=openid)
-        if not w_user.exists() or not w_user.first().user:
-            to_json_response = {
-                'ret_code': 3011,
-                'message': u'weixin info No saved',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-        else:
-            user = w_user.first().user
-
+        # openid = request.DATA.get("openid", "")
+        # if None == openid:
+        #     to_json_response = {
+        #         'ret_code': 3010,
+        #         'message': u'openid 没有传入',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        #
+        # w_user = WeixinUser.objects.filter(openid=openid)
+        # if not w_user.exists() or not w_user.first().user:
+        #     to_json_response = {
+        #         'ret_code': 3011,
+        #         'message': u'weixin info No saved',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        # else:
+        #     user = w_user.first().user
+        user = request.user
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today, action_name=self.action_name).first()
 
@@ -2671,6 +2690,82 @@ class RockFinanceQRCodeView(TemplateView):
         else:
             logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.request.user))
             return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
+
+class HappyMonkeyAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        self.token = 'happy_monkey'
+        rewards = {
+            (0, 20): u'幸福猴66元体验金',
+            (21, 40): u'幸福猴166元体验金',
+            (41, 60): u'幸福猴566元体验金',
+            (61, 100000000): u'幸福猴866元体验金'
+        }
+        phone = request.POST.get('phone', None)
+        user = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        # 是否是登录用户
+        if not request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        today = (datetime.now()+timedelta(hours=-8)).strftime("%Y-%m-%d")
+        user = user.user if user else request.user
+
+        #今天用户没有玩过
+        with transaction.atomic():
+            logger.debug('enter transaction atomic')
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.token).first()
+            if not join_record:
+                try:
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code=self.token,
+                        remain_chance=1)
+                except Exception:
+                    to_json_response = {
+                        'ret_code': 1001,
+                        'message': u'每一个用户,一天只能玩一次',
+                    }
+                    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            #今天用户已经玩过了
+            reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
+            if reward and today == str(reward.create_at)[:10]:
+                to_json_response = {
+                    'ret_code': 1001,
+                    'message': u'每一个用户,一天只能玩一次',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            total = int(request.POST.get('total', None))
+            exp_name = ''
+            for key, value in rewards.items():
+                if total>=key[0] and total<=key[1]:
+                    exp_name = value
+
+            exp_gold=ExperienceEvent.objects.filter(name=exp_name).first()
+            reward = ActivityReward.objects.create(
+                user=user,
+                experience=exp_gold,
+                channel=self.token,
+                create_at=today,
+                left_times=0,
+                join_times=1,)
+
+            SendExperienceGold(user).send(reward.experience.id)
+            join_record.remain_chance = 0
+            join_record.save()
+
+            to_json_response = {
+                'ret_code': 0,
+                'type':exp_name,
+                'message': u'用户已经获得%s体验金' % reward.experience.amount,
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
 class RockFinanceForOldUserAPIView(APIView):
@@ -2961,12 +3056,12 @@ class ThunderBindingApi(APIView):
         # Modify by cwb@20151230
         user = self.request.user
         user_channel = get_user_channel_record(user)
-        if not user_channel or user_channel.code != 'xunlei9':
+        channel_codes = ('xunlei9', 'mxunlei')
+        if not user_channel or user_channel.code not in channel_codes:
             response_data = {
                 'ret_code': '10004',
                 'message': u'非迅雷渠道用户',
             }
-            logger.info("=20160104= [%s] : 非迅雷渠道用户" % (user.id))
             return HttpResponse(json.dumps(response_data), content_type='application/json')
 
         channel_code = request.POST.get('promo_token', '').strip()
@@ -2974,7 +3069,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        if channel_code and (channel_code == 'xunlei9' and channel_user
+        if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
@@ -3004,7 +3099,105 @@ class ThunderBindingApi(APIView):
                 'message': u'非法请求',
             }
 
-        logger.info("Thunder binding userid[%s] promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
-                    % (user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
+        logger.info("%s binding user_id[%s], promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
+                    % (user_channel.code, user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+import math
+class CustomerAccount2015ApiView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        error_code = 0
+        error_message = u''
+        account_dict = dict()
+
+        user = self.request.user
+        if user and user.id:
+            user_id = user.id
+            account = Account2015.objects.filter(user_id=user_id).first()
+            if account:
+                account_dict = account.toJSON_filter()
+                if account.tz_times>0:
+                    account_dict['tz_avg_time'] = round(365.0/float(account.tz_times), 2)
+                if account.tz_amount>0:
+                    a = round(account.tz_sterm_amount / account.tz_amount * 100, 2)
+                    b = round(account.tz_mterm_amount / account.tz_amount * 100, 2)
+                    c = round(account.tz_lterm_amount / account.tz_amount * 100, 2)
+
+                    aa = math.ceil(a)
+                    bb = math.ceil(b)
+                    cc = math.ceil(c)
+
+                    abc = aa + bb +cc
+                    if abc>100 and abc<=101:
+                        max_value = max(aa, bb, cc)
+                        if aa==max_value:
+                            aa = aa - 1
+                        elif bb==max_value:
+                            bb = bb - 1
+                        elif cc==max_value:
+                            cc = cc - 1
+                    elif abc>101 and abc<=102:
+                        min_value = min(aa, bb, cc)
+                        if aa==min_value:
+                            bb = bb - 1
+                            cc = cc - 1
+                        elif bb==min_value:
+                            aa = aa - 1
+                            cc = cc - 1
+                        elif cc==min_value:
+                            aa = aa - 1
+                            bb = bb - 1
+                    elif abc>102:
+                            aa = aa - 1
+                            bb = bb - 1
+                            cc = cc - 1
+
+                    account_dict['tz_sterm_percent'] = a
+                    account_dict['tz_mterm_percent'] = b
+                    account_dict['tz_lterm_percent'] = c
+
+                    account_dict['tz_sterm_point'] = aa
+                    account_dict['tz_mterm_point'] = bb
+                    account_dict['tz_lterm_point'] = cc
+
+                    try:
+                        account.total_visit_count += 1
+                        if not account.first_visit_time:
+                            account.first_visit_time = timezone.now()
+                            account.first_visit_ipaddr = get_client_ip(request)
+                        else:
+                            account.last_visit_time = timezone.now()
+                            account.last_visit_ipaddr = get_client_ip(request)
+                        account.save()
+                    except Exception, ex:
+                        logger.exception("=20150127= Failed to save account2015 visited record: [%s], [%s]", user_id, ex)
+
+                error_code=0
+                error_message=u'Success'
+            else:
+                error_code=0
+                error_message=u'未统计的2016年新注册用户'
+                zc_ranking = User.objects.filter(id__lte=user_id).count()
+                account_dict['zc_ranking'] = zc_ranking
+                account_dict['tz_amount'] = 0
+                account_dict['income_reward'] = 0
+                account_dict['invite_income'] = 0
+
+            profile = user.wanglibaouserprofile
+            user_name = u'网利宝用户'
+            if profile:
+                if profile.id_is_valid:
+                    user_name= profile.name
+                else:
+                    user_name = safe_phone_str(profile.phone)
+                account_dict['user_name'] = user_name
+        else:
+            error_code=404
+            error_message=u'User not found'
+
+        resp = {"error_code":error_code, "error_message":error_message, "account":account_dict}
+        return HttpResponse(json.dumps(resp, sort_keys=True), content_type='application/json')

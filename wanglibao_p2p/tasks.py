@@ -23,9 +23,32 @@ from wanglibao.templatetags.formatters import period_unit
 import time, datetime
 
 
+
 @app.task
 def p2p_watchdog():
     P2POperator().watchdog()
+
+
+@app.task
+def p2p_prepayment(product_id, penal_interest, repayment_type, flag_date):
+    """
+    提前还款任务
+    :param product_id, 产品id
+    :param penal_interest, 罚息
+    :param repayment_type, 类型 daily, monthly
+    :param flag_date, 还款日期
+    """
+    from prepayment import PrepaymentHistory
+    from dateutil import parser
+
+    flag_date = parser.parse(flag_date)
+
+    p2p = P2PProduct.objects.filter(pk=product_id).first()
+    if p2p:
+        payment = PrepaymentHistory(p2p, flag_date)
+        payment.prepayment(penal_interest, repayment_type, flag_date)
+    else:
+        return
 
 
 @app.task
@@ -33,11 +56,13 @@ def delete_old_product_amortization(pa_list):
     time.sleep(10)
     ProductAmortization.objects.filter(id__in=pa_list).delete()
 
+
 @app.task
 def process_paid_product(product_id):
     time.sleep(2)
     p2p = P2PProduct.objects.select_related('user').get(pk=product_id)
     P2POperator.preprocess_for_settle(p2p)
+
 
 @app.task
 def full_send_message(product_name):
@@ -61,6 +86,7 @@ def full_send_message(product_name):
         "content":msg,
         "mtype":"fullbid"
     })
+
 
 @app.task
 def build_earning(product_id):
@@ -170,6 +196,7 @@ def p2p_auto_published_by_publish_time(pay_method, period):
         products.publish_time = timezone.now()
         products.save()
 
+
 @app.task
 def p2p_auto_ready_for_settle():
     """
@@ -196,10 +223,10 @@ def p2p_auto_ready_for_settle():
     now = timezone.now()
     for amort in product_amorts:
         time_offset = datetime.timedelta(minutes=random.randint(1, 30))
-        settle_time = now + time_offset
+        term_date = now + time_offset
         # amort.update(ready_for_settle=True, settlement_time=settle_time, is_auto_ready_for_settle=True)
         amort.ready_for_settle = True
-        amort.settlement_time = settle_time
+        amort.term_date = term_date
         amort.is_auto_ready_for_settle = True
         amort.save()
 

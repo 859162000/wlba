@@ -12,30 +12,34 @@ html
         .register
             .register_nav_min.register_nav_min4
             .register_box.clearfix
-                .login-form
-                    p.txt_s 恭喜您已完成注册
-                    p.txt_s 扫码关注网利宝微信服务号
-                    p.erweima_max
-                        span
-                    p.go_p2p
-                        a(href='/p2p/list/') 去投资
-                .register_info.last_page
-                    .info_middle.clearfix
-                        .welfare_ed 已获得的奖励：
-                        .welfare_ed_list
-                            i
-                            | 新手注册即送28888元体验金
-                        .welfare_ed_list
-                            i
-                            | 实名认证20元红包
-                        if first_pay_succeed
-                            .welfare_ed_list
-                                i
-                                | 首次充值100元红包
-                        .my_reward
-                            a(href='/accounts/coupon/unused/') 查看我的奖励
-                                i
+                .register-success
+                    .max-text 恭喜您，
+                    .max-text 成功获得新手大礼包！
+                    mixin reward(counts, title, pop, class1)
+                        .reward-box(class=class1)
+                            .reward-left
+                                p
+                                    span=counts
+                                    | 元
+                                p=pop
+                            .reward-right=title
+                    .clearfix
+                        +reward('28888', '体验金', '注册即送', '')
+                        +reward('50', '红包', '注册即送', 'mls20')
+                    .min-text.go-i-r 您可以
+                        a(href='/activity/experience/gold/') 投资体验金
+                        | ，或者
+                        a(href='/p2p/list/') 投资使用红包
+                    .max-text 首次投资还有红包赠送！
+                    .clearfix
+                        .reward-box-s
+                            +reward('100', '红包', '首次投资送现金红包', '')
+                            .min-text 1000≤首投金额<5000元即可获得
+                        .reward-box-s.mls20
+                            +reward('150', '红包', '首次投资送现金红包', '')
+                            .min-text 5000≤首投金额<10000元即可获得
+                        .reward-box-s.mls20
+                            +reward('250', '红包', '首次投资送现金红包', '')
+                            .min-text 10000≤首投金额 即可获得
     include global/g_footer
-    script.
-      require(["/static/src/pc/register_next.js?v=20151202"])
 

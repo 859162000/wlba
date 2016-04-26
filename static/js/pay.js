@@ -14,6 +14,7 @@
   });
 
   require(['jquery', 'jquery.validate', 'lib/modal'], function($, validate, modal) {
+    var userStatus;
     $('.banks a').click(function(e) {
       e.preventDefault();
       $('.banks a').removeClass('active');
@@ -23,11 +24,13 @@
       return $('#' + $(e.target).attr('data-desc-id')).show();
     });
     $('#pay').click(function(e) {
+      return userStatus();
+    });
+    userStatus = function() {
       if ($('#id-is-valid').val() === 'False') {
-        e.preventDefault();
         $('#id-validate').modal();
       }
-    });
+    };
     $.validator.addMethod('morethan100', function(value, element) {
       return Number(value) >= 100;
     }, '充值金额100元起');
@@ -62,9 +65,7 @@
         }
       }
     });
-    if ($('#id-is-valid').val() === 'False') {
-      return $('#id-validate').modal();
-    }
+    return userStatus();
   });
 
 }).call(this);

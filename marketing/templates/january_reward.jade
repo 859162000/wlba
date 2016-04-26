@@ -1,0 +1,121 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/january_reward.css?v=201512")
+        - csrf_token
+    body(style="background: url('/static/imgs/pc_activity/january_reward/body_bg.jpg')")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+                .title 30万理财金满额送，更有千万红包加息券猛撒
+                .text 10倍理财金年终奖专场
+            .main_wrap.main_wrap_1
+                .title_top 单笔投资满额就送10倍理财金年终奖，多投多得上不封顶.年终福利靠自己！
+                .red_wrap
+                    .red_box
+                        .title 5000元≤单笔投资＜ 1万元
+                        .ico 送
+                        dl.red
+                            dt!='50,000<span>元</span>'
+                            dd 体验金
+                    .red_box
+                        .title 1万元≤单笔投资＜ 3万元
+                        .ico 送
+                        dl.red
+                            dt!='100,000<span>元</span>'
+                            dd 体验金
+                    .red_box.no_margin
+                        .title 3万元≤单笔投资＜ 5万元
+                        .ico 送
+                        dl.red
+                            dt!='300,000<span>元</span>'
+                            dd 体验金
+                a.button(href='/p2p/list/') 立即投资
+                .title_bottom!='备注：所有体验金10%年化、1天期限计算发放收益到账户余额。<span id="see_rule_1">点击查看理财金规则>></span>'
+                .rule_wrap.rule_wrap_1
+                    .title 【理财金领取和使用规则】
+                    p 1、新老用户均可参与，活动期间内首次满额投资即可获得定额10倍理财金，理财金自动发放到相应账户并站内信通知；
+                    p 2、理财金只能在相关活动页投体验标使用（体验标为10%年化收益，1天期限），投标时不能使用其他理财券，理财金自发放日起15日内有效；
+                    p!=' 3、理财金需用户手动投资，投资时系统将自动按理财金总额一次性投标完成。<span id="go_experience">立即前往理财金投资页面>></span>；'
+                    p 4、理财金投资完毕后，当日开始计算利息，到期日16点回款。还款本金系统自动回收，利息收益系统自动发放到用户账户；
+                    p 5、理财金利息收益和正常账户余额一样，可正常投资和提现。
+                    p.last
+                .title_img 红包加息券专场
+                .main_wrap.main_wrap_2
+                    .title_top 千万红包雨迎新猛撒，单笔投资双享红包和加息券，一箭双雕开年专享！超级福利盛大来袭
+                    .reward_wrap
+                       .reward_box
+                           .title 5万元≤单笔投资＜ 10万元
+                           .ico 送
+                           .reward_img
+                               dl.left
+                                    dt 1.5%
+                                    dd 加息券
+                               dl.right
+                                    dt 200元
+                                    dd 红包
+                       .reward_box
+                           .title 10万元≤单笔投资＜ 20万元
+                           .ico 送
+                           .reward_img
+                               dl.left
+                                    dt 2.0%
+                                    dd 加息券
+                               dl.right
+                                    dt 500元
+                                    dd 红包
+                       .reward_box
+                           .title 20万元≤单笔投资＜ 50万元
+                           .ico 送
+                           .reward_img
+                               dl.left
+                                    dt 2.4%
+                                    dd 加息券
+                               dl.right
+                                    dt 1200元
+                                    dd 红包
+                       .reward_box.last
+                           .title 50万元≤单笔投资
+                           .ico 送
+                           .reward_img
+                               dl.left
+                                    dt 2.8%
+                                    dd 加息券
+                               dl.right
+                                    dt 3000元
+                                    dd 红包
+                a.button(href='/p2p/list/') 立即投资
+                .title_bottom!='备注：<span id="see_rule_2">点击查看红包和加息券规则>></span>'
+                .rule_wrap.rule_wrap_2
+                    .title 【红包和加息券规则】
+                    p 1、红包和加息券有效期：2016年1月15日00:00-2016年2月5日23:59；
+                    p 2、单笔投资满额所赠加息券不限标期均可使用，所赠红包为直抵现金红包。投资满额后立即发放，详情使用方法请见我的账户-理财券查看。活动期间多投多送上不封顶；
+                    p 3、红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
+                    p 4、加息券在电脑端和手机端均可使用，一券一标永久加息。投标时选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+                    p 5、投资一个项目时，红包不可叠加使用，也不可与加息券叠加使用；
+                    p 6、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+                    p 7、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+                    p.last
+                .act_rule
+                    .title 【活动规则】
+                    p 1、活动时间：2016年1月15日-2016年1月24日；
+                    p 2、活动期间，新老用户均可参加活动，投资满额送10倍年终奖理财金理财金需用户投体验标后才可获得收益，立即前往理财金投资页面；
+                    p 3、大额投资专享加息券和红包福利，单笔投资后立得双重好礼;
+                    p 4、红包和加息券只限投正常期限理财标获得和使用，不可用于定存宝和债转等产品;
+                    p 5、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑;
+                    p 6、网利宝对此活动享有最终解释权。
+
+            .code_wrap
+                .bg
+                .main
+                    img.code(src="/static/imgs/pc_activity/january_reward/code.jpg")
+                    .text 手机扫一下也许就能赚钱
+        include global/g_footer
+script.
+    require(['/static/js/january_reward.js?v=2015122101'])
+                                                                    

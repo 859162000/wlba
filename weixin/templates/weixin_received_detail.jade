@@ -1,0 +1,19 @@
+-load formatters
+doctype html
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 还款明细
+      a(href="javascript:history.back()")
+        span 返回
+    .received-loding
+      include  include/weixin_loading
+    .received-item
+      .received-list
+
+    script(src='/static/scripts/mobile/pro/vendor.zepto.js?v=2016040414')
+    script(src='/static/scripts/mobile/pro/received_detail.js?v=2016040414')
+
+

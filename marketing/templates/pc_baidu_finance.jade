@@ -22,14 +22,11 @@ html
       .g-banner-slide-baidu
         .g-slide
           if token == 'google1'
-            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_signnew.jpg')")
-            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_signnew.jpg')")
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner2_signnew.jpg')")
           else
-            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_unsign.jpg')")
-            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_unsign.jpg')")
-        .g-slide-anchor
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner2_unsign.jpg')")
+        //.g-slide-anchor
             a.slide-anchor.active 0
-            a.slide-anchor 1
       .gold2
         if user.is_authenticated
           //#ganjiwang-model
@@ -226,5 +223,5 @@ html
             p 3. 首投所赠50元红包单笔投资满5000元可直抵使用、100元红包单笔投资满8000元可直抵使用、180元红包单笔投资满12000元可直抵使用。有效期自领取日起15天内有效；
     include global/g_footer
   script.
-    require(["/static/js/newgive.js?v=20151020"])
+    require(["/static/js/newgive.js?v=20160127"])
   include include/tracking
