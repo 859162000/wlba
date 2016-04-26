@@ -88,6 +88,7 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
 from wanglibao_rest.utils import get_client_ip
+from marketing.utils import get_channel_record
 reload(sys)
 
 class YaoView(TemplateView):
@@ -3230,7 +3231,11 @@ class MaiMaiView(TemplateView):
             token = token_session
         else:
             token = ''
-
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
         return {
-            'token': token
+            'token': token,
+            'channel': channel
         }
