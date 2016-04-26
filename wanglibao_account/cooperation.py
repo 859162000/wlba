@@ -2279,10 +2279,10 @@ class BiSouYiRegister(BaJinSheRegister):
             binding.save()
 
 
-class JXHZRegister(CoopRegister):
+class JiaXiHZRegister(CoopRegister):
     def __init__(self, request):
-        super(JXHZRegister, self).__init__(request)
-        self.c_code = 'jxhz'
+        super(JiaXiHZRegister, self).__init__(request)
+        self.c_code = 'jiaxihz'
         # self.coop_key = YZCJ_COOP_KEY
         # self.call_back_url = YZCJ_CALL_BACK_URL
 
