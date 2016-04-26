@@ -100,20 +100,7 @@ org.mmIndex = (function(org){
 
                 _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
-                    ops = {
-                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token='+token,
-                        type: 'POST',
-                        success: function(data){
-                            if(data.ret_code == 0){
-                                window.location.href = '/activity/maimai_success/?state=1'
-                            }else if(data.ret_code === 1000){
-                                window.location.href = '/activity/maimai_success/?state=0'
-                            }
-                        },
-                        complete:function(){
-                            lib.$submit.removeAttr('disabled').html('领 取');
-                        }
-                    }
+                    alert('您已注册过网利宝！')
                 }else{
                     ops = {
                         url: '/api/register/?promo_token='+token,
@@ -204,7 +191,7 @@ org.mmIndex = (function(org){
 
             function callback (data){
                 if(data.existing){
-                    lib.$submit.removeAttr('disabled');
+                    $(document.body).trigger('from:error',['您已经是我们的老用户', true, false]);
                     _self.$body_h.css({'height': '0'});
                     _self.$phone.attr('data-existing', true);
                 }else{
