@@ -898,9 +898,9 @@ class KongGangRewardDistributer(RewardDistributer):
         all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
         send_reward = None
-        if  self.amount>=15000 and self.amount<20000:
+        if  self.amount>=10000 and self.amount<15000:
             send_reward = wait_reward
-        if  self.amount>=20000:
+        if  self.amount>=15000:
             send_reward = all_reward or wait_reward
         if send_reward:
             try:
@@ -970,11 +970,19 @@ class KongGangAPIView(APIView):
 
             reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
             if reward == None:
-                json_to_response = {
-                    'ret_code': 1002,
-                    'message': u'您不满足领取条件，满额投资后再来领取吧！'
-                }
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                noused = Reward.objects.filter(type__in=('尊贵休息室服务', '贵宾全套出岗服务'), is_used=False).count()
+                if noused == 0:
+                    json_to_response = {
+                        'ret_code': 1005,
+                        'message': u'亲,您来晚了;奖品已经发完了！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    json_to_response = {
+                        'ret_code': 1002,
+                        'message': u'您不满足领取条件，满额投资后再来领取吧！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
             if reward.has_sent == False:
                 reward.has_sent=True
@@ -1022,7 +1030,10 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
         send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
         if send_reward:
             try:
-                WanglibaoActivityReward.objects.create(
+                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
+                if reward:
+                    return
+                reward = WanglibaoActivityReward.objects.create(
                         activity='sy',
                         order_id=self.order_id,
                         user=self.user,
@@ -1031,8 +1042,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                         has_sent=False,
                         left_times=1,
                         join_times=1)
-                
-                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
+                #reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
                 if reward:
                     reward.has_sent=True
                     reward.left_time=0
