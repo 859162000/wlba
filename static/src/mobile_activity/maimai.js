@@ -96,10 +96,12 @@ org.mmIndex = (function(org){
                 if(!lib.checkState) return
 
                 var ops = {};
+                var token = $('input[name=token]').val();
+
                 _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
-                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimai1',
+                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token='+token,
                         type: 'POST',
                         success: function(data){
                             if(data.ret_code == 0){
@@ -114,7 +116,7 @@ org.mmIndex = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=blued',
+                        url: '/api/register/?promo_token='+token,
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),

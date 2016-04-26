@@ -3217,3 +3217,20 @@ class OpenHouseApiView(TemplateView):
             self.template_name = 'h5_open_house.jade'
 
         return {}
+
+class MaiMaiView(TemplateView):
+    template_name = 'app_maimaiIndex.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = ''
+
+        return {
+            'token': token
+        }
