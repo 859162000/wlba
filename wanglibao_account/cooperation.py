@@ -733,10 +733,19 @@ class BaJinSheCallback(CoopCallback):
             'purchases': timezone.localtime(equity.created_at).strftime('%Y%m%d%H%M%S'),
         }
 
-        reward_data_list = list()
-        if user_amo.settled and int(user_amo.term) > 1:
-            user_amos = UserAmortization.objects.filter(product=product, user=user_amo.user).order_by('term')
-            for user_amo in user_amos:
+        if user_amo.settled:
+            reward_data_list = list()
+            if int(user_amo.term) > 1:
+                user_amos = UserAmortization.objects.filter(product=product, user=user_amo.user).order_by('term')
+                for user_amo in user_amos:
+                    reward_data = {
+                        'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
+                        'income': float(user_amo.interest),
+                        'principal': float(user_amo.principal),
+                        'incomeState': income_state,
+                    }
+                    reward_data_list.append(reward_data)
+            else:
                 reward_data = {
                     'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
                     'income': float(user_amo.interest),
@@ -744,19 +753,11 @@ class BaJinSheCallback(CoopCallback):
                     'incomeState': income_state,
                 }
                 reward_data_list.append(reward_data)
-        else:
-            reward_data = {
-                'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
-                'income': float(user_amo.interest),
-                'principal': float(user_amo.principal),
-                'incomeState': income_state,
-            }
-            reward_data_list.append(reward_data)
 
-        act_data['reward'] = reward_data_list
+            act_data['reward'] = reward_data_list
 
         if state != 5:
-            act_data['bearingDate'] = timezone.localtime(equity.confirm_at).strftime('%Y%m%d%H%M%S')
+            act_data['bearingDate'] = timezone.localtime(user_amo.settlement_time).strftime('%Y%m%d%H%M%S')
 
         return act_data
 
