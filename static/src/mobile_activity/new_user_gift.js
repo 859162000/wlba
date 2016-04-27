@@ -26,6 +26,53 @@ $(function(){
     $("div.js-rule").on("touchstart", function(){
         $("div.alt-rule").css("display","-webkit-box");
     });
+    var weiURL = '/weixin/api/jsapi_config/';
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+    org.ajax({
+        type: 'GET',
+        url: weiURL,
+        dataType: 'json',
+        success: function (data) {
+            //请求成功，通过config注入配置信息,
+            wx.config({
+                debug: false,
+                appId: data.appId,
+                timestamp: data.timestamp,
+                nonceStr: data.nonceStr,
+                signature: data.signature,
+                jsApiList: jsApiList
+            });
+        }
+    });
+    wx.ready(function () {
+        var winHost = window.location.href;
+        var host = winHost.substring(0,winHost.indexOf('/activity')),
+            shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+            shareLink = host + '/weixin/new_user_gift/',
+            shareMainTit = '尊贵新人礼',
+            shareBody = '尊贵新人礼';
+        //分享给微信好友
+         org.onMenuShareAppMessage({
+            title: shareMainTit,
+            desc: shareBody,
+            link: shareLink,
+            imgUrl: shareImg
+        });
+        //分享给微信朋友圈
+        org.onMenuShareTimeline({
+            title: shareMainTit,
+            link : shareLink,
+            imgUrl: shareImg
+        });
+        //分享给QQ
+        org.onMenuShareQQ({
+            title: shareMainTit,
+            desc: shareBody,
+            link : shareLink,
+            imgUrl: shareImg
+        });
+    });
+
     function get_gift(){
         //领取加息券
         $("button.js-receive").on("touchstart", function(){
@@ -58,53 +105,6 @@ $(function(){
                 complete: function () {
                     self.removeAttr("disabled").text("领取加息特权");
                 }
-            });
-        });
-
-        var weiURL = '/weixin/api/jsapi_config/';
-        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
-        org.ajax({
-            type: 'GET',
-            url: weiURL,
-            dataType: 'json',
-            success: function (data) {
-                //请求成功，通过config注入配置信息,
-                wx.config({
-                    debug: false,
-                    appId: data.appId,
-                    timestamp: data.timestamp,
-                    nonceStr: data.nonceStr,
-                    signature: data.signature,
-                    jsApiList: jsApiList
-                });
-            }
-        });
-        wx.ready(function () {
-            var winHost = window.location.href;
-            var host = winHost.substring(0,winHost.indexOf('/activity')),
-                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-                shareLink = host + '/weixin/new_user_gift/',
-                shareMainTit = '尊贵新人礼',
-                shareBody = '尊贵新人礼';
-            //分享给微信好友
-             org.onMenuShareAppMessage({
-                title: shareMainTit,
-                desc: shareBody,
-                link: shareLink,
-                imgUrl: shareImg
-            });
-            //分享给微信朋友圈
-            org.onMenuShareTimeline({
-                title: shareMainTit,
-                link : shareLink,
-                imgUrl: shareImg
-            });
-            //分享给QQ
-            org.onMenuShareQQ({
-                title: shareMainTit,
-                desc: shareBody,
-                link : shareLink,
-                imgUrl: shareImg
             });
         });
     }
@@ -142,7 +142,7 @@ $(function(){
                             url += "?1";
                             self.location.replace(url);
                         }
-                        org.experience.init()
+                        get_gift();
                     }
                 })
             }
@@ -152,7 +152,7 @@ $(function(){
                     mixins.loginApp({refresh:1, url:''});
                 } else {
                     login = true;
-                    connect(data)
+                    connect(data);
                 }
             });
             //document.getElementById('refresh').onclick= function(){
