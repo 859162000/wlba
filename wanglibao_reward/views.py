@@ -997,9 +997,9 @@ class KongGangAPIView(APIView):
                 all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
                 send_reward = None
-                if  self.amount>=10000 and self.amount<15000:
+                if reward.amount>=10000 and reward.amount<15000:
                     send_reward = wait_reward
-                if  self.amount>=15000:
+                if reward.amount>=15000:
                     send_reward = all_reward or wait_reward
 
                 if None == send_reward:
