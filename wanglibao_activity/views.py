@@ -183,6 +183,7 @@ class PcActivityAreaView(TemplateView):
             'results': activity_list[:limit],
             'all_page': all_page,
             'page': page,
+            'pagesize': limit,
             'list_count': data_count
         }
 
@@ -228,6 +229,7 @@ class ActivityAreaApi(APIView):
         return Response({
             'html_data': html_data,
             'page': page,
+            'pagesize': pagesize,
             'all_page': all_page,
             'list_count': data_count
         })
