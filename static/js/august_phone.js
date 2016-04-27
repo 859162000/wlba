@@ -54,13 +54,13 @@
             success: function (data1) {
                 h5_user_static = data1.login;
 
-                $('#button_link').click(function() {
-                    if(h5_user_static) {
-                        window.location.href = '/p2p/list/?promo_token=sy'
-                    }else {
-                        window.location.href = '/accounts/login/?next=/activity/august_phone/?promo_token=sy'
-                    }
-                })
+                //$('#button_link').click(function() {
+                //    if(h5_user_static) {
+                //        window.location.href = '/p2p/list/?promo_token=sy'
+                //    }else {
+                //        window.location.href = '/accounts/login/?next=/activity/august_phone/?promo_token=sy'
+                //    }
+                //})
             }
         })
 
@@ -78,7 +78,15 @@
             }
         })
 
+        $('#button_link').click(function() {
+            $.ajax({
+                url: '/activity/zhaoxiangguan/',
+                type: 'post',
+                success: function (data1) {
 
+                }
+            })
+        })
 
 
     })
