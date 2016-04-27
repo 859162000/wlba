@@ -745,8 +745,8 @@ class BaJinSheCallback(CoopCallback):
             'purchases': timezone.localtime(equity.created_at).strftime('%Y%m%d%H%M%S'),
         }
 
+        reward_data_list = list()
         if user_amo.settled:
-            reward_data_list = list()
             if int(user_amo.term) > 1:
                 user_amos = UserAmortization.objects.filter(product=product, user=user_amo.user).order_by('term')
                 for user_amo in user_amos:
@@ -766,7 +766,7 @@ class BaJinSheCallback(CoopCallback):
                 }
                 reward_data_list.append(reward_data)
 
-            act_data['reward'] = reward_data_list
+        act_data['reward'] = reward_data_list
 
         if state != 5:
             act_data['bearingDate'] = timezone.localtime(user_amo.settlement_time).strftime('%Y%m%d%H%M%S')
