@@ -93,14 +93,14 @@
     opacity: 1
 @-webkit-keyframes translateR
   0%
-    -webkit-transform: translate(-100%)
-  100%
     -webkit-transform: translate(0)
+  100%
+    -webkit-transform: translate(100%)
 @keyframes translateR
   0%
-    transform: translate(-100%)
-  100%
     transform: translate(0)
+  100%
+    transform: translate(100%)
 //箭头
 @keyframes topAbtm
   0%,100%
@@ -139,9 +139,9 @@
     -webkit-animation: toBig $t $d ease-in backwards
     animation: toBig $t $d ease-in backwards
   @mixin translateR($d:0.8s,$t:0.5s)
-    animation: translateR $t $d ease-out backwards
+    animation: translateR $t $d ease-out both
     transform-origin: 0 50%
-    -webkit-animation: translateR $t $d ease-out backwards
+    -webkit-animation: translateR $t $d ease-out both
     -webkit-transform-origin: 0 50%
   @mixin pageArr-animate($t:0s)
     animation: topAbtm 1s ease-in-out $t infinite
@@ -173,7 +173,7 @@
     text-align: center
     position: absolute
     left: 0
-    bottom: 1.5rem
+    bottom: 10%
     z-index: 9
     color: #666
   .page-tit
@@ -250,13 +250,21 @@
       z-index: 1
       top: 20%
       overflow: hidden
-      &:after
+      &:after, &:before
         display: block
         content: ''
         width: 100%
         height: 100%
+        position: absolute
+        top: 0
+        left: 0
+      &:after
         background: url("/static/imgs/mobile_activity/new_user_gift/iconfont_arrow.png") left center no-repeat
         background-size: contain
+        z-index: 1
+      &:before
+        background: #fff
+        z-index: 2
         +translateR
     .page-arr
       background: #33A8F7
@@ -264,6 +272,7 @@
       height: 1.2rem
       transform: rotate(45deg)
       -webkit-transform: rotate(45deg)
+      z-index: 4
       &.arr1
         right: 15%
         top: 10%
@@ -364,6 +373,7 @@
         font-size: 0.7rem
         +toBig(2.1s, 0.2s)
   .page4
+    min-height: 24rem
     .page-people
       width: 48%
       height: 18rem
@@ -541,6 +551,7 @@
 @media screen and (max-width: 330px)
   .new-user-gift
     .page-txt
+      color: #f00
       bottom: 3rem
     .page4
       .page-txt

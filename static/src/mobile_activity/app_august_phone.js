@@ -85,12 +85,7 @@
                         ts: data.ts
                     },
                     success: function (data) {
-                        //var url = location.href;
-                        //var times = url.split("?");
-                        //if(times[1] != 1){
-                        //    url += "?1";
-                        //    self.location.replace(url);
-                        //}
+
                     }
                 })
             }
@@ -98,22 +93,18 @@
             mixins.sendUserInfo(function(data) {
 
                 if (data.ph == '') {
-
+                    $('#button_link').on("click",function(){
+                         mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_august_phone/?promo_token=sy'});
+                    })
                 } else {
                     connect(data);
-
-                }
-
-                $('#button_link').on("click",function(){
-
+                    $('#button_link').on("click",function(){
                     org.ajax({
                         type: "post",
                         url: "/api/activity/zhaoxiangguan/",
                         dataType: 'json',
                         success: function(data){
-                            if(data.ret_code=='1000'){
-                                mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
-                            }else if(data.ret_code=='1'){
+                            if(data.ret_code=='1'){
                                 $('.popup_box .main .textairport').text(''+data.message+'');
                                 $('.popup_box').show();
                             }else if(data.ret_code=='0'){
@@ -123,7 +114,10 @@
                         }
 
                     })
-                })
+                        })
+                }
+
+
 
             })
         },
