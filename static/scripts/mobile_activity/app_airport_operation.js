@@ -339,7 +339,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         dataType: 'json',
                         success: function(data){
                             if(data.ret_code=='1000'){
-                                mixins.registerApp({loginApp:1, url:'/activity/app_airport_operation/'});
+                                mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
                             }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
                                 $('.popup_box .main .textairport').text(''+data.message+'');
                                 $('.popup_box').show();

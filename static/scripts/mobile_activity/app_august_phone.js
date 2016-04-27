@@ -315,6 +315,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
 			mixins.shareData({title: '网利宝影像投资节送福利喽', content: '全民福利 火速领取'});
             mixins.sendUserInfo(function(data) {
+
+                if (data.ph == '') {
+                    alert('1');
+                } else {
+                    connect(data);
+                    alert('2');
+                }
+
                 $('#button_link').on("click",function(){
 
                     org.ajax({
@@ -323,15 +331,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         dataType: 'json',
                         success: function(data){
                             if(data.ret_code=='1000'){
-                                mixins.registerApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
+                                mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
                             }else if(data.ret_code=='1'){
                                 $('.popup_box .main .textairport').text(''+data.message+'');
                                 $('.popup_box').show();
                             }else if(data.ret_code=='0'){
                                 mixins.jumpToManageMoney();
+                            }else{
+                                alert(data.ret_code);
+                                alert(data.message);
                             }
                             //console.log(data)
                         }
+
                     })
                 })
 
