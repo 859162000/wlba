@@ -624,6 +624,19 @@ class WechatShareTemplate(TemplateView):
                 logout(request)
             return super(WechatShareTemplate, self).dispatch(request, *args, **kwargs)
 
+class FetchXunleiCardAward(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+
+        return Response({"ret_code": 0, "msg": 'ok'})
+
+
+
+
+
+
 
 
 

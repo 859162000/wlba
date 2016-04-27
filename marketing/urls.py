@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
-                            OpenHouseApiView
+                            OpenHouseApiView, MaiMaiView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -97,6 +97,7 @@ urlpatterns = patterns(
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
+    url(r'^xunlei/$', TemplateView.as_view(template_name="xunlei.jade")),
 
 )
 
@@ -162,7 +163,9 @@ urlpatterns += patterns(
     url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
     url(r'^app_halloween/$', TemplateView.as_view(template_name="app_halloween.jade")),
 
-    url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade"), name='maimai_index'),
+
+    url(r'^maimai_index/$', MaiMaiView.as_view(), name="maimai_index"),
+    #url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade"), name='maimai_index'),
     url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
     url(r'^maimai_success/$', TemplateView.as_view(template_name="app_maimaiSuccess.jade")),
     url(r'^wechat_reward/$', TemplateView.as_view(template_name="app_wechatReward.jade")),
@@ -209,6 +212,7 @@ urlpatterns += patterns(
     url(r'^app_xunleizhuce/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunleizhuce.jade")),
     url(r'^h5_recruit/$', TemplateView.as_view(template_name="h5_recruit.jade")),
     url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
+    url(r'^new_user_gift/$', TemplateView.as_view(template_name="new_user_gift.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),

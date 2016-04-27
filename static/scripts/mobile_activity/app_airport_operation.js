@@ -222,7 +222,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	var sixlis = document.getElementById("six_lis");
 
-     $('#sec').fullpage();
+     $('#sec').fullpage({
+         scrollingSpeed: 700
+     });
      sixlis.addEventListener("touchstart",function(){
           $(this).next().slideToggle();
       },false)
@@ -272,7 +274,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://staging.wanglibao.com/',
+		var host = 'https://www.wanglibao.com/',
 			shareName = '从容出行 尊贵定制',
 			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
 			shareLink = host + 'weixin_activity/app_airport_operation/',
@@ -360,7 +362,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     success: function(data){
                         if(data.ret_code=='1000'){
                             window.location.href = '/weixin/regist/?next=/weixin/list/'
-                        }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
+                        }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'||data.ret_code=='1005'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else if(data.ret_code=='1002'){

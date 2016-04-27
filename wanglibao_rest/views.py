@@ -70,7 +70,7 @@ from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 from wanglibao_invite.invite_common import ShareInviteRegister
-from wanglibao.settings import GEETEST_ID, GEETEST_KEY
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY, INNER_IP
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -1514,13 +1514,13 @@ class GuestCheckView(APIView):
 
 class InnerSysHandler(object):
     def ip_valid(self, request):
-        INNER_IP = ("182.92.179.24", "10.171.37.235")
         client_ip = get_client_ip(request)
+        logger.debug('request ip:%s' % (client_ip, ))
         return True if client_ip in INNER_IP else False
 
     def judge_valid(self, request):
         if not self.ip_valid(request):
-            return False, u'IP没有通过验证'
+            return False, u'IP(%s)没有通过验证' % get_client_ip(request)
 
         return True, u'通过验证'
 
