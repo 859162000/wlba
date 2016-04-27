@@ -1520,7 +1520,7 @@ class InnerSysHandler(object):
 
     def judge_valid(self, request):
         if not self.ip_valid(request):
-            return False, u'IP没有通过验证'
+            return False, u'IP(%s)没有通过验证' % get_client_ip(request)
 
         return True, u'通过验证'
 
@@ -2021,7 +2021,7 @@ class BiSouYiUserExistsApi(APIView):
         response_data = {
             'cid': client_id,
             'sign': sign,
-            'conten': content,
+            'content': content,
         }
 
         http_response = HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

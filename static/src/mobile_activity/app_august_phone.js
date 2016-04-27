@@ -85,17 +85,25 @@
                         ts: data.ts
                     },
                     success: function (data) {
-                        var url = location.href;
-                        var times = url.split("?");
-                        if(times[1] != 1){
-                            url += "?1";
-                            self.location.replace(url);
-                        }
+                        //var url = location.href;
+                        //var times = url.split("?");
+                        //if(times[1] != 1){
+                        //    url += "?1";
+                        //    self.location.replace(url);
+                        //}
                     }
                 })
             }
 			mixins.shareData({title: '网利宝影像投资节送福利喽', content: '全民福利 火速领取'});
             mixins.sendUserInfo(function(data) {
+
+                if (data.ph == '') {
+
+                } else {
+                    connect(data);
+
+                }
+
                 $('#button_link').on("click",function(){
 
                     org.ajax({
@@ -104,7 +112,7 @@
                         dataType: 'json',
                         success: function(data){
                             if(data.ret_code=='1000'){
-                                mixins.registerApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
+                                mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
                             }else if(data.ret_code=='1'){
                                 $('.popup_box .main .textairport').text(''+data.message+'');
                                 $('.popup_box').show();
@@ -113,6 +121,7 @@
                             }
                             //console.log(data)
                         }
+
                     })
                 })
 
@@ -128,7 +137,7 @@
                     dataType: 'json',
                     success: function(data){
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?next=/weixin/list/?promo_token=sy'
+                            window.location.href = '/weixin/regist/?next=/activity/app_august_phone/?promo_token=sy'
                         }else if(data.ret_code=='1'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();

@@ -108,6 +108,7 @@ $(function(){
             });
         });
     }
+    s
     //音乐
     var audioBox = document.getElementById("js-audio"),
         audioDom = audioBox.getElementsByTagName("audio")[0];
@@ -158,7 +159,7 @@ $(function(){
             //document.getElementById('refresh').onclick= function(){
             //    window.location.reload();
             //}
-            mixins.shareData({title: "尊贵新人礼", content: "尊贵新人礼"});
+            mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利"});
         },
         other: function(){
             get_gift();
