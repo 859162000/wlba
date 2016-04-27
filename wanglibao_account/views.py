@@ -2897,7 +2897,7 @@ class BiSouYiRegisterApi(APIView):
 
         response_data['oauth_data'] = json.dumps(oauth_data)
 
-        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        logger.info("BiSouYiRegisterApi process result: %s" % response_data)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
@@ -2970,7 +2970,7 @@ class BiSouYiRegisterView(TemplateView):
 
         response_data['oauth_data'] = json.dumps(oauth_data)
 
-        logger.info("BiSouYiRegisterView process result: %s" % response_data['message'])
+        logger.info("BiSouYiRegisterView process result: %s" % response_data)
         return response_data
 
 
@@ -3047,6 +3047,6 @@ class BiSouYiLoginApi(APIView):
             }
 
         response_data['oauth_data'] = json.dumps(oauth_data)
-        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        logger.info("BiSouYiRegisterApi process result: %s" % response_data)
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
