@@ -98,11 +98,12 @@ def split_ua(request):
 
 
 def get_client_ip(request):
+    #client_ip = self.request.META['HTTP_X_FORWARDED_FOR'] if self.request.META.get('HTTP_X_FORWARDED_FOR', None) else self.request.META.get('HTTP_X_REAL_IP', None)
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         return x_forwarded_for
     else:
-        ip = request.META.get('REMOTE_ADDR')
+        ip = request.META.get('HTTP_X_REAL_IP')
     return ip
 
 
