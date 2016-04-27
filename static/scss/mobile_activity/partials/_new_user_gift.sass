@@ -93,13 +93,17 @@
     opacity: 1
 @-webkit-keyframes translateR
   0%
+    opacity: 1
     -webkit-transform: translate(0)
   100%
+    opacity: 1
     -webkit-transform: translate(100%)
 @keyframes translateR
   0%
+    opacity: 1
     transform: translate(0)
   100%
+    opacity: 1
     transform: translate(100%)
 //箭头
 @keyframes topAbtm
@@ -263,6 +267,7 @@
         background-size: contain
         z-index: 1
       &:before
+        opacity: 0
         background: #fff
         z-index: 2
         +translateR
@@ -551,11 +556,7 @@
 @media screen and (max-width: 330px)
   .new-user-gift
     .page-txt
-      color: #f00
-      bottom: 3rem
-    .page4
-      .page-txt
-        bottom: 4.5rem
+      bottom: 4.5rem
 @media screen and (min-width: 331px) and (max-width: 360px)
   .new-user-gift
     .page4
