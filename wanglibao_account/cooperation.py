@@ -1154,6 +1154,30 @@ class KongGangRegister(CoopRegister):
         self.c_code = 'kgyx'
         self.invite_code = 'kgyx'
 
+    def decide_which_reward_distribute(self, p2p_amount):
+
+        reward = None
+        if p2p_amount>=500 and p2p_amount<5000:
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='CIP专用安检通道服务', is_used=False).first()
+                reward.is_used = True
+                reward.save()
+                return reward
+
+        if reward == None or (p2p_amount>=5000 and p2p_amount<10000):
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
+                reward.is_used = True
+                reward.save()
+                return reward
+
+        if reward == None or p2p_amount>=10000:
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
+                reward.is_used = True
+                reward.save()
+        return reward
+
     def purchase_call_back(self, user, order_id):
 
         key = 'konggang'
@@ -1172,7 +1196,10 @@ class KongGangRegister(CoopRegister):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
-        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        #now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        now = p2p_record.create_time
         if now < start_time or now > end_time:
             json_to_response = {
                 'ret_code': 1001,
@@ -1180,10 +1207,16 @@ class KongGangRegister(CoopRegister):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
-
         # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == int(order_id):
+        if not (p2p_record and p2p_record.order_id == int(order_id)):
+            return
+
+        #判断有没有奖品剩余
+        reward = self.decide_which_reward_distribute(p2p_record.p2p_amount)
+        if reward == None:
+            return
+
+        try:
             with transaction.atomic():
                 join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
                 if not join_record:
@@ -1191,54 +1224,45 @@ class KongGangRegister(CoopRegister):
                         user=user,
                         activity_code=self.c_code
                     )
-                cip_reward = Reward.objects.filter(type='CIP专用安检通道服务', is_used=False).first()
-                wait_reward = Reward.objects.filter(type='尊贵休息室服务', is_used=False).first()
-                all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
-                p2p_amount = int(p2p_record.amount)
-                send_reward = None
-                if  p2p_amount>=500 and p2p_amount<5000:
-                    send_reward = cip_reward
-                if  p2p_amount>=5000 and p2p_amount<10000:
-                    send_reward = wait_reward or cip_reward
-                if  p2p_amount>=10000:
-                    send_reward = all_reward or wait_reward or cip_reward
-                if send_reward:
-                    try:
-                        ActivityReward.objects.create(
-                                activity='kgyx',
-                                order_id=order_id,
-                                user=user,
-                                p2p_amount=p2p_record.amount,
-                                reward=send_reward,
-                                has_sent=True,
-                                left_times=0,
-                                join_times=0)
-                        send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
-                                   u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
-                                   u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
-                                   u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (send_reward.type, send_reward.content)
-                        logger.debug("空港易行短信内容:%s, user_id:%s" % (send_msg, user.id))
-                        send_messages.apply_async(kwargs={
-                            "phones": [user.id, ],
-                            "message": [send_msg,],
-                        })
-
-                        inside_message.send_one.apply_async(kwargs={
-                            "user_id": user.id,
-                            "title": u"空港易行优惠服务",
-                            "content": send_msg,
-                            "mtype": "activity"
-                        })
-                        send_reward.is_used = True
-                        send_reward.save()
-                    except Exception:
-                        logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
-                    join_record.save()
-                else: #所有奖品已经发完了
+                reward_record = ActivityReward.objects.filter(has_sent=True, activity='kgyx', user=user).first()
+                if reward_record:  #奖品记录已经生成了
                     join_record.save()
                     return
-                
+                reward_record = ActivityReward.objects.create(
+                            activity='kgyx',
+                            order_id=order_id,
+                            user=user,
+                            p2p_amount=p2p_record.amount,
+                            reward=reward,
+                            has_sent=False,
+                            left_times=0,
+                            join_times=0)
+        except Exception:
+            reward.is_used = False
+            reward.save()
+            join_record.save()
+        else:
+            send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                       u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                       u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
+                       u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
+
+            send_messages.apply_async(kwargs={
+                "phones": [user.id, ],
+                "message": [send_msg,],
+            })
+
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"空港易行优惠服务",
+                "content": send_msg,
+                "mtype": "activity"
+            })
+            reward_record.has_sent = True
+            reward_record.save()
+            join_record.save()
+
 class ZhaoXiangGuanRegister(CoopRegister):
     def __init__(self, request):
         super(ZhaoXiangGuanRegister, self).__init__(request)

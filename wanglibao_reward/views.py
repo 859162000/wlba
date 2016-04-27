@@ -935,6 +935,25 @@ class KongGangAPIView(APIView):
     def __init__(self):
         super(KongGangAPIView, self).__init__()
 
+    def decide_which_reward_distribute(self, p2p_amount):
+
+        reward = None
+
+        if reward == None or (p2p_amount>=15000 and p2p_amount<20000):
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
+                reward.is_used = True
+                reward.save()
+                return reward
+
+        if reward == None or p2p_amount>=20000:
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
+                reward.is_used = True
+                reward.save()
+
+        return reward
+
     def post(self, request):
         if not request.user.is_authenticated():
             json_to_response = {
@@ -967,82 +986,74 @@ class KongGangAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        with transaction.atomic():
-            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code='kgyx').first()
-            if not join_record:
-                join_record = WanglibaoRewardJoinRecord.objects.create(
-                    user=request.user,
-                    activity_code='kgyx',
-                    remain_chance=1,
-                )
+        reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
+        if reward == None:
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'您不满足领取条件，满额投资后再来领取吧！'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
-            if reward == None:
-                noused = Reward.objects.filter(type__in=('尊贵休息室服务', '贵宾全套出岗服务'), is_used=False).count()
-                if noused == 0:
-                    json_to_response = {
-                        'ret_code': 1005,
-                        'message': u'亲,您来晚了;奖品已经发完了！'
-                    }
-                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-                else:
-                    json_to_response = {
-                        'ret_code': 1002,
-                        'message': u'您不满足领取条件，满额投资后再来领取吧！'
-                    }
-                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        sent_reward = self.decide_which_reward_distribute(reward.amount)
+        if sent_reward == None:
+            json_to_response = {
+                'ret_code': 1005,
+                'message': u'亲,您来晚了;奖品已经发完了！'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-            if reward.has_sent == False:
-                wait_reward = Reward.objects.filter(type='尊贵休息室服务', is_used=False).first()
-                all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
+        try:
+            with transaction.atomic():
+                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code='kgyx').first()
+                if not join_record:
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=request.user,
+                        activity_code='kgyx',
+                        remain_chance=1,
+                    )
 
-                send_reward = None
-                if reward.amount>=10000 and reward.amount<15000:
-                    send_reward = wait_reward
-                if reward.amount>=15000:
-                    send_reward = all_reward or wait_reward
-
-                if None == send_reward:
-                    json_to_response = {
-                        'ret_code': 1005,
-                        'message': u'亲,您来晚了;奖品已经发完了！'
-                    }
-                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-                else:
-                    reward.reward = send_reward
-                    reward.has_sent=True
-                    reward.left_time=0
-                    send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
-                               u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
-                               u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
-                               u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
-                    logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
-                    send_messages.apply_async(kwargs={
-                        "phones": [request.user.wanglibaouserprofile.phone, ],
-                        "messages": [send_msg, ],
-                    })
-
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id": request.user.id,
-                        "title": u"空港易行优惠服务",
-                        "content": send_msg,
-                        "mtype": "activity"
-                    })
-                    reward.save()
+                if reward.has_sent == True:
                     join_record.save()
                     json_to_response = {
-                        'ret_code': 0,
-                        'message': u'奖品发放成功，请查看网利宝站内信'
+                        'ret_code': 1003,
+                        'message': u'奖品已经发放'
                     }
                     return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-            else:
-                json_to_response = {
-                    'ret_code': 1003,
-                    'message': u'奖品已经发放'
-                }
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-    
+                reward.reward = sent_reward
+                reward.has_sent = True
+                reward.left_time=0
+        except Exception:
+            sent_reward.is_used = False
+            sent_reward.save()
+            join_record.save()
+        else:
+            send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                       u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                       u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
+                       u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
+            logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
+            send_messages.apply_async(kwargs={
+                "phones": [request.user.wanglibaouserprofile.phone, ],
+                "messages": [send_msg, ],
+            })
+
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": u"空港易行优惠服务",
+                "content": send_msg,
+                "mtype": "activity"
+            })
+            reward.save()
+            join_record.save()
+            json_to_response = {
+                'ret_code': 0,
+                'message': u'奖品发放成功，请查看网利宝站内信'
+            }
+            join_record.save()
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+
 class ZhaoXiangGuanRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
         super(ZhaoXiangGuanRewardDistributer, self).__init__(request, kwargs)
