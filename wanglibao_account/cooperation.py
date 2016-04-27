@@ -2175,6 +2175,9 @@ class RenRenLiRegister(BaJinSheRegister):
         sign = self.request.REQUEST.get(self.external_channel_sign_key, None)
         c_user_id = self.request.REQUEST.get(self.external_channel_user_id_key, None)
 
+        logger.info("renrenli request url[%s] params[%s]" % (self.request.get_full_path(),
+                                                             self.request.REQUEST))
+
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
 
