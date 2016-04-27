@@ -85,12 +85,12 @@
                         ts: data.ts
                     },
                     success: function (data) {
-                        var url = location.href;
-                        var times = url.split("?");
-                        if(times[1] != 1){
-                            url += "?1";
-                            self.location.replace(url);
-                        }
+                        //var url = location.href;
+                        //var times = url.split("?");
+                        //if(times[1] != 1){
+                        //    url += "?1";
+                        //    self.location.replace(url);
+                        //}
                     }
                 })
             }
@@ -98,10 +98,10 @@
             mixins.sendUserInfo(function(data) {
 
                 if (data.ph == '') {
-                    alert('1');
+                    alert('3');
                 } else {
                     connect(data);
-                    alert('2');
+                    alert('4');
                 }
 
                 $('#button_link').on("click",function(){
