@@ -98,10 +98,10 @@
             mixins.sendUserInfo(function(data) {
 
                 if (data.ph == '') {
-                    alert('3');
+
                 } else {
                     connect(data);
-                    alert('4');
+
                 }
 
                 $('#button_link').on("click",function(){
@@ -118,9 +118,6 @@
                                 $('.popup_box').show();
                             }else if(data.ret_code=='0'){
                                 mixins.jumpToManageMoney();
-                            }else{
-                                alert(data.ret_code);
-                                alert(data.message);
                             }
                             //console.log(data)
                         }
