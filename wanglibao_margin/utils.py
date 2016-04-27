@@ -28,7 +28,7 @@ def save_to_margin(req_data):
                 }
         else:
             response_data = {
-                'ret_code': 10114,
+                'ret_code': 10000,
                 'message': u'小于当前margin的sync_id[%s]' % margin_instance.sync_id,
             }
     else:

@@ -34,7 +34,7 @@ def save_to_p2p_equity(req_data):
                 }
         else:
             response_data = {
-                'ret_code': 10114,
+                'ret_code': 10000,
                 'message': u'小于当前p2p_equity的sync_id[%s]' % equity_instance.sync_id,
             }
     else:
