@@ -432,7 +432,8 @@ class AppExploreView(TemplateView):
         return {
             'results': activity_list[:limit],
             'all_page': all_page,
-            'page': page
+            'page': page,
+            'pagesize': limit,
         }
 
 
@@ -944,7 +945,8 @@ class AppAreaView(TemplateView):
         return {
             'results': activity_list[:limit],
             'all_page': all_page,
-            'page': page
+            'page': page,
+            'pagesize': limit,
         }
 
 
@@ -985,6 +987,7 @@ class AppAreaApiView(APIView):
         return Response({
             'html_data': html_data,
             'page': page,
+            'pagesize': pagesize,
             'all_page': all_page,
         })
 
