@@ -363,7 +363,9 @@ class CoopRegister(object):
             channel_processor = self.get_channel_processor(self.channel.code)
             if channel_processor:
                 try:
-                    channel_processor(self.btype, self.bid, self.client_id, self.order_id).process_for_register(user)
+                    channel_processor(self.btype, self.bid,
+                                      self.client_id, self.order_id,
+                                      self.access_token, self.account).process_for_register(user)
                 except Exception, e:
                     logger.info("%s raise error: %s" % (channel_processor.__name__, e))
             else:
