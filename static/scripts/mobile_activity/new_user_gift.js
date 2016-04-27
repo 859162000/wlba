@@ -221,11 +221,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     var mySwiper = new Swiper ('#swiper-container', {
       direction: 'vertical',
       loop: false,
-      onSlideChangeStart:function(){
+      onSlideChangeStart:function(swiper){
         if(mySwiper.activeIndex == 3){
-             $('#next-box').hide()
-         }else{
-            $('#next-box').show()
+            $('#next-box').hide();
+        }else{
+            $('#next-box').show();
         }
       }
     });
@@ -252,7 +252,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     });
 
-    $("body").one("touchstart",function(){
+    $("div.swiper-container").one("touchstart",function(){
         alert("body");
         if(audioDom.paused){
             audioDom.play();
