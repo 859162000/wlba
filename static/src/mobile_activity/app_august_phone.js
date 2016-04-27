@@ -137,7 +137,7 @@
                     dataType: 'json',
                     success: function(data){
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?next=/weixin/list/?promo_token=sy'
+                            window.location.href = '/weixin/regist/?next=/activity/app_august_phone/?promo_token=sy'
                         }else if(data.ret_code=='1'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
