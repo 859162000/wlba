@@ -329,7 +329,7 @@ class YeeShortPay:
         self.BIND_CARD_QUERY = settings.YEE_SHORT_BIND_CARD_QUERY
         self.BIND_PAY_REQUEST = settings.YEE_SHORT_BIND_PAY_REQUEST
         self.YEE_CALLBACK = settings.YEE_SHORT_CALLBACK
-        self.QUERY_TRX_RESULT = settings.YEE_SHORT_QUERY_TRX_RESULT
+        self.QUERY_TRX_RESULT = settings.YEE_URL + '/api/query/order' 
 
     def _sign(self, dic):
         values = self._sort(dic)
@@ -459,7 +459,9 @@ class YeeShortPay:
     def _request_yee_get(self, url, data):
         post = self._format_post(data)
         res = requests.get(url, params=post)
-        return self._response_data_change(res=json.loads(res.text))
+        res_dict = self._response_data_change(res=json.loads(res.text))
+        logger.error("yee_pay: %s | %s | %s" % (url, data, res_dict))
+        return res_dict 
 
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
@@ -945,7 +947,8 @@ class YeeShortPay:
         return {'code': code,
                 'message': message,
                 'last_card_no': last_card_no,
-                'amount': amount}
+                'amount': amount,
+                'raw_response': res_data}
  
     def sync_bind_card(self, user):
         """

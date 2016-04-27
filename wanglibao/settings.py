@@ -190,7 +190,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        #'HOST': '192.168.1.242',
+        'HOST': '192.168.1.242',
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -205,12 +205,12 @@ if ENV_ALPHA_DEPLOY:
 
 import sys
 
-if 'test' in sys.argv:
-    SOUTH_TESTS_MIGRATE = False
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/db.sqlite3'
-    }
+# if 'test' in sys.argv:
+    # SOUTH_TESTS_MIGRATE = False
+    # DATABASES['default'] = {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': '/tmp/db.sqlite3'
+    # }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/

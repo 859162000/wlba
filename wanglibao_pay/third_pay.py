@@ -618,12 +618,19 @@ def yee_callback(request):
 
 def query_trx(order_id):
     pay_info = PayInfo.objects.get(order_id=order_id)
-    if pay_info.channel == 'yeepay_bind':
-        return YeeShortPay().query_trx_result(order_id)
-    elif pay_info.channel == 'kuaipay':
-        return KuaiShortPay().query_trx_result(order_id)
-    else:
-        return None
+    trx_result = None
+    try:
+        if pay_info.channel == 'yeepay_bind':
+            trx_result = YeeShortPay().query_trx_result(order_id)
+        elif pay_info.channel == 'kuaipay':
+            trx_result = KuaiShortPay().query_trx_result(order_id)
+    except:
+        logger.exception('query_trx %s failed:'%order_id)
+    pay_info.is_checked = True
+    if trx_result:
+        pay_info.check_response = trx_result['raw_response']
+    pay_info.save()
+    return trx_result
 
 
 #######################################同卡进出 start###############################

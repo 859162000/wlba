@@ -30,19 +30,18 @@ def sync_pay_result(start_time=None, end_time=None):
         start_time = today_start
         end_time = five_min_before
     # todo test performance
-    # todo transaction
+    # finish transaction
     # todo email
-    # todo log
+    # finish log
     pay_infos = PayInfo.objects.filter(type='D')\
                                .filter(channel__in=['kuaipay', 'yeepay_bind'])\
                                .filter(create_time__gte=start_time, create_time__lte=end_time)\
-                               .filter(status='处理中').all()
+                               .filter(status='处理中', is_checked=False).all()
 
     pay_order = PayOrder()
-    import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
 
     for pay_info in pay_infos:
-        logger.debug('sync_pay_result for:%s'%pay_info.order_id)
         pay_result = query_trx(pay_info.order_id)
 
         code = pay_result['code']
@@ -50,22 +49,10 @@ def sync_pay_result(start_time=None, end_time=None):
         amount = pay_result['amount']
         last_card_no = pay_result['last_card_no']
 
-        # check 
-        if amount != pay_info.amount or last_card_no != pay_info.card_no[-4:] != last_card_no:
-            return
+        # found, succeed
+        if int(code) == 0:
+            # check 
+            if amount != pay_info.amount or last_card_no != pay_info.card_no[-4:] != last_card_no:
+                return
 
-        try:
-            if code == None:
-                # None, not found
-                raise ThirdPayError('20333', '用户未完成交易，第三方未找到交易信息')
-            else:
-                # found
-                if int(code) == 0:
-                    pay_order.order_after_pay_succcess(amount, pay_info.order_id)
-                else:
-                    raise ThirdPayError(code, message)
-        except ThirdPayError, error:
-            pay_order.order_after_pay_error(error, pay_info.order_id)
-
-
-
+            pay_order.order_after_pay_succcess(amount, pay_info.order_id)

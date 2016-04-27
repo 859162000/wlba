@@ -139,7 +139,7 @@ class PayInfo(models.Model):
     management_fee = models.DecimalField(u'资金管理费用', max_digits=20, decimal_places=2, default=0)
     management_amount = models.DecimalField(u'资金管理金额', max_digits=20, decimal_places=2, default=0)
     total_amount = models.DecimalField(u'总金额', max_digits=20, decimal_places=2, default=0)
-    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True, db_index=True)
     update_time = models.DateTimeField(u'更新时间', auto_now=True)
     confirm_time = models.DateTimeField(u'审核时间', blank=True, null=True)
     request = models.TextField(u'请求数据', blank=True)
@@ -156,6 +156,8 @@ class PayInfo(models.Model):
     account_name = models.CharField(u'姓名', max_length=12, blank=True, null=True)
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
     phone_for_card = models.CharField(u'预留手机号', max_length=25, blank=True, null=False, default='')
+    is_checked = models.BooleanField(u'是否同步支付结果', default=False)
+    check_response = models.CharField(u'同步支付结果返回', max_length=200, blank=True, default='')
     channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"), #汇付网银
         ("huifu_bind", "Huifu_bind"), #汇付快捷
@@ -178,8 +180,8 @@ class PayInfo(models.Model):
         return simplejson.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
 
     def save_error(self, error_code, error_message, is_inner_error=False):
-        self.error_code += '|' + str(error_code)
-        self.error_message = '|' + error_message
+        self.error_code = str(error_code)
+        self.error_message = error_message
         if is_inner_error:
             self.status = self.EXCEPTION
         else:
