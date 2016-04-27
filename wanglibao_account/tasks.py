@@ -327,22 +327,6 @@ def common_callback_for_post(url, params, channel, headers=None):
 
 
 @app.task
-def coop_callback_for_post(url, params, channel):
-    logger.info("Enter %s_callback task===>>>" % channel)
-    try:
-        logger.info(params)
-        ret = requests.post(url, data=params)
-        logger.info('%s callback url: %s' % (channel, ret.url))
-        if ret.status_code == 200:
-            logger.info('callback return: %s' % ret.json())
-        else:
-            logger.info('callback return: %s' % ret.text)
-    except Exception, e:
-        logger.info(" {'%s callback':'failed to connect'} " % channel)
-        logger.info(e)
-
-
-@app.task
 def coop_call_back(params):
     # 此任务由渠道中心平台处理
     pass

@@ -1515,11 +1515,12 @@ class GuestCheckView(APIView):
 class InnerSysHandler(object):
     def ip_valid(self, request):
         client_ip = get_client_ip(request)
+        logger.debug('request ip:%s' % (client_ip, ))
         return True if client_ip in INNER_IP else False
 
     def judge_valid(self, request):
         if not self.ip_valid(request):
-            return False, u'IP没有通过验证'
+            return False, u'IP(%s)没有通过验证' % get_client_ip(request)
 
         return True, u'通过验证'
 
