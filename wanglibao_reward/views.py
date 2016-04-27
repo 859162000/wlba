@@ -892,6 +892,7 @@ class KongGangRewardDistributer(RewardDistributer):
         self.order_id = kwargs['order_id']
         self.user = kwargs['user']
         self.token = 'kgyx'
+        self.create_time = kwargs['create_time']
         self.request = request
 
     @method_decorator(transaction.atomic)
@@ -947,7 +948,7 @@ class KongGangAPIView(APIView):
                     reward.save()
                     return reward
 
-        if (reward == None and p2p_amount>=20000) or (p2p_amount>=15000 and p2p_amount<20000):
+        if p2p_amount >= 15000:
             with transaction.atomic:
                 reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
                 if reward:
@@ -956,6 +957,47 @@ class KongGangAPIView(APIView):
                 return reward
 
         return 'invalid'
+
+    @method_decorator(transaction.atomic)
+    def distribute(user, start_time, end_time):
+        join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='kgyx').first()
+        if not join_record:
+            join_record = WanglibaoRewardJoinRecord.objects.create(
+                    user=user,
+                    activity_code='kgyx',
+                    remain_chance=1,
+            )
+
+        #用户已参加活动并领取奖品
+        if join_record and join_record.remain_chance==0:
+            return '用户已领取奖品'
+
+        send_reward = WanglibaoActivityReward.objects.filter(activity='kgyx', user=user).first()
+        if send_reward:
+            if send_reward.has_sent == True:
+                return '用户已领取奖品'
+        else:
+            try:
+                #TODO:转换为UTC时间后跟表记录时间对比
+                utc_start_time = start_time
+                utc_end_time = end_time
+                p2precord = P2PRecord.objects.filter(user=user, create_time__gte=utc_start_time, create_time__lt=utc_end_time).first()
+                if p2precord:
+                    WanglibaoActivityReward.objects.create(
+                        activity='kgyx',
+                        order_id=p2precord.order_id,
+                        user=user,
+                        p2p_amount=p2precord.amount,
+                        has_sent=False,
+                        left_times=1,
+                        join_times=1)
+                else:
+                    return '活动期间没有投资记录'
+            except Exception:
+                logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错' % (user, p2precord.order_id or 0, p2precord.amount or 0))
+                return '系统忙，请稍后重试'
+
+        return ''
 
     def post(self, request):
         if not request.user.is_authenticated():
@@ -982,12 +1024,28 @@ class KongGangAPIView(APIView):
             raise Exception(u"misc中没有配置activities杂项")
 
         now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
-        if now < start_time or now > end_time:
+        if now < start_time or now >= end_time:
+            message = u'活动还未开始,请耐心等待'
+            if now >= end_time:
+                message = u'活动已结束，感谢参与'
             json_to_response = {
                 'ret_code': 1001,
-                'message': u'活动还未开始,请耐心等待'
+                'message': message
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        try:
+            message = self.distribute(request.user, start_time, end_time)
+        except Exception, ex:
+            message = u'系统忙，请稍后重试'
+            logger.debug('Exception in distribute: %s' % ex)
+        if message != '':
+            json_to_response = {
+                'ret_code': 1001,
+                'message': message
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
 
         reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
         if reward == None:
@@ -1043,16 +1101,20 @@ class KongGangAPIView(APIView):
                 reward.reward = sent_reward
                 reward.has_sent = True
                 reward.left_time = 0
+                reward.save()
+
+                join_record.remain_chance=0
+                join_record.save()
         except Exception:
             sent_reward.is_used = False
             sent_reward.save()
-            join_record.save()
         else:
+            logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
+
             send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
                        u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                        u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                        u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
-            logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
             send_messages.apply_async(kwargs={
                 "phones": [request.user.wanglibaouserprofile.phone, ],
                 "messages": [send_msg, ],
@@ -1064,13 +1126,11 @@ class KongGangAPIView(APIView):
                 "content": send_msg,
                 "mtype": "activity"
             })
-            reward.save()
-            join_record.save()
+
             json_to_response = {
                 'ret_code': 0,
                 'message': u'奖品发放成功，请查看网利宝站内信'
             }
-            join_record.save()
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 
