@@ -237,6 +237,28 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }, 1000);
     };
 
+    //音乐
+    var audioBox = document.getElementById("js-audio"),
+        audioDom = audioBox.getElementsByTagName("audio")[0];
+    $(audioBox).on("touchstart", function(){
+        var $t = $(this);
+        console.log(audioDom.paused);
+        if(audioDom.paused){
+            audioDom.play();
+            $t.removeClass("audio-close");
+        }else{
+            audioDom.pause();
+            $t.addClass("audio-close");
+        }
+    });
+
+    $("body").one("touchstart",function(){
+        alert("body");
+        if(audioDom.paused){
+            audioDom.play();
+        }
+    });
+
     //弹层
     $("div.js-close").on("touchstart", function(){
         $(this).parents(".page-alt").hide();
@@ -327,22 +349,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             });
         });
     }
-    s
-    //音乐
-    var audioBox = document.getElementById("js-audio"),
-        audioDom = audioBox.getElementsByTagName("audio")[0];
-    $(audioBox).on("touchstart", function(){
-        var $t = $(this);
-        console.log(audioDom.paused);
-        if(audioDom.paused){
-            audioDom.play();
-            $t.removeClass("audio-close");
-        }else{
-            audioDom.pause();
-            $t.addClass("audio-close");
-        }
-    });
-
 
     wlb.ready({
         app: function(mixins){
