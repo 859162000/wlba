@@ -1052,7 +1052,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                                u'感谢您的参与！【网利科技】' % (reward.reward.content)
                     send_messages.apply_async(kwargs={
                         "phones": [self.request.user.wanglibaouserprofile.phone, ],
-                        "message": send_msg,
+                        "messages": [send_msg,],
                     })
     
                     inside_message.send_one.apply_async(kwargs={
