@@ -991,9 +991,10 @@ class KongGangAPIView(APIView):
                            u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                            u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                            u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
+                logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
                 send_messages.apply_async(kwargs={
                     "phones": [request.user.wanglibaouserprofile.phone, ],
-                    "message": send_msg,
+                    "messages": [send_msg, ],
                 })
 
                 inside_message.send_one.apply_async(kwargs={
@@ -1065,6 +1066,34 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,影像投资节优惠码发奖报错')
         else: #所有奖品已经发完了
             return
+        
+class ZhaoXiangGuanAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(ZhaoXiangGuanAPIView, self).__init__()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
+        if reward:
+            json_to_response = {
+                'ret_code': 1,
+                'message': u'奖品已经发放'
+            }
+        else:
+            json_to_response = {
+                'ret_code': 0,
+                'message': u'奖品未发放'
+            }            
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
 
 class XingMeiRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
