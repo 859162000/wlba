@@ -3,7 +3,15 @@
 import json
 from django.contrib import admin
 from .tasks import common_callback
+from .utils import get_bajinshe_access_token
 from .models import CallbackRecord
+
+LOCAL_VAR = locals()
+
+
+def update_bajinshe_recallback_data(order_id, data):
+    data['access_token'] = get_bajinshe_access_token(order_id)
+    return data
 
 
 class CallbackRecordAdmin(admin.ModelAdmin):
@@ -23,18 +31,18 @@ class CallbackRecordAdmin(admin.ModelAdmin):
             obj.re_callback = False
             headers = obj.request_headers
             headers = json.loads(headers) if headers else headers
-            common_callback.apply_async(
-                countdown=3,
-                kwargs={'channel': obj.callback_to,
-                        'url': obj.request_url,
-                        'params': json.loads(obj.request_data),
-                        'headers': headers,
-                        'order_id': obj.order_id,
-                        'ret_parser': obj.ret_parser,
-                        }
-            )
 
-        obj.save()
+            update_coop_recallback_data = LOCAL_VAR['update_%s_recallback_data' % obj.callback_to.lower()]
+            data = update_coop_recallback_data(obj.order_id, json.loads(obj.request_data))
+
+            common_callback(channel=obj.callback_to,
+                            url=obj.request_url,
+                            params=data,
+                            headers=headers,
+                            order_id=obj.order_id,
+                            ret_parser=obj.ret_parser)
+        else:
+            obj.save()
 
 
 admin.site.register(CallbackRecord, CallbackRecordAdmin)

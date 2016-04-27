@@ -27,7 +27,7 @@ class CallbackRecord(models.Model):
     request_action = models.CharField(u'请求动作', max_length=6, default=1, choices=REQUEST_ACT_CHOICE)
     ret_parser = models.CharField(u'回调结果解析器', max_length=50, blank=True, null=True)
     extra = models.CharField(max_length=200, default="", blank=True)
-    re_callback = models.BooleanField(u"回调补发", default=False)
+    re_callback = models.BooleanField(u"回调补发", default=False, help_text=u'如选择回调补发，则其他改动将不保存')
 
     class Meta:
         verbose_name = u'渠道回调记录'

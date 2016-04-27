@@ -16,6 +16,7 @@ from django.template.loader import render_to_string
 from registration.models import RegistrationProfile
 from common.tasks import common_callback
 from common.tools import detect_identifier_type
+from common.utils import get_bajinshe_access_token
 from wanglibao import settings
 from wanglibao_rest.utils import generate_bisouyi_sign, generate_bisouyi_content
 from wanglibao_oauth2.utils import get_client_with_channel_code
@@ -101,48 +102,10 @@ def get_coop_binding_for_phone(channel_code, phone):
     return Binding.objects.filter(channel__code=channel_code, user__wanglibaouserprofile__phone=phone).first()
 
 
-def get_bajinshe_access_token(coop_id, coop_key, order_id):
-    access_token = None
-    message = None
-
-    coop_access_token_url = settings.BAJINSHE_ACCESS_TOKEN_URL
-
-    data = {
-        'platform': coop_id,
-        'key': coop_key,
-        'order_id': order_id,
-    }
-
-    headers = {
-       'Content-Type': 'application/json',
-    }
-
-    res = requests.post(url=coop_access_token_url, data=json.dumps(data), headers=headers)
-    logger.info("bajinshe access token url [%s]" % res.url)
-    logger.info("bajinshe access token request data [%s]" % data)
-    res_status_code = res.status_code
-    if res_status_code == 200:
-        res_data = res.json()
-        logger.info("get_bajinshe_access_token return: %s" % res_data)
-        if res_data['code'] == '10000':
-            access_token = res_data.get('access_token', None)
-            message = 'success'
-        else:
-            logger.info("bajinshe access token faild return %s" % res_data)
-    else:
-        message = 'bad request %s' % res_status_code
-        logger.info("bajinshe access token connect faild with status code[%s]" % res_status_code)
-        logger.info(res.text)
-
-    logger.info("get_bajinshe_access_token process result: %s" % message)
-    return access_token
-
-
 def get_bajinshe_base_data(order_id):
     data = dict()
     coop_id = settings.BAJINSHE_COOP_ID
-    coop_key = settings.BAJINSHE_COOP_KEY
-    access_token = get_bajinshe_access_token(coop_id, coop_key, order_id)
+    access_token = get_bajinshe_access_token(order_id)
     if access_token:
         data = {
             'access_token': access_token,
