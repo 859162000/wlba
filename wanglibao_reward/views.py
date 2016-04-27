@@ -892,34 +892,42 @@ class KongGangRewardDistributer(RewardDistributer):
         self.order_id = kwargs['order_id']
         self.user = kwargs['user']
         self.token = 'kgyx'
+        self.request = request
 
+    @method_decorator(transaction.atomic)
     def distribute(self):
-        wait_reward = Reward.objects.filter(type='尊贵休息室服务', is_used=False).first()
-        all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
+        join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=self.request.user, activity_code='kgyx').first()
+        if not join_record:
+            join_record = WanglibaoRewardJoinRecord.objects.create(
+                    user=self.request.user,
+                    activity_code='kgyx',
+                    remain_chance=1,
+            )
+        send_count = Reward.objects.filter(type__in=('尊贵休息室服务','贵宾全套出岗服务'), is_used=False).count()
+        if send_count == 0:  #  奖品已经发放完毕
+            join_record.save()
+            return
 
-        send_reward = None
-        if  self.amount>=10000 and self.amount<15000:
-            send_reward = wait_reward
-        if  self.amount>=15000:
-            send_reward = all_reward or wait_reward
-        if send_reward:
+        send_reward = WanglibaoActivityReward.objects.filter(activity='kgyx', user=self.user).first()
+        if send_reward:  #  已经给改用户下发了发奖机会
+            join_record.save()
+            return
+        else:
             try:
                 WanglibaoActivityReward.objects.create(
                         activity='kgyx',
                         order_id=self.order_id,
                         user=self.user,
                         p2p_amount=self.amount,
-                        reward=send_reward,
                         has_sent=False,
                         left_times=1,
                         join_times=1)
-                send_reward.is_used=True
-                send_reward.save()
 
             except Exception:
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
-        else: #所有奖品已经发完了
-            return
+
+            join_record.save()
+
 
 class KongGangAPIView(APIView):
     permission_classes = ()
@@ -985,31 +993,48 @@ class KongGangAPIView(APIView):
                     return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
             if reward.has_sent == False:
-                reward.has_sent=True
-                reward.left_time=0
-                send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
-                           u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
-                           u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
-                           u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
-                logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
-                send_messages.apply_async(kwargs={
-                    "phones": [request.user.wanglibaouserprofile.phone, ],
-                    "messages": [send_msg, ],
-                })
+                wait_reward = Reward.objects.filter(type='尊贵休息室服务', is_used=False).first()
+                all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": request.user.id,
-                    "title": u"空港易行优惠服务",
-                    "content": send_msg,
-                    "mtype": "activity"
-                })
-                reward.save()
-                join_record.save()
-                json_to_response = {
-                    'ret_code': 0,
-                    'message': u'奖品发放成功，请查看网利宝站内信'
-                }
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                send_reward = None
+                if  self.amount>=10000 and self.amount<15000:
+                    send_reward = wait_reward
+                if  self.amount>=15000:
+                    send_reward = all_reward or wait_reward
+
+                if None == send_reward:
+                    json_to_response = {
+                        'ret_code': 1005,
+                        'message': u'亲,您来晚了;奖品已经发完了！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    reward.reward = send_reward
+                    reward.has_sent=True
+                    reward.left_time=0
+                    send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                               u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                               u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
+                               u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
+                    logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
+                    send_messages.apply_async(kwargs={
+                        "phones": [request.user.wanglibaouserprofile.phone, ],
+                        "messages": [send_msg, ],
+                    })
+
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": request.user.id,
+                        "title": u"空港易行优惠服务",
+                        "content": send_msg,
+                        "mtype": "activity"
+                    })
+                    reward.save()
+                    join_record.save()
+                    json_to_response = {
+                        'ret_code': 0,
+                        'message': u'奖品发放成功，请查看网利宝站内信'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
             else:
                 json_to_response = {
                     'ret_code': 1003,
