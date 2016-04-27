@@ -304,12 +304,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         ts: data.ts
                     },
                     success: function (data) {
-                        //var url = location.href;
-                        //var times = url.split("?");
-                        //if(times[1] != 1){
-                        //    url += "?1";
-                        //    self.location.replace(url);
-                        //}
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
                     }
                 })
             }
