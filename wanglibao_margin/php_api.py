@@ -208,7 +208,7 @@ class SendMessages(APIView):
             else:
                 from wanglibao_sms.send_php import PHPSendSMS
                 for phone in phones:
-                    PHPSendSMS().send_sms_msg_one(7, phone, 'phone', messages[phones.index(phone)])
+                    PHPSendSMS().send_sms_msg_one(1, phone, 'phone', messages[phones.index(phone)])
                 ret = {'status': 1, 'message': 'messages send by PHP.'}
         except Exception, e:
             logger.debug(u'发送短息失败! phones = {}, err = {}'.format(phones, e.message))
