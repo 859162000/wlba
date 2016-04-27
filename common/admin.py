@@ -9,8 +9,16 @@ from .models import CallbackRecord
 LOCAL_VAR = locals()
 
 
-def update_bajinshe_recallback_data(order_id, data):
+def update_bajinshe_recallback_data(order_id, channel, data):
+    data = json.loads(data)
     data['access_token'] = get_bajinshe_access_token(order_id)
+    data = json.dumps(data)
+
+    call_back_record = CallbackRecord.objects.filter(callback_to=channel, order_id=order_id).first()
+    if call_back_record:
+        call_back_record.request_data = json.dumps(data)
+        call_back_record.save()
+
     return data
 
 
@@ -33,7 +41,7 @@ class CallbackRecordAdmin(admin.ModelAdmin):
             headers = json.loads(headers) if headers else headers
 
             update_coop_recallback_data = LOCAL_VAR['update_%s_recallback_data' % obj.callback_to.lower()]
-            data = update_coop_recallback_data(obj.order_id, json.loads(obj.request_data))
+            data = update_coop_recallback_data(obj.order_id, obj.callback_to, json.loads(obj.request_data))
 
             common_callback(channel=obj.callback_to,
                             url=obj.request_url,
