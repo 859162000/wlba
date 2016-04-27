@@ -20,7 +20,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
 # from wanglibao_sms.tasks import send_messages
-from wanglibao_sms import messages as sms_messages
+# from wanglibao_sms import messages as sms_messages
 from wanglibao_rest.utils import decide_device
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from weixin.models import WeixinUser
@@ -50,7 +50,6 @@ def handle_lottery_distribute(user, activity, trigger_node, order_id, amount):
     probabilities = []
     for rule in activity_rules:
         probabilities.append(rule.probability)
-
 
     for chance in xrange(activity.chances):
         _index = get_reward_index(activity, probabilities)
@@ -99,15 +98,15 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
     if not trigger_node:
         return
     channel = helper.which_channel(user)
-    #查询符合条件的活动
+    # 查询符合条件的活动
     # TODO: 需要将渠道的判断的范围从渠道name缩小为渠道code
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False)\
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
 
-            if False and activity.is_lottery:
-                handle_lottery_distribute(activity, trigger_node)
+            # if False and activity.is_lottery:
+            #     handle_lottery_distribute(activity, trigger_node)
 
             if activity.is_all_channel is False and trigger_node not in ('p2p_audit', 'repaid'):
                 if activity.channel != "":
@@ -126,7 +125,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                 activity_rules = ActivityRule.objects.filter(activity=activity, trigger_node=trigger_node,
                                                              is_used=True).order_by('-id')
 
-            #activity_rules = activity_rules.exclude(activity__is_lottery=True)  等需要开放优化功能的时候，放开 add by yihen
+            # activity_rules = activity_rules.exclude(activity__is_lottery=True)  等需要开放优化功能的时候，放开 add by yihen
 
             if activity_rules:
                 for rule in activity_rules:
