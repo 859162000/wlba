@@ -1270,49 +1270,111 @@ class ZhaoXiangGuanRegister(CoopRegister):
         self.invite_code = 'sy'
 
     def purchase_call_back(self, user, order_id):
+
+        key = 'zhaoxiangguan'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
-        # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == int(order_id):
+        now = p2p_record.create_time
+        if now < start_time:
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'活动还未开始,请耐心等待'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        if now > end_time:
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'活动已经结束！'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        
+        
+        #判断有没有奖品剩余
+        with transaction.atomic:
+            reward = Reward.objects.select_for_update().filter(type='影像投资节优惠码', is_used=False).first()
+            if reward == None:
+                return
+            else:
+                reward.is_used = True
+                reward.save()
+                
+        try:
             with transaction.atomic():
                 join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
                 if not join_record:
-                    join_record = join_record.objects.create(
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
                         user=user,
                         activity_code=self.c_code
                     )
-                send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
-                if send_reward:
-                    try:
-                        ActivityReward.objects.create(
-                                activity='sy',
-                                order_id=order_id,
-                                user=user,
-                                p2p_amount=p2p_record.amount,
-                                reward=send_reward,
-                                has_sent=True,
-                                left_times=0,
-                                join_times=0)
-                        send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
-                                   u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
-                                   u'感谢您的参与！【网利科技】' % (send_reward.content)
-                        send_messages.apply_async(kwargs={
-                            "phones": [user.wanglibaouserprofile.phone, ],
-                            "message": [send_msg, ],
-                        })
 
-                        inside_message.send_one.apply_async(kwargs={
-                            "user_id": user.id,
-                            "title": u"影像投资节优惠码",
-                            "content": send_msg,
-                            "mtype": "activity"
-                        })
-                    except Exception:
-                        logger.debug('user:%s, order_id:%s,p2p_amount:%s,影像投资节优惠码发奖报错')
-                    join_record.save()
-                else: #所有奖品已经发完了
+                reward_record = ActivityReward.objects.filter(has_sent=True, activity='sy', user=user).first()
+                if reward_record:  #奖品记录已经生成了
                     join_record.save()
                     return
+                reward_record = ActivityReward.objects.create(
+                            activity='sy',
+                            order_id=order_id,
+                            user=user,
+                            p2p_amount=p2p_record.amount,
+                            reward=reward,
+                            has_sent=False,
+                            left_times=0,
+                            join_times=0)
+        except Exception:
+            reward.is_used = False
+            reward.save()
+            join_record.save()
+        else:
+            send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+                       u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                       u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
+                       u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
+
+            send_messages.apply_async(kwargs={
+                "phones": [user.id, ],
+                "message": [send_msg,],
+            })
+
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"空港易行优惠服务",
+                "content": send_msg,
+                "mtype": "activity"
+            })
+            
+            send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
+                       u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
+                       u'感谢您的参与！【网利科技】' % (send_reward.content)
+            send_messages.apply_async(kwargs={
+                "phones": [user.id, ],
+                "message": [send_msg, ],
+            })
+
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"影像投资节优惠码",
+                "content": send_msg,
+                "mtype": "activity"
+            })
+            reward_record.has_sent = True
+            reward_record.save()
+            join_record.save()
 
 class RockFinanceRegister(CoopRegister):
     def __init__(self, request):
