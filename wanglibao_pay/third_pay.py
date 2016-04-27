@@ -507,7 +507,7 @@ def bind_pay_deposit(request):
         stop_no_sms_channel = Misc.objects.filter(
                 key='kuai_qpay_stop_no_sms_channel').first()  
         if stop_no_sms_channel and stop_no_sms_channel.value == '1' and \
-                len(card_no) == 10 and not request.post.get('mode'): 
+                len(card_no) == 10 and not request.DATA.get('mode'): 
                     # mode != vcode_for_qpay
             return {'ret_code': 20022,
                     'message': u'部分银行支付安全升级，需更新到最新版本才能使用，快去更新吧'}
