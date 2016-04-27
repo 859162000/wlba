@@ -1157,25 +1157,30 @@ class KongGangRegister(CoopRegister):
     def decide_which_reward_distribute(self, p2p_amount):
 
         reward = None
-        if p2p_amount>=500 and p2p_amount<5000:
-            with transaction.atomic:
-                reward = Reward.objects.select_for_update().filter(type='CIP专用安检通道服务', is_used=False).first()
-                reward.is_used = True
-                reward.save()
-                return reward
-
-        if reward == None or (p2p_amount>=5000 and p2p_amount<10000):
-            with transaction.atomic:
-                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
-                reward.is_used = True
-                reward.save()
-                return reward
-
-        if reward == None or p2p_amount>=10000:
+        if p2p_amount>=10000:
             with transaction.atomic:
                 reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
-                reward.is_used = True
-                reward.save()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                    return reward
+
+        if (reward == None and p2p_amount>=10000) or (p2p_amount>=5000 and p2p_amount<10000):
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                    return reward
+
+        if (reward == None and p2p_amount>=10000) or (p2p_amount>=5000 and p2p_amount<10000) or (p2p_amount>=500 and p2p_amount<5000):
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='CIP专用安检通道服务', is_used=False).first()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                    return reward
+
         return reward
 
     def purchase_call_back(self, user, order_id):
@@ -1227,6 +1232,8 @@ class KongGangRegister(CoopRegister):
 
                 reward_record = ActivityReward.objects.filter(has_sent=True, activity='kgyx', user=user).first()
                 if reward_record:  #奖品记录已经生成了
+                    reward.is_used = False
+                    reward.save()
                     join_record.save()
                     return
                 reward_record = ActivityReward.objects.create(
