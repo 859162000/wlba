@@ -245,6 +245,53 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $("div.js-rule").on("touchstart", function(){
         $("div.alt-rule").css("display","-webkit-box");
     });
+    var weiURL = '/weixin/api/jsapi_config/';
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+    org.ajax({
+        type: 'GET',
+        url: weiURL,
+        dataType: 'json',
+        success: function (data) {
+            //请求成功，通过config注入配置信息,
+            wx.config({
+                debug: false,
+                appId: data.appId,
+                timestamp: data.timestamp,
+                nonceStr: data.nonceStr,
+                signature: data.signature,
+                jsApiList: jsApiList
+            });
+        }
+    });
+    wx.ready(function () {
+        var winHost = window.location.href;
+        var host = winHost.substring(0,winHost.indexOf('/activity')),
+            shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+            shareLink = host + '/weixin/new_user_gift/',
+            shareMainTit = '尊贵新人礼',
+            shareBody = '尊贵新人礼';
+        //分享给微信好友
+         org.onMenuShareAppMessage({
+            title: shareMainTit,
+            desc: shareBody,
+            link: shareLink,
+            imgUrl: shareImg
+        });
+        //分享给微信朋友圈
+        org.onMenuShareTimeline({
+            title: shareMainTit,
+            link : shareLink,
+            imgUrl: shareImg
+        });
+        //分享给QQ
+        org.onMenuShareQQ({
+            title: shareMainTit,
+            desc: shareBody,
+            link : shareLink,
+            imgUrl: shareImg
+        });
+    });
+
     function get_gift(){
         //领取加息券
         $("button.js-receive").on("touchstart", function(){
@@ -279,54 +326,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 }
             });
         });
-
-        var weiURL = '/weixin/api/jsapi_config/';
-        var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
-        org.ajax({
-            type: 'GET',
-            url: weiURL,
-            dataType: 'json',
-            success: function (data) {
-                //请求成功，通过config注入配置信息,
-                wx.config({
-                    debug: false,
-                    appId: data.appId,
-                    timestamp: data.timestamp,
-                    nonceStr: data.nonceStr,
-                    signature: data.signature,
-                    jsApiList: jsApiList
-                });
-            }
-        });
-        wx.ready(function () {
-            var winHost = window.location.href;
-            var host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
-            var shareImg = host + '/static/imgs/mobile_activity/new_user_gift/icon_weixin.png',
-                shareLink = host + '/weixin/new_user_gift/',
-                shareMainTit = '尊贵新人礼 专享5%加息',
-                shareBody = '网利宝新手狂撒福利';
-            //分享给微信好友
-            org.onMenuShareAppMessage({
-                title: shareMainTit,
-                desc: shareBody,
-                link: shareLink,
-                imgUrl: shareImg
-            });
-            //分享给微信朋友圈
-            org.onMenuShareTimeline({
-                title: shareMainTit,
-                link : shareLink,
-                imgUrl: shareImg
-            });
-            //分享给QQ
-            org.onMenuShareQQ({
-                title: shareMainTit,
-                desc: shareBody,
-                link : shareLink,
-                imgUrl: shareImg
-            });
-        });
     }
+    s
     //音乐
     var audioBox = document.getElementById("js-audio"),
         audioDom = audioBox.getElementsByTagName("audio")[0];
@@ -361,7 +362,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             url += "?1";
                             self.location.replace(url);
                         }
-                        org.experience.init()
+                        get_gift();
                     }
                 })
             }
@@ -371,7 +372,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     mixins.loginApp({refresh:1, url:''});
                 } else {
                     login = true;
-                    connect(data)
+                    connect(data);
                 }
             });
             //document.getElementById('refresh').onclick= function(){
