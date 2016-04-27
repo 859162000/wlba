@@ -48,7 +48,7 @@ ENV = ENV_DEV
 # Add by hb on 2016-04-19 for Support Alpha-Deploy
 ENV_ALPHA_DEPLOY = False
 if ENV == ENV_ALPHA:
-    ENV == "staging"
+    ENV = "staging"
     ENV_ALPHA_DEPLOY = True
 
 if ENV != ENV_DEV:
@@ -1276,6 +1276,16 @@ else:
     BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
     BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 
+
+# 加息盒子
+JXHZ_COOP_id = 'wanglibao'
+JXHZ_COOP_KEY = 'wAnGlibAo'
+if ENV == ENV_PRODUCTION:
+    JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/rest/v1/invest'
+else:
+    JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/test/v1/invest'
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1418,3 +1428,8 @@ if ENV == ENV_PRODUCTION:
     PHP_INSIDE_MESSAGES_LIST = "http://123.57.146.238/message.php/message/list"
     PHP_INSIDE_MESSAGE_READ = 'http://123.57.146.238/message.php/message'
     PHP_INSIDE_MESSAGE_READ_ALL = 'http://123.57.146.238/message.php/message/0'
+
+if ENV == ENV_PRODUCTION:
+    INNER_IP = ("182.92.179.24", "10.171.37.235")
+else:
+    INNER_IP = ("192.168.1.20",)

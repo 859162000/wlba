@@ -10,7 +10,6 @@ html
     style.
       .video-js .vjs-big-play-button {line-height: 3em; height: 3em; border-radius: 1.5em;}
       .video-js .vjs-big-play-button { margin-top: -1.5em; }
-      .vjs-big-play-button:before{font-size: 2em;}
   body
     - with '新手指引' as activeItem
     include global/g_nav
@@ -27,7 +26,7 @@ html
         .i-item-cont-warp
           .guide-title
             span.guide-tit-1.font-xxl 什么是网利宝？
-          .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台，中国第一家互联网私人银行。网利宝在业内独创产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国20多个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
+          .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台。网利宝在业内创立产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国20多个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
           img(src="/static/imgs/pc/security/security_grid_4_23.jpg", alt='p2p理财').guide-item-company
 
     .section.i-mod-warp.i-guide-advantage
@@ -48,13 +47,13 @@ html
                   .ex-cont-tit.font-xl=title
                   for txt in textArr
                     .ex-cont-small=txt
-            - var safe = ['阳光保险承保', 'IT数据风控系统把关', '合作机构全额担保', '四重身份认证']
+            - var safe = ['阳光保险承保', 'IT数据风控系统把关', '足值实物质押', '四重身份认证']
             +adItem('ex-blue', 'icon-safe', '安全保障', safe, 'true')
 
-            - var rocket = ['年化高达10-16%', '30余倍银行活期理财', '打通传统金融行业中间环节', '让利给投资者']
+            - var rocket = ['预期年化高达7-13%', '30余倍银行活期理财', '打通传统金融行业中间环节', '让利给投资者']
             +adItem('ex-red', 'icon-rocket', '高收益', rocket, 'true')
 
-            - var authority = ['独创IT数据风控系统', '汇聚华尔街精英金融团队', '专注于垂直细分领域', '打造金融服务新蓝海']
+            - var authority = ['大数据风控', '汇聚华尔街精英金融团队', '专注于垂直细分领域', '打造金融服务新蓝海']
             +adItem('ex-orange', 'icon-authority', '专业', authority, 'true')
 
             - var service = ['360度贴心服务', '理财需求快速反应', '客户问题即时解决', '优质产品精心推荐']
