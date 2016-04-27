@@ -126,13 +126,13 @@ def assignment_buy(buyer_token=None, seller_token=None):
 
                 # 卖家流水
                 seller_keeper.margin_process(
-                    assignment.seller, 0, assignment.buy_price, description=u'', catalog=u"卖债转")
+                    assignment.seller, 0, assignment.buy_price, description=u'卖债转', catalog=u"转让回款")
                 # 卖家流水增加一条, 先加买家的钱, 再减去平台手续费
                 seller_keeper.margin_process(
-                    assignment.seller, 1, assignment.fee, description=u'债转平台手续费', catalog=u"卖债转")
+                    assignment.seller, 1, assignment.fee, description=u'债转平台手续费', catalog=u"转让手续费")
                 # 买家流水
                 buyer_keeper.margin_process(
-                    assignment.buyer, 1, assignment.buy_price, description=u'', catalog=u"买债转")
+                    assignment.buyer, 1, assignment.buy_price, description=u'买债转', catalog=u"投资")
 
                 # 如果加减钱成功后, 更新债转的表的状态为成功
                 assignment.trade_status = 'PAID'

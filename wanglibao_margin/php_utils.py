@@ -161,7 +161,7 @@ class PhpMarginKeeper(MarginKeeper):
             record = self.tracer(catalog, amount, margin.margin, description, margin_before=margin_before)
             return record
 
-    def yue_cancel(self, user, amount, description=u'月利宝购买失败', catalog=u'月利宝购买失败回滚', savepoint=True):
+    def yue_cancel(self, user, amount, description=u'月利宝购买失败', catalog=u'投资失败退回', savepoint=True):
         """
         # 月利宝购买失败回滚.
         :param user:  请求用户
@@ -267,7 +267,7 @@ class PhpMarginKeeper(MarginKeeper):
             uninvested_freeze = margin.uninvested_freeze - amount
             margin.uninvested_freeze = uninvested_freeze if uninvested_freeze >= 0 else Decimal('0.00')
             margin.save()
-            catalog = u'月利宝交易成功扣款'
+            catalog = u'投资'       # u'月利宝交易成功扣款' ----> u'投资'
             record = self.tracer(catalog, amount, margin.margin, description,
                                  freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
             return record
@@ -303,14 +303,14 @@ class PhpMarginKeeper(MarginKeeper):
                 except Exception, e:
                     print e
 
-    def php_amortize_detail(self, category, principal, interest, penal_interest, coupon_interest, platform_interest,
+    def php_amortize_detail(self, category, principal, interest, t0_interest, coupon_interest, platform_interest,
                             refund_id, savepoint=True):
         """
         针对php 的还款详细写记录
         :param category                 类型, 0 月利宝; 1 债转
         :param principal:           本金
         :param interest:            利息
-        :param penal_interest:      罚息
+        :param : t0_interest        罚息    penal_interest ---> t0_interest    t+0 补息   # 月利宝平台无罚息
         :param coupon_interest:     红包加息
         :param platform_interest:   平台加息
         :param refund_id:           订单号(唯一值)
@@ -319,10 +319,10 @@ class PhpMarginKeeper(MarginKeeper):
         """
         check_amount(principal)
         check_amount(interest)
-        check_amount(penal_interest)
+        check_amount(t0_interest)
         principal = Decimal(principal)
         interest = Decimal(interest)
-        penal_interest = Decimal(penal_interest)
+        t0_interest = Decimal(t0_interest)
         coupon_interest = Decimal(coupon_interest)
         platform_interest = Decimal(platform_interest)
 
@@ -333,55 +333,55 @@ class PhpMarginKeeper(MarginKeeper):
 
             if str(category) == '0':
                 margin.margin += principal
-                self.tracer(u'月利宝本金入账', principal, margin.margin,
+                self.tracer(u'回款本金', principal, margin.margin,     # u'月利宝本金入账' ---> u'回款本金'
                             u'月利宝本金入账', refund_id, margin_before=margin_before)
                 margin_before = margin.margin
                 margin.margin += interest
-                self.tracer(u'月利宝利息入账', interest, margin.margin,
+                self.tracer(u'回款收益', interest, margin.margin,       # u'月利宝利息入账' ---> u'回款收益'
                             u'月利宝利息入账', refund_id, margin_before=margin_before)
-                if penal_interest > 0:
+                if t0_interest > 0:
                     margin_before = margin.margin
-                    margin.margin += penal_interest
-                    self.tracer(u'月利宝罚息入账', penal_interest, margin.margin,
-                                u'月利宝罚息入账', refund_id, margin_before=margin_before)
+                    margin.margin += t0_interest
+                    self.tracer(u't+0补息', t0_interest, margin.margin,       # u'月利宝罚息入账' ---> u't+0补息'
+                                u'月利宝 t+0补息入账', refund_id, margin_before=margin_before)
                 if platform_interest > 0:
                     margin_before = margin.margin
                     margin.margin += platform_interest
-                    self.tracer(u'月利宝平台加息入账', platform_interest, margin.margin,
+                    self.tracer(u'平台加息', platform_interest, margin.margin,     # u'月利宝平台加息入账' ---> u'平台加息'
                                 u'月利宝平台加息入账', refund_id, margin_before=margin_before)
                 if coupon_interest > 0:
                     margin_before = margin.margin
                     margin.margin += coupon_interest
                     description = u"月利宝加息存入{}元".format(coupon_interest)
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
-                    self.tracer(u"月利宝加息存入", coupon_interest, margin.margin,
+                    self.tracer(u"加息券收益", coupon_interest, margin.margin,    # u'月利宝加息存入' ---> u'加息券收益'
                                 description, refund_id, margin_before=margin_before)
 
             if str(category) == '1':
                 margin_before = margin.margin
                 margin.margin += principal
-                self.tracer(u'债转本金入账', principal, margin.margin,
+                self.tracer(u'回款本金', principal, margin.margin,
                             u'债转本金入账', refund_id, margin_before=margin_before)
                 margin_before = margin.margin
                 margin.margin += interest
-                self.tracer(u'债转利息入账', interest, margin.margin,
+                self.tracer(u'回款收益', interest, margin.margin,
                             u'债转利息入账', refund_id, margin_before=margin_before)
-                if penal_interest > 0:
+                if t0_interest > 0:
                     margin_before = margin.margin
-                    margin.margin += penal_interest
-                    self.tracer(u'债转罚息入账', penal_interest, margin.margin,
-                                u'债转罚息入账', refund_id, margin_before=margin_before)
+                    margin.margin += t0_interest
+                    self.tracer(u't+0补息', t0_interest, margin.margin,
+                                u'债转t+0补息', refund_id, margin_before=margin_before)
                 if platform_interest > 0:
                     margin_before = margin.margin
                     margin.margin += platform_interest
-                    self.tracer(u'债转平台加息入账', platform_interest, margin.margin,
+                    self.tracer(u'平台加息', platform_interest, margin.margin,
                                 u'债转平台加息入账', refund_id, margin_before=margin_before)
                 if coupon_interest > 0:
                     margin_before = margin.margin
                     margin.margin += coupon_interest
                     description = u"债转加息存入{}元".format(coupon_interest)
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
-                    self.tracer(u"债转加息存入", coupon_interest, margin.margin,
+                    self.tracer(u"加息券收益", coupon_interest, margin.margin,
                                 description, refund_id, margin_before=margin_before)
             margin.save()
 

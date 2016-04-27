@@ -61,13 +61,13 @@ class MarginKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.freeze:
-                logger.info('user id: {}, amount:{}, freeze:{} ========'.format(self.user.id, amount, margin.freeze))
+                logger.debug('user id: {}, amount:{}, freeze:{} ========'.format(self.user.id, amount, margin.freeze))
                 raise MarginLack(u'202')
             margin.freeze -= amount
             uninvested_freeze = margin.uninvested_freeze - amount
             margin.uninvested_freeze = uninvested_freeze if uninvested_freeze >= 0 else Decimal('0.00')
             margin.save()
-            catalog = u'月利宝交易成功扣款'
+            catalog = u'交易成功扣款'
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 

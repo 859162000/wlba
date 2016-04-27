@@ -232,8 +232,8 @@ class CheckTradePassword(APIView):
         try:
             ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
-            ret = {'status': 0, 'message': str(e)}
-            logger.debug('CheckTradePassword error with {}!\n'.format(str(e)))
+            ret = {'status': 0, 'message': e.message}
+            logger.debug('CheckTradePassword error with {}!\n'.format(e.message))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -257,7 +257,7 @@ class CheckAppTradePassword(PHPDecryptParmsAPIView):
         try:
             ret = trade_pwd_check(int(user_id), trade_password)
         except Exception, e:
-            ret = {'status': -1, 'message': str(e)}
+            ret = {'status': -1, 'message': e.message}
             logger.debug('CheckTradePassword error with {}!\n'.format(e.message))
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
@@ -307,9 +307,9 @@ class YueLiBaoBuy(APIView):
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
         except Exception, e:
-            logger.debug('buy month product failed with {}!\n'.format(str(e)))
+            logger.debug('buy month product failed with {}!\n'.format(e.message))
             return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error! ' + str(e)}, 'application/json'))
+                {'status': '0', 'msg': 'args error! ' + e.message}, 'application/json'))
 
 
 class YueLiBaoBuyFail(APIView):
@@ -367,9 +367,9 @@ class YueLiBaoBuyFail(APIView):
             ret.update(status=1,
                        msg='success')
         except Exception, e:
-            logger.debug('call fail API failed with : {}\n'.format(str(e)))
+            logger.debug('call fail API failed with : {}\n'.format(e.message))
             ret.update(status=0,
-                       msg=str(e))
+                       msg=e.message)
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -444,9 +444,9 @@ class YueLiBaoCheck(APIView):
                 ret.update(status=1,
                            msg='success')
         except Exception, e:
-            logger.debug(u'月利宝id: {} 满标审核失败: {}\n'.format(product_id, str(e)))
+            logger.debug(u'月利宝id: {} 满标审核失败: {}\n'.format(product_id, e.message))
             ret.update(status=0,
-                       msg=str(e))
+                       msg=e.message)
         logger.info('ret = {}'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -500,9 +500,9 @@ class YueLiBaoCancel(APIView):
                        msg=msg_list)
             logger.info(u'month_product_id = {}, 流标成功\n'.format(product_id))
         except Exception, e:
-            logger.debug(u'month_product_id = {}, 流标失败: {}\n'.format(product_id, str(e)))
+            logger.debug(u'month_product_id = {}, 流标失败: {}\n'.format(product_id, e.message))
             ret.update(status=0,
-                       msg=str(e))
+                       msg=e.message)
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -517,15 +517,15 @@ class YueLiBaoRefund(APIView):
     interest 利息
     increase 加息额
     plusInterest 平台加息
+    t0Interest t+0 利息
     amount 本次还款金额
     tradeType 产品类型 0月利宝 1债转
-    remark 备注 [{"refundId":1,"userId":78641,"amount":15,"tradeType":0,"remark":"string"},
-                {"refundId":2,"userId":78694,"amount":15,"tradeType":0,"remark":""}]
-        # args = [{'refundId': 1, 'userId': 2, 'productId': 4, 'tradeType': 0, 'remark': 'string',
-        #          'amount': 1018, 'principal': 1000, 'interest': 10, 'increase': 5, 'plusInterest': 3},
-        #         {'refundId': 2, 'userId': 2, 'amount': 4, 'tradeType': 0, 'remark': 'string',
-        #          'amount': 1018, 'principal': 1000, 'interest': 10, 'increase': 5, 'plusInterest': 3},
-        #         ...]
+    remark 备注
+    # args = [{'refundId': 1, 'userId': 2, 'productId': 4, 'tradeType': 0, 'remark': 'string',
+    #          'amount': 1018, 'principal': 1000, 'interest': 10, 'increase': 5, 'plusInterest': 3, 'add_interest': 6},
+    #         {'refundId': 2, 'userId': 2, 'amount': 4, 'tradeType': 0, 'remark': 'string',
+    #          'amount': 1018, 'principal': 1000, 'interest': 10, 'increase': 5, 'plusInterest': 3, 'add_interest': 6},
+    #         ...]
     返回数据格式：json
     :return:
     """
@@ -545,9 +545,13 @@ class YueLiBaoRefund(APIView):
                     user = User.objects.get(pk=arg['userId'])
 
                     margin_record = MarginRecord.objects.filter(
-                        # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
-                        (Q(catalog=u'\u6708\u5229\u5b9d\u672c\u91d1\u5165\u8d26') |
-                         Q(catalog=u'\u503a\u8f6c\u672c\u91d1\u5165\u8d26')) &
+                        # # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
+                        # (Q(catalog=u'\u6708\u5229\u5b9d\u672c\u91d1\u5165\u8d26') |
+                        #  Q(catalog=u'\u503a\u8f6c\u672c\u91d1\u5165\u8d26')) &
+
+                        # u'月利宝本金入账' 和 u'债转本金入账'  ---> u'回款本金'
+                        # Q(catalog=u'回款本金') &
+                        Q(catalog=u'\u56de\u6b3e\u672c\u91d1') &
                         Q(order_id=arg['refundId']) & Q(user=user)
                     ).first()
 
@@ -559,14 +563,14 @@ class YueLiBaoRefund(APIView):
 
                         try:
                             buyer_keeper.php_amortize_detail(
-                                arg['tradeType'], arg['principal'], arg['interest'], 0, arg['increase'],
-                                arg['plusInterest'], arg['refundId']
+                                arg['tradeType'], arg['principal'], arg['interest'], arg['add_interest'],
+                                arg['increase'], arg['plusInterest'], arg['refundId']
                             )
                             msg_list.append({'refundId': arg['refundId'], 'status': 1})
 
                         except Exception, e:
                             ret.update(status=0,
-                                       msg=str(e))
+                                       msg=e.message)
                             logger.debug('in YueLiBaoRefund error = {}\n'.format(e.message))
                             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -575,7 +579,7 @@ class YueLiBaoRefund(APIView):
 
         except Exception, e:
             ret.update(status=0,
-                       msg=str(e))
+                       msg=e.message)
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -633,7 +637,7 @@ class AssignmentOfClaimsBuy(APIView):
 
         except Exception, e:
             return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error! ' + str(e)}, 'application/json'))
+                {'status': '0', 'msg': 'args error! ' + e.message}, 'application/json'))
 
 
 class AssignmentBuyStatus(APIView):
@@ -716,7 +720,7 @@ class AssignmentBuyFail(APIView):
                            msg='success')
         except Exception, e:
             ret.update(status=0,
-                       msg=str(e))
+                       msg=e.message)
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
