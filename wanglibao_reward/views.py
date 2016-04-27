@@ -939,20 +939,23 @@ class KongGangAPIView(APIView):
 
         reward = None
 
-        if reward == None or (p2p_amount>=15000 and p2p_amount<20000):
-            with transaction.atomic:
-                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
-                reward.is_used = True
-                reward.save()
-                return reward
-
-        if reward == None or p2p_amount>=20000:
+        if p2p_amount >= 20000:
             with transaction.atomic:
                 reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
-                reward.is_used = True
-                reward.save()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                    return reward
 
-        return reward
+        if (reward == None and p2p_amount>=20000) or (p2p_amount>=15000 and p2p_amount<20000):
+            with transaction.atomic:
+                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                return reward
+
+        return 'invalid'
 
     def post(self, request):
         if not request.user.is_authenticated():
@@ -994,7 +997,22 @@ class KongGangAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+        if reward.has_sent == True:
+            json_to_response = {
+                'ret_code': 1003,
+                'message': u'奖品已经发放'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
         sent_reward = self.decide_which_reward_distribute(reward.amount)
+
+        if sent_reward == 'invalid':
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'您不满足领取条件，满额投资后再来领取吧！'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
         if sent_reward == None:
             json_to_response = {
                 'ret_code': 1005,
@@ -1013,6 +1031,8 @@ class KongGangAPIView(APIView):
                     )
 
                 if reward.has_sent == True:
+                    sent_reward.is_used = False
+                    sent_reward.save()
                     join_record.save()
                     json_to_response = {
                         'ret_code': 1003,
@@ -1022,7 +1042,7 @@ class KongGangAPIView(APIView):
 
                 reward.reward = sent_reward
                 reward.has_sent = True
-                reward.left_time=0
+                reward.left_time = 0
         except Exception:
             sent_reward.is_used = False
             sent_reward.save()
