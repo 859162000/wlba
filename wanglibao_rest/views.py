@@ -1217,7 +1217,7 @@ class StatisticsInside(APIView):
         today_utc = local_to_utc(today, 'now')
         start_withdraw = today_start + timedelta(hours=16)
         # 当日16点前查询以昨日16点作为起始时间
-        if today_utc < start_withdraw :
+        if today_utc < start_withdraw:
             start_withdraw = yesterday_start + timedelta(hours=16)
         stop_withdraw = today_utc
         yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
@@ -1256,6 +1256,12 @@ class StatisticsInside(APIView):
         yesterday_repayment_total = (yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else 0) \
                 + (yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else 0)
 
+        # 今日申请提现,0点到当前
+        today_withdraw = MarginRecord.objects.filter(create_time__gte=today_start, catalog='取款预冻结')\
+            .aggregate(Sum('amount'))
+        # 实际
+        today_withdraw_amount = today_withdraw['amount__sum'] if today_withdraw['amount__sum'] else 0
+
         # 昨日首投用户
         from django.db import connection
         cursor = connection.cursor()
@@ -1277,8 +1283,9 @@ class StatisticsInside(APIView):
             'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
             'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
-            'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
-            'today_deposit_amount' : today_deposit_amount, # 今日冲值总额
+            'yesterday_withdraw': yesterday_withdraw,  # 每日累计申请提现
+            'today_deposit_amount': today_deposit_amount,  # 今日冲值总额
+            'today_withdraw_amount': today_withdraw_amount,  # 今日提现申请(0点到当前)
         }
 
         data.update(get_public_statistics())
