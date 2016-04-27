@@ -111,11 +111,11 @@ urlpatterns = patterns(
     #刮刮乐
     url(r'^activity_ggl/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='activity_ggl'),
-    url(r'^sub_checkIn/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
+    url(r'^sub_checkIn/$', fwh_login_required(TemplateView.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='sub_checkIn'),
     url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
 
-    url(r'^new_user_gift/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="server_new_user_gift.jade"),login_url='/weixin/sub_login_redirect/'
+    url(r'^new_user_gift/$', fwh_login_required(TemplateView.as_view(template_name="server_new_user_gift.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='new_user_gift'),
 
 )

@@ -863,8 +863,6 @@ class RewardDistributer(object):
         self.request = request
         self.kwargs = kwargs
         self.Processor = {
-            ThanksGivenRewardDistributer: ('all',),
-            XingMeiRewardDistributer: ('all',),
             KongGangRewardDistributer:('kgyx',),
             ZhaoXiangGuanRewardDistributer:('ys',),
         }
@@ -878,11 +876,11 @@ class RewardDistributer(object):
     def processors(self):
         processor = []
         for key, value in self.Processor.items():
-            if key().token in value:
-                processor.append(key)
+            processor.append(key)
         return processor
 
     def processor_for_distribute(self):
+        logger.debug('processor: %s' % (self.processors))
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
 
@@ -900,9 +898,9 @@ class KongGangRewardDistributer(RewardDistributer):
         all_reward = Reward.objects.filter(type='贵宾全套出岗服务', is_used=False).first()
 
         send_reward = None
-        if  self.amount>=15000 and self.amount<20000:
+        if  self.amount>=10000 and self.amount<15000:
             send_reward = wait_reward
-        if  self.amount>=20000:
+        if  self.amount>=15000:
             send_reward = all_reward or wait_reward
         if send_reward:
             try:
@@ -915,6 +913,9 @@ class KongGangRewardDistributer(RewardDistributer):
                         has_sent=False,
                         left_times=1,
                         join_times=1)
+                send_reward.is_used=True
+                send_reward.save()
+
             except Exception:
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错')
         else: #所有奖品已经发完了
@@ -969,11 +970,19 @@ class KongGangAPIView(APIView):
 
             reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
             if reward == None:
-                json_to_response = {
-                    'ret_code': 1002,
-                    'message': u'您不满足领取条件，满额投资后再来领取吧！'
-                }
-                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                noused = Reward.objects.filter(type__in=('尊贵休息室服务', '贵宾全套出岗服务'), is_used=False).count()
+                if noused == 0:
+                    json_to_response = {
+                        'ret_code': 1005,
+                        'message': u'亲,您来晚了;奖品已经发完了！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+                else:
+                    json_to_response = {
+                        'ret_code': 1002,
+                        'message': u'您不满足领取条件，满额投资后再来领取吧！'
+                    }
+                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
             if reward.has_sent == False:
                 reward.has_sent=True
@@ -982,9 +991,10 @@ class KongGangAPIView(APIView):
                            u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                            u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                            u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.reward.type, reward.reward.content)
+                logger.debug('空港易行user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
                 send_messages.apply_async(kwargs={
                     "phones": [request.user.wanglibaouserprofile.phone, ],
-                    "message": send_msg,
+                    "messages": [send_msg, ],
                 })
 
                 inside_message.send_one.apply_async(kwargs={
@@ -1021,7 +1031,10 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
         send_reward = Reward.objects.filter(type='影像投资节优惠码', is_used=False).first()
         if send_reward:
             try:
-                WanglibaoActivityReward.objects.create(
+                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
+                if reward:
+                    return
+                reward = WanglibaoActivityReward.objects.create(
                         activity='sy',
                         order_id=self.order_id,
                         user=self.user,
@@ -1030,8 +1043,7 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                         has_sent=False,
                         left_times=1,
                         join_times=1)
-                
-                reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
+                #reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=False).first()
                 if reward:
                     reward.has_sent=True
                     reward.left_time=0
@@ -1054,6 +1066,34 @@ class ZhaoXiangGuanRewardDistributer(RewardDistributer):
                 logger.debug('user:%s, order_id:%s,p2p_amount:%s,影像投资节优惠码发奖报错')
         else: #所有奖品已经发完了
             return
+        
+class ZhaoXiangGuanAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(ZhaoXiangGuanAPIView, self).__init__()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
+        if reward:
+            json_to_response = {
+                'ret_code': 1,
+                'message': u'奖品已经发放'
+            }
+        else:
+            json_to_response = {
+                'ret_code': 0,
+                'message': u'奖品未发放'
+            }            
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
 
 class XingMeiRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
