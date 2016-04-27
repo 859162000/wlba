@@ -81,7 +81,7 @@ webpackJsonp([7],[
 	    $submit.on('click', function () {
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
-	            return login('/weixin/api/login/');
+	            return login('/api/bisouyi/login/?promo_token=bisouyissssssss');
 	        }).then(function (result) {
 	            console.log('login success');
 	            var next_url = (0, _api.getQueryStringByName)('next');
