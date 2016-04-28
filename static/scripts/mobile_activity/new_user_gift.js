@@ -236,6 +236,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $(".page-loading").hide();
             $("#swiper-container .swiper-wrapper,#next-box").show();
         }, 1000);
+        var u = navigator.userAgent;
+        alert(u);
     };
 
     //音乐
