@@ -434,7 +434,7 @@ class WechatInviteTemplate(TemplateView):
         if self.w_user:
             is_bind = True if self.w_user.user else False
             w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
-            if w_daily_reward and w_daily_reward.status:
+            if w_daily_reward:# and w_daily_reward.status
                 fetched = True
                 if w_daily_reward.reward_type == "redpack":
                     redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
