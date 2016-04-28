@@ -75,10 +75,8 @@
     });
 
 
-})(org);
-
-;(function(org){
     var login = false;
+    alert('1');
     wlb.ready({
         app: function (mixins) {
             function connect(data) {
@@ -97,6 +95,7 @@
                             url += "?1";
                             self.location.replace(url);
                         }
+                        alert('5');
                         $('#button_link').on("click",function(){
                             org.ajax({
                                 type: "post",
@@ -118,14 +117,18 @@
                 })
             }
             mixins.sendUserInfo(function (data) {
+                alert('2');
                 if (data.ph == '') {
+                    alert('3');
                     login = false;
                     $('#button_link').on("click",function(){
-                         mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_august_phone/?promo_token=sy'});
+                         mixins.loginApp({refresh:1, url:'/activity/app_august_phone/'});
                     })
                 } else {
+                    alert('4');
                     login = true;
                     connect(data)
+
                 }
             })
 
@@ -145,7 +148,6 @@
                         }else if(data.ret_code=='0'){
                             window.location.href = '/weixin/list/?promo_token=sy'
                         }
-
                         //console.log(data)
                     }
                 })
