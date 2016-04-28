@@ -1,3 +1,4 @@
+
 (function(org) {
     var h5_user_static;
     org.ajax({
@@ -79,6 +80,7 @@
     alert('1');
     wlb.ready({
         app: function (mixins) {
+            alert(1232456);
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -89,6 +91,7 @@
                         ts: data.ts
                     },
                     success: function (data) {
+
                         var url = location.href;
                         var times = url.split("?");
                         if(times[1] != 1){
@@ -96,6 +99,7 @@
                             self.location.replace(url);
                         }
                         alert('5');
+
                         $('#button_link').on("click",function(){
                             org.ajax({
                                 type: "post",
@@ -134,6 +138,7 @@
 
         },
         other: function(){
+            alert(32222111)
             $('#button_link').on("click",function(){
                 org.ajax({
                     type: "post",

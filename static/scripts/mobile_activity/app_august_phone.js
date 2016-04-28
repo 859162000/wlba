@@ -217,7 +217,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function(org) {
+;
+(function(org) {
     var h5_user_static;
     org.ajax({
         url: '/api/user_login/',
@@ -298,6 +299,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     alert('1');
     wlb.ready({
         app: function (mixins) {
+            alert(1232456);
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -308,6 +310,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         ts: data.ts
                     },
                     success: function (data) {
+
                         var url = location.href;
                         var times = url.split("?");
                         if(times[1] != 1){
@@ -315,6 +318,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             self.location.replace(url);
                         }
                         alert('5');
+
                         $('#button_link').on("click",function(){
                             org.ajax({
                                 type: "post",
@@ -353,6 +357,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
         },
         other: function(){
+            alert(32222111)
             $('#button_link').on("click",function(){
                 org.ajax({
                     type: "post",
