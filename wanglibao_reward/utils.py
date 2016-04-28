@@ -313,7 +313,7 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
     else:
         raise Exception(u"misc中没有配置activities杂项")
 
-    p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+    p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id).first()
     if not p2p_record:
         raise Exception(u"购买订单异常")
 
