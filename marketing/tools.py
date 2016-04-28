@@ -18,7 +18,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_activity import backends as activity_backends
-from wanglibao_activity.tasks import check_activity
+from wanglibao_activity.tasks import check_activity_task
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
 import json
@@ -54,7 +54,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
 
     # 活动检测
     # activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full)
-    check_activity.apply_async(kwargs={
+    check_activity_task.apply_async(kwargs={
         "user_id": user.id,
         "trigger_node": 'invest',
         "device_type": device_type,
@@ -118,7 +118,7 @@ def register_ok(user_id, device):
     })
     # 活动检测
     # activity_backends.check_activity(user, 'register', device_type)
-    check_activity.apply_async(kwargs={
+    check_activity_task.apply_async(kwargs={
         "user_id": user.id,
         "trigger_node": 'register',
         "device_type": device_type,
@@ -141,7 +141,7 @@ def idvalidate_ok(user_id, device):
 
     # 活动检测
     # activity_backends.check_activity(user, 'validation', device_type)
-    check_activity.apply_async(kwargs={
+    check_activity_task.apply_async(kwargs={
         "user_id": user.id,
         "trigger_node": 'validation',
         "device_type": device_type,
@@ -188,7 +188,7 @@ def deposit_ok(user_id, amount, device, order_id):
         user_profile = user.wanglibaouserprofile
         # activity_backends.check_activity(user, 'recharge', device_type,
         #                                  amount, **{'order_id': order_id})
-        check_activity.apply_async(kwargs={
+        check_activity_task.apply_async(kwargs={
             "user_id": user.id,
             "trigger_node": 'recharge',
             "device_type": device_type,

@@ -871,10 +871,12 @@ org.detail = (function (org) {
                 url : lib.weiURL,
                 dataType : 'json',
                 success : function(data) {
+                    org.ui.alert(JSON.stringify(data));
                     //请求成功，通过config注入配置信息,
                     wx.config({
                         debug: wxDebug,
-                        appId: data.appId,
+                        //appId: data.appId,
+                        appId: true,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
                         signature: data.signature,
@@ -883,6 +885,7 @@ org.detail = (function (org) {
                 }
             });
             wx.ready(function(){
+                org.ui.alert("wx.raddy");
                 var host = 'https://www.wanglibao.com',
                     shareImg,//图片
                     shareLink,//连接地址
@@ -3119,6 +3122,7 @@ org.redpacket = (function(org){
             });
         },
         shareFn: function(){
+            org.ui.alert($("input.share_url").val());
             var html = '<div class="invite-share-ok">' +
                 '<div class="share-mian">' +
                 '<div class="share-img"></div>' +
@@ -3682,6 +3686,7 @@ org.awardEvent = (function(org){ //微信抽奖
             url: '/api/weixin/distribute/redpack/',
             dataType: 'json',
             data: {"action": obj,"openid": $("#openid").val()},
+            //data: {"action": obj,"openid": "oILFQt3q9C-SqnZRlUTYvhgQUHYE"},
             success: function(data){
                 fn(data);
                 awardsNum = data.left;

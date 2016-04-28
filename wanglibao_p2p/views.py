@@ -55,7 +55,7 @@ from celery.execute import send_task
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
-from wanglibao_activity.tasks import check_activity
+from wanglibao_activity.tasks import check_activity_task
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_redis.backend import redis_backend
 from .common import get_p2p_list
@@ -333,7 +333,7 @@ class AuditProductView(TemplateView):
 
         # 满标审核时检测活动规则
         # activity_backends.check_activity(request.user, 'p2p_audit', 'all', 0, pk)
-        check_activity.apply_async(kwargs={
+        check_activity_task.apply_async(kwargs={
             "user_id": request.user.id,
             "trigger_node": 'p2p_audit',
             "device_type": 'all',

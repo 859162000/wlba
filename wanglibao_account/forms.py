@@ -26,6 +26,7 @@ from marketing.models import LoginAccessToken
 from django.conf import settings
 from wanglibao_profile.models import USER_TYPE
 from report.crypto import Aes
+from common.tools import StrQuote
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -586,9 +587,11 @@ class BiSouYiRegisterForm(forms.Form):
         return token
 
     def check_sign(self):
+        quote = StrQuote()
         client_id = self.cleaned_data['client_id']
         sign = self.cleaned_data['sign']
         content = self.cleaned_data['content'][0]
+        content = quote.quote_plus(content)
         local_sign = hashlib.md5(str(client_id) + settings.BISOUYI_CLIENT_SECRET + content).hexdigest()
         if sign != local_sign:
             return False

@@ -1208,9 +1208,9 @@ class KongGangRegister(CoopRegister):
         #now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
         #TODO:转换为UTC时间后跟表记录时间对比
         from wanglibao_account import utils
-        utc_start = (utils.str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
-        utc_end = (utils.str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
-        now = p2p_record.create_time
+        utc_start = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+        utc_end = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
+        now = p2p_record.create_time.strftime("%Y-%m-%d %H:%M:%S")
         if now < utc_start or now >= utc_end:
             #raise Exception(u"活动还未开始,请耐心等待")
             return
@@ -1220,7 +1220,7 @@ class KongGangRegister(CoopRegister):
             return
 
         #判断有没有奖品剩余
-        reward = self.decide_which_reward_distribute(p2p_record.p2p_amount)
+        reward = self.decide_which_reward_distribute(p2p_record.amount)
         if reward == 'invalid':
             raise Exception(u"不满足领取条件")
         if reward == None:
@@ -2274,6 +2274,7 @@ class JiaXiHZRegister(CoopRegister):
             data_encode = '&'.join([k + '=' + str(v) for k, v in data])
             sign = hashlib.md5(data_encode).hexdigest()
             params = dict(data)
+            params.pop('key', None)
             params['sign'] = sign
 
             # 异步回调
