@@ -1159,7 +1159,7 @@ class KongGangRegister(CoopRegister):
         reward = None
         if p2p_amount>=10000:
             with transaction.atomic():
-                reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
+                reward = Reward.objects.select_for_update().filter(type='贵宾全套出港服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
                     reward.save()
@@ -1167,7 +1167,7 @@ class KongGangRegister(CoopRegister):
 
         if p2p_amount>=5000:
             with transaction.atomic():
-                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
+                reward = Reward.objects.select_for_update().filter(type='贵宾休息室服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
                     reward.save()
