@@ -296,7 +296,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 //
 //})(org);
 
-
 ;(function(org){
     alert(6666666666);
     var login = false;
