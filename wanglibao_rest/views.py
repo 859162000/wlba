@@ -370,7 +370,7 @@ class RegisterAPIView(DecryptParmsAPIView):
             if register_channel and register_channel == 'fwh' and openid:
                 ShareInviteRegister(request).process_for_register(request.user, openid)
                 w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
-                bindUser(w_user, request.user)
+                bindUser(w_user, request.user, new_registed=True)
                 request.session['openid'] = openid
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
@@ -1225,7 +1225,7 @@ class StatisticsInside(APIView):
         today_utc = local_to_utc(today, 'now')
         start_withdraw = today_start + timedelta(hours=16)
         # 当日16点前查询以昨日16点作为起始时间
-        if today_utc < start_withdraw :
+        if today_utc < start_withdraw:
             start_withdraw = yesterday_start + timedelta(hours=16)
         stop_withdraw = today_utc
         yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
@@ -1264,6 +1264,12 @@ class StatisticsInside(APIView):
         yesterday_repayment_total = (yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else 0) \
                 + (yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else 0)
 
+        # 今日申请提现,0点到当前
+        today_withdraw = MarginRecord.objects.filter(create_time__gte=today_start, catalog='取款预冻结')\
+            .aggregate(Sum('amount'))
+        # 实际
+        today_withdraw_amount = today_withdraw['amount__sum'] if today_withdraw['amount__sum'] else 0
+
         # 昨日首投用户
         from django.db import connection
         cursor = connection.cursor()
@@ -1285,8 +1291,9 @@ class StatisticsInside(APIView):
             'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
             'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
-            'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
-            'today_deposit_amount' : today_deposit_amount, # 今日冲值总额
+            'yesterday_withdraw': yesterday_withdraw,  # 每日累计申请提现
+            'today_deposit_amount': today_deposit_amount,  # 今日冲值总额
+            'today_withdraw_amount': today_withdraw_amount,  # 今日提现申请(0点到当前)
         }
 
         data.update(get_public_statistics())
@@ -1515,11 +1522,12 @@ class GuestCheckView(APIView):
 class InnerSysHandler(object):
     def ip_valid(self, request):
         client_ip = get_client_ip(request)
+        logger.debug('request ip:%s' % (client_ip, ))
         return True if client_ip in INNER_IP else False
 
     def judge_valid(self, request):
         if not self.ip_valid(request):
-            return False, u'IP没有通过验证'
+            return False, u'IP(%s)没有通过验证' % get_client_ip(request)
 
         return True, u'通过验证'
 
@@ -1530,6 +1538,7 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
     def post(self, request):
         phone = request.DATA.get("phone", None)
         message = request.DATA.get("message", None)
+        msg_type = request.DATA.get('msg_type', None)
         logger.debug("phone:%s, message:%s" % (phone, message))
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
@@ -1540,7 +1549,8 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
 
         send_messages.apply_async(kwargs={
                 "phones": [phone, ],
-                "messages": [message, ]
+                "messages": [message, ],
+                "ext": msg_type,
             })
 
         return Response({"code": 0, "message": u"短信发送成功"})
@@ -2020,7 +2030,7 @@ class BiSouYiUserExistsApi(APIView):
         response_data = {
             'cid': client_id,
             'sign': sign,
-            'conten': content,
+            'content': content,
         }
 
         http_response = HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

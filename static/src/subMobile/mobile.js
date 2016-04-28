@@ -738,6 +738,9 @@ org.detail = (function (org) {
          */
         _share: function(obj,hide){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideMenuItems'];
+            var host = window.location.search,
+                wxDebug = host.split('debug=')[1];
+            wxDebug = wxDebug ? wxDebug : false;
             org.ajax({
                 type : 'GET',
                 url : lib.weiURL,
@@ -745,7 +748,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: false,
+                        debug: wxDebug,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -3148,7 +3151,8 @@ org.redpacket_bind = (function(org){
                     },
                     success: function (data) {
                         if(data.re_code != 0){
-                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                            alert(data.re_code);
+                            window.location.href = "/weixin/jump_page/?message="+data.errmessage;
                         }else{
                             window.location.href = $("input.next-url").val();
                         }

@@ -217,7 +217,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function(org) {
+;
+(function(org) {
     var h5_user_static;
     org.ajax({
         url: '/api/user_login/',
@@ -289,14 +290,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         })
 
-        $('.popup_button').click(function(){
-            $('.popup_box').hide();
-        });
+    $('.popup_box .popup_button').click(function(){
+        $('.popup_box').hide();
+    });
 
 
-
+    var login = false;
+    alert('1');
     wlb.ready({
-        app: function(mixins) {
+        app: function (mixins) {
+            alert(1232456);
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -307,46 +310,72 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         ts: data.ts
                     },
                     success: function (data) {
-                        var url = location.href;
-                        var times = url.split("?");
-                        if(times[1] != 1){
-                            url += "?1";
-                            self.location.replace(url);
-                        }
+
+                        //var url = location.href;
+                        //var times = url.split("?");
+                        //if(times[1] != 1){
+                        //    url += "?1";
+                        //    self.location.replace(url);
+                        //}
+                        alert('5');
+
+                        $('#button_link').on("click",function(){
+                            org.ajax({
+                                type: "post",
+                                url: "/api/activity/zhaoxiangguan/",
+                                dataType: 'json',
+                                success: function(data){
+                                    if(data.ret_code=='1'){
+                                        $('.popup_box .main .textairport').text(''+data.message+'');
+                                        $('.popup_box').show();
+                                    }else if(data.ret_code=='0'){
+                                        mixins.jumpToManageMoney();
+                                    }
+                                    //console.log(data)
+                                }
+
+                            })
+                        })
                     }
                 })
             }
-			mixins.shareData({title: '网利宝影像投资节送福利喽', content: '全民福利 火速领取'});
-            mixins.sendUserInfo(function(data) {
+            mixins.sendUserInfo(function (data) {
+                alert('2');
                 if (data.ph == '') {
+                    alert('3');
                     login = false;
-                    $('#button_link').click(function() {
-                        mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
-                    });
-
+                    $('#button_link').on("click",function(){
+                         mixins.loginApp({refresh:1, url:'/activity/app_august_phone/'});
+                    })
                 } else {
-                    connect(data);
+                    alert('4');
                     login = true;
-                    $('#button_link').click(function() {
-                        mixins.jumpToManageMoney();
-                    });
-                }
+                    connect(data)
 
+                }
             })
+
         },
-        other: function() {
-
-            $('#button_link').click(function() {
-                if(h5_user_static) {
-                    window.location.href = '/weixin/list/?promo_token=sy'
-                }else {
-                    window.location.href = '/weixin/login/?next=/activity/app_august_phone/?promo_token=sy'
-                }
+        other: function(){
+            alert(32222111)
+            $('#button_link').on("click",function(){
+                org.ajax({
+                    type: "post",
+                    url: "/api/activity/zhaoxiangguan/",
+                    dataType: 'json',
+                    success: function(data){
+                        if(data.ret_code=='1000'){
+                            window.location.href = '/weixin/regist/?next=/activity/app_august_phone/?promo_token=sy'
+                        }else if(data.ret_code=='1'){
+                            $('.popup_box .main .textairport').text(''+data.message+'');
+                            $('.popup_box').show();
+                        }else if(data.ret_code=='0'){
+                            window.location.href = '/weixin/list/?promo_token=sy'
+                        }
+                        //console.log(data)
+                    }
+                })
             })
-            //console.log('其他场景的业务逻辑');
-
-
         }
-    });
-
+    })
 })(org);

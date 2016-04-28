@@ -574,7 +574,7 @@ class BiSouYiRegisterForm(forms.Form):
         return phone
 
     def get_other(self):
-        other = self.cleaned_data['content'][1]['other']
+        other = self.cleaned_data['content'][1]['other'] or settings.SITE_URL
         return other
 
     def get_account(self):

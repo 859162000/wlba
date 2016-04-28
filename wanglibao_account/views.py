@@ -2765,9 +2765,6 @@ class MarginRecordsAPIView(APIView):
         return Response(res)
 
 
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
 def user_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
     def messenger(message, user=None):
         res = dict()
@@ -2897,7 +2894,7 @@ class BiSouYiRegisterApi(APIView):
 
         response_data['oauth_data'] = json.dumps(oauth_data)
 
-        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        logger.info("BiSouYiRegisterApi process result: %s" % response_data)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
@@ -2970,7 +2967,7 @@ class BiSouYiRegisterView(TemplateView):
 
         response_data['oauth_data'] = json.dumps(oauth_data)
 
-        logger.info("BiSouYiRegisterView process result: %s" % response_data['message'])
+        logger.info("BiSouYiRegisterView process result: %s" % response_data)
         return response_data
 
 
@@ -2978,7 +2975,7 @@ class BiSouYiLoginApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = BiSouYiRegisterForm(self.request.session, action='login')
+        form = BiSouYiRegisterForm(self.request.session, action='old_login')
         p_code = settings.BISOUYI_PCODE
         oauth_data = {
             'pcode': p_code,
@@ -3047,6 +3044,6 @@ class BiSouYiLoginApi(APIView):
             }
 
         response_data['oauth_data'] = json.dumps(oauth_data)
-        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        logger.info("BiSouYiLoginApi process result: %s" % response_data)
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
