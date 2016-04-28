@@ -142,11 +142,11 @@
 
                 if (data.ph == '') {
                     login = false;
-
-                    $('.popup_box .popup_button').hide();
-                    $('.popup_box .main .textairport').text('请您先去登录');
-                    $('.popup_box').show();
-
+                    $('.six_btn').on("click",function() {
+                        $('.popup_box .popup_button').hide();
+                        $('.popup_box .main .textairport').text('请您先去登录');
+                        $('.popup_box').show();
+                    });
                     //$('.six_btn').on("click",function(){
                     //     mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=sy'});
                     //})
