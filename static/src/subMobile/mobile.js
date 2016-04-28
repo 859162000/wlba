@@ -749,7 +749,8 @@ org.detail = (function (org) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
                         debug: wxDebug,
-                        appId: data.appId,
+                        //appId: data.appId,
+                        appId: true,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
                         signature: data.signature,
