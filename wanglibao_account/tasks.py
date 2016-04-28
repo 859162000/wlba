@@ -223,6 +223,9 @@ def process_products_push_callback(req_data):
         if p_make_loans_time:
             product['make_loans_time'] = str_to_utc(p_make_loans_time)
 
+        if product['status'] == u'流标':
+            product['flow_time'] = now()
+
         product_instance = P2PProduct.objects.filter(pk=product['id']).first()
         if product_instance:
             if product_instance.status == product['status'] or sync_id < product_instance.sync_id:

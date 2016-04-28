@@ -59,10 +59,10 @@ class P2PProduct(models.Model):
 
     sync_id = models.FloatField(u'同步id(时间戳)', default=0)
 
-    def save(self, *args, **kwargs):
-        if self.status == u'流标':
-            self.flow_time = now()
-        super(P2PProduct, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.status == u'流标':
+    #         self.flow_time = now()
+    #     super(P2PProduct, self).save(*args, **kwargs)
 
     @property
     def completion_rate(self):
