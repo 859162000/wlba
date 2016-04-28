@@ -367,7 +367,7 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
     else:
         send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
                    u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
-                   u'感谢您的参与！【网利科技】' % (send_reward.content)
+                   u'感谢您的参与！【网利科技】' % (reward.content)
         send_messages.apply_async(kwargs={
             "phones": [user.id, ],
             "message": [send_msg, ],
