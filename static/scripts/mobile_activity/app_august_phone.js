@@ -289,11 +289,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         })
 
+    $('.popup_box .popup_button').click(function(){
+        $('.popup_box').hide();
+    });
 
 
-    alert('4');
+})(org);
+
+
+
+;(function(org){
+    var login = false;
     wlb.ready({
-        app: function(mixins) {
+        app: function (mixins) {
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -310,47 +318,41 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             url += "?1";
                             self.location.replace(url);
                         }
+                        $('#button_link').on("click",function(){
+                            org.ajax({
+                                type: "post",
+                                url: "/api/activity/zhaoxiangguan/",
+                                dataType: 'json',
+                                success: function(data){
+                                    if(data.ret_code=='1'){
+                                        $('.popup_box .main .textairport').text(''+data.message+'');
+                                        $('.popup_box').show();
+                                    }else if(data.ret_code=='0'){
+                                        mixins.jumpToManageMoney();
+                                    }
+                                    //console.log(data)
+                                }
+
+                            })
+                        })
                     }
                 })
             }
-			mixins.shareData({title: '网利宝影像投资节送福利喽', content: '全民福利 火速领取'});
-            mixins.sendUserInfo(function(data) {
-                alert(data.ph);
+            mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
-                    alert('5');
+                    login = false;
                     $('#button_link').on("click",function(){
                          mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_august_phone/?promo_token=sy'});
                     })
                 } else {
-                    connect(data);
-                    alert('6');
-                    $('#button_link').on("click",function(){
-                    org.ajax({
-                        type: "post",
-                        url: "/api/activity/zhaoxiangguan/",
-                        dataType: 'json',
-                        success: function(data){
-                            if(data.ret_code=='1'){
-                                $('.popup_box .main .textairport').text(''+data.message+'');
-                                $('.popup_box').show();
-                            }else if(data.ret_code=='0'){
-                                mixins.jumpToManageMoney();
-                            }
-                            //console.log(data)
-                        }
-
-                    })
-                        })
+                    login = true;
+                    connect(data)
                 }
-
-
-
             })
+
         },
-        other: function() {
-
+        other: function(){
             $('#button_link').on("click",function(){
-
                 org.ajax({
                     type: "post",
                     url: "/api/activity/zhaoxiangguan/",
@@ -369,13 +371,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     }
                 })
             })
-
         }
-    });
-
-    $('.popup_box .popup_button').click(function(){
-        $('.popup_box').hide();
-    });
-
-
+    })
 })(org);
