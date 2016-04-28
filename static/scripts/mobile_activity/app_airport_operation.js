@@ -320,36 +320,61 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         ts: data.ts
                     },
                     success: function (data) {
-                        var url = location.href;
-                        var times = url.split("?");
-                        if(times[1] != 1){
-                            url += "?1";
-                            self.location.replace(url);
-                        }
+                        //var url = location.href;
+                        //var times = url.split("?");
+                        //if(times[1] != 1){
+                        //    url += "?1";
+                        //    self.location.replace(url);
+                        //}
+
+                        $('.six_btn').on("click",function(){
+
+                            org.ajax({
+                                type: "post",
+                                url: "/api/activity/konggang/",
+                                dataType: 'json',
+                                success: function(data){
+                                    if(data.ret_code=='1000'){
+
+                                        $('.popup_box .popup_button').hide();
+                                        $('.popup_box .main .textairport').text('请您先去登录');
+                                        $('.popup_box').show();
+
+                                        //mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
+                                    }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
+                                        $('.popup_box .main .textairport').text(''+data.message+'');
+                                        $('.popup_box').show();
+                                    }else if(data.ret_code=='1002'){
+                                        mixins.jumpToManageMoney();
+                                    }
+                                    //console.log(data)
+                                }
+                            })
+                        })
+
+
                     }
                 })
             }
 			mixins.shareData({title: '从容出行 尊贵定制', content: '网利宝携手空港易行狂撒出行卡！'});
             mixins.sendUserInfo(function(data) {
-                $('.six_btn').on("click",function(){
 
-                    org.ajax({
-                        type: "post",
-                        url: "/api/activity/konggang/",
-                        dataType: 'json',
-                        success: function(data){
-                            if(data.ret_code=='1000'){
-                                mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
-                            }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
-                                $('.popup_box .main .textairport').text(''+data.message+'');
-                                $('.popup_box').show();
-                            }else if(data.ret_code=='1002'){
-                                mixins.jumpToManageMoney();
-                            }
-                            //console.log(data)
-                        }
-                    })
-                })
+                if (data.ph == '') {
+                    login = false;
+
+                    $('.popup_box .popup_button').hide();
+                    $('.popup_box .main .textairport').text('请您先去登录');
+                    $('.popup_box').show();
+
+                    //$('.six_btn').on("click",function(){
+                    //     mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=sy'});
+                    //})
+                } else {
+                    login = true;
+                    connect(data)
+
+                }
+
             })
         },
         other: function() {
