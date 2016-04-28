@@ -8,8 +8,7 @@ from django.contrib.auth.models import User
 
 from wanglibao import settings
 from wanglibao.celery import app
-from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type, UserPushId
-from wanglibao_sms import bae_channel
+from wanglibao_account.models import Message, MessageText, MessageNoticeSet, message_type
 from BeautifulSoup import BeautifulSoup
 
 logger = logging.getLogger('wanglibao_inside_messages')
@@ -22,7 +21,7 @@ def count_msg(params, user):
     logger.info('in count message!!!!!!')
     listtype = params.get("listtype", "").strip()
     if not listtype or listtype not in ("read", "unread", "all"):
-        return {"ret_code":30071, "message":"参数输入错误"}
+        return {"ret_code": 30071, "message": "参数输入错误"}
 
     if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
         if listtype == "unread":
@@ -31,10 +30,8 @@ def count_msg(params, user):
             count = Message.objects.filter(target_user=user, read_status=True, notice=True).count()
         else:
             count = Message.objects.filter(target_user=user).count()
-        #actitype = "activity"
-        #actcount = MessageText.objects.raw('select a.id from wanglibao_account_messagetext as a where a.id \
-        #            not in (select message_text_id from wanglibao_account_message where user_id=%s) and a.mtype in (%s)' % (user.id, actitype)).count()
         return {"ret_code": 0, "message": "ok", "count": count}
+
     else:
         logger.info('in PHP_INSIDE_MESSAGE_SWITCH != 1')
         try:
@@ -58,13 +55,13 @@ def list_msg(params, user):
     pagenum = params.get("pagenum", "").strip()
     listtype = params.get("listtype", "").strip()
     if not pagenum or not listtype:
-        return {"ret_code":30081, "message":"信息输入不完整"}
+        return {"ret_code": 30081, "message": "信息输入不完整"}
     if not pagenum.isdigit() or not pagesize.isdigit() or listtype not in ("read", "unread", "all"):
-        return {"ret_code":30082, "message":"参数输入错误"}
+        return {"ret_code": 30082, "message": "参数输入错误"}
     pagenum = int(pagenum)
     pagesize = int(pagesize)
-    if not 1<=pagenum<100 or not 1<=pagesize<=50:
-        return {"ret_code":30083, "message":"参数输入错误"}
+    if not 1 <= pagenum < 100 or not 1 <= pagesize <= 50:
+        return {"ret_code": 30083, "message": "参数输入错误"}
 
     if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
         if listtype == "unread":
@@ -80,6 +77,7 @@ def list_msg(params, user):
         response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                  data={'uid': user.id, 'read_status': listtype}, timeout=3)
         resp = response.json()
+        messages = []
         if resp['code'] == 'success':
             count = len(resp['data'])
             data = resp['data']
@@ -103,9 +101,10 @@ def list_msg(params, user):
     dtype = {}
     for x in msgs:
         content = x.message_text.content
-        obj = {"id":x.id, "title":x.message_text.title, "content":content, 
-                    "mtype":mt[x.message_text.mtype],
-                    "created_at":time.strftime("%Y-%m-%d", time.localtime(x.message_text.created_at)), "read_status":x.read_status}
+        obj = {"id": x.id, "title": x.message_text.title, "content": content,
+               "mtype": mt[x.message_text.mtype],
+               "created_at": time.strftime("%Y-%m-%d", time.localtime(x.message_text.created_at)),
+               "read_status": x.read_status}
         rs.append(obj)
         bs = BeautifulSoup(content)
         arr = bs.findAll('a')
@@ -126,7 +125,7 @@ def list_msg(params, user):
                 else:
                     dtype[item['href']] = item['href']
                     dtype[item.text] = item['href']
-    return {"ret_code":0, "message":"ok", "data":rs, "dtype":dtype}
+    return {"ret_code": 0, "message": "ok", "data": rs, "dtype": dtype}
 
 
 def sign_read(user, message_id):
@@ -204,8 +203,9 @@ def _send(target_user, msgTxt, push_type):
     msg.save()
     return True
 
+
 def _send_batch(user_objs, msgTxt, push_type):
-    #notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype)
+    # notice_list = MessageNoticeSet.objects.filter(user__in=user_objs, mtype=msgTxt.mtype)
     msg_list = list()
     for user_obj in user_objs:
 
@@ -237,6 +237,7 @@ def _send_batch(user_objs, msgTxt, push_type):
 
     return True
 
+
 def notice_set(params, user):
     """
         设置消息通知
@@ -245,7 +246,7 @@ def notice_set(params, user):
     value = params.get("value", "").strip()
     nt = dict(message_type).keys()
     if notice_type not in nt or value not in ("true", "false"):
-        return {"ret_code":1, "message":"参数输入错误"}
+        return {"ret_code": 1, "message": "参数输入错误"}
     if value == "true":
         value = True
     else:
@@ -260,7 +261,7 @@ def notice_set(params, user):
         mns.mtype = notice_type
         mns.notice = value
         mns.save()
-    return {"ret_code":0, "message":"设置成功"}
+    return {"ret_code": 0, "message": "设置成功"}
 
 
 @app.task
@@ -319,13 +320,13 @@ def send_one(user_id, title, content, mtype, push_type="in"):
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                      data={'uid': user_id, 'mtype': mtype, 'title': title, 'content': content},
                                      timeout=3)
+            return response.json().get('status')
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
             logger.debug('failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
                 user_id, mtype, title, content
             ))
-
-        return response.json().get('status')
+            return False
 
     else:
         # PHP 发送
@@ -333,13 +334,13 @@ def send_one(user_id, title, content, mtype, push_type="in"):
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                      data={'uid': user_id, 'mtype': mtype, 'title': title, 'content': content},
                                      timeout=3)
+            return response.json().get('status')
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
             logger.debug('failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
                 user_id, mtype, title, content
             ))
-
-        return response.json().get('status')
+            return False
 
 
 @app.task
@@ -370,27 +371,30 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
         # PHP 发送
         try:
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
-                                     data={'uid': users, 'mtype': mtype, 'title': title, 'content': content}, timeout=0.01)
+                                     data={'uid': users, 'mtype': mtype, 'title': title, 'content': content}, timeout=30)
+            return response.json().get('status')
+
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
             logger.debug('send batch failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
                 users, mtype, title, content
             ))
 
-        return response.json().get('status')
+            return False
 
     else:
         # PHP 发送
         try:
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                      data={'uid': users, 'mtype': mtype, 'title': title, 'content': content}, timeout=3)
+            return response.json().get('status')
+
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
             logger.debug('send batch failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
                 users, mtype, title, content
             ))
-
-        return response.json().get('status')
+            return False
 
 
 def send_prepayment(user_records):
