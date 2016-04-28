@@ -117,6 +117,7 @@ urlpatterns = patterns(
 
     url(r'^new_user_gift/$', fwh_login_required(TemplateView.as_view(template_name="server_new_user_gift.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='new_user_gift'),
+    url(r'^app_airport_operation/$', fwh_login_required(TemplateView.as_view(template_name="app_airport_operation.jade"),login_url='/weixin/sub_login_redirect/'))
 
 )
 
