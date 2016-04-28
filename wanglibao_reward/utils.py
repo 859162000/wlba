@@ -327,7 +327,7 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
         return
 
     #判断有没有奖品剩余
-    with transaction.atomic:
+    with transaction.atomic():
         reward = Reward.objects.select_for_update().filter(type='影像投资节优惠码', is_used=False).first()
         if reward == None:
             raise Exception(u"奖品已经发完了")
