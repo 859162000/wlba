@@ -132,7 +132,7 @@ def get_renrenli_base_data(channel_code):
     return data
 
 
-def bisouyi_callback(url, content_data, channel_code, callback_data, async_callback=True, order_id=None, ret_parser=''):
+def bisouyi_callback(url, content_data, channel_code, callback_data=None, async_callback=True, order_id=None, ret_parser=''):
     content = generate_bisouyi_content(content_data)
 
     headers = {
@@ -143,14 +143,15 @@ def bisouyi_callback(url, content_data, channel_code, callback_data, async_callb
 
     data = json.dumps({'content': content})
 
-    callback_data['order_id'] = order_id
-    callback_data['request_url'] = url
-    callback_data['request_data'] = data
-    callback_data['request_headers'] = headers
-    callback_data['request_action'] = 1
-    callback_data['ret_parser'] = ret_parser
+    if callback_data:
+        callback_data['order_id'] = order_id
+        callback_data['request_url'] = url
+        callback_data['request_data'] = data
+        callback_data['request_headers'] = headers
+        callback_data['request_action'] = 1
+        callback_data['ret_parser'] = ret_parser
 
-    save_to_callback_record(callback_data, channel_code)
+        save_to_callback_record(callback_data, channel_code)
 
     if async_callback:
         common_callback.apply_async(
@@ -161,5 +162,3 @@ def bisouyi_callback(url, content_data, channel_code, callback_data, async_callb
         common_callback(channel=channel_code, url=url,
                         params=data, headers=headers,
                         order_id=order_id, ret_parser=ret_parser)
-
-    return headers, data
