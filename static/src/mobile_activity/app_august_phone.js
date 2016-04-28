@@ -77,10 +77,8 @@
 
 
     var login = false;
-    alert('1');
     wlb.ready({
         app: function (mixins) {
-            alert(1232456);
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -98,7 +96,6 @@
                         //    url += "?1";
                         //    self.location.replace(url);
                         //}
-                        alert('5');
 
                         $('#button_link').on("click",function(){
                             org.ajax({
@@ -121,15 +118,17 @@
                 })
             }
             mixins.sendUserInfo(function (data) {
-                alert('2');
                 if (data.ph == '') {
-                    alert('3');
                     login = false;
-                    $('#button_link').on("click",function(){
-                         mixins.loginApp({refresh:1, url:'/activity/app_august_phone/'});
-                    })
+
+                    $('.popup_box .popup_button').hide();
+                    $('.popup_box .main .textairport').text('请您先去登录');
+                    $('.popup_box').show();
+
+                    //$('#button_link').on("click",function(){
+                    //     mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
+                    //})
                 } else {
-                    alert('4');
                     login = true;
                     connect(data)
 
@@ -138,7 +137,6 @@
 
         },
         other: function(){
-            alert(32222111)
             $('#button_link').on("click",function(){
                 org.ajax({
                     type: "post",
