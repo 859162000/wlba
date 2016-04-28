@@ -120,14 +120,10 @@
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-                    $('#button_link').on("click",function() {
-                        $('.popup_box .popup_button').hide();
-                        $('.popup_box .main .textairport').text('请您先去登录');
-                        $('.popup_box').show();
-                    });
-                    //$('#button_link').on("click",function(){
-                    //     mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
-                    //})
+
+                    $('#button_link').on("click",function(){
+                         mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
+                    })
                 } else {
                     login = true;
                     connect(data)

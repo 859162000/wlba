@@ -116,12 +116,7 @@
                                 dataType: 'json',
                                 success: function(data){
                                     if(data.ret_code=='1000'){
-
-                                        $('.popup_box .popup_button').hide();
-                                        $('.popup_box .main .textairport').text('请您先去登录');
-                                        $('.popup_box').show();
-
-                                        //mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
+                                        mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
                                     }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
@@ -142,14 +137,10 @@
 
                 if (data.ph == '') {
                     login = false;
-                    $('.six_btn').on("click",function() {
-                        $('.popup_box .popup_button').hide();
-                        $('.popup_box .main .textairport').text('请您先去登录');
-                        $('.popup_box').show();
-                    });
-                    //$('.six_btn').on("click",function(){
-                    //     mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=sy'});
-                    //})
+
+                    $('.six_btn').on("click",function(){
+                         mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=sy'});
+                    })
                 } else {
                     login = true;
                     connect(data)
