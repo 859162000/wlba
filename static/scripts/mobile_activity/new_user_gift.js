@@ -224,6 +224,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       onSlideChangeStart:function(swiper){
         if(mySwiper.activeIndex == 3){
             $('#next-box').hide();
+            //mySwiper.destroy(false, true);
         }else{
             $('#next-box').show();
         }
@@ -235,6 +236,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $(".page-loading").hide();
             $("#swiper-container .swiper-wrapper,#next-box").show();
         }, 1000);
+        var u = navigator.userAgent;
+        alert(u);
     };
 
     //音乐
@@ -242,7 +245,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         audioDom = audioBox.getElementsByTagName("audio")[0];
     $(audioBox).on("touchstart", function(){
         var $t = $(this);
-        console.log(audioDom.paused);
         if(audioDom.paused){
             audioDom.play();
             $t.removeClass("audio-close");
@@ -253,7 +255,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     });
 
     $("div.swiper-container").one("touchstart",function(){
-        alert("body");
         if(audioDom.paused){
             audioDom.play();
         }
@@ -288,10 +289,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     wx.ready(function () {
         var winHost = window.location.href;
         var host = winHost.substring(0,winHost.indexOf('/activity')),
-            shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+            shareImg = host + '/static/imgs/mobile_activity/new_user_gift/icon_weixin.png',
             shareLink = host + '/weixin/new_user_gift/',
-            shareMainTit = '尊贵新人礼',
-            shareBody = '尊贵新人礼';
+            shareMainTit = '尊贵新人礼 专享5%加息',
+            shareBody = '网利宝新手狂撒福利';
         //分享给微信好友
          org.onMenuShareAppMessage({
             title: shareMainTit,

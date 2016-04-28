@@ -77,8 +77,6 @@
 
 })(org);
 
-
-
 ;(function(org){
     var login = false;
     wlb.ready({
