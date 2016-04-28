@@ -32,7 +32,7 @@ from weixin.tasks import sentTemplate
 # from wanglibao_reward.tasks import sendWechatPhoneReward
 from marketing.send_data import send_register_data, send_idvalidate_data, send_deposit_data, send_investment_data,\
      send_withdraw_data
-from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy, processAugustAwardZhaoXiangGuan
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -71,6 +71,11 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # 发送红包
     # send_lottery.apply_async((user_id,))
     processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
+    #八月照相馆活动
+    try:
+        processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount)
+    except Exception:
+        pass    
     # 往数据中心发送投资信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_investment_data.apply_async(kwargs={

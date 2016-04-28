@@ -1272,103 +1272,6 @@ class KongGangRegister(CoopRegister):
                 "mtype": "activity"
             })
 
-class ZhaoXiangGuanRegister(CoopRegister):
-    def __init__(self, request):
-        super(ZhaoXiangGuanRegister, self).__init__(request)
-        self.c_code = 'sy'
-        self.invite_code = 'sy'
-
-    def purchase_call_back(self, user, order_id):
-
-        key = 'zhaoxiangguan'
-        activity_config = Misc.objects.filter(key=key).first()
-        if activity_config:
-            activity = json.loads(activity_config.value)
-            if type(activity) == dict:
-                try:
-                    start_time = activity['start_time']
-                    end_time = activity['end_time']
-                except KeyError, reason:
-                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
-                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
-            else:
-                raise Exception(u"misc中activities的配置参数，应是字典类型")
-        else:
-            raise Exception(u"misc中没有配置activities杂项")
-
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
-
-        now = p2p_record.create_time
-        if now < start_time:
-            json_to_response = {
-                'ret_code': 1001,
-                'message': u'活动还未开始,请耐心等待'
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        if now > end_time:
-            json_to_response = {
-                'ret_code': 1001,
-                'message': u'活动已经结束！'
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        
-        
-        
-        #判断有没有奖品剩余
-        with transaction.atomic:
-            reward = Reward.objects.select_for_update().filter(type='影像投资节优惠码', is_used=False).first()
-            if reward == None:
-                return
-            else:
-                reward.is_used = True
-                reward.save()
-                
-        try:
-            with transaction.atomic():
-                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
-                if not join_record:
-                    join_record = WanglibaoRewardJoinRecord.objects.create(
-                        user=user,
-                        activity_code=self.c_code
-                    )
-
-                reward_record = ActivityReward.objects.filter(has_sent=True, activity='sy', user=user).first()
-                if reward_record:  #奖品记录已经生成了
-                    join_record.save()
-                    return
-                reward_record = ActivityReward.objects.create(
-                            activity='sy',
-                            order_id=order_id,
-                            user=user,
-                            p2p_amount=p2p_record.amount,
-                            reward=reward,
-                            has_sent=False,
-                            left_times=0,
-                            join_times=0)
-        except Exception:
-            reward.is_used = False
-            reward.save()
-            join_record.save()
-        else:
-            
-            send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
-                       u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
-                       u'感谢您的参与！【网利科技】' % (send_reward.content)
-            send_messages.apply_async(kwargs={
-                "phones": [user.id, ],
-                "message": [send_msg, ],
-            })
-
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": user.id,
-                "title": u"影像投资节优惠码",
-                "content": send_msg,
-                "mtype": "activity"
-            })
-            reward_record.has_sent = True
-            reward_record.save()
-            join_record.save()
-
 class RockFinanceRegister(CoopRegister):
     def __init__(self, request):
         super(RockFinanceRegister, self).__init__(request)
@@ -2388,7 +2291,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          ZhaoXiangGuanRegister, JiaXiHZRegister]
+                          JiaXiHZRegister]
 
 
 # ######################第三方用户查询#####################
