@@ -92,12 +92,12 @@
                     },
                     success: function (data) {
 
-                        var url = location.href;
-                        var times = url.split("?");
-                        if(times[1] != 1){
-                            url += "?1";
-                            self.location.replace(url);
-                        }
+                        //var url = location.href;
+                        //var times = url.split("?");
+                        //if(times[1] != 1){
+                        //    url += "?1";
+                        //    self.location.replace(url);
+                        //}
                         alert('5');
 
                         $('#button_link').on("click",function(){
