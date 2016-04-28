@@ -21,7 +21,7 @@ from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
 # from wanglibao_activity import backends as activity_backends
-from wanglibao_activity.tasks import check_activity
+from wanglibao_activity.tasks import check_activity_task
 import re
 import json
 
@@ -587,7 +587,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 try:
                     if sub_amo.principal > 0:
                         # activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
-                        check_activity.apply_async(kwargs={
+                        check_activity_task.apply_async(kwargs={
                             "user_id": sub_amo.user.id,
                             "trigger_node": 'repaid',
                             "device_type": 'pc',
