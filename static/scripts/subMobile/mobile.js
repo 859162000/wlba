@@ -871,7 +871,7 @@ org.detail = (function (org) {
                 url : lib.weiURL,
                 dataType : 'json',
                 success : function(data) {
-                    alert(JSON.stringfy(data));
+                    org.ui.alert(JSON.stringfy(data));
                     //请求成功，通过config注入配置信息,
                     wx.config({
                         debug: wxDebug,
@@ -885,7 +885,7 @@ org.detail = (function (org) {
                 }
             });
             wx.ready(function(){
-                alert("wx.raddy");
+                org.ui.alert("wx.raddy");
                 var host = 'https://www.wanglibao.com',
                     shareImg,//图片
                     shareLink,//连接地址
@@ -3122,7 +3122,7 @@ org.redpacket = (function(org){
             });
         },
         shareFn: function(){
-            alert($("input.share_url").val());
+            org.ui.alert($("input.share_url").val());
             var html = '<div class="invite-share-ok">' +
                 '<div class="share-mian">' +
                 '<div class="share-img"></div>' +
@@ -3139,7 +3139,6 @@ org.redpacket = (function(org){
         shareOk: function(){
             var url = $("input.share_url").val(),
                 price = $(".js-reward-price").text();
-            //alert(url);
             var num = price.substring(0,price.length-1)*1;
             var pnum = num ? num : "X";
             var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ pnum +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
