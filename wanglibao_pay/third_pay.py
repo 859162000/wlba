@@ -215,7 +215,7 @@ def withdraw(request):
             return {"ret_code": 20073, "message": u'银行卡号有多张重复,请联系客服'}
 
         # 检测银行卡在以前的提现记录中是否为同一个用户
-        payinfo_record = PayInfo.objects.filter(card_no=card.no).order_by('-create_time').first()
+        payinfo_record = PayInfo.objects.filter(card_no=card.no, type='W').order_by('-create_time').first()
         if payinfo_record:
             if payinfo_record.user != user:
                 return {"ret_code": 20074, "message": u'银行卡号与身份信息不符,请联系客服'}
