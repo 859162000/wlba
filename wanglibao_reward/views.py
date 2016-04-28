@@ -960,7 +960,7 @@ class KongGangAPIView(APIView):
         return 'invalid'
 
     @method_decorator(transaction.atomic)
-    def distribute(user, start_time, end_time):
+    def distribute(self, user, start_time, end_time):
         join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='kgyx').first()
         if not join_record:
             join_record = WanglibaoRewardJoinRecord.objects.create(
