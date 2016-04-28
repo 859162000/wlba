@@ -6,7 +6,6 @@ import json
 import string
 import hashlib
 import logging
-import requests
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
@@ -16,7 +15,7 @@ from django.template.loader import render_to_string
 from registration.models import RegistrationProfile
 from common.tasks import common_callback
 from common.tools import detect_identifier_type
-from common.utils import get_bajinshe_access_token
+from common.utils import get_bajinshe_access_token, save_to_callback_record
 from wanglibao import settings
 from wanglibao_rest.utils import generate_bisouyi_sign, generate_bisouyi_content
 from wanglibao_oauth2.utils import get_client_with_channel_code
@@ -133,7 +132,7 @@ def get_renrenli_base_data(channel_code):
     return data
 
 
-def bisouyi_callback(url, content_data, channel_code, async_callback=True, order_id=None, ret_parser=''):
+def bisouyi_callback(url, content_data, channel_code, callback_data, async_callback=True, order_id=None, ret_parser=''):
     content = generate_bisouyi_content(content_data)
 
     headers = {
@@ -143,6 +142,15 @@ def bisouyi_callback(url, content_data, channel_code, async_callback=True, order
     }
 
     data = json.dumps({'content': content})
+
+    callback_data['order_id'] = order_id
+    callback_data['request_url'] = url
+    callback_data['request_data'] = data
+    callback_data['request_headers'] = headers
+    callback_data['request_action'] = 1
+    callback_data['ret_parser'] = ret_parser
+
+    save_to_callback_record(callback_data, channel_code)
 
     if async_callback:
         common_callback.apply_async(

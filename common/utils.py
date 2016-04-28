@@ -6,6 +6,7 @@ import logging
 import requests
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from .models import CallbackRecord
 
 logger = logging.getLogger(__name__)
 
@@ -54,3 +55,20 @@ def get_bajinshe_access_token(order_id):
 
     logger.info("get_bajinshe_access_token process result: %s" % message)
     return access_token
+
+
+def save_to_callback_record(data, channel):
+    """
+    渠道用户回调记录
+    """
+    data['callback_to'] = channel
+    data['request_data'] = json.dumps(data['request_data'])
+    request_headers = data.get('request_headers', None)
+    if request_headers:
+        data['request_headers'] = json.dumps(request_headers)
+
+    call_back_record = CallbackRecord()
+    for k, v in data.iteritems():
+        setattr(call_back_record, k, v)
+
+    call_back_record.save()
