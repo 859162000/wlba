@@ -357,7 +357,7 @@ def ext_str_to_utc(time_str):
     """
     time_zone = settings.TIME_ZONE
     local = pytz.timezone(time_zone)
-    naive = datetime.datetime.strptime(time_str, "%Y-%m-%d %M:%H:%S")
+    naive = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
     local_dt = local.localize(naive, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
     return utc_dt
