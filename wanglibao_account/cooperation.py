@@ -2371,6 +2371,7 @@ class JiaXiHZRegister(CoopRegister):
             data_encode = '&'.join([k + '=' + str(v) for k, v in data])
             sign = hashlib.md5(data_encode).hexdigest()
             params = dict(data)
+            params.pop('key', None)
             params['sign'] = sign
 
             # 异步回调
