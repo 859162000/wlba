@@ -378,3 +378,4 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
             "content": send_msg,
             "mtype": "activity"
         })
+        logger.info('影像投资节优惠码发送成功，user_id:%s; order_id:%s; reward_id:%s' % (user.id , order_id, reward.id))
