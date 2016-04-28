@@ -1040,6 +1040,7 @@ class KongGangAPIView(APIView):
         except Exception, ex:
             message = u'系统忙，请稍后重试'
             logger.debug('Exception in distribute: %s' % ex)
+        logger.debug('message:%s' % (message, ))
         if message != '':
             json_to_response = {
                 'ret_code': 1001,
@@ -1049,6 +1050,7 @@ class KongGangAPIView(APIView):
 
 
         reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
+        logger.debug("reward:%s" % (reward,))
         if reward == None:
             json_to_response = {
                 'ret_code': 1002,
@@ -1065,6 +1067,7 @@ class KongGangAPIView(APIView):
 
         sent_reward = self.decide_which_reward_distribute(reward.p2p_amount)
 
+        logger.debug('send_reward:%s' % sent_reward)
         if sent_reward == 'invalid':
             json_to_response = {
                 'ret_code': 1002,
