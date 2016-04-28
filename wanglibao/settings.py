@@ -191,7 +191,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        #'HOST': '192.168.1.242',
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -1432,4 +1432,4 @@ if ENV == ENV_PRODUCTION:
 if ENV == ENV_PRODUCTION:
     INNER_IP = ("182.92.179.24", "10.171.37.235")
 else:
-    INNER_IP = ("192.168.1.20","192.168.10.1")
+    INNER_IP = ("192.168.1.20","192.168.10.1", "192.168.30.1")
