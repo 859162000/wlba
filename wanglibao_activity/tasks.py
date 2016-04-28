@@ -19,6 +19,9 @@ def check_activity(user_id, trigger_node, device_type, **kwargs):
     :param device_type, 设备类型 'pc','android', 'ios'
     :param kwargs, amount=0, product_id=0, order_id=0, is_full=False, is_first_bind=False
     """
+    logger.debug(">>>>> 1:start check: user_id:[{}], trigger_node:[{}], device_type:[{}]".format(user_id,
+                                                                                                 trigger_node,
+                                                                                                 device_type))
 
     if not user_id or not trigger_node:
         logger.debug(">>>>> not user_id: [{}] or not trigger_node: [{}]".format(user_id, trigger_node))
@@ -27,8 +30,9 @@ def check_activity(user_id, trigger_node, device_type, **kwargs):
     if not device_type:
         device_type = 'pc'
 
-    user = User.objects.filter(pk=user_id).first()
-    if user:
+    user_res = User.objects.filter(pk=user_id).first()
+    if user_res:
+        logger.debug(">>>>> 2: search result, user:[{}]".format(user_res.id))
         amount = kwargs.get('amount', 0)
         product_id = kwargs.get('product_id', 0)
         order_id = kwargs.get('order_id', 0)
@@ -36,7 +40,7 @@ def check_activity(user_id, trigger_node, device_type, **kwargs):
         is_first_bind = kwargs.get('is_first_bind', False)
 
         try:
-            check_activity(user, trigger_node, device_type, amount=amount, product_id=product_id, order_id=order_id,
+            check_activity(user_res, trigger_node, device_type, amount=amount, product_id=product_id, order_id=order_id,
                            is_full=is_full, is_first_bind=is_first_bind)
         except Exception:
             logger.exception(">>>>> check activity err")
