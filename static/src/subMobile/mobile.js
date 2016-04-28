@@ -748,8 +748,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        //debug: wxDebug,
-                        debug: true,
+                        debug: wxDebug,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -3010,13 +3009,15 @@ org.redpacket = (function(org){
             });
         },
         shareOk: function(){
+            var winHost = window.location.href,
+                host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
             var url = $("input.share_url").val(),
                 price = $(".js-reward-price").text();
             var num = "X";
             if(price){
                 num = price.substring(0,price.length-1)*1;
             }
-            var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ num +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
+            var share = {shareImg: host+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ num +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
             org.detail.share(share, true);
             //org.detail.share(share, false);
         }
