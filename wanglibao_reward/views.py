@@ -1063,7 +1063,7 @@ class KongGangAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        sent_reward = self.decide_which_reward_distribute(reward.amount)
+        sent_reward = self.decide_which_reward_distribute(reward.p2p_amount)
 
         if sent_reward == 'invalid':
             json_to_response = {
