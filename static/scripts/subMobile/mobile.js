@@ -3119,7 +3119,6 @@ org.redpacket = (function(org){
             });
         },
         shareFn: function(){
-            org.ui.alert($("input.share_url").val());
             var html = '<div class="invite-share-ok">' +
                 '<div class="share-mian">' +
                 '<div class="share-img"></div>' +
@@ -3134,11 +3133,14 @@ org.redpacket = (function(org){
             });
         },
         shareOk: function(){
-            var winHost = window.location.href,
-                host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
+            var winHost = window.location.href;
             var url = $("input.share_url").val(),
                 price = $(".js-reward-price").text();
-            var num = "X";
+            var num = 10000,
+                host = 'https://www.wanglibao.com/';
+            if(winHost.indexof("staging.wanglibao.com")){
+                host = 'https://staging.wanglibao.com/';
+            }
             if(price){
                 num = price.substring(0,price.length-1)*1;
             }
