@@ -436,6 +436,8 @@ class WechatInviteTemplate(TemplateView):
             is_bind = True if user else False
             if is_bind:
                 w_daily_reward = WechatUserDailyReward.objects.filter(user=user, create_date=today, status=True).first()
+                if not w_daily_reward:
+                    w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
             else:
                 w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
 
