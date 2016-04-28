@@ -75,7 +75,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     try:
         processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount)
     except Exception:
-        logger.error('影像投资节优惠码发送失败')
+        logger.error('影像投资节优惠码发送失败，user_id:%s; product_id:%s; order_id:%s' % (user.id , product_id, order_id))
         pass    
     # 往数据中心发送投资信息数据
     if settings.SEND_PHP_ON_OR_OFF:
