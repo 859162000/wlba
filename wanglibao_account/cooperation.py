@@ -1220,7 +1220,7 @@ class KongGangRegister(CoopRegister):
             return
 
         #判断有没有奖品剩余
-        reward = self.decide_which_reward_distribute(p2p_record.p2p_amount)
+        reward = self.decide_which_reward_distribute(p2p_record.amount)
         if reward == 'invalid':
             raise Exception(u"不满足领取条件")
         if reward == None:
