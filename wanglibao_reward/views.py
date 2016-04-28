@@ -942,7 +942,7 @@ class KongGangAPIView(APIView):
 
         if p2p_amount >= 15000:
             with transaction.atomic():
-                reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
+                reward = Reward.objects.select_for_update().filter(type='贵宾全套出港服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
                     reward.save()
@@ -3081,27 +3081,41 @@ class FetchMarchAwardAPI(APIView):
             return Response({"ret_code":0, 'redpack':{'amount':redpack_event.amount}, 'chances':chances})
         return Response({"ret_code":-1, "message":"活动已经截止"})
 
+class AirportServiceRewardTemplate(TemplateView):
+    def get_context_data(self, **kwargs):
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
+        airport_service_reward = getMiscValue("airport_service_reward")
+        rule_ids = airport_service_reward['rule_ids']
+        return {
+            "rule_ids":rule_ids
+            }
 
 class FetchAirportServiceReward(APIView):
     authentication_classes = (IsAuthenticated, )
 
     def post(self, request):
-        activity = Activity.objects.filter(code='').first()
-        if activity.is_stopped:
-            return Response({"ret_code":-1, "message":"活动已经截止"})
-        now = timezone.now()
-        if activity.start_at > now:
-            return Response({"ret_code":-1, "message":"活动还未开始"})
-        if activity.end_at < now:
-            return Response({"ret_code":-1, "message":"活动已经结束"})
-        user = request.user
-        # reward_name = request.DATA.get('reward_name', "").strip()
-        # if not reward_name:
-        #     return Response({"ret_code":-1, "message":""})
+        # airport_service_reward = {"rule_ids":[],"activity_code":"","old":{"":10000,"":15000},"new":{"":500,"":5000,"":1000}}
         rule_id = request.DATA.get('rule_id', "").strip()
         if not rule_id or not rule_id.isdigit():
             return Response({"ret_code":-1, "message":""})
         rule_id = int(rule_id)
+        airport_service_reward_limit = getMiscValue("airport_service_reward")
+        old_min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
+        new_min_amount = int(airport_service_reward_limit['new'][str(rule_id)])
+        activity_code = airport_service_reward_limit['activity_code']
+        activity = Activity.objects.filter(code=activity_code).first()
+        if activity.is_stopped:
+            return Response({"ret_code": -1, "message":"活动已经截止"})
+        now = timezone.now()
+        if activity.start_at > now:
+            return Response({"ret_code": -1, "message":"活动还未开始"})
+        if activity.end_at < now:
+            return Response({"ret_code": -1, "message":"活动已经结束"})
+        user = request.user
+        # reward_name = request.DATA.get('reward_name', "").strip()
+        # if not reward_name:
+        #     return Response({"ret_code":-1, "message":""})
+
         activity_rules = ActivityRule.objects.filter(activity=activity).all()
         activity_rule = None
         for a_rule in activity_rules:
@@ -3110,56 +3124,133 @@ class FetchAirportServiceReward(APIView):
                 break
 
         if not activity_rule or activity_rule.gift_type!=u"reward" or not activity_rule.reward or not activity_rule.is_used:
-            return Response({"ret_code": -1, "message": ""})
+            return Response({"ret_code": -1, "message": "系统错误"})
 
-        reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
-        if not reward:
-            return Response({"ret_code": -1, "message": ""})
-        user_ib = IntroducedBy.objects.filter(user=user, created_at__gt=activity.start_at).first()
-        is_new = True
-        if not user_ib:
-            is_new = False
+        user_ib = IntroducedBy.objects.filter(user=user).first() #created_at__gt=activity.start_at,
+        user_channel = user_ib.channel
+        is_new = False
+        if user_ib and user_channel.code==activity.channel:
+            is_new = True
 
-        if activity_rule.is_invite_in_date:
-            if not is_new or not user_ib.channel or user_ib.channel.code != activity.channel:
-                return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+
         if is_new:
-            return Response({"ret_code": -1, "message": ""})
-        airport_service_reward_limit = getMiscValue("airport_service_reward")
-        min_amount = int(airport_service_reward_limit['old'][str(rule_id)])
-
-        first_buy = P2PRecord.objects.filter(user=user,
-                                             create_time__gt=activity.start_at
+            if not user_ib.bought_at:
+                return Response({"ret_code":-2, "message": "您还没有投资，快去投资吧~"})
+            first_buy = P2PRecord.objects.filter(user=user).order_by('create_time').first()
+            if first_buy.amount <5000:
+                return Response({"ret_code": -1, "message": "首次投资不足金额~"})
+            return Response({"ret_code": -1, "message": "奖品只能获得一份~"})
+        else:
+            if activity_rule.is_invite_in_date:
+                return Response({"ret_code": -1, "message": "抱歉，此奖励为新用户专享~"})
+            reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
+            if reward_record and reward_record.status:
+                return Response({"ret_code": -1, "message": "您已领取奖励过~"})
+            p2precord = P2PRecord.objects.filter(user=user,
+                                             create_time__gte=activity.start_at,
+                                             amount__gte=old_min_amount,
                                              ).order_by('create_time').first()
-        if not first_buy or float(first_buy.amount) < min_amount:
-            return Response({"ret_code": -1, "message": "抱歉，您还不符合奖励条件哦~"})
+            if not p2precord:
+                return Response({"ret_code": -1, "message": "抱歉，您还不符合奖励条件哦~"})
+
+            ActivityRewardRecord.objects.get_or_create(
+                    activity_code=activity.code,
+                    user=user
+                )
+            with transaction.atomic():
+                reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=activity.code, user=request.user).first()
+                if reward_record.status:
+                    return Response({"ret_code": -1, "message": "您已领取奖励"})
+                reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
+                if not reward:
+                    Response({"ret_code": -1, "message": "该奖品已经发完了"})
+                reward.is_used = True
+                reward.save()
+                reward_record.activity_desc = u"领取了%s,reward_id:%s"%(reward.type, reward.id)
+                reward_record.status = True
+                reward_record.save()
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": reward.reward.type,
+                "content": reward.reward.content,
+                "mtype": "activity"
+            })
+            return Response({"ret_code": 0, "message": "奖品领取成功"})
 
 
-        reward_record = ActivityRewardRecord.objects.filter(activity_code=activity.code, user=request.user).first()
-        if not reward_record:
-            reward_record = ActivityRewardRecord.objects.create(
-                activity_code=activity.code,
-                user=user
-            )
-        if reward_record.status:
-            return Response({"ret_code": -1, "message": "您已领取奖励"})
+class FetchNewUserReward(APIView):
+    """
+    尊贵新人礼
+    """
+    permission_classes = (IsAuthenticated, )
 
+    def post(self, request):
+        activity = Activity.objects.filter(code='newgift').first()
+        utc_now = timezone.now()
+        if activity.is_stopped:
+            return Response({"ret_code": -1, "message":"活动已经截止"})
+        if activity.start_at > utc_now:
+            return Response({"ret_code": -1, "message":"活动还未开始"})
+        if activity.end_at < utc_now:
+            return Response({"ret_code": -1, "message":"活动已经结束"})
+
+        activity_rules = ActivityRule.objects.filter(activity=activity, is_used=True).all()
+        device = split_ua(self.request)
+        device_type = device['device_type']
+        redpack_txts = []
+        events = []
+        records = []
+        p2precord = P2PRecord.objects.filter(create_time__gte=activity.start_at, create_time__lt=activity.end_at, user=request.user, catalog=u'申购').first()
+        if p2precord:
+            return Response({"ret_code": 1, "message": "抱歉，您不符合领取条件哦~"})
+        gift_record, _ = ActivityRewardRecord.objects.get_or_create(user=self.request.user, activity_code=activity.code)
+        if gift_record.status:
+            return Response({"ret_code": 1, "message": "您已领取过该奖励，不要太贪心哦"})
         with transaction.atomic():
-            reward_record = ActivityRewardRecord.objects.select_for_update().filter(activity_code=activity.code, user=request.user).first()
-
-            reward = Reward.objects.filter(type=activity_rule.reward, is_used=False).first()
-            if not reward:
-                Response({"ret_code": -1, "message": "该奖品已经发完了"})
-            reward.is_used = True
-            reward.save()
-            reward_record.activity_desc = u"领取了%s,reward_id:%s"%(reward.type, reward.id)
-            reward_record.status = True
-            reward_record.save()
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": request.user.id,
-            "title": reward.reward.type,
-            "content": reward.reward.content,
-            "mtype": "activity"
-        })
-        return Response({"ret_code": 0, "message": "奖品领取成功"})
-
+            gift_record = ActivityRewardRecord.objects.select_for_update().get(id=gift_record.id)
+            if gift_record.status:
+                return Response({"ret_code": 1, "message": "您已领取过该奖励，不要太贪心哦"})
+            for activity_rule in activity_rules:
+                if activity_rule.gift_type == "redpack":
+                    redpack_record_ids = ""
+                    redpack_ids = activity_rule.redpack.split(',')
+                    for redpack_id in redpack_ids:
+                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                        if not redpack_event:
+                            return Response({"ret_code":-1, "message":'优惠券不存在'})
+                        status, messege, record = redpack_backends.give_activity_redpack_for_hby(request.user, redpack_event, device_type)
+                        if not status:
+                            return Response({"ret_code":6,"message":messege})
+                        redpack_text = "None"
+                        if redpack_event.rtype == 'interest_coupon':
+                            redpack_text = "%s%%加息券"%redpack_event.amount
+                        if redpack_event.rtype == 'percent':
+                            redpack_text = "%s%%百分比红包"%redpack_event.amount
+                        if redpack_event.rtype == 'direct':
+                            redpack_text = "%s元红包"%int(redpack_event.amount)
+                        redpack_txts.append(redpack_text)
+                        redpack_record_ids += (str(record.id) + ",")
+                        events.append(redpack_event)
+                        records.append(record)
+                    gift_record.redpack_record_ids = redpack_record_ids
+                if activity_rule.gift_type == "experience_gold":
+                    experience_record_ids = ""
+                    experience_record_id, experience_event = SendExperienceGold(request.user).send(pk=activity_rule.redpack)
+                    if not experience_record_id:
+                        return Response({"ret_code": 6, "message": '体验金不存在'})
+                    redpack_txts.append('%s元体验金'%int(experience_event.amount))
+                    experience_record_ids += (str(experience_record_id) + ",")
+                    gift_record.experience_record_ids = experience_record_ids
+            gift_record.status=True
+            gift_record.save()
+            try:
+                idx = 0
+                for event in events:
+                    record = records[idx]
+                    idx += 1
+                    start_time, end_time = redpack_backends.get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                                  record.created_at, event.available_at, event.unavailable_at)
+                    redpack_backends._send_message_for_hby(request.user, event, end_time)
+            except Exception, e:
+                logger.debug(traceback.format_exc())
+        return Response({"ret_code": 0, "message": "奖励发放成功，请前往【账户】-【理财券】查看"})
