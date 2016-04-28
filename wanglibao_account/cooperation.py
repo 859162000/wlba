@@ -1210,7 +1210,7 @@ class KongGangRegister(CoopRegister):
         from wanglibao_account import utils
         utc_start = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
         utc_end = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
-        now = p2p_record.create_time
+        now = p2p_record.create_time.strftime("%Y-%m-%d %H:%M:%S")
         if now < utc_start or now >= utc_end:
             #raise Exception(u"活动还未开始,请耐心等待")
             return
