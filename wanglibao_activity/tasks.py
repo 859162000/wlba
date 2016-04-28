@@ -4,14 +4,13 @@
 import logging
 from wanglibao.celery import app
 from django.contrib.auth.models import User
-from wanglibao_activity.backends import check_activity
 import datetime
 
 logger = logging.getLogger(__name__)
 
 
 @app.task
-def check_activity(user_id, trigger_node, device_type, **kwargs):
+def check_activity_task(user_id, trigger_node, device_type, **kwargs):
     """
     检测活动
     :param user_id, 用户id
@@ -40,6 +39,7 @@ def check_activity(user_id, trigger_node, device_type, **kwargs):
         is_first_bind = kwargs.get('is_first_bind', False)
 
         try:
+            from wanglibao_activity.backends import check_activity
             check_activity(user_res, trigger_node, device_type, amount=amount, product_id=product_id, order_id=order_id,
                            is_full=is_full, is_first_bind=is_first_bind)
         except Exception:
