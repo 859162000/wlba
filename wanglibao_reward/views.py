@@ -980,8 +980,9 @@ class KongGangAPIView(APIView):
         else:
             try:
                 #TODO:转换为UTC时间后跟表记录时间对比
-                utc_start_time = (utils.str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
-                utc_end_time = (utils.str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
+                utc_start_time = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+                utc_end_time = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
+                logger.debug('utc_start_time:%s, utc_end_time:%s' % (utc_start_time, utc_end_time))
                 p2precord = P2PRecord.objects.filter(amount__gte=10000, user=user, create_time__gte=utc_start_time, create_time__lt=utc_end_time).first()
                 if p2precord:
                     WanglibaoActivityReward.objects.create(
@@ -995,7 +996,7 @@ class KongGangAPIView(APIView):
                 else:
                     return '活动期间没有投资记录'
             except Exception:
-                logger.debug('user:%s, order_id:%s,p2p_amount:%s,空港易行发奖报错' % (user, p2precord.order_id or 0, p2precord.amount or 0))
+                logger.debug('user:%s 空港易行发奖报错' % (user,))
                 return '系统忙，请稍后重试'
 
         return ''
