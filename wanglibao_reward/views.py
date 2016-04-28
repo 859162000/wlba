@@ -12,6 +12,7 @@ from django.db import transaction
 from django.db import IntegrityError
 from django.db.models import Sum
 from wanglibao_sms.tasks import send_messages
+from wanglibao_account import utils
 # from datetime import datetime
 import datetime
 from wanglibao_account import message as inside_message
@@ -863,7 +864,7 @@ class RewardDistributer(object):
         self.request = request
         self.kwargs = kwargs
         self.Processor = {
-            KongGangRewardDistributer:('kgyx',),
+            #KongGangRewardDistributer:('kgyx',),
             ZhaoXiangGuanRewardDistributer:('ys',),
         }
 
@@ -979,8 +980,8 @@ class KongGangAPIView(APIView):
         else:
             try:
                 #TODO:转换为UTC时间后跟表记录时间对比
-                utc_start_time = start_time
-                utc_end_time = end_time
+                utc_start_time = (utils.str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+                utc_end_time = (utils.str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
                 p2precord = P2PRecord.objects.filter(user=user, create_time__gte=utc_start_time, create_time__lt=utc_end_time).first()
                 if p2precord:
                     WanglibaoActivityReward.objects.create(
