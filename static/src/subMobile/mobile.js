@@ -746,7 +746,7 @@ org.detail = (function (org) {
                 url : lib.weiURL,
                 dataType : 'json',
                 success : function(data) {
-                    org.ui.alert(JSON.stringfy(data));
+                    org.ui.alert(JSON.stringify(data));
                     //请求成功，通过config注入配置信息,
                     wx.config({
                         debug: wxDebug,
