@@ -1260,6 +1260,9 @@ class KongGangRegister(CoopRegister):
                        u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                        u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                        u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
+
+            logger.debug("===20160428 send_messages : [%s] [%s]" % (user.wanglibaouserprofile.phone, send_msg))
+
             send_messages.apply_async(kwargs={
                 "phones": [user.wanglibaouserprofile.phone, ],
                 "message": [send_msg,],
