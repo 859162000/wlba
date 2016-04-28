@@ -1419,70 +1419,6 @@ org.recharge = (function (org) {
     }
 })(org);
 
-org.authentication = (function (org) {
-    var lib = {
-        isPost: true,
-        $fromComplete: $(".from-four-complete"),
-        init: function () {
-            lib._checkForm();
-        },
-        _checkForm: function () {
-            var formName = ['name', 'id_number'],
-                formError = ['.error-name', '.error-card'],
-                formSign = ['请输入姓名', '请输入身份证号', '请输入有效身份证'],
-                data = {},
-                reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/; //身份证正则
-
-            lib.$fromComplete.on('click', function () {
-                var isFor = true;
-                $('.sign-all').hide();
-                $('.check-input').each(function (i) {
-                    if (!$(this).val()) {
-                        isFor = false;
-                        return $(formError[i]).text(formSign[i]).show();
-                    } else {
-                        if (i === 1 && !reg.test($(this).val())) {
-                            isFor = false;
-                            return $(formError[i]).text(formSign[2]).show();
-                        }
-                    }
-                    data[formName[i]] = $(this).val();
-                })
-                isFor && lib._forAuthentication(data)
-            });
-        },
-        _forAuthentication: function (ags) {
-            if (lib.isPost) {
-                org.ajax({
-                    type: 'POST',
-                    url: '/api/id_validate/',
-                    data: ags,
-                    beforeSend: function () {
-                        lib.isPost = false;
-                        lib.$fromComplete.text("认证中，请等待...");
-                    },
-                    success: function () {
-                        org.ui.alert("实名认证成功!", function () {
-                            return window.location.href = '/weixin/account/';
-                        });
-                    },
-                    error: function (xhr) {
-                        result = JSON.parse(xhr.responseText);
-                        return org.ui.alert(result.message);
-                    },
-                    complete: function () {
-                        lib.isPost = true;
-                        lib.$fromComplete.text("完成");
-                    }
-                })
-            }
-        }
-    };
-    return {
-        init: lib.init
-    }
-})(org);
-
 org.bankOneCard = (function(){
     var lib = {
         init : function(){
@@ -1552,7 +1488,7 @@ org.bankOneCard = (function(){
     return {
         init: lib.init
     }
-})()
+})();
 
 org.processFirst = (function (org) {
     var lib = {
@@ -1685,7 +1621,7 @@ org.processSecond = (function (org) {
             if(localStorage.getItem('bank')){
                 var content = JSON.parse(localStorage.getItem('bank'));
                 lib.$bank.append(appendBanks(content));
-                lib._limit_style(content)
+                return lib._limit_style(content)
             }
             org.ajax({
                 type: 'POST',
@@ -1695,6 +1631,7 @@ org.processSecond = (function (org) {
                         lib.$bank.append(appendBanks(results.banks));
                         var content = JSON.stringify(results.banks);
                         window.localStorage.setItem('bank', content);
+
                     } else {
 
                         return org.ui.alert(results.message);
@@ -2357,7 +2294,6 @@ org.received_all = (function(){
                 }
             })
         }
-
     }
 
     return {

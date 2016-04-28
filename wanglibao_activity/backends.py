@@ -322,8 +322,8 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
     if product_id:
         # 检查单标投资顺序是否设置数字
         ranking_num = int(rule.ranking)
-        if not rule.is_total_invest:
-            if ranking_num > 0 and not is_full:
+        if rule.is_total_invest is False:
+            if ranking_num > 0 and is_full is False:
                 # 查询单标投资顺序
                 records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
                                            .order_by('create_time')
@@ -352,11 +352,15 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                 # 查询是否满标，满标时不再考虑最小/最大金额，直接发送
                 _check_trade_amount(user, rule, device_type, amount, is_full)
                 # _send_gift(user, rule, device_type, is_full)
-            elif ranking_num == 0 and not is_full:
+            elif ranking_num == 0 and is_full is False:
+                # 未配置顺序奖且未满标,直接发
+                _check_trade_amount(user, rule, device_type, amount, is_full)
+            elif ranking_num == 0 and is_full is True:
+                # 未配置顺序奖且满标,直接发
                 _check_trade_amount(user, rule, device_type, amount, is_full)
 
         # 判断单标累计投资名次
-        if rule.is_total_invest and is_full is True:
+        if rule.is_total_invest is True and is_full is True:
             total_invest_order = int(rule.total_invest_order)
             if total_invest_order > 0:
                 # 按用户查询单标投资的总金额
@@ -903,14 +907,21 @@ def _send_message_template(user, title, content):
         "title": title,
         "content": content,
         "mtype": "activity"
-    })
+    }, queue='celery02')
 
 
 def _send_sms_template(phone, content):
     # 发送短信,功能推送id: 7
     # 直接发送短信内容
-    from wanglibao_sms.send_php import PHPSendSMS
-    PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content)
+    # from wanglibao_sms.send_php import PHPSendSMS
+    from wanglibao_sms.tasks import send_sms_msg_one
+    send_sms_msg_one.apply_async(kwargs={
+        'rule_id': 7,
+        'phone': phone,
+        'user_type': 'phone',
+        'content': content
+    }, queue='celery02')
+    # PHPSendSMS().send_sms_msg_one(7, phone, 'phone', content)
 
     # send_messages.apply_async(kwargs={
     #     "phones": [phone, ],
@@ -923,16 +934,18 @@ def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):
     weixin_user = WeixinUser.objects.filter(user=user).first()
     if weixin_user:
         now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-        remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。"%(amount,
-                                                                     invest_amount, end_date)
-        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                    "openid":weixin_user.openid,
-                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                    "name1":"",
-                                    "name2":user.wanglibaouserprofile.phone,
-                                    "time":now_str+'\n',
-                                    "remark":remark
-                                        })},
-                                    queue='celery02'
-                                    )
+        remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。" % (
+            amount, invest_amount, end_date)
+
+        sentTemplate.apply_async(kwargs={
+            "kwargs": json.dumps({
+                "openid": weixin_user.openid,
+                "template_id": BIND_SUCCESS_TEMPLATE_ID,
+                "name1": "",
+                "name2": user.wanglibaouserprofile.phone,
+                "time": now_str+'\n',
+                "remark": remark
+            })
+        }, queue='celery02')
+
 

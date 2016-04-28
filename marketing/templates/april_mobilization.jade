@@ -1,0 +1,256 @@
+-load formatters
+-load mathfilters
+doctype html
+html.no-js(lang="en-gb")
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/april_mobilization.css?v=2016041505")
+        - csrf_token
+    body(style="background:#fff")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+                .text_1 翻开旧时光，每一笔账都是希望，四月，温故而加息，只给那个幸运的你。<br>叮叮叮， 回馈活动如下：
+                .banner_main
+                    dl.dl_1
+                        dt 活动一
+                        dd 千万体验金<br>大放送
+                    dl.dl_2
+                        dt 活动二
+                        dd 春暖花开季<br>温故而加息
+                    dl.dl_3
+                        dt 活动三
+                        dd 满额加息<br>high翻全场
+            #main
+                #main_center
+                    .title_img.title_img_1 千万投资，送千万体验金
+                    .title_big.title_big_0 活动时间：4月16日 0:00 —— 5月6日 23:59
+                    .title_small.title_small_1 阳光温热，岁月静好，好是好，就是体验金送得太少。<br>这次网利君开仓放“粮”，活动期间，投资就送体验金，多投多送，是不是很赞
+                    .table
+                        table
+                            thead
+                                tr
+                                    th 单笔投资金额
+                                    th 获得体验金奖励
+                            tbody
+                                tr
+                                    td 100≤投资额＜5,000
+                                    td 500
+                                tr
+                                    td 5,000≤投资额＜10,000
+                                    td 5,000
+                                tr
+                                    td 10,000≤投资额＜20,000
+                                    td 10,000
+                                tr
+                                    td 20,000≤投资额＜30,000
+                                    td 20,000
+                                tr
+                                    td 30,000≤投资额＜40,000
+                                    td 30,000
+                                tr
+                                    td 40,000≤投资额＜50,000
+                                    td 40,000
+                                tr
+                                    td 50,000≤投资额＜80,000
+                                    td 60,000
+                                tr
+                                    td 80,000≤投资额＜100,000
+                                    td 90,000
+                                tr
+                                    td 投资额≥100,000
+                                    td 100,000
+                        .grass.grass_1
+                        .grass.grass_2
+                    dl.rule.rule_1
+                        dt 温馨小提示：
+                        dd 1、活动期间投资一月及以上标，即可获取体验金。
+                        dd 2、投资完成后，体验金实时发放到账户哦~，请登录“我的账户”-- 体验金专区查看体验金！
+                    a.button_link.button_link_1(href='/p2p/list/') 投资立领体验金
+                    .title_img.title_img_2 春暖花开季，温故而加息
+                    .title_big.title_big_1 活动时间：4月18日 0:00 —— 4月22日 23:59
+                    .title_small.title_small_2 活动期间，单笔购买金额满足网利君设定的条件，即可获得相应的加息券！
+                    .condition_wrap
+                        .box
+                            .box_main
+                                .top_text 获得加息额度
+                                .gold_img 0.5%
+                                .column.column_1
+                                    .text_box
+                                        .text_1 单笔投资金额
+                                        .text_2 ≥ 1,000
+                                .condition_footer
+                                    .text_1 使用门槛
+                                    .text_2 10,000
+                        .box
+                            .box_main
+                                .top_text 获得加息额度
+                                .gold_img 0.8%
+                                .column.column_2
+                                    .text_box
+                                        .text_1 单笔投资金额
+                                        .text_2 ≥ 10,000
+                                .condition_footer
+                                    .text_1 使用门槛
+                                    .text_2 20,000
+                        .box
+                            .box_main
+                                .top_text 获得加息额度
+                                .gold_img 1.2%
+                                .column.column_3
+                                    .text_box
+                                        .text_1 单笔投资金额
+                                        .text_2 ≥ 20,000
+                                .condition_footer
+                                    .text_1 使用门槛
+                                    .text_2 50,000
+                        .box
+                            .box_main
+                                .top_text 获得加息额度
+                                .gold_img 1.5%
+                                .column.column_4
+                                    .text_box
+                                        .text_1 单笔投资金额
+                                        .text_2 ≥ 50,000
+                                .condition_footer
+                                    .text_1 使用门槛
+                                    .text_2 100,000
+                        .box.box_5
+                            .box_main
+                                .top_text 获得加息额度
+                                .gold_img 2%
+                                .column.column_5
+                                    .text_box
+                                        .text_1 单笔投资金额
+                                        .text_2 ≥ 100,000
+                                .condition_footer
+                                    .text_1 使用门槛
+                                    .text_2 200,000
+                        .grass.grass_0
+                    dl.rule.rule_2
+                        dt 温馨小提示：
+                        dd 1、活动期间投资一月及以上标，即可获得加息券。
+                        dd 2、投资完成后，加息券实时发放到用户账户，登录“我的账户” -- 理财券专区查看。
+                        dd 3、加息券有效期7天，领取次日生效；限投一月及以上标期。
+
+                    a.button_link.button_link_2(href='/p2p/list/') 投资立领加息券
+
+                    .title_img.title_img_1 满额加息，High翻全场
+                    .title_big.title_big_1 活动时间：4月16日 0:00 —— 5月6日 23:59:59
+                    .title_small.title_small_2 期间网利宝每周交易额达到1亿，网利宝为参与投资的小伙伴下发相应额度的加息券
+
+                    dl.rule.rule_0
+                        dt 活动概述
+                        dd 1、第一周（4月16日 0:00-4月22日 23:59） 单周交易额突破一亿，在本周结束后3个工作日内（4.25-4.27），网利宝会为当周（4月16日 0:00-4月22日 23:59）参与投资用户下发一张1%加息券。
+                        dd 2、第二周（4月23日 0:00-4月29日 23:59），单周交易再次突破一亿，累计两周都有投资用户得到一张1.5%加息券，只有当周参与投资用户得到1%加息券。
+                        dd 3、第三周（4月30日 0:00-5月6日 23:59），单周交易额突破一亿，活动期间累计三周都有投资用户得到一张2%加息券，参与2周投资用户得到一张1.5%加息券，只有本周参与投资用户得到1%加息券。
+
+                    .all_text_1 全站交易额
+                    .all_text_2!='<span id="act_time">16年4月16日</span>零点至今'
+                    .num_wrap
+                        //.num_1
+                        //.num_1
+                        //.num_2
+                        //.num_1
+                        //.num_1
+                        //.num_1
+                        //.num_2
+                        //.num_1
+                        //.num_1
+                        //.num_1
+                        //.num_2
+                        //.num_1
+                        //.num_1
+                        //.num_1
+                        //.num_2
+                        //.num_1
+                        //.num_1.last
+                    .table
+                        table
+                            thead
+                                tr
+                                    th.one 时间
+                                    th.two 全站交易额
+                                    th.three 配送加息券
+                                    th.four 加息状态
+                            tbody
+                                tr
+                                    td.one 第一周（4月16日 - 4月22日）
+                                    td.two 突破1亿
+                                    td.three 1%
+                                    td.four 已加息
+                                tr
+                                    td.one 第二周（4月23日 - 4月29日）
+                                    td.two 突破1亿
+                                    td.three 1.5%
+                                    td.four 待加息
+                                tr
+                                    td.one 第三周（4月30日 - 5月6日）
+                                    td.two 突破1亿
+                                    td.three 2%
+                                    td.four 待加息
+                    dl.rule.rule_3
+                        dt 温馨小提示：
+                        dd 1、活动期间，满足下发条件后，加息券于次周三个工作日内下发。
+                        dd 2、活动期间，满足下发条件后，每周每位用户限得一张加息券。
+                        dd 3、加息券使用门槛：2万起投，限三月及以上标；效期7天，领取次日生效。
+                        dd 4、如交易额未达到指定额度，加息券则不予下发。
+                    .title_img.title_img_4 累计投资前10名实物奖励
+                        .grass.grass_3
+                    .title_big.title_big_0 每周累计投资前10名用户，还可获得百元加油卡和超值电影票；
+                    .ranking_main_2
+                        .list_wrap
+                            .list_main
+                                .title_box!='<span id="act_week">第一周</span>用户投资排行榜（每逢半点更新）'
+                                table
+                                    thead
+                                        tr
+                                            th.one 用户名
+                                            th.two 投资金额
+                                            th.three 获得福利
+                                    tbody
+                                        //
+                                        //tr.first
+                                        //    td.one
+                                        //        span.ico
+                                        //        span.phone 139 XXXX 2453
+                                        //    td.two 25,000 元
+                                        //    td.three 5张百元加油卡+2张星美电影票
+                                        //
+                                        //tr.second
+                                        //    td.one
+                                        //        span.ico
+                                        //        span.phone 139 XXXX 2453
+                                        //    td.two 25,000 元
+                                        //    td.three 5张百元加油卡+2张星美电影票
+                                        //
+                                        //tr.third
+                                        //    td.one
+                                        //        span.ico
+                                        //        span.phone 139 XXXX 2453
+                                        //    td.two 25,000 元
+                                        //    td.three 5张百元加油卡+2张星美电影票
+                                        //
+                                        //tr
+                                        //    td.one
+                                        //        span.ico 4
+                                        //        span.phone 139 XXXX 2453
+                                        //    td.two 25,000 元
+                                        //    td.three 5张百元加油卡+2张星美电影票
+                                .title_bottom 说明：<br>1、投资额相同的情况下，按照投资时间先后顺序进行排名。<br>2、当周结束后三个工作日内，网利宝客服以短信的形式将电子兑换码（加油卡和电影票）发送给得奖用户。
+                        .grass.grass_4
+                        .link_list
+                            .line_left
+                            .line_right
+                            p
+                                a(href='https://www.wanglibao.com/announcement/detail/626/') >第一周奖励发放记录
+
+                .footer_bottom
+                    a.button_link.button_link_3(href='/p2p/list/') 投资领奖品
+        include global/g_footer
+script.
+    require(['/static/js/april_mobilization.js?v=2016042502'])
+
+                                                                    

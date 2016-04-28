@@ -6,18 +6,20 @@
       'jquery.modal': 'lib/jquery.modal.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
       'jquery.validate': 'lib/jquery.validate.min',
+      'jquery.form': 'lib/jquery.form',
       tools: 'lib/modal.tools'
     },
     urlArgs: 'v=20151118',
     shim: {
       'jquery.modal': ['jquery'],
       'jquery.placeholder': ['jquery'],
-      'jquery.validate': ['jquery']
+      'jquery.validate': ['jquery'],
+      'jquery.form': ['jquery']
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, tool, placeholder, validate) {
-    var max_amount, min_amount;
+  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
+    var addFormValidateor, geetestStatus, max_amount, min_amount, _refreshCode, _sendSMSFun, _showModal;
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
@@ -42,7 +44,7 @@
       }
       return false;
     });
-    $("#withdraw-form").validate({
+    addFormValidateor = $("#withdraw-form").validate({
       rules: {
         amount: {
           required: true,
@@ -52,7 +54,7 @@
           small: false
         },
         card_id: {
-          required: true
+          required: false
         },
         validate_code: {
           required: true
@@ -61,13 +63,13 @@
           required: true,
           minlength: 1
         },
-        pwd: {
-          required: false
+        trade_pwd: {
+          required: true
         }
       },
       messages: {
         amount: {
-          required: '不能为空',
+          required: '请输入金额',
           money: '请输入正确的金额格式',
           balance: '余额不足',
           huge: '单笔提现金额不能超过' + max_amount + '万元',
@@ -83,41 +85,84 @@
           required: '不能为空',
           minlength: $.format("验证码至少输入1位")
         },
-        pwd: {
+        trade_pwd: {
           required: '请输入交易密码'
         }
       }
     });
-    if ($('#id-is-valid').val() === 'False') {
-      $('#id-validate').modal();
-    }
+    geetestStatus = '';
+    $.ajax({
+      type: 'POST',
+      url: '/api/geetest/',
+      dataType: 'json',
+      timeout: 5000,
+      data: {
+        type: 'get'
+      }
+    }).success(function(data) {
+      var config;
+      geetestStatus = 'true';
+      config = {
+        gt: data.gt,
+        challenge: data.challenge,
+        product: "popup",
+        offline: !data.success
+      };
+      $.modal.close();
+      return initGeetest(config, function(captchaObj) {
+        captchaObj.appendTo("#captcha-box");
+        captchaObj.bindOn(".ispan4-omega");
+        captchaObj.onSuccess(function() {
+          var array;
+          $.modal.close();
+          array = captchaObj.getValidate();
+          return _sendSMSFun(array);
+        });
+        captchaObj.onFail(function() {});
+        captchaObj.onRefresh(function() {});
+        return captchaObj.getValidate();
+      });
+    }).error(function(data) {
+      return geetestStatus = 'false';
+    });
     $('.ispan4-omega').click(function() {
+      if ((geetestStatus === 'false') || (geetestStatus === '')) {
+        $('.captcha-box2').show();
+        $('.code-img-error').html('');
+        $('#img-code-div2').find('#id_captcha_1').val('');
+        _refreshCode();
+        return $('#img-code-div2').modal();
+      }
+    });
+    $('.captcha-refresh').click(function() {
+      return _refreshCode();
+    });
+    _refreshCode = function() {
       var url;
-      $('.code-img-error').html('');
-      $('#img-code-div2').modal();
-      $('#img-code-div2').find('#id_captcha_1').val('');
       url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
       return $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);
       });
-    });
-    $("#submit-code-img4").click(function(e) {
-      var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
+    };
+    _sendSMSFun = function(array) {
+      var captcha_0, captcha_1, count, dataStr, element, intervalId, phoneNumber, timerFunction;
       element = $('#button-get-code-btn');
       if ($(element).attr('disabled')) {
         return;
       }
       phoneNumber = $(element).attr("data-phone");
-      captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
-      captcha_1 = $(this).parents('form').find('.captcha').val();
+      if ((array === '') || (array === void 0)) {
+        captcha_0 = $('#id_captcha_0').val();
+        captcha_1 = $('.captcha').val();
+        dataStr = 'captcha_0=' + captcha_0 + '&captcha_1=' + captcha_1;
+      } else {
+        dataStr = 'type=geetest' + '&geetest_validate=' + array.geetest_validate + '&geetest_seccode=' + array.geetest_seccode + '&geetest_challenge=' + array.geetest_challenge;
+      }
       $.ajax({
         url: "/api/phone_validation_code/" + phoneNumber + "/",
         type: "POST",
-        data: {
-          captcha_0: captcha_0,
-          captcha_1: captcha_1
-        }
+        data: dataStr
       }).fail(function(xhr) {
         var result;
         clearInterval(intervalId);
@@ -126,22 +171,32 @@
         $(element).addClass('button-red');
         $(element).removeClass('button-gray');
         result = JSON.parse(xhr.responseText);
-        if (result.type === 'captcha') {
-          return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
+        if ((array === '') || (array === void 0)) {
+          if (result.type === 'captcha') {
+            return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
+          } else {
+            if (xhr.status >= 400) {
+              return tool.modalAlert({
+                title: '温馨提示',
+                msg: result.message
+              });
+            }
+          }
         } else {
-          if (xhr.status >= 400) {
-            return tool.modalAlert({
-              title: '温馨提示',
-              msg: result.message
-            });
+          $('#codeError').text(result.message);
+          if (result.message === '极验验证失败') {
+            return geetestStatus = 'false';
           }
         }
       }).success(function() {
+        $('#codeError,.code-img-error').text('');
         element.attr('disabled', 'disabled');
         element.removeClass('button-red');
         element.addClass('button-gray');
         $('.voice-validate').attr('disabled', 'disabled');
-        return $.modal.close();
+        if ((array === '') || (array === void 0)) {
+          return $.modal.close();
+        }
       });
       intervalId;
       count = 60;
@@ -167,11 +222,9 @@
       };
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
-    });
-    $('.withdraw-button').click(function() {
-      if (!$(this).hasClass('no-click')) {
-        return $('#withdraw-form').submit();
-      }
+    };
+    $("#submit-code-img4").click(function(e) {
+      return _sendSMSFun();
     });
     $(".voice").on('click', '.voice-validate', function(e) {
       var element, url;
@@ -224,46 +277,58 @@
         }
       });
     });
+    $('.poundageF').click(function() {
+      return $('#poundageExplain').modal();
+    });
 
     /*显示设置密码弹框 */
     $('.forget-pwd').click(function() {
-      var dr, tag;
-      tag = $(this).attr('tag');
-      dr = $('.setTradingPwd1');
-      if (tag === '1') {
-        dr.find('.tag1').show();
-        dr.find('.tag2').hide();
-        dr.find('.nextBtn').attr('tag', '1');
+      if ($('#bankIsNoBind').val() === 'false') {
+        $('#goBindingBackWin').modal();
+        return $('#goBindingBackWin').find('.close-modal').hide();
       } else {
-        dr.find('.tag2').show();
-        dr.find('.tag1').hide();
-        dr.find('.nextBtn').attr('tag', '2');
+        $('#setTradingPwd').modal();
+        return $('.modal').css({
+          'width': '640px'
+        });
       }
-      return $('#setTradingPwd').modal();
+    });
+    $('#temporaryNot').click(function() {
+      return $.modal.close();
     });
 
     /*判断提交表单 */
     $('.withdraw-button').click(function() {
       if (!$(this).hasClass('no-click')) {
-        return $('#withdraw-form').submit();
+        if ($('.bindingCard').text() === '') {
+          return $('.bindingError').text('*请绑定银行卡');
+        } else {
+          if (addFormValidateor.form()) {
+            return $('#withdraw-form').ajaxSubmit(function(data) {
+              return tool.modalAlert({
+                title: '温馨提示',
+                msg: data.message,
+                callback_ok: _showModal
+              });
+            });
+          }
+        }
       }
     });
+    _showModal = function() {
+      return location.reload();
+    };
 
     /*设置密码提交表单 */
     $('#nextBtn').click(function() {
-      var id, parent, phone, reg, res, select, sfzError, tag, yhkError, yhkh, yhkhError;
+      var id, parent, phone, reg, sfzError, yhkh;
       parent = $('.setTradingPwd1');
       phone = $(this).attr('data-phone');
       id = $.trim(parent.find('.sfz').val());
-      select = $('#card-select1').val();
-      yhkh = $.trim($('.yhkh').val());
-      reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/);
-      tag = $(this).attr('tag');
+      yhkh = $('#bindingEdInfo').attr('data-no');
+      reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$|[a-zA-Z][a-zA-Z0-9]{1,}$/);
       $('.errorS').html('').hide();
       sfzError = parent.find('#sfzError');
-      yhkError = parent.find('#yhkError');
-      yhkhError = parent.find('#yhkhError');
-      res = /^\d{10,20}$/;
       if (id === '') {
         sfzError.show().addClass('errorS').html('<i></i>请输入身份证号码');
         return;
@@ -275,23 +340,6 @@
           sfzError.show().removeClass('errorS').html('<i></i>');
         }
       }
-      if (select === '') {
-        yhkError.show().addClass('errorS').html('<i></i>请输选择银行卡');
-        return;
-      } else {
-        yhkError.show().removeClass('errorS').html('<i></i>');
-      }
-      if (yhkh === '') {
-        yhkhError.show().addClass('errorS').html('<i></i>请输入银行卡号');
-        return;
-      } else {
-        if (!res.test(yhkh)) {
-          yhkhError.show().addClass('errorS').html('<i></i>卡号无效');
-          return;
-        } else {
-          yhkhError.show().removeClass('errorS').html('<i></i>');
-        }
-      }
       return $.ajax({
         url: "/api/trade_pwd/",
         type: "POST",
@@ -301,43 +349,30 @@
           citizen_id: id,
           requirement_check: 1
         }
-      }).success(function(date) {
-        var dr;
-        if (date.ret_code === 5) {
-          $.modal.close();
-          dr = $('.setTradingPwd2');
-          if (tag === '1') {
-            dr.find('.tag1').show();
-            dr.find('.tag2').hide();
-          } else {
-            dr.find('.tag2').show();
-            dr.find('.tag1').hide();
-          }
-          $('#backTradingPwd').modal();
-          return $('#confirmBtn').attr({
-            'tag': tag
+      }).success(function(data) {
+        if (data.ret_code === 5) {
+          $('#setTradingPwd2').modal();
+          return $('.modal').css({
+            'width': '640px'
           });
         } else {
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: date.message
-          });
+          return sfzError.show().addClass('errorS').html('<i></i>' + data.message);
         }
       });
     });
 
     /*确认密码 */
-    $('#confirmBtn').click(function() {
-      var action_type, card_id, citizen_id, erro1, erro2, par, pwd1, pwd2, re, tag;
-      par = $('.setTradingPwd2');
+    $('.confirmBtn').click(function() {
+      var card_id, citizen_id, dataStr, erro1, erro2, par, pwd1, pwd2, re, tag;
+      par = $(this).parent().parent();
       pwd1 = $.trim(par.find('#pwd1').val());
       pwd2 = $.trim(par.find('#pwd2').val());
       erro1 = par.find('#sfzError');
       erro2 = par.find('#yzmError');
-      card_id = $.trim($('.yhkh').val());
+      card_id = $.trim($('#bindingEdInfo').attr('data-no'));
       citizen_id = $.trim($('#citizen_id').val());
-      re = /^\d{6}$/;
       tag = $(this).attr('tag');
+      re = /^\d{6}$/;
       $('.errorS').html('').hide();
       if (pwd1 === '') {
         erro1.show().addClass('errorS').html('<i></i>请输入密码');
@@ -368,24 +403,39 @@
         erro2.show().removeClass('errorS').html('<i></i>');
       }
       if (tag === '1') {
-        action_type = '3';
+        dataStr = 'action_type=3&new_trade_pwd=' + pwd1 + '&card_id=' + card_id + '&citizen_id=' + citizen_id + '&requirement_check=0';
       } else {
-        action_type = '1';
+        dataStr = 'action_type=1&new_trade_pwd=' + pwd1 + '&requirement_check=0';
       }
-      alert(action_type);
       return $.ajax({
         url: "/api/trade_pwd/",
         type: "POST",
-        data: {
-          action_type: action_type,
-          card_id: card_id,
-          citizen_id: citizen_id,
-          new_trade_pwd: pwd1,
-          requirement_check: 0
-        }
-      }).success(function() {
-        return location.reload();
+        data: dataStr
+      }).success(function(xhr) {
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: xhr.message,
+          callback_ok: _showModal
+        });
       });
+    });
+
+    /*获取绑卡状态 */
+    $.ajax({
+      url: "/api/pay/the_one_card/",
+      type: "GET",
+      data: {}
+    }).fail(function() {
+      $('.noCard').show();
+      $('.bindingCard').hide();
+      return $('#bankIsNoBind').val('false');
+    }).done(function(xhr) {
+      var str;
+      $('.noCard').hide();
+      str = xhr.bank.name + '&nbsp;&nbsp;' + xhr.no.substring(0, 3) + '**** ****' + xhr.no.substr(xhr.no.length - 4);
+      $('.bindingCard').show().html(str).attr('id', xhr.bank.id);
+      $('#bindingEdInfo').html(str).attr('data-no', xhr.no);
+      return $('input[name="card_id"]').val(xhr.id);
     });
 
     /*判断是否设置了交易密码 */
@@ -393,21 +443,28 @@
       url: "/api/profile/",
       type: "GET",
       data: {}
-    }).success(function(date) {
-      if (date.trade_pwd_is_set) {
+    }).success(function(data) {
+      if (data.trade_pwd_is_set) {
         return $('.trade_pwd_is_set').show();
       } else {
         $('.trade_pwd_is_set_no').show();
-        if (date.cards_number > 0) {
-          return $('.bank-counts').show();
-        } else {
+        if ($('#bankIsNoBind').val() === 'false') {
           return $('.bank-count').show();
+        } else {
+          return $('.bank-counts').show();
         }
       }
     });
-    return $('.poundageF').click(function() {
-      return $('#poundageExplain').modal();
+    $.ajax({
+      url: "/api/home/",
+      type: "GET",
+      data: {}
+    }).success(function(data) {
+      return $('.red-text').text(data.p2p_margin);
     });
+    if ($('#id-is-valid').val() === 'False') {
+      $('#id-validate').modal();
+    }
   });
 
 }).call(this);

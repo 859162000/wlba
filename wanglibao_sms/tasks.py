@@ -8,6 +8,7 @@ from wanglibao_sms.send_php import PHPSendSMS
 
 logger = logging.getLogger('wanglibao_inside_messages')
 
+
 @app.task
 def send_messages(phones, messages, channel=1, ext=''):
     logger.info('going to send phone message phone = {}, message = {}'.format(phones, messages))
@@ -15,7 +16,18 @@ def send_messages(phones, messages, channel=1, ext=''):
 
 
 @app.task
-def send_sms_msg_one(rule_id, phone, content, user_type):
+def send_sms_batch(rule_id, data_messages, timeout=20):
+    """
+    PHP批量发短信任务
+    :param rule_id:  rule id
+    :param data_messages: view the format on send_php.py
+    :param timeout: timeout, default: 2 sec
+    """
+    return PHPSendSMS().send_sms(rule_id, data_messages, timeout=timeout)
+
+
+@app.task
+def send_sms_msg_one(rule_id, phone, content, user_type, timeout=2):
     """
     PHP发短信任务,直接发送短信文本内容
     单条短信发送
@@ -23,10 +35,11 @@ def send_sms_msg_one(rule_id, phone, content, user_type):
     :param phone:  phone number
     :param content:  sms content
     :param user_type: default value: phone
+    :param timeout: timeout, default: 2 sec
     """
     if not rule_id:
         rule_id = 7
-    return PHPSendSMS().send_sms_msg_one(rule_id, phone, user_type, content)
+    return PHPSendSMS().send_sms_msg_one(rule_id, phone, user_type, content, timeout=timeout)
 
 
 @app.task

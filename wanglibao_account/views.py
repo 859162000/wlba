@@ -87,6 +87,7 @@ from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha
 from wanglibao_profile.models import WanglibaoUserProfile
+
 import requests
 
 logger = logging.getLogger(__name__)
@@ -1177,7 +1178,7 @@ class AccountBankCard(TemplateView):
 
         cards = BindBank.objects.filter(user__exact=self.request.user)
         p2p_cards = Card.objects.filter(user__exact=self.request.user)
-        banks = Bank.get_withdraw_banks()
+        banks = Bank.get_bind_channel_banks()
         return {
             "cards": cards,
             'p2p_cards': p2p_cards,
@@ -1373,6 +1374,57 @@ class MessageDetailAPIView(APIView):
 
         return Response(result)
 
+def verified_user_login(phone, ip, action=None):
+    from wanglibao_account.models import GeetestModifiedTimes
+    phone_times = 'login_verified_phone_times_%s' % (phone,)
+    ip_times = 'login_verified_ip_times_%s' % (ip,)
+    with transaction.atomic():
+        phone_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+        if not phone_record:
+            try:
+                phone_record = GeetestModifiedTimes.objects.create(
+                    identified=phone_times,
+                    times=0)
+            except Exception:
+                logger.debug('极验验证手机验证次数创建数据记录失败')
+
+        if action == 'reset':
+            phone_record.times = 0
+            phone_verified_times = 0
+            phone_record.save()
+        else:
+            phone_verified_times = phone_record.times
+            phone_record.times = phone_verified_times + 1
+            phone_record.save()
+
+    with transaction.atomic():
+        ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=ip_times).first()
+        if not ip_record:
+            try:
+                ip_record = GeetestModifiedTimes.objects.create(
+                        identified=ip_times,
+                        times=0)
+            except Exception:
+                logger.debug('极验验证IP验证次数创建数据记录失败')
+
+        if action == 'reset':
+            ip_record.times = 0
+            ip_record.save()
+            ip_verified_times = 0
+        else:
+            ip_verified_times = ip_record.times
+            ip_record.times = ip_verified_times + 1
+            ip_record.save()
+
+    if phone_verified_times >= 2:
+        # Modify by hb on 2016-04-26
+        #return False, u'用户名或密码错误2次以上'
+        return False, u'用户名或密码错误，请拖动图形验证'
+    if ip_verified_times >= 5:
+        # Modify by hb on 2016-04-26
+        #return False, u'同一IP失败5次以上'
+        return False, u'用户名或密码错误，请拖动图形验证。'
+    return True, 'success'
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -1386,10 +1438,14 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
         return json.dumps(res)
 
     if request.method == "POST":
+        client_ip = request.META['HTTP_X_FORWARDED_FOR'] if request.META.get('HTTP_X_FORWARDED_FOR', None) else request.META.get('HTTP_X_REAL_IP', None)
 
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
+            identifier = request.POST.get('identifier', None)
             if form.is_valid():
+                # 用户的登录次数,存储在session中,用户登录成功后,清零用户的登录次数
+                verified_user_login(identifier, client_ip, 'reset')
                 auth_login(request, form.get_user())
 
                 if request.POST.has_key('remember_me'):
@@ -1403,7 +1459,19 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                 set_cookie(response, 'session_bak', request.session.session_key)
                 return response
             else:
-                return HttpResponseForbidden(messenger(form.errors))
+                # 用户的登录次数失败后,处理对应的session
+                if request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
+                    result, msg = verified_user_login(identifier, client_ip)
+                    if not result:
+                        json_response = {
+                            'ret_code': '7001',
+                            'message': msg
+                        }
+                        return HttpResponse(json.dumps(json_response), content_type='application/json')
+                    else:
+                        return HttpResponseForbidden(messenger(form.errors))
+                else:
+                    return HttpResponseForbidden(messenger(form.errors))
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
@@ -2312,7 +2380,10 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = json.loads(request.POST)
+                if channel_code == 'zgdx':
+                    params = json.loads(request.body)
+                else:
+                    params = request.POST
                 request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
@@ -2429,7 +2500,6 @@ class ValidateAccountInfoAPI(APIView):
         if form.is_valid():
             if id_number != profile.id_number:
                 return Response({'message':"身份证错误"}, status=400)
-
         # 同卡之后要对银行卡号进行验证
             card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
             if not card.exists():
@@ -2495,7 +2565,6 @@ class ManualModifyPhoneAPI(APIView):
         profile = user.wanglibaouserprofile
         if not profile.id_is_valid or not profile.id_number:
             return Response({'message':"还没有实名认证"}, status=400)
-
         card = Card.objects.filter(user=self.request.user, is_the_one_card=True)
         if not card.exists():
             return Response({'message':"用户需要绑定的银行卡号"}, status=400)
@@ -2621,7 +2690,6 @@ class SMSModifyPhoneValidateAPI(APIView):
             new_phone_user = User.objects.filter(wanglibaouserprofile__phone=new_phone).first()
             if new_phone_user:
                 return Response({'message':"要修改的手机号已经注册网利宝，请更换其他手机号"}, status=400)
-
             modify_phone_record = ManualModifyPhoneRecord.objects.filter(user=user).first()
             if modify_phone_record and modify_phone_record.status in [u"待初审", u"初审待定", u"待复审", u"复审驳回", u"初审驳回"]:
                 return Response({'message':"你有还未处理结束的人工修改手机号申请，请耐心等待客服处理"}, status=400)

@@ -283,6 +283,13 @@ def withdraw(request):
         pay_info.save()
         return {"ret_code": 20065, 'message': u'余额不足'}
 
+def _need_validation_for_qpay(card):
+    need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
+    if need_sms and need_sms.value == '1' and card.bank.channel == 'kuaipay':
+        need_validation_for_qpay = True
+    else:
+        need_validation_for_qpay = False
+    return need_validation_for_qpay
 
 def card_bind_list(request):
     # 查询已经绑定支付渠道的银行卡列表
@@ -318,7 +325,7 @@ def card_bind_list(request):
                     'gate_id': card.bank.gate_id,
                     'storable_no': card.no[:6] + card.no[-4:],
                     'is_the_one_card': card.is_the_one_card,
-                    'need_validation_for_qpay': need_validation_for_qpay
+                    'need_validation_for_qpay': _need_validation_for_qpay(card)
                 }
 
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
@@ -464,7 +471,14 @@ def bind_pay_deposit(request):
 
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
-
+    
+    #验证银行卡和银行匹配
+    if len(card_no) != 10 and bank.cards_info:
+        cardinfo = check_bank_carkinfo(card_no,bank)
+        #返回ret_code为20075的话表示银行卡和银行不匹配
+        if cardinfo['ret_code'] == 20075:
+            return cardinfo
+        
     amount = request.DATA.get('amount', '').strip()
     try:
         amount = float(amount)
@@ -500,6 +514,21 @@ def bind_pay_deposit(request):
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
 
+#----------------------------------------------------------------------
+def check_bank_carkinfo(card_no,bank):
+    """根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息"""
+    card_to_bank = False
+    cards_info = bank.cards_info.split(',')
+    for no in cards_info:
+        if card_no.startswith(no):
+            card_to_bank = True
+    if card_to_bank:
+        pass
+    else:
+        return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
+    #银行卡号和银行匹配正确
+    return {"ret_code":0}
+    
 
 def bind_pay_dynnum(request):
     """ 根据银行设置的支付渠道进行支付渠道的支付
@@ -656,6 +685,8 @@ class TheOneCardAPIView(APIView):
     def get(self, request):
         card = TheOneCard(request.user).get()
         serializer = CardSerializer(card)
+        serializer.data.update(
+            {'need_validation_for_qpay': _need_validation_for_qpay(card)})
         return Response(serializer.data)
 
     def put(self, request):
@@ -673,14 +704,14 @@ class TheOneCardAPIView(APIView):
         TheOneCard(request.user).set(card_id)
         return Response({'status_code': 0})
 
-    def delete(self, request):
-        """
-        这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
-        :param request:
-        :param card_id:
-        :return:
-        """
-        TheOneCard(request.user).unbind()
-        return Response({'status_code': 0})
+    # def delete(self, request):
+        # """
+        # 这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
+        # :param request:
+        # :param card_id:
+        # :return:
+        # """
+        # TheOneCard(request.user).unbind()
+        # return Response({'status_code': 0})
 
 #######################################同卡进出 end###############################

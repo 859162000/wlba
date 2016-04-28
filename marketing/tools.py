@@ -65,7 +65,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
         send_investment_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "device_type":device_type,
             "order_id": order_id, "product_id": product_id,
-        })
+        }, queue='celery02')
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
@@ -109,7 +109,7 @@ def register_ok(user_id, device):
     if settings.SEND_PHP_ON_OR_OFF:
         send_register_data.apply_async(kwargs={
             "user_id": user_id, "device_type":device_type,
-        })
+        }, queue='celery02')
 
 @app.task
 def idvalidate_ok(user_id, device):
@@ -127,7 +127,7 @@ def idvalidate_ok(user_id, device):
         if user.wanglibaouserprofile.id_is_valid:
             send_idvalidate_data.apply_async(kwargs={
                 "user_id": user_id, "device_type":device_type,
-            })
+            }, queue='celery02')
         
 @app.task
 def deposit_ok(user_id, amount, device, order_id):
@@ -198,7 +198,7 @@ def deposit_ok(user_id, amount, device, order_id):
     if settings.SEND_PHP_ON_OR_OFF:
         send_deposit_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
-        })
+        }, queue='celery02')
         
 @app.task
 def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, device):
@@ -243,7 +243,6 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
                                         "keyword1":"%s 元"%str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
-
                                         ###"url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % order_id,
                                             })},
                                         queue='celery02')
@@ -257,7 +256,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
     if settings.SEND_PHP_ON_OR_OFF:
         send_withdraw_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
-        })
+        }, queue='celery02')
 
 @app.task
 def calc_broker_commission(product_id):
@@ -470,7 +469,7 @@ def check_unavailable_3_days():
             }
         }
     # 功能推送id: 1
-    PHPSendSMS().send_sms(rule_id=1, data_messages=data_messages)
+    PHPSendSMS().send_sms(rule_id=1, data_messages=data_messages, timeout=20)
 
 
 @app.task
@@ -502,7 +501,7 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
         i += 1
 
     # 功能推送id: 2
-    PHPSendSMS().send_sms(rule_id=2, data_messages=data_messages)
+    PHPSendSMS().send_sms(rule_id=2, data_messages=data_messages, timeout=20)
 
     # phones_list = []
     # for user in users:

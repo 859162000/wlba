@@ -59,7 +59,13 @@ class QrCodeAdmin(admin.ModelAdmin):
 
 
 class SubscribeServiceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'key', 'describe', 'type', 'num_limit', 'channel', 'is_open')
+    list_display = ('id', 'key', 'describe', 'type', 'num_limit', 'finance_type', 'channel', 'is_open')
+
+class SeriesActionActivityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'code', 'description', 'action_type', 'days', 'start_at', 'end_at', 'is_stopped')
+
+class SeriesActionActivityRuleAdmin(admin.ModelAdmin):
+    list_display = ('id','rule_name', 'rule_description', 'gift_type', 'redpack', 'reward', 'is_used')
 
 class SeriesActionActivityAdmin(admin.ModelAdmin):
     list_display = ('id', 'code', 'description', 'action_type', 'days', 'start_at', 'end_at', 'is_stopped')

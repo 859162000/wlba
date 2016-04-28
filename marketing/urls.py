@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
-                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi
+                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
+                            MaiMaiView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -88,6 +89,7 @@ urlpatterns = patterns(
     url(r'^open_house/$', TemplateView.as_view(template_name="open_house.jade")),
     # url(r'^spring_mobilization/$', TemplateView.as_view(template_name="spring_mobilization.jade")),
     url(r'^wangli_vip/$', TemplateView.as_view(template_name="wangli_vip.jade")),
+    url(r'^april_mobilization/$', TemplateView.as_view(template_name="april_mobilization.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
@@ -154,7 +156,9 @@ urlpatterns += patterns(
     url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
     url(r'^app_halloween/$', TemplateView.as_view(template_name="app_halloween.jade")),
 
-    url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade"), name='maimai_index'),
+
+    url(r'^maimai_index/$', MaiMaiView.as_view(), name="maimai_index"),
+    #url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade"), name='maimai_index'),
     url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
     url(r'^maimai_success/$', TemplateView.as_view(template_name="app_maimaiSuccess.jade")),
     url(r'^wechat_reward/$', TemplateView.as_view(template_name="app_wechatReward.jade")),
@@ -199,6 +203,7 @@ urlpatterns += patterns(
     url(r'^app_xunleithree/$', TemplateView.as_view(template_name="app_xunleithree.jade")),
     url(r'^app_xunleizhuce/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunleizhuce.jade")),
     url(r'^h5_recruit/$', TemplateView.as_view(template_name="h5_recruit.jade")),
+    url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),

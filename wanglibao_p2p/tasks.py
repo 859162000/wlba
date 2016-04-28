@@ -24,15 +24,39 @@ import time, datetime
 
 logger = get_task_logger(__name__)
 
+
 @app.task
 def p2p_watchdog():
     P2POperator().watchdog()
 
 
 @app.task
+def p2p_prepayment(product_id, penal_interest, repayment_type, flag_date):
+    """
+    提前还款任务
+    :param product_id, 产品id
+    :param penal_interest, 罚息
+    :param repayment_type, 类型 daily, monthly
+    :param flag_date, 还款日期
+    """
+    from prepayment import PrepaymentHistory
+    from dateutil import parser
+
+    flag_date = parser.parse(flag_date)
+
+    p2p = P2PProduct.objects.filter(pk=product_id).first()
+    if p2p:
+        payment = PrepaymentHistory(p2p, flag_date)
+        payment.prepayment(penal_interest, repayment_type, flag_date)
+    else:
+        return
+
+
+@app.task
 def delete_old_product_amortization(pa_list):
     time.sleep(10)
     ProductAmortization.objects.filter(id__in=pa_list).delete()
+
 
 @app.task
 def process_paid_product(product_id):
@@ -43,6 +67,7 @@ def process_paid_product(product_id):
     except:
         print('p2p process_for_settle error: ' + str(p2p))
         logger.error('p2p process_for_settle error: ' + str(p2p))
+
 
 @app.task
 def full_send_message(product_name):
@@ -66,6 +91,7 @@ def full_send_message(product_name):
         "content":msg,
         "mtype":"fullbid"
     })
+
 
 @app.task
 def build_earning(product_id):
@@ -174,6 +200,7 @@ def p2p_auto_published_by_publish_time(pay_method, period):
     if products:
         products.publish_time = timezone.now()
         products.save()
+
 
 @app.task
 def p2p_auto_ready_for_settle():

@@ -28,7 +28,7 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, RepaymentAPIView
 from wanglibao_pay.third_pay import  TheOneCardAPIView
-from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
+from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView,
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
                             BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
@@ -49,7 +49,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
                             InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, CoopPvApi, ActivityUserInfoUploadApi)
+                            BidHasBindingForChannel, CoopPvApi, ActivityUserInfoUploadApi, GeetestAPIView)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -60,10 +60,10 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView,
                              GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
-from marketing.views import UserActivityStatusAPIView
+from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView)
+from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI)
+                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, AprilAwardApi)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -151,6 +151,7 @@ urlpatterns = patterns(
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^has_validate/', HasValidationAPIView.as_view()),
+    # url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),
@@ -283,7 +284,10 @@ urlpatterns += patterns(
     url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
     url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
     url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
-    url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view())
+    url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view()),
+    url(r'^april_reward/fetch/$', AprilAwardApi.as_view()),  #四月活动
+    url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
+    url(r'^geetest/$', GeetestAPIView.as_view()),
 )
 
 # app端改版新接口
@@ -304,6 +308,7 @@ urlpatterns += patterns(
     '',
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
+
 
 # 理财金接口
 urlpatterns += patterns(

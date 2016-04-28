@@ -65,8 +65,9 @@ import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
 import urllib
+from wanglibao_geetest.geetest import GeetestLib
 from wanglibao_profile.forms import ActivityUserInfoForm
-
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -112,10 +113,15 @@ class SendValidationCodeView(APIView):
             descrpition: if...else(line98~line101)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -124,6 +130,22 @@ class SendValidationCodeView(APIView):
         return Response({
                             'message': message
                         }, status=status)
+
+
+    def validate_captcha(self, request):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        #status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
 
 
 class TestSendRegisterValidationCodeView(APIView):
@@ -163,6 +185,7 @@ class SendRegisterValidationCodeView(APIView):
             descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
         """
         phone_number = phone.strip()
+        _type = request.POST.get('type', None)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
             return Response({"message": u"该手机号已经被注册，不能重复注册", 
@@ -172,7 +195,10 @@ class SendRegisterValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            if _type == 'geetest' and not self.validate_captcha(request):
+                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            else:
+                res, message = verify_captcha(request.POST)
 
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
@@ -181,6 +207,23 @@ class SendRegisterValidationCodeView(APIView):
         # 仅在用户注册时使用
         status, message = send_validation_code(phone_number, ip=get_client_ip(request), ext='777')
         return Response({'message': message, "type": "validation"}, status=status)
+
+    def validate_captcha(self, request):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+        gt = GeetestLib(self.id, self.key)
+        challenge = request.POST.get(gt.FN_CHALLENGE, '')
+        validate = request.POST.get(gt.FN_VALIDATE, '')
+        seccode = request.POST.get(gt.FN_SECCODE, '')
+        status = request.session[gt.GT_STATUS_SESSION_KEY]
+
+        if status:
+            result = gt.success_validate(challenge, validate, seccode)
+        else:
+            result = gt.failback_validate(challenge, validate, seccode)
+        return  True if result else False
+
+
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
@@ -884,6 +927,7 @@ class UserHasLoginAPI(APIView):
         else:
             return Response({"login": True})
 
+
 class HasValidationAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -909,6 +953,17 @@ class HasValidationAPIView(APIView):
                 "id_number": "%s************%s" % (profile.id_number[:3], profile.id_number[-3:]),
                 "id_valid_time": profile.id_valid_time if not profile.id_valid_time else redpack_backends.local_transform_str(profile.id_valid_time)
             })
+        else:
+            return Response({"ret_code": 1, "message": u"您没有认证通过"})
+
+class HasValidationAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        profile = WanglibaoUserProfile.objects.filter(user=user).first()
+        if profile.id_is_valid:
+            return Response({"ret_code": 0, "message": u"您已认证通过"})
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
@@ -1190,13 +1245,18 @@ class StatisticsInside(APIView):
         today_utc = local_to_utc(today, 'now')
         start_withdraw = today_start + timedelta(hours=16)
         # 当日16点前查询以昨日16点作为起始时间
-        if today_utc < start_withdraw :
+        if today_utc < start_withdraw:
             start_withdraw = yesterday_start + timedelta(hours=16)
         stop_withdraw = today_utc
         yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
             .filter(catalog='取款预冻结').aggregate(Sum('amount'))
         yesterday_withdraw = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
-
+        
+        # 今日充值总额
+        today_deposit = MarginRecord.objects.filter(create_time__gte=today_start) \
+            .filter(catalog='现金存入').aggregate(Sum('amount'))
+        today_deposit_amount = today_deposit['amount__sum'] if today_deposit['amount__sum'] else Decimal('0')
+        
         # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
@@ -1224,6 +1284,12 @@ class StatisticsInside(APIView):
         yesterday_repayment_total = (yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else 0) \
                 + (yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else 0)
 
+        # 今日申请提现,0点到当前
+        today_withdraw = MarginRecord.objects.filter(create_time__gte=today_start, catalog='取款预冻结')\
+            .aggregate(Sum('amount'))
+        # 实际
+        today_withdraw_amount = today_withdraw['amount__sum'] if today_withdraw['amount__sum'] else 0
+
         # 昨日首投用户
         from django.db import connection
         cursor = connection.cursor()
@@ -1245,7 +1311,9 @@ class StatisticsInside(APIView):
             'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
             'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
-            'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
+            'yesterday_withdraw': yesterday_withdraw,  # 每日累计申请提现
+            'today_deposit_amount': today_deposit_amount,  # 今日冲值总额
+            'today_withdraw_amount': today_withdraw_amount,  # 今日提现申请(0点到当前)
         }
 
         data.update(get_public_statistics())
@@ -1705,7 +1773,6 @@ class CoopPvApi(APIView):
                     'ext2': ext2,
                 }
                 data = urllib.urlencode(data)
-
                 try:
                     res = requests.get(url=coop_pv_url, params=data)
                     res_status_code = res.status_code
@@ -1733,6 +1800,50 @@ class CoopPvApi(APIView):
 
             logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
             return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class GeetestAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
+
+    def post(self, request):
+        self.type = request.POST.get('type', None)
+        import time
+        if self.type == 'get':
+            return self.get_captcha(request)
+        if self.type == 'validate':
+            return self.validate_captcha(request)
+
+    def get_captcha(self, request):
+        user_id = random.randint(1,100)
+        gt = GeetestLib(self.id, self.key)
+        status = gt.pre_process()
+        request.session[gt.GT_STATUS_SESSION_KEY] = status
+        request.session["user_id"] = user_id
+        response_str = gt.get_response_str()
+        return HttpResponse(response_str)
+
+    def validate_captcha(self, request):
+        resp = {"result":'error'}
+        if request.method == "POST":
+            gt = GeetestLib(self.id, self.key)
+            challenge = request.POST.get(gt.FN_CHALLENGE, '')
+            validate = request.POST.get(gt.FN_VALIDATE, '')
+            seccode = request.POST.get(gt.FN_SECCODE, '')
+            status = request.session[gt.GT_STATUS_SESSION_KEY]
+            user_id = request.session["user_id"]
+            if status:
+                result = gt.success_validate(challenge, validate, seccode)
+            else:
+                result = gt.failback_validate(challenge, validate, seccode)
+            result = "success" if result else "fail"
+            resp = {"result":result}
+            print 'result:', result
+            return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
+        return HttpResponse(json.dumps(resp), status=200, content_type='application/json')
 
 
 class ActivityUserInfoUploadApi(APIView):

@@ -701,7 +701,7 @@ class WarrantCompanyAdmin(admin.ModelAdmin):
 
 class ProductTypeAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('name', 'description', 'priority')
+    list_display = ('name', 'description', 'priority', 'fiance_type')
 
     def has_delete_permission(self, request, obj=None):
         return False

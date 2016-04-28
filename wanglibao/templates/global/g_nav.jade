@@ -13,7 +13,7 @@
         .samll-wechat-hover
           .wechat-hover-body
             .wechat-hover-san
-            img(src='/static/imgs/pc/nav/wechat_server.jpg')
+            img(src='/static/imgs/pc/nav/qcode_gwsb.jpg')
             .wechat-hover-dec 关注网利宝微信
 
       a(href='/generalize').samll-nav-app.samll-nav-animate
@@ -26,6 +26,11 @@
             .wechat-hover-dec 下载网利宝APP
 
     .g-samll-end
+      //if user.is_authenticated
+      //  if user.wanglibaouserprofile.utype == '3'
+      //    a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
+      //else
+      //  a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
       a(href='http://lianmeng.wanglibao.com/', target='_blank')#investment.samll-nav-guide 网利联盟
       a(href='/data_cube/',target="_blank").samll-nav-guide 平台数据
       a(href='/pc_guide/').samll-nav-guide 新手指引
@@ -43,8 +48,8 @@
 .g-nav-warp
   .g-nav.g-year-layout
     a(href="/").g-logo-box
-      img(src="/static/imgs/pc/logo/logo_80.jpg?v=2", alt='网利宝', class='logo_l')
-      img(src="/static/imgs/pc/logo/logo_60.jpg?v=2", alt='网利宝', class='logo_s')
+      img(src="/static/imgs/pc/logo/logo_4_23_79.jpg?v=423", alt='网利宝', class='logo_l')
+      img(src="/static/imgs/pc/logo/logo_4_23_59.jpg?v=423", alt='网利宝', class='logo_s')
     .g-user-warp
       .g-user
         if activeItem == "我的账户"
@@ -56,7 +61,7 @@
             i.user-icon-img
           span.user-text 我的账户
           i.icon.iconfont.icon-down
-        ul.g-nav-user-nav.user-nav-hover#minNavs
+        ul.g-nav-user-nav#minNavs
           mixin liItem(url, text)
             li
               a(href=url)=text

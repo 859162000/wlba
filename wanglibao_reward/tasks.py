@@ -33,6 +33,7 @@ def updateRedisTopRank():
     except Exception,e:
         logger.error("====updateRedisTopRank======="+e.message)
 
+
 @app.task
 def sendYesterdayTopRankAward():
     rank_activity = Activity.objects.filter(code='march_awards').first()

@@ -261,12 +261,18 @@ class SecurityView(TemplateView):
 
 
 def page_not_found(request):
-    template = loader.get_template('html/404.html')
+    #老的404页面
+    #template = loader.get_template('html/404.html')
+    #新的404页面
+    template = loader.get_template('html/wanglibao_404.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=404)
 
 
 def server_error(request):
-    template = loader.get_template('html/500.html')
+    #老的500页面
+    #template = loader.get_template('html/500.html')
+    #新的500页面
+    template = loader.get_template('html/wanglibao_maintain.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=500)
 
 

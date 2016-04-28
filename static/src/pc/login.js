@@ -353,10 +353,14 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                     remember_me: remember_me
                 }
             }).done(function (xhr) {
-
+                //var o = {name: "counts", value: 0},
+                //str = JSON.stringify(o);
+                //$.cookie("counts", str, { path: '/'});
+                //xhr.ret_code == '7001' ? fastTestOne('login') : null ;
                 if(xhr.ret_code == '7001'){
                     if($('#check-tag').val() == '') {
                         fastTestOne('login')
+                        //statusV = 0;
                     }
                     if (xhr.message != undefined) {
                         $('#loginForm').find('.loginError').show().text(xhr.message);
@@ -367,7 +371,17 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                 }
                 $('.gt_refresh_tips').click();$('#loginPwd').val('').focus();statusV = 0;
             }).fail(function (xhr) {
-
+                //var str1 = $.cookie("counts");
+                //if (($.cookie("counts") != null) && ($.cookie("counts") != 'null')) {
+                //    var o1 = JSON.parse(str1),
+                //        clickCount = o1.value + 1,
+                //        o = {name: "counts", value: clickCount},
+                //        str = JSON.stringify(o);
+                //    $.cookie("counts", str, { path: '/'});
+                //    if (clickCount == 2) {
+                //        fastTestOne('login');
+                //    }
+                //}
                 var result = JSON.parse(xhr.responseText);
                 if (result.message.__all__ != undefined) {
                     $('#loginForm').find('.loginError').show().text(result.message.__all__[0]);

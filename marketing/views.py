@@ -1,5 +1,8 @@
 # encoding:utf-8
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
+from experience_gold.backends import SendExperienceGold
+from experience_gold.models import ExperienceEvent
+from wanglibao_reward.models import WanglibaoRewardJoinRecord
 import base64
 import hashlib
 import os
@@ -85,6 +88,7 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
 from wanglibao_rest.utils import get_client_ip
+from marketing.utils import get_channel_record
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2688,6 +2692,82 @@ class RockFinanceQRCodeView(TemplateView):
             logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.request.user))
             return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
 
+class HappyMonkeyAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        self.token = 'happy_monkey'
+        rewards = {
+            (0, 20): u'幸福猴66元体验金',
+            (21, 40): u'幸福猴166元体验金',
+            (41, 60): u'幸福猴566元体验金',
+            (61, 100000000): u'幸福猴866元体验金'
+        }
+        phone = request.POST.get('phone', None)
+        user = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        # 是否是登录用户
+        if not request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        today = (datetime.now()+timedelta(hours=-8)).strftime("%Y-%m-%d")
+        user = user.user if user else request.user
+
+        #今天用户没有玩过
+        with transaction.atomic():
+            logger.debug('enter transaction atomic')
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.token).first()
+            if not join_record:
+                try:
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code=self.token,
+                        remain_chance=1)
+                except Exception:
+                    to_json_response = {
+                        'ret_code': 1001,
+                        'message': u'每一个用户,一天只能玩一次',
+                    }
+                    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            #今天用户已经玩过了
+            reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
+            if reward and today == str(reward.create_at)[:10]:
+                to_json_response = {
+                    'ret_code': 1001,
+                    'message': u'每一个用户,一天只能玩一次',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            total = int(request.POST.get('total', None))
+            exp_name = ''
+            for key, value in rewards.items():
+                if total>=key[0] and total<=key[1]:
+                    exp_name = value
+
+            exp_gold=ExperienceEvent.objects.filter(name=exp_name).first()
+            reward = ActivityReward.objects.create(
+                user=user,
+                experience=exp_gold,
+                channel=self.token,
+                create_at=today,
+                left_times=0,
+                join_times=1,)
+
+            SendExperienceGold(user).send(reward.experience.id)
+            join_record.remain_chance = 0
+            join_record.save()
+
+            to_json_response = {
+                'ret_code': 0,
+                'type':exp_name,
+                'message': u'用户已经获得%s体验金' % reward.experience.amount,
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
 
 class RockFinanceForOldUserAPIView(APIView):
     permission_classes = ()
@@ -3122,3 +3202,25 @@ class CustomerAccount2015ApiView(APIView):
 
         resp = {"error_code":error_code, "error_message":error_message, "account":account_dict}
         return HttpResponse(json.dumps(resp, sort_keys=True), content_type='application/json')
+
+
+class MaiMaiView(TemplateView):
+    template_name = 'app_maimaiIndex.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = ''
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
+        return {
+            'token': token,
+            'channel': channel
+        }

@@ -114,7 +114,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         type: 'post'
       }
       .done (xhr)->
-        if xhr.ret_code == 0 || xhr.ret_code == 22000
+        if xhr.ret_code == 0 || xhr.ret_code == 2200
           location.reload()
         else
          tool.modalAlert({title: '温馨提示', msg: xhr.message})
@@ -248,44 +248,17 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       $form.find('img.captcha').attr('src', json.image_url)
 
   $('#add-card-button').click (e)->
-
-    if $('#id-is-valid').attr('data-type') == 'qiye'
-      if $('#id-is-valid').val() == 'False'
-        $.ajax {
-          url: '/qiye/profile/exists/'
-          data: {
-          }
-          type: 'GET'
-        }
-        .done (data)->
-          if data.ret_code == 10000
-            $.ajax {
-              url: '/qiye/profile/get/'
-              data: {
-              }
-              type: 'GET'
-            }
-            .done (data)->
-              if data.data.status != '审核通过'
-                $('.verifyHref').attr('href','/qiye/profile/edit/')
-        .fail (data)->
-          $('.verifyHref').attr('href','/qiye/info/')
-
-        $('#id-validate').modal()
-        return
-
-    else
-      if $('#id-is-valid').val() == 'False'
-        $('#id-validate').modal()
-        $.ajax
-          url: "/api/profile/"
-          type: "GET"
-          data: {}
-        .success (data) ->
-          if data.is_mainland_user == false
-            $('#goPersonalInfo').attr('data-type':'special')
-            $('#goPersonalInfo').text('绑定银行卡')
-        return
+    if $('#id-is-valid').val() == 'False'
+      $('#id-validate').modal()
+      $.ajax
+        url: "/api/profile/"
+        type: "GET"
+        data: {}
+      .success (data) ->
+        if data.is_mainland_user == false
+          $('#goPersonalInfo').attr('data-type':'special')
+          $('#goPersonalInfo').text('绑定银行卡')
+      return
 
     e.preventDefault()
     $('.banks-list,.bankManage').hide()

@@ -7,7 +7,7 @@ html
     - with '网利宝官网' as title
     include global/g_head
     - endwith
-    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
+    script(src="https://static.geetest.com/static/tools/gt.js")
   body
     include global/g_nav
     .i-mod-wrap.login-box-bg
@@ -24,14 +24,14 @@ html
                         dl
                             dt.login-icon2
                             dd
-                                p 银行
-                                p 全程资金监管
+                                p IT数据风控系统
+                                p 第三方权威征信
                         dl.w175
                             dt.login-icon3
                             dd
                                 p IDG资本
                                 p A股上市公司
-                        dl
+                        //dl
                             dt.login-icon4
                             dd
                                 p 第三方
@@ -51,11 +51,12 @@ html
                         li
                             i.icon.iconfont.icon-key
                             input#loginPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
-                        li.baoxian
-                            em.bao-icon
-                            span 账户资金安全由阳光保险承保
+                        li.loginError.loginErrorNew(style='display:none')
+                        li.captcha-box(style="display:none")
+                            #captcha-box
+                            input(type="hidden")#captcha-status
+                            input(type="hidden")#check-tag
                         li.login-submit
-                            .loginError
                             if user.is_authenticated and user.wanglibaouserprofile.frozen
                                 .submitFormStyle.disabled(style="background-color:#999999") 账户已冻结
                             else
@@ -65,6 +66,9 @@ html
                                 input#remember_me.checkboxStyle(type="checkbox", name="remember_me" )
                                 | 一周内自动登录
                             a(href='/accounts/password/reset/identifier/').findPwd 忘记密码？
+                        li.baoxian
+                            em.bao-icon
+                            span 账户资金安全由阳光保险承保
     include global/g_footer
     script.
-      require(["/static/src/pc/login.js?v=20160329"])
+      require(["/static/src/pc/login.js?v=20160426"])
