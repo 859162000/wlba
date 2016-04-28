@@ -3135,6 +3135,7 @@ org.redpacket = (function(org){
         shareOk: function(){
             var url = $("input.share_url").val(),
                 price = $(".js-reward-price").text();
+            alert(url);
             var num = price.substring(0,price.length-1)*1;
             var pnum = num ? num : "X";
             var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ pnum +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
@@ -3682,6 +3683,7 @@ org.awardEvent = (function(org){ //微信抽奖
             url: '/api/weixin/distribute/redpack/',
             dataType: 'json',
             data: {"action": obj,"openid": $("#openid").val()},
+            //data: {"action": obj,"openid": "oILFQt3q9C-SqnZRlUTYvhgQUHYE"},
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
