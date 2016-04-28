@@ -277,7 +277,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = 'https://www.wanglibao.com/',
 			shareName = '从容出行 尊贵定制',
 			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
-			shareLink = host + 'weixin_activity/app_airport_operation/',
+			shareLink = host + 'activity/app_airport_operation/',
 			shareMainTit = '从容出行 尊贵定制',
 			shareBody = '网利宝携手空港易行狂撒出行卡';
 		//分享给微信好友
