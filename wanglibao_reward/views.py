@@ -942,7 +942,7 @@ class KongGangAPIView(APIView):
 
         if p2p_amount >= 15000:
             with transaction.atomic():
-                reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
+                reward = Reward.objects.select_for_update().filter(type='贵宾全套出港服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
                     reward.save()
