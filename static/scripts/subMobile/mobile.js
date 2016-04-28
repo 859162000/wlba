@@ -884,6 +884,7 @@ org.detail = (function (org) {
                 }
             });
             wx.ready(function(){
+                alert("wx.raddy");
                 var host = 'https://www.wanglibao.com',
                     shareImg,//图片
                     shareLink,//连接地址
