@@ -375,6 +375,7 @@ class Reward(models.Model):
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'奖品'
+        index_together = (("type", "is_used"),)
 
     def __unicode__(self):
         return u'<%s>' % self.type

@@ -2,11 +2,11 @@ $(function(){
     var mySwiper = new Swiper ('#swiper-container', {
       direction: 'vertical',
       loop: false,
-      onSlideChangeStart:function(){
+      onSlideChangeStart:function(swiper){
         if(mySwiper.activeIndex == 3){
-             $('#next-box').hide()
-         }else{
-            $('#next-box').show()
+            $('#next-box').hide();
+        }else{
+            $('#next-box').show();
         }
       }
     });
@@ -17,6 +17,28 @@ $(function(){
             $("#swiper-container .swiper-wrapper,#next-box").show();
         }, 1000);
     };
+
+    //音乐
+    var audioBox = document.getElementById("js-audio"),
+        audioDom = audioBox.getElementsByTagName("audio")[0];
+    $(audioBox).on("touchstart", function(){
+        var $t = $(this);
+        console.log(audioDom.paused);
+        if(audioDom.paused){
+            audioDom.play();
+            $t.removeClass("audio-close");
+        }else{
+            audioDom.pause();
+            $t.addClass("audio-close");
+        }
+    });
+
+    $("div.swiper-container").one("touchstart",function(){
+        alert("body");
+        if(audioDom.paused){
+            audioDom.play();
+        }
+    });
 
     //弹层
     $("div.js-close").on("touchstart", function(){
@@ -108,22 +130,6 @@ $(function(){
             });
         });
     }
-    s
-    //音乐
-    var audioBox = document.getElementById("js-audio"),
-        audioDom = audioBox.getElementsByTagName("audio")[0];
-    $(audioBox).on("touchstart", function(){
-        var $t = $(this);
-        console.log(audioDom.paused);
-        if(audioDom.paused){
-            audioDom.play();
-            $t.removeClass("audio-close");
-        }else{
-            audioDom.pause();
-            $t.addClass("audio-close");
-        }
-    });
-
 
     wlb.ready({
         app: function(mixins){
