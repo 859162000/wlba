@@ -326,10 +326,6 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
         #raise Exception(u"活动还未开始,请耐心等待")
             return
 
-    # 判断是否首次投资
-    if not (p2p_record and p2p_record.order_id == int(order_id)):
-        return
-
     #判断有没有奖品剩余
     with transaction.atomic:
         reward = Reward.objects.select_for_update().filter(type='影像投资节优惠码', is_used=False).first()
@@ -341,11 +337,11 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
             
     try:
         with transaction.atomic():
-            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
             if not join_record:
                 join_record = WanglibaoRewardJoinRecord.objects.create(
                     user=user,
-                    activity_code=self.c_code,
+                    activity_code='sy',
                     remain_chance=0,
                 )
 
