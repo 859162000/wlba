@@ -3151,7 +3151,8 @@ org.redpacket_bind = (function(org){
                     },
                     success: function (data) {
                         if(data.re_code != 0){
-                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                            alert(data.re_code);
+                            window.location.href = "/weixin/jump_page/?message="+data.errmessage;
                         }else{
                             window.location.href = $("input.next-url").val();
                         }

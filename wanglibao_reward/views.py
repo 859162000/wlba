@@ -941,16 +941,16 @@ class KongGangAPIView(APIView):
 
         reward = None
 
-        if p2p_amount >= 20000:
-            with transaction.atomic:
+        if p2p_amount >= 15000:
+            with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
                     reward.save()
                     return reward
 
-        if p2p_amount >= 15000:
-            with transaction.atomic:
+        if p2p_amount >= 10000:
+            with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
@@ -960,7 +960,7 @@ class KongGangAPIView(APIView):
         return 'invalid'
 
     @method_decorator(transaction.atomic)
-    def distribute(user, start_time, end_time):
+    def distribute(self, user, start_time, end_time):
         join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='kgyx').first()
         if not join_record:
             join_record = WanglibaoRewardJoinRecord.objects.create(
@@ -982,7 +982,7 @@ class KongGangAPIView(APIView):
                 #TODO:转换为UTC时间后跟表记录时间对比
                 utc_start_time = (utils.str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
                 utc_end_time = (utils.str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
-                p2precord = P2PRecord.objects.filter(user=user, create_time__gte=utc_start_time, create_time__lt=utc_end_time).first()
+                p2precord = P2PRecord.objects.filter(amount__gte=10000, user=user, create_time__gte=utc_start_time, create_time__lt=utc_end_time).first()
                 if p2precord:
                     WanglibaoActivityReward.objects.create(
                         activity='kgyx',
@@ -1040,6 +1040,7 @@ class KongGangAPIView(APIView):
         except Exception, ex:
             message = u'系统忙，请稍后重试'
             logger.debug('Exception in distribute: %s' % ex)
+        logger.debug('message:%s' % (message, ))
         if message != '':
             json_to_response = {
                 'ret_code': 1001,
@@ -1049,6 +1050,7 @@ class KongGangAPIView(APIView):
 
 
         reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='kgyx').first()
+        logger.debug("reward:%s" % (reward,))
         if reward == None:
             json_to_response = {
                 'ret_code': 1002,
@@ -1063,8 +1065,9 @@ class KongGangAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        sent_reward = self.decide_which_reward_distribute(reward.amount)
+        sent_reward = self.decide_which_reward_distribute(reward.p2p_amount)
 
+        logger.debug('send_reward:%s' % sent_reward)
         if sent_reward == 'invalid':
             json_to_response = {
                 'ret_code': 1002,

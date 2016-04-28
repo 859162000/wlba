@@ -215,7 +215,7 @@ def withdraw(request):
             return {"ret_code": 20073, "message": u'银行卡号有多张重复,请联系客服'}
 
         # 检测银行卡在以前的提现记录中是否为同一个用户
-        payinfo_record = PayInfo.objects.filter(card_no=card.no).order_by('-create_time').first()
+        payinfo_record = PayInfo.objects.filter(card_no=card.no, type='W').order_by('-create_time').first()
         if payinfo_record:
             if payinfo_record.user != user:
                 return {"ret_code": 20074, "message": u'银行卡号与身份信息不符,请联系客服'}
@@ -509,7 +509,9 @@ def bind_pay_deposit(request):
         if stop_no_sms_channel and stop_no_sms_channel.value == '1' and \
                 len(card_no) == 10 and not request.DATA.get('mode'): 
                     # mode != vcode_for_qpay
-            return {'ret_code': 201183,
+            # Modify by hb on 2016-04-28
+            #return {'ret_code': 201183,
+            return {'ret_code': 201181,
                     'message': u'该银行支付升级，请更新App版本'}
         result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, 
                                         device_type, ip, request, mode=mode)

@@ -97,14 +97,14 @@
     -webkit-transform: translate(0)
   100%
     opacity: 1
-    -webkit-transform: translate(100%)
+    -webkit-transform: translate(120%)
 @keyframes translateR
   0%
     opacity: 1
     transform: translate(0)
   100%
     opacity: 1
-    transform: translate(100%)
+    transform: translate(120%)
 //箭头
 @keyframes topAbtm
   0%,100%
@@ -378,7 +378,6 @@
         font-size: 0.7rem
         +toBig(2.1s, 0.2s)
   .page4
-    min-height: 24rem
     .page-people
       width: 48%
       height: 18rem
@@ -565,15 +564,13 @@
 @media (device-height: 480px) and (-webkit-min-device-pixel-ratio: 2)
   .new-user-gift
     .page4
+      -webkit-box-align: start
+      padding-top: 0.5rem
       .ug-page-box
-        height: 20rem
+        height: 20.5rem
       .page-people
-        height: 13.5rem
-        background-position: top center
-      .page-btn
-        bottom: 2.5rem
-      .page-txt
-        color: #a00
+        height: 14rem
+        background-position-y: top
 
 
 

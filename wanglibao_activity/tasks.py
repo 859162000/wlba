@@ -29,11 +29,11 @@ def check_activity(user_id, trigger_node, device_type, **kwargs):
 
     user = User.objects.filter(pk=user_id).first()
     if user:
-        amount = kwargs['amount'] or 0
-        product_id = kwargs['product_id'] or 0
-        order_id = kwargs['order_id'] or 0
-        is_full = kwargs['is_full'] or False
-        is_first_bind = kwargs['is_first_bind'] or False
+        amount = kwargs.get('amount', 0)
+        product_id = kwargs.get('product_id', 0)
+        order_id = kwargs.get('order_id', 0)
+        is_full = kwargs.get('is_full', False)
+        is_first_bind = kwargs.get('is_first_bind', False)
 
         try:
             check_activity(user, trigger_node, device_type, amount=amount, product_id=product_id, order_id=order_id,

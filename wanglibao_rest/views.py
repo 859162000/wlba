@@ -1538,6 +1538,7 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
     def post(self, request):
         phone = request.DATA.get("phone", None)
         message = request.DATA.get("message", None)
+        msg_type = request.DATA.get('msg_type', None)
         logger.debug("phone:%s, message:%s" % (phone, message))
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
@@ -1548,7 +1549,8 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
 
         send_messages.apply_async(kwargs={
                 "phones": [phone, ],
-                "messages": [message, ]
+                "messages": [message, ],
+                "ext": msg_type,
             })
 
         return Response({"code": 0, "message": u"短信发送成功"})
