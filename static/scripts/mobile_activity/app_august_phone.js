@@ -290,8 +290,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         })
 
 
-
-
+    alert('3');
     wlb.ready({
         app: function(mixins) {
             function connect(data) {
@@ -310,14 +309,15 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
 			mixins.shareData({title: '网利宝影像投资节送福利喽', content: '全民福利 火速领取'});
             mixins.sendUserInfo(function(data) {
-
+                alert(data.ph);
                 if (data.ph == '') {
-
+                    alert('1');
                     $('#button_link').on("click",function(){
                          mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_august_phone/?promo_token=sy'});
                     })
                 } else {
-                    connect(data);
+                    //connect(data);
+                    alert('2');
                     $('#button_link').on("click",function(){
                     org.ajax({
                         type: "post",

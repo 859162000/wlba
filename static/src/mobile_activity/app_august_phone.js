@@ -71,8 +71,7 @@
         })
 
 
-
-
+    alert('3');
     wlb.ready({
         app: function(mixins) {
             function connect(data) {
