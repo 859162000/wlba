@@ -369,7 +369,7 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
         # PHP 发送
         try:
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
-                                     data={'uid': users, 'mtype': mtype, 'title': title, 'content': content}, timeout=0.01)
+                                     data={'uid': users, 'mtype': mtype, 'title': title, 'content': content}, timeout=20)
             return response.json().get('status')
 
         except Exception, e:
