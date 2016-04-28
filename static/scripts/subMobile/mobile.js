@@ -873,9 +873,9 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: wxDebug,
-                        //appId: data.appId,
-                        appId: true,
+                        //debug: wxDebug,
+                        debug: true,
+                        appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
                         signature: data.signature,
@@ -3142,8 +3142,8 @@ org.redpacket = (function(org){
                 num = price.substring(0,price.length-1)*1;
             }
             var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ num +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
-            //org.detail.share(share, true);
-            org.detail.share(share, false);
+            org.detail.share(share, true);
+            //org.detail.share(share, false);
         }
     }
     return {
