@@ -23,8 +23,14 @@ def bind_ok(openid, is_first_bind, new_registed=False):
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
     user = weixin_user.user
     if is_first_bind:
-        from wanglibao_activity.backends import check_activity
-        check_activity(user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
+        from wanglibao_activity.tasks import check_activity
+        check_activity.apply_async(kwargs={
+                "user_id": user.id,
+                "trigger_node": 'first_bind_weixin',
+                "device_type": 'weixin',
+                "is_first_bind": is_first_bind,
+            }, queue='celery02')
+        # check_activity(user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
     else:
         sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                                     "openid":weixin_user.openid,
