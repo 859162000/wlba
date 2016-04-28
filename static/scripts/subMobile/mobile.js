@@ -871,12 +871,11 @@ org.detail = (function (org) {
                 url : lib.weiURL,
                 dataType : 'json',
                 success : function(data) {
-                    org.ui.alert(JSON.stringify(data));
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: wxDebug,
-                        //appId: data.appId,
-                        appId: true,
+                        //debug: wxDebug,
+                        debug: true,
+                        appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
                         signature: data.signature,
@@ -885,7 +884,6 @@ org.detail = (function (org) {
                 }
             });
             wx.ready(function(){
-                org.ui.alert("wx.raddy");
                 var host = 'https://www.wanglibao.com',
                     shareImg,//图片
                     shareLink,//连接地址
@@ -3139,11 +3137,13 @@ org.redpacket = (function(org){
         shareOk: function(){
             var url = $("input.share_url").val(),
                 price = $(".js-reward-price").text();
-            var num = price.substring(0,price.length-1)*1;
-            var pnum = num ? num : "X";
-            var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ pnum +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
-            //org.detail.share(share, true);
-            org.detail.share(share, false);
+            var num = "X";
+            if(price){
+                num = price.substring(0,price.length-1)*1;
+            }
+            var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ num +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
+            org.detail.share(share, true);
+            //org.detail.share(share, false);
         }
     }
     return {
@@ -3281,7 +3281,6 @@ org.redpacket_bind = (function(org){
                     },
                     success: function (data) {
                         if(data.re_code != 0){
-                            alert(data.re_code);
                             window.location.href = "/weixin/jump_page/?message="+data.errmessage;
                         }else{
                             window.location.href = $("input.next-url").val();

@@ -324,10 +324,6 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
     now = p2p_record.create_time.strftime("%Y-%m-%d %H:%M:%S")
     if now < utc_start or now >= utc_end:
         #raise Exception(u"活动还未开始,请耐心等待")
-            return
-
-    # 判断是否首次投资
-    if not (p2p_record and p2p_record.order_id == int(order_id)):
         return
 
     #判断有没有奖品剩余
@@ -341,11 +337,11 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
             
     try:
         with transaction.atomic():
-            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
             if not join_record:
                 join_record = WanglibaoRewardJoinRecord.objects.create(
                     user=user,
-                    activity_code=self.c_code,
+                    activity_code='sy',
                     remain_chance=0,
                 )
 
@@ -371,7 +367,7 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
     else:
         send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
                    u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
-                   u'感谢您的参与！【网利科技】' % (send_reward.content)
+                   u'感谢您的参与！【网利科技】' % (reward.content)
         send_messages.apply_async(kwargs={
             "phones": [user.id, ],
             "message": [send_msg, ],
