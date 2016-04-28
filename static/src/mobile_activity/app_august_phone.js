@@ -72,7 +72,7 @@
 
 
 
-    alert('3');
+    alert('4');
     wlb.ready({
         app: function(mixins) {
             function connect(data) {
@@ -85,7 +85,12 @@
                         ts: data.ts
                     },
                     success: function (data) {
-
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
                     }
                 })
             }
@@ -93,13 +98,13 @@
             mixins.sendUserInfo(function(data) {
                 alert(data.ph);
                 if (data.ph == '') {
-                    alert('1');
+                    alert('5');
                     $('#button_link').on("click",function(){
                          mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_august_phone/?promo_token=sy'});
                     })
                 } else {
-                    //connect(data);
-                    alert('2');
+                    connect(data);
+                    alert('6');
                     $('#button_link').on("click",function(){
                     org.ajax({
                         type: "post",
