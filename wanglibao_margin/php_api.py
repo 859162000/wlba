@@ -498,9 +498,9 @@ class YueLiBaoCancel(APIView):
 
             ret.update(status=1,
                        msg=msg_list)
-            logger.info(u'month_product_id = {}, 流标成功\n'.format(product_id))
+            logger.info(u'tokens = {}, 流标成功\n'.format(tokens))
         except Exception, e:
-            logger.debug(u'month_product_id = {}, 流标失败: {}\n'.format(product_id, e.message))
+            logger.debug(u'tokens = {}, 流标失败: {}\n'.format(tokens, e.message))
             ret.update(status=0,
                        msg=e.message)
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
