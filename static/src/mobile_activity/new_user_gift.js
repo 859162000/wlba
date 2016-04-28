@@ -17,8 +17,8 @@ $(function(){
             $(".page-loading").hide();
             $("#swiper-container .swiper-wrapper,#next-box").show();
         }, 1000);
-        var u = navigator.userAgent;
-        alert(u);
+        //var u = navigator.userAgent;
+        //alert(u);
     };
 
     //音乐
