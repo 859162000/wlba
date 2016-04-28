@@ -324,7 +324,7 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
     now = p2p_record.create_time.strftime("%Y-%m-%d %H:%M:%S")
     if now < utc_start or now >= utc_end:
         #raise Exception(u"活动还未开始,请耐心等待")
-            return
+        return
 
     #判断有没有奖品剩余
     with transaction.atomic:
