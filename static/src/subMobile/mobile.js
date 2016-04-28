@@ -746,10 +746,12 @@ org.detail = (function (org) {
                 url : lib.weiURL,
                 dataType : 'json',
                 success : function(data) {
+                    alert(JSON.stringfy(data));
                     //请求成功，通过config注入配置信息,
                     wx.config({
                         debug: wxDebug,
-                        appId: data.appId,
+                        //appId: data.appId,
+                        appId: true,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
                         signature: data.signature,
@@ -758,6 +760,7 @@ org.detail = (function (org) {
                 }
             });
             wx.ready(function(){
+                alert("wx.raddy");
                 var host = 'https://www.wanglibao.com',
                     shareImg,//图片
                     shareLink,//连接地址

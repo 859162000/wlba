@@ -1208,8 +1208,8 @@ class KongGangRegister(CoopRegister):
         #now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
         #TODO:转换为UTC时间后跟表记录时间对比
         from wanglibao_account import utils
-        utc_start = (utils.str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
-        utc_end = (utils.str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
+        utc_start = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+        utc_end = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
         now = p2p_record.create_time
         if now < utc_start or now >= utc_end:
             #raise Exception(u"活动还未开始,请耐心等待")
