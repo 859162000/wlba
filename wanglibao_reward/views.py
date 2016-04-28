@@ -994,7 +994,7 @@ class KongGangAPIView(APIView):
                         left_times=1,
                         join_times=1)
                 else:
-                    return '活动期间没有投资记录'
+                    return '您不满足领取条件，满额投资后再来领取吧！'
             except Exception:
                 logger.debug('user:%s 空港易行发奖报错' % (user,))
                 return '系统忙，请稍后重试'
