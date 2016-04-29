@@ -250,7 +250,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = 'https://www.wanglibao.com/',
 			shareName = '网利宝影像投资节送福利喽',
 			shareImg = host + '/static/imgs/mobile_activity/app_august_phone/300x300.jpg',
-			shareLink = host + 'activity/app_august_phone/',
+			shareLink = host + '/activity/app_august_phone/',
 			shareMainTit = '网利宝影像投资节送福利喽',
 			shareBody = '全民福利 火速领取';
 		//分享给微信好友
