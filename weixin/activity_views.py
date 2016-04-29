@@ -25,6 +25,7 @@ from experience_gold.backends import SendExperienceGold
 from wanglibao_rest.utils import split_ua
 from marketing.models import Reward
 from wanglibao_activity.backends import _keep_reward_record, _send_message_template
+from wanglibao_activity.models import Activity
 from tasks import sentCustomerMsg
 from wanglibao_invite.utils import getWechatDailyReward
 from wanglibao_invite.models import WechatUserDailyReward
@@ -403,6 +404,16 @@ class FetchWechatHBYReward(APIView):
         openid = self.request.session.get('openid')
         if not openid:
             return Response({"ret_code": -1, "msg": "系统错误"})
+        activity = Activity.objects.filter(code="hby").first()
+        if not activity:
+            return Response({"ret_code": -1, "message":"没有该活动"})
+        if activity.is_stopped:
+            return Response({"ret_code": -1, "message":"活动已经截止"})
+        now = timezone.now()
+        if activity.start_at > now:
+            return Response({"ret_code": -1, "message":"活动还未开始"})
+        if activity.end_at < now:
+            return Response({"ret_code": -1, "message":"活动已经结束"})
         w_user = WeixinUser.objects.filter(openid=openid).first()
         ret_code, msg, amount = getWechatDailyReward(openid)
         is_bind = True if w_user.user else False
