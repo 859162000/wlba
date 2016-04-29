@@ -88,6 +88,7 @@ def list_msg(params, user):
             for message in messages:
                 message.id = data[index]['id']
                 message.read_status = True if data[index]['read_status'] == str(1) else False
+                message.message_text.mtype = data[index]['mtype']
                 message.message_text.title = data[index]['title']
                 message.message_text.content = data[index]['content']
                 message.message_text.created_at = int(data[index]['created_at'])
