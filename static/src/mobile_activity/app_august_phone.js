@@ -28,8 +28,8 @@
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
-			shareName = '网利宝影像投资节送福利喽',
+		var winHost = window.location.href,
+            host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
 			shareImg = host + '/static/imgs/mobile_activity/app_august_phone/300x300.jpg',
 			shareLink = host + '/activity/app_august_phone/?promo_token=sy',
 			shareMainTit = '网利宝影像投资节送福利喽',
