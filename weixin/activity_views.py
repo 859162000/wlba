@@ -563,7 +563,7 @@ class WechatShareTemplate(TemplateView):
                 fetched = False
                 w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, status=False).first()
                 if w_daily_reward:
-                    fetched_date = w_daily_reward.create_date.strftime("%Y-%M-%d")
+                    fetched_date = str(w_daily_reward.create_date).split(" ")[0]
 
         if w_daily_reward and w_daily_reward.reward_type == "redpack":
             redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
