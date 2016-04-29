@@ -55,8 +55,7 @@
 		}
 	});
 	wx.ready(function(){
-		var winHost = window.location.href,
-            host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
+		var host = location.protocol+"//"+location.host,
 			shareName = '从容出行 尊贵定制',
 			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
 			shareLink = host + '/activity/app_airport_operation/?promo_token=sy',
