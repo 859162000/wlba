@@ -90,6 +90,7 @@ class BaseWeChatClient(object):
         res = requests.request(
             method=method,
             url=url,
+            timeout=5,#增加微信请求时间限制
             **kwargs
         )
         try:

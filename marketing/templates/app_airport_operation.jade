@@ -1,0 +1,130 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+    head
+        title 空港易行
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_airport_operation.css?v=2015042503", rel="stylesheet")
+        - csrf_token
+    body
+      audio#audios(autoplay="autoplay", loop="loop", style='width:0;height:0;')
+        source(type="audio/mpeg", src="/static/musics/Real.mp3")
+      .audio#audio
+
+      .container
+        .sec#sec
+          .section.li1
+            .indicate
+              span.indi_left
+              span.indi_right
+            p.inditext
+              span 对于出行，我们有更好的期待
+              span 这一切，从空港易行开始...
+          .section.li2
+            dl.start_top
+              dt
+              dd
+                h3
+                  span 国内快速专用
+                  span 通道安检
+                  p 新用户专享
+            dl.start_center
+              dt
+              dd
+                h3
+                  span 商务贵宾
+                  span 休息室
+            dl.start_bottom
+              dt
+              dd
+                h3
+                  span 贵宾全套
+                  span 出港服务
+            .indicate
+              span.indi_left
+              span.indi_right
+            p.inditext
+              span 对于出行，我们有更好的期待
+              span 这一切，从空港易行开始...
+          .section.li3
+            .three_text
+              span.three_xian1
+              h3 <span>国内快速专用通道安检</span>不排队
+              p 北京、天津、山西、武汉、重庆、呼和浩特、郑州、合肥<span>八城齐上线</span>
+              span.three_xian2
+              ul
+                li <span></span>高效、快捷的国内快速专用通道安检
+                li <span></span>持卡验证通过后，即可享受免费通行
+            .indicate
+              span.indi_left
+              span.indi_right
+            p.inditext
+              span 对于出行，我们有更好的期待
+              span 这一切，从空港易行开始...
+          .section.li4
+            .three_text.four_text
+              span.three_xian1
+              h3 <span>尊贵</span>候机区
+              p <span>恍如在家一般舒适</span>
+              span.three_xian2
+              ul
+                li <span></span>宁静、舒适的休息室环境
+                li <span></span>冷热饮品、精美小吃
+                li <span></span>互联网、最新报刊杂志阅览、电视
+            .indicate
+              span.indi_left
+              span.indi_right
+            p.inditext
+              span 对于出行，我们有更好的期待
+              span 这一切，从空港易行开始...
+          .section.li5
+            .three_text.four_text
+              span.three_xian1
+              h3 <span>嘉宾全套出港服务</span>
+              p <span>在旅途，除了家人，最牵挂您的是我们</span>
+              span.three_xian2
+              ul
+                li <span></span>客人抵达贵宾区
+                li <span></span>专人协助办理值机手续
+                li <span></span>国内快速专用通道安检
+                li <span></span>国内快速专用通道安检商务贵宾休息室/或直接登机
+            .indicate
+              span.indi_left
+              span.indi_right
+            p.inditext
+              span 对于出行，我们有更好的期待
+              span 这一切，从空港易行开始...
+          .section.li6
+            .six_instr
+              span
+              h3 活动规则
+              ul
+                li 1. 活动时间：4月30日00:00分至5月31日23:59分；
+                li 2. 新用户在此页面注册为网利宝用户即得28888元体验金，体验金专享1天10%年化收益；<a id="six_lis">新用户奖励</a>
+                  ul
+                    li ①活动期间新用户注册即送50元红包（满5000元可用，限1月及以上标期，领取之日起7天有效）
+                    li ② 用户首次投资满额送以下红包，红包3月标及以上使用，领取之日15天有效；
+                    li a. 1000元≤首次投资＜5000元，送100元直抵红包（满15000元可直抵使用）
+                    li b. 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
+                    li c. 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
+                li 3. 新用户在此页面注册并单笔首次投资500元及以上即可体验国内快速专用通道安检一次；
+                li 4. 新用户在此页面注册并单笔首次投资5000元及以上或老用户单笔投资10000元及以上即可获得尊贵候机厅体验一次；
+                li 5. 新用户在此页面注册并单笔首次投资10000元及以上或老用户单笔投资15000元即可获得贵宾全套出港服务一次；
+                li 6. 活动期间内， 新用户单笔首投满足领取条件则按照最高奖励自动发放。老用户活动期间内单笔首次满足投资领取条件点击领取按钮按照最高奖励发放，新老用户若最高奖励发放完毕则按照下一级奖励发放；
+                li 7. 满足条件用户请留意网利宝站内信及短信提示，并凭站内信兑换码到指定通道入口处的核销台验证；
+                li 8. 手机号为网利宝唯一帐号，新老用户优惠仅可享受一次并且数量有限，送完即止；
+                li 9. 本活动在法律允许范围内归网利科技所有。
+              span.six_btn 领取奖励
+      .popup_box
+        .main
+            .textairport 您还没有抽奖机会，赶紧去投资吧
+            .popup_button 我知道了
+      script(src="/static/js/lib/jquery.min.js")
+      script(src='/static/src/mobile/lib/weixin/wx.js')
+      script(src="/static/js/lib/fullpage.js")
+      script(src="/static/scripts/component/webview.js?v=20160328")
+      script(src="/static/scripts/mobile_activity/app_airport_operation.js?v=2015042906")
+
+
+
+

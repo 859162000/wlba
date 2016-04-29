@@ -36,6 +36,11 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
         const auto = new Automatic({
             submit: $submit,
             checklist: autolist,
+            done() {
+                if(timeIntervalId){
+                    $validate_operation.attr('disabled', true);
+                }
+            }
         });
         auto.operationClear();
     }
@@ -143,7 +148,7 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                         success(result) {
 
                             if(result.ret_code == 0){
-                                return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(result.amount);
+                                return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(`${result.amount}元`);
                             }
 
                             if(result.ret_code == 30047){
@@ -155,6 +160,9 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                                 return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
                                     window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/'
                                 })
+                            }
+                            if(result.ret_code === 3){
+                                return Alert('单卡超过单笔支付限额 ');
                             }
                             if (result.ret_code > 0) {
                                 return Alert(result.message);
@@ -177,6 +185,12 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
 
                     if(need_validation_for_qpay){
                         //需要短信
+                        if(!order_data){
+                            operation.loadingHide();
+                            operation.destroy();
+                            operation.layoutHide();
+                            return signModel('请获取短信码');
+                        }
                         options.data = {
                             phone: '',
                             vcode: $validate_code.val(),
@@ -317,42 +331,16 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
             data: options.data,
             beforeSend () {
                 options.beforeSend && options.beforeSend()
-                //$submit.attr('disabled', true).text("充值中..");
             },
             success (result) {
-
                 options.success && options.success(result);
-                //trade_operation.loadingHide();
-                //trade_operation.destroy();
-                //trade_operation.layoutHide();
-                //if(result.ret_code == 0){
-                //    return $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(result.amount);
-                //}
-                //
-                //if(result.ret_code == 30047){
-                //    return Deal_ui.show_entry(result.retry_count, function(){
-                //        trade_operation.layoutShow();
-                //    })
-                //}
-                //if(result.ret_code == 30048){
-                //    return Deal_ui.show_lock('取消', '找回密码', '交易密码已被锁定，请3小时后再试',function(){
-                //        window.location = '/weixin/trade-pwd/back/?next=/weixin/recharge/'
-                //    })
-                //}
-                //if (result.ret_code > 0) {
-                //    return Alert(result.message);
-                //}
             },
             error (data) {
                 options.error && options.error(data);
 
-                //if (data.status >= 403) {
-                //    Alert('服务器繁忙，请稍后再试');
-                //}
             },
             complete () {
                 options.complete && options.complete(trade_operation);
-                //$submit.removeAttr('disabled').text("充值");
             }
         })
     }

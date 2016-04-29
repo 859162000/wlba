@@ -6,12 +6,23 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/april_mobilization.css?v=2016041502")
+        link(rel="stylesheet",href="/static/styles/pc_activity/april_mobilization.css?v=2016041505")
         - csrf_token
     body(style="background:#fff")
         include global/g_nav
         .body_wrap.clear
             .banner
+                .text_1 翻开旧时光，每一笔账都是希望，四月，温故而加息，只给那个幸运的你。<br>叮叮叮， 回馈活动如下：
+                .banner_main
+                    dl.dl_1
+                        dt 活动一
+                        dd 千万体验金<br>大放送
+                    dl.dl_2
+                        dt 活动二
+                        dd 春暖花开季<br>温故而加息
+                    dl.dl_3
+                        dt 活动三
+                        dd 满额加息<br>high翻全场
             #main
                 #main_center
                     .title_img.title_img_1 千万投资，送千万体验金
@@ -137,7 +148,7 @@ html.no-js(lang="en-gb")
                         dd 3、第三周（4月30日 0:00-5月6日 23:59），单周交易额突破一亿，活动期间累计三周都有投资用户得到一张2%加息券，参与2周投资用户得到一张1.5%加息券，只有本周参与投资用户得到1%加息券。
 
                     .all_text_1 全站交易额
-                    .all_text_2 16年4月16日零点至今
+                    .all_text_2!='<span id="act_time">16年4月16日</span>零点至今'
                     .num_wrap
                         //.num_1
                         //.num_1
@@ -169,15 +180,15 @@ html.no-js(lang="en-gb")
                                     td.one 第一周（4月16日 - 4月22日）
                                     td.two 突破1亿
                                     td.three 1%
-                                    td.four 待加息
+                                    td.four 已加息
                                 tr
                                     td.one 第二周（4月23日 - 4月29日）
-                                    td.two 突破2亿
+                                    td.two 突破1亿
                                     td.three 1.5%
                                     td.four 待加息
                                 tr
                                     td.one 第三周（4月30日 - 5月6日）
-                                    td.two 突破3亿
+                                    td.two 突破1亿
                                     td.three 2%
                                     td.four 待加息
                     dl.rule.rule_3
@@ -192,7 +203,7 @@ html.no-js(lang="en-gb")
                     .ranking_main_2
                         .list_wrap
                             .list_main
-                                .title_box 第一周用户投资排行榜（每逢半点更新）
+                                .title_box!='<span id="act_week">第一周</span>用户投资排行榜（每逢半点更新）'
                                 table
                                     thead
                                         tr
@@ -228,13 +239,18 @@ html.no-js(lang="en-gb")
                                         //        span.phone 139 XXXX 2453
                                         //    td.two 25,000 元
                                         //    td.three 5张百元加油卡+2张星美电影票
-                                .title_bottom 说明：<br>1、投资额相同的情况下，按照投资时间先后顺序进行排名。<br>2、当周结束后，三个工作日网利宝客服将以电子兑换码的形式将奖品以短信的形式告知用户。
+                                .title_bottom 说明：<br>1、投资额相同的情况下，按照投资时间先后顺序进行排名。<br>2、当周结束后三个工作日内，网利宝客服以短信的形式将电子兑换码（加油卡和电影票）发送给得奖用户。
                         .grass.grass_4
+                        .link_list
+                            .line_left
+                            .line_right
+                            p
+                                a(href='https://www.wanglibao.com/announcement/detail/626/') >第一周奖励发放记录
 
                 .footer_bottom
                     a.button_link.button_link_3(href='/p2p/list/') 投资领奖品
         include global/g_footer
 script.
-    require(['/static/js/april_mobilization.js?v=2016041503'])
+    require(['/static/js/april_mobilization.js?v=2016042502'])
 
                                                                     

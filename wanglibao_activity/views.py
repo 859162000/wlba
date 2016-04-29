@@ -139,10 +139,16 @@ class PcActivityAreaView(TemplateView):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_pc=True,
                                                     start_at__lte=timezone.now(),
-                                                    end_at__gt=timezone.now()
                                                     ).select_related('activity')
 
-        activity_list = get_sorts_for_activity_show(activity_list)
+        activity_now_shows = activity_list.filter(end_at__gt=timezone.now())
+        activity_now_shows = get_sorts_for_activity_show(activity_now_shows)
+
+        activity_overdue_shows = activity_list.filter(end_at__lte=timezone.now())
+        activity_overdue_shows = get_sorts_for_activity_show(activity_overdue_shows)
+
+        activity_list = activity_now_shows + activity_overdue_shows
+
         act_banner_shows = ActivityBannerShow.objects.filter(show_start_at__lte=timezone.now(),
                                                              show_end_at__gt=timezone.now()
                                                              ).select_related('activity_show')
@@ -177,6 +183,7 @@ class PcActivityAreaView(TemplateView):
             'results': activity_list[:limit],
             'all_page': all_page,
             'page': page,
+            'pagesize': limit,
             'list_count': data_count
         }
 
@@ -194,7 +201,6 @@ class ActivityAreaApi(APIView):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_pc=True,
                                                     start_at__lte=timezone.now(),
-                                                    end_at__gt=timezone.now(),
                                                     ).select_related('activity')
 
         category = request.GET.get('category', 'all')
@@ -202,7 +208,13 @@ class ActivityAreaApi(APIView):
         if category and category != 'all':
             activity_list = activity_list.filter(Q(category='all') | Q(category=category))
 
-        activity_list = get_sorts_for_activity_show(activity_list)
+        activity_now_shows = activity_list.filter(end_at__gt=timezone.now())
+        activity_now_shows = get_sorts_for_activity_show(activity_now_shows)
+
+        activity_overdue_shows = activity_list.filter(end_at__lte=timezone.now())
+        activity_overdue_shows = get_sorts_for_activity_show(activity_overdue_shows)
+
+        activity_list = activity_now_shows + activity_overdue_shows
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
@@ -217,6 +229,7 @@ class ActivityAreaApi(APIView):
         return Response({
             'html_data': html_data,
             'page': page,
+            'pagesize': pagesize,
             'all_page': all_page,
             'list_count': data_count
         })

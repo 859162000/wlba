@@ -53,17 +53,42 @@
             type: 'post',
             success: function (data1) {
                 h5_user_static = data1.login;
-                if(h5_user_static){
-                    $('span#zero').hide();
-                    $('span#chance_num').css('display','inline-block');
-                }else{
-                    $('span#chance_num').hide();
-                    $('span#zero').css('display','inline-block');
-
-                }
             }
         })
 
+        $('#show_button').on('click',function(){
+            var ele = $('#show_list');
+
+            if (!ele.hasClass('list_down')){
+                $('#show_list').slideDown('fast');
+                ele.addClass('list_down');
+                $('#show_button').addClass('open');
+            }else{
+                $('#show_list').slideUp('fast');
+                ele.removeClass('list_down');
+                $('#show_button').removeClass('open');
+            }
+        })
+
+        $('#button_link').click(function() {
+            $.ajax({
+                url: '/api/activity/zhaoxiangguan/',
+                type: 'post',
+                success: function (data) {
+                    if(data.ret_code=='1000'){
+                        window.location.href = '/accounts/login/?next=/activity/august_phone/?promo_token=sy'
+                    }else if(data.ret_code=='1'){
+                        $('.popup_box .main .textairport').text(''+data.message+'');
+                        $('.popup_box').show();
+                    }else if(data.ret_code=='0'){
+                        window.location.href = '/p2p/list/?promo_token=sy'
+                    }
+                }
+            })
+        })
+        $('.popup_box .popup_button').click(function(){
+            $('.popup_box').hide();
+        });
 
     })
 

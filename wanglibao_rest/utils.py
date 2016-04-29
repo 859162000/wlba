@@ -16,6 +16,7 @@ from wanglibao_redis.backend import redis_backend
 from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
+from marketing.models import IntroducedBy
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 
@@ -97,11 +98,12 @@ def split_ua(request):
 
 
 def get_client_ip(request):
+    #client_ip = self.request.META['HTTP_X_FORWARDED_FOR'] if self.request.META.get('HTTP_X_FORWARDED_FOR', None) else self.request.META.get('HTTP_X_REAL_IP', None)
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         return x_forwarded_for
     else:
-        ip = request.META.get('REMOTE_ADDR')
+        ip = request.META.get('HTTP_X_REAL_IP')
     return ip
 
 
@@ -149,8 +151,8 @@ def process_for_fuba_landpage(request, channel_code):
             redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
-def generate_oauth2_sign(user_id, client_id, utc_timestamp, key):
-    sign = hashlib.md5(str(user_id) + client_id + str(utc_timestamp) + key).hexdigest()
+def generate_oauth2_sign(user_id, client_id, key):
+    sign = hashlib.md5(str(user_id) + client_id + key).hexdigest()
     return sign
 
 
@@ -237,6 +239,12 @@ def has_binding_for_bid(channel_code, bid):
 
 def get_coop_binding_for_phone(channel_code, phone):
     return Binding.objects.filter(btype=channel_code, user__wanglibaouserprofile__phone=phone).first()
+
+
+def get_introduce_by_for_phone(phone, channel_code):
+    introduce_by = IntroducedBy.objects.filter(user__wanglibaouserprofile__phone=phone,
+                                               channel__code=channel_code).first()
+    return introduce_by
 
 
 def has_register_for_phone(phone):
@@ -350,5 +358,42 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
         'invitation_code': channel_code,
         'ext': '',
     }
+
+    return response_data
+
+
+def process_bajinshe_user_exists(user, introduce_by, phone, sign_is_ok):
+    if sign_is_ok:
+        if introduce_by and user:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号已注册',
+                'invitation_code': 'bajinshe',
+                'user_id': get_uid_for_coop(user.id),
+            }
+        elif not user:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号未注册',
+                'invitation_code': '',
+                'user_id': '',
+            }
+        else:
+            response_data = {
+                'ret_code': 10000,
+                'message': u'该号已注册，非本渠道用户',
+                'invitation_code': 'bajinshe',
+                'user_id': get_uid_for_coop(user.id),
+            }
+    else:
+        response_data = {
+            'ret_code': 10008,
+            'message': u'无效签名',
+            'invitation_code': '',
+            'user_id': '',
+        }
+
+    response_data['ext'] = ''
+    response_data['usn'] = phone
 
     return response_data

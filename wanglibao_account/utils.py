@@ -350,6 +350,18 @@ def str_add_md5(value):
     else:
         return ''
 
+def ext_str_to_utc(time_str):
+    """
+    :param str:  '2015-08-08'
+    :return:     datetime.datetime(2015, 8, 8, 7, 0, tzinfo=<UTC>)
+    """
+    time_zone = settings.TIME_ZONE
+    local = pytz.timezone(time_zone)
+    naive = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
+    local_dt = local.localize(naive, is_dst=None)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    return utc_dt
+
 
 def str_to_utc(time_str):
     """
@@ -843,6 +855,7 @@ def generate_coop_base_data(act):
         'time': utc_timestamp,
         'act': act,
         'channel': channel,
+        'sync_id': float(time.time()),
     }
     return data
 
@@ -861,9 +874,10 @@ def generate_random_password(length):
 
 
 def generate_bisouyi_content(data):
-    data = json.dumps(data)
+    data = unicode(json.dumps(data), 'unicode_escape').encode('utf-8')
+    key = unicode(settings.BISOUYI_AES_KEY, 'unicode_escape').encode('utf-8')
     ase = Aes()
-    encrypt_text = ase.encrypt(settings.BISOUYI_AES_KEY, data)
+    encrypt_text = ase.encrypt(key, data, mode_tag='ECB')
     return encrypt_text
 
 

@@ -79,7 +79,7 @@ require ['jquery', 'knockout', 'underscore', 'lib/backend', 'model/messageTable'
       $("#icon_" + msg_id).removeClass('icon-msg-arrow-down')
       $("#icon_" + msg_id).addClass('icon-msg-arrow-up')
 
-      if read_status == 'False'
+      if read_status == 'False' || read_status == '0'
         backend.readMessage(msg_id_id)
         .done (data)->
           $('#'+msg_id).attr('data-read-status','True')

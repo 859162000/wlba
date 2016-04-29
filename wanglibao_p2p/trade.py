@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 
 from django.db import transaction
 from django.utils import timezone
 from marketing import tools
-#from marketing.models import IntroducedBy, Reward, RewardRecord
+# from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 from django.conf import settings
-#from wanglibao.templatetags.formatters import safe_phone_str
+# from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_reward.views import RewardDistributer
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -22,10 +22,6 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
-import logging
-# from wanglibao_account.utils import CjdaoUtils
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
 import json, datetime
 
@@ -38,6 +34,7 @@ from weixin.tasks import sentTemplate
 
 
 logger = logging.getLogger('wanglibao_account')
+
 
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
@@ -246,28 +243,33 @@ class P2POperator(object):
         Automatic().auto_trade()
 
     @classmethod
-    #@transaction.commit_manually
+    # @transaction.commit_manually
     def preprocess_for_settle(cls, product):
         cls.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
-        if product.status != u'满标已打款':
-            raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
+
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
-            amo_keeper = AmortizationKeeper(product, order_id=order.id)
+            # 重新查询并锁定产品记录
+            product_lock = P2PProduct.objects.select_for_update().get(pk=product.id)
 
+            if product_lock.status != u'满标已打款':
+                raise P2PException(u'产品状态(%s)不是(满标已打款)' % product_lock.status)
+
+            amo_keeper = AmortizationKeeper(product_lock, order_id=order.id)
+
+            # 生成用户还款计划
             amo_keeper.generate_amortization_plan(savepoint=False)
 
             # for equity in product.equities.all():
             #     EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
             # EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
 
-            product = P2PProduct.objects.get(pk=product.id)
-            product.status = u'满标待审核'
-            product.make_loans_time = timezone.now()
-            product.save()
+            product_lock.status = u'满标待审核'
+            product_lock.make_loans_time = timezone.now()
+            product_lock.save()
 
     @classmethod
     def settle(cls, product):

@@ -73,7 +73,7 @@ import { check } from './mixins/from_validation'
         checkOperation()
             .then((result)=> {
                 console.log(result); //check success
-                return login('/weixin/api/login/');
+                return login('/api/bisouyi/login/?promo_token=bisouyi');
             })
             .then((result)=> {
                 console.log('login success');

@@ -8,11 +8,15 @@ import requests
 import logging
 from hashlib import md5
 from datetime import datetime
+from django.conf import settings
 
 logger = logging.getLogger('wanglibao_sms')
 
 # PHP_SMS_HOST = 'http://101.200.149.172/index.php?s=/node_push/send.html'
-PHP_SMS_HOST = 'http://101.200.149.172/api.php?route=/send'
+if settings.ENV == settings.ENV_PRODUCTION:
+    PHP_SMS_HOST = 'http://101.200.149.172/api.php?route=/send'
+else:
+    PHP_SMS_HOST = 'http://192.168.20.245/api.php?route=/send'
 # PHP_SMS_HOST = 'http://haopeiwen.dev.wanglibao.com/wanglibao_push/index.php?s=/node_push/send.html'
 PHP_AUTH_ID = 'admin'
 PHP_AUTH_KEY = '192006250b4c09247ec02edce69f6a2d'
@@ -33,10 +37,11 @@ class PHPSendSMS(SMSBackEnd):
     PHP发短信服务
     """
     @classmethod
-    def send_sms(cls, rule_id, data_messages):
+    def send_sms(cls, rule_id, data_messages, timeout=2):
         """
         :param rule_id: send node id
         :param data_messages: must be dict
+        :param timeout: timeout, default 2 sec
         :return status_code, json data
             {"result":"success","msg":"success","code":0,"total":2,"end":2}
         """
@@ -76,12 +81,13 @@ class PHPSendSMS(SMSBackEnd):
         post_data_json = json.dumps(post_data)
 
         headers = {'content-type': 'application/json'}
-        response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers, timeout=2.0)
+        response = requests.post(PHP_SMS_HOST, post_data_json, headers=headers, timeout=timeout)
 
         status_code = response.status_code
         try:
             res_text = json.loads(response.text)
-        except:
+        except Exception:
+            logger.exception(">>>> php send sms err <<<<")
             res_text = response.text
 
         # 写入日志
@@ -105,15 +111,19 @@ class PHPSendSMS(SMSBackEnd):
                 'user_id': user_id,
                 'user_type': user_type,
                 'params': {
-                    key: str(kwargs[key]) for key in kwargs.keys()
+                    key: str(kwargs[key]) for key in kwargs.keys() if key != 'timeout'
                 }
             }
         }
+
+        # 超时时间
+        timeout = kwargs.get('timeout', 2)
+
         # 功能推送id: rule_id
-        cls.send_sms(rule_id=rule_id, data_messages=data_messages)
+        cls.send_sms(rule_id=rule_id, data_messages=data_messages, timeout=timeout)
 
     @classmethod
-    def send_sms_msg_one(cls, rule_id, user_id, user_type, msg):
+    def send_sms_msg_one(cls, rule_id, user_id, user_type, msg, timeout=2):
         if not rule_id or not user_id or not user_type or not msg:
             logger.info(">>>> 参数不全,发送失败 ")
             return
@@ -129,7 +139,7 @@ class PHPSendSMS(SMSBackEnd):
             }
         }
         # 功能推送id: rule_id
-        cls.send_sms(rule_id=rule_id, data_messages=data_messages)
+        cls.send_sms(rule_id=rule_id, data_messages=data_messages, timeout=timeout)
 
 
 def generate_random_str(count):
@@ -154,7 +164,7 @@ def test():
         },
     }
 
-    PHPSendSMS.send_sms_one(3, '15038038823', 'phone', name='李先生', count=3, amount=123.45)
+    PHPSendSMS.send_sms_one(3, '15038038823', 'phone', timeout=3, name='李先生', count=3, amount=123.45)
 
 
 if __name__ == "__main__":

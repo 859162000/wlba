@@ -1,4 +1,4 @@
-webpackJsonp([15],[
+webpackJsonp([16],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -578,7 +578,7 @@ webpackJsonp([15],[
 	        key: 'createInput',
 	        value: function createInput() {
 	            var HASH = this.hash();
-	            var input_body = '<input type=\'tel\' name=' + HASH + ' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
+	            var input_body = '<input type=\'tel\' name=' + HASH + ' style=\'opacity:0;\' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
 	            this.$layout.append(input_body);
 	            this.$input = $('#' + HASH);
 	        }

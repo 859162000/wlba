@@ -3,6 +3,7 @@ from django.conf import settings
 import urlparse
 from wanglibao_account.cooperation import CoopRegister
 import logging
+from wanglibao_invite.invite_common import ShareInviteRegister
 
 logger = logging.getLogger("marketing")
 
@@ -12,6 +13,10 @@ class PromotionTokenMiddleWare(object):
         if token:
             request.session[settings.PROMO_TOKEN_QUERY_STRING] = token
         CoopRegister(request).all_processors_for_session()
+
+        ShareInviteRegister(request).save_to_session()
+
+
 
 class StatsKeyWordMiddleWare(object):
     def __init__(self):
@@ -79,3 +84,4 @@ class StatsKeyWordMiddleWare(object):
                         request.session['promo_source_website'] = self.statics[website]['website']
             except Exception, reason:
                 logger.debug(u"SEM关键词统计，中间件报异常, reason:%s" % reason)
+

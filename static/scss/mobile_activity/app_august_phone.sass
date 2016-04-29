@@ -167,9 +167,11 @@
       line-height: 0.7rem
   .text_box
     width: 100%
-    padding: 0.45rem 2.5% 0
+    padding: 0 2.5% 0
     position: relative
     display: inline-block
+    height: 0
+    overflow: hidden
     dl
       clear: both
       width: 100%
@@ -197,6 +199,8 @@
         span
           width: 0.6rem
           display: inline-block
+    dl.first_dl
+      padding-top: 0.45rem
     img
       position: absolute
       right: 3%
@@ -327,11 +331,13 @@
   .explain_text_3
     padding: 0.6rem 0
   .explain_text_4
-    padding: 0.6rem 0 1rem
+    padding: 0.6rem 0 0.5rem
     span
       padding-bottom: 0.25rem
       width: 100%
       display: block
+  .explain_text_5
+    font-size: 0.5rem
   .main_footer
     width: 100%
     text-align: center
@@ -347,3 +353,40 @@
       line-height: 0.35rem
       color: #262525
       max-height: 9999rem
+.popup_box
+  position: fixed
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  z-index: 999
+  display: none
+  background: rgba(0,0,0,0.7)
+  .main
+    width: 70%
+    position: absolute
+    left: 50%
+    top: 50%
+    margin: -1.4rem 0 0 -35%
+    float: none
+    background: #fff
+    border-radius: 1rem
+    z-index: 99
+    padding-bottom: 0.25rem
+    .textairport
+      width: 100%
+      text-align: center
+      line-height: 0.6rem
+      font-size: 0.5rem
+      padding: 0.75rem 0 0.5rem
+    .popup_button
+      width: 30%
+      height: 0.75rem
+      line-height: 0.75rem
+      text-align: center
+      margin: 0 auto 0.5rem
+      display: block
+      background: #ed2b4e
+      border-radius: 0.25rem
+      color: #fff
+      font-size: 0.5rem

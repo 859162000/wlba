@@ -1215,6 +1215,7 @@ class KuaiShortPay:
         pay_info.request = ""
         pay_info.status = PayInfo.PROCESSING
         pay_info.account_name = profile.name
+        pay_info.phone_for_card = input_phone
         pay_info.save()
         OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 

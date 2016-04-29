@@ -92,33 +92,38 @@
                 url: '/api/april_reward/fetch/',
                 type: 'post',
                 success: function (json) {
+
+                    $('#act_time').text(json.week_frist_day);
+                    $('#act_week').text(json.week_number);
+
                     substring(json.week_sum_amount);
 
 
                     var rankingList = [];
                     var json_one;
-                    for(var i=1; i<json.weekranks.length; i++){
+                    for(var i=0; i<json.weekranks.length; i++){
                         json_one = json.weekranks[i];
                         if(json_one!=''){
                             var number = fmoney(json_one.amount__sum, 0);
-                            if(i<=3){
-                                if(i==1){
+                            if(i<3){
+                                if(i==0){
                                     rankingList.push(['<tr class="first">'].join(''));
-                                }else if(i==2){
+                                }else if(i==1){
                                     rankingList.push(['<tr class="second">'].join(''));
-                                }else if(i==3){
+                                }else if(i==2){
                                     rankingList.push(['<tr class="third">'].join(''));
                                 }
                                 rankingList.push(['<td class="one"><span class="ico"></span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">'].join(''));
-                                if(i==1){
+                                if(i==0){
                                     rankingList.push(['5张百元加油卡+2张星美电影票</td></tr>'].join(''));
-                                }else if(i==2){
+                                }else if(i==1){
                                     rankingList.push(['3张百元加油卡+2张星美电影票</td></tr>'].join(''));
-                                }else if(i==3){
+                                }else if(i==2){
                                     rankingList.push(['2张百元加油卡+2张星美电影票</td></tr>'].join(''));
                                 }
                             }else{
-                                rankingList.push(['<tr><td class="one"><span class="ico">'+i+'</span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                                var i_num = i+1;
+                                rankingList.push(['<tr><td class="one"><span class="ico">'+i_num+'</span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
                             }
 
                         }else{

@@ -27,7 +27,7 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_redpack.models import RedPackEvent
 from random import randint
 from wanglibao_sms.tasks import send_messages
-from wanglibao_account.utils import create_user
+from wanglibao_account.utils import create_user, generate_bisouyi_content, generate_bisouyi_sign
 from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
@@ -44,9 +44,9 @@ from wanglibao_sms import messages, backends
 from django.utils import timezone
 # from wanglibao_account import message as inside_message
 from misc.models import Misc
-from wanglibao_account.forms import IdVerificationForm, verify_captcha
+from wanglibao_account.forms import IdVerificationForm, verify_captcha, BiSouYiRegisterForm
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid)
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid, get_introduce_by_for_phone)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
@@ -63,13 +63,14 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
-from weixin.util import bindUser
+from weixin.util import bindUser, createInvite
 from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
-from .forms import OauthUserRegisterForm
+from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
-
+from wanglibao_invite.invite_common import ShareInviteRegister
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY, INNER_IP
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -148,9 +149,8 @@ class SendValidationCodeView(APIView):
 
 
     def validate_captcha(self, request):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -225,9 +225,8 @@ class SendRegisterValidationCodeView(APIView):
         return Response({'message': message, "type": "validation"}, status=status)
 
     def validate_captcha(self, request):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
-
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
         gt = GeetestLib(self.id, self.key)
         challenge = request.POST.get(gt.FN_CHALLENGE, '')
         validate = request.POST.get(gt.FN_VALIDATE, '')
@@ -365,6 +364,17 @@ class RegisterAPIView(DecryptParmsAPIView):
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
+        try:
+            openid = request.session.get('openid')
+            register_channel = request.DATA.get('register_channel', '').strip()
+            if register_channel and register_channel == 'fwh' and openid:
+                ShareInviteRegister(request).process_for_register(request.user, openid)
+                w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
+                bindUser(w_user, request.user, new_registed=True)
+                request.session['openid'] = openid
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
@@ -415,15 +425,7 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-        try:
-            register_channel = request.DATA.get('register_channel', '').strip()
-            if register_channel and register_channel == 'fwh':
-                openid = request.session.get('openid')
-                if openid:
-                    w_user = WeixinUser.objects.filter(openid=openid, subscribe=1).first()
-                    bindUser(w_user, request.user)
-        except Exception, e:
-            logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
@@ -1223,7 +1225,7 @@ class StatisticsInside(APIView):
         today_utc = local_to_utc(today, 'now')
         start_withdraw = today_start + timedelta(hours=16)
         # 当日16点前查询以昨日16点作为起始时间
-        if today_utc < start_withdraw :
+        if today_utc < start_withdraw:
             start_withdraw = yesterday_start + timedelta(hours=16)
         stop_withdraw = today_utc
         yesterday_amount = MarginRecord.objects.filter(create_time__gte=start_withdraw, create_time__lt=stop_withdraw) \
@@ -1262,6 +1264,12 @@ class StatisticsInside(APIView):
         yesterday_repayment_total = (yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else 0) \
                 + (yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else 0)
 
+        # 今日申请提现,0点到当前
+        today_withdraw = MarginRecord.objects.filter(create_time__gte=today_start, catalog='取款预冻结')\
+            .aggregate(Sum('amount'))
+        # 实际
+        today_withdraw_amount = today_withdraw['amount__sum'] if today_withdraw['amount__sum'] else 0
+
         # 昨日首投用户
         from django.db import connection
         cursor = connection.cursor()
@@ -1283,8 +1291,9 @@ class StatisticsInside(APIView):
             'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
             'yesterday_new_amount': yesterday_new_amount,  # 昨日新用户投资金额
-            'yesterday_withdraw' : yesterday_withdraw, # 每日累计申请提现
-            'today_deposit_amount' : today_deposit_amount, # 今日冲值总额
+            'yesterday_withdraw': yesterday_withdraw,  # 每日累计申请提现
+            'today_deposit_amount': today_deposit_amount,  # 今日冲值总额
+            'today_withdraw_amount': today_withdraw_amount,  # 今日提现申请(0点到当前)
         }
 
         data.update(get_public_statistics())
@@ -1512,13 +1521,13 @@ class GuestCheckView(APIView):
 
 class InnerSysHandler(object):
     def ip_valid(self, request):
-        INNER_IP = ("182.92.179.24", "10.171.37.235")
         client_ip = get_client_ip(request)
+        logger.debug('request ip:%s' % (client_ip, ))
         return True if client_ip in INNER_IP else False
 
     def judge_valid(self, request):
         if not self.ip_valid(request):
-            return False, u'IP没有通过验证'
+            return False, u'IP(%s)没有通过验证' % get_client_ip(request)
 
         return True, u'通过验证'
 
@@ -1529,6 +1538,7 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
     def post(self, request):
         phone = request.DATA.get("phone", None)
         message = request.DATA.get("message", None)
+        msg_type = request.DATA.get('msg_type', None)
         logger.debug("phone:%s, message:%s" % (phone, message))
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
@@ -1539,7 +1549,8 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
 
         send_messages.apply_async(kwargs={
                 "phones": [phone, ],
-                "messages": [message, ]
+                "messages": [message, ],
+                "ext": msg_type,
             })
 
         return Response({"code": 0, "message": u"短信发送成功"})
@@ -1871,17 +1882,15 @@ class GeetestAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        self.id = 'b7dbc3e7c7e842191a6436e2b0bebf3a'
-        self.key = '6b5129633547f5b0c0967b4c65193b0c'
+        self.id = GEETEST_ID
+        self.key = GEETEST_KEY
 
     def post(self, request):
         self.type = request.POST.get('type', None)
         import time
         if self.type == 'get':
-            # time.sleep(10)
             return self.get_captcha(request)
         if self.type == 'validate':
-            time.sleep(10)
             return self.validate_captcha(request)
 
     def get_captcha(self, request):
@@ -1943,3 +1952,89 @@ class ActivityUserInfoUploadApi(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class AccessUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
+    permission_classes = ()
+
+    def post(self, request):
+        logger.info("enter AccessUserExistsApi with data [%s], [%s]" % (request.REQUEST, request.body))
+
+        form = AccessUserExistsForm(request.session)
+        channel_code = request.GET.get('promo_token')
+
+        if form.is_valid():
+            phone = form.cleaned_data['phone']
+            user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+            introduce_by = get_introduce_by_for_phone(phone, channel_code)
+            coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
+            sign_is_ok = coop_sign_check()
+            coop_exists_processor = getattr(rest_utils, 'process_%s_user_exists' % channel_code.lower(), None)
+            response_data = coop_exists_processor(user, introduce_by, phone, sign_is_ok)
+        else:
+            response_data = {
+                'ret_code': 10020,
+                'message': form.errors.values()[0][0],
+            }
+
+        if channel_code == 'bajinshe':
+            response_data['code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['message']
+            response_data.pop('message')
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
+    permission_classes = ()
+
+    def post(self, request):
+        form = BiSouYiRegisterForm(request.session, action='select')
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                _type = 0 if user else 1
+                user_type = u'是' if user else u'否'
+                content_data = {
+                    'code': 10000,
+                    'message': 'success',
+                    'status': 1,
+                    'yaccount': user_type,
+                    'mobile': phone,
+                    'type': _type,
+                }
+            else:
+                content_data = {
+                    'code': 10010,
+                    'message': u'无效签名',
+                }
+        else:
+            content_data = {
+                'code': 10020,
+                'message': form.errors.values()[0][0],
+            }
+
+        content_data['pcode'] = settings.BISOUYI_PCODE
+        if content_data['code'] != 10000:
+            content_data['status'] = 0
+
+        content = generate_bisouyi_content(content_data)
+        client_id = settings.BISOUYI_CLIENT_ID
+        sign = generate_bisouyi_sign(content)
+        response_data = {
+            'cid': client_id,
+            'sign': sign,
+            'content': content,
+        }
+
+        http_response = HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+        http_response['cid'] = client_id
+        http_response['sign'] = sign
+
+        return http_response

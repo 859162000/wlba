@@ -2,7 +2,7 @@
 import logging
 from datetime import *
 from decimal import *
-from dateutil.relativedelta import relativedelta
+# from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Sum
@@ -20,7 +20,8 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
-from wanglibao_activity import backends as activity_backends
+# from wanglibao_activity import backends as activity_backends
+from wanglibao_activity.tasks import check_activity_task
 import re
 import json
 
@@ -31,6 +32,7 @@ from wanglibao_profile.models import RepeatPaymentUser, RepeatPaymentUserRecords
 
 
 logger = logging.getLogger(__name__)
+
 
 class ProductKeeper(KeeperBaseMixin):
 
@@ -92,18 +94,8 @@ class EquityKeeperDecorator():
 
         with transaction.atomic(savepoint=savepoint):
             contract_list = list()
-            #p2p_quities = self.product.equities.select_related('user', 'product').all()
             p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
             for p2p_equity in p2p_equities:
-                #EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
-
-                # product = p2p_equity.product
-                # user = p2p_equity.user
-                # equity_query = P2PEquity.objects.filter(user=user, product=product)
-                # if (not equity_query.exists()) or (len(equity_query) != 1):
-                #     raise P2PException('can not get equity info.')
-                #
-                # equity = equity_query.first()
                 contract_string = generate_contract(p2p_equity, None, p2p_equities)
 
                 contract = P2PContract()
@@ -116,17 +108,11 @@ class EquityKeeperDecorator():
     def generate_contract_one(self, equity_id, savepoint=True):
 
         with transaction.atomic(savepoint=savepoint):
-            # p2p_equities = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template').filter(product=self.product)
             p2p_equity = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template')\
                                           .select_related('product').filter(id=equity_id).first()
             amortizations = UserAmortization.objects.filter(user=p2p_equity.user, product_amortization__product=p2p_equity.product)
             productAmortizations = ProductAmortization.objects.filter(product=p2p_equity.product).select_related('product').all()
             contract_info = P2PProductContract.objects.filter(product=p2p_equity.product).first()
-
-            #酒仙众筹标信息
-            jiuxian_equity = P2PEquityJiuxian.objects.filter(user=p2p_equity.user, equity=p2p_equity).first()
-            if jiuxian_equity:
-                p2p_equity.jiuxian = jiuxian_equity
 
             p2p_equity.contract_info = contract_info
             p2p_equity.amortizations_all = amortizations
@@ -167,15 +153,6 @@ class EquityKeeper(KeeperBaseMixin):
             catalog = u'申购'
             record = self.__tracer(catalog, amount, description)
 
-            #酒仙网众筹用户增加额外的记录
-            # if self.product.category == u'酒仙众筹标':
-            #     self.equity_jiuxian, created = P2PEquityJiuxian.objects\
-            #         .get_or_create(user=self.user, product=self.product, equity=self.equity)
-            #     self.equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(pk=self.equity_jiuxian.id).first()
-            #     self.equity_jiuxian.equity_amount += amount
-            #     self.equity_jiuxian.created_at = datetime.now()
-            #     self.equity_jiuxian.save()
-
             return record
 
     def rollback(self, description=u'', savepoint=True):
@@ -191,18 +168,13 @@ class EquityKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount)
             user_margin_keeper = MarginKeeper(self.user, self.order_id)
             user_margin_keeper.unfreeze(amount, savepoint=False)
-            #流标要将红包退回账号
+            # 流标要将红包退回账号
             p2precord = P2PRecord.objects.filter(user=self.user, product=self.product, catalog=u"申购")
             if p2precord:
                 for p2p in p2precord:
                     result = redpack_backends.restore(p2p.order_id, p2p.amount, p2p.user)
                     if result['ret_code'] == 0:
                         user_margin_keeper.redpack_return(result['deduct'], description=u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct']))
-            #酒仙网流标后删除酒仙标用户持仓记录
-            # if self.product.category == u'酒仙众筹标':
-            #     equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(user=self.user, product=self.product).first()
-            #     if equity_jiuxian and equity_jiuxian.confirm is False:
-            #         equity_jiuxian.delete()
             return record
 
     def settle(self, savepoint=True):
@@ -219,14 +191,6 @@ class EquityKeeper(KeeperBaseMixin):
             self.__tracer(catalog, equity.equity, description)
             user_margin_keeper = MarginKeeper(self.user)
             user_margin_keeper.settle(equity.equity, savepoint=False)
-
-            #酒仙网众筹用户增加额外的记录
-            # if self.product.category == u'酒仙众筹标':
-            #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.user, product=self.product).first()
-            #     if equity_jiuxian:
-            #         equity_jiuxian.confirm = True
-            #         equity_jiuxian.confirm_at = datetime.now()
-            #         equity_jiuxian.save()
 
     def generate_contract(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
@@ -271,23 +235,15 @@ class AmortizationKeeper(KeeperBaseMixin):
         if self.product.status != u'满标已打款':
             raise P2PException('invalid product status.')
 
-        get_amortization_plan(self.product.pay_method).calculate_term_date(self.product) #每期还款日期不在单独生成
+        get_amortization_plan(self.product.pay_method).calculate_term_date(self.product)  # 每期还款日期不在单独生成
 
         # Delete all old user amortizations
         with transaction.atomic(savepoint=savepoint):
-            #UserAmortization.objects.filter(product_amortization__in=self.amortizations).delete() 生成产品还款计划时，删除的时候就已经删除了
-
             self.amortizations = self.product.amortizations.all()
 
-            #self.amortizations = self.__generate_product_amortization(self.product)
             self.product_interest = self.amortizations.aggregate(Sum('interest'))['interest__sum']
             equities = self.product.equities.select_related('user').all()
 
-            #ProductAmortization.objects.select_for_update().filter(product=self.product)
-            # for equity in equities:
-            #     self.__dispatch(equity)
-            #self.__generate_useramortization(equities)
-            
             self.__generate_user_amortization(equities)
 
     def __generate_product_amortization(self, product):
@@ -395,7 +351,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 settled_sub_amos.append({
                     'id': sub_amo.id,
                     'product': product.id,
-                    'user_id': sub_amo.user.id,
+                    'user': sub_amo.user.id,
                     'term': sub_amo.term,
                     'settled': sub_amo.settled,
                     'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
@@ -596,51 +552,63 @@ class AmortizationKeeper(KeeperBaseMixin):
                     logger.error("用户扣款失败,用户id:[%s], 回款本息合计:[%s]" % (sub_amo.user, amo_amount))
                     pass
 
-                phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
-                message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
-                                                              amortization.product,
-                                                              # sub_amo.settlement_time,
-                                                              amo_amount))
-                title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": sub_amo.user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "amortize"
-                })
+                try:
+                    phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
+                    message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
+                                                                  amortization.product,
+                                                                  # sub_amo.settlement_time,
+                                                                  amo_amount))
+                    title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": sub_amo.user.id,
+                        "title": title,
+                        "content": content,
+                        "mtype": "amortize"
+                    })
+                except:
+                    logger.debug("")
+
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                               amortization, description, sub_amo.coupon_interest)
 
                 # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
                 try:
                     if sub_amo.principal > 0:
-                        activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                        # activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                        check_activity_task.apply_async(kwargs={
+                            "user_id": sub_amo.user.id,
+                            "trigger_node": 'repaid',
+                            "device_type": 'pc',
+                            "amount": sub_amo.principal,
+                            "product_id": product.id,
+                        }, queue='celery02')
                 except Exception:
                     logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
-                        sub_amo.user, sub_amo.principal, product.id
+                        sub_amo.user.id, sub_amo.principal, product.id
                     ))
+
                 try:
                     weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
-        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
                     if weixin_user and weixin_user.subscribe:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
-                                        "kwargs":json.dumps({
-                                                        "openid": weixin_user.openid,
-                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                                        "keyword1": product.name,
-                                                        "keyword2": "%s 元"%str(amo_amount),
-                                                        "keyword3": now,
-                                                            })},
-                                                        queue='celery02')
+                            "kwargs": json.dumps({
+                                "openid": weixin_user.openid,
+                                "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                "keyword1": product.name,
+                                "keyword2": "%s 元" % str(amo_amount),
+                                "keyword3": now,
+                            })
+                        }, queue='celery02')
 
-                except Exception,e:
+                except Exception, e:
+                    logger.debug(">>>> weixin msg send err, user_id:[%s], [%s] " % sub_amo.user.id, e)
                     pass
 
                 settled_sub_amos.append({
                     'id': sub_amo.id,
-                    'user_id': sub_amo.user.id,
+                    'user': sub_amo.user.id,
                     'product': product.id,
                     'term': sub_amo.term,
                     'settled': sub_amo.settled,

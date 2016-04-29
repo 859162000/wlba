@@ -41,8 +41,15 @@ ENV_DEV = 'debug'
 ENV_PRODUCTION = 'production'
 ENV_PREPRODUCTION = 'pre'
 ENV_STAGING = 'staging'
+ENV_ALPHA = 'alpha'
 
 ENV = ENV_DEV
+
+# Add by hb on 2016-04-19 for Support Alpha-Deploy
+ENV_ALPHA_DEPLOY = False
+if ENV == ENV_ALPHA:
+    ENV = "staging"
+    ENV_ALPHA_DEPLOY = True
 
 if ENV != ENV_DEV:
     DEBUG = False
@@ -137,6 +144,7 @@ INSTALLED_APPS = (
     'daterange_filter',
     'experience_gold',
     'wanglibao_qiye',
+    'wanglibao_invite',
     'wanglibao_geetest',
 )
 
@@ -184,6 +192,16 @@ if LOCAL_MYSQL:
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
         'HOST': '192.168.1.242',
+    }
+
+# Add by hb on 2016-04-19 for Deploy-Aplpha
+if ENV_ALPHA_DEPLOY:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wanglibao',
+        'USER': 'wanglibao',
+        'PASSWORD': 'wanglibank',
+        'HOST': '192.168.20.236',
     }
 
 import sys
@@ -430,6 +448,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_sms.log',
             'formatter': 'verbose'
         },
+        'wanglibao_inside_messages': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/inside_messages.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -517,6 +541,10 @@ LOGGING = {
             'handlers': ['file', 'console'],
             'level': 'DEBUG'
         },
+        'wanglibao_inside_messages': {
+            'handlers': ['file', 'wanglibao_inside_messages'],
+            'level': 'DEBUG',
+        },
     }
 }
 
@@ -586,13 +614,11 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 CELERY_QUEUES = {
-                "celery":  {"exchange": "celery",
-                              "routing_key": "celery"},
-                "celery01": {"exchange": "celery01",
-                              "routing_key": "celery01"},
-                "celery02": {"exchange": "celery02",
-                              "routing_key": "celery02"},
-                }
+    "celery": {"exchange": "celery", "routing_key": "celery"},
+    "celery01": {"exchange": "celery01", "routing_key": "celery01"},
+    "celery02": {"exchange": "celery02", "routing_key": "celery02"},
+    # "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
+}
 
 from datetime import timedelta, datetime
 
@@ -619,34 +645,34 @@ CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute=0, hour=16),
     },
 
-    #add by guoya: 希财网渠道数据定时推送
-    'xicai_send_data': {
-        'task': 'wanglibao_account.tasks.xicai_send_data_task',
-        'schedule': timedelta(hours=1),
-    },
+    # add by guoya: 希财网渠道数据定时推送
+    # 'xicai_send_data': {
+    #     'task': 'wanglibao_account.tasks.xicai_send_data_task',
+    #     'schedule': timedelta(hours=1),
+    # },
 
-    #add by zhanghe: PC端WEB首页统计数据
+    # add by zhanghe: PC端WEB首页统计数据
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
         'schedule': crontab(minute=10, hour=0),
     },
 
-    #add by lili: 全民佣金收入短信/站内信每日定时发送
+    # add by lili: 全民佣金收入短信/站内信每日定时发送
     'all_invite_earning_data': {
         'task': 'marketing.tools.send_income_message_sms',
         'schedule': crontab(minute=0, hour=20)
     },
-    #add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
-    'lottery_set_status': {
-        'task': 'wanglibao_lottery.tasks.lottery_set_status',
-        'schedule': crontab(minute=0, hour=5)
-    },
+    # add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
+    # 'lottery_set_status': {
+    #     'task': 'wanglibao_lottery.tasks.lottery_set_status',
+    #     'schedule': crontab(minute=20, hour=5)
+    # },
 
-    #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
-    'handle_delay_time_data': {
-        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
-        'schedule': timedelta(minutes=3)
-    },
+    # add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
+    # 'handle_delay_time_data': {
+    #     'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+    #     'schedule': timedelta(minutes=3)
+    # },
 
     # by Zhoudong 菜苗上报平台信息.
     'caimiao_platform_post': {
@@ -671,13 +697,13 @@ CELERYBEAT_SCHEDULE = {
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
     'update_virtual_earning': {
         'task': 'wanglibao_redpack.tasks.update_virtual_earning',
-        'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute=30, hour=0)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
-    'zhongjin_send_data': {
-        'task': 'wanglibao_account.tasks.zhongjin_post_task',
-        'schedule': timedelta(hours=1),
-    },
+    # 'zhongjin_send_data': {
+    #     'task': 'wanglibao_account.tasks.zhongjin_post_task',
+    #     'schedule': timedelta(hours=1),
+    # },
     # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
     'rongtu_send_data': {
         'task': 'wanglibao_account.tasks.rongtu_post_task',
@@ -686,13 +712,13 @@ CELERYBEAT_SCHEDULE = {
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
-        'schedule': crontab(minute=0, hour=3)
+        'schedule': crontab(minute=30, hour=3)
     },
 
     # by Zhoudong 定期检查没有投资的新用户, 提醒投资
     'invested_status_task_check': {
         'task': 'marketing.tools.check_invested_status',
-        'schedule': crontab(minute=0, hour=10),
+        'schedule': crontab(minute=15, hour=10),
     },
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
@@ -930,6 +956,9 @@ if ENV == ENV_DEV:
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
 PROMO_TOKEN_USER_KEY = 'tid'
+
+SHARE_INVITE_KEY = "fwh_fp"
+
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
@@ -1210,15 +1239,19 @@ else:
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
 if ENV == ENV_PRODUCTION:
+    BAJINSHE_CLIENT_ID = '7cbb6aeb381b780edfa2'
     BAJINSHE_COOP_KEY = ''
 else:
+    BAJINSHE_CLIENT_ID = '7cbb6aeb381b780edfa2'
     BAJINSHE_COOP_KEY = '4762c2c53ed701597c1d6cf3b409ff87c3f04f98'
 
 # 人人利
 RENRENLI_CHANNEL_CODE = 'renrenli'
 if ENV == ENV_PRODUCTION:
+    RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
     RENRENLI_COOP_KEY = ''
 else:
+    RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
     RENRENLI_COOP_KEY = 'wanglibaorrl'
 
 
@@ -1243,6 +1276,16 @@ else:
     BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
     BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 
+
+# 加息盒子
+JXHZ_COOP_id = 'wanglibao'
+JXHZ_COOP_KEY = 'wAnGlibAo'
+if ENV == ENV_PRODUCTION:
+    JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/rest/v1/invest'
+else:
+    JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/test/v1/invest'
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1265,6 +1308,17 @@ REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = 'wanglibank_redis'
+
+PHP_REDIS_HOST = '192.168.20.241'
+PHP_REDIS_PORT = 6379
+PHP_REDIS_DB = 0
+PHP_REDIS_PASSWORD = 'wanglibao_ylb.com'
+
+if ENV == ENV_PRODUCTION:
+    PHP_REDIS_HOST = '10.172.83.189'
+    PHP_REDIS_PORT = 6379
+    PHP_REDIS_DB = 0
+    PHP_REDIS_PASSWORD = 'wanglibao_ylb.com'
 
 # CACHES = {
 #     'default': {
@@ -1296,8 +1350,8 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST = 'https://staging.wanglibao.com'
+    WEIXIN_CALLBACK_URL = "https://staging.wanglibao.com"
+    CALLBACK_HOST = "https://staging.wanglibao.com"
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
@@ -1341,3 +1395,41 @@ elif ENV == ENV_STAGING:
     SITE_URL = 'https://staging.wanglibao.com'
 elif ENV == ENV_DEV:
     SITE_URL = 'http://127.0.0.1:8000'
+
+#极验验证 KEY及ID设置
+GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
+GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'
+
+# settings for PHP
+PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
+
+# 控制发送站内信的地方, PHP消息中心还是主站.
+# 1 -------> 主站自己发
+# 2 -------> 主站发, 然后通知消息中心也发一份
+# 3 -------> 测试成功后, 站内信功能转交给消息中心
+PHP_INSIDE_MESSAGE_SWITCH = 2
+
+# PHP 发送站内信地址
+PHP_SEND_INSIDE_MESSAGE = "http://192.168.20.248/message.php/message/inside"
+# PHP 查询未读数量
+PHP_UNREAD_MESSAGES_COUNT = "http://192.168.20.248/message.php/message/count"
+# PHP 站内信显示
+PHP_INSIDE_MESSAGES_LIST = "http://192.168.20.248/message.php/message/list"
+# PHP 读站内信
+PHP_INSIDE_MESSAGE_READ = 'http://192.168.20.248/message.php/message'
+PHP_INSIDE_MESSAGE_READ_ALL = 'http://192.168.20.248/message.php/message/0'
+
+if ENV == ENV_PRODUCTION:
+    PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+    PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'
+    PHP_SEND_INSIDE_MESSAGE = "http://123.57.146.238/message.php/message/inside"
+    PHP_UNREAD_MESSAGES_COUNT = "http://123.57.146.238/message.php/message/count"
+    PHP_INSIDE_MESSAGES_LIST = "http://123.57.146.238/message.php/message/list"
+    PHP_INSIDE_MESSAGE_READ = 'http://123.57.146.238/message.php/message'
+    PHP_INSIDE_MESSAGE_READ_ALL = 'http://123.57.146.238/message.php/message/0'
+
+if ENV == ENV_PRODUCTION:
+    INNER_IP = ("182.92.179.24", "10.171.37.235")
+else:
+    INNER_IP = ("192.168.1.20","192.168.10.1", "192.168.30.1")

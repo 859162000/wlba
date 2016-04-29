@@ -7,11 +7,12 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.utils import timezone
 from django.template import Template, Context
+from django.contrib.auth import login as auth_login, logout
+from django.core.urlresolvers import reverse
 import logging
-import base64
+import base64,urllib
 import datetime
 import traceback
-import json
 from wanglibao_account.backends import invite_earning
 from weixin.models import UserDailyActionRecord, SeriesActionActivity, SeriesActionActivityRule, WeixinUser
 from experience_gold.models import ExperienceEventRecord
@@ -24,7 +25,19 @@ from experience_gold.backends import SendExperienceGold
 from wanglibao_rest.utils import split_ua
 from marketing.models import Reward
 from wanglibao_activity.backends import _keep_reward_record, _send_message_template
+from wanglibao_activity.models import Activity
 from tasks import sentCustomerMsg
+from wanglibao_invite.utils import getWechatDailyReward
+from wanglibao_invite.models import WechatUserDailyReward
+from weixin.models import WeixinAccounts
+from weixin.util import redirectToJumpPage, getOrCreateWeixinUser, get_weixin_code_url, getMiscValue
+from wechatpy.oauth import WeChatOAuth
+from wechatpy.exceptions import WeChatException
+from experience_gold.models import ExperienceEvent
+from .forms import OpenidAuthenticationForm
+from wanglibao_invite.models import InviteRelation, UserExtraInfo
+from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_invite.invite_common import ShareInviteRegister
 
 
 logger = logging.getLogger("weixin")
@@ -373,6 +386,284 @@ class GetSignShareInfo(APIView):
                 experience_record = ExperienceEventRecord.objects.get(id=share_record.experience_record_id)
                 share_info['amount']=experience_record.event.amount
         return Response({"ret_code": 0, "data": data})
+
+class WechatShareInviteBindTemplate(TemplateView):
+    template_name = ""
+
+    def get_context_data(self, **kwargs):
+        next = self.request.GET.get('next')
+        return {"next":next}
+
+    def dispatch(self, request, *args, **kwargs):
+        self.openid = self.request.session.get('openid')
+        return super(WechatShareInviteBindTemplate, self).dispatch(request, *args, **kwargs)
+
+class FetchWechatHBYReward(APIView):
+    permission_classes = ()
+    def post(self, request):
+        openid = self.request.session.get('openid')
+        if not openid:
+            return Response({"ret_code": -1, "msg": "系统错误"})
+        activity = Activity.objects.filter(code="hby").first()
+        if not activity:
+            return Response({"ret_code": -1, "message":"没有该活动"})
+        if activity.is_stopped:
+            return Response({"ret_code": -1, "message":"活动已经截止"})
+        now = timezone.now()
+        if activity.start_at > now:
+            return Response({"ret_code": -1, "message":"活动还未开始"})
+        if activity.end_at < now:
+            return Response({"ret_code": -1, "message":"活动已经结束"})
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        ret_code, msg, amount = getWechatDailyReward(openid)
+        is_bind = True if w_user.user else False
+        return Response({"ret_code": ret_code, "msg": msg, "is_bind":is_bind, "amount":amount})
+
+class WechatInviteTemplate(TemplateView):
+    template_name = ""
+    def get_context_data(self, **kwargs):
+        today = datetime.datetime.today()
+        # w_user = WeixinUser.objects.filter(user=self.request.user).first()
+        fphone = self.request.session.get(settings.SHARE_INVITE_KEY, "")
+        inviter_head_url = ""
+        if fphone:
+            friend_profile = WanglibaoUserProfile.objects.filter(phone=fphone).first()
+            f_w_user = WeixinUser.objects.filter(user=friend_profile.user).first()
+            if f_w_user:
+                inviter_head_url = f_w_user.headimgurl
+            fphone = base64.b64encode(fphone + '=')
+        friend_num=0
+        reward_text = ""
+        reward_type = ""
+        fetched = False
+        fetched_date = ""
+        is_bind = False
+        invite_experience_amount = 0
+        userprofile = self.request.user.wanglibaouserprofile
+        share_url = settings.CALLBACK_HOST + reverse("hby_weixin_share") + "?%s=%s&%s=%s"%(settings.SHARE_INVITE_KEY, base64.b64encode(userprofile.phone+"="), settings.PROMO_TOKEN_QUERY_STRING, "hby")
+        share_url = get_weixin_code_url(share_url)
+        user = self.w_user.user
+        if self.w_user:
+            is_bind = True if user else False
+            if is_bind:
+                w_daily_reward = WechatUserDailyReward.objects.filter(user=user, create_date=today, status=True).first()
+                if not w_daily_reward:
+                    w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
+            else:
+                w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
+
+            if w_daily_reward:# and w_daily_reward.status
+                fetched = True
+                if w_daily_reward.reward_type == "redpack":
+                    redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
+                    if redpack_event.rtype == 'interest_coupon':
+                        reward_text = "%s%%"%redpack_event.amount
+                    if redpack_event.rtype == 'percent':
+                        reward_text = "%s%%"%redpack_event.amount
+                    if redpack_event.rtype == 'direct':
+                        reward_text = "%s元"%int(redpack_event.amount)
+                    reward_type = redpack_event.rtype
+                if w_daily_reward.reward_type == "experience_gold":
+                    experience_event = ExperienceEvent.objects.filter(pk=w_daily_reward.experience_gold_id).first()
+                    reward_text = "%s元"%int(experience_event.amount)
+                    reward_type = w_daily_reward.reward_type
+            friend_num = InviteRelation.objects.filter(inviter=self.request.user).count()
+
+            extro_info = UserExtraInfo.objects.filter(user=self.request.user).first()
+            if extro_info:
+                invite_experience_amount = extro_info.invite_experience_amount
+        weixin_qrcode_info = getMiscValue("weixin_qrcode_info")
+        ShareInviteRegister(self.request).clear_session()
+        logger.debug('--------------------------share_url::'+share_url)
+        logger.debug('-----------------------------------%s'%{
+            "fetched":fetched,
+            "fetched_date":fetched_date,
+            "reward_text":reward_text,
+            "reward_type":reward_type,
+            "is_bind": is_bind,
+            "friend_num":friend_num,
+            "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
+            "share_url":share_url,
+            "fphone":fphone,
+            "original_id":weixin_qrcode_info.get("fwh", ""),
+            "weixin_channel_code":"hby",
+        })
+        return {
+            "fetched":fetched,
+            "fetched_date":fetched_date,
+            "reward_text":reward_text,
+            "reward_type":reward_type,
+            "is_bind": is_bind,
+            "friend_num":friend_num,
+            "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
+            "share_url":share_url,
+            "fphone":fphone,
+            "original_id":weixin_qrcode_info.get("fwh", ""),
+            "weixin_channel_code":"hby",
+        }
+
+    def dispatch(self, request, *args, **kwargs):
+        self.openid = self.request.session.get('openid')
+        code = request.GET.get('code', "")
+        state = request.GET.get('state', "")
+        if not self.openid:
+            error_msg = ""
+            if code and state:
+                try:
+                    account = WeixinAccounts.getByOriginalId(state)
+                    request.session['account_key'] = account.key
+                    oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                    user_info = oauth.fetch_access_token(code)
+                    self.openid = user_info.get('openid')
+                    request.session['openid'] = self.openid
+                    self.w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
+                except WeChatException, e:
+                    error_msg = e.message
+            else:
+                error_msg = u"code or state is None"
+            if error_msg:
+                return redirectToJumpPage(error_msg)
+        else:
+            self.w_user = WeixinUser.objects.filter(openid=self.openid).first()
+        if not self.w_user.user:
+            next_uri=reverse("hby_weixin_invite")
+            return redirectToJumpPage("", next=settings.CALLBACK_HOST + reverse("si_bind_login")+"?next=%s"%urllib.quote(settings.CALLBACK_HOST+next_uri))
+        if request.user.is_authenticated():
+            if self.w_user.user==request.user:
+                return super(WechatInviteTemplate, self).dispatch(request, *args, **kwargs)
+        form = OpenidAuthenticationForm(self.openid, data=request.GET)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+        return super(WechatInviteTemplate, self).dispatch(request, *args, **kwargs)
+
+
+class WechatShareTemplate(TemplateView):
+    template_name = ""
+
+    def get_context_data(self, **kwargs):
+        today = datetime.datetime.today()
+        fetched = False
+        reward_text = ""
+        reward_type = ""
+        fetched_date = ""
+        friend_num = 0
+        invite_experience_amount = 0
+        fphone = self.request.session.get(settings.SHARE_INVITE_KEY, "")
+        inviter_head_url = ""
+        if fphone:
+            friend_profile = WanglibaoUserProfile.objects.filter(phone=fphone).first()
+            f_w_user = WeixinUser.objects.filter(user=friend_profile.user).first()
+            if f_w_user:
+                inviter_head_url = f_w_user.headimgurl
+            fphone = base64.b64encode(fphone+"=")
+
+        w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, create_date=today).first()
+        if self.request.user.is_authenticated():
+            friend_num = InviteRelation.objects.filter(inviter=self.request.user).count()
+            extro_info = UserExtraInfo.objects.filter(user=self.request.user).first()
+            if extro_info:
+                invite_experience_amount = extro_info.invite_experience_amount
+            if w_daily_reward and w_daily_reward.status:
+                fetched = True
+        else:
+            if w_daily_reward:
+                fetched = True
+            else:
+                fetched = False
+                w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, status=False).first()
+                if w_daily_reward:
+                    fetched_date = str(w_daily_reward.create_date).split(" ")[0]
+
+        if w_daily_reward and w_daily_reward.reward_type == "redpack":
+            redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
+            if redpack_event.rtype == 'interest_coupon':
+                reward_text = "%s%%"%redpack_event.amount
+            if redpack_event.rtype == 'percent':
+                reward_text = "%s%%"%redpack_event.amount
+            if redpack_event.rtype == 'direct':
+                reward_text = "%s元"%int(redpack_event.amount)
+            reward_type = redpack_event.rtype
+        if w_daily_reward and w_daily_reward.reward_type == "experience_gold":
+            experience_event = ExperienceEvent.objects.filter(pk=w_daily_reward.experience_gold_id).first()
+            reward_text = "%s元"%int(experience_event.amount)
+            reward_type = w_daily_reward.reward_type
+        weixin_qrcode_info = getMiscValue("weixin_qrcode_info")
+        ShareInviteRegister(self.request).clear_session()
+        logger.debug('-------share----------------------------%s'%{
+            "fetched":fetched,
+            "fetched_date":fetched_date,
+            "reward_text":reward_text,
+            "reward_type":reward_type,
+            "is_bind": self.request.user.is_authenticated(),
+            "friend_num":friend_num,
+            "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
+            "fphone": fphone,
+            "original_id":weixin_qrcode_info.get("fwh",""),
+            "weixin_channel_code":"hby",
+        })
+        return {
+            "fetched":fetched,
+            "fetched_date":fetched_date,
+            "reward_text":reward_text,
+            "reward_type":reward_type,
+            "is_bind": self.request.user.is_authenticated(),
+            "friend_num":friend_num,
+            "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
+            "fphone": fphone,
+            "original_id":weixin_qrcode_info.get("fwh",""),
+            "weixin_channel_code":"hby",
+        }
+
+    def dispatch(self, request, *args, **kwargs):
+        self.openid = self.request.session.get('openid')
+        self.w_user = None
+        if not self.openid:
+            code = request.GET.get('code')
+            state = request.GET.get('state')
+            error_msg = ""
+            if code and state:
+                try:
+                    account = WeixinAccounts.getByOriginalId(state)
+                    request.session['account_key'] = account.key
+                    oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                    user_info = oauth.fetch_access_token(code)
+                    self.openid = user_info.get('openid')
+                    request.session['openid'] = self.openid
+                    self.w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
+                except WeChatException, e:
+                    error_msg = e.message
+            else:
+                error_msg = u"code or state is None"
+            if error_msg:
+                return redirectToJumpPage(error_msg)
+        else:
+            self.w_user =WeixinUser.objects.filter(openid=self.openid).first()
+        if self.w_user and self.w_user.user:
+            if request.user.is_authenticated():
+                if self.w_user.user == request.user:
+                    return super(WechatShareTemplate, self).dispatch(request, *args, **kwargs)
+            form = OpenidAuthenticationForm(self.openid, data=request.GET)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+            return super(WechatShareTemplate, self).dispatch(request, *args, **kwargs)
+        else:
+            if request.user.is_authenticated():
+                logout(request)
+            return super(WechatShareTemplate, self).dispatch(request, *args, **kwargs)
+
+class FetchXunleiCardAward(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+
+        return Response({"ret_code": 0, "msg": 'ok'})
+
+
 
 
 
