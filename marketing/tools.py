@@ -151,7 +151,7 @@ def deposit_ok(user_id, amount, device, order_id):
             "user_id": user_id,
             "title": title,
             "content": content,
-            "mtype": "activityintro"
+            "mtype": "pay"
         })
 
         user = User.objects.get(id=user_id)
