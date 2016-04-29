@@ -75,10 +75,13 @@ def broker_invite_list(user):
 
 def invite_earning(user):
     amount = Income.objects.filter(user=user, paid=True).aggregate(Sum('earning'))
+    php_amount = PhpIncome.objects.filter(user=user, paid=True).aggregate(Sum('earning'))
+
+    earning = 0
     if amount['earning__sum']:
         earning = amount['earning__sum']
-    else:
-        earning = 0
+    if php_amount['earning__sum']:
+        earning += php_amount['earning__sum']
     return earning
 
 
