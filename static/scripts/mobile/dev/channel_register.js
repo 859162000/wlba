@@ -184,7 +184,7 @@ webpackJsonp([3],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback();
+	        callback && callback();
 	    });
 	};
 
