@@ -113,6 +113,9 @@ urlpatterns = patterns(
                                           ),name='sub_checkIn'),
     url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
 
+    url(r'^app_airport_operation/$', fwh_login_required(TemplateView.as_view(template_name="app_airport_operation.jade"),login_url='/weixin/sub_login_redirect/')),
+    #url(r'^app_august_phone/$', fwh_login_required(TemplateView.as_view(template_name="app_august_phone.jade"), login_url='/weixin/sub_login_redirect/')),
+
 )
 #活动api
 urlpatterns += patterns(
