@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
 import decimal
-from wanglibao_account.utils import FileObject
+from common.tools import FileObject
 import cStringIO
 import json
 import urllib2
