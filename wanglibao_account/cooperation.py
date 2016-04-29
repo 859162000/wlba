@@ -1389,8 +1389,10 @@ class XunleiVipRegister(CoopRegister):
 
         if ENV == ENV_PRODUCTION:
             self.activity_start_time = datetime.datetime.strptime('2016-03-30 00:00:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_end_time = datetime.datetime.strptime('2016-05-11 23:59:59', "%Y-%m-%d %H:%M:%S")
         else:
             self.activity_start_time = datetime.datetime.strptime('2016-03-28 17:30:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_end_time = datetime.datetime.strptime('2016-04-29 14:51:00', "%Y-%m-%d %H:%M:%S")
 
     @property
     def channel_user(self):
@@ -1483,7 +1485,8 @@ class XunleiVipRegister(CoopRegister):
                         self.purchase_call_back(user, first_p2p_record.order_id)
 
                     # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
-                    p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
+                    p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
+                                                     Q(create_time__lte=self.activity_end_time))
                     for p2p_record in p2p_records:
                         if p2p_record.id != first_p2p_record.id:
                             self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
@@ -1613,7 +1616,8 @@ class XunleiVipRegister(CoopRegister):
                     })
 
         # 根据迅雷勋章活动开始时间查询
-        p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
+        p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
+                                         Q(create_time__lte=self.activity_end_time))
         p2p_record = p2p_records.filter(order_id=order_id).first()
         self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
