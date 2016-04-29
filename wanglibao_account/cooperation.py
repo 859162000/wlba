@@ -1240,7 +1240,7 @@ class KongGangRegister(CoopRegister):
                        u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
             send_messages.apply_async(kwargs={
                 "phones": [user.wanglibaouserprofile.phone, ],
-                "message": [send_msg,],
+                "messages": [send_msg,],
             })
 
             inside_message.send_one.apply_async(kwargs={
