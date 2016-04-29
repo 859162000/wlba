@@ -40,7 +40,7 @@ from wanglibao_reward.models import WanglibaoWeixinRelative
 from wanglibao_profile.models import Account2015
 from weixin.models import WeixinAccounts
 import cStringIO
-from wanglibao_account.utils import FileObject
+from common.tools import FileObject
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
