@@ -277,7 +277,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = location.protocol+"//"+location.host,
 			shareName = '从容出行 尊贵定制',
 			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
-			shareLink = host + '/activity/app_airport_operation/?promo_token=sy',
+			shareLink = host + '/activity/app_airport_operation/?promo_token=kgyx',
 			shareMainTit = '从容出行 尊贵定制',
 			shareBody = '网利宝携手空港易行狂撒出行卡';
 		//分享给微信好友
@@ -334,7 +334,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                 dataType: 'json',
                                 success: function(data){
                                     if(data.ret_code=='1000'){
-                                        mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
+                                        mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=kgyx'});
                                     }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
@@ -357,7 +357,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     login = false;
 
                     $('.six_btn').on("click",function(){
-                         mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=sy'});
+                         mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=kgyx'});
                     })
                 } else {
                     login = true;
