@@ -419,6 +419,7 @@ class YueLiBaoCheck(APIView):
 
         product_id = request.POST.get('productId')
         period = request.POST.get('period')
+        logger.info('in YueLiBaoCheck, product_id = {}, period = {}'.format(product_id, period))
 
         try:
             with transaction.atomic(savepoint=True):
