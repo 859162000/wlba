@@ -563,7 +563,7 @@ class WechatShareTemplate(TemplateView):
                 fetched = False
                 w_daily_reward = WechatUserDailyReward.objects.filter(w_user=self.w_user, status=False).first()
                 if w_daily_reward:
-                    fetched_date = w_daily_reward.create_date
+                    fetched_date = w_daily_reward.create_date.strftime("%Y年%M月%d日")
 
         if w_daily_reward and w_daily_reward.reward_type == "redpack":
             redpack_event = RedPackEvent.objects.get(id=w_daily_reward.redpack_id)
@@ -580,6 +580,19 @@ class WechatShareTemplate(TemplateView):
             reward_type = w_daily_reward.reward_type
         weixin_qrcode_info = getMiscValue("weixin_qrcode_info")
         ShareInviteRegister(self.request).clear_session()
+        logger.debug('-------share----------------------------%s'%{
+            "fetched":fetched,
+            "fetched_date":fetched_date,
+            "reward_text":reward_text,
+            "reward_type":reward_type,
+            "is_bind": self.request.user.is_authenticated(),
+            "friend_num":friend_num,
+            "invite_experience_amount":invite_experience_amount,
+            "inviter_head_url":inviter_head_url,
+            "fphone": fphone,
+            "original_id":weixin_qrcode_info.get("fwh",""),
+            "weixin_channel_code":"hby",
+        })
         return {
             "fetched":fetched,
             "fetched_date":fetched_date,
