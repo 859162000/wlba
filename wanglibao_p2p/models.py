@@ -84,6 +84,12 @@ class P2PProduct(models.Model):
     def get_h5_url(self):
         return '/weixin/view/buy/%s' % self.id
 
+    def get_detail_url_for_post(self, channel):
+        return '/api/landpage/?promo_token=%s&action=purchase&product_id=%s' % (channel, self.id)
+
+    def get_detail_url_for_get(self, channel):
+        return '/landpage/?promo_token=%s&action=purchase&product_id=%s' % (channel, self.id)
+
     @property
     def get_category_num(self):
         return self.CATEGORY_CHOICES.get(self.category, 0)

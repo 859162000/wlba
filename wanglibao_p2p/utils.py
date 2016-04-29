@@ -153,10 +153,11 @@ def generate_bisouyi_product_data(product, action):
             _attribute = u'抵押贷'
 
         product_name = product.name[:100]
+        detail_url = settings.WLB_URL + product.get_detail_url_for_get('bisouyi')
         product_data = {
             'pcode': settings.BISOUYI_PCODE,
             'ocode': product.id,
-            'ourl': settings.WLB_URL + product.get_h5_url,
+            'ourl': detail_url,
             'type': 2,
             'attribute': _attribute,
             'category': product.get_category_num,
@@ -175,8 +176,8 @@ def generate_bisouyi_product_data(product, action):
             'detail': product.brief.strip() or product_name,
             'tradable': status,
             'status': 1,
-            'appurl': settings.WLB_URL + product.get_h5_url,
-            'weburl': settings.WLB_URL + product.get_pc_url,
+            'appurl': detail_url,
+            'weburl': detail_url,
         }
     else:
         product_data = {
