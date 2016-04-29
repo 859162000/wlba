@@ -76,7 +76,7 @@
                 type: 'post',
                 success: function (data) {
                     if(data.ret_code=='1000'){
-                        window.location.href = '/accounts/login/?next=/activity/august_phone/?promo_token=sy'
+                        window.location.href = '/accounts/login/?promo_token=sy&next=/activity/august_phone/?promo_token=sy'
                     }else if(data.ret_code=='1'){
                         $('.popup_box .main .textairport').text(''+data.message+'');
                         $('.popup_box').show();
