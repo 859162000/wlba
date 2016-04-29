@@ -418,6 +418,7 @@ class YueLiBaoCheck(APIView):
         ret = dict()
 
         product_id = request.POST.get('productId')
+        period = request.POST.get('period')
 
         try:
             with transaction.atomic(savepoint=True):
@@ -438,8 +439,9 @@ class YueLiBaoCheck(APIView):
                     buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
-                calc_php_commission(product_id)
-                logger.info(u'全民淘金数据写入: {}\n'.format(product_id))
+                if period > 3:
+                    calc_php_commission(product_id)
+                    logger.info(u'全民淘金数据写入: {}\n'.format(product_id))
 
                 ret.update(status=1,
                            msg='success')
@@ -538,6 +540,7 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
+        logger.info('in refund, args = '.format(args))
 
         try:
             with transaction.atomic(savepoint=True):
@@ -556,6 +559,7 @@ class YueLiBaoRefund(APIView):
                     ).first()
 
                     if margin_record:
+                        logger.info('refund_ID = {} has been refunded already!!! '.format(arg['refundId']))
                         msg_list.append({'refundId': arg['refundId'], 'status': 1})
 
                     else:
