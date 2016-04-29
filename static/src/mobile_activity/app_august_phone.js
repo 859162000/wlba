@@ -28,10 +28,10 @@
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://staging.wanglibao.com/',
+		var host = 'https://www.wanglibao.com/',
 			shareName = '网利宝影像投资节送福利喽',
 			shareImg = host + '/static/imgs/mobile_activity/app_august_phone/300x300.jpg',
-			shareLink = host + 'weixin_activity/app_august_phone/',
+			shareLink = host + '/activity/app_august_phone/?promo_token=sy',
 			shareMainTit = '网利宝影像投资节送福利喽',
 			shareBody = '全民福利 火速领取';
 		//分享给微信好友
@@ -55,7 +55,6 @@
 			imgUrl: shareImg
 		})
 	})
-
         $('#show_button').on('click',function(){
             var ele = $('#show_list');
             var curHeight = ele.height();

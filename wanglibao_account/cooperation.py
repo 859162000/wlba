@@ -1256,13 +1256,14 @@ class KongGangRegister(CoopRegister):
             reward.save()
             raise Exception(u"发奖异常，奖品回库")
         else:
-            send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+            send_msg = u'尊敬的贵宾客户，恭喜您获得%s，' \
                        u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                        u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                        u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
+
             send_messages.apply_async(kwargs={
-                "phones": [user.id, ],
-                "message": [send_msg,],
+                "phones": [user.wanglibaouserprofile.phone, ],
+                "messages": [send_msg,],
             })
 
             inside_message.send_one.apply_async(kwargs={
