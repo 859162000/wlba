@@ -14,7 +14,7 @@ from weixin.models import SubscribeRecord, SubscribeService, WeixinUser, WeixinA
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
 from weixin.util import sendTemplate, getMiscValue
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
-from wanglibao_invite.tasks import processShareInviteDailyReward
+
 
 
 @app.task
@@ -41,6 +41,7 @@ def bind_ok(openid, is_first_bind, new_registed=False):
                 "time": now_str,
             })
         }, queue='celery02')
+    from wanglibao_invite.tasks import processShareInviteDailyReward
     processShareInviteDailyReward.apply_async(
             kwargs={'openid': openid, 'user_id': user.id, "new_registed": new_registed})
 
