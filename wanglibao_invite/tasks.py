@@ -12,7 +12,7 @@ def processShareInviteDailyReward(openid, user_id, new_registed=True):
     rewards = WechatUserDailyReward.objects.filter(w_user=w_user, status=False).all()
     user = User.objects.get(id=user_id)
     for reward in rewards:
-        sendDailyReward(user, reward.id, True, new_registed)
+        sendDailyReward(user, reward.id, openid, True, new_registed)
 
 
 
