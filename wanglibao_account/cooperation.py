@@ -2160,6 +2160,7 @@ class BiSouYiRegister(BaJinSheRegister):
         self.external_channel_sign_key = 'sign'
         self.internal_channel_sign_key = 'sign'
         self.channel_content_key = 'content'
+        self.channel_product_id_key = 'product_id'
 
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
@@ -2173,6 +2174,7 @@ class BiSouYiRegister(BaJinSheRegister):
         channel_user = req_data.get(self.external_channel_user_key, None)
         content = req_data.get(self.channel_content_key, None)
         client_id = req_data.get(self.external_channel_client_id_key, None)
+        p_id = req_data.get(self.channel_product_id_key, None)
 
         if not client_id:
             client_id = self.request.META.get(self.external_channel_client_id_key.upper(), None)
@@ -2204,6 +2206,9 @@ class BiSouYiRegister(BaJinSheRegister):
         if content:
             self.request.session[self.channel_content_key] = content
 
+        if p_id:
+            self.request.session[self.channel_product_id_key] = p_id
+
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
         self.request.session.pop(self.internal_channel_phone_key, None)
@@ -2211,6 +2216,7 @@ class BiSouYiRegister(BaJinSheRegister):
         self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.channel_content_key, None)
         self.request.session.pop(self.internal_channel_key, None)
+        self.request.session.pop(self.channel_product_id_key, None)
 
     def save_to_binding(self, user):
         """
