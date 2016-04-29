@@ -274,10 +274,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
+		var host = location.protocol+"//"+location.host,
 			shareName = '从容出行 尊贵定制',
 			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
-			shareLink = host + 'activity/app_airport_operation/',
+			shareLink = host + '/activity/app_airport_operation/?promo_token=sy',
 			shareMainTit = '从容出行 尊贵定制',
 			shareBody = '网利宝携手空港易行狂撒出行卡';
 		//分享给微信好友
@@ -301,7 +301,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			imgUrl: shareImg
 		})
 	});
-
 
 
     $('.popup_box .popup_button').click(function(){
