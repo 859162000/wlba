@@ -247,8 +247,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var winHost = window.location.href,
-            host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
+		var host = location.protocol+"//"+location.host,
+			shareName = '网利宝影像投资节送福利喽',
 			shareImg = host + '/static/imgs/mobile_activity/app_august_phone/300x300.jpg',
 			shareLink = host + '/activity/app_august_phone/?promo_token=sy',
 			shareMainTit = '网利宝影像投资节送福利喽',
