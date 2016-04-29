@@ -157,12 +157,12 @@
                     dataType: 'json',
                     success: function(data){
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?next=/weixin/list/'
+                            window.location.href = '/weixin/regist/?promo_token=kgyx&next=/weixin/list/?promo_token=kgyx'
                         }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'||data.ret_code=='1005'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else if(data.ret_code=='1002'){
-                            window.location.href = '/weixin/list/'
+                            window.location.href = '/weixin/list/?promo_token=kgyx'
                         }
 
                         //console.log(data)
