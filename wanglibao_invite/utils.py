@@ -118,15 +118,16 @@ def sendDailyReward(user, daily_reward_id, openid, save_point=False, new_registe
             daily_reward.user = user
             daily_reward.status = True
         daily_reward.save()
+        datestr= str(daily_reward.create_date).split(" ")[0]
         if fetch_state == 1:
             sentCustomerMsg.apply_async(kwargs={
-            "txt":"尊敬的用户，您的网利宝账号（%s）今天已经领取过红包花雨季奖励了,\n此微信号今日领取的奖励失效了~\n要记得，无法每天重复领取奖励哦，认真查看活动规则哦~~"%safe_phone_str(user.wanglibaouserprofile.phone),
+            "txt":"尊敬的用户，您的网利宝账号（%s）%s已经领取过红包花雨季奖励了,\n此微信号%s领取的奖励失效了~\n要记得，无法每天重复领取奖励哦，认真查看活动规则哦~~"%(safe_phone_str(user.wanglibaouserprofile.phone), datestr, datestr),
             "openid":openid,
                 },
                             queue='celery02')
         if fetch_state ==2:
             sentCustomerMsg.apply_async(kwargs={
-            "txt":"恭喜您获得网利红包花雨季奖励\n成功领取：%s元现金红包\n快去我的账户 - 理财券页面查看吧！"%amount,
+            "txt":"恭喜您获得%s网利红包花雨季奖励\n成功领取：%s元现金红包\n快去我的账户 - 理财券页面查看吧！"%(datestr, amount),
             "openid":openid,
                 },
                             queue='celery02')
