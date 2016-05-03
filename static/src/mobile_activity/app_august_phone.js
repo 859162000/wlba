@@ -106,7 +106,12 @@
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
                                     }else if(data.ret_code=='0'){
-                                        mixins.jumpToManageMoney();
+                                        if(data.tag=='标记成功'){
+                                            mixins.jumpToManageMoney();
+                                        }else{
+                                            $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                                            $('.popup_box').show();
+                                        }
                                     }
                                     //console.log(data)
                                 }
@@ -144,7 +149,13 @@
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else if(data.ret_code=='0'){
-                            window.location.href = '/weixin/list/?promo_token=sy'
+                             if(data.tag=='标记成功'){
+                                window.location.href = '/weixin/list/?promo_token=sy'
+                            }else{
+                                $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                                $('.popup_box').show();
+                            }
+
                         }
                         //console.log(data)
                     }
