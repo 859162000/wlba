@@ -301,3 +301,29 @@ def rongtu_post_task():
     if settings.ENV == settings.ENV_PRODUCTION:
         from wanglibao_account.cooperation import rongtu_post_data
         rongtu_post_data()
+
+
+@app.task
+def common_callback_for_post(url, params, channel, headers=None):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    ret = None
+    try:
+        logger.info(params)
+        if headers:
+            ret = requests.post(url, data=params, headers=headers)
+        else:
+            ret = requests.post(url, data=params)
+        logger.info('%s callback url: %s' % (channel, ret.url))
+        logger.info('callback return: %s' % ret.text)
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel)
+        logger.info(e)
+
+    if ret:
+        logger.info(ret.text)
+
+
+@app.task
+def coop_call_back(params):
+    # 此任务由渠道中心平台处理
+    pass
