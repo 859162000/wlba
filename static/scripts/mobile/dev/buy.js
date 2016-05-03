@@ -250,6 +250,11 @@ webpackJsonp([1],[
 	                    return;
 	                }
 	                if (result.error_number > 0) {
+	                    if (result.error_number == 2) {
+	                        return (0, _ui.Alert)(result.message, function () {
+	                            window.location.href = "/weixin/regist/first/";
+	                        });
+	                    }
 	                    return (0, _ui.Alert)(result.message);
 	                }
 	            },
