@@ -9,7 +9,8 @@ from .models import WechatUserDailyReward, InviteRelation, UserExtraInfo
 from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_message_for_hby, get_start_end_time
 from wanglibao_redpack.models import RedPackEvent
 from experience_gold.backends import SendExperienceGold
-from wanglibao_p2p.models import P2PRecord
+from weixin.tasks import sentCustomerMsg
+from wanglibao.templatetags.formatters import safe_phone_str
 
 def iter_method(data):
     total = sum([vv[1] for vv in data.values()])
@@ -67,11 +68,12 @@ def getWechatDailyReward(openid):
     if not user:
         return 0, "ok", 0
 
-    return sendDailyReward(user, daily_reward.id, save_point=True, isbind=False)
+    return sendDailyReward(user, daily_reward.id, openid, save_point=True, isbind=False)
 
 
-def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False, isbind=True):
+def sendDailyReward(user, daily_reward_id, openid, save_point=False, new_registed=False, isbind=True):
     # today = datetime.datetime.today()
+    fetch_state=0
     with transaction.atomic(savepoint=save_point):
         daily_reward = WechatUserDailyReward.objects.select_for_update().get(id=daily_reward_id)
         amount = 0
@@ -80,6 +82,7 @@ def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False,
         if WechatUserDailyReward.objects.filter(create_date=daily_reward.create_date, user=user, status=True).exists():
             daily_reward.status = True
             daily_reward.desc = "绑定发放给用户%s，但是该天用户已经领取过，所以该领奖作废"%user.id
+            fetch_state = 1
         else:
             if daily_reward.reward_type == "redpack":
                 share_invite_config = getMiscValue("redpack_rain_award_config")
@@ -111,8 +114,22 @@ def sendDailyReward(user, daily_reward_id, save_point=False, new_registed=False,
                 daily_reward.desc="绑定发放"
             else:
                 daily_reward.desc="领取发放"
+            fetch_state = 2
             daily_reward.user = user
             daily_reward.status = True
         daily_reward.save()
+        datestr= str(daily_reward.create_date).split(" ")[0]
+        if fetch_state == 1:
+            sentCustomerMsg.apply_async(kwargs={
+            "txt":"尊敬的用户，您的网利宝账号（%s）%s已经领取过红包花雨季奖励了,\n此微信号%s领取的奖励失效了~\n要记得，无法每天重复领取奖励哦，认真查看活动规则哦~~"%(safe_phone_str(user.wanglibaouserprofile.phone), datestr, datestr),
+            "openid":openid,
+                },
+                            queue='celery02')
+        if fetch_state ==2:
+            sentCustomerMsg.apply_async(kwargs={
+            "txt":"恭喜您获得%s网利红包花雨季奖励\n成功领取：%s元现金红包\n快去我的账户 - 理财券页面查看吧！"%(datestr, amount),
+            "openid":openid,
+                },
+                            queue='celery02')
         return 0, "ok", amount
 

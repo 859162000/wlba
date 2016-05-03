@@ -107,3 +107,11 @@ class StrQuote(object):
             s = self.quote(s, safe + ' ')
             return s.replace(' ', '+')
         return self.quote(s, safe)
+
+
+class FileObject(object):
+    """构造文件对象（file, size云存储所需）"""
+
+    def __init__(self, content, size):
+        self.file = content
+        self.size = size

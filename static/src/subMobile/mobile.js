@@ -2933,7 +2933,7 @@ org.redpacket = (function(org){
                 fphone = $("input.fphone").val(),
                 original_id = $("input.original_id").val(),
                 weixin_channel = $("input.weixin_channel_code").val();
-            var imgDom = $("#js-share-sign");
+            var imgDom = $("img.js-share-sign");
             if(is_bind=="False" && $(".redpacket-index").length < 1){
                 org.ajax({
                     url: '/weixin/api/generate/qr_invite_scene_ticket/',

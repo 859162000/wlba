@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
 import decimal
-from wanglibao_account.utils import FileObject
+from common.tools import FileObject
 import cStringIO
 import json
 import urllib2
@@ -1515,8 +1515,10 @@ class XunleiVipRegister(CoopRegister):
 
         if ENV == ENV_PRODUCTION:
             self.activity_start_time = datetime.datetime.strptime('2016-03-30 00:00:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_end_time = datetime.datetime.strptime('2016-05-11 23:59:59', "%Y-%m-%d %H:%M:%S")
         else:
             self.activity_start_time = datetime.datetime.strptime('2016-03-28 17:30:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_end_time = datetime.datetime.strptime('2016-04-29 14:51:00', "%Y-%m-%d %H:%M:%S")
 
     @property
     def channel_user(self):
@@ -1609,7 +1611,8 @@ class XunleiVipRegister(CoopRegister):
                         self.purchase_call_back(user, first_p2p_record.order_id)
 
                     # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
-                    p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
+                    p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
+                                                     Q(create_time__lte=self.activity_end_time))
                     for p2p_record in p2p_records:
                         if p2p_record.id != first_p2p_record.id:
                             self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
@@ -1739,7 +1742,8 @@ class XunleiVipRegister(CoopRegister):
                     })
 
         # 根据迅雷勋章活动开始时间查询
-        p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
+        p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
+                                         Q(create_time__lte=self.activity_end_time))
         p2p_record = p2p_records.filter(order_id=order_id).first()
         self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
@@ -2161,6 +2165,7 @@ class BiSouYiRegister(BaJinSheRegister):
         self.external_channel_sign_key = 'sign'
         self.internal_channel_sign_key = 'sign'
         self.channel_content_key = 'content'
+        self.channel_product_id_key = 'product_id'
 
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
@@ -2174,6 +2179,7 @@ class BiSouYiRegister(BaJinSheRegister):
         channel_user = req_data.get(self.external_channel_user_key, None)
         content = req_data.get(self.channel_content_key, None)
         client_id = req_data.get(self.external_channel_client_id_key, None)
+        p_id = req_data.get(self.channel_product_id_key, None)
 
         if not client_id:
             client_id = self.request.META.get(self.external_channel_client_id_key.upper(), None)
@@ -2205,6 +2211,9 @@ class BiSouYiRegister(BaJinSheRegister):
         if content:
             self.request.session[self.channel_content_key] = content
 
+        if p_id:
+            self.request.session[self.channel_product_id_key] = p_id
+
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
         self.request.session.pop(self.internal_channel_phone_key, None)
@@ -2212,6 +2221,7 @@ class BiSouYiRegister(BaJinSheRegister):
         self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.channel_content_key, None)
         self.request.session.pop(self.internal_channel_key, None)
+        self.request.session.pop(self.channel_product_id_key, None)
 
     def save_to_binding(self, user):
         """
