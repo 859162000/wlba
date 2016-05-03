@@ -144,7 +144,10 @@ def generate_bisouyi_product_data(product, action):
     status = 1 if product.status == u'正在招标' else 0
 
     if action == 'info':
-        period = product_period_to_days(pay_method, product.period)
+        if pay_method in (u'等额本息', u'按月付息', u'到期还本付息'):
+            unit = 2
+        else:
+            unit = 1
 
         product_type = product.types
         if product_type in (u'房贷', u'车贷'):
@@ -164,8 +167,8 @@ def generate_bisouyi_product_data(product, action):
             'name': product_name,
             'bidmoney': float(product.total_amount),
             'rate': product.expected_earning_rate,
-            'period': period,
-            'unit': 1,
+            'period': product.period,
+            'unit': unit,
             'progress': product.completion_rate,
             'rdate': product.publish_time.strftime("%Y-%m-%d %H:%M:%S"),
             'edate': product.end_time.strftime("%Y-%m-%d %H:%M:%S"),
