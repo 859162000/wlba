@@ -2079,7 +2079,7 @@ org.trade_back = (function (org) {
         return this.callback && this.callback(this.password);
     }
 
-    Deal_ui = {
+    var Deal_ui = {
         show_alert: function(state, callback, state_message){
             $('.tran-alert-error').show().find('.'+state).show().siblings().hide()
             if(state_message)  $('.tran-alert-error').show().find('.'+state).find('p').html(state_message)

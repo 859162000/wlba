@@ -236,6 +236,11 @@ import { Trade, Deal_ui } from './mixins/trade_validation.js'
                     return
                 }
                 if(result.error_number > 0){
+                    if(result.error_number == 2){
+                        return Alert(result.message, function(){
+                            window.location.href = "/weixin/regist/first/";
+                        });
+                    }
                     return Alert(result.message);
                 }
             },

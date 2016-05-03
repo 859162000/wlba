@@ -1,4 +1,4 @@
-webpackJsonp([14],[
+webpackJsonp([3],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -14,7 +14,7 @@ webpackJsonp([14],[
 
 	var _from_validation = __webpack_require__(6);
 
-	var _images_validation = __webpack_require__(12);
+	var _images_validation = __webpack_require__(8);
 
 	(function () {
 
@@ -26,8 +26,8 @@ webpackJsonp([14],[
 	        $password = $('input[name=password]'),
 	        $invite_code = $('input[name=invite_code]'),
 	        $agreement = $('input[name=agreement]'),
-	        $validate_operation = $('button[name=validate_operation]'),
 	        $captcha = $('#captcha'),
+	        $validate_operation = $('button[name=validate_operation]'),
 	        $token = $('#token');
 
 	    //---------------初始化操作start---------
@@ -98,12 +98,6 @@ webpackJsonp([14],[
 	        });
 	    };
 
-	    function getUrl(c) {
-	        var lUrl = window.location.href;
-	        var urlArr = lUrl.split(c);
-	        return urlArr[1].indexOf("&") > -1 ? urlArr[1].substring(0, urlArr[1].indexOf("&")) : urlArr[1];
-	    }
-
 	    //注册
 	    function register(url) {
 	        var invite_val = $.trim($invite_code.val());
@@ -117,7 +111,8 @@ webpackJsonp([14],[
 	                    'captcha_0': $captcha_0.val(),
 	                    'captcha_1': $captcha_1.val(),
 	                    'validate_code': $validate_code.val(),
-	                    'invite_code': invite_val === "" ? $token.val() : invite_val
+	                    'invite_code': invite_val === "" ? $token.val() : invite_val,
+	                    'invite_phone': ''
 	                },
 	                beforeSend: function beforeSend() {
 	                    $submit.text('注册中,请稍等...').attr('disabled', 'true');
@@ -138,22 +133,18 @@ webpackJsonp([14],[
 	    $submit.on('click', function () {
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
-	            //return register('/api/register/');
-	            return register('/api/bisouyi/register/?promo_token=bisouyi');
+	            return register('/api/register/');
 	        }).then(function (result) {
 	            console.log('register success');
-	            if (result.ret_code === 10000) {
-	                //成功
-
-	                BSY.Oauth(); //对接
-
+	            if (result.ret_code === 0) {
 	                (0, _ui.Alert)('注册成功', function () {
-	                    //var next = getQueryStringByName('next') == '' ? '/weixin/regist/first/' : getQueryStringByName('next');
-	                    //    next = getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ getQueryStringByName('mobile');
-	                    //    next = getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ getQueryStringByName('serverId');
-	                    window.location.href = '/weixin/list/';
+	                    var next = (0, _api.getQueryStringByName)('next') == '' ? '/weixin/channel_register_success/' : (0, _api.getQueryStringByName)('next');
+	                    next = (0, _api.getQueryStringByName)('mobile') == '' ? next : next + '&mobile=' + (0, _api.getQueryStringByName)('mobile');
+	                    next = (0, _api.getQueryStringByName)('serverId') == '' ? next : next + '&serverId=' + (0, _api.getQueryStringByName)('serverId');
+	                    window.location.href = next;
 	                });
-	            } else {
+	            }
+	            if (result.ret_code > 0) {
 	                (0, _ui.signModel)(result.message);
 	            }
 	        }).catch(function (xhr) {
@@ -524,11 +515,7 @@ webpackJsonp([14],[
 
 /***/ },
 /* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
