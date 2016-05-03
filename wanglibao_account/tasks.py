@@ -228,7 +228,9 @@ def process_products_push_callback(req_data):
 
         product_instance = P2PProduct.objects.filter(pk=product['id']).first()
         if product_instance:
-            if product_instance.status == product['status'] or sync_id < product_instance.sync_id:
+            if ((product_instance.status == product['status'] and
+                 product_instance.ordered_amount == product['ordered_amount']) or
+                    sync_id < product_instance.sync_id):
                 continue
             product_form = P2PProductForm(product, instance=product_instance)
         else:

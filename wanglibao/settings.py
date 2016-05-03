@@ -196,7 +196,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'publish/static')
 
 # The request rate for some apis
 request_rate = '2/minute'

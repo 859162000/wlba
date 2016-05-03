@@ -29,8 +29,8 @@ def production():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
-    env.depot_name = 'wanglibao-backend'
-    env.branch = 'production3.0'
+    env.depot_name = 'wanglibao-channel'
+    env.branch = 'channel_center'
 
     env.pip_install = "pip install -r requirements.txt"
     env.pip_install_command = "pip install"
@@ -47,8 +47,8 @@ def pre_production():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
-    env.depot_name = 'wanglibao-backend'
-    env.branch = 'production3.0'
+    env.depot_name = 'wanglibao-channel'
+    env.branch = 'channel_center'
 
     env.pip_install = "pip install -r requirements.txt"
     env.pip_install_command = "pip install"
@@ -62,8 +62,8 @@ def dev():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
-    env.depot_name = 'wanglibao-backend'
-    env.branch = 'master'
+    env.depot_name = 'wanglibao-channel'
+    env.branch = 'channel_center'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -79,8 +79,8 @@ def staging():
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
-    env.depot_name = 'wanglibao-backend'
-    env.branch = 'master'
+    env.depot_name = 'wanglibao-channel'
+    env.branch = 'channel_center'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
     env.pip_install_command = "pip install -i http://pypi.douban.com/simple/"
@@ -97,19 +97,21 @@ def staging():
 
 if env.get('group') == 'staging':
     env.roledefs = {
-        'lb': ['staging.wanglibao.com'],
-        'web': ['staging.wanglibao.com'],
+        'lb': ['qdtest.wanglibao.com'],
+        'web': ['qdtest.wanglibao.com'],
         'web_private': ['127.0.0.1'],
 
         # task_queue should be ip
-        'task_queue': ['staging.wanglibao.com'],
+        'task_queue': [],
+        # 'task_queue': ['staging.wanglibao.com'],
         # 'task_queue': ['111.206.165.43'],
-        'task_queue_private': ['127.0.0.1'],
+        # 'task_queue_private': ['127.0.0.1'],
+        'task_queue_private': ['192.168.1.242'],
 
-        'db': ['staging.wanglibao.com'],
+        'db': ['qdtest.wanglibao.com'],
         'old_lb': [],
         'old_web': [],
-        'cron_tab': ['staging.wanglibao.com'],
+        'cron_tab': ['qdtest.wanglibao.com'],
     }
     staging()
 
