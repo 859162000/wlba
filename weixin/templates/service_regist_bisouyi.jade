@@ -1,0 +1,113 @@
+doctype html
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    if token == 'dxdt'
+      script(src="http://m.wo.cn/js/top.js")
+    header
+      hgroup 注册网利宝
+
+    //banner
+    section.regist-banner
+      if channel and channel.image
+        img(src='/media/{{channel.image}}')
+      else
+        img(src='/static/imgs/mobile/regist/channel_weixin.jpg')
+
+
+    //表单
+    section.wx-regist-from-warp
+      if phone
+        phoneValue = phone
+      else
+        phoneValue = ''
+      //表单单个模版
+      .wx-input-public.wx-login-input-space
+        .wx-input-icon
+          .phone
+        input(type='tel', name='identifier',value=phoneValue, placeholder= '请输入手机号', data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-clear-input
+
+      .wx-input-double.wx-login-input-space
+        .wx-input-public
+          .wx-input-icon
+            .captcha
+          input(type='tel', name='captcha_1', placeholder= '请输入计算结果',data-icon='wx-input-icon', data-other='wx-validation-btn', autocomplete='off').wx-input-main
+          input(type='hidden', name='captcha_0')
+        .wx-validation
+          img(src="", alt="", width="100%", height="100%")#captcha
+
+      .wx-input-double.wx-login-input-space
+        .wx-input-public
+          .wx-input-icon
+            .validation
+          input(type='tel', name='validate_code', placeholder= '请输入验证码', data-icon='wx-input-icon',  autocomplete='off').wx-input-main
+
+        .wx-validation
+          button(type="button",name='validate_operation', disabled=true).wx-validation-btn 获取验证码
+      .wx-input-public.wx-login-input-space
+        .wx-input-icon
+          .password
+        input(type='password', name='password', placeholder= '请设置密码',data-icon='wx-input-icon',  autocomplete='off').wx-input-main
+        .wx-operation-icon.wx-hide-password.wx-password-operation
+      //.wx-input-public
+      //  .wx-input-icon
+      //    .token
+      //  input(type='text', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', data-icon='wx-input-icon',  autocomplete='off').wx-input-main
+      input(type="hidden", name="token", id="token", value="{{token}}")
+
+
+      //账户安全
+      section.regist-safe
+        span 阳光保险承保资金账户安全
+
+      //注册按钮
+      section#regist-submit.regist-submit
+        button(type="submit", disabled=true) 立即注册 ｜ 领取奖励
+
+      //注册协议
+      section.regist-protocol-n
+        span.checkbox.agreement#agreement
+          input(type='checkbox',name='agreement', checked=true)
+        span.xieyi-btn 同意网利宝注册协议
+        if next == ''
+          a(href="/weixin/login/").regist-for-login 立即登录
+        else
+          a(href="/weixin/login/?next={{next}}").regist-for-login 立即登录
+    //宣传文案
+    section.regist-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4=title
+            p=bodyTxt1
+            p=bodyTxt2
+        +li('trust', '信赖', 'IDG资本A轮投资', '100%本息保障')
+        +li('authority', '权威', 'A股百亿上市公司', '鸿利光电投资入股')
+        +li('safe', '安全', '账户资金安全', '由阳光保险承保')
+        +li('profit', '高收益', '37倍银行活期收益', '100元起投0手续')
+    //公司地址
+    section.regist-adress
+      .adress-top
+        .company-adress 北京网利科技有限公司
+        .company-phone  010-84417763
+      .adress-bottom 北京市朝阳区东三环北路乙2号海南航空大厦A座7层
+    //协议内容
+    section.regist-protocol-div
+      header.xieyi-head
+        hgroup 注册协议
+        a(href="javascript:void(0)").cancel-xiyie
+          span 返回
+      article.xieyi-cont
+        include include/weixin_xieyiFixed
+    include include/ui_model/mobile_errorsign
+    include include/ui_model/mobile_alert
+    include include/tracking
+
+    script(src='/static/src/mobile/lib/Bsy-Oauth.min.1.0.js')
+    script(src='/static/scripts/mobile/dev/vendor.zepto.js?20160405')
+    script(src='/static/scripts/mobile/dev/regist_bsy.js?2016040502')
+
+    //script(data-init='regist', src="/static/scripts/mobile/dist/mobile.js?v=201251207")
