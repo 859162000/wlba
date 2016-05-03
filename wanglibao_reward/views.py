@@ -1153,15 +1153,13 @@ class ZhaoXiangGuanAPIView(APIView):
         
         reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
         if reward:
-            json_to_response = {
-                'ret_code': 1,
-                'message': u'奖品已经发放'
-            }
+            json_to_response = {'ret_code': 1,'message': u'奖品已经发放'}
         else:
-            json_to_response = {
-                'ret_code': 0,
-                'message': u'奖品未发放'
-            }            
+            try:
+                join_record = WanglibaoRewardJoinRecord.objects.create(user=user,activity_code='sy',remain_chance=0,)
+                json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记成功'}
+            except:
+                json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记失败'}
         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 
