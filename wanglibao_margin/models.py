@@ -1,7 +1,6 @@
 # encoding: utf-8
 from decimal import Decimal
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
@@ -35,6 +34,11 @@ class MarginRecord(models.Model):
     amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
     margin_current = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
+
+    # Add by zhoud for yuelibao
+    freeze_before = models.DecimalField(verbose_name=u'操作前冻结金额', max_digits=20, decimal_places=2, null=True)
+    freeze_after = models.DecimalField(verbose_name=u'操作后冻结金额', max_digits=20, decimal_places=2, null=True)
+    margin_before = models.DecimalField(verbose_name=u'操作前用户余额', max_digits=20, decimal_places=2, null=True)
 
     def __unicode__(self):
         return u'%s , %s, 交易金额%s, 余额%s' % (self.catalog, self.user, self.amount, self.margin_current)
