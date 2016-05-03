@@ -155,7 +155,7 @@ class PayInfo(models.Model):
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
     phone_for_card = models.CharField(u'预留手机号', max_length=25, blank=True, null=False, default='')
     is_checked = models.BooleanField(u'是否同步支付结果', default=False)
-    check_response = models.CharField(u'同步支付结果返回', max_length=200, blank=True, default='')
+    check_response = models.CharField(u'同步支付结果返回', max_length=1000, blank=True, default='')
     channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"), #汇付网银
         ("huifu_bind", "Huifu_bind"), #汇付快捷
