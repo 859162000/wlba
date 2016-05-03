@@ -54,7 +54,7 @@ class ContractTemplate(models.Model):
 FINANCES = (
     (u"产融通", u"产融通"),
     (u"黄金精选", u"黄金精选"),
-    (u"房稳赚", u"房稳赚"),
+    (u"好房赚", u"好房赚"),
     (u"好车盈", u"好车盈"),
     (u"银行优选", u"银行优选"),
 )
