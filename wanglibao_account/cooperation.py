@@ -994,7 +994,7 @@ class BiSouYiCallback(CoopCallback):
                 'name': product.name[:100],
                 'amoney': float(p2p_record.amount),
                 'aperiod': period,
-                'unit': u'天',
+                'unit': 1,
                 'adate': timezone.localtime(p2p_record.create_time).strftime('%Y-%m-%d %H:%M:%S'),
                 'rate': product.expected_earning_rate,
                 'guarantee': pay_method,

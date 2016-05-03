@@ -4,7 +4,7 @@ from adminplus.sites import AdminSitePlus
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
-from wanglibao import settings
+from django.conf import settings
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
