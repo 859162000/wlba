@@ -106,7 +106,7 @@ webpackJsonp([10],{
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback();
+	        callback && callback();
 	    });
 	};
 
