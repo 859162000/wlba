@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
 import decimal
-from wanglibao_account.utils import FileObject
+from common.tools import FileObject
 import cStringIO
 import json
 import urllib2
@@ -26,6 +26,7 @@ import hashlib
 import datetime
 import time
 import logging
+from datetime import datetime as dt
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
@@ -1158,23 +1159,23 @@ class KongGangRegister(CoopRegister):
 
         reward = None
         if p2p_amount>=10000:
-            with transaction.atomic:
-                reward = Reward.objects.select_for_update().filter(type='贵宾全套出岗服务', is_used=False).first()
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='贵宾全套出港服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
                     reward.save()
                     return reward
 
         if p2p_amount>=5000:
-            with transaction.atomic:
-                reward = Reward.objects.select_for_update().filter(type='尊贵休息室服务', is_used=False).first()
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='贵宾休息室服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
                     reward.save()
                     return reward
 
         if p2p_amount>=500:
-            with transaction.atomic:
+            with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='CIP专用安检通道服务', is_used=False).first()
                 if reward:
                     reward.is_used = True
@@ -1208,9 +1209,9 @@ class KongGangRegister(CoopRegister):
         #now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
         #TODO:转换为UTC时间后跟表记录时间对比
         from wanglibao_account import utils
-        utc_start = (utils.str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
-        utc_end = (utils.str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
-        now = p2p_record.create_time
+        utc_start = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+        utc_end = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
+        now = p2p_record.create_time.strftime("%Y-%m-%d %H:%M:%S")
         if now < utc_start or now >= utc_end:
             #raise Exception(u"活动还未开始,请耐心等待")
             return
@@ -1220,7 +1221,7 @@ class KongGangRegister(CoopRegister):
             return
 
         #判断有没有奖品剩余
-        reward = self.decide_which_reward_distribute(p2p_record.p2p_amount)
+        reward = self.decide_which_reward_distribute(p2p_record.amount)
         if reward == 'invalid':
             raise Exception(u"不满足领取条件")
         if reward == None:
@@ -1256,13 +1257,14 @@ class KongGangRegister(CoopRegister):
             reward.save()
             raise Exception(u"发奖异常，奖品回库")
         else:
-            send_msg = u'尊敬的贵宾客户，恭喜您获得%s' \
+            send_msg = u'尊敬的贵宾客户，恭喜您获得%s，' \
                        u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                        u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                        u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
+
             send_messages.apply_async(kwargs={
-                "phones": [user.id, ],
-                "message": [send_msg,],
+                "phones": [user.wanglibaouserprofile.phone, ],
+                "messages": [send_msg,],
             })
 
             inside_message.send_one.apply_async(kwargs={
@@ -1271,103 +1273,6 @@ class KongGangRegister(CoopRegister):
                 "content": send_msg,
                 "mtype": "activity"
             })
-
-class ZhaoXiangGuanRegister(CoopRegister):
-    def __init__(self, request):
-        super(ZhaoXiangGuanRegister, self).__init__(request)
-        self.c_code = 'sy'
-        self.invite_code = 'sy'
-
-    def purchase_call_back(self, user, order_id):
-
-        key = 'zhaoxiangguan'
-        activity_config = Misc.objects.filter(key=key).first()
-        if activity_config:
-            activity = json.loads(activity_config.value)
-            if type(activity) == dict:
-                try:
-                    start_time = activity['start_time']
-                    end_time = activity['end_time']
-                except KeyError, reason:
-                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
-                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
-            else:
-                raise Exception(u"misc中activities的配置参数，应是字典类型")
-        else:
-            raise Exception(u"misc中没有配置activities杂项")
-
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
-
-        now = p2p_record.create_time
-        if now < start_time:
-            json_to_response = {
-                'ret_code': 1001,
-                'message': u'活动还未开始,请耐心等待'
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        if now > end_time:
-            json_to_response = {
-                'ret_code': 1001,
-                'message': u'活动已经结束！'
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        
-        
-        
-        #判断有没有奖品剩余
-        with transaction.atomic:
-            reward = Reward.objects.select_for_update().filter(type='影像投资节优惠码', is_used=False).first()
-            if reward == None:
-                return
-            else:
-                reward.is_used = True
-                reward.save()
-                
-        try:
-            with transaction.atomic():
-                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
-                if not join_record:
-                    join_record = WanglibaoRewardJoinRecord.objects.create(
-                        user=user,
-                        activity_code=self.c_code
-                    )
-
-                reward_record = ActivityReward.objects.filter(has_sent=True, activity='sy', user=user).first()
-                if reward_record:  #奖品记录已经生成了
-                    join_record.save()
-                    return
-                reward_record = ActivityReward.objects.create(
-                            activity='sy',
-                            order_id=order_id,
-                            user=user,
-                            p2p_amount=p2p_record.amount,
-                            reward=reward,
-                            has_sent=False,
-                            left_times=0,
-                            join_times=0)
-        except Exception:
-            reward.is_used = False
-            reward.save()
-            join_record.save()
-        else:
-            
-            send_msg = u'尊敬的用户，恭喜您在参与影像投资节活动中获得优惠机会，优惠码为：%s，'\
-                       u'请凭借此信息至相关门店享受优惠，相关奖励请咨询八月婚纱照相馆及鼎极写真摄影，'\
-                       u'感谢您的参与！【网利科技】' % (send_reward.content)
-            send_messages.apply_async(kwargs={
-                "phones": [user.id, ],
-                "message": [send_msg, ],
-            })
-
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": user.id,
-                "title": u"影像投资节优惠码",
-                "content": send_msg,
-                "mtype": "activity"
-            })
-            reward_record.has_sent = True
-            reward_record.save()
-            join_record.save()
 
 class RockFinanceRegister(CoopRegister):
     def __init__(self, request):
@@ -1610,9 +1515,14 @@ class XunleiVipRegister(CoopRegister):
         self.coop_sign_key = 'sign'
 
         if ENV == ENV_PRODUCTION:
-            self.activity_start_time = datetime.datetime.strptime('2016-03-30 00:00:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_start_time = dt.strptime('2016-03-30 00:00:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_end_time = dt.strptime('2016-05-11 23:59:59', "%Y-%m-%d %H:%M:%S")
         else:
-            self.activity_start_time = datetime.datetime.strptime('2016-03-28 17:30:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_start_time = dt.strptime('2016-03-28 17:30:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_end_time = dt.strptime('2016-04-29 14:51:00', "%Y-%m-%d %H:%M:%S")
+
+        self.activity_start_time = timezone.make_aware(self.activity_start_time, timezone.get_default_timezone())
+        self.activity_end_time = timezone.make_aware(self.activity_end_time, timezone.get_default_timezone())
 
     @property
     def channel_user(self):
@@ -1705,10 +1615,12 @@ class XunleiVipRegister(CoopRegister):
                         self.purchase_call_back(user, first_p2p_record.order_id)
 
                     # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
-                    p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
-                    for p2p_record in p2p_records:
-                        if p2p_record.id != first_p2p_record.id:
-                            self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
+                    if self.activity_start_time <= timezone.now() <= self.activity_end_time:
+                        p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
+                                                         Q(create_time__lte=self.activity_end_time))
+                        for p2p_record in p2p_records:
+                            if p2p_record.id != first_p2p_record.id:
+                                self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
                     # 处理渠道用户绑卡回调补发
                     self.binding_card_call_back(user)
@@ -1835,9 +1747,11 @@ class XunleiVipRegister(CoopRegister):
                     })
 
         # 根据迅雷勋章活动开始时间查询
-        p2p_records = p2p_records.filter(create_time__gte=self.activity_start_time)
-        p2p_record = p2p_records.filter(order_id=order_id).first()
-        self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
+        if self.activity_start_time <= timezone.now() <= self.activity_end_time:
+            p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
+                                             Q(create_time__lte=self.activity_end_time))
+            p2p_record = p2p_records.filter(order_id=order_id).first()
+            self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
     def common_purchase_call_back(self, user, p2p_record, p2p_records, binding):
         # 判断用户是否绑定
@@ -2257,6 +2171,7 @@ class BiSouYiRegister(BaJinSheRegister):
         self.external_channel_sign_key = 'sign'
         self.internal_channel_sign_key = 'sign'
         self.channel_content_key = 'content'
+        self.channel_product_id_key = 'product_id'
 
     def save_to_session(self):
         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
@@ -2270,6 +2185,7 @@ class BiSouYiRegister(BaJinSheRegister):
         channel_user = req_data.get(self.external_channel_user_key, None)
         content = req_data.get(self.channel_content_key, None)
         client_id = req_data.get(self.external_channel_client_id_key, None)
+        p_id = req_data.get(self.channel_product_id_key, None)
 
         if not client_id:
             client_id = self.request.META.get(self.external_channel_client_id_key.upper(), None)
@@ -2301,6 +2217,9 @@ class BiSouYiRegister(BaJinSheRegister):
         if content:
             self.request.session[self.channel_content_key] = content
 
+        if p_id:
+            self.request.session[self.channel_product_id_key] = p_id
+
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
         self.request.session.pop(self.internal_channel_phone_key, None)
@@ -2308,6 +2227,7 @@ class BiSouYiRegister(BaJinSheRegister):
         self.request.session.pop(self.internal_channel_client_id_key, None)
         self.request.session.pop(self.channel_content_key, None)
         self.request.session.pop(self.internal_channel_key, None)
+        self.request.session.pop(self.channel_product_id_key, None)
 
     def save_to_binding(self, user):
         """
@@ -2371,6 +2291,7 @@ class JiaXiHZRegister(CoopRegister):
             data_encode = '&'.join([k + '=' + str(v) for k, v in data])
             sign = hashlib.md5(data_encode).hexdigest()
             params = dict(data)
+            params.pop('key', None)
             params['sign'] = sign
 
             # 异步回调
@@ -2388,7 +2309,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          ZhaoXiangGuanRegister, JiaXiHZRegister]
+                          JiaXiHZRegister]
 
 
 # ######################第三方用户查询#####################

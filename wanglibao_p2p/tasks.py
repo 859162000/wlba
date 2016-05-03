@@ -307,6 +307,7 @@ def coop_product_push(product_id=None):
 
 @app.task
 def coop_amortizations_push(amortizations, product_id):
+    logger.info("Enter coop_amortizations_push for product id[%s]" % product_id)
     amortization_list = list()
     amo_terms = ProductAmortization.objects.filter(product_id=product_id).count()
     for amo in amortizations:

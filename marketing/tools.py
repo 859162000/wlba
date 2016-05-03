@@ -18,7 +18,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_activity import backends as activity_backends
-from wanglibao_activity.tasks import check_activity
+from wanglibao_activity.tasks import check_activity_task
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
 import json
@@ -32,7 +32,7 @@ from weixin.tasks import sentTemplate
 # from wanglibao_reward.tasks import sendWechatPhoneReward
 from marketing.send_data import send_register_data, send_idvalidate_data, send_deposit_data, send_investment_data,\
      send_withdraw_data
-from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy, processAugustAwardZhaoXiangGuan
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -54,7 +54,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
 
     # 活动检测
     # activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full)
-    check_activity.apply_async(kwargs={
+    check_activity_task.apply_async(kwargs={
         "user_id": user.id,
         "trigger_node": 'invest',
         "device_type": device_type,
@@ -71,6 +71,12 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # 发送红包
     # send_lottery.apply_async((user_id,))
     processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
+    #八月照相馆活动
+    try:
+        processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount)
+    except Exception:
+        logger.error('影像投资节优惠码发送失败，user_id:%s; product_id:%s; order_id:%s' % (user.id , product_id, order_id))
+        pass    
     # 往数据中心发送投资信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_investment_data.apply_async(kwargs={
@@ -113,7 +119,7 @@ def register_ok(user_id, device):
     })
     # 活动检测
     # activity_backends.check_activity(user, 'register', device_type)
-    check_activity.apply_async(kwargs={
+    check_activity_task.apply_async(kwargs={
         "user_id": user.id,
         "trigger_node": 'register',
         "device_type": device_type,
@@ -136,7 +142,7 @@ def idvalidate_ok(user_id, device):
 
     # 活动检测
     # activity_backends.check_activity(user, 'validation', device_type)
-    check_activity.apply_async(kwargs={
+    check_activity_task.apply_async(kwargs={
         "user_id": user.id,
         "trigger_node": 'validation',
         "device_type": device_type,
@@ -183,7 +189,7 @@ def deposit_ok(user_id, amount, device, order_id):
         user_profile = user.wanglibaouserprofile
         # activity_backends.check_activity(user, 'recharge', device_type,
         #                                  amount, **{'order_id': order_id})
-        check_activity.apply_async(kwargs={
+        check_activity_task.apply_async(kwargs={
             "user_id": user.id,
             "trigger_node": 'recharge',
             "device_type": device_type,

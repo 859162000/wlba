@@ -67,7 +67,7 @@
                 dataType: 'json',
                 success: function(data){
                     if(data.ret_code=='1000'){
-                        window.location.href = '/accounts/login/?next=/activity/airport_operation/'
+                        window.location.href = '/accounts/login/?promo_token=kgyx&next=/activity/airport_operation/?promo_token=kgyx'
                     }else if(data.ret_code=='1002'||data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'||data.ret_code=='1005'){
                         $('.popup_box .main .textairport').text(''+data.message+'');
                         $('.popup_box').show();

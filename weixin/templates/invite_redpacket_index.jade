@@ -32,7 +32,7 @@ html.service-redpacket-bg1
         document.write(c);
         document.documentElement.style.fontSize = 20 * a + "px"
       })();
-    link(href="/static/styles/sub_weixin/sub_weixin.css?v=20160303102", rel="stylesheet")
+    link(href="/static/styles/sub_weixin/sub_weixin.css?v=20160402902", rel="stylesheet")
 
     - csrf_token
   body.service-redpack-activity
@@ -87,23 +87,42 @@ html.service-redpacket-bg1
             .price-tit 现金红包
             .share-promote 长按二维码，每天领取现金红包
             .price-code.mt20
-              img(src="/static/imgs/sub_weixin/redpack_activity/loader.gif")#js-share-sign
+              img(src="/static/imgs/sub_weixin/redpack_activity/loader.gif").js-share-sign
     else
-      .redpacket.redpacket-index
-        .cloud-top
-        .cloud-btm
-        .main-box
-          .price-box 1~10000元
-          .price-tit 现金红包
-          .price-btn.js-open-redpacket 打开红包雨
+      if fetched_date
+        .redpacket.redpacket-code
+          .cloud-top
+          .cloud-btm
+          .main-box
+            //（您于x月x日获得）
+            .price-b-tit 您于{{ fetched_date }}获得
+            .price-box.js-reward-price {{ reward_text }}
+            .price-tit 现金红包
+            .share-promote 长按二维码，每天领取现金红包
+            .price-code.mt20
+              img(src="/static/imgs/sub_weixin/redpack_activity/loader.gif").js-share-sign
+      else
+        .redpacket.redpacket-index
+          .cloud-top
+          .cloud-btm
+          .main-box
+            .price-box 1~10000元
+            .price-tit 现金红包
+            .price-btn.js-open-redpacket 打开红包雨
 
     .activity-rule
       .rule-tit 活动规则
       .rule-list
-        p 1.活动规则活动规则活动规则活动规则
-        p 2.活动规则活动规则活动规则活动规则活动规则
-        p 3.活动规则活动规则活动规则活动规则活动规则
-        p 4.活动规则活动规则活动规则活动规则活动规则
-
+        p 1.参与网利红包花雨季活动，即可每日领取奖励，奖励内容随机；
+        p 2.每个微信号、每个手机号每天只能领取一次奖励；
+        p 3.微信号开奖时：
+        p.txt-indent (1).若已绑定网利宝服务号，则奖励发放到对应手机号；
+        p.txt-indent (2).若对应的绑定手机号当日已领奖，则该微信号当日所开奖励无效。
+        p 4.邀请好友参与活动，还能获得额外奖励：
+        p.txt-indent (1).邀请注册奖励：成功邀请一名注册用户，邀请人即可获得体验金奖励，每人可获邀请体验金奖励封顶20万；
+        p.txt-indent (2).邀请投资奖励：邀请用户成功投资后，邀请人即可获得现金红包奖励。
+        p 5.建议通过网利宝服务号内的分享链接才能获得邀请奖励，在网利宝服务号外进行分享可能无法得到邀请奖励；
+        p 6.参与本活动，则不共享全民淘金对应奖励；
+        p 7.活动最终解释权，归网利宝所有。
     script(src='/static/src/subMobile/lib/weixin/jweixin-1.0.0.js')
-    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?2016042104")
+    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?20160429")

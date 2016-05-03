@@ -36,6 +36,7 @@ from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_rest.utils import get_current_utc_timestamp
 from report.crypto import Aes
+from common.tools import FileObject
 
 
 logger = logging.getLogger(__name__)
@@ -350,6 +351,18 @@ def str_add_md5(value):
     else:
         return ''
 
+def ext_str_to_utc(time_str):
+    """
+    :param str:  '2015-08-08'
+    :return:     datetime.datetime(2015, 8, 8, 7, 0, tzinfo=<UTC>)
+    """
+    time_zone = settings.TIME_ZONE
+    local = pytz.timezone(time_zone)
+    naive = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
+    local_dt = local.localize(naive, is_dst=None)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    return utc_dt
+
 
 def str_to_utc(time_str):
     """
@@ -457,14 +470,6 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
-
-
-class FileObject(object):
-    """构造文件对象（file, size云存储所需）"""
-
-    def __init__(self, content, size):
-        self.file = content
-        self.size = size
 
 
 def base64_to_image(base64_str):

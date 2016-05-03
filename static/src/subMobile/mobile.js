@@ -2933,7 +2933,7 @@ org.redpacket = (function(org){
                 fphone = $("input.fphone").val(),
                 original_id = $("input.original_id").val(),
                 weixin_channel = $("input.weixin_channel_code").val();
-            var imgDom = $("#js-share-sign");
+            var imgDom = $("img.js-share-sign");
             if(is_bind=="False" && $(".redpacket-index").length < 1){
                 org.ajax({
                     url: '/weixin/api/generate/qr_invite_scene_ticket/',
@@ -3010,10 +3010,15 @@ org.redpacket = (function(org){
         shareOk: function(){
             var url = $("input.share_url").val(),
                 price = $(".js-reward-price").text();
-            var num = price.substring(0,price.length-1)*1;
-            var pnum = num ? num : "X";
-            var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ pnum +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
+            var num = 10000,
+                host = 'https://staging.wanglibao.com/';
+
+            if(price){
+                num = price.substring(0,price.length-1)*1;
+            }
+            var share = {shareImg: host+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ num +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
             org.detail.share(share, true);
+            //org.detail.share(share, false);
         }
     }
     return {
@@ -3151,7 +3156,7 @@ org.redpacket_bind = (function(org){
                     },
                     success: function (data) {
                         if(data.re_code != 0){
-                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                            window.location.href = "/weixin/jump_page/?message="+data.errmessage;
                         }else{
                             window.location.href = $("input.next-url").val();
                         }
@@ -3556,6 +3561,7 @@ org.awardEvent = (function(org){ //微信抽奖
             url: '/api/weixin/distribute/redpack/',
             dataType: 'json',
             data: {"action": obj,"openid": $("#openid").val()},
+            //data: {"action": obj,"openid": "oILFQt3q9C-SqnZRlUTYvhgQUHYE"},
             success: function(data){
                 fn(data);
                 awardsNum = data.left;

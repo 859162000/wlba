@@ -1,4 +1,25 @@
+.account-body
+  .redpacket-entry
+    position: fixed
+    z-index: 999
+    bottom: 0.5rem
+    right: 0.5rem
+    height: 3.5rem
+    width: 3.5rem
+    background: url("/static/imgs/sub_weixin/redpack_activity/iconfont_yu.png") center top no-repeat
+    background-size: 100%
+    color: #fff
+    font-size: 0.8rem
+    overflow: hidden
+    a
+      display: block
+      width: 100%
+      padding: 1.8rem 0.5rem 0
+      text-align: center
+      color: #f8e71c
 .service-redpacket-bg1
+  width: 100%
+  overflow: hidden
   background: #751B34 url("/static/imgs/sub_weixin/redpack_activity/redpack_bg.png") center top no-repeat
   background-size: 100% auto
 .service-redpacket-grey
@@ -100,13 +121,15 @@
       color: #D92B45
       font-weight: bold
   .activity-rule
-    padding: 0 rem(40)
+    padding: 0 rem(40) 0.5rem
     font-size: rem(24)
     color: #fff
     line-height: rem(38)
     .rule-list
       margin-top: rem(5)
       opacity: 0.7
+      .txt-indent
+        text-indent: 2em
   .redpacket-share-alt
     display: none
     background: rgba(0, 0, 0, 0.7)

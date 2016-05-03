@@ -274,10 +274,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
+		var host = location.protocol+"//"+location.host,
 			shareName = '从容出行 尊贵定制',
 			shareImg = host + '/static/imgs/mobile_activity/app_airport_operation/300x300.jpg',
-			shareLink = host + 'weixin_activity/app_airport_operation/',
+			shareLink = host + '/activity/app_airport_operation/?promo_token=kgyx',
 			shareMainTit = '从容出行 尊贵定制',
 			shareBody = '网利宝携手空港易行狂撒出行卡';
 		//分享给微信好友
@@ -303,7 +303,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 
 
-
     $('.popup_box .popup_button').click(function(){
         $('.popup_box').hide();
     });
@@ -320,36 +319,52 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         ts: data.ts
                     },
                     success: function (data) {
-                        var url = location.href;
-                        var times = url.split("?");
-                        if(times[1] != 1){
-                            url += "?1";
-                            self.location.replace(url);
-                        }
+                        //var url = location.href;
+                        //var times = url.split("?");
+                        //if(times[1] != 1){
+                        //    url += "?1";
+                        //    self.location.replace(url);
+                        //}
+
+                        $('.six_btn').on("click",function(){
+
+                            org.ajax({
+                                type: "post",
+                                url: "/api/activity/konggang/",
+                                dataType: 'json',
+                                success: function(data){
+                                    if(data.ret_code=='1000'){
+                                        mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=kgyx'});
+                                    }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
+                                        $('.popup_box .main .textairport').text(''+data.message+'');
+                                        $('.popup_box').show();
+                                    }else if(data.ret_code=='1002'){
+                                        mixins.jumpToManageMoney();
+                                    }
+                                    //console.log(data)
+                                }
+                            })
+                        })
+
+
                     }
                 })
             }
 			mixins.shareData({title: '从容出行 尊贵定制', content: '网利宝携手空港易行狂撒出行卡！'});
             mixins.sendUserInfo(function(data) {
-                $('.six_btn').on("click",function(){
 
-                    org.ajax({
-                        type: "post",
-                        url: "/api/activity/konggang/",
-                        dataType: 'json',
-                        success: function(data){
-                            if(data.ret_code=='1000'){
-                                mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/'});
-                            }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'){
-                                $('.popup_box .main .textairport').text(''+data.message+'');
-                                $('.popup_box').show();
-                            }else if(data.ret_code=='1002'){
-                                mixins.jumpToManageMoney();
-                            }
-                            //console.log(data)
-                        }
+                if (data.ph == '') {
+                    login = false;
+
+                    $('.six_btn').on("click",function(){
+                         mixins.registerApp({refresh:1, url:'/activity/app_airport_operation/?promo_token=kgyx'});
                     })
-                })
+                } else {
+                    login = true;
+                    connect(data)
+
+                }
+
             })
         },
         other: function() {
@@ -361,12 +376,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     dataType: 'json',
                     success: function(data){
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?next=/weixin/list/'
+                            window.location.href = '/weixin/regist/?promo_token=kgyx&next=/weixin/list/?promo_token=kgyx'
                         }else if(data.ret_code=='0'||data.ret_code=='1003'||data.ret_code=='1001'||data.ret_code=='1005'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else if(data.ret_code=='1002'){
-                            window.location.href = '/weixin/list/'
+                            window.location.href = '/weixin/list/?promo_token=kgyx'
                         }
 
                         //console.log(data)

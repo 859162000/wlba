@@ -22,7 +22,7 @@ import pytz
 import json
 from datetime import datetime
 # from wanglibao_activity import backends as activity_backends
-from wanglibao_activity.tasks import check_activity
+from wanglibao_activity.tasks import check_activity_task
 import traceback
 
 REPAYMENT_MONTHLY = 'monthly'
@@ -130,7 +130,7 @@ class PrepaymentHistory(object):
                 try:
                     if user_record.principal > 0:
                         # activity_backends.check_activity(user, 'repaid', 'pc', user_record.principal, product.id)
-                        check_activity.apply_async(kwargs={
+                        check_activity_task.apply_async(kwargs={
                             "user_id": user.id,
                             "trigger_node": 'repaid',
                             "device_type": 'pc',

@@ -236,8 +236,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $(".page-loading").hide();
             $("#swiper-container .swiper-wrapper,#next-box").show();
         }, 1000);
-        var u = navigator.userAgent;
-        alert(u);
+        //var u = navigator.userAgent;
+        //alert(u);
     };
 
     //音乐
@@ -287,9 +287,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     });
     wx.ready(function () {
-        var winHost = window.location.href;
-        var host = winHost.substring(0,winHost.indexOf('/activity')),
-            shareImg = host + '/static/imgs/mobile_activity/new_user_gift/icon_weixin.png',
+        var winHost = window.location.href,
+            host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
+        var shareImg = host + '/static/imgs/mobile_activity/new_user_gift/icon_weixin.png',
             shareLink = host + '/weixin/new_user_gift/',
             shareMainTit = '尊贵新人礼 专享5%加息',
             shareBody = '网利宝新手狂撒福利';
@@ -385,7 +385,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             //document.getElementById('refresh').onclick= function(){
             //    window.location.reload();
             //}
-            mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利"});
+            mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利", image: "/static/imgs/mobile_activity/new_user_gift/icon_weixin.png"});
         },
         other: function(){
             get_gift();
