@@ -272,12 +272,21 @@ def coop_product_push(product_id=None):
     for product in product_list:
         # 对比redis缓存标的状态
         if redis.redis and redis.redis.ping():
-            redis_product_status_key = 'product_%s_status' % product['id']
+            redis_product_status_key = '_product_%s_status' % product['id']
             redis_product_status = redis._get(redis_product_status_key)
-            if redis_product_status and redis_product_status == product['status']:
-                continue
+            if redis_product_status:
+                redis_product_status = json.loads(redis_product_status)
+                status = redis_product_status.get('status', None)
+                ordered_amount = redis_product_status.get('ordered_amount', None)
+                if product['status'] == status and product['ordered_amount'] == ordered_amount:
+                    continue
             else:
-                redis._set(redis_product_status_key, product['status'])
+                redis_product_status = {
+                    'status': product['status'],
+                    'ordered_amount': product['ordered_amount'],
+                }
+                redis_product_status = json.dumps(redis_product_status)
+                redis._set(redis_product_status_key, redis_product_status)
 
         product['types'] = product['types__name']
         product['warrant_company'] = product['warrant_company__name']
