@@ -213,6 +213,7 @@ urlpatterns += patterns(
     url(r'^h5_recruit/$', TemplateView.as_view(template_name="h5_recruit.jade")),
     url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
     url(r'^new_user_gift/$', TemplateView.as_view(template_name="new_user_gift.jade")),
+    url(r'^app_xunlei_new/$', TemplateView.as_view(template_name="app_xunlei_new.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
