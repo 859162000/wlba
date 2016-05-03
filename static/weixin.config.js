@@ -35,7 +35,7 @@ module.exports = {
         received_month: path.resolve(JS_PATH, 'received_month'),
         process_authentication: path.resolve(JS_PATH, 'process_authentication'),
         process_addbank: path.resolve(JS_PATH, 'process_addbank'),
-        channel_register: path.resolve(JS_PATH, 'channel_register'),
+        //channel_register: path.resolve(JS_PATH, 'channel_register'),
         vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto'),path.resolve(JS_PATH, 'lib/polyfill.min')]
     },
     output: {
