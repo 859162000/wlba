@@ -3248,7 +3248,7 @@ class FetchNewUserReward(APIView):
                     idx += 1
                     start_time, end_time = redpack_backends.get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                                   record.created_at, event.available_at, event.unavailable_at)
-                    redpack_backends._send_message_for_hby(request.user, event, end_time)
+                    redpack_backends._send_message(request.user, event, end_time)
             except Exception, e:
                 logger.debug(traceback.format_exc())
         return Response({"ret_code": 0, "message": "奖励发放成功，请前往【账户】-【理财券】查看"})
