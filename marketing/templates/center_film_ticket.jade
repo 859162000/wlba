@@ -1,0 +1,23 @@
+-load formatters
+-load mathfilters
+doctype html
+html.no-js(lang="en-gb")
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/center_film_ticket.css?v=2016050401")
+        - csrf_token
+    body(style="background:#222")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+                .banner_main
+                    .form_wrap
+            .section.section_1
+
+        include global/g_footer
+script.
+    require(['/static/js/center_film_ticket.js?v=2016050401'])
+
+                                                                    

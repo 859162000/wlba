@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015042201")
+        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015050402")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
@@ -24,25 +24,25 @@ html.no-js(lang="en-gb")
                 .line_gray
                 .advantage_wrap
                     .box.box_1.box_hover
-                        .title_text 行业市场
+                        .text 木材行业交易量：约6000亿/年<br>红木行业交易量：约1000亿/年
                         .img.img_1
-                        .text 木材行业交易量：6000亿/年<br>红木行业交易量：1000亿/年
+                        .title_text 行业市场
                     .box.box_2
-                        .title_text 金融渗透
+                        .text 传统金融机构很少涉足
                         .img.img_2
-                        .text 传统银行很少涉足
+                        .title_text 金融渗透
                     .box.box_3
-                        .title_text 市场周转周期
-                        .img.img_3
                         .text 资金灵活
+                        .img.img_3
+                        .title_text 市场周转周期
                     .box.box_4
-                        .title_text 盈利空间
-                        .img.img_4
                         .text 行业内存在相对较高利润率的木材品种
+                        .img.img_4
+                        .title_text 盈利空间
                     .box.box_5
-                        .title_text 木材风控团队
-                        .img.img_5
                         .text 团队拥有多年专业积累、产业资源积累
+                        .img.img_5
+                        .title_text 木材风控团队
             .section.section_1
                 .small_title.small_title_2 主要业务范围？
                 .line_gray
@@ -67,20 +67,20 @@ html.no-js(lang="en-gb")
                         .text.text_1 1、必须提供实物质押
                     .box.box_2
                         .img.img_2
-                        .text.text_2 2、质押物种类易流通<br>(如紫檀木类、花梨木类等)
+                        .text.text_2 2、质押物种类易流通
                     .box.box_3
                         .img.img_3
                         .text.text_3 3、质押物所属品种价格平稳
                     .box.box_4
-                        .text.text_4 6、逾期自动启动质押物<br>处置偿付机制
+                        .text.text_4 6、逾期启动质押物<br>处置偿付机制
                         .img.img_4
                     .box.box_5
                         .text.text_5 5、每月跟踪评估价格,<br>下跌 15%及时补仓
                         .img.img_5
                     .box.box_6
-                        .text.text_6 4、双倍质押物保障
+                        .text.text_6 4、质押率控制在3－5成
                         .img.img_6
-                .section_text.section_text_2!='网利宝以<span>质押物</span>为核心制定了严密的风控手段。'
+                .section_text.section_text_2!='网利宝以<span>质押物</span>为核心制定了严密的风控手段。<br>此外，平台金盾计划设立债权转让专项资金，进一步维护用户权益。'
             .section.section_2
                 .small_title.small_title_5 如何评估质押物？
                 .line_gray
@@ -120,62 +120,85 @@ html.no-js(lang="en-gb")
                 .line_gray
                 .slide_phone
                     .big_photo
-                        img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-01.jpg')
+                        img.big_photo_img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-01.jpg')
                     .small_box.small_box_1
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-1.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-2.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-3.jpg')
+                        .img.choose(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-01.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-1.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-02.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-2.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-03.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-3.jpg')
                     .photo_text 在廊坊大城县,用户代表不仅与合作机构负责人进行了亲切交流,<br>还参观了仓储的监控室。
             .section.section_1
                 .small_title.small_title_8 考察木材质押物
                 .line_gray
                 .slide_phone
                     .big_photo
-                        img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-04.jpg')
+                        img.big_photo_img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-04.jpg')
                     .small_box.small_box_2
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-4.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-5.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-6.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-7.jpg')
+                        .img.choose(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-04.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-4.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-05.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-5.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-06.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-6.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-07.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-7.jpg')
                     .photo_text 合作机构负责人带领用户实地参观了两个质押物的所在仓储,<br>并详细讲述了质押物的管控模式。
             .section.section_2
                 .small_title.small_title_8 参观木材体验馆
                 .line_gray
                 .slide_phone
                     .big_photo
-                        img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-08.jpg')
+                        img.big_photo_img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-08.jpg')
                     .small_box.small_box_2
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-8.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-9.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-10.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-11.jpg')
+                        .img.choose(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-08.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-8.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-09.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-9.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-10.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-10.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-11.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-11.jpg')
                     .photo_text 用户代表来到木材家具体验馆,<br>切身感受原木经过加工、安装、打磨、抛光等环节最终到成品的巨大变化。
             .section.section_1
                 .big_title.big_title_3 实地考察后,用户怎么说?
                 .line_red
                 .talk_wrap
                     .box
-                        .woman 余 女 士
+                        .people_box.people_1
+                            img.people(src='/static/imgs/pc_activity/open_day_review/people_img_1.png')
+                            .people_name 余 女 士
                         .woman_talk 我是带着远方朋友的嘱托对平台和质押物进行的实地考察,不论是在总部与CEO交流,还是在参观质押物过程中与仓储机构负责人交流, 对于我这个门外汉所提的疑问,他们都耐心地做了解答。个人感觉,公司要想做大做强,靠的不是手段,而是制度和精神。通过这次活动,我感觉网利宝CEO赵润龙先生是想做一番事业的人。
                     .box
                         .man_talk 安全性是整个平台的重中之重,作为投资人,十分想了解自己的钱究竟用在了哪些地方,听了网利宝高管的讲解,心里踏实了许多, 也学习了很多投资方面的知识,可以说实地考察不虚此行,我觉得任何行业如果都有这种觉悟和企业理念,就不会出现种种骗局。希望网利宝以后可以多举办一些这样的互动活动或在线讲座等。
-                        .man 曹 先 生
+                        .people_box.people_2
+                            img.people(src='/static/imgs/pc_activity/open_day_review/people_img_2.png')
+                            .people_name 曹 先 生
                     .box
-                        .woman 小 轩
+                        .people_box.people_3
+                            img.people(src='/static/imgs/pc_activity/open_day_review/people_img_3.png')
+                            .people_name 小 轩
                         .woman_talk 网利宝木材专场开放日活动回答了两个我最想问的问题,一是网利宝的模式,二是网利宝的风控,个人感觉网利宝是一家比较靠谱的公司,通过足值实物质押,不私设资金池,最大程度保护了投资人的利益,在实地考察质押物后,这一感触更深。希望网利宝发展得越来越好,为投资人带来更多收益。
                     .box
                         .man_talk 感谢网利宝开设木材仓储专项活动,赵总、杨总和曹总详细讲述了公司业务的开展流程、风险控制等投资者最想了解的问题。在P2P的大领域里,网利宝选择精耕细作自己擅长的细分领域,不仅让平台避免了同质化竞争,还有效保证了公司收入和投资人的利益,应该为网利宝公司点赞。
-                        .man 黄 先 生
+                        .people_box.people_4
+                            img.people(src='/static/imgs/pc_activity/open_day_review/people_img_4.png')
+                            .people_name 黄 先 生
                     .box
-                        .woman 小 蒙
+                        .people_box.people_5
+                            img.people(src='/static/imgs/pc_activity/open_day_review/people_img_5.png')
+                            .people_name 小 蒙
                         .woman_talk 这次活动中CEO赵润龙和各位高管以专业角度给我们讲述了平台的风控模式和业务流程,让我学习到了业内更深层面的知识,尤其木材专场让我更直观得看到了平台的专业能力和综合实力,收获颇丰。以前对网利宝一知半解,现在是更有信心!
                     .box
                         .man_talk 一天的考察结束了,在回来的路途中我想了很多。互联网金融的关健是做好风控、保护投资者利益,而网利宝的高层都是从事金融行业多年,术有专攻这方面让投资者放心。通过实地考察木材质押物、 参观家具成品,让我体会到了木材之所以经久不衰,带给我们的不仅仅是美,更多的是工艺与智慧的传承,让我们期待网利宝做得更好!
-                        .man 苏 先 生
+                        .people_box.people_6
+                            img.people(src='/static/imgs/pc_activity/open_day_review/people_img_6.png')
+                            .people_name 苏 先 生
 
 
         include global/g_footer
 script.
-    require(['/static/js/open_day_review.js?v=2015042901'])
+    require(['/static/js/open_day_review.js?v=2015050401'])
 
                                                                     
