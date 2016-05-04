@@ -70,7 +70,7 @@ org.ui = (function(){
         i=0
       }else{
         i++
-        $('#winList').css({'top':-i+'px'})
+        $('#winList').css({'top':-i+'px'});
       }
     }
 
