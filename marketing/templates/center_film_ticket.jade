@@ -1,0 +1,23 @@
+-load formatters
+-load mathfilters
+doctype html
+html.no-js(lang="en-gb")
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/april_mobilization.css?v=2016041505")
+        - csrf_token
+    body(style="background:#fff")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+
+
+                .footer_bottom
+                    a.button_link.button_link_3(href='/p2p/list/') 投资领奖品
+        include global/g_footer
+script.
+    require(['/static/js/april_mobilization.js?v=2016042502'])
+
+                                                                    
