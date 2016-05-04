@@ -69,19 +69,19 @@
           color: #e2e5e7
           margin-right: 22px
           display: block
-          float: left
+          float: right
         .img
-          float: left
+          float: right
           display: block
           margin-right: 28px
           display: block
         .text
-          float: left
+          float: right
           display: block
           font-size: 20px
           color: #e2e5e7
       .box_1
-        left: 190px
+        right: 213px
         top: 0
         height: 128px
         .title_text
@@ -94,7 +94,7 @@
           padding-top: 32px
           line-height: 32px
       .box_2
-        left: 330px
+        right: 270px
         top: 111px
         height: 102px
         .title_text
@@ -106,7 +106,7 @@
         .text
           line-height: 102px
       .box_3
-        left: 242px
+        right: 400px
         top: 194px
         height: 102px
         .title_text
@@ -118,7 +118,7 @@
         .text
           line-height: 102px
       .box_4
-        left: 218px
+        right: 184px
         top: 272px
         height: 128px
         .title_text
@@ -130,7 +130,7 @@
         .text
           line-height: 128px
       .box_5
-        left: 244px
+        right: 138px
         top: 376px
         height: 102px
         .title_text
@@ -149,6 +149,14 @@
           color: #e5493a
         .img_1
           background: url("/static/imgs/pc_activity/open_day_review/font_1_hover.png") no-repeat
+        .img_2
+          background: url("/static/imgs/pc_activity/open_day_review/font_2_hover.png") no-repeat
+        .img_3
+          background: url("/static/imgs/pc_activity/open_day_review/font_3_hover.png") no-repeat
+        .img_4
+          background: url("/static/imgs/pc_activity/open_day_review/font_1_hover.png") no-repeat
+        .img_5
+          background: url("/static/imgs/pc_activity/open_day_review/font_4_hover.png") no-repeat
     .small_title_2
       padding: 48px 0 0
     .map_img
@@ -437,17 +445,28 @@
       width: 100%
       height: 101px
       z-index: 9
-      img
+      .img
         width: 201px
         height: 101px
         display: block
         float: left
         margin: 0 4px
         box-shadow: 0 0 10px #b3b3b3
+        background: #e5493a
+        cursor: pointer
+      .choose
+        img
+          opacity: 0.7
+      img
+        width: 201px
+        height: 101px
+        display: block
+        opacity: 1
     .small_box_1
       padding-left: 186px
     .small_box_2
       padding-left: 82px
+
     .photo_text
       line-height: 22px
       color: #585757
