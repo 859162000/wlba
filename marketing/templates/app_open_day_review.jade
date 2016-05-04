@@ -1,0 +1,23 @@
+- load formatters
+doctype html
+html(style="background: #91ce00")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_spring_mobilization.css?v=2015031002", rel="stylesheet")
+        - csrf_token
+    body
+        input(type='hidden',value='{{user.is_authenticated}}')#authenticated
+        .body_wrap.clear
+            .banner
+
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_spring_mobilization.js?v=2015031102")
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
