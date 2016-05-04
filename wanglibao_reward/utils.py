@@ -339,11 +339,7 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
         with transaction.atomic():
             join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
             if not join_record:
-                join_record = WanglibaoRewardJoinRecord.objects.create(
-                    user=user,
-                    activity_code='sy',
-                    remain_chance=0,
-                )
+                return
 
             reward_record = ActivityReward.objects.filter(has_sent=True, activity='sy', user=user).first()
             if reward_record:  #奖品记录已经生成了
