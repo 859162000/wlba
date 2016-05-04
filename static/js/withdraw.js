@@ -305,11 +305,20 @@
         } else {
           if (addFormValidateor.form()) {
             return $('#withdraw-form').ajaxSubmit(function(data) {
-              return tool.modalAlert({
-                title: '温馨提示',
-                msg: data.message,
-                callback_ok: _showModal
-              });
+              if (data.ret_code === 0) {
+                return tool.modalAlert({
+                  title: '温馨提示',
+                  msg: '<p style="font-size:14px;color:#333">提现申请已受理</p><p style="margin-top:5px;font-size:14px;color:#333">预计1-3个工作日到账</p>',
+                  callback_ok: _showModal,
+                  height: '220px'
+                });
+              } else {
+                return tool.modalAlert({
+                  title: '温馨提示',
+                  msg: data.message,
+                  callback_ok: _showModal
+                });
+              }
             });
           }
         }

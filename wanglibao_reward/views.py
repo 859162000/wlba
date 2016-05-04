@@ -1151,14 +1151,47 @@ class ZhaoXiangGuanAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
+        key = 'zhaoxiangguan'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+    
+        #TODO:转换为UTC时间后跟表记录时间对比
+        utc_start = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+        utc_end = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")        
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now >= end_time:
+            message = u'活动还未开始,请耐心等待'
+            if now >= end_time:
+                message = u'活动已结束，感谢参与'
+            logger.debug('message:%s' % message)
+            json_to_response = {'ret_code': 1001,'message': message}
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
         reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
         if reward:
             json_to_response = {'ret_code': 1,'message': u'奖品已经发放'}
         else:
             try:
-                join_record = WanglibaoRewardJoinRecord.objects.create(user=user,activity_code='sy',remain_chance=0,)
-                json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记成功'}
-            except:
+                join_record, flag = WanglibaoRewardJoinRecord.objects.get_or_create(user=self.request.user,activity_code='sy', defaults={'remain_chance':1})
+                if join_record:
+                    json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记成功'}
+                else:
+                    logger.exception("Failure to WanglibaoRewardJoinRecord.objects.get_or_create(%s, 'sy')" % (self.request.user) )
+                    json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记失败'}
+            except Exception, ex:
+                logger.exception('Except in get_or_create: %s' % ex)
                 json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记失败'}
         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
