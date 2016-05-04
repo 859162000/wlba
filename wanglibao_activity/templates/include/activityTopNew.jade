@@ -2,24 +2,61 @@
 include include/activityTop2
 .wrap#ganjiwang-banner
   .gold2
+    input#userStatus(type='hidden',value='{{ user.is_authenticated }}')
     if user.is_authenticated
-      #ganjiwang-model
-      .banner-form#ganjiwang-welcome
-        .space-vertical-m
-          h1.banner-form--title 欢迎来网利宝投资理财
-          .space-vertical-s
-          p.banner-form--row.font-s 您的登录账户:
-            span {{user|display_name}}
-          .space-vertical-m
-          .banner-form--row.align-center
-            a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
-      .denglu-user#denglu-user
-        h1 欢迎来网利宝投资理财
-        p 您的登录账户：{{user|display_name}}
-        .user-btn
-          a(href="/accounts/home") 进入我的账户
-        span.xm-com.xm-icon4
+      //#ganjiwang-model
+      //    .banner-form#ganjiwang-welcome
+      //      .space-vertical-m
+      //        h1.banner-form--title 欢迎来网利宝投资理财
+      //        .space-vertical-s
+      //        p.banner-form--row.font-s 您的登录账户:
+      //          span {{user|display_name}}
+      //        .space-vertical-m
+      //        .banner-form--row.align-center
+      //          a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
+
+
+      //.denglu-user#denglu-user
+      //  h1 欢迎来网利宝投资理财
+      //  p 您的登录账户：{{user|display_name}}
+      //  .user-btn
+      //    a(href="/accounts/home") 进入我的账户
+      //  span.xm-com.xm-icon4
+      .xunlei-login
+        p.success-pop 恭喜已完成网利宝注册
+        p.success-pop 并与您的迅雷账号绑定成功
+        p.accounts-pop.mt10 迅雷账号：123456
+        p.accounts-pop 网利宝账号：1234567
+        .login-btns
+            .lio-img
+            a(href='') 登&nbsp;&nbsp;&nbsp;&nbsp;录
+        p.reminder 温馨提示：
+        .reminder-content.clearfix
+            span 1.
+            label 绑定后，您在本网站所获得的迅雷会员奖励将直接充值到上述迅雷账号中；
+        .reminder-content.clearfix
+            span 2.
+            label 一旦绑定，不可随意解绑，否则影响会员奖励发放。
+
     else
+        .xunlei-login-v(style="display:none")
+            p.regist-reward 完成首充和首投后，
+                span 会员奖励
+                | 将直接发放
+            .regist-c
+                p.wlb-re 请登录迅雷账号，完成网利宝帐号注册：
+                .xunlei-account
+                    input.xl-account(type="text", name="identifier", placeholder="请输入迅雷账号")
+                    input.xl-pwd(type="text", name="identifier", placeholder="密码")
+                .login-q.clearfix
+                    label(for="auto")
+                        input(type="checkbox", name="", id="auto")
+                        | 下次自动登录
+                    a() 忘记密码
+                .xunlei-login-btn
+                    a() 登&nbsp;&nbsp;&nbsp;&nbsp;录
+                .go-register-xl
+                    a() 注册帐号
         .denelu-form#denglu
             #aug-center
                 .off-form#off-form ×
@@ -43,22 +80,22 @@ include include/activityTop2
                 .form-row-error
               .form-row.voice
                 .span12-omega.hidden.show
-                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                  | 没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
                 .form-control-group
-                  .span6(style="width:49%")
+                  .span6
                     input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
                   .span6-omega
                     button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
                     button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:5px") 获取验证码
                 .form-row-error
-              .form-row
+              .form-row.pwd-input
                 input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
                 .form-row-error
-              .form-row
+              .form-row.pwd-input
                 input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
                 .form-row-error#aug-form-row-eroor
-              .form-row.form-bottom-bar
-                .agreement(style="padding:0 0 10px 10px;text-align:left")
+              .form-row.form-bottom-bar.clearfix
+                .agreement(style="text-align:left")
                   label(for="agreement")
                     input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
                   | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>

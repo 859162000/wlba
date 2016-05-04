@@ -12,6 +12,7 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.models import P2PProduct, Warrant, Attachment
 from misc.models import Misc
 import json
+import re
 
 
 class redis_backend(object):
@@ -300,6 +301,7 @@ class redis_backend(object):
                 "status": p2p.status,
                 "priority": p2p.priority,
                 "period": p2p.period,
+                "period_days": period_days(p2p.period, p2p.pay_method),
                 "brief": p2p.brief,
                 "expected_earning_rate": p2p.expected_earning_rate,
                 "excess_earning_rate": p2p.excess_earning_rate,
@@ -360,6 +362,7 @@ class redis_backend(object):
                 "status": p2p.status,
                 "priority": p2p.priority,
                 "period": p2p.period,
+                "period_days": period_days(p2p.period, p2p.pay_method),
                 "brief": p2p.brief,
                 "expected_earning_rate": p2p.expected_earning_rate,
                 "excess_earning_rate": p2p.excess_earning_rate,
@@ -395,7 +398,7 @@ class redis_backend(object):
                 "available_amount": p2p.available_amount,
                 "is_taojin": p2p.is_taojin,
                 "is_app_exclusive": p2p.is_app_exclusive,
-            } for p2p in p2p_products if p2p.status_int==status_int
+            } for p2p in p2p_products if p2p.status_int == status_int
         ]
 
         return p2p_list
@@ -457,3 +460,11 @@ class redis_backend(object):
             if not x['start_at'] <= timezone.now() <= x['end_at']:
                 arr.remove(x)
         return arr
+
+
+def period_days(period, pay_method):
+    matches = re.search(u'日计息', pay_method)
+    if matches and matches.group():
+        return period
+    else:
+        return period * 30
