@@ -87,7 +87,9 @@
                             $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
                             $('.popup_box').show();
                         }
-
+                    }else if(data.ret_code=='1001'||data.ret_code=='1002'){
+                        $('.popup_box .main .textairport').text(''+data.message+'');
+                        $('.popup_box').show();
                     }
                 }
             })
