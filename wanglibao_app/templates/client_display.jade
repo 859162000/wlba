@@ -1,14 +1,31 @@
 -load formatters
 doctype html
-html(style='background: #4e7cda')
+html(style='background: rgba(78,146,223, 1);')
   head
     include include/app_header.jade
     style.
+      body{
+        position: absolute;
+        height: 100%;
+      }
+      .warp-404{
+        display: -webkit-box;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+      }
       .display-dec{
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        height: auto;
         color: #fff;
         font-size: .7rem;
         text-align: center;
-        margin: 4rem;
       }
   body
-    .display-dec 新版攻略，敬请期待！
+    .warp-404
+      img(src='/static/imgs/app/404/404.png').display-dec 新版攻略，敬请期待！
