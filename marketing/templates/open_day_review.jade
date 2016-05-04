@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015042201")
+        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015050401")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
@@ -24,25 +24,25 @@ html.no-js(lang="en-gb")
                 .line_gray
                 .advantage_wrap
                     .box.box_1.box_hover
-                        .title_text 行业市场
-                        .img.img_1
                         .text 木材行业交易量：6000亿/年<br>红木行业交易量：1000亿/年
+                        .img.img_1
+                        .title_text 行业市场
                     .box.box_2
-                        .title_text 金融渗透
-                        .img.img_2
                         .text 传统银行很少涉足
+                        .img.img_2
+                        .title_text 金融渗透
                     .box.box_3
-                        .title_text 市场周转周期
-                        .img.img_3
                         .text 资金灵活
+                        .img.img_3
+                        .title_text 市场周转周期
                     .box.box_4
-                        .title_text 盈利空间
-                        .img.img_4
                         .text 行业内存在相对较高利润率的木材品种
+                        .img.img_4
+                        .title_text 盈利空间
                     .box.box_5
-                        .title_text 木材风控团队
-                        .img.img_5
                         .text 团队拥有多年专业积累、产业资源积累
+                        .img.img_5
+                        .title_text 木材风控团队
             .section.section_1
                 .small_title.small_title_2 主要业务范围？
                 .line_gray
@@ -120,35 +120,46 @@ html.no-js(lang="en-gb")
                 .line_gray
                 .slide_phone
                     .big_photo
-                        img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-01.jpg')
+                        img.big_photo_img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-01.jpg')
                     .small_box.small_box_1
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-1.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-2.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-3.jpg')
+                        .img.choose(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-01.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-1.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-02.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-2.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-03.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-3.jpg')
                     .photo_text 在廊坊大城县,用户代表不仅与合作机构负责人进行了亲切交流,<br>还参观了仓储的监控室。
             .section.section_1
                 .small_title.small_title_8 考察木材质押物
                 .line_gray
                 .slide_phone
                     .big_photo
-                        img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-04.jpg')
+                        img.big_photo_img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-04.jpg')
                     .small_box.small_box_2
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-4.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-5.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-6.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-7.jpg')
+                        .img.choose(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-04.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-4.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-05.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-5.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-06.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-6.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-07.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-7.jpg')
                     .photo_text 合作机构负责人带领用户实地参观了两个质押物的所在仓储,<br>并详细讲述了质押物的管控模式。
             .section.section_2
                 .small_title.small_title_8 参观木材体验馆
                 .line_gray
                 .slide_phone
                     .big_photo
-                        img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-08.jpg')
+                        img.big_photo_img(src='/static/imgs/pc_activity/open_day_review/bkfr_img_-08.jpg')
                     .small_box.small_box_2
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-8.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-9.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-10.jpg')
-                        img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-11.jpg')
+                        .img.choose(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-08.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-8.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-09.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-9.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-10.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-10.jpg')
+                        .img(data-src='/static/imgs/pc_activity/open_day_review/bkfr_img_-11.jpg')
+                            img.photo(src='/static/imgs/pc_activity/open_day_review/kfr_img_-11.jpg')
                     .photo_text 用户代表来到木材家具体验馆,<br>切身感受原木经过加工、安装、打磨、抛光等环节最终到成品的巨大变化。
             .section.section_1
                 .big_title.big_title_3 实地考察后,用户怎么说?
@@ -176,6 +187,6 @@ html.no-js(lang="en-gb")
 
         include global/g_footer
 script.
-    require(['/static/js/open_day_review.js?v=2015042901'])
+    require(['/static/js/open_day_review.js?v=2015050401'])
 
                                                                     
