@@ -313,6 +313,10 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
     else:
         raise Exception(u"misc中没有配置activities杂项")
 
+    reward = ActivityReward.objects.filter(user=user, activity='sy', has_sent=True).first()
+    if reward:
+        return
+
     p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id).first()
     if not p2p_record:
         raise Exception(u"购买订单异常")
@@ -334,23 +338,29 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
         else:
             reward.is_used = True
             reward.save()
-            
+
     try:
         with transaction.atomic():
-            channel = Channels.objects.filter(code='sy')
-            new_account = IntroducedBy.objects.filter(user=user,channel=channel)
-            if new_account:
-                pass
-            else:
-                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
-                if not join_record:
-                    return
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
+            if not join_record:
+                channel = Channels.objects.filter(code='sy')
+                new_account = IntroducedBy.objects.filter(user=user,channel=channel)
+                if new_account:
+                    try :
+                        WanglibaoRewardJoinRecord.objects.create(user=user, activity_code='sy', remain_chance=1)
+                    except:
+                        logger.exception()
+                        pass
+                    join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
 
-            reward_record = ActivityReward.objects.filter(has_sent=True, activity='sy', user=user).first()
-            if reward_record:  #奖品记录已经生成了
-                reward.is_used = False
-                reward.save()
+            if join_record.remain_chance==0:
                 return
+
+            #reward_record = ActivityReward.objects.filter(has_sent=True, activity='sy', user=user).first()
+            #if reward_record:  #奖品记录已经生成了
+            #    reward.is_used = False
+            #    reward.save()
+            #return
 
             ActivityReward.objects.create(
                         activity='sy',
@@ -361,6 +371,10 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
                         has_sent=True,
                         left_times=0,
                         join_times=0)
+
+            join_record.remain_chance = 0
+            join_record.save()
+
     except Exception:
         reward.is_used = False
         reward.save()
@@ -373,10 +387,12 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
             "phones": [user.wanglibaouserprofile.phone, ],
             "messages": [send_msg, ],
         })
+
         inside_message.send_one.apply_async(kwargs={
             "user_id": user.id,
             "title": u"影像投资节优惠码",
             "content": send_msg,
             "mtype": "activity"
         })
+
         logger.info('影像投资节优惠码发送成功，user_id:%s; order_id:%s; reward_id:%s' % (user.id , order_id, reward.id))

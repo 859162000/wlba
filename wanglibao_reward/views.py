@@ -1178,25 +1178,21 @@ class ZhaoXiangGuanAPIView(APIView):
             logger.debug('message:%s' % message)
             json_to_response = {'ret_code': 1001,'message': message}
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-    
-        #判断有没有奖品剩余
-        with transaction.atomic():
-            reward = Reward.objects.select_for_update().filter(type='影像投资节优惠码', is_used=False).first()
-            logger.debug('reward:%s' % reward)
-            if reward == None:
-                json_to_response = {'ret_code': 1002,'message': u'亲,您来晚了;奖品已经发完了！'}
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-       
+
         reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
         if reward:
             json_to_response = {'ret_code': 1,'message': u'奖品已经发放'}
         else:
             try:
-                join_record = WanglibaoRewardJoinRecord.objects.create(user=self.request.user,activity_code='sy',remain_chance=0,)
-                json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记成功'}
-            except:
+                join_record, flag = WanglibaoRewardJoinRecord.objects.get_or_create(user=self.request.user,activity_code='sy', defaults={'remain_chance':1})
+                if join_record:
+                    json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记成功'}
+                else:
+                    logger.exception("Failure to WanglibaoRewardJoinRecord.objects.get_or_create(%s, 'sy')" % (self.request.user) )
+                    json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记失败'}
+            except Exception, ex:
+                logger.exception('Except in get_or_create: %s' % ex)
                 json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记失败'}
-        logger.debug('json_to_response:%s' % json_to_response)
         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 
