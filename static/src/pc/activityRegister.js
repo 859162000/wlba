@@ -1,7 +1,6 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
       tools: 'lib/modal.tools'
     },
@@ -95,12 +94,12 @@
                         captcha_1: captcha_1
                     }
                 }).success(function() {
-                    element.attr('disabled', 'disabled');
+                    element.attr('disabled', 'disabled').addClass('buttonDisabled');
                     $('.voice-validate').attr('disabled', 'disabled');
                     $('#aug-code,#aug-center').hide();
                 }).fail(function(xhr) {
                     clearInterval(intervalId);
-                    $(element).text('重新获取').removeAttr('disabled');
+                    $(element).text('重新获取').removeAttr('disabled').removeClass('buttonDisabled');
                     var result = JSON.parse(xhr.responseText);
                     if (result.type === 'captcha') {
                         return $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message);
@@ -115,8 +114,8 @@
                         }
                     }
                 });
-                count = 180;
-                $(element).attr('disabled', 'disabled');
+                count = 5;
+                $(element).attr('disabled', 'disabled').addClass('buttonDisabled');
                 $('.voice-validate').attr('disabled', 'disabled');
                 timerFunction = function() {
                     if (count >= 1) {
@@ -124,7 +123,7 @@
                         return $(element).text('已经发送(' + count + ')');
                     } else {
                         clearInterval(intervalId);
-                        $(element).text('重新获取').removeAttr('disabled');
+                        $(element).text('重新获取').removeAttr('disabled').removeClass('buttonDisabled');
                         $('.span12-omega').removeClass('hidden');
                         $('.voice-validate').removeAttr('disabled');
                         return $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>');
@@ -269,7 +268,7 @@
                     if (json.ret_code === 0) {
                         count = 60;
                         button = $("#button-get-validate-modal");
-                        button.attr('disabled', 'disabled');
+                        button.attr('disabled', 'disabled').addClass('buttonDisabled');
                         button.addClass('button-gray');
                         $('.voice').addClass('tip');
                         timerFunction = function() {
@@ -280,7 +279,7 @@
                                 clearInterval(intervalId);
                                 element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>');
                                 element.removeAttr('disabled');
-                                button.removeAttr('disabled');
+                                button.removeAttr('disabled').removeClass('buttonDisabled');
                                 button.addClass('button-red');
                                 button.removeClass('button-gray');
                                 return $('.voice').removeClass('tip');
