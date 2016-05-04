@@ -562,7 +562,7 @@ class P2PListView(TemplateView):
         if p2p_done_list:
             show_slider = True
             p2p_earning = sorted(p2p_done_list, key=lambda x: (-x['expected_earning_rate'], x['available_amount']))
-            p2p_period = sorted(p2p_done_list, key=lambda x: (x['period'], x['available_amount']))
+            p2p_period = sorted(p2p_done_list, key=lambda x: (x['period_days'], x['available_amount']))
             p2p_amount = sorted(p2p_done_list, key=itemgetter('completion_rate'), reverse=True)
         else:
             p2p_earning = p2p_period = p2p_amount = []
