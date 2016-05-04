@@ -6,18 +6,18 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/april_mobilization.css?v=2016041505")
+        link(rel="stylesheet",href="/static/styles/pc_activity/center_film_ticket.css?v=2016050401")
         - csrf_token
-    body(style="background:#fff")
+    body(style="background:#222")
         include global/g_nav
         .body_wrap.clear
             .banner
+                .banner_main
+                    .form_wrap
+            .section.section_1
 
-
-                .footer_bottom
-                    a.button_link.button_link_3(href='/p2p/list/') 投资领奖品
         include global/g_footer
 script.
-    require(['/static/js/april_mobilization.js?v=2016042502'])
+    require(['/static/js/center_film_ticket.js?v=2016050401'])
 
                                                                     
