@@ -1156,7 +1156,7 @@ class ZhaoXiangGuanAPIView(APIView):
             json_to_response = {'ret_code': 1,'message': u'奖品已经发放'}
         else:
             try:
-                join_record = WanglibaoRewardJoinRecord.objects.create(user=user,activity_code='sy',remain_chance=0,)
+                join_record = WanglibaoRewardJoinRecord.objects.create(user=self.request.user,activity_code='sy',remain_chance=0,)
                 json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记成功'}
             except:
                 json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记失败'}
