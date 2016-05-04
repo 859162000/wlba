@@ -1151,6 +1151,42 @@ class ZhaoXiangGuanAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
+        key = 'zhaoxiangguan'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+    
+        #TODO:转换为UTC时间后跟表记录时间对比
+        utc_start = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+        utc_end = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")        
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now >= end_time:
+            message = u'活动还未开始,请耐心等待'
+            if now >= end_time:
+                message = u'活动已结束，感谢参与'
+            logger.debug('message:%s' % message)
+            json_to_response = {'ret_code': 1001,'message': message}
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+    
+        #判断有没有奖品剩余
+        with transaction.atomic():
+            reward = Reward.objects.select_for_update().filter(type='影像投资节优惠码', is_used=False).first()
+            logger.debug('reward:%s' % reward)
+            if reward == None:
+                json_to_response = {'ret_code': 1002,'message': u'亲,您来晚了;奖品已经发完了！'}
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+       
         reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='sy', has_sent=True).first()
         if reward:
             json_to_response = {'ret_code': 1,'message': u'奖品已经发放'}
@@ -1160,6 +1196,7 @@ class ZhaoXiangGuanAPIView(APIView):
                 json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记成功'}
             except:
                 json_to_response = {'ret_code': 0,'message': u'奖品未发放','tag':'标记失败'}
+        logger.debug('json_to_response:%s' % json_to_response)
         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 

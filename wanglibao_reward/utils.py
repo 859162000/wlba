@@ -21,7 +21,7 @@ import pickle
 from decimal import Decimal
 from weixin.util import getMiscValue
 from wanglibao.templatetags.formatters import safe_phone_str
-from marketing.models import Reward
+from marketing.models import Reward, IntroducedBy,Channels
 from wanglibao_reward.models import WanglibaoRewardJoinRecord
 from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
 from wanglibao_account import message as inside_message
@@ -337,9 +337,14 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
             
     try:
         with transaction.atomic():
-            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
-            if not join_record:
-                return
+            channel = Channels.objects.filter(code='sy')
+            new_account = IntroducedBy.objects.filter(user=user,channel=channel)
+            if new_account:
+                pass
+            else:
+                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code='sy').first()
+                if not join_record:
+                    return
 
             reward_record = ActivityReward.objects.filter(has_sent=True, activity='sy', user=user).first()
             if reward_record:  #奖品记录已经生成了
