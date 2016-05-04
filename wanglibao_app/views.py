@@ -111,7 +111,7 @@ class AppActivateScoreImageAPIView(APIView):
 
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
     DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
@@ -150,8 +150,19 @@ class AppActivateImageAPIView(APIView):
             jump_state = activate.jump_state
             link_dest = activate.link_dest
             if img_url:
-                invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
-                if activate.user_invest_limit=='-1' or (activate.user_invest_limit=='0' and not invest_flag) or (activate.user_invest_limit=='1' and invest_flag):
+                if self.DEVICE_MAP[device_type] in ("act_iso", 'act_android'):
+                    if request.user.is_authenticated():
+                        invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
+                        if activate.user_invest_limit=='-1' or (activate.user_invest_limit=='0' and not invest_flag) or (activate.user_invest_limit=='1' and invest_flag):
+                            img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
+                            return Response({'ret_code': 0,
+                                             'message': 'ok',
+                                             'image': img_url,
+                                             'jump_state': jump_state,
+                                             'link_dest':link_dest,
+                                             'link_dest_url':activate.link_dest_h5_url,
+                                             })
+                else:
                     img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
                     return Response({'ret_code': 0,
                                      'message': 'ok',
