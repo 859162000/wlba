@@ -125,7 +125,7 @@ class AppActivate(models.Model):
 
     name = models.CharField(u'名称', max_length=30, help_text=u'名称')
     device = models.CharField(u'设备', max_length=15, choices=DEVICES,
-                              help_text=u'活动图片应用的设备，启动页选择类型app_*，弹出页选择类型act_*')
+                              help_text=u'活动图片应用的设备，启动页选择类型app_*，弹出页(浮层)选择类型act_*')
     img_one = models.ImageField(u'大图片', upload_to='activity', blank=True,
                                 help_text=u'IOS：5.5，Android：1280，图片名称只允许字母数字下划线组成<br/> app端活动弹出框图片地址在此处上传')
     img_two = models.ImageField(u'中图片', upload_to='activity', blank=True,
