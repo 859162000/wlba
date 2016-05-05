@@ -1,0 +1,89 @@
+doctype html
+html.hight-total
+   head
+      title 尊贵新人礼
+      include include/service_head.jade
+   body.new-user-gift
+      .page-loading#page-loading
+         img(src="/static/imgs/app/data_cube/loading.gif",style="height:4rem")
+      .page-next-box#next-box
+         img(src="/static/imgs/mobile_activity/new_user_gift/iconfont_guide.png",style="height:1.1rem")
+      .audio-box#js-audio
+         audio(autoplay="autoplay", loop="loop", src="/static/imgs/mobile_activity/new_user_gift/003_01.mp3") 您的浏览器不支持 audio 标签。
+      .swiper-container#swiper-container
+         .swiper-wrapper(style="display:none")
+            .swiper-slide.page1
+               .ug-page-box
+                  .page-people
+                  .page-txt 上班族饱尝心酸，但工资上涨总比物价慢<br />或许，您需要的是更优质的理财产品
+                  .page-arr.arr1
+                  .page-arr.arr2
+                  .page-arr.arr3
+                  .page-arr.arr4
+                  //.page-tit.tit1 高收益
+                  //.page-tit.tit2 高收益
+                  //.page-tit.tit3 高收益
+            .swiper-slide.page2
+               .ug-page-box
+                  .page-people
+                  .point
+                  .page-txt 每月收益屈指可数，意外事件却资金套牢<br />或许，您需要的是多元化、更灵活的理财产品
+                  .page-arr.arr1
+                  .page-arr.arr2
+                  .page-arr.arr3
+                  .page-arr.arr4
+                  .page-arr.arr5
+                  //.page-tit.tit1 更灵活
+                  //.page-tit.tit2 更灵活
+                  //.page-tit.tit3 更灵活
+            .swiper-slide.page3
+               .ug-page-box
+                  .page-people
+                  .point
+                  .page-txt 辛苦了大半辈子，积攒的资金总担心风险投资<br />或许，您需要的是低风险的理财产品
+                  .page-arr.arr1
+                  .page-arr.arr2
+                  .page-arr.arr3
+                  .page-arr.arr4
+                  .page-arr.arr5
+                  .page-arr.arr6
+                  //.page-tit.tit1 更安全
+                  //.page-tit.tit2 更安全
+                  //.page-tit.tit3 更安全
+            .swiper-slide.page4
+               .ug-page-box
+                  .page-people
+                  .point
+                  .page-txt 网利宝特奉上5%加息券<br />为您的财富增值保驾护航
+                  .page-arr.arr1
+                  .page-arr.arr2
+                  .page-arr.arr3
+                  .page-arr.arr4
+                  .page-arr.arr5
+                  //.page-tit.tit1 更真诚
+                  //.page-tit.tit2 更真诚
+                  //.page-tit.tit3 更真诚
+               button.page-btn.js-receive 领取加息特权
+               .page-rule.js-rule 活动规则
+      .page-alt.receive-alt.alt-error
+         .alt-main
+            .alt-icon
+            .alt-tit 抱歉，您不符合领取要求哦～
+            .alt-btn.js-close 知道了
+      .page-alt.receive-alt.alt-ok
+         .alt-main
+            .alt-icon
+            .alt-tit 领取加息特权成功～<br />请前往[账户]-[理财券]中查看
+            .alt-btn.js-close 知道了
+      .page-alt.alt-rule
+         .alt-main
+            .alt-tit 活动规则
+            .alt-txt-box
+               p <span>*</span>活动时间：4月25日——6月25日；
+               p <span>*</span>活动期间，未投资用户点击领取按钮均可获得5%加息券，限定1月标使用，1000元起投；
+               p <span>*</span>加息券自领取之日起7天有效。
+            .alt-btn.js-close 知道了
+      script(src="/static/src/subMobile/lib/weixin/jweixin-1.0.0.js")
+      script(src='/static/scripts/component/webview.js')
+      script(src='/static/scripts/app/swiper/swiper.min.js?v=201512181')
+      script(src='/static/scripts/mobile_activity/new_user_gift.js?v=1116')
