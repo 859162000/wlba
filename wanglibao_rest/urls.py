@@ -62,9 +62,10 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
-from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView, WeixinActivityAPIView,
-                                    QMBanquetRewardAPI, HMBanquetRewardAPI, Lantern_FetchRewardAPI, FetchMarchAwardAPI, AprilAwardApi,
-                                    KongGangAPIView, ZhaoXiangGuanAPIView,)
+from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
+                                    WeixinActivityAPIView, QMBanquetRewardAPI, HMBanquetRewardAPI,
+                                    Lantern_FetchRewardAPI, FetchMarchAwardAPI,
+                                    AprilAwardApi, KongGangAPIView, FetchNewUserReward, ZhaoXiangGuanAPIView,)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -290,6 +291,7 @@ urlpatterns += patterns(
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
     url(r'^geetest/$', GeetestAPIView.as_view()),
     url(r'^activity/konggang/$', KongGangAPIView.as_view()),
+    url(r'^activity/newusergift/$', FetchNewUserReward.as_view()),
     url(r'^activity/zhaoxiangguan/$', ZhaoXiangGuanAPIView.as_view()),
 )
 

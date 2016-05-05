@@ -18,5 +18,5 @@ urlpatterns = patterns(
     url(r'^new_ameal/$', views.QMBanquetTemplate.as_view(template_name="new_ameal.jade")),
     url(r'^lantern_banquet/$', views.LanternBanquetTemplate.as_view(template_name="festival_two.html")),
     url(r'^spring_reward/$', views.MarchAwardTemplate.as_view(template_name="app_spring_mobilization.jade")),
-    url(r"^march_reward/$", views.MarchAwardTemplate.as_view(template_name="spring_mobilization.jade"))
+    url(r"^march_reward/$", views.MarchAwardTemplate.as_view(template_name="spring_mobilization.jade")),
 )
