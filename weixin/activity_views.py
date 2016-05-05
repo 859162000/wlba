@@ -696,13 +696,13 @@ class FetchXunleiCardAward(APIView):
         if type == 0:#bind vip card
             bind_action_record = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='bind').first()
             if bind_action_record and datetime.datetime.utcfromtimestamp(bind_action_record.create_time)>=activity.start_at and datetime.datetime.utcfromtimestamp(bind_action_record.create_time)<=activity.end_at:
-                reward = self.getReward("")
+                reward = self.getReward("7天迅雷会员")
             else:
                 return Response({"ret_code": -1, "message":"首次绑定服务号为活动期内的用户才可领取"})
         if type == 1:#invest vip card
             p2pRecord = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by("+create_time").first()
             if p2pRecord.create_time >=activity.start_at and p2pRecord.create_time<=activity.end_at and float(p2pRecord.amount)>=1000:
-                reward = self.getReward("")
+                reward = self.getReward("1年迅雷会员")
             else:
                 return Response({"ret_code": -1, "message":"活动期内为首次投资，并且投资金额不低于1000元"})
         if not reward:
