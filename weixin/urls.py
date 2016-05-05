@@ -136,6 +136,7 @@ urlpatterns += patterns(
     url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
     url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
     url(r'^fetch_hby_reward/$', activity_views.FetchWechatHBYReward.as_view()),
+    url(r'^fetch_xunlei_vipcard/$', activity_views.FetchXunleiCardAward.as_view()),
 
 )
 #活动页面
