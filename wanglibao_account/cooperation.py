@@ -2179,6 +2179,8 @@ class BiSouYiRegister(BaJinSheRegister):
         else:
             req_data = self.request.REQUEST
 
+        logger.info("%s request url[%s] params[%s]" % (self.c_code, self.request.get_full_path(), req_data))
+
         channel_code = self.get_channel_code_from_request()
         channel_phone = req_data.get(self.external_channel_phone_key, None)
         sign = req_data.get(self.external_channel_sign_key, None)
