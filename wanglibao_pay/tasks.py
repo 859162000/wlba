@@ -90,4 +90,5 @@ def sync_pay_result(start_time=None, end_time=None):
 
             pay_order.order_after_pay_succcess(amount, pay_info.order_id)
             profile = WanglibaoUserProfile.objects.get(user=pay_info.user)
+            logger.critical('sync_pay_result_deposit for pay_info_id %s' % pay_info.id)
             send_mail(pay_info.id, profile.name, profile.phone, pay_info.amount, raw_response)
