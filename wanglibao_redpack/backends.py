@@ -274,11 +274,21 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
 
             if x.order_id:
                 pr = P2PRecord.objects.filter(order_id=x.order_id).first()
-                obj.update({"product": pr.product.name, "apply_at": stamp(x.apply_at),
-                            "apply_platform": x.apply_platform})
-                packages['used'].append(obj)
-                packages['used'].sort(key=lambda t: t['unavailable_at'])
-                packages['used'].sort(key=lambda x: x['order_by'])
+                if pr:
+                    obj.update({"product": pr.product.name, "apply_at": stamp(x.apply_at),
+                                "apply_platform": x.apply_platform})
+                    packages['used'].append(obj)
+                    packages['used'].sort(key=lambda x: x['unavailable_at'])
+                    packages['used'].sort(key=lambda x: x['order_by'])
+                else:
+                    obj.update({"product": u'月利宝红包', "apply_at": stamp(x.apply_at),
+                                "apply_platform": x.apply_platform})
+                    packages['used'].append(obj)
+                    packages['used'].sort(key=lambda x: x['unavailable_at'])
+                    packages['used'].sort(key=lambda x: x['order_by'])
+                    logger.debug(u'月利宝使用的红包, order_id = {}, redpackrecord_id = {}'
+                                 .format(x.order_id, x.id))
+                    continue
             else:
                 if x.redpack.status == "invalid":
                     packages['invalid'].append(obj)

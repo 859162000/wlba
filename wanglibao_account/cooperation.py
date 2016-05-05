@@ -2179,8 +2179,6 @@ class BiSouYiRegister(BaJinSheRegister):
         else:
             req_data = self.request.REQUEST
 
-        logger.info("%s request url[%s] params[%s]" % (self.c_code, self.request.get_full_path(), req_data))
-
         channel_code = self.get_channel_code_from_request()
         channel_phone = req_data.get(self.external_channel_phone_key, None)
         sign = req_data.get(self.external_channel_sign_key, None)
@@ -2221,6 +2219,9 @@ class BiSouYiRegister(BaJinSheRegister):
 
         if p_id:
             self.request.session[self.channel_product_id_key] = p_id
+
+        logger.info("%s request url[%s] params[%s] client_id[%s] sign[%s]" % (
+            self.c_code, self.request.get_full_path(), req_data, client_id, sign))
 
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
