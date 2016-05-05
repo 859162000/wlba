@@ -2714,7 +2714,7 @@ class HappyMonkeyAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        today = (datetime.now()+timedelta(hours=-8)).strftime("%Y-%m-%d")
+        today = datetime.now().strftime("%Y-%m-%d")
         user = user.user if user else request.user
 
         #今天用户没有玩过
@@ -2736,7 +2736,10 @@ class HappyMonkeyAPIView(APIView):
 
             #今天用户已经玩过了
             reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
-            if reward and today == str(reward.create_at)[:10]:
+            timestamp = time.mktime(time.strptime(reward.create_at.strftime("%Y-%m-%d %M:%H:%S"), "%Y-%m-%d %M:%H:%S"))
+            res = datetime.datetime.utcfromtimestamp(timestamp)+datetime.timedelta(hours=8)
+            res = res.strftime("%Y-%m-%d %H:%M:%S")
+            if reward and today == str(res)[:10]:
                 to_json_response = {
                     'ret_code': 1001,
                     'message': u'每一个用户,一天只能玩一次',
