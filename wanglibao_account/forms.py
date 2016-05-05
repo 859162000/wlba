@@ -591,7 +591,10 @@ class BiSouYiRegisterForm(forms.Form):
         client_id = self.cleaned_data['client_id']
         sign = self.cleaned_data['sign']
         content = self.cleaned_data['content'][0]
-        content = quote.quote_plus(content)
+
+        if self.action != 'select':
+            content = quote.quote_plus(content)
+
         local_sign = hashlib.md5(str(client_id) + settings.BISOUYI_CLIENT_SECRET + content).hexdigest()
         if sign != local_sign:
             return False

@@ -1995,45 +1995,43 @@ class BiSouYiUserExistsApi(APIView):
 
     def post(self, request):
         form = BiSouYiRegisterForm(request.session, action='select')
+        content_data = dict()
         if form.is_valid():
             if form.check_sign():
                 phone = form.get_phone()
                 user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
                 _type = 0 if user else 1
                 user_type = u'是' if user else u'否'
-                content_data = {
+                public_data = {
                     'code': 10000,
-                    'message': 'success',
                     'status': 1,
+                    'message': 'success',
+                }
+                content_data = {
                     'yaccount': user_type,
                     'mobile': phone,
                     'type': _type,
+                    'pcode': settings.BISOUYI_PCODE,
                 }
             else:
-                content_data = {
+                public_data = {
                     'code': 10010,
+                    'status': 0,
                     'message': u'无效签名',
                 }
         else:
-            content_data = {
+            public_data = {
                 'code': 10020,
+                'status': 0,
                 'message': form.errors.values()[0][0],
             }
-
-        content_data['pcode'] = settings.BISOUYI_PCODE
-        if content_data['code'] != 10000:
-            content_data['status'] = 0
 
         content = generate_bisouyi_content(content_data)
         client_id = settings.BISOUYI_CLIENT_ID
         sign = generate_bisouyi_sign(content)
-        response_data = {
-            'cid': client_id,
-            'sign': sign,
-            'content': content,
-        }
+        public_data['content'] = content
 
-        http_response = HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+        http_response = HttpResponse(json.dumps(public_data), status=200, content_type='application/json')
         http_response['cid'] = client_id
         http_response['sign'] = sign
 
