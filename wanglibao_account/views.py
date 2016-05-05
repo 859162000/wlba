@@ -1275,7 +1275,10 @@ class MessageView(TemplateView):
     template_name = 'message.jade'
 
     def get_context_data(self, **kwargs):
+
         listtype = self.request.GET.get("listtype")
+        messages = []
+        messages_list = []
 
         if not listtype or listtype not in ("read", "unread", "all"):
             listtype = 'all'
@@ -1293,24 +1296,24 @@ class MessageView(TemplateView):
         else:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                      data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
-            resp = response.json()
-            if resp['code'] == 'success':
-                count = len(resp['data'])
-                data = resp['data']
-                messages = Message.objects.all()[:count]
+            if response.status_code == 200:
+                resp = response.json()
+                if resp['code'] == 'success':
+                    count = len(resp['data'])
+                    data = resp['data']
+                    messages = Message.objects.all()[:count]
 
-                # 把 data 的数据 赋值都展示的messages 对象
-                index = 0
-                for message in messages:
-                    message.id = data[index]['id']
-                    message.read_status = data[index]['read_status']
-                    message.message_text.title = data[index]['title']
-                    message.message_text.content = data[index]['content']
-                    message.message_text.created_at = int(data[index]['created_at'])
-                    index += 1
+                    # 把 data 的数据 赋值都展示的messages 对象
+                    index = 0
+                    for message in messages:
+                        message.id = data[index]['id']
+                        message.read_status = data[index]['read_status']
+                        message.message_text.title = data[index]['title']
+                        message.message_text.content = data[index]['content']
+                        message.message_text.created_at = int(data[index]['created_at'])
+                        index += 1
 
-        messages_list = []
-        messages_list.extend(messages)
+                messages_list.extend(messages)
 
         limit = 10
         paginator = Paginator(messages_list, limit)
