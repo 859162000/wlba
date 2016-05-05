@@ -31,6 +31,7 @@ import base64
 from wanglibao_pay.pay import PayOrder, PayMessage
 from wanglibao_rest.utils import split_ua
 # from wanglibao_account.cooperation import CoopRegister
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -939,7 +940,11 @@ class YeeShortPay:
         code = res_data.get('errorcode')
         message = res_data.get('errormsg')
         last_card_no = res_data.get('lastno')
-        amount = res_data.get('amount')
+        try:
+            amount = Decimal(res_data.get('amount')) / 100
+            amount = amount.quantize(Decimal('0.01'))
+        except:
+            amount = None
 
         if not code and last_card_no and amount:
             code = '0'

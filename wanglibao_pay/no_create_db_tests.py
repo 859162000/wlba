@@ -36,8 +36,8 @@ class TaskSyncPayResultTest(SimpleTestCase):
 
     def test_sync_pay_result(self):
         timezone = get_default_timezone()
-        start_time = timezone.localize(datetime(2016,4,21))
-        end_time = timezone.localize(datetime(2016, 4,22))
+        start_time = timezone.localize(datetime(2016,4,28))
+        end_time = timezone.localize(datetime(2016, 4,29))
         sync_pay_result(start_time, end_time)
 
 
