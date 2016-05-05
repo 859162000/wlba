@@ -3685,8 +3685,8 @@ org.awardEvent = (function(org){ //微信抽奖
             type: "post",
             url: '/api/weixin/distribute/redpack/',
             dataType: 'json',
-            //data: {"action": obj,"openid": $("#openid").val()},
-            data: {"action": obj,"openid": "oILFQt3q9C-SqnZRlUTYvhgQUHYE"},
+            data: {"action": obj,"openid": $("#openid").val()},
+            //data: {"action": obj,"openid": "oILFQt3q9C-SqnZRlUTYvhgQUHYE"},
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
