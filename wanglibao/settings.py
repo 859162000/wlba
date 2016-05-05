@@ -206,12 +206,6 @@ if ENV_ALPHA_DEPLOY:
 
 import sys
 
-if 'test' in sys.argv:
-    SOUTH_TESTS_MIGRATE = False
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/db.sqlite3'
-    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -1433,3 +1427,8 @@ if ENV == ENV_PRODUCTION:
     INNER_IP = ("182.92.179.24", "10.171.37.235")
 else:
     INNER_IP = ("192.168.1.20","192.168.10.1", "192.168.30.1")
+
+#SMTP server
+SMTP_SERVER = 'smtp.exmail.qq.com'
+SMTP_USER = 'develop@wanglibank.com'
+SMTP_PASSWORD = 'abc&321'
