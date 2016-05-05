@@ -4,8 +4,8 @@ html(style="background: #fff")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015031002", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015031002", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050501", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015050501", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -158,7 +158,7 @@ html(style="background: #fff")
                         img.people_footer(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper.min.js')
-        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015050501")
+        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015050502")
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
         //        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,

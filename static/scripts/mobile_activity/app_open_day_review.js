@@ -239,8 +239,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '春日总动员',
-			shareImg = host + '/static/imgs/mobile_activity/app_spring_mobilization/300x300.jpg',
-			shareLink = host + 'weixin_activity/spring_reward/',
+			shareImg = host + '/static/imgs/mobile_activity/app_open_day_review/300x300.png',
+			shareLink = host + '/activity/app_open_day_review/',
 			shareMainTit = '春日总动员',
 			shareBody = '万份豪礼倾情送，全民来抢乐出游！';
 		//分享给微信好友
