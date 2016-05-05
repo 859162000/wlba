@@ -37,12 +37,15 @@ def count_msg(params, user):
         try:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                      data={'uid': user.id, 'read_status': listtype}, timeout=3)
-            resp = response.json()
-            if resp['code'] == 'success':
-                count = len(resp['data'])
-                return {"ret_code": 0, "message": "ok", "count": count}
-            else:
-                return {"ret_code": 10001, "message": "failed", "count": -1}
+
+            if response.status_code == 200:
+                resp = response.json()
+                if resp['code'] == 'success':
+                    count = len(resp['data'])
+                    return {"ret_code": 0, "message": "ok", "count": count}
+
+            return {"ret_code": 10001, "message": "failed with{}".format(response.status_code), "count": -1}
+
         except Exception, e:
             return {"ret_code": 10002, "message": e.message, "count": -1}
 
@@ -74,25 +77,25 @@ def list_msg(params, user):
             msgs = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
 
     else:
+        messages = []
         response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                  data={'uid': user.id, 'read_status': listtype}, timeout=3)
-        resp = response.json()
-        messages = []
-        if resp['code'] == 'success':
-            count = len(resp['data'])
-            data = resp['data']
-            messages = Message.objects.all()[:count]
+        if response.status_code == 200:
+            resp = response.json()
+            if resp['code'] == 'success':
+                count = len(resp['data'])
+                data = resp['data']
+                messages = Message.objects.all()[:count]
 
-            # 把 data 的数据 赋值都展示的messages 对象
-            index = 0
-            for message in messages:
-                message.id = data[index]['id']
-                message.read_status = True if data[index]['read_status'] == str(1) else False
-                message.message_text.mtype = data[index]['mtype']
-                message.message_text.title = data[index]['title']
-                message.message_text.content = data[index]['content']
-                message.message_text.created_at = int(data[index]['created_at'])
-                index += 1
+                # 把 data 的数据 赋值都展示的messages 对象
+                index = 0
+                for message in messages:
+                    message.id = data[index]['id']
+                    message.read_status = True if data[index]['read_status'] == str(1) else False
+                    message.message_text.title = data[index]['title']
+                    message.message_text.content = data[index]['content']
+                    message.message_text.created_at = int(data[index]['created_at'])
+                    index += 1
 
         msgs = []
         msgs.extend(messages)
@@ -140,11 +143,12 @@ def sign_read(user, message_id):
             url = settings.PHP_INSIDE_MESSAGE_READ_ALL
             response = requests.post(url,
                                      data={'uid': user.id}, timeout=3)
-            resp = response.json()
-            if resp['code'] == 'success':
-                return {"ret_code": 0, "message": "ok"}
+            if response.status_code == 200:
+                resp = response.json()
+                if resp['code'] == 'success':
+                    return {"ret_code": 0, "message": "ok"}
             else:
-                return {"ret_code": 10000, "message": "请求超时"}
+                return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
     else:
         if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
             msg = Message.objects.filter(target_user=user).filter(pk=message_id).first()
@@ -158,11 +162,13 @@ def sign_read(user, message_id):
             url = settings.PHP_INSIDE_MESSAGE_READ
             response = requests.post(url,
                                      data={'uid': user.id, 'mid': message_id}, timeout=3)
-            resp = response.json()
-            if resp['code'] == 'success':
-                return {"ret_code": 0, "message": "ok"}
+
+            if response.status_code == 200:
+                resp = response.json()
+                if resp['code'] == 'success':
+                    return {"ret_code": 0, "message": "ok"}
             else:
-                return {"ret_code": 10000, "message": "请求超时"}
+                return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
 
 
 def create(title, content, mtype):
@@ -321,7 +327,10 @@ def send_one(user_id, title, content, mtype, push_type="in"):
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                      data={'uid': user_id, 'mtype': mtype, 'title': title, 'content': content},
                                      timeout=3)
-            return response.json().get('status')
+            if response.status_code == 200:
+                return True
+            else:
+                return False
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
             logger.debug('failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
@@ -335,7 +344,10 @@ def send_one(user_id, title, content, mtype, push_type="in"):
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                      data={'uid': user_id, 'mtype': mtype, 'title': title, 'content': content},
                                      timeout=3)
-            return response.json().get('status')
+            if response.status_code == 200:
+                return True
+            else:
+                return False
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
             logger.debug('failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
@@ -373,7 +385,10 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
         try:
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                      data={'uid': users, 'mtype': mtype, 'title': title, 'content': content}, timeout=30)
-            return response.json().get('status')
+            if response.status_code == 200:
+                return True
+            else:
+                return False
 
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
@@ -388,7 +403,10 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
         try:
             response = requests.post(settings.PHP_SEND_INSIDE_MESSAGE,
                                      data={'uid': users, 'mtype': mtype, 'title': title, 'content': content}, timeout=3)
-            return response.json().get('status')
+            if response.status_code == 200:
+                return True
+            else:
+                return False
 
         except Exception, e:
             logger.debug('exception = {}'.format(e.message))
