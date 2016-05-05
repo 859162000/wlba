@@ -31,6 +31,7 @@ import base64
 from wanglibao_pay.pay import PayOrder, PayMessage
 from wanglibao_rest.utils import split_ua
 # from wanglibao_account.cooperation import CoopRegister
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -341,7 +342,7 @@ class YeeShortPay:
         self.BIND_CARD_QUERY = settings.YEE_SHORT_BIND_CARD_QUERY
         self.BIND_PAY_REQUEST = settings.YEE_SHORT_BIND_PAY_REQUEST
         self.YEE_CALLBACK = settings.YEE_SHORT_CALLBACK
-        self.QUERY_TRX_RESULT = settings.YEE_SHORT_QUERY_TRX_RESULT
+        self.QUERY_TRX_RESULT = settings.YEE_URL + '/api/query/order' 
 
     def _sign(self, dic):
         values = self._sort(dic)
@@ -955,6 +956,28 @@ class YeeShortPay:
 
         return rs
 
+    def query_trx_result(self, order_id):
+        res = self._query_trx_result(order_id)
+        res_data = res.get('data')
+
+        code = res_data.get('errorcode')
+        message = res_data.get('errormsg')
+        last_card_no = res_data.get('lastno')
+        try:
+            amount = Decimal(res_data.get('amount')) / 100
+            amount = amount.quantize(Decimal('0.01'))
+        except:
+            amount = None
+
+        if not code and last_card_no and amount:
+            code = '0'
+
+        return {'code': code,
+                'message': message,
+                'last_card_no': last_card_no,
+                'amount': amount,
+                'raw_response': res_data}
+ 
     def sync_bind_card(self, user):
         """
         同步一个用户的所有卡列表
@@ -974,32 +997,3 @@ class YeeShortPay:
             Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
             Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
                                 is_the_one_card=True).update(is_the_one_card=False)
-
-    def query_trx_result(self, order_id):
-        res = self._query_trx_result(order_id)
-        res_data = res.get('data')
-
-        code = res_data.get('errorcode')
-        message = res_data.get('errormsg')
-        last_card_no = res_data.get('lastno')
-        amount = res_data.get('amount')
-
-        if not code and last_card_no and amount:
-            code = '0'
-
-        return {'code': code,
-                'message': message,
-                'last_card_no': last_card_no,
-                'amount': amount}
-
-
-
-
-
-
-
-
-
-
-
-    
