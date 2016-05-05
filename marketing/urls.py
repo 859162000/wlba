@@ -110,7 +110,7 @@ urlpatterns += patterns(
     url(r'^app_movie/$', TemplateView.as_view(template_name="app_movie.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
     url(r'^app_invite/$', TemplateView.as_view(template_name="app_invite.jade")),
-    url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_gold_season.jade")),
+    url(r'^app_shareReward/$', TemplateView.as_view(template_name="client_display.jade")),
     url(r'^app_request/$', TemplateView.as_view(template_name="app_request.jade")),
     url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold_season.jade")),
     url(r'^app_july_act/$', TemplateView.as_view(template_name="app_july_act.jade")),
@@ -216,6 +216,7 @@ urlpatterns += patterns(
     url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
     url(r'^new_user_gift/$', TemplateView.as_view(template_name="new_user_gift.jade")),
     url(r'^app_xunlei_new/$', TemplateView.as_view(template_name="app_xunlei_new.jade")),
+    url(r'^app_open_day_review/$', TemplateView.as_view(template_name="app_open_day_review.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
