@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def send_mail(payinfo_id, user_name, user_phone, amount, message):
     # accountant_team_email = 'jiesuan@wanglibank.com'
-    accountant_team_email = 'guoya@wanglibank.com'
+    accountant_team_email = 'wangzhenhai@wanglibank.com'
     admin_email = 'guoya@wanglibank.com'
     from_addr = settings.SMTP_USER
     if settings.ENV == settings.ENV_PRODUCTION:
