@@ -96,7 +96,7 @@ def sync_pay_result(start_time=None, end_time=None):
             send_mail(pay_info.id, profile.name, profile.phone, pay_info.amount, raw_response) 
 
 @worker_process_init.connect
-def crypto_init():
+def crypto_init(**kwagrgs):
     Crypto.Random.atfork()
     
 
