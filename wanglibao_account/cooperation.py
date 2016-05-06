@@ -986,8 +986,11 @@ class BiSouYiCallback(CoopCallback):
             pay_method = product.pay_method
             if pay_method in (u'等额本息', u'按月付息', u'到期还本付息'):
                 unit = 2
+                period = product.period * 30
             else:
                 unit = 1
+                period = product.period
+
             content_data = {
                 'pcode': settings.BISOUYI_PCODE,
                 'sn': p2p_record.order_id,
@@ -996,7 +999,7 @@ class BiSouYiCallback(CoopCallback):
                 'idcard': get_id_number_for_coop(user_id)[:18],
                 'name': product.name[:100],
                 'amoney': float(p2p_record.amount),
-                'aperiod': product.period,
+                'aperiod': period,
                 'unit': unit,
                 'adate': timezone.localtime(p2p_record.create_time).strftime('%Y-%m-%d %H:%M:%S'),
                 'rate': product.expected_earning_rate,
