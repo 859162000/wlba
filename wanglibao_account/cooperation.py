@@ -1086,7 +1086,7 @@ class BiSouYiCallback(CoopCallback):
                                 'edate': timezone.localtime(last_user_amo.term_date).strftime('%Y-%m-%d %H:%M:%S'),
                                 'ostatus': 1,
                                 'pstatus': 1,
-                                'bstatus': 1,
+                                'bstatus': 2,
                             }
 
                 if content_data:

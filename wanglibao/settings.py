@@ -44,9 +44,15 @@ ENV_DEV = 'debug'
 ENV_PRODUCTION = 'production'
 ENV_PREPRODUCTION = 'pre'
 ENV_STAGING = 'staging'
+ENV_ALPHA = 'alpha'
 
 ENV = ENV_DEV
 # ENV = ENV_STAGING
+
+ENV_ALPHA_DEPLOY = False
+if ENV == ENV_ALPHA:
+    ENV = "staging"
+    ENV_ALPHA_DEPLOY = True
 
 if ENV != ENV_DEV:
     DEBUG = False
@@ -148,6 +154,15 @@ if LOCAL_MYSQL:
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
         # 'HOST': '192.168.20.237',
+    }
+
+if ENV_ALPHA_DEPLOY:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wanglibao',
+        'USER': 'wanglibao',
+        'PASSWORD': 'wanglibank',
+        'HOST': '192.168.20.236',
     }
 
 import sys
@@ -407,6 +422,8 @@ if ENV == ENV_PRODUCTION:
     BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
 elif ENV == ENV_STAGING:
     BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.1.242:5672/wanglibao')
+elif ENV == ENV_ALPHA:
+    BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.20.233:5672/wanglibao')
 else:
     # FixMe,　修改测试环境broker　URL, 如果DEBUG is False, 需添加静态文件配置，否则后台管理页面无法加载
     # BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
@@ -465,11 +482,17 @@ else:
 BAJINSHE_COOP_ID = 'wanglibao'
 BAJINSHE_COOP_KEY = '3795dd52-3ad9-47cf-9fe7-67d69566c1ba'
 if ENV == ENV_PRODUCTION:
+    BAJINSHE_ACCESS_TOKEN_URL = 'http://node.jr360.com/web-outer/json/v2/external/UserService/refreshUserToken/gzip'
+    BAJINSHE_PRODUCT_PUSH_URL = 'http://node.jr360.com/web-outer/json/v1/external/ProductService/publishProduct/gzip'
+    BAJINSHE_ACCOUNT_PUSH_URL = 'http://node.jr360.com/web-outer/json/v1/external/AccountService/pushAccount/gzip'
+    BAJINSHE_TRANSACTION_PUSH_URL = 'http://node.jr360.com/web-outer/json/v1/external/BusinessLogService/pushBusinessLog/gzip'
+    BAJINSHE_PURCHASE_PUSH_URL = 'http://node.jr360.com/web-outer/json/v1/external/InvestmentService/pushInvestment/gzip'
+elif ENV == ENV_ALPHA:
     BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
     BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
     BAJINSHE_ACCOUNT_PUSH_URL = 'http://test.jr360.com/json/v1/external/AccountService/pushAccount/gzip'
     BAJINSHE_TRANSACTION_PUSH_URL = 'http://test.jr360.com/json/v1/external/BusinessLogService/pushBusinessLog/gzip'
-    BAJINSHE_PURCHASE_PUSH_URL = ''
+    BAJINSHE_PURCHASE_PUSH_URL = 'http://test.jr360.com/json/v1/external/InvestmentService/pushInvestment/gzip'
 else:
     BAJINSHE_ACCESS_TOKEN_URL = 'http://test.jr360.com/json/v1/external/TokenService/getAccessToken/gzip'
     BAJINSHE_PRODUCT_PUSH_URL = 'http://test.jr360.com/json/v1/external/ProductService/publishProduct/gzip'
