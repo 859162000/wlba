@@ -2220,6 +2220,9 @@ class BiSouYiRegister(BaJinSheRegister):
         if p_id:
             self.request.session[self.channel_product_id_key] = p_id
 
+        logger.info("%s request url[%s] params[%s] client_id[%s] sign[%s]" % (
+            self.c_code, self.request.get_full_path(), req_data, client_id, sign))
+
     def clear_session(self):
         super(BiSouYiRegister, self).clear_session()
         self.request.session.pop(self.internal_channel_phone_key, None)

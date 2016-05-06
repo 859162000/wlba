@@ -3646,28 +3646,28 @@ function isAwards(k){//判断抽奖是第几项
         case 0.2:
             is = 1;
             break;
-        case 0.3:
+        case 0.4:
             is = 2;
             break;
-        case 0.4:
+        case 0.5:
             is = 3;
             break;
-        case 1:
+        case 0.8:
             is = 4;
             break;
-        case 1.5:
+        case 1.0:
             is = 5;
             break;
-        case 25:
+        case 1.2:
             is = 6;
             break;
-        case 2:
+        case 1.5:
             is = 7;
             break;
-        case 6:
+        case 1.8:
             is = 8;
             break;
-        case 10:
+        case 2.0:
             is = 9;
             break;
         default :

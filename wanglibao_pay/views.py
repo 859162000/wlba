@@ -62,7 +62,6 @@ from weixin.models import WeixinUser
 from wanglibao_rest.common import DecryptParmsAPIView
 from marketing.tools import withdraw_submit_ok
 from misc.models import Misc
-from wanglibao_pay.tasks import sync_bind_card
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2

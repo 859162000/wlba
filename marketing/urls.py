@@ -94,6 +94,8 @@ urlpatterns = patterns(
     url(r'^wangli_vip/$', TemplateView.as_view(template_name="wangli_vip.jade")),
     url(r'^august_phone/$', TemplateView.as_view(template_name="august_phone.jade")),
     url(r'^april_mobilization/$', TemplateView.as_view(template_name="april_mobilization.jade")),
+    url(r'^open_day_review/$', TemplateView.as_view(template_name="open_day_review.jade")),
+    url(r'^center_film_ticket/$', TemplateView.as_view(template_name="center_film_ticket.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
@@ -108,7 +110,7 @@ urlpatterns += patterns(
     url(r'^app_movie/$', TemplateView.as_view(template_name="app_movie.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
     url(r'^app_invite/$', TemplateView.as_view(template_name="app_invite.jade")),
-    url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_gold_season.jade")),
+    url(r'^app_shareReward/$', TemplateView.as_view(template_name="client_display.jade")),
     url(r'^app_request/$', TemplateView.as_view(template_name="app_request.jade")),
     url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold_season.jade")),
     url(r'^app_july_act/$', TemplateView.as_view(template_name="app_july_act.jade")),
@@ -213,6 +215,8 @@ urlpatterns += patterns(
     url(r'^h5_recruit/$', TemplateView.as_view(template_name="h5_recruit.jade")),
     url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
     url(r'^new_user_gift/$', TemplateView.as_view(template_name="new_user_gift.jade")),
+    url(r'^app_xunlei_new/$', TemplateView.as_view(template_name="app_xunlei_new.jade")),
+    url(r'^app_open_day_review/$', TemplateView.as_view(template_name="app_open_day_review.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),

@@ -385,7 +385,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             //document.getElementById('refresh').onclick= function(){
             //    window.location.reload();
             //}
-            mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利", image: "/static/imgs/mobile_activity/new_user_gift/icon_weixin.png"});
+            //mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利", image: "https://staging.wanglibao.com/static/imgs/mobile_activity/new_user_gift/icon_weixin.png"});
+            mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利"});
+
         },
         other: function(){
             get_gift();
