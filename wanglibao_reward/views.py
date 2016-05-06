@@ -3134,7 +3134,7 @@ class FetchNewUserReward(APIView):
         redpack_txts = []
         events = []
         records = []
-        p2precord = P2PRecord.objects.filter(create_time__gte=activity.start_at, create_time__lt=activity.end_at, user=request.user, catalog=u'申购').first()
+        p2precord = P2PRecord.objects.filter(user=request.user, catalog=u'申购').first()
         if p2precord:
             return Response({"ret_code": 1, "message": "抱歉，您不符合领取条件哦~"})
         gift_record, _ = ActivityRewardRecord.objects.get_or_create(user=self.request.user, activity_code=activity.code)
