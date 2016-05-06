@@ -13,12 +13,14 @@ import smtplib
 from wanglibao import settings
 from email.parser import Parser
 from decimal import Decimal
+from celery.signals import worker_process_init
+import Crypto
 
 logger = logging.getLogger(__name__)
 
 def send_mail(payinfo_id, user_name, user_phone, amount, message):
     # accountant_team_email = 'jiesuan@wanglibank.com'
-    accountant_team_email = 'guoya@wanglibank.com'
+    accountant_team_email = 'wangzhenhai@wanglibank.com'
     admin_email = 'guoya@wanglibank.com'
     from_addr = settings.SMTP_USER
     if settings.ENV == settings.ENV_PRODUCTION:
@@ -91,4 +93,10 @@ def sync_pay_result(start_time=None, end_time=None):
             pay_order.order_after_pay_succcess(amount, pay_info.order_id)
             profile = WanglibaoUserProfile.objects.get(user=pay_info.user)
             logger.critical('sync_pay_result_deposit for pay_info_id %s' % pay_info.id)
-            send_mail(pay_info.id, profile.name, profile.phone, pay_info.amount, raw_response)
+            send_mail(pay_info.id, profile.name, profile.phone, pay_info.amount, raw_response) 
+
+@worker_process_init.connect
+def crypto_init(**kwagrgs):
+    Crypto.Random.atfork()
+    
+
