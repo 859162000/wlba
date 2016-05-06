@@ -3,6 +3,7 @@
 .body_wrap
   width: 100%
   font-size: 0
+  overflow: hidden
   .banner
     width: 100%
     display: block
@@ -57,6 +58,10 @@
       margin: 0.85rem auto 0
     .line_gray_1
       margin-bottom: 3.3rem
+    .line_gray_2
+      margin-bottom: 1.75rem
+    .small_title_2
+      padding: 1.75rem 0 0
     .advantage_wrap
       width: 91.2%
       margin: 3.3rem auto 2.1rem
@@ -175,6 +180,10 @@
         background: #a3a3a3
       .swiper-pagination-bullet-active
         background: #E5493A
+      .swiper-slide
+        img
+          width: 100%
+          display: block
     .photo_text
       line-height: 1.15rem
       color: #a3a3a3
@@ -212,15 +221,14 @@
         display: block
       .talk
         width: 100%
-        background: url("/static/imgs/mobile_activity/app_open_day_review/people_bg.png")
-        background-size: 100% auto
-        display: block
+        background: url("/static/imgs/mobile_activity/app_open_day_review/people_bg.png") repeat-y
+        background-size: 100% 100%
+        display: inline-block
         color: #585757
         font-size: 0.6rem
         line-height: 1.2rem
         padding: 0.2rem 0.7rem 0.5rem
         max-height: 9999rem
-        .people_name
         .people_text
           text-indent: 2em
       .people_bottom
