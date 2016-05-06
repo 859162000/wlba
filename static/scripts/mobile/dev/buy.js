@@ -250,6 +250,11 @@ webpackJsonp([1],[
 	                    return;
 	                }
 	                if (result.error_number > 0) {
+	                    if (result.error_number == 2) {
+	                        return (0, _ui.Alert)(result.message, function () {
+	                            window.location.href = "/weixin/regist/first/";
+	                        });
+	                    }
 	                    return (0, _ui.Alert)(result.message);
 	                }
 	            },
@@ -367,7 +372,7 @@ webpackJsonp([1],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback();
+	        callback && callback();
 	    });
 	};
 
@@ -782,7 +787,7 @@ webpackJsonp([1],[
 	        key: 'createInput',
 	        value: function createInput() {
 	            var HASH = this.hash();
-	            var input_body = '<input type=\'tel\' name=' + HASH + ' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
+	            var input_body = '<input type=\'tel\' name=' + HASH + ' style=\'opacity:0;\' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
 	            this.$layout.append(input_body);
 	            this.$input = $('#' + HASH);
 	        }

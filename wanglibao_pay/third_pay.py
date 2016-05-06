@@ -478,7 +478,7 @@ def bind_pay_deposit(request):
         #返回ret_code为20075的话表示银行卡和银行不匹配
         if cardinfo['ret_code'] == 20075:
             return cardinfo
-        
+
     amount = request.DATA.get('amount', '').strip()
     try:
         amount = float(amount)
@@ -502,10 +502,12 @@ def bind_pay_deposit(request):
         stop_no_sms_channel = Misc.objects.filter(
                 key='kuai_qpay_stop_no_sms_channel').first()  
         if stop_no_sms_channel and stop_no_sms_channel.value == '1' and \
-                len(card_no) == 10 and not request.post.get('mode'): 
+                len(card_no) == 10 and not request.DATA.get('mode'): 
                     # mode != vcode_for_qpay
-            return {'ret_code': 20022,
-                    'message': u'部分银行支付安全升级，需更新到最新版本才能使用，快去更新吧'}
+            # Modify by hb on 2016-04-28
+            #return {'ret_code': 201183,
+            return {'ret_code': 201181,
+                    'message': u'该银行支付升级，请更新App版本'}
         result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, 
                                         device_type, ip, request, mode=mode)
 
@@ -528,7 +530,7 @@ def check_bank_carkinfo(card_no,bank):
         return {"ret_code":20075, "message": "所选银行与银行卡号不匹配，请重新选择"}
     #银行卡号和银行匹配正确
     return {"ret_code":0}
-    
+
 
 def bind_pay_dynnum(request):
     """ 根据银行设置的支付渠道进行支付渠道的支付

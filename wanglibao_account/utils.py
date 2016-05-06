@@ -346,6 +346,18 @@ def str_add_md5(value):
     else:
         return ''
 
+def ext_str_to_utc(time_str):
+    """
+    :param str:  '2015-08-08'
+    :return:     datetime.datetime(2015, 8, 8, 7, 0, tzinfo=<UTC>)
+    """
+    time_zone = settings.TIME_ZONE
+    local = pytz.timezone(time_zone)
+    naive = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
+    local_dt = local.localize(naive, is_dst=None)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    return utc_dt
+
 
 def str_to_utc(time_str):
     """

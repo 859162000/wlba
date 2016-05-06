@@ -22,7 +22,6 @@ urlpatterns = patterns(
     url(r'^coop_regist/$', views.WeixinCoopRegister.as_view(), name="weixin_coop_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
-    #url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
     url(r'^regist/second/$', login_required(views.WeixinRegisterBindCard.as_view(), login_url='/weixin/login/'), name='weixin_regist_bind_card'),
     url(r'^regist/three/$', TemplateView.as_view(template_name="weixin_registProcess_three.jade")),
 
@@ -109,9 +108,14 @@ urlpatterns = patterns(
     #刮刮乐
     url(r'^activity_ggl/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='activity_ggl'),
-    url(r'^sub_checkIn/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
+    url(r'^sub_checkIn/$', fwh_login_required(TemplateView.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='sub_checkIn'),
     url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
+
+    url(r'^new_user_gift/$', fwh_login_required(TemplateView.as_view(template_name="server_new_user_gift.jade"),login_url='/weixin/sub_login_redirect/'
+                                          ),name='new_user_gift'),
+    url(r'^app_airport_operation/$', fwh_login_required(TemplateView.as_view(template_name="app_airport_operation.jade"),login_url='/weixin/sub_login_redirect/')),
+    url(r'^app_august_phone/$', fwh_login_required(TemplateView.as_view(template_name="app_august_phone.jade"), login_url='/weixin/sub_login_redirect/')),
 
 )
 #活动api

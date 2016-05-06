@@ -60,14 +60,14 @@ html(style="background: #f5f5f5")
 
       //账户安全
       section.regist-safe
-        span 账户资金安全由阳光保险承保
+        span 阳光保险承保资金账户安全
 
       //注册按钮
       section#regist-submit.regist-submit
         button(type="submit", disabled=true) 立即注册 ｜ 领取奖励
 
       //注册协议
-      section.regist-protocol-n
+      section.regist-protocol-n.wx-login-input-space
         span.checkbox.agreement#agreement
           input(type='checkbox',name='agreement', checked=true)
         span.xieyi-btn 同意网利宝注册协议
@@ -84,10 +84,10 @@ html(style="background: #f5f5f5")
             h4=title
             p=bodyTxt1
             p=bodyTxt2
-        +li('trust', '信赖', 'IDG资本A轮投资', '足额抵押物保障')
-        +li('authority', '权威', 'A股百亿上市公司', '鸿利光电投资入股')
-        +li('safe', '安全', '账户资金安全', '由阳光保险承保')
-        +li('profit', '高收益', '37倍银行活期收益', '100元起投0手续')
+        +li('trust', '信赖', '0逾期', '百万用户的共同选择')
+        +li('authority', '实力', 'IDG资本A轮投资', '鸿利光电B轮投资')
+        +li('safe', '风控', '抵押、质押或保证担保', '金盾计划收购逾期违约债权')
+        +li('profit', '好收益', '100元起投', '预期年化6-13%')
     //公司地址
     section.regist-adress
       .adress-top

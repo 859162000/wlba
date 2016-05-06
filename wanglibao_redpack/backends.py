@@ -17,7 +17,7 @@ import logging
 import decimal
 from django.utils import timezone
 from django.db.models import Sum
-from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike, Income, PhpIncome
+from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike, Income
 from wanglibao_p2p.models import P2PRecord, P2PProduct, P2PEquity
 from marketing import helper
 from wanglibao_sms import messages
@@ -285,12 +285,12 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     packages['used'].sort(key=lambda x: x['unavailable_at'])
                     packages['used'].sort(key=lambda x: x['order_by'])
                 else:
-                    obj.update({"product": u'月利宝红包', "apply_at": stamp(x.apply_at),
+                    obj.update({"product": u'月利宝产品', "apply_at": stamp(x.apply_at),
                                 "apply_platform": x.apply_platform})
                     packages['used'].append(obj)
                     packages['used'].sort(key=lambda x: x['unavailable_at'])
                     packages['used'].sort(key=lambda x: x['order_by'])
-                    logger.debug(u'月利宝使用的红包, order_id = {}, redpackrecord_id = {}'
+                    logger.debug(u'月利宝产品使用的红包, order_id = {}, redpackrecord_id = {}'
                                  .format(x.order_id, x.id))
                     continue
             else:

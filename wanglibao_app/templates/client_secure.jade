@@ -4,9 +4,9 @@ html
   head
     include include/app_header.jade
   body
-    article.secure-head
+    article.secure-head(style='padding: 1.15rem 3rem 1rem .5rem;')
       .secure-head-explain
-        p 多重保障
+        p 多重专业风控
         p 安全升级
       .secure-head-img
     mixin secureItem(bgStyle, explainTit, explain2, explain3, fangxiang, explain4)
@@ -27,10 +27,10 @@ html
             if explain4
               p=explain4
           .secure-item-img
-    +secureItem('buleLeft', '多业务模式', '业务综合完整', '强力保障个人资产稳健增值', 'imgleft')
-    +secureItem('greenRight', '资金安全', '多重身份认证', '阳光保险保障账户资金安全')
-    +secureItem('orginLeft', '合作伙伴', '与权威机构合作', '从源头杜绝安全风险', 'imgleft')
-    +secureItem('brownRight', '信息安全', '业界最安全标准全站加密', '全面保障账户信息安全')
-    +secureItem('greenLeft', '理财保障', '资金链360°保障', '足额抵押物保障', 'imgleft')
+    +secureItem('buleLeft', '多业务模式', '业务综合完整', '帮助个人实现稳健增值', 'imgleft')
+    +secureItem('greenRight', '资金安全', '多重身份认证', '阳光保险承保账户资金安全')
+    +secureItem('orginLeft', '合作伙伴', '第三方合作机构联合风控', '从源头防范风险', 'imgleft')
+    +secureItem('brownRight', '信息保护', '全站信息多重加密', '全面守卫账户信息安全')
+    +secureItem('greenLeft', '风控手段', '金盾计划收购逾期违约债权', '抵押物快速处理', 'imgleft')
     //+secureItem('blueRight', '风险准备金', '千万级别风险准备金', '借款逾期时', 'right', '风险准备金先行垫付')
     //+secureItem('writeNone')

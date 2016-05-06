@@ -31,7 +31,7 @@ from weixin.tasks import sentTemplate
 from wanglibao_reward.tasks import sendWechatPhoneReward
 from marketing.send_data import send_register_data, send_idvalidate_data, send_deposit_data, send_investment_data,\
      send_withdraw_data
-from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy, processAugustAwardZhaoXiangGuan
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -60,7 +60,13 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # 发送红包
     # send_lottery.apply_async((user_id,))
     processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
-    #往数据中心发送投资信息数据
+    #八月照相馆活动
+    try:
+        processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount)
+    except Exception:
+        logger.error('影像投资节优惠码发送失败')
+        pass    
+    # 往数据中心发送投资信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_investment_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "device_type":device_type,
@@ -128,7 +134,7 @@ def idvalidate_ok(user_id, device):
             send_idvalidate_data.apply_async(kwargs={
                 "user_id": user_id, "device_type":device_type,
             }, queue='celery02')
-        
+
 @app.task
 def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
@@ -199,7 +205,7 @@ def deposit_ok(user_id, amount, device, order_id):
         send_deposit_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
         }, queue='celery02')
-        
+
 @app.task
 def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, device):
     user = User.objects.filter(id=user_id).first()

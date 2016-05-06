@@ -81,7 +81,7 @@ webpackJsonp([6],[
 	    $submit.on('click', function () {
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
-	            return login('/weixin/api/login/');
+	            return login('/api/bisouyi/login/?promo_token=bisouyi');
 	        }).then(function (result) {
 	            console.log('login success');
 	            var next_url = (0, _api.getQueryStringByName)('next');
@@ -125,7 +125,7 @@ webpackJsonp([6],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback();
+	        callback && callback();
 	    });
 	};
 

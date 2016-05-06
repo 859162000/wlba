@@ -29,7 +29,7 @@ export class Trade {
 
     createInput() {
         let HASH = this.hash()
-        let input_body = `<input type='tel' name=${HASH} id=${HASH} oncontextmenu='return false' value='' onpaste='return false' oncopy='return false' oncut='return false' autocomplete='off'  maxlength='6' minlength='6' />`
+        let input_body = `<input type='tel' name=${HASH} style='opacity:0;' id=${HASH} oncontextmenu='return false' value='' onpaste='return false' oncopy='return false' oncut='return false' autocomplete='off'  maxlength='6' minlength='6' />`
         this.$layout.append(input_body)
         this.$input = $('#' + HASH);
     }

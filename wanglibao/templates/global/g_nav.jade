@@ -16,7 +16,7 @@
             img(src='/static/imgs/pc/nav/qcode_gwsb.jpg')
             .wechat-hover-dec 关注网利宝微信
 
-      a(href='/generalize').samll-nav-app.samll-nav-animate
+      .samll-nav-app.samll-nav-animate
         span 网利宝APP
         span.icon-app
         .samll-wechat-hover
@@ -31,8 +31,8 @@
       //    a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
       //else
       //  a(href='javascript:void(0)')#investment.samll-nav-guide 企业理财
-      a(href='http://lianmeng.wanglibao.com/', target='_blank')#investment.samll-nav-guide 网利联盟
-      a(href='/data_cube/',target="_blank").samll-nav-guide 平台数据
+      //a(href='http://lianmeng.wanglibao.com/', target='_blank')#investment.samll-nav-guide 网利联盟
+      //a(href='/data_cube/',target="_blank").samll-nav-guide 平台数据
       a(href='/pc_guide/').samll-nav-guide 新手指引
       a(href='/help/').samll-nav-guide 帮助中心
       if user.is_authenticated
@@ -105,12 +105,11 @@
                   +smallNav('/p2p/list/', '散标')
                   +smallNav('/ylb/exchange.php', '转让标')
 
-
       +nav-item('nav-index', '首页', '/')
       +nav-item('nav-p2p', '理财专区', '/p2p/list/', 'list')
-      +nav-item('nav-dai', '贷款专区', '/finance/')
-      +nav-item('nav-area', '活动专区', '/activity/area/')
-      +nav-item('nav-security', '安全保障', '/security')
+      +nav-item('nav-dai', '风险控制', '/security')
+      +nav-item('nav-area', '平台数据', '/data_cube/')
+      +nav-item('nav-security', '关于我们', '/about/')
+
+
   .g-nav-multicolour-line
-
-

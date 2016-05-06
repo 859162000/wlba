@@ -1246,6 +1246,15 @@ else:
     YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
 
+# 加息盒子
+JXHZ_COOP_id = 'wanglibao'
+JXHZ_COOP_KEY = 'wAnGlibAo'
+if ENV == ENV_PRODUCTION:
+    JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/rest/v1/invest'
+else:
+    JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/test/v1/invest'
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None

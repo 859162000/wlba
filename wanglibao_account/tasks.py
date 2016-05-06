@@ -207,7 +207,7 @@ def yiche_callback(url, params, channel):
         logger.info(params)
         ret = requests.post(url, data=params)
         logger.info('%s callback url: %s' % (channel, ret.url))
-        logger.info('callback return: %s' % ret.text)
+        logger.info('callback return: %s' % (ret.text))
     except Exception, e:
         logger.info(" {'%s callback':'failed to connect'} " % channel)
         logger.info(e)
@@ -304,12 +304,15 @@ def rongtu_post_task():
 
 
 @app.task
-def common_callback_for_post(url, params, channel):
+def common_callback_for_post(url, params, channel, headers=None):
     logger.info("Enter %s_callback task===>>>" % channel)
     ret = None
     try:
         logger.info(params)
-        ret = requests.post(url, data=params)
+        if headers:
+            ret = requests.post(url, data=params, headers=headers)
+        else:
+            ret = requests.post(url, data=params)
         logger.info('%s callback url: %s' % (channel, ret.url))
         logger.info('callback return: %s' % ret.text)
     except Exception, e:
@@ -321,16 +324,6 @@ def common_callback_for_post(url, params, channel):
 
 
 @app.task
-def coop_callback_for_post(url, params, channel):
-    logger.info("Enter %s_callback task===>>>" % channel)
-    try:
-        logger.info(params)
-        ret = requests.post(url, data=params)
-        logger.info('%s callback url: %s' % (channel, ret.url))
-        if ret.status_code == 200:
-            logger.info('callback return: %s' % ret.json())
-        else:
-            logger.info('callback return: %s' % ret.text)
-    except Exception, e:
-        logger.info(" {'%s callback':'failed to connect'} " % channel)
-        logger.info(e)
+def coop_call_back(params):
+    # 此任务由渠道中心平台处理
+    pass

@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
-from wanglibao_reward.models import WanglibaoActivityReward
+from wanglibao_reward.models import WanglibaoRewardJoinRecord
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.models import WeixinAccounts
@@ -59,7 +59,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
-                                    xunleivip_callback
+                                    xunleivip_callback, common_callback_for_post, coop_call_back
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -1125,6 +1125,131 @@ class XingMeiRegister(CoopRegister):
                 logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
                 raise Exception(u"生成获奖记录异常")
 
+
+class KongGangRegister(CoopRegister):
+    def __init__(self, request):
+        super(KongGangRegister, self).__init__(request)
+        self.c_code = 'kgyx'
+        self.invite_code = 'kgyx'
+
+    def decide_which_reward_distribute(self, p2p_amount):
+
+        reward = None
+        if p2p_amount>=10000:
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='贵宾全套出港服务', is_used=False).first()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                    return reward
+
+        if p2p_amount>=5000:
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='贵宾休息室服务', is_used=False).first()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                    return reward
+
+        if p2p_amount>=500:
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='CIP专用安检通道服务', is_used=False).first()
+                if reward:
+                    reward.is_used = True
+                    reward.save()
+                return reward
+
+        return 'invalid'
+
+    def purchase_call_back(self, user, order_id):
+
+        key = 'konggang'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+        if not p2p_record:
+            raise Exception(u"购买订单异常")
+
+        #now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        #TODO:转换为UTC时间后跟表记录时间对比
+        from wanglibao_account import utils
+        utc_start = (utils.ext_str_to_utc(start_time)).strftime("%Y-%m-%d %H:%M:%S")
+        utc_end = (utils.ext_str_to_utc(end_time)).strftime("%Y-%m-%d %H:%M:%S")
+        now = p2p_record.create_time.strftime("%Y-%m-%d %H:%M:%S")
+        if now < utc_start or now >= utc_end:
+            #raise Exception(u"活动还未开始,请耐心等待")
+            return
+
+        # 判断是否首次投资
+        if not (p2p_record and p2p_record.order_id == int(order_id)):
+            return
+
+        #判断有没有奖品剩余
+        reward = self.decide_which_reward_distribute(p2p_record.amount)
+        if reward == 'invalid':
+            raise Exception(u"不满足领取条件")
+        if reward == None:
+            raise Exception(u"奖品已经发完了")
+
+        try:
+            with transaction.atomic():
+                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.c_code).first()
+                if not join_record:
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code=self.c_code,
+                        remain_chance=0,
+                    )
+
+                reward_record = ActivityReward.objects.filter(has_sent=True, activity='kgyx', user=user).first()
+                if reward_record:  #奖品记录已经生成了
+                    reward.is_used = False
+                    reward.save()
+                    return
+
+                ActivityReward.objects.create(
+                            activity='kgyx',
+                            order_id=order_id,
+                            user=user,
+                            p2p_amount=p2p_record.amount,
+                            reward=reward,
+                            has_sent=True,
+                            left_times=0,
+                            join_times=0)
+        except Exception:
+            reward.is_used = False
+            reward.save()
+            raise Exception(u"发奖异常，奖品回库")
+        else:
+            send_msg = u'尊敬的贵宾客户，恭喜您获得%s，' \
+                       u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
+                       u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
+                       u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
+            send_messages.apply_async(kwargs={
+                "phones": [user.wanglibaouserprofile.phone, ],
+                "messages": [send_msg,],
+            })
+
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"空港易行优惠服务",
+                "content": send_msg,
+                "mtype": "activity"
+            })
+
 class RockFinanceRegister(CoopRegister):
     def __init__(self, request):
         super(RockFinanceRegister, self).__init__(request)
@@ -1719,6 +1844,57 @@ class YZCJRegister(CoopRegister):
                     kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
+class JiaXiHZRegister(CoopRegister):
+    def __init__(self, request):
+        super(JiaXiHZRegister, self).__init__(request)
+        self.c_code = 'jiaxihz'
+        self.coop_id = settings.JXHZ_COOP_id
+        self.coop_key = settings.JXHZ_COOP_KEY
+        self.call_back_url = settings.JXHZ_CALL_BACK_URL
+
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(
+            user=user, catalog=u'申购'
+        ).select_related('product').order_by('create_time').last()
+
+        if p2p_record:
+            product = p2p_record.product
+            phone = WanglibaoUserProfile.objects.get(user=user).phone
+            rate = product.expected_earning_rate / 100
+            invest_time = p2p_record.create_time
+            invest_time = timezone.localtime(invest_time).strftime('%Y-%m-%d %H:%M:%S')
+
+            # 根据支付方式判定标周期的单位（天/月）
+            pay_method = product.pay_method
+            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                period_type = 2
+            else:
+                period_type = 1
+
+            data = (
+                ['platform', self.coop_id],
+                ['title', product.name],
+                ['number', str(product.id)],
+                ['mobile', phone],
+                ['money', float(p2p_record.amount)],
+                ['rate', rate],
+                ['investAt', invest_time],
+                ['deadlineType', period_type],
+                ['deadline', product.period],
+                ['key', self.coop_key],
+            )
+
+            data_encode = '&'.join([k + '=' + str(v) for k, v in data])
+            sign = hashlib.md5(data_encode).hexdigest()
+            params = dict(data)
+            params.pop('key', None)
+            params['sign'] = sign
+
+            # 异步回调
+            common_callback_for_post.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
@@ -1726,9 +1902,9 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
-                          YZCJRegister, RockFinanceRegister,
+                          YZCJRegister, RockFinanceRegister, JiaXiHZRegister,
                           XunleiMobileRegister, XingMeiRegister,
-                          HappyMonkeyRegister]
+                          HappyMonkeyRegister, KongGangRegister]
 
 
 # ######################第三方用户查询#####################
