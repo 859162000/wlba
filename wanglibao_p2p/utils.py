@@ -146,8 +146,10 @@ def generate_bisouyi_product_data(product, action):
     if action == 'info':
         if pay_method in (u'等额本息', u'按月付息', u'到期还本付息'):
             unit = 2
+            period = product.period * 30
         else:
             unit = 1
+            period = product.period
 
         product_type = product.types
         if product_type in (u'房贷', u'车贷'):
@@ -167,7 +169,7 @@ def generate_bisouyi_product_data(product, action):
             'name': product_name,
             'bidmoney': float(product.total_amount),
             'rate': product.expected_earning_rate,
-            'period': product.period,
+            'period': period,
             'unit': unit,
             'progress': product.completion_rate,
             'rdate': product.publish_time.strftime("%Y-%m-%d %H:%M:%S"),

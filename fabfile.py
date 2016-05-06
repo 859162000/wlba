@@ -74,12 +74,12 @@ def dev():
 
 
 def staging():
-    env.user = 'deploy'
-    env.password = 'wanglibank'
+    env.user = 'wangli'
+    env.password = '89her4city'
     env.path = '/var/deploy/wanglibao'
     env.activate = 'source ' + env.path + '/virt-python/bin/activate'
     env.depot = 'git@github.com:wanglibao/wanglibao-backend.git'
-    env.depot_name = 'wanglibao-channel'
+    env.depot_name = 'wanglibao-backend'
     env.branch = 'channel_center'
 
     env.pip_install = "pip install -r requirements.txt -i http://pypi.douban.com/simple/"
@@ -97,21 +97,18 @@ def staging():
 
 if env.get('group') == 'staging':
     env.roledefs = {
-        'lb': ['qdtest.wanglibao.com'],
-        'web': ['qdtest.wanglibao.com'],
+        'lb': ['192.168.20.237'],
+        'web': ['192.168.20.237'],
         'web_private': ['127.0.0.1'],
 
         # task_queue should be ip
-        'task_queue': [],
-        # 'task_queue': ['staging.wanglibao.com'],
-        # 'task_queue': ['111.206.165.43'],
-        # 'task_queue_private': ['127.0.0.1'],
+        'task_queue': ['staging.wanglibao.com'],
         'task_queue_private': ['192.168.1.242'],
 
-        'db': ['qdtest.wanglibao.com'],
+        'db': ['192.168.20.237'],
         'old_lb': [],
         'old_web': [],
-        'cron_tab': ['qdtest.wanglibao.com'],
+        'cron_tab': ['192.168.20.237'],
     }
     staging()
 
@@ -326,7 +323,7 @@ def init():
 
         if env.host_string in env.roledefs['db']:
             env.root_password = 'wanglibank'
-            env.database = 'wanglibao'
+            env.database = 'wanglibao_channel'
             env.database_user = 'wanglibao'
             env.database_password = 'wanglibank'
 
@@ -451,6 +448,7 @@ def setup_cron_tab():
                     if exists('/var/run/wanglibao/supervisor.pid'):
                         run("python manage.py supervisor stop all")
                         sudo("kill `cat /var/run/wanglibao/supervisor.pid`")
+                    sudo("chmod -R 770 /var/log/wanglibao")
                     run("python manage.py supervisor --daemonize --logfile=/var/log/wanglibao/supervisord.log --pidfile=/var/run/wanglibao/supervisor.pid")
                     run("python manage.py supervisor update")
                     run("python manage.py supervisor restart all")
@@ -486,9 +484,9 @@ def config_apache():
                 run("python manage.py collectstatic --noinput")
 
                 print green('clean published files')
-                run("rm publish/static/config.rb")
-                run("rm -rf publish/static/sass")
-                run("rm -rf publish/static/images/images-original")
+                # run("rm publish/static/config.rb")
+                # run("rm -rf publish/static/sass")
+                # run("rm -rf publish/static/images/images-original")
                 with cd('publish'):
                     run("find . | grep .coffee | xargs rm -rf")
 
@@ -533,9 +531,9 @@ def config_apache():
             sudo('rm -f /etc/apache2/sites-enabled/*')
             sudo('a2ensite %s' % os.path.split(env.apache_conf)[-1])
 
-            if env.get('group') == 'staging':
-                sudo('a2ensite chandao.conf')
-                sudo('ln -s /etc/apache2/sites-available/staging_80_redirect /etc/apache2/sites-enabled/')
+            # if env.get('group') == 'staging':
+            #     sudo('a2ensite chandao.conf')
+            #     sudo('ln -s /etc/apache2/sites-available/staging_80_redirect /etc/apache2/sites-enabled/')
 
             sudo('service apache2 reload')
             sudo('chown -R www-data:www-data /var/log/wanglibao/')

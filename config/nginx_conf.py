@@ -12,7 +12,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True, listen_on_http=Fa
         conf += [
             [['server'], [
                 ['listen', '80'],
-                ['server_name', 'www.wanglibao.com staging.wanglibao.com pre.wanglibao.com'],
+                ['server_name', 'www.wanglibao.com qdtest.wanglibao.com pre.wanglibao.com'],
                 ['return', '301 https://$host$request_uri'],
             ]],
             [['server'], [
@@ -37,7 +37,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True, listen_on_http=Fa
         conf += [
             [['server'], [
                 ['listen', '8081'],
-                ['server_name', 'staging.wanglibao.com'],
+                ['server_name', 'qdtest.wanglibao.com'],
 
             [['location', '^~/weixin/join/'], [
                 ['proxy_pass', 'http://apps'],
@@ -53,7 +53,7 @@ def generate_conf(apps, upstream_port='80', listen_on_80=True, listen_on_http=Fa
         [['server'], [
             ['listen', '443 ssl'],
             #['server_name', 'localhost'],
-            ['server_name', 'www.wanglibao.com pre.wanglibao.com staging.wanglibao.com'],
+            ['server_name', 'www.wanglibao.com pre.wanglibao.com qdtest.wanglibao.com'],
             ['ssl_certificate', '/etc/nginx/ssl/wanglibao.crt'],
             ['ssl_certificate_key', '/etc/nginx/ssl/wanglibao.key'],
             ['ssl_protocols', 'SSLv3 TLSv1 TLSv1.1 TLSv1.2'],
