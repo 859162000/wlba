@@ -1519,7 +1519,7 @@ class XunleiVipRegister(CoopRegister):
             self.activity_end_time = dt.strptime('2016-05-11 23:59:59', "%Y-%m-%d %H:%M:%S")
         else:
             self.activity_start_time = dt.strptime('2016-03-28 17:30:00', "%Y-%m-%d %H:%M:%S")
-            self.activity_end_time = dt.strptime('2016-04-29 14:51:00', "%Y-%m-%d %H:%M:%S")
+            self.activity_end_time = dt.strptime('2016-05-06 18:00:00', "%Y-%m-%d %H:%M:%S")
 
         self.activity_start_time = timezone.make_aware(self.activity_start_time, timezone.get_default_timezone())
         self.activity_end_time = timezone.make_aware(self.activity_end_time, timezone.get_default_timezone())
