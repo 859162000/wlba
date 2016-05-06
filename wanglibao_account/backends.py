@@ -176,7 +176,11 @@ class ProductionIDVerifyV2BackEnd(object):
         records = IdVerification.objects.filter(id_number=id_number, name=name)
         if records.exists():
             record = records.first()
-            return record, None
+            if record.description == u'该用户未满18周岁':
+                if not check_age_for_id(id_number):
+                    return record, None
+            else:
+                return record, None
 
         verify_result, id_photo, message = get_verify_result(id_number, name)
 
