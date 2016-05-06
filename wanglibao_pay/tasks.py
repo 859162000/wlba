@@ -13,7 +13,7 @@ import smtplib
 from wanglibao import settings
 from email.parser import Parser
 from decimal import Decimal
-from celery.signals import worker_init
+from celery.signals import worker_process_init
 import Crypto
 
 logger = logging.getLogger(__name__)
@@ -95,7 +95,7 @@ def sync_pay_result(start_time=None, end_time=None):
             logger.critical('sync_pay_result_deposit for pay_info_id %s' % pay_info.id)
             send_mail(pay_info.id, profile.name, profile.phone, pay_info.amount, raw_response) 
 
-@worker_init.connect(sender='wanglibao_pay.tasks.sync_pay_result')
+@worker_process_init.connect
 def crypto_init():
     Crypto.Random.atfork()
     
