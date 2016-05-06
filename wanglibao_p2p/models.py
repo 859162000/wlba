@@ -223,6 +223,15 @@ class P2PProduct(ProductBase):
         except:
             pass
         super(P2PProduct, self).save(*args, **kwargs)
+        try:
+            if self.id:
+                from .tasks import coop_product_push
+                coop_product_push.apply_async(
+                    countdown=5,
+                    kwargs={'product_id': self.id}
+                )
+        except:
+            pass
 
     class Meta:
         verbose_name_plural = u'P2P产品'

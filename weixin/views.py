@@ -71,6 +71,10 @@ from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser,
 from weixin.util import FWH_UNBIND_URL, filter_emoji
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_redis.backend import redis_backend
+from misc.views import MiscRecommendProduction
+from marketing.utils import pc_data_generator
+# from wanglibao_invite.models import WechatInviteRelation
+
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
@@ -552,6 +556,48 @@ class WeixinLogin(TemplateView):
             }
 
 
+class WeixinCoopLogin(TemplateView):
+    template_name = 'weixin_login.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinCoopLogin, self).get_context_data(**kwargs)
+        code = self.request.GET.get('code')
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            tp_name = 'weixin_login_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
+
+        if code:
+            account_id = self.request.GET.get('state')
+            try:
+                account = Account.objects.get(pk=account_id)
+            except Account.DoesNotExist:
+                return HttpResponseNotFound()
+
+            try:
+                oauth = WeChatOAuth(account.app_id, account.app_secret)
+                res = oauth.fetch_access_token(code)
+                account.oauth_access_token = res.get('access_token')
+                account.oauth_access_token_expires_in = res.get('expires_in')
+                account.oauth_refresh_token = res.get('refresh_token')
+                account.save()
+                WeixinUser.objects.get_or_create(openid=res.get('openid'))
+                context['openid'] = res.get('openid')
+            except WeChatException, e:
+                pass
+        next = self.request.GET.get('next', '')
+        next = urllib.unquote(next.encode('utf-8'))
+        return {
+            'context': context,
+            'next': next
+            }
+
+
 class WeixinRegister(TemplateView):
     template_name = 'weixin_regist_new.jade'
 
@@ -577,6 +623,41 @@ class WeixinRegister(TemplateView):
             'phone': phone,
             'next' : next
         }
+
+class ChannelRegister(TemplateView):
+    template_name = 'channel_register.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = 'weixin'
+
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        next = self.request.GET.get('next', '')
+        return {
+            'token': token,
+            'channel': channel,
+            'next': next,
+            'site_data': site_data
+        }
+
 
 
 class WeixinCoopRegister(TemplateView):
@@ -895,6 +976,16 @@ class P2PListView(TemplateView):
     template_name = 'weixin_list.jade'
 
     def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+
+        if token:
+            tp_name = 'weixin_list_%s.jade' % token.lower()
+            try:
+                get_template(tp_name)
+                self.template_name = tp_name
+            except TemplateDoesNotExist:
+                pass
+
         p2p_products = []
 
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
