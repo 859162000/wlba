@@ -145,10 +145,10 @@ def generate_bisouyi_product_data(product, action):
 
     if action == 'info':
         if pay_method in (u'等额本息', u'按月付息', u'到期还本付息'):
-            unit = 1
+            unit = 2
             period = product.period * 30
         else:
-            unit = 2
+            unit = 1
             period = product.period
 
         product_type = product.types
