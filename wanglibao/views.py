@@ -174,6 +174,25 @@ class IndexView(TemplateView):
         p2p_gt6 = self.get_products(period=9, product_id=exclude_pid)
         getmore = True
 
+        # 短,中,长期 各选一个为一组, 排成3组
+        p2p_list = []
+        for i in range(3):
+            tmp_list = []
+            try:
+                tmp_list.append(p2p_lt3[i])
+            except:
+                tmp_list.append([])
+            try:
+                tmp_list.append(p2p_lt6[i])
+            except:
+                tmp_list.append([])
+            try:
+                tmp_list.append(p2p_gt6[i])
+            except:
+                tmp_list.append([])
+
+            p2p_list.append(tmp_list)
+
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         # 新闻页面只有4个固定位置
         news_and_reports = NewsAndReport.objects.all().order_by('-score', '-created_at')[:4]
@@ -241,7 +260,8 @@ class IndexView(TemplateView):
             'p2p_total_asset': float(p2p_total_asset + fund_total_asset),
             'index': True,
             'month_data': month_data,
-            'assignment_data': assignment_data
+            'assignment_data': assignment_data,
+            'p2p_list': p2p_list
         }
 
     def get(self, request, *args, **kwargs):
