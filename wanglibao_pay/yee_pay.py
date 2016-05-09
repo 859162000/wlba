@@ -31,6 +31,7 @@ import base64
 from wanglibao_pay.pay import PayOrder, PayMessage
 from wanglibao_rest.utils import split_ua
 # from wanglibao_account.cooperation import CoopRegister
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -329,6 +330,7 @@ class YeeShortPay:
         self.BIND_CARD_QUERY = settings.YEE_SHORT_BIND_CARD_QUERY
         self.BIND_PAY_REQUEST = settings.YEE_SHORT_BIND_PAY_REQUEST
         self.YEE_CALLBACK = settings.YEE_SHORT_CALLBACK
+        self.QUERY_TRX_RESULT = settings.YEE_URL + '/api/query/order' 
 
     def _sign(self, dic):
         values = self._sort(dic)
@@ -458,7 +460,9 @@ class YeeShortPay:
     def _request_yee_get(self, url, data):
         post = self._format_post(data)
         res = requests.get(url, params=post)
-        return self._response_data_change(res=json.loads(res.text))
+        res_dict = self._response_data_change(res=json.loads(res.text))
+        logger.error("yee_pay: %s | %s | %s" % (url, data, res_dict))
+        return res_dict 
 
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
@@ -557,6 +561,15 @@ class YeeShortPay:
         post['callbackurl'] = self.YEE_CALLBACK
         post['userip'] = util.get_client_ip(request)
         return self._request_yee(url=self.BIND_PAY_REQUEST, data=post)
+
+    def _query_trx_result(self, order_id):
+        """
+        去第三方查询交易结果
+        """
+        post = dict()
+        post['merchantaccount'] = self.MER_ID
+        post['orderid'] = str(order_id)
+        return self._request_yee_get(url=self.QUERY_TRX_RESULT, data=post)
 
     def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
@@ -919,6 +932,28 @@ class YeeShortPay:
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
         return rs
+
+    def query_trx_result(self, order_id):
+        res = self._query_trx_result(order_id)
+        res_data = res.get('data')
+
+        code = res_data.get('errorcode')
+        message = res_data.get('errormsg')
+        last_card_no = res_data.get('lastno')
+        try:
+            amount = Decimal(res_data.get('amount')) / 100
+            amount = amount.quantize(Decimal('0.01'))
+        except:
+            amount = None
+
+        if not code and last_card_no and amount:
+            code = '0'
+
+        return {'code': code,
+                'message': message,
+                'last_card_no': last_card_no,
+                'amount': amount,
+                'raw_response': res_data}
  
     def sync_bind_card(self, user):
         """

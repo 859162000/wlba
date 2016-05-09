@@ -190,7 +190,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        #'HOST': '192.168.1.242',
+        'HOST': '192.168.1.242',
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -205,12 +205,12 @@ if ENV_ALPHA_DEPLOY:
 
 import sys
 
-if 'test' in sys.argv:
-    SOUTH_TESTS_MIGRATE = False
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/db.sqlite3'
-    }
+# if 'test' in sys.argv:
+    # SOUTH_TESTS_MIGRATE = False
+    # DATABASES['default'] = {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': '/tmp/db.sqlite3'
+    # }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -728,6 +728,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
         'schedule': crontab(minute=30, hour=0),
     },
+    # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
+    'sync_pay_result': {
+        'task': 'wanglibao_pay.tasks.sync_pay_result',
+        'schedule': timedelta(minutes=10), 
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -886,9 +891,11 @@ else:
 
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
     KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "kuai_pay_signature.pem")
-    KUAI_MER_ID = "104110045112012"
+    # KUAI_MER_ID = "104110045112012"
+    KUAI_MER_ID = "812331253110002"
     KUAI_MER_PASS = "vpos123"
-    KUAI_TERM_ID = "00002012"
+    # KUAI_TERM_ID = "00002012"
+    KUAI_TERM_ID = "33120009"
 
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
@@ -1372,3 +1379,9 @@ elif ENV == ENV_DEV:
 #极验验证 KEY及ID设置
 GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
 GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'
+
+#SMTP server
+SMTP_SERVER = 'smtp.exmail.qq.com'
+SMTP_USER = 'develop@wanglibank.com'
+SMTP_PASSWORD = 'abc&321'
+
