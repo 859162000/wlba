@@ -25,7 +25,7 @@ env.git_server_address = "git clone wangli@192.168.20.231:~/wanglibao-backend"
 env.activate = "source %s/bin/activate" % env.deploy_virt_path
 env.pip_install = "pip install -r %s/requirements.txt" % env.deploy_path
 #env.branch = "production5.0"
-env.branch = "chennel_center"
+env.branch = "channel_center"
 # env.branch = "master"
 
 # env.environment = 'ENV_PRODUCTION'
@@ -41,9 +41,11 @@ def check_out():
     with cd("~/channel"):
         print yellow("update git server")
         if not exists(env.git_server_path):
+            run("pwd")
             run("git clone git@github.com:wanglibao/wanglibao-backend.git")
         else:
             with cd("wanglibao-backend"):
+                run("pwd")
                 run('git clean -f -d')
                 with settings(warn_only=True):
                     result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
