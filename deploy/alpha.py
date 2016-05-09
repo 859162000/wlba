@@ -26,7 +26,8 @@ env.deploy_virt_path = "/var/www/wanglibao/virt-wanglibao"
 env.git_server_address = "git clone wangli@192.168.20.231:~/wanglibao-backend"
 env.activate = "source %s/bin/activate" % env.deploy_virt_path
 env.pip_install = "pip install -r %s/requirements.txt" % env.deploy_path
-env.branch = "production5.0"
+# env.branch = "production5.0"
+env.branch = "pre_base_platform"
 #env.branch = "master"
 
 #env.environment = 'ENV_PRODUCTION'

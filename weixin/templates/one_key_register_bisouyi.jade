@@ -6,7 +6,7 @@ html(style="background: #f5f5f5")
     body
         input(type="hidden",value="{{ next_url }}").next_url
         .oauth_data(style="display:none;") {{ oauth_data }}
-
+        .bsy-box(style="padding: 1rem; font-size: 0.7rem") 正在加载……
         script(src='/static/src/mobile/lib/zepto/zepto.js')
         //script(src='/static/src/mobile/lib/Bsy-Oauth.min.1.0.js')
         script.

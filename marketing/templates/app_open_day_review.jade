@@ -4,7 +4,8 @@ html(style="background: #fff")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015031002", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015050503", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -13,8 +14,8 @@ html(style="background: #fff")
             .section.section_1
                 .big_title.big_title_1 “产业银行”的业务模式
                 .line_red
-                p.text.text_1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网利宝凭借丰富的金融行业经验、互联网优势，在业内创立了“产业银行”的商业模式，即以产业为切入点、在细分领域深耕，通过产融结合的方式，挖掘产业链中优质中小企业的融资需求。与消费信贷相比，网利宝在获取优质资产方面的优势主要体现在两个方面。一是网利宝不依靠传统的担保、小贷公司推荐债权，而是借助产业龙头的行业积累主动挖掘，建立一条稳定、可靠的渠道;二是在中国个人征信不健全的环境下，网利宝专注企业贷，通过管控质押物，更易确保借款企业按时还款，保证用户资金安全。
-                p.text.text_2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2014 年 8 月上线来，网利宝在车房贷、物流货运、红木、珠宝、金融仓储等细分产业进行了深度布局，建立了一个稳定的、挖掘优质资产的渠道，先后服务近 2000 家中小企业，截至4月末完成了 50 多亿交易额，拥有近 150 万用户。
+                p.text.text_1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网利宝凭借丰富的金融行业经验、互联网优势，在业内创立了“产业银行”的商业模式，即以产业为切入点、在细分领域深耕，通过产融结合的方式，挖掘产业链中优质中小企业的融资需求。与消费信贷相比，网利宝在获取优质资产方面的优势主要体现在两个方面。一是网利宝不依靠传统的担保、小贷公司推荐债权，而是借助产业龙头的行业积累主动挖掘，建立一条稳定、可靠的渠道;二是在中国个人征信不健全的环境下，网利宝专注企业贷，通过管控质押物，更易确保借款企业按时还款，降低用户投资风险。
+                p.text.text_2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2014 年 8 月上线来，网利宝在车房贷、物流货运、红木、珠宝、金融仓储等细分产业进行了深度布局，建立了一个稳定的、挖掘优质资产的渠道，先后服务近 2000 家中小企业，截至2016年4月末完成了 50 多亿交易额，拥有近 150 万用户。
             .section.section_2
                 .big_title.big_title_1 木材为网利宝重点深耕产业之一
                 .line_red
@@ -64,13 +65,104 @@ html(style="background: #fff")
                     .box.box_2
                         img(src='/static/imgs/mobile_activity/app_open_day_review/Group-4.png')
                         .text 合作伙伴提供<br>质押物回购服务;
+            .red_box
+                .text 2016 年 4 月 9 日，网利宝以“木材专场”为主题开展了开放日活动。当日，用户不仅在总部与平台高管进行了面对面交流，还乘坐专车来到廊坊大城县，实地参观了平台在合作机构设立的质押物仓储。
+            .section.section_2
+                .big_title.big_title_1 用户代表实地考察
+                .line_red
+                .small_title.small_title_1 参观合作机构
+                .line_gray.line_gray_1
+                .section_box8
+                    .swiper-container.swiper1
+                        .swiper-wrapper
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_1.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_2.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_3.jpg')
+                    .pagination.pagination1
+                .photo_text 在廊坊大城县，用户代表不仅与合作机构负责人进行了亲切交流，还参观了仓储的监控室。
+            .section.section_1
+                .small_title.small_title_2 考察木材质押物
+                .line_gray.line_gray_2
+                .section_box8
+                    .swiper-container.swiper2
+                        .swiper-wrapper
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_4.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_5.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_6.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_7.jpg')
+                    .pagination.pagination2
+                .photo_text 合作机构负责人带领用户实地参观了两个质押物的所在仓储，并详细讲述了质押物的管控模式。
+            .section.section_2
+                .small_title.small_title_2 参观木材体验馆
+                .line_gray.line_gray_2
+                .section_box8
+                    .swiper-container.swiper3
+                        .swiper-wrapper
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_8.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_9.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_10.jpg')
+                          .swiper-slide
+                            img(src='/static/imgs/mobile_activity/app_open_day_review/img_11.jpg')
+                    .pagination.pagination3
+                .photo_text 用户代表来到木材家具体验馆，切身感受原木经过加工、安装、打磨、抛光等环节最终到成品的巨大变化。
+            .section.section_1
+                .big_title.big_title_1 实地考察后，用户怎么说?
+                .line_red
+                .talk_box
+                    .box
+                        img.people_top.people_1(src='/static/imgs/mobile_activity/app_open_day_review/people_1.png')
+
+                        .talk
+                            .people_name 余女士：<br>
+                            .people_text 我是带着远方朋友的嘱托对平台和质押物进行的实地考察，不论是在总部与CEO交流，还是在参观质押物过程中与仓储机构负责人交流，对于我这个门外汉所提的疑问，他们都耐心地做了解答。个人感觉，公司要想做大做强，靠的不是手段，而是制度和精神。通过这次活动，我感觉网利宝CEO赵润龙先生是想做一番事业的人。
+                        img.people_bottom(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
+                    .box
+                        img.people_top.people_1(src='/static/imgs/mobile_activity/app_open_day_review/people_2.png')
+                        .talk
+                            .people_name 曹先生：<br>
+                            .people_text 安全性是整个平台的重中之重，作为投资人，十分想了解自己的钱究竟用在了哪些地方，听了网利宝高管的讲解，心里踏实了许多，也学习了很多投资方面的知识，可以说实地考察不虚此行，我觉得任何行业如果都有这种觉悟和企业理念，就不会出现种种骗局。希望网利宝以后可以多举办一些这样的互动活动或在线讲座等。
+                        img.people_bottom(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
+                    .box
+                        img.people_top.people_1(src='/static/imgs/mobile_activity/app_open_day_review/people_3.png')
+                        .talk
+                            .people_name 小轩：<br>
+                            .people_text 网利宝木材专场开放日活动回答了两个我最想问的问题，一是网利宝的模式，二是网利宝的风控，个人感觉网利宝是一家比较靠谱的公司，通过足值实物质押，不私设资金池，最大程度保护了投资人的利益，在实地考察质押物后，这一感触更深。希望网利宝发展得越来越好，为投资人带来更多收益。
+                        img.people_bottom(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
+                    .box
+                        img.people_top.people_1(src='/static/imgs/mobile_activity/app_open_day_review/people_4.png')
+                        .talk
+                            .people_name 黄先生：<br>
+                            .people_text 感谢网利宝开设木材仓储专项活动，赵总、杨总和曹总详细讲述了公司业务的开展流程、风险控制等投资者最想了解的问题。在P2P的大领域里，网利宝选择精耕细作自己擅长的细分领域，不仅让平台避免了同质化竞争，还有效保证了公司收入和投资人的利益，应该为网利宝公司点赞。
+                        img.people_bottom(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
+                    .box
+                        img.people_top.people_1(src='/static/imgs/mobile_activity/app_open_day_review/people_5.png')
+                        .talk
+                            .people_name 小蒙：<br>
+                            .people_text 这次活动中CEO赵润龙和各位高管以专业角度给我们讲述了平台的风控模式和业务流程，让我学习到了业内更深层面的知识，尤其木材专场让我更直观得看到了平台的专业能力和综合实力，收获颇丰。以前对网利宝一知半解，现在是更有信心！
+                        img.people_bottom(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
+                    .box
+                        img.people_top.people_1(src='/static/imgs/mobile_activity/app_open_day_review/people_6.png')
+                        .talk
+                            .people_name 苏先生：<br>
+                            .people_text 一天的考察结束了，在回来的路途中我想了很多。互联网金融的关健是做好风控、保护投资者利益，而网利宝的高层都是从事金融行业多年，术有专攻这方面让投资者放心。通过实地考察木材质押物、 参观家具成品，让我体会到了木材之所以经久不衰，带给我们的不仅仅是美，更多的是工艺与智慧的传承，让我们期待网利宝做得更好！
+                        img.people_bottom(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
         script(src='/static/src/mobile/lib/weixin/wx.js')
-        script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015031102")
-        script.
-            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
-                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
-                ios = ipad || iphone;
-            if (ios) {
-                document.getElementById('ios-show').style.display = 'block';
+        script(src='/static/js/lib/swiper.min.js')
+        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015050502")
+        //script.
+        //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+        //        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+        //        ios = ipad || iphone;
+        //    if (ios) {
+        //        document.getElementById('ios-show').style.display = 'block';
             }
