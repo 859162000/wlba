@@ -11,9 +11,7 @@ html.no-js(lang="en-gb")
     body(style="background:#222")
         include global/g_nav
         .body_wrap.clear
-            .banner
-                .banner_main
-                    .form_wrap
+            include include/activityTopNew2
             .section.section_1
                 .box_wrap
                     .box
@@ -36,7 +34,64 @@ html.no-js(lang="en-gb")
             .section.section_2
                 img.title_big(src='/static/imgs/pc_activity/center_film_ticket/section_title_1.png')
                 .section_2_box
-
+                    .section_2_text.section_2_text1 关注“中影票务通”微信公众号
+                    .section_2_text.section_2_text2 进入公众号后点击快速购票
+                    .section_2_text.section_2_text3 依次选择喜爱的电影、影院及场次
+                    .section_2_text.section_2_text4 继而开始输入<br>次卡卡号及密码
+                    .section_2_text.section_2_text5 进入支付页面<br>并选择“电影卡支付”<br>点击立即购票
+                    .section_2_text.section_2_text6 选择喜爱的座位<br>在座位下面填写接收<br>买票信息的手机号码
+                    .section_2_text.section_2_text7 完成购票，等待接收短信获取取票号
+            .section.section_3
+                .section_3_box
+                    img.title_big(src='/static/imgs/pc_activity/center_film_ticket/section_title_2.png')
+                    .th 定期理财
+                    .percentage
+                        .num.num_1!='6<span>%</span>'
+                        .line
+                        .num.num_2!='13<span>%</span>'
+                    dl.dl
+                        dt 年化利率
+                        dd 短期灵活、中期方便、长期优选
+                    .section_button 立即投资
+            .section.section_4
+                .section_4_box
+                    img.title_big(src='/static/imgs/pc_activity/center_film_ticket/section_title_3.png')
+                    .box_wrap
+                        .box
+                            img(src='/static/imgs/pc_activity/center_film_ticket/section_4_img1.png')
+                            dl.dl
+                                dt 专业
+                                dd 专注于垂直细分领域<br>打造金融服务新蓝海
+                        .box
+                            img(src='/static/imgs/pc_activity/center_film_ticket/section_4_img2.png')
+                            dl.dl
+                                dt 风险控制
+                                dd 足值实物抵押放款<br>阳光保险承保资金账户安全
+                        .box
+                            img(src='/static/imgs/pc_activity/center_film_ticket/section_4_img3.png')
+                            dl.dl
+                                dt 服务
+                                dd 客户问题即时解决<br>优质产品精心推荐
+                        .box.last_box
+                            img(src='/static/imgs/pc_activity/center_film_ticket/section_4_img4.png')
+                            dl.dl
+                                dt 收益
+                                dd 预期30倍银行活期理财<br>低门槛 100元起投
+            .section.section_5
+                .section_5_box
+                    .big_title 活动说明
+                    p 1. 活动时间：2016年3月1日开始；
+                    p 2. 兑换券有效期：
+                    p 3. 用户通过中影票务通页面注册为网利宝用户并且单笔首次投资3000元及以上即可获得2张通用兑换券，兑换码以站内信以及短信形式通知；
+                    p 4. 手机号为网利宝唯一账户，本期新用户专享福利仅限于中影票务通渠道新注册用户参与；
+                    p!='5. 活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益，<span>新用户更多福利</span>；' 
+                    .slide_text
+                        p.indent_1 &nbsp;① 活动期间新用户注册即送50元红包（满5000元可用，限1月及以上标期，领取之日起7天有效）
+                        p.indent_1 &nbsp;② 用户首次投资满额送以下红包，红包3月标及以上使用，领取之日15天有效；
+                        p.indent_2 &nbsp;&nbsp;a. 1000元≤首次投资＜5000元，送100元直抵红包（满15000元可直抵使用）
+                        p.indent_2 &nbsp;&nbsp;b. 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
+                        p.indent_2 &nbsp;&nbsp;c. 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
+                    p 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
         include global/g_footer
 script.
     require(['/static/js/center_film_ticket.js?v=2016050401'])
