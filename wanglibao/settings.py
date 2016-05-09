@@ -1359,6 +1359,10 @@ PHP_INSIDE_MESSAGES_LIST = "http://192.168.20.248/message.php/message/list"
 PHP_INSIDE_MESSAGE_READ = 'http://192.168.20.248/message.php/message'
 PHP_INSIDE_MESSAGE_READ_ALL = 'http://192.168.20.248/message.php/message/0'
 
+# 月利宝首页展示
+PHP_INDEX_MONTH = 'http://hanzhaoxing.dev.wanglibao.com/finnal.php?method=projectPcpool'
+PHP_INDEX_ASSIGNMENT = 'http://hanzhaoxing.dev.wanglibao.com/finnal.php?method=listzqAll'
+
 if ENV == ENV_PRODUCTION:
     PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
     PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'
@@ -1367,6 +1371,9 @@ if ENV == ENV_PRODUCTION:
     PHP_INSIDE_MESSAGES_LIST = "http://123.57.146.238/message.php/message/list"
     PHP_INSIDE_MESSAGE_READ = 'http://123.57.146.238/message.php/message'
     PHP_INSIDE_MESSAGE_READ_ALL = 'http://123.57.146.238/message.php/message/0'
+    # 月利宝首页展示
+    PHP_INDEX_MONTH = 'https://wlpython.wanglibao.com/finnal.php?method=projectPcpool'
+    PHP_INDEX_ASSIGNMENT = 'https://wlpython.wanglibao.com/finnal.php?method=listzqAll'
 
 if ENV == ENV_PRODUCTION:
     SITE_URL = 'https://www.wanglibao.com'

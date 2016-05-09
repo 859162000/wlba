@@ -1,4 +1,5 @@
 # encoding: utf8
+import requests
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader, Context
@@ -117,6 +118,21 @@ class IndexView(TemplateView):
                                                        product_id=product_id, order_by=order_by))
         return p2p_list
 
+    def _get_php_products(self):
+        """
+        get yuelibao products display on Index page.
+        :return:
+        """
+        month_data, assignment_data = [], []
+        month_response = requests.post(settings.PHP_INDEX_MONTH, data={}, timeout=3)
+        if month_response.status_code == 200:
+            month_data = month_response.json()
+        assignment_response = requests.post(settings.PHP_INDEX_ASSIGNMENT, data={}, timeout=3)
+        if assignment_response.status_code == 200:
+            assignment_data = assignment_response.json()
+
+        return month_data, assignment_data
+
     def get_context_data(self, **kwargs):
         # 需要过滤的标id
         exclude_pid = list()
@@ -208,6 +224,8 @@ class IndexView(TemplateView):
                 for hold_info in fund_hold_info:
                     fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
+        month_data, assignment_data = self._get_php_products()
+
         return {
             "recommend_product": recommend_product,
             "p2p_lt_three": p2p_lt3,
@@ -221,7 +239,9 @@ class IndexView(TemplateView):
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
             'p2p_total_asset': float(p2p_total_asset + fund_total_asset),
-            'index': True
+            'index': True,
+            'month_data': month_data,
+            'assignment_data': assignment_data
         }
 
     def get(self, request, *args, **kwargs):
