@@ -10,10 +10,11 @@ from fabric.contrib.files import exists, contains
 from fabric.colors import green, red, yellow
 
 env.roledefs = {
-    #'lb': ["192.168.20.231"],
-    #'web': ["192.168.20.232"],
-    #'mq': ["192.168.20.233"],
-
+    'lb': ["192.168.20.231"],
+    'web': ["192.168.20.238"],
+    'mq': ["192.168.20.233"],
+    'pre': ["192.168.20.236"],
+    'dbback': ["192.168.20.236"],
     'git_server': ["192.168.20.231"],
     'channel': ["192.168.20.238"],
 }
