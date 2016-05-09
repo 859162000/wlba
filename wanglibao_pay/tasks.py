@@ -13,6 +13,8 @@ import smtplib
 from wanglibao import settings
 from email.parser import Parser
 from decimal import Decimal
+from celery.signals import worker_process_init
+import Crypto
 
 logger = logging.getLogger(__name__)
 
@@ -27,19 +29,20 @@ def send_mail(payinfo_id, user_name, user_phone, amount, message):
         env_notice = '测试邮件'
     email_content = (
         'From: <%s>\n'
-        'To: <%s>, <%s>\n'
+        'To: <%s>,<%s>\n'
         'Subject: 用户对账成功(%s)\n'
         '\n'
         '用户 %s 手机号 %s 支付订单 %s 成功，自动为其充值 %s 元\n'
         '第三方返回信息如下：\n'
         '%s\n'
-    ) %(from_addr, admin_email, accountant_team_email,
+    ) %(from_addr, accountant_team_email, admin_email,
           env_notice, user_name, user_phone, payinfo_id, amount, message)
     headers = Parser().parsestr(email_content)
 
     mail_server = smtplib.SMTP(settings.SMTP_SERVER, 25, 'localhost', 30)    
     mail_server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-    mail_server.sendmail(headers['from'], headers['to'], email_content)
+    mail_server.sendmail(headers['from'], headers['to'].split(','), email_content)
+    import pdb;pdb.set_trace()
     mail_server.quit()
 
 @app.task()
@@ -91,4 +94,10 @@ def sync_pay_result(start_time=None, end_time=None):
             pay_order.order_after_pay_succcess(amount, pay_info.order_id)
             profile = WanglibaoUserProfile.objects.get(user=pay_info.user)
             logger.critical('sync_pay_result_deposit for pay_info_id %s' % pay_info.id)
-            send_mail(pay_info.id, profile.name, profile.phone, pay_info.amount, raw_response)
+            send_mail(pay_info.id, profile.name, profile.phone, pay_info.amount, raw_response) 
+
+@worker_process_init.connect
+def crypto_init(**kwagrgs):
+    Crypto.Random.atfork()
+    
+
