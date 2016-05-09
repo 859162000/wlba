@@ -129,467 +129,313 @@ html
     //product start
     .i-mod-wrap.mg-t-sm
         .i-mod-product.clearfix
-            mixin projectTitle(sty, title, introduce, new)
+            mixin projectTitle(sty, title, introduce, url, new)
                 .project-title-box
-                    i.project-type-icon(class=sty)
-                    span=title
+                    a(href=url)
+                        i.project-type-icon(class=sty)
+                        span=title
                     if new == 'new'
                         em
                     i.vertical-icon
                     label=introduce
-            +projectTitle('type-icon-1', 'G计划', '收益递增，当日计息', 'new')
+            +projectTitle('type-icon-1', '月利宝', '收益递增', '/ylb/monthly.php', 'new')
             .g-plan-box.clearfix
                 .slide-left(tag=1)
                 .slide-right(tag=1)
                 .project-boxs
                     .project-box-c
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A1
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A2
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A3
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.a-icon
-                                span G计划A
-                                label |
-                                span 001期
-                            .percentage-box
-                                span 9~9.5
-                                label %
-                            .time-money.clearfix
-                                .time-left
-                                    p.p-top 1个月
-                                    p.p-b 项目期限
-                                .border-left
-                                .money-right
-                                    p.p-top 500万元
-                                    p.p-b 计划金额
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a() 立即投资
-                .page-boxs(tag=1)
+                        for month in month_data
+                            .g-plan-project
+                                .g-plan-title
+                                    if  month.name == 'A'
+                                        letterS = 'a-icon'
+                                    elif month.name == 'B'
+                                        letterS = 'b-icon'
+                                    elif month.name == 'C'
+                                        letterS = 'c-icon'
+                                    elif month.name == 'D'
+                                        letterS = 'd-icon'
+                                    i.letter-icon(class=letterS)
+                                    span 月利宝{{month.name}}
+                                    label |
+                                    span {{month.short_name}}
+                                .percentage-box
+                                    span {{month.expected_earning_rate}} ~ {{month.rate_end}}
+                                    label %
+                                .time-money.clearfix
+                                    .time-left
+                                        p.p-top {{month.period}}个月
+                                        p.p-b 项目期限
+                                    .border-left
+                                    .money-right
+                                        p.p-top {{month.total_amount | convert_to_10k}}元
+                                        p.p-b 计划金额
+                                .progress-bar.clearfix
+                                    .progress-bar-left
+                                        span(style='width:{{month.ordered_percent }}%')
+                                    .progress-bar-right {{month.ordered_percent}}%
+                                ktjes = float(month['remain_amount'])
+                                .available-amount 可投金额 {{ktjes | money_format_int}}元
+                                .go-investment
+                                    if month.display_status == '已审核'
+                                        a(href="{{month.detail_url}}") 立即投资
+                                    else
+                                        a.disable-style(href="javascript:void(0)") 计划满额
+                lengths = len(month_data)
+                .page-boxs
                     span.active
-                    span
-                    span
-            +projectTitle('type-icon-2', '散标投资', '担保抵押，期限灵活')
+                    if lengths > 3
+                        span
+                    if lengths > 6
+                        span
+            +projectTitle('type-icon-2', '散标', '选择多样', '/p2p/list/')
             .g-plan-box.clearfix
                 .slide-left(tag=2)
                 .slide-right(tag=2)
                 .project-boxs
                     .project-box-c
-                        .g-plan-project
-                            .icons.app-share-new
-                            .g-plan-title
-                                i.card-icon
-                                span.san-title 1车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.short-term 短期
-                            .mt40
-                                .project-introduction
-                                    label 年化收益：
-                                    span.profit 12.5
-                                        i %
-                                .project-introduction
-                                    label 项目期限：
-                                    span 5
-                                        i 天
-                                .project-introduction
-                                    label 融资金额：
-                                    span 200
-                                        i 万元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
-                        .g-plan-project
-                            .icons.new-user-icon
-                            .g-plan-title
-                                i.house-icon
-                                span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.metaphase 中期
-                            .mt40
-                                .project-introduction
-                                    label 年化收益：
-                                    span.profit 12.5
-                                        i %
-                                .project-introduction
-                                    label 项目期限：
-                                    span 5
-                                        i 天
-                                .project-introduction
-                                    label 融资金额：
-                                    span 200
-                                        i 万元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.san-icon
-                                span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.long-term 长期
-                            .mt40
-                                .project-introduction
-                                    label 年化收益：
-                                    span.profit 12.5
-                                        i %
-                                .project-introduction
-                                    label 项目期限：
-                                    span 5
-                                        i 天
-                                .project-introduction
-                                    label 融资金额：
-                                    span 200
-                                        i 万元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
-                        .g-plan-project
-                            .icons.app-share-new
-                            .g-plan-title
-                                i.card-icon
-                                span.san-title 2车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.short-term 短期
-                            .mt40
-                                .project-introduction
-                                    label 年化收益：
-                                    span.profit 12.5
-                                        i %
-                                .project-introduction
-                                    label 项目期限：
-                                    span 5
-                                        i 天
-                                .project-introduction
-                                    label 融资金额：
-                                    span 200
-                                        i 万元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
-                        .g-plan-project
-                            .icons.new-user-icon
-                            .g-plan-title
-                                i.house-icon
-                                span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.metaphase 中期
-                            .mt40
-                                .project-introduction
-                                    label 年化收益：
-                                    span.profit 12.5
-                                        i %
-                                .project-introduction
-                                    label 项目期限：
-                                    span 5
-                                        i 天
-                                .project-introduction
-                                    label 融资金额：
-                                    span 200
-                                        i 万元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.san-icon
-                                span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.long-term 长期
-                            .mt40
-                                .project-introduction
-                                    label 年化收益：
-                                    span.profit 12.5
-                                        i %
-                                .project-introduction
-                                    label 项目期限：
-                                    span 5
-                                        i 天
-                                .project-introduction
-                                    label 融资金额：
-                                    span 200
-                                        i 万元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
-                        .g-plan-project
-                            .g-plan-title
-                                i.san-icon
-                                span.san-title 3车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.long-term 长期
-                            .mt40
-                                .project-introduction
-                                    label 年化收益：
-                                    span.profit 12.5
-                                        i %
-                                .project-introduction
-                                    label 项目期限：
-                                    span 5
-                                        i 天
-                                .project-introduction
-                                    label 融资金额：
-                                    span 200
-                                        i 万元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
+                        for p2p, index in p2p_list
+                            .g-plan-project
+                                .icons.app-share-new
+                                .g-plan-title
+                                    i.card-icon
+                                    span.san-title {{p2p.types.name}}{{p2p.name}}
+                                    if index == 0 or index == 3 or index == 6
+                                        em.short-term 短期
+                                    elif index == 1 or index == 4 or index == 7
+                                        em.metaphase 中期
+                                    elif index == 2 or index == 5 or index == 8
+                                        em.long-term 长期
+                                .mt40
+                                    total_amount = p2p.total_amount / 10000.0
+                                    amount = p2p.total_amount - p2p.ordered_amount
+                                    .project-introduction
+                                        label 年化收益：
+                                        span.profit {{p2p.expected_earning_rate}}
+                                            i %
+                                    .project-introduction
+                                        label 项目期限：
+                                        span {{p2p.period}}
+                                            i {{p2p.pay_method|period_unit}}
+                                    .project-introduction
+                                        label 融资金额：
+                                        span {{total_amount}}
+                                            i 万元
+                                .progress-bar.clearfix
+                                    percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                                    .progress-bar-left
+                                        span(style='width:{{percent | percentage}}')
+                                    .progress-bar-right {{percent | percentage}}
+                                .available-amount 可投金额 {{amount | money_format_int}}元
+                                .go-investment
+                                    a.min() 立即投资
+                        //.g-plan-project
+                        //    .icons.new-user-icon
+                        //    .g-plan-title
+                        //        i.house-icon
+                        //        span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
+                        //        em.metaphase 中期
+                        //    .mt40
+                        //        .project-introduction
+                        //            label 年化收益：
+                        //            span.profit 12.5
+                        //                i %
+                        //        .project-introduction
+                        //            label 项目期限：
+                        //            span 5
+                        //                i 天
+                        //        .project-introduction
+                        //            label 融资金额：
+                        //            span 200
+                        //                i 万元
+                        //    .progress-bar.clearfix
+                        //        .progress-bar-left
+                        //            span
+                        //        .progress-bar-right 62.5%
+                        //    .available-amount 可投金额 79,600元
+                        //    .go-investment
+                        //        a.min() 立即投资
+                        //.g-plan-project
+                        //    .g-plan-title
+                        //        i.san-icon
+                        //        span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
+                        //        em.long-term 长期
+                        //    .mt40
+                        //        .project-introduction
+                        //            label 年化收益：
+                        //            span.profit 12.5
+                        //                i %
+                        //        .project-introduction
+                        //            label 项目期限：
+                        //            span 5
+                        //                i 天
+                        //        .project-introduction
+                        //            label 融资金额：
+                        //            span 200
+                        //                i 万元
+                        //    .progress-bar.clearfix
+                        //        .progress-bar-left
+                        //            span
+                        //        .progress-bar-right 62.5%
+                        //    .available-amount 可投金额 79,600元
+                        //    .go-investment
+                        //        a.min() 立即投资
+                        //.g-plan-project
+                        //    .icons.app-share-new
+                        //    .g-plan-title
+                        //        i.card-icon
+                        //        span.san-title 2车辆抵押借款（宝马B车辆抵押借款（宝马B
+                        //        em.short-term 短期
+                        //    .mt40
+                        //        .project-introduction
+                        //            label 年化收益：
+                        //            span.profit 12.5
+                        //                i %
+                        //        .project-introduction
+                        //            label 项目期限：
+                        //            span 5
+                        //                i 天
+                        //        .project-introduction
+                        //            label 融资金额：
+                        //            span 200
+                        //                i 万元
+                        //    .progress-bar.clearfix
+                        //        .progress-bar-left
+                        //            span
+                        //        .progress-bar-right 62.5%
+                        //    .available-amount 可投金额 79,600元
+                        //    .go-investment
+                        //        a.min() 立即投资
+                        //.g-plan-project
+                        //    .icons.new-user-icon
+                        //    .g-plan-title
+                        //        i.house-icon
+                        //        span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
+                        //        em.metaphase 中期
+                        //    .mt40
+                        //        .project-introduction
+                        //            label 年化收益：
+                        //            span.profit 12.5
+                        //                i %
+                        //        .project-introduction
+                        //            label 项目期限：
+                        //            span 5
+                        //                i 天
+                        //        .project-introduction
+                        //            label 融资金额：
+                        //            span 200
+                        //                i 万元
+                        //    .progress-bar.clearfix
+                        //        .progress-bar-left
+                        //            span
+                        //        .progress-bar-right 62.5%
+                        //    .available-amount 可投金额 79,600元
+                        //    .go-investment
+                        //        a.min() 立即投资
+                        //.g-plan-project
+                        //    .g-plan-title
+                        //        i.san-icon
+                        //        span.san-title 车辆抵押借款（宝马B车辆抵押借款（宝马B
+                        //        em.long-term 长期
+                        //    .mt40
+                        //        .project-introduction
+                        //            label 年化收益：
+                        //            span.profit 12.5
+                        //                i %
+                        //        .project-introduction
+                        //            label 项目期限：
+                        //            span 5
+                        //                i 天
+                        //        .project-introduction
+                        //            label 融资金额：
+                        //            span 200
+                        //                i 万元
+                        //    .progress-bar.clearfix
+                        //        .progress-bar-left
+                        //            span
+                        //        .progress-bar-right 62.5%
+                        //    .available-amount 可投金额 79,600元
+                        //    .go-investment
+                        //        a.min() 立即投资
+                        //.g-plan-project
+                        //    .g-plan-title
+                        //        i.san-icon
+                        //        span.san-title 3车辆抵押借款（宝马B车辆抵押借款（宝马B
+                        //        em.long-term 长期
+                        //    .mt40
+                        //        .project-introduction
+                        //            label 年化收益：
+                        //            span.profit 12.5
+                        //                i %
+                        //        .project-introduction
+                        //            label 项目期限：
+                        //            span 5
+                        //                i 天
+                        //        .project-introduction
+                        //            label 融资金额：
+                        //            span 200
+                        //                i 万元
+                        //    .progress-bar.clearfix
+                        //        .progress-bar-left
+                        //            span
+                        //        .progress-bar-right 62.5%
+                        //    .available-amount 可投金额 79,600元
+                        //    .go-investment
+                        //        a.min() 立即投资
                 .page-boxs
                     span.active
                     span
                     span
-            +projectTitle('type-icon-3', '债券转让', '债权市场，任性采购', 'new')
+            +projectTitle('type-icon-3', '转让标', '灵活快捷', '/ylb/exchange.php', 'new')
             .g-plan-box.clearfix
-                .slide-left(tag=1)
-                .slide-right(tag=1)
+                .slide-left
+                .slide-right
                 .project-boxs
                     .project-box-c
-                        .g-plan-project
-                            .g-plan-title
-                                i.san-icon
-                                span.san-title 3车辆抵押借款（宝马B车辆抵押借款（宝马B
-                                em.transfer 转
-                                    .transfer-box 查看
-                                        a() 债权转让
-                                        | 规则
-                            .time-money.transfer-info.clearfix
-                                .time-left
-                                    p.p-top.num 12.5
-                                        i %
-                                    p.p-b 年化收益
-                                .border-left
-                                .money-right
-                                    p.p-top 8
-                                        i 天
-                                    p.p-b 剩余期限
-                            .detail-info
-                                p
-                                    label 原标年化：
-                                    span 12%
-                                p
-                                    label 转让金额：
-                                    span 1,600,000元
-                            .progress-bar.clearfix
-                                .progress-bar-left
-                                    span
-                                .progress-bar-right 62.5%
-                            .available-amount 可投金额 79,600元
-                            .go-investment
-                                a.min() 立即投资
+                        for assignment in assignment_data
+                            .g-plan-project.zqzr-project
+                                .g-plan-title
+                                    i.zrb-icon
+                                    span.san-title {{assignment.short_name}}
+                                    em.transfer 转
+                                        .transfer-box 查看
+                                            a() 债权转让
+                                            | 规则
+                                .time-money.transfer-info.clearfix
+                                    .time-left
+                                        p.p-top.num {{assignment.purchaser_year_interset}}
+                                            i %
+                                        p.p-b 年化收益
+                                    .border-left
+                                    .money-right
+                                        p.p-top
+                                            i {{assignment.rate_end}}天
+                                        p.p-b 剩余期限
+                                .detail-info
+                                    p
+                                        label 原标年化：
+                                        span {{assignment.rate_end}}%
+                                    p
+                                        label 转让金额：
+                                        span {{assignment.principal_sale_amount}}元
+                                .progress-bar.clearfix
+                                    .progress-bar-left
+                                        span(style="width:{{assignment.ordered_percent}}%")
+                                    .progress-bar-right {{assignment.ordered_percent}}%
+                                ktje = float(assignment['principal_left_amount'])
+                                .available-amount 可投金额 {{ktje | money_format_int }}元
+                                .go-investment
+                                    if assignment.display_status == '正在售卖'
+                                        a.min(href="{{assignment.detail_url}}") 立即投资
+                                    else
+                                        a.min.disable-style(href='javascript:void(0)') 转让完成
+                assignmenLlengths = len(assignment_data)
+                .page-boxs
+                    span.active
+                    if assignmenLlengths > 3
+                        span
+                    if assignmenLlengths > 6
+                        span
 
     .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-news

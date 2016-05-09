@@ -540,12 +540,19 @@
           @include home-sprite(new_user_icon)
         .g-plan-title
           text-align: center
-          .a-icon
+          .letter-icon
             width: 22px
             height: 22px
             display: inline-block
-            @include home-sprite(a_icon)
             vertical-align: middle
+          .a-icon
+            @include home-sprite(a_icon)
+          .b-icon
+            @include home-sprite(b_icon)
+          .c-icon
+            @include home-sprite(c_icon)
+          .d-icon
+            @include home-sprite(d_icon)
           .card-icon
             width: 30px
             height: 21px
@@ -564,6 +571,12 @@
             display: inline-block
             @include home-sprite(san)
             vertical-align: middle
+          .zrb-icon
+            width: 23px
+            height: 24px
+            display: inline-block
+            @include home-sprite(zrb)
+            vertical-align: middle
           span
             color: $t-d10
             font-size: $font-xl
@@ -576,6 +589,7 @@
             text-overflow: ellipsis
             font-size: $font-m
             display: inline-block
+            text-align: left
           em
             width: 31px
             height: 16px
@@ -634,6 +648,12 @@
             span
               color: $t-d11
               font-size: $font-xxl
+              overflow: hidden
+              text-overflow: ellipsis
+              white-space: nowrap
+              width: 170px
+              display: inline-block
+              vertical-align: middle
               i
                 font-size: $font-m
           span.profit
@@ -660,7 +680,7 @@
             float: left
             text-align: right
         .transfer-info
-          margin-top: 40px
+          margin-top: 30px
           .num
             color: #db493f
           .p-top
@@ -720,6 +740,10 @@
           a.min
             width: 180px
             background: #db493f
+          a.disable-style
+            background: #c7c7c7
+      .zqzr-project
+        padding: 30px 55px 20px
   .page-boxs
     margin-top: 13px
     text-align: center
