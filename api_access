@@ -1,0 +1,187 @@
+/ GET
+/?promo_token=360pcss GET
+/PK7wlbQ4Q9KPs9Io_zOpac/jsi18n/ GET
+/about/ GET
+
+/api/m/cost/ GET
+/api/m/daylist/ GET
+/api/m/explore/ GET
+/api/m/guard/ GET
+/api/m/guide/ GET
+/api/m/preload/ POST
+/api/m/questions/ GET
+/api/m/rate/ POST
+/api/phone_validation_code/register/13016464553/ POST/api/phone_validation_code/register/13564006283/ POST
+/api/profile/ GET
+/api/rong360/token/?username=rong360&password=wanglibao_1116 GET
+/api/shareurl/ POST
+/api/weixin/distribute/redpack/ POST
+/api/xunlei/2016/1/?type=chances GET
+/api/xunlei/award/action/ POST
+/api/xunlei/getProjectList/?xluid=0 GET
+/finance/ GET
+/help/ GET
+/pc_guide/ GET
+/security/ GET
+/tdt/getProjectsByDate.json?date=2016-01-01 GET
+/team/ GET
+
+
+/weixin/account/ GET
+/weixin/api/jsapi_config/ GET
+/weixin/api/wx_code/?state=3&redirect_uri=https://www.wanglibao.com/weixin/award_index/ GET
+/weixin/authentication/ GET
+/weixin/award_index/ GET
+/weixin/list/ GET
+/weixin/more/ GET
+/weixin/recharge/?rechargeNext=/weixin/account/ GET
+/weixin/regist/ GET
+/weixin/regist/first/ GET
+/weixin/security/ GET
+
+用户账号
+/accounts/login/ GET
+/accounts/login/ajax/ POST
+/accounts/password/reset/identifier/ GET
+/accounts/password/reset/set_password/ POST
+/accounts/password/reset/validate/ POST
+/accounts/password/reset/validate_phone_code/ POST
+/accounts/register/ GET
+/accounts/register/ajax/ POST
+/accounts/register/first/ GET
+/accounts/token/login/ajax/ POST
+/accounts/token_login/?next=/activity/experience/account/ GET
+/accounts/id_verify/ GET
+/api/user_exists/\xBF\xC9\xCA\xB9\xD3\xC3\xD3\xE0\xB6\xEE\xB2\xBB\xD7\xE3 GET
+/api/user_login/ POST
+/api/api-token-auth/ POST
+/api/id_validate/ POST
+/api/id_validation/ POST
+/api/trade_pwd/ POST
+/api/register/ POST
+/captcha/refresh/?v=1449299154488 GET
+/weixin/api/login/ POST
+/weixin/login/ GET
+
+
+
+用户平台信息
+/accounts/coupon/unused/ GET
+/accounts/coupon/used/ GET
+/accounts/redpacket/unused/ GET
+/accounts/redpacket/used/ GET
+/accounts/auto_tender/ GET
+/accounts/home/ GET
+/accounts/home/experience/ GET
+/accounts/invite/ GET
+/accounts/message/ GET
+/accounts/message/count/ POST
+/accounts/repayment/ GET
+/api/redpacket/ POST
+/api/redpacket/selected/ POST
+/api/message/0/ POST
+/api/message/count/ POST
+/api/message/list/ POST
+/api/home/ GET
+/api/home/?channelId=ios&network=WWAN&ticket=&userDevice=iPhone&version=2.6.0 GET
+/api/home/invite/income/ POST
+/api/activity/reward/ POST
+/api/client_update/ POST
+/api/experience/buy/ POST
+/api/experience/get_experience/ POST
+/api/fee/ POST
+/api/fund_info/ GET
+/api/gettopofearings/ POST
+/api/m/repayment/ post 还款
+/api/m/repayment_plan/all/ post
+/api/m/repayment_plan/month/ post
+/api/m/phone/alert/ POST 用户通讯录上传相关
+/api/m/phone/invite/broker/ POST
+/api/m/phone/query/ POST
+/api/m/phone/upload/ POST
+/api/trade_record/ POST
+/weixin/reward/expires/ GET
+/weixin/reward/unused/ GET
+/weixin/reward/used/ GET
+
+产品，购买
+/p2p/detail/7 GET
+/api/home/p2precords GET
+/p2p/list GET
+/api/p2p/investrecord POST
+/api/p2p/purchase/ POST
+/api/p2p/purchase/mobile/ POST
+/api/p2ps/wx/?page=2&pagesize=10 GET
+/accounts/transaction/p2p/ GET
+/api/m/recommend/ GET
+/api/m/investlist/ GET
+/weixin/transaction/buying/ GET
+/weixin/transaction/finished/ GET
+/weixin/transaction/repaying/ GET
+
+支付
+/accounts/bankcard/ GET
+/api/bank_card/add/ POST   pc页使用，即将废弃
+/api/bank_card/list/ POST  pc页面使用，即将废弃
+/api/card/ POST  pc页面使用，即将废弃
+/weixin/account/bankcard/ GET
+/weixin/account/bankcard/add/ GET
+/pay/banks/ GET
+/pay/banks_for_register/ GET
+/pay/deposit/ POST
+/pay/deposit/callback/ POST
+/pay/deposit/complete/ POST
+/api/pay/cnp/dynnum_new/ POST
+/api/pay/cnp/list/ POST
+/api/pay/cnp/list_new/ POST
+/api/pay/cnp/yee/callback/ POST
+/api/pay/deposit/callback/ POST
+/api/pay/deposit_new/ POST
+/api/pay/gate/ POST
+/pay/withdraw/ GET
+/pay/withdraw/complete/ POST
+/pay/withdraw/complete/提现成功/ GET
+/accounts/transaction/deposit/ GET
+/accounts/transaction/withdraw/ GET
+/api/bank/list_new/ POST
+/api/withdraw/ POST
+
+
+活动
+/activity/app_bid/ GET
+/activity/app_colorpage GET
+/activity/app_colorpage/ GET
+/activity/app_double_eggs/ GET
+/activity/app_gold_season/ GET
+/activity/app_noviceDecember_h5 GET
+/activity/app_noviceDecember_h5/ GET
+/activity/app_pc_download/ GET
+/activity/app_shareReward/ GET
+/activity/app_thanksgivin/ GET
+/activity/app_xingmei/?promo_token=xingmei GET
+/activity/area/ GET
+/activity/baidu_finance/ GET
+/activity/baidu_finance/?promo_token=360pcss GET
+/activity/baidu_finance/?promo_token=baidujj GET
+/activity/baidu_finance/?promo_token=google1 GET
+/activity/baidu_finance/?promo_token=sougou1 GET
+/activity/double_eggs/ GET
+/activity/experience/account/ GET
+/activity/experience/gold GET
+/activity/experience/gold/ GET
+/activity/experience/mobile/ GET
+/activity/gold_season/ GET
+/activity/maimai_index/?promo_token=maimai1 GET
+/activity/maimai_success/?state=2 GET
+/activity/noviceDecember GET
+/activity/noviceDecember/ GET
+/activity/thanksgiving/ GET
+/activity/wx_november_new/ GET
+/activity/xunlei_setp/?promo_token=xunlei9 GET
+
+其他
+/announcement/ GET
+/announcement/detail/455/ GET
+/api/coop/order/receive/zgdx/ POST
+/api/m/about/ GET
+/api/marketing/tv/ POST
