@@ -721,6 +721,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
         'schedule': crontab(minute=30, hour=0),
     },
+    # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
+    'sync_pay_result': {
+        'task': 'wanglibao_pay.tasks.sync_pay_result',
+        'schedule': timedelta(minutes=10), 
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
