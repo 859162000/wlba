@@ -336,6 +336,6 @@ def coop_amortizations_push(amortizations, product_id):
             queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
 # 只在程序初始化时执行
-if GlobalVar.get_push_status() is False:
-    coop_product_push.apply_async()
-    GlobalVar.set_push_status(True)
+# if GlobalVar.get_push_status() is False:
+#     coop_product_push.apply_async()
+#     GlobalVar.set_push_status(True)
