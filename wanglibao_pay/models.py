@@ -122,7 +122,7 @@ class PayInfo(models.Model):
     PROCESSING = u'处理中'
     SUCCESS = u'成功'
     FAIL = u'失败'
-    EjtyXCEPTION = u'异常'
+    EXCEPTION = u'异常'
     ACCEPTED = u'已受理'
 
     DEPOSIT = 'D'  # 充值
