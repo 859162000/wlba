@@ -40,11 +40,12 @@ class CallbackRecordAdmin(admin.ModelAdmin):
             headers = obj.request_headers
             headers = json.loads(headers) if headers else headers
 
-            update_coop_recallback_data = LOCAL_VAR['update_%s_recallback_data' % obj.callback_to.lower()]
-            if update_coop_recallback_data:
-                data = update_coop_recallback_data(obj.order_id, obj.callback_to, json.loads(obj.request_data))
-            else:
+            try:
+                update_coop_recallback_data = LOCAL_VAR['update_%s_recallback_data' % obj.callback_to.lower()]
+            except KeyError:
                 data = json.loads(obj.request_data)
+            else:
+                data = update_coop_recallback_data(obj.order_id, obj.callback_to, json.loads(obj.request_data))
 
             common_callback(channel=obj.callback_to,
                             url=obj.request_url,
