@@ -24,7 +24,7 @@ from wanglibao_p2p.utility import validate_date, validate_status, handler_pagina
 from .models import IntroducedBy
 from wanglibao_account.models import IdVerification, Binding
 from wanglibao_pay.models import Card
-from wanglibao.settings import YIRUITE_KEY, WANGLIBAO_ACCESS_TOKEN_KEY
+from wanglibao.settings import YIRUITE_KEY, DUOZHUAN_TOKEN_KEY
 from wanglibao_profile.models import WanglibaoUserProfile
 import hashlib
 
@@ -260,7 +260,7 @@ class DuoZhuanByDateAPI(APIView):
         """
         验证密钥
         """
-        self_token = hashlib.md5("%s%s%s%s" % (self.page, self.pageSize, WANGLIBAO_ACCESS_TOKEN_KEY, self.timestamp)).hexdigest()
+        self_token = hashlib.md5("%s%s%s%s" % (self.page, self.pageSize, DUOZHUAN_TOKEN_KEY, self.timestamp)).hexdigest()
         if self_token != self.token:
             self.message = u'验证失败'
         if (time.time() - int(self.timestamp)) > 300:
