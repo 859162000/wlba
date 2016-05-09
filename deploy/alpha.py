@@ -224,17 +224,17 @@ def deploy_mq_action():
             sudo("supervisorctl reload")
         run("ps aux|grep python")
 
-    print yellow("update crontab job")
-    with cd("/var/www/wanglibao"):
-        fund, income, info, cmd = config_crontab()
-        put(StringIO(fund), 'scrawl_job')
-        put(StringIO(income), 'sync_sm_income')
-        put(StringIO(info), 'sync_sm_info')
-        put(StringIO(cmd), '/tmp/tmp_tab')
-        run("chmod +x scrawl_job")
-        run("chmod +x sync_sm_income")
-        run("chmod +x sync_sm_info")
-        run("crontab /tmp/tmp_tab")
+    #print yellow("update crontab job")
+    #with cd("/var/www/wanglibao"):
+    #    fund, income, info, cmd = config_crontab()
+    #    put(StringIO(fund), 'scrawl_job')
+    #    put(StringIO(income), 'sync_sm_income')
+    #    put(StringIO(info), 'sync_sm_info')
+    #    put(StringIO(cmd), '/tmp/tmp_tab')
+    #    run("chmod +x scrawl_job")
+    #    run("chmod +x sync_sm_income")
+    #    run("chmod +x sync_sm_info")
+    #    run("crontab /tmp/tmp_tab")
 
 
 @roles("webback")
