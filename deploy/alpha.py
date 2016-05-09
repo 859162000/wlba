@@ -11,7 +11,7 @@ from fabric.colors import green, red, yellow
 
 env.roledefs = {
     'lb': ["192.168.20.231"],
-    'web': ["192.168.20.232"],
+    'web': ["192.168.20.238"],
     'mq': ["192.168.20.233"],
     'pre': ["192.168.20.236"],
     'dbback': ["192.168.20.236"],
@@ -22,7 +22,7 @@ env.roledefs = {
 }
 env.user = "wangli"
 env.git_server_path = "~/wanglibao-backend"
-env.deploy_path = "/var/www/wanglibao/wanglibao-backend"
+env.deploy_path = "/var/www/wanglibao/channel/wanglibao-backend"
 env.deploy_virt_path = "/var/www/wanglibao/virt-wanglibao"
 env.git_server_address = "git clone wangli@192.168.20.231:~/wanglibao-backend"
 env.activate = "source %s/bin/activate" % env.deploy_virt_path
