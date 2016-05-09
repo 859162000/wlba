@@ -1347,19 +1347,19 @@ if ENV == ENV_PRODUCTION:
 if ENV == ENV_PRODUCTION:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
-    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
-    PUSH_COOP_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/push_coop_token/'
-    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
+    OAUTH2_URL = 'https://qdtest.wanglibao.com/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'https://qdtest.wanglibao.com/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/'
+    PUSH_COOP_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/push_coop_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/push/'
 else:
     CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
     CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'http://192.168.20.237:8001/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = 'http://192.168.20.237:8001/api/dispatch/'
-    COOP_ACCESS_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/access_token/'
-    PUSH_COOP_TOKEN_URL = 'http://192.168.20.237:8001/oauth2/push_coop_token/'
-    COOP_ACCESS_TOKEN_PUSH_URL = 'http://192.168.20.237:8001/oauth2/access_token/push/'
+    OAUTH2_URL = 'https://qdtest.wanglibao.com/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'https://qdtest.wanglibao.com/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/'
+    PUSH_COOP_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/push_coop_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/push/'
 
 
 if ENV == ENV_PRODUCTION:
