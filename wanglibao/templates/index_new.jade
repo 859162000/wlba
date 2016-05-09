@@ -206,10 +206,12 @@ html
                                         i.card-icon
                                     elif p2p.types.name == '房贷'
                                         i.house-icon
-                                    elif p2p.types.name == '一般企业贷'
+                                    elif p2p.types.name == '一般企业贷' or p2p.types.name == '珠宝贷' or p2p.types.name == '艺术品贷' or p2p.types.name == '红木贷'
                                         i.qy-icon
                                     elif p2p.types.name == '黄金标'
                                         i.glod-icon
+                                    elif p2p.types.name == '过桥周转业务'
+                                        i.bank-icon
                                     else
                                         i.other-icon
                                     span.san-title {{p2p.name}}
