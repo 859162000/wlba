@@ -619,6 +619,7 @@ class BaJinSheCallback(CoopCallback):
                     'moneyType': 0,
                     'availableBalance': float(margin_record.margin_current),
                     'totalBalance': float(margin_record.margin_current),
+                    'channel': 'bjs',
                 }
 
                 data['tran'] = [act_data]
@@ -668,6 +669,7 @@ class BaJinSheCallback(CoopCallback):
                     'moneyType': 1,
                     'availableBalance': float(margin_record.margin_current),
                     'totalBalance': float(margin_record.margin_current),
+                    'channel': 'bjs',
                 }
 
                 data['tran'] = [act_data]
@@ -723,6 +725,7 @@ class BaJinSheCallback(CoopCallback):
             'apr': product.expected_earning_rate,
             'state': state,
             'purchases': timezone.localtime(equity.created_at).strftime('%Y%m%d%H%M%S'),
+            'channel': 'bjs',
         }
 
         reward_data_list = list()
