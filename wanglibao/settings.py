@@ -159,7 +159,7 @@ if LOCAL_MYSQL:
 if ENV_ALPHA_DEPLOY:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'wanglibao',
+        'NAME': 'wanglibao_channel',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
         'HOST': '192.168.20.236',
