@@ -263,8 +263,12 @@ class DuoZhuanByDateAPI(APIView):
         self_token = hashlib.md5("%s%s%s%s" % (self.page, self.pageSize, DUOZHUAN_TOKEN_KEY, self.timestamp)).hexdigest()
         if self_token != self.token:
             self.message = u'验证失败'
-        if (time.time() - int(self.timestamp)) > 300:
-            self.message = u'请求超时'
+        if time.time() >= int(self.timestamp):
+            if (time.time() - int(self.timestamp)) >= 300:
+                self.message = u'请求超时'
+        else:
+            if (time.time() - int(self.timestamp)) >= -300:
+                self.message = u'请求超时'
         return self.message
 
     def get(self, request):
