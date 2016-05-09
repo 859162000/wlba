@@ -19,8 +19,7 @@ import Crypto
 logger = logging.getLogger(__name__)
 
 def send_mail(payinfo_id, user_name, user_phone, amount, message):
-    # accountant_team_email = 'jiesuan@wanglibank.com'
-    accountant_team_email = 'wangzhenhai@wanglibank.com'
+    accountant_team_email = 'jiesuan@wanglibank.com'
     admin_email = 'guoya@wanglibank.com'
     from_addr = settings.SMTP_USER
     if settings.ENV == settings.ENV_PRODUCTION:
@@ -42,7 +41,6 @@ def send_mail(payinfo_id, user_name, user_phone, amount, message):
     mail_server = smtplib.SMTP(settings.SMTP_SERVER, 25, 'localhost', 30)    
     mail_server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
     mail_server.sendmail(headers['from'], headers['to'].split(','), email_content)
-    import pdb;pdb.set_trace()
     mail_server.quit()
 
 @app.task()
