@@ -24,7 +24,7 @@ from wanglibao_banner.views import (HiringView, AboutView, CompanyView, TeamView
                                     AgreementAutoView, DynamicHomeView, DynamicDetailView)
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
-    WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
+    WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser, DuoZhuanByDateAPI
 from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
     AppShareViewSuccess, AppShareViewError, RockFinanceQRCodeView
 # from wanglibao_activity.decorators import decorator_include
@@ -140,6 +140,8 @@ urlpatterns += patterns(
     # 网贷之家
     url(r'^tdt/getNowProjects.json', WangDaiListAPI.as_view()),
     url(r'^tdt/getProjectsByDate.json', WangDaiByDateAPI.as_view()),
+    #多赚
+    url(r'^getWanglibaoData/$', DuoZhuanByDateAPI.as_view()),
     # 和讯网
     url(r'^hexun/p2plist.json', HeXunListAPI.as_view()),
     # 网贷天眼

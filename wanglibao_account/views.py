@@ -1313,7 +1313,7 @@ class MessageView(TemplateView):
                         message.message_text.created_at = int(data[index]['created_at'])
                         index += 1
 
-                messages_list.extend(messages)
+        messages_list.extend(messages)
 
         limit = 10
         paginator = Paginator(messages_list, limit)
