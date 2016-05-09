@@ -915,7 +915,9 @@ class P2PListView(TemplateView):
         except Exception:
             p2p_products = paginator.page(paginator.num_pages)
 
-        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
+        now = timezone.now()
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True)\
+            .filter(Q(is_long_used=True) | Q(start_at__lt=now, end_at__gt=now)).order_by('-priority')[:3]
 
         return {
             'results': p2p_products[:10],
