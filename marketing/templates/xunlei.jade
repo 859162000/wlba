@@ -30,21 +30,24 @@ html
                         .mountain-icon
                         .prompt-icon
                         .gold-icon
-                    .user-count 请先
-                        a() 登录
-                        | ，您有
-                        a() 3
-                        | 次挖宝机会
+                    .user-count
+                        if user.is_authenticated
+                            span 您有
+                            a()#lotteryCounts
+                            | 次挖宝机会
+                        else
+                            span 请先
+                            a(href='/accounts/login/?next=/activity/xunlei/') 登录
                     .win-user
                         .win-box
                             .megaphone
                             .ul-p.clearfix
                                 ul#winList
-                                    li 恭喜 132****6426 用户，获得 1% 加息券
-                                    li 恭喜 132****6426 用户，获得 2% 加息券
-                                    li 恭喜 132****6426 用户，获得 3% 加息券
-                                    li 恭喜 132****6426 用户，获得 4% 加息券
-                                    li 恭喜 132****6426 用户，获得 5% 加息券
+                                    //li 恭喜 132****6426 用户，获得 1% 加息券
+                                    //li 恭喜 132****6426 用户，获得 2% 加息券
+                                    //li 恭喜 132****6426 用户，获得 3% 加息券
+                                    //li 恭喜 132****6426 用户，获得 4% 加息券
+                                    //li 恭喜 132****6426 用户，获得 5% 加息券
             .xunlei-box2.clearfix
                 .xunlei-content.clearfix
                     +titles('新手', '秘籍', 'New techniques')
@@ -123,26 +126,34 @@ html
                         p 8. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
         .alert-box(style='display:none')
             .alert-top
+            a(href='javascript:void(0)')#close-modal.close-modal.close-btn
             .alert-content
-                .jiaxiquan(style='display:none')
-                    p 人品大爆发，1%加息券已经
+                .jiaxiquan.alert-c#jxq(style='display:none')
+                    p 人品大爆发，
+                        span 1
+                        | %加息券已经
                     p 悄悄的在您的账户中！
-                    a(href="javascript:void(0)") 太棒了
-                .tiyanjin(style='display:none')
+                    a(href="javascript:void(0)").close-alert-box 太棒了
+                .tiyanjin.alert-c#tyj(style='display:none')
                     p 人世间最美好的事情
-                    p 莫不过如此，88元体验金
+                    p 莫不过如此，
+                        span 88
+                        | 元体验金
                     p 已经在您的账户中！
-                    a(href="javascript:void(0)") 太棒了
-                .wzj(style='display:none')
+                    a(href="javascript:void(0)").close-alert-box 太棒了
+                .wzj.alert-c#no1(style='display:none')
                     p 佛说：前世的500次回眸
                     p 才换得今世的一次中奖，淡定！
-                    a(href="javascript:void(0)") 再试一次
-                .wzj1(style='display:none')
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#no2(style='display:none')
                     p 大奖何时有？把酒问青天！
-                    a(href="javascript:void(0)") 再试一次
-                .wzj1
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#no3(style='display:none')
                     p 大奖下回见，网利宝天天见！
-                    a(href="javascript:void(0)") 再试一次
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#noChance(style='display:none')
+                    p 客官，您的挖奖机会已经用光！
+                    a(href="javascript:void(0)").close-alert-box 知道了
                 .cont-img(style='display:none')
                 .despair
         include global/g_footer
