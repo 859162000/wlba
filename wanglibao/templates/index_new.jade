@@ -139,7 +139,7 @@ html
                     i.vertical-icon
                     label=introduce
             +projectTitle('type-icon-1', '月利宝', '收益递增', '/ylb/monthly.php', 'new')
-            .g-plan-box.clearfix
+            .g-plan-box.clearfix(tag=1)
                 .slide-left(tag=1)
                 .slide-right(tag=1)
                 .project-boxs
@@ -147,18 +147,19 @@ html
                         for month in month_data
                             .g-plan-project
                                 .g-plan-title
-                                    if  month.name == 'A'
-                                        letterS = 'a-icon'
-                                    elif month.name == 'B'
-                                        letterS = 'b-icon'
-                                    elif month.name == 'C'
-                                        letterS = 'c-icon'
-                                    elif month.name == 'D'
-                                        letterS = 'd-icon'
-                                    i.letter-icon(class=letterS)
-                                    span 月利宝{{month.name}}
-                                    label |
-                                    span {{month.short_name}}
+                                    a(href="{{month.detail_url}}")
+                                        if  month.name == 'A'
+                                            letterS = 'a-icon'
+                                        elif month.name == 'B'
+                                            letterS = 'b-icon'
+                                        elif month.name == 'C'
+                                            letterS = 'c-icon'
+                                        elif month.name == 'D'
+                                            letterS = 'd-icon'
+                                        i.letter-icon(class=letterS)
+                                        span 月利宝{{month.name}}
+                                        label |
+                                        span {{month.short_name}}
                                 .percentage-box
                                     span {{month.expected_earning_rate}} ~ {{month.rate_end}}
                                     label %
@@ -189,7 +190,7 @@ html
                     if lengths > 6
                         span
             +projectTitle('type-icon-2', '散标', '选择多样', '/p2p/list/')
-            .g-plan-box.clearfix
+            .g-plan-box.clearfix(tag=2)
                 .slide-left(tag=2)
                 .slide-right(tag=2)
                 .project-boxs
@@ -214,7 +215,8 @@ html
                                         i.bank-icon
                                     else
                                         i.other-icon
-                                    span.san-title {{p2p.name}}
+                                    a(href="/p2p/detail/{{p2p.id}}")
+                                        span.san-title {{p2p.name}}
                                     if index == 0 or index == 3 or index == 6
                                         em.short-term 短期
                                     elif index == 1 or index == 4 or index == 7
@@ -255,16 +257,17 @@ html
                     if p2pLengths > 6
                         span
             +projectTitle('type-icon-3', '转让标', '灵活快捷', '/ylb/exchange.php', 'new')
-            .g-plan-box.clearfix
-                .slide-left
-                .slide-right
+            .g-plan-box.clearfix(tag=3)
+                .slide-left(tag=3)
+                .slide-right(tag=3)
                 .project-boxs
                     .project-box-c
                         for assignment in assignment_data
                             .g-plan-project.zqzr-project
                                 .g-plan-title
                                     i.zrb-icon
-                                    span.san-title {{assignment.short_name}}
+                                    a(href='{{assignment.detail_url}}')
+                                        span.san-title {{assignment.short_name}}
                                     em.transfer 转
                                         .transfer-box 查看
                                             a(href='/ylb/exchange.php') 债权转让
@@ -342,5 +345,5 @@ html
     .page(style='display:none')
     include global/g_footer
     script.
-      require(["/static/src/pc/index.js?v=20160505"])
+      require(["/static/src/pc/index.js?v=20160510"])
     include include/tracking

@@ -190,6 +190,9 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
         var self = $(this)
         if(!self.hasClass('onClick')) {
             var indexs = self.index(), parents = self.parents('.g-plan-box'), widths = parseInt(parents.find('.g-plan-project').outerWidth() * 3) + leftV;
+            var tag = parents.attr('tag');
+            if(tag == '1'){ index0 = indexs;}else if(tag == '2'){ index1 = indexs}else{ index2 = indexs }
+            console.log(tag)
             self.addClass('onClick');
             parents.find('.project-box-c').stop().animate({'left': -widths * (indexs)}, 500, function () {
                 self.removeClass('onClick');
