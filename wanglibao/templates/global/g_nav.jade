@@ -60,7 +60,7 @@
           else
             i.user-icon-img
           span.user-text 我的账户
-          i.icon.iconfont.icon-down
+          i.icon.iconfont.icon-down-new
         ul.g-nav-user-nav#minNavs
           mixin liItem(url, text)
             li
@@ -78,7 +78,7 @@
               if news
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
               if smallNav == 'list'
-                  i.icon.iconfont.icon-down
+                  i.icon.iconfont.icon-down-new
             if smallNav == 'list'
               ul.g-nav-user-nav.list-nav-hover
                 mixin smallNav(url, text)
@@ -94,7 +94,7 @@
                 if news
                   img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
                 if smallNav == 'list'
-                  i.icon.iconfont.icon-down
+                  i.icon.iconfont.icon-down-new
               if smallNav == 'list'
 
                 ul.g-nav-user-nav.list-nav-hover
@@ -106,7 +106,7 @@
                   +smallNav('/ylb/exchange.php', '转让标')
 
       +nav-item('nav-index', '首页', '/')
-      +nav-item('nav-p2p', '理财专区', '/p2p/list/', 'list')
+      +nav-item('nav-p2p', '理财专区', '', 'list')
       +nav-item('nav-dai', '风险控制', '/security')
       +nav-item('nav-area', '平台数据', '/data_cube/')
       +nav-item('nav-security', '关于我们', '/about/')
