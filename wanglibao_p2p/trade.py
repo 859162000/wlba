@@ -36,7 +36,9 @@ from weixin.models import WeixinUser
 from weixin.constant import PRODUCT_INVEST_SUCCESS_TEMPLATE_ID
 from weixin.tasks import sentTemplate
 
+
 logger = logging.getLogger('wanglibao_account')
+
 
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
@@ -64,6 +66,7 @@ class P2PTrader(object):
     def purchase(self, amount, redpack=0, platform=u''):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
         is_full = False
+        product_balance_after = 0
         if self.user.wanglibaouserprofile.frozen:
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
@@ -98,7 +101,8 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-            if product_record.product_balance_after <= 0:
+            product_balance_after = product_record.product_balance_after
+            if product_balance_after <= 0:
                 is_full = True
 
         # fix@chenweibin, add order_id
@@ -108,7 +112,8 @@ class P2PTrader(object):
                          (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
             tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
                                                    "device": self.device, "order_id": self.order_id,
-                                                   "product_id": self.product.id, "is_full": is_full})
+                                                   "product_id": self.product.id, "is_full": is_full,
+                                                   "product_balance_after": product_balance_after})
         except Exception, reason:
             logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
             pass
@@ -220,6 +225,14 @@ class P2POperator(object):
                 cls().settle(product)
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (product.id, e.message))
+
+            try:
+                from .tasks import coop_product_push
+                coop_product_push.apply_async(
+                    kwargs={'product_id': product.id}
+                )
+            except:
+                pass
 
         print('Getting products with status 正在招标 and end time earlier than now')
         for product in P2PProduct.objects.filter(status=u'正在招标', end_time__lte=timezone.now()):
@@ -337,6 +350,14 @@ class P2POperator(object):
                 messages_list.append(messages.product_failed(equity.user.wanglibaouserprofile.name, product))
             ProductKeeper(product).fail()
 
+        try:
+            from .tasks import coop_product_push
+            coop_product_push.apply_async(
+                kwargs={'product_id': product.id}
+            )
+        except:
+            pass
+
         user_ids = {}.fromkeys(user_ids).keys()
         if phones:
             send_messages.apply_async(kwargs={
@@ -383,6 +404,14 @@ class P2POperator(object):
 
                 # 将标信息从还款中的redis列表中挪到已完成的redis列表
                 cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
+
+                try:
+                    from .tasks import coop_product_push
+                    coop_product_push.apply_async(
+                        kwargs={'product_id': product.id}
+                    )
+                except:
+                    pass
 
     @classmethod
     def settle_hike(cls, product):
