@@ -2018,9 +2018,10 @@ class XunleiTreasureAPIView(APIView):
         when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
         for _index in xrange(3):
             if _index == when_dist_redpack:
+                redpack =RedPackEvent.objects.filter(name=rewards[int(time.time()%2)]).first()
                 WanglibaoActivityReward.objects.create(
                         user=user,
-                        experience=ExperienceEvent.objects.filter(name=rewards[int(time.time()%2)]).first(),
+                        redpack_event=redpack,
                         activity=self.activity_name,
                         when_dist=1,
                         left_times=1,
@@ -2048,13 +2049,15 @@ class XunleiTreasureAPIView(APIView):
         no_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
 
         logger.debug('glod_name:%s, redpack_name:%s, experience:%s, redpack_event:%s' % (goldexp_rewards[no_dist_redpack], redpack_rewards[no_dist_redpack], ExperienceEvent.objects.filter(name=goldexp_rewards[no_dist_redpack]).first(),RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first()))
+        experience = ExperienceEvent.objects.filter(name=goldexp_rewards[no_dist_redpack]).first()
         WanglibaoActivityReward.objects.create(
                 user=user,
                 activity=self.activity_name,
-                experience=ExperienceEvent.objects.filter(name=goldexp_rewards[no_dist_redpack]).first(),
+                experience=experience,
                 when_dist=1,
                 left_times=1,
                 join_times=1,
+                p2p_amount=experience.amount,
                 channel='xunlei9',
                 has_sent=False,
         )
@@ -2065,18 +2068,18 @@ class XunleiTreasureAPIView(APIView):
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
-                p2p_amount=100,
                 has_sent=False,
         )
+        redpack = RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first()
         WanglibaoActivityReward.objects.create(
                 user=user,
                 activity=self.activity_name,
-                redpack_event=RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first(),
+                redpack_event= redpack,
                 when_dist=1,
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
-                p2p_amount=100,
+                p2p_amount=redpack.amount,
                 has_sent=False,
         )
 
