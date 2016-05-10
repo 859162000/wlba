@@ -11,7 +11,7 @@ from .forms import P2PEquityForm
 
 def update_p2p_product_ordered_amount(product_id, remain_amount):
     try:
-        product = P2PProduct.objects.get(product_id)
+        product = P2PProduct.objects.get(pk=product_id)
     except P2PProduct.DoesNotExist:
         return False
     else:
