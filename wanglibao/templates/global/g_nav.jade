@@ -72,6 +72,8 @@
 
     .g-nav-box
       mixin nav-item(className, name, link, smallNav, news)
+        if smallNav == 'list'
+            link = 'javascript:void(0)'
         if activeItem == name
           .g-nav-list(class=className)
             a.highlight(href=link, class='nav-a')= name

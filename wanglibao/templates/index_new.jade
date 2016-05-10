@@ -161,7 +161,10 @@ html
                                         label |
                                         span {{month.short_name}}
                                 .percentage-box
-                                    span {{month.expected_earning_rate}} ~ {{month.rate_end}}
+                                    if month.expected_earning_rate == month.rate_end
+                                        span {{month.expected_earning_rate}}
+                                    else
+                                        span {{month.expected_earning_rate}} ~ {{month.rate_end}}
                                     label %
                                 .time-money.clearfix
                                     .time-left
