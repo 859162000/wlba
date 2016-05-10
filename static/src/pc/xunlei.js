@@ -13,7 +13,8 @@ require(['jquery', 'activityRegister'], function ($, re) {
     //注册
     re.activityRegister.activityRegisterInit({
         registerTitle :'领取迅雷会员+现金红包',    //注册框标语
-        isNOShow : '1'
+        isNOShow : '1',
+        activityUrl: '/activity/xunlei/'
     });
 
     $('#rewardDetail').on('click',function(){

@@ -17,6 +17,7 @@
         isNOShow : '1',      //是否显示
         hasCallBack : false, //回调
         buttonFont : '',
+        activityUrl : '',
         initFun : function(){
             $('.biaoyu').text(this.registerTitle);
             this.buttonFont != undefined ? $('#register_submit').text(this.buttonFont) : $('#register_submit').text('立即注册');
@@ -56,6 +57,10 @@
                     }
                 }
             });
+            var activityUrl = this.activityUrl
+            $('#goLogin').on('click',function(){
+                window.location.href = '/accounts/login/?next='+activityUrl;
+            })
         },
         //图片验证码
         imgCodeFun : function(){
@@ -299,6 +304,7 @@
             this.hasCallBack = options.hasCallBack;
             this.buttonFont = options.buttonFont;
             this.callBack = options.callBack;    //回调函数
+            this.activityUrl = options.activityUrl;
 
             if(this.isNOShow == '1'){
                 activityRegister.initFun();
