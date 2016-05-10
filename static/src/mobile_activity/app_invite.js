@@ -110,7 +110,7 @@ var weChatShare = (function(org){
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = $('input[name=url]').val(),
                 shareMainTit = '送你300元现金豪礼，就是这么任性！',
-                shareBody = '新人立领300元现金红包，专享16%超高收益，史无前例！100元起投立即去看看～戳这里>>';
+                shareBody = '来 利宝投资,让钱 钱!现在受邀注册理财即可获得28888元体验 及最 300元现 红包,APP投资分享还送加息券。IDG资本、百亿A股上市公司超4000万美 投资平台,100元起投资, 即去看看  戳 这 ';
             //分享给微信好友
             org.onMenuShareAppMessage({
                 title: shareMainTit,
