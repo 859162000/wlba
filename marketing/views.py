@@ -2444,7 +2444,7 @@ class RewardDistributeAPIView(APIView):
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
         #self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
-        self.rates = (5, 9.2, 10.8, 10.5, 9.5, 11, 9, 15, 20)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.rates = (5, 8, 12, 7, 13, 11, 9, 15, 20)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
