@@ -9,6 +9,17 @@ from .models import P2PEquity, P2PProduct
 from .forms import P2PEquityForm
 
 
+def update_p2p_product_ordered_amount(product_id, remain_amount):
+    try:
+        product = P2PProduct.objects.get(product_id)
+    except P2PProduct.DoesNotExist:
+        return False
+    else:
+        product.ordered_amount = float(product.total_amount) - float(remain_amount)
+        product.save()
+        return True
+
+
 def save_to_p2p_equity(req_data):
     equity = json.loads(req_data["equity"])
     equity['created_at'] = str_to_utc(equity['created_at'])

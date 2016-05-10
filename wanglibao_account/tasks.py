@@ -13,7 +13,7 @@ from wanglibao_margin.forms import MarginRecordForm
 from wanglibao_margin.utils import save_to_margin
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_p2p.forms import P2PRecordForm, UserAmortizationForm, P2PProductForm
-from wanglibao_p2p.utils import save_to_p2p_equity
+from wanglibao_p2p.utils import save_to_p2p_equity, update_p2p_product_ordered_amount
 from wanglibao_p2p.tasks import process_channel_product_push
 from wanglibao_p2p.models import P2PProduct, UserAmortization
 from .cooperation import CoopCallback
@@ -117,6 +117,15 @@ def process_purchase_callback(req_data):
         p2p_record_form = P2PRecordForm(p2p_record)
         if p2p_record_form.is_valid():
             p2p_record = p2p_record_form.save()
+
+            # 更新标的已投金额
+            product_id = p2p_record.product.id
+            update_p2p_product_ordered_amount(product_id, p2p_record.product_balance_after)
+            # 推送标的信息到第三方
+            process_channel_product_push.apply_async(
+                kwargs={'product_id': product_id}
+            )
+
             save_margin_response_data = save_to_margin(req_data)
             save_equity_response_data = save_to_p2p_equity(req_data)
             if save_margin_response_data['ret_code'] == 10000:
@@ -135,6 +144,26 @@ def process_purchase_callback(req_data):
         response_data = parase_form_error(margin_record_form)
 
     return response_data
+
+
+def process_product_update_callback(req_data):
+    product = json.loads(req_data["product"])
+    product_id = product['id']
+    product_instance = P2PProduct.objects.filter(pk=product_id).first()
+    if product_instance:
+        if 'product_balance_after' in product:
+            product_balance_after = product['product_balance_after']
+            product['ordered_amount'] = float(product_instance.total_amount) - float(product_balance_after)
+            product.pop('product_balance_after', None)
+
+            for k, v in product.iteritems():
+                setattr(product_instance, k, v)
+            product_instance.save()
+
+            # 推送标的信息到第三方
+            process_channel_product_push.apply_async(
+                kwargs={'product_id': product_instance.id}
+            )
 
 
 def process_bind_card_callback(req_data):
