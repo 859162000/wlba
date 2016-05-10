@@ -32,8 +32,8 @@ LOCAL_VAR = locals()
 #         CoopCallback(channel).process_all_callback(user_id, act, order_id)
 
 
-@app.task
 def process_amortize(amortizations, product_id, sync_id):
+    logger.info("Enter process_amortize >>>>>>>>>>>> with product_id[%s]" % product_id)
     user_amo_list = list()
     for amo in amortizations:
         amo['sync_id'] = sync_id
@@ -222,8 +222,9 @@ def process_amortizations_push_callback(req_data):
 
     if p2p_product:
         amortizations = json.loads(req_data['amortizations'])
-        process_amortize.apply_async(
-            kwargs={'amortizations': amortizations, 'product_id': product_id, 'sync_id': sync_id})
+        process_amortize(amortizations=amortizations, product_id=product_id, sync_id=sync_id)
+        # .apply_async(
+        # kwargs={'amortizations': amortizations, 'product_id': product_id, 'sync_id': sync_id})
 
         response_data = {
             'ret_code': 10000,
