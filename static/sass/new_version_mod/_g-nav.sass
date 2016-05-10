@@ -62,9 +62,17 @@ $g-nav-height-fixed: 60px
   .g-user,.nav-p2p
     position: relative
     font-size: $font-m
+    .icon-down-new
+      display: inline-block
+      width: 9px
+      height: 7px
+      background: url("/static/imgs/pc/nav/triangle_down.png") no-repeat center center
+      vertical-align: middle
     &:hover, &:active
       .g-nav-user-nav
         display: block
+      .icon-down-new
+        background: url("/static/imgs/pc/nav/triangle_up.png") no-repeat center center
   .user-nav
     text-align: center
     line-height: $g-nav-height
