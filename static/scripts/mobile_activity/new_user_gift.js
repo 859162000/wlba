@@ -378,7 +378,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-                    mixins.loginApp();
+                    mixins.loginApp({refresh: 1});
                 } else {
                     login = true;
                     connect(data);
