@@ -1,14 +1,15 @@
 require.config({
     paths: {
         'jquery.modal': 'lib/jquery.modal.min',
-        'activityRegister': 'activityRegister'
+        'activityRegister': 'activityRegister',
+        'csrf' : 'model/csrf'
     },
     shim: {
       'jquery.modal': ['jquery']
     }
 });
 
-require(['jquery', 'activityRegister'], function ($, re) {
+require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
     var count = 0;
     //注册
     re.activityRegister.activityRegisterInit({
@@ -21,6 +22,38 @@ require(['jquery', 'activityRegister'], function ($, re) {
         $('.explain-min').slideToggle("slow");
     })
 
+    $.ajax({
+        url: '/api/xunlei/treasure/',
+        dataType: 'json',
+        type: 'GET',
+        data: {
+            type: 'orders'
+        },
+        success: function (data) {
+            var str = '';
+            $.each(data.data,function(i,o){
+                if(o.award > 2){
+                    var strs = '<span>'+o.awards + '元</span>  体验金'
+                }else{
+                    var strs = '<span>'+o.awards + '%</span>  加息券'
+                }
+                str+='<li>恭喜 '+ o.phone +' 用户，获得 '+ strs +'</li>'
+            })
+            $('#winList').append(str);
+        }
+    })
+
+    $.ajax({
+        url: '/api/xunlei/treasure/',
+        dataType: 'json',
+        type: 'GET',
+        data: {
+            type: 'chances'
+        },
+        success: function (data) {
+            $('#lotteryCounts').text(data.lefts);
+        }
+    })
      //滚动
     var timer,i= 1,j=2;
     timer=setInterval(function(){
@@ -43,23 +76,61 @@ require(['jquery', 'activityRegister'], function ($, re) {
             $('body,html').animate({scrollTop: 0}, 600);
         }else{
             var self = $(this);
-            if(count == 0){
-                count = 1;
-                setTimeout(function(){
-                    self.addClass('people-icon2');
-                    setTimeout(function(){
-                        self.addClass('people-icon3');
-                        count = 0;
-                        setTimeout(function() {
+            $.ajax({
+                url: '/api/xunlei/treasure/',
+                dataType: 'json',
+                type: 'post',
+                data: {},
+                success: function (data) {
+                    if(count == 0){
+                        count = 1;
+                        $('#lotteryCounts').text(data.lefts);
+                        if(data.code == 1002){
                             $('.alert-box').modal({
                                 modalClass: 'alert-box-c',
-                                closeClass: 'close-btn'
+                                closeClass: 'close-btn',
+                                showClose: false
                             })
-                        },200)
-                    },500)
-                },300)
-            }
+                            $('#noChance').show();
+                        }else if(data.code == 0){
+                            setTimeout(function(){
+                                self.addClass('people-icon2');
+                                setTimeout(function(){
+                                    self.addClass('people-icon3');
+                                    count = 0;
+                                    setTimeout(function() {
+                                        $('.alert-box').modal({
+                                            modalClass: 'alert-box-c',
+                                            closeClass: 'close-btn',
+                                            showClose: false
+                                        })
+                                        self.removeClass('people-icon2 people-icon3');
+                                        if(data.type == '加息券'){
+                                            $('#jxq').show();$('#jxq').find('span').text(data.amount);
+                                        }else{
+                                            $('#tyj').show();$('#tyj').find('span').text(data.amount);
+                                        }
+                                    },200)
+                                },500)
+                            },300)
+                        }else if(data.code == 1){
+                            $('.alert-box').modal({
+                                modalClass: 'alert-box-c',
+                                closeClass: 'close-btn',
+                                showClose: false
+                            })
+                            var array = ['no1','no2','no3'],
+                                random = parseInt(3*Math.random());
+                            $('#'+array[random]).show();
+                        }
+                    }
+                }
+            })
         }
+    })
+
+    $('.close-alert-box,.close-modal').on('click',function(){
+        $.modal.close();$('.alert-c').hide(); count = 0;
     })
 
     $('.userAction').on('click',function(){
