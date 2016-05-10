@@ -1,0 +1,27 @@
+- load formatters
+doctype html
+html(style="background: #ffd200")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_xunlei_welfare.css?v=2015040501", rel="stylesheet")
+    body
+        .body_wrap.clear
+            .banner
+
+            .popup_box
+                .main
+                    .textairport
+                    .popup_button 我知道了
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_xunlei_welfare.js?v=2015050401")
+
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
