@@ -159,6 +159,7 @@ class UserAmortization(models.Model):
     def __unicode__(self):
         return u'用户%s 本金%s 利息%s' % (self.user, self.principal, self.interest)
 
+    @property
     def get_total_amount(self):
         return float(self.principal + self.interest + self.penal_interest + self.coupon_interest)
 
