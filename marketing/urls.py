@@ -218,6 +218,7 @@ urlpatterns += patterns(
     url(r'^app_xunlei_new/$', TemplateView.as_view(template_name="app_xunlei_new.jade")),
     url(r'^app_open_day_review/$', TemplateView.as_view(template_name="app_open_day_review.jade")),
     url(r'^app_center_film_ticket/$', TemplateView.as_view(template_name="app_center_film_ticket.jade")),
+    url(r'^app_xunlei_welfare/$', TemplateView.as_view(template_name="app_xunlei_welfare.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
