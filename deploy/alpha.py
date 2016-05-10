@@ -107,6 +107,7 @@ def deploy_web_action():
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
             run("""fab config:'wanglibao/settings.py',"REDIS_HOST \= '127.0.0.1'",'REDIS_HOST \= "%s"' """%env.redis_server)
             run("fab config:'wanglibao/settings.py','staging.wanglibao.com','alpha.wanglibao.com'")
+            run("fab config:'wanglibao/settings.py','qdtest.wanglibao.com','alpha-channel.wanglibao.com'")
             json_env = json.dumps({"BROKER_URL":"amqp://wanglibao:wanglibank@%s/wanglibao"%env.mq_server})
             put(StringIO(json_env), 'env.json')
             #如果为web01
