@@ -630,7 +630,7 @@ def query_trx(order_id):
         logger.exception('query_trx %s failed:'%order_id)
     status_code = trx_result['code']
     # status_code =3 处理中
-    if status_code and int(status_code) != 3: 
+    if not (status_code and int(status_code)==3): 
         pay_info.is_checked = True
     if trx_result:
         pay_info.check_response = trx_result['raw_response']
