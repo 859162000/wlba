@@ -66,7 +66,7 @@ def process_amortize(amortizations, product_id, sync_id):
                 response_data = save_to_p2p_equity(amo)
                 logger.info("process_amortize save_to_p2p_equity amo[%s] result: [%s]" % (amo, response_data))
         else:
-            logger.info("process_amortize data[%s] invalid" % user_amo_form.errors)
+            logger.info("process_amortize data[%s] invalid error[%s]" % (amo, user_amo_form.errors))
 
     if user_amo_list:
         CoopCallback().process_amortize_callback(user_amo_list)
