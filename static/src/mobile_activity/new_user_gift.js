@@ -159,7 +159,7 @@ $(function(){
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-                    mixins.loginApp();
+                    mixins.loginApp({refresh: 1});
                 } else {
                     login = true;
                     connect(data);
