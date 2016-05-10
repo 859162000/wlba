@@ -336,7 +336,7 @@ var weChatShare = (function(org){
                 desc: shareBody,
                 link: shareLink,
                 imgUrl: shareImg
-            }); 
+            });
             //分享给微信朋友圈
             org.onMenuShareTimeline({
                 title: shareMainTit,

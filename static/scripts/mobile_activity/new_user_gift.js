@@ -338,9 +338,20 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 
     //音乐
-    var audioBox = document.getElementById("js-audio"),
-        audioDom = audioBox.getElementsByTagName("audio")[0];
-
+    var audioBox = document.getElementById("js-audio");
+    if(audioBox){
+        var audioDom = audioBox.getElementsByTagName("audio")[0];
+        $(audioBox).on("touchstart", function(){
+            var $t = $(this);
+            if(audioDom.paused){
+                audioDom.play();
+                $t.removeClass("audio-close");
+            }else{
+                audioDom.pause();
+                $t.addClass("audio-close");
+            }
+        });
+    }
 
     wlb.ready({
         app: function(mixins){
@@ -378,22 +389,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             //}
             //mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利", image: "https://staging.wanglibao.com/static/imgs/mobile_activity/new_user_gift/icon_weixin.png"});
             mixins.shareData({title: "尊贵新人礼 专享5%加息", content: "网利宝新手狂撒福利"});
-            audioBox.innerHTML = '';
-            
+
         },
         other: function(){
             get_gift();
             audioBox.style.display = "block";
-            $(audioBox).on("touchstart", function(){
-                var $t = $(this);
-                if(audioDom.paused){
-                    audioDom.play();
-                    $t.removeClass("audio-close");
-                }else{
-                    audioDom.pause();
-                    $t.addClass("audio-close");
-                }
-            });
+
         }
     })
 });
