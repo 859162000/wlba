@@ -2045,38 +2045,37 @@ class XunleiTreasureAPIView(APIView):
         redpack_rewards = ['幸运宝藏1.0加息券', '幸运宝藏1.2加息券', '幸运宝藏1.5加息券']
         goldexp_rewards = ['幸运宝藏88元体验金', '幸运宝藏158元体验金','幸运宝藏588元体验金']
         no_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
-        for _index in xrange(3):
-            if _index == no_dist_redpack:
-                WanglibaoActivityReward.objects.create(
-                        user=user,
-                        activity=self.activity_name,
-                        when_dist=1,
-                        left_times=1,
-                        join_times=1,
-                        channel='xunlei9',
-                        has_sent=False,
-                )
-            else:
-                WanglibaoActivityReward.objects.create(
-                        user=user,
-                        activity=self.activity_name,
-                        experience=ExperienceEvent.objects.filter(name=goldexp_rewards[no_dist_redpack]).first(),
-                        when_dist=1,
-                        left_times=1,
-                        join_times=1,
-                        channel='xunlei9',
-                        has_sent=False,
-                )
-                WanglibaoActivityReward.objects.create(
-                        user=user,
-                        activity=self.activity_name,
-                        experience=RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first(),
-                        when_dist=1,
-                        left_times=1,
-                        join_times=1,
-                        channel='xunlei9',
-                        has_sent=False,
-                )
+
+        logger.debug('glod_name:%s, redpack_name:%s, experience:%s, redpack_event:%s' % (goldexp_rewards[no_dist_redpack], redpack_rewards[no_dist_redpack], ExperienceEvent.objects.filter(name=goldexp_rewards[no_dist_redpack]).first(),RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first()))
+        WanglibaoActivityReward.objects.create(
+                user=user,
+                activity=self.activity_name,
+                experience=ExperienceEvent.objects.filter(name=goldexp_rewards[no_dist_redpack]).first(),
+                when_dist=1,
+                left_times=1,
+                join_times=1,
+                channel='xunlei9',
+                has_sent=False,
+        )
+        WanglibaoActivityReward.objects.create(
+                user=user,
+                activity=self.activity_name,
+                when_dist=1,
+                left_times=1,
+                join_times=1,
+                channel='xunlei9',
+                has_sent=False,
+        )
+        WanglibaoActivityReward.objects.create(
+                user=user,
+                activity=self.activity_name,
+                redpack_event=RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first(),
+                when_dist=1,
+                left_times=1,
+                join_times=1,
+                channel='xunlei9',
+                has_sent=False,
+        )
 
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
