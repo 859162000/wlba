@@ -940,14 +940,19 @@ class YeeShortPay:
         code = res_data.get('errorcode')
         message = res_data.get('errormsg')
         last_card_no = res_data.get('lastno')
+        status = res_data.get('status')
+        
         try:
             amount = Decimal(res_data.get('amount')) / 100
             amount = amount.quantize(Decimal('0.01'))
         except:
             amount = None
 
-        if not code and last_card_no and amount:
-            code = '0'
+        if not code and last_card_no and amount and status:
+            if int(status) == 3:
+                code = '3'
+            elif int(status) == 0:
+                code = '0'
 
         return {'code': code,
                 'message': message,

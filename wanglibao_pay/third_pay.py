@@ -628,7 +628,10 @@ def query_trx(order_id):
             trx_result = KuaiShortPay().query_trx_result(order_id)
     except:
         logger.exception('query_trx %s failed:'%order_id)
-    pay_info.is_checked = True
+    status_code = trx_result['code']
+    # status_code =3 处理中
+    if status_code and int(status_code) != 3: 
+        pay_info.is_checked = True
     if trx_result:
         pay_info.check_response = trx_result['raw_response']
     pay_info.save()
