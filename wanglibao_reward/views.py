@@ -2036,6 +2036,7 @@ class XunleiTreasureAPIView(APIView):
                         left_times=1,
                         join_times=1,
                         channel='xunlei9',
+                        p2p_amount=100,
                         has_sent=False,
                 )
 
@@ -2064,6 +2065,7 @@ class XunleiTreasureAPIView(APIView):
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
+                p2p_amount=100,
                 has_sent=False,
         )
         WanglibaoActivityReward.objects.create(
@@ -2074,6 +2076,7 @@ class XunleiTreasureAPIView(APIView):
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
+                p2p_amount=100,
                 has_sent=False,
         )
 
