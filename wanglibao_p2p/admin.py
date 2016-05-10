@@ -331,11 +331,11 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         return ['amortization_count', 'soldout_time', 'make_loans_time']
 
     def save_model(self, request, obj, form, change):
-        if obj.status == [u'正在招标', u'满标已打款']:
+        if obj.status in [u'正在招标', u'满标已打款']:
             try:
                 coop_product_push.apply_async(
                     countdown=5,
-                    kwargs={'product_id': self.id}
+                    kwargs={'product_id': obj.id}
                 )
             except:
                 pass
