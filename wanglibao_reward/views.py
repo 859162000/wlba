@@ -2155,6 +2155,14 @@ class XunleiTreasureAPIView(APIView):
                         'message': u'用户抽到奖品'
                     }
                     SendExperienceGold(request.user).send(record.experience.id)
+                elif record.redpack_event:
+                    json_to_response = {
+                        'code': 0,
+                        'lefts': sum_left["amount_sum"]-1,
+                        'amount': "%04d" % (record.redpack_event.amount,),
+                        'message': u'用户抽到奖品'
+                    }
+                    redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
 
                 else:
                     json_to_response = {
