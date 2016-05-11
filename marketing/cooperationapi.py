@@ -350,7 +350,7 @@ class DuoZhuanByDateAPI(APIView):
                 "interestRate": '{}%'.format(Decimal.from_float(p2p.expected_earning_rate).quantize(Decimal('0.0'))+reward),
                 "deadline": str(p2p.period),
                 "deadlineUnit": deadlineUnit,
-                "reward": '{}%'.format(0),#'{}%'.format(reward),
+                "reward": '{}%'.format(reward),
                 "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
