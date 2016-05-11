@@ -8,6 +8,7 @@
   height: $heightValue + rem
   line-height: $heightValue + rem
 .app-xunlei-new
+  max-height: 999999rem
   .banner
     width: 100%
     display: block
@@ -62,6 +63,7 @@
           background: url(/static/imgs/mobile_activity/app_xunlei_new/boy1.png)  center center no-repeat
           background-size: cover
           margin: 0 auto
+          display: block
         .people-icon2
           background: url(/static/imgs/mobile_activity/app_xunlei_new/boy2.png)  center center no-repeat
           background-size: cover
@@ -119,6 +121,9 @@
             li
               +line-height(1.125)
               padding-left: 1.825rem
+              span
+                color: #ff5252
+                font-size: .65rem
             li:nth-child(even)
               background: #eeeeee
   .app-xunlei-box2
@@ -242,7 +247,9 @@
   font-size: .6rem
   text-align: center
   .two-line-sty
-    margin-top: .5rem
+    margin: 1rem  .5rem
+  .mtO
+    margin-top: 1.8rem
   .one-line-sty
     margin-top: 1rem
   .close-alert

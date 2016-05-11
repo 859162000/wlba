@@ -17,32 +17,14 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
         isNOShow : '1',
         activityUrl: '/activity/xunlei/'
     });
-
+    //显示新用户奖励
     $('#rewardDetail').on('click',function(){
         $('.explain-min').slideToggle("slow");
     })
+    //中奖用户列表
+    winList();
 
-    $.ajax({
-        url: '/api/xunlei/treasure/',
-        dataType: 'json',
-        type: 'GET',
-        data: {
-            type: 'orders'
-        },
-        success: function (data) {
-            var str = '';
-            $.each(data.data,function(i,o){
-                if(o.award > 2){
-                    var strs = '<span>'+o.awards + '元</span>  体验金'
-                }else{
-                    var strs = '<span>'+o.awards + '%</span>  加息券'
-                }
-                str+='<li>恭喜 '+ o.phone +' 用户，获得 '+ strs +'</li>'
-            })
-            $('#winList').append(str);
-        }
-    })
-
+    //可挖宝次数
     $.ajax({
         url: '/api/xunlei/treasure/',
         dataType: 'json',
@@ -54,22 +36,6 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
             $('#lotteryCounts').text(data.lefts);
         }
     })
-     //滚动
-    var timer,i= 1,j=2;
-    timer=setInterval(function(){
-      scroll();
-    },30)
-
-    function scroll(){
-      if (-parseInt($('#winList').css('top'))>=$('#winList li').height()){
-        $('#winList li').eq(0).appendTo($('#winList'));
-        $('#winList').css({'top':'0px'})
-        i=0
-      }else{
-        i++
-        $('#winList').css({'top':-i+'px'})
-      }
-    }
     //挖宝
     $('.people-icon').on('click',function(){
         if($('#userStatus').val() == 'False'){
@@ -84,8 +50,8 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
                 success: function (data) {
                     if(count == 0){
                         count = 1;
-                        $('#lotteryCounts').text(data.lefts);
                         if(data.code == 1002){
+                            $('#lotteryCounts').text(0);
                             $('.alert-box').modal({
                                 modalClass: 'alert-box-c',
                                 closeClass: 'close-btn',
@@ -93,6 +59,7 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
                             })
                             $('#noChance').show();
                         }else if(data.code == 0){
+                            $('#lotteryCounts').text(data.lefts);
                             setTimeout(function(){
                                 self.addClass('people-icon2');
                                 setTimeout(function(){
@@ -110,10 +77,12 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
                                         }else{
                                             $('#tyj').show();$('#tyj').find('span').text(data.amount);
                                         }
+                                        winList();
                                     },200)
                                 },500)
                             },300)
                         }else if(data.code == 1){
+                            $('#lotteryCounts').text(data.lefts);
                             $('.alert-box').modal({
                                 modalClass: 'alert-box-c',
                                 closeClass: 'close-btn',
@@ -128,14 +97,58 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
             })
         }
     })
-
+    //关闭弹框
     $('.close-alert-box,.close-modal').on('click',function(){
         $.modal.close();$('.alert-c').hide(); count = 0;
     })
-
+    //未注册用户操作效果
     $('.userAction').on('click',function(){
         if($('#userStatus').val() == 'False'){
             $('body,html').animate({scrollTop: 0}, 600);
         }
     })
+    function winList() {
+        $.ajax({
+            url: '/api/xunlei/treasure/',
+            dataType: 'json',
+            type: 'GET',
+            data: {
+                type: 'orders'
+            },
+            success: function (data) {
+                if (data.data == '') {
+                    $('.win-box').hide()
+                } else {
+                    $('.win-box').show()
+                    var str = '';
+                    $.each(data.data, function (i, o) {
+                        if (o.awards > 2) {
+                            var strs = '<span>' + o.awards + '元</span>  体验金'
+                        } else {
+                            var strs = '<span>' + o.awards + '%</span>  加息券'
+                        }
+                        str += '<li>恭喜 ' + o.phone + ' 用户，获得 ' + strs + '</li>'
+                    })
+                    $('#winList').append(str);
+                    if(data.data.length > 2){
+                        scroll();
+                    }
+                }
+            }
+        })
+    }
+    //滚动
+    function scroll(){
+        var timer,i= 1;
+        timer=setInterval(function(){
+            if (-parseInt($('#winList').css('top'))>=$('#winList li').height()){
+                $('#winList li').eq(0).appendTo($('#winList'));
+                $('#winList').css({'top':'0px'})
+                i=0
+              }else{
+                i++
+                $('#winList').css({'top':-i+'px'})
+            }
+        },30)
+    }
 })
