@@ -156,14 +156,26 @@ def process_product_update_callback(req_data):
             product['ordered_amount'] = float(product_instance.total_amount) - float(product_balance_after)
             product.pop('product_balance_after', None)
 
-            for k, v in product.iteritems():
-                setattr(product_instance, k, v)
-            product_instance.save()
+        for k, v in product.iteritems():
+            setattr(product_instance, k, v)
+        product_instance.save()
 
-            # 推送标的信息到第三方
-            process_channel_product_push.apply_async(
-                kwargs={'product_id': product_instance.id}
-            )
+        # 推送标的信息到第三方
+        process_channel_product_push.apply_async(
+            kwargs={'product_id': product_instance.id}
+        )
+
+        response_data = {
+            'message': 'success',
+            'ret_code': 10000,
+        }
+    else:
+        response_data = {
+            'message': u'无效产品id',
+            'ret_code': 10001,
+        }
+
+    return response_data
 
 
 def process_bind_card_callback(req_data):
