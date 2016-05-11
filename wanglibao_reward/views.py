@@ -2131,17 +2131,16 @@ class XunleiTreasureAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
-            json_to_response = {
-                'code': 1001,
-                'message': u'用户不是在活动期内从迅雷渠道过来的用户'
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
-
         _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name)
-        activitys = _activitys if _activitys else self.generate_reward_activity(request.user)
-        activity_record = activitys.filter(left_times__gt=0)
+        if not _activitys:
+            if self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                activitys = self.generate_newUser_reward_activity(request.user)
+            else:
+                activitys = self.generate_oldUser_reward_activity(request.user)
+        else:
+            activitys = _activitys
 
+        activity_record = activitys.filter(left_times__gt=0)
         if activity_record.filter(left_times__gt=0).count() == 0:
             json_to_response = {
                 'code': 1002,
