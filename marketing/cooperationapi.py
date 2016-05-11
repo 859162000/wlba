@@ -312,6 +312,7 @@ class DuoZhuanByDateAPI(APIView):
                 n = n + 1
             p2p_data['totalPage'] = n
         p2p_list = []
+        repaymentType = ''
         for p2p in p2pproducts:
 
             amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
