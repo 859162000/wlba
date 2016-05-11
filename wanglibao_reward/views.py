@@ -2017,6 +2017,7 @@ class XunleiTreasureAPIView(APIView):
         for _index in xrange(3):
             if _index == when_dist_redpack:
                 redpack =RedPackEvent.objects.filter(name=rewards[int(time.time()%2)]).first()
+                logger.debug('redpack:%s, amount:%s' %(redpack, redpack.amount))
                 WanglibaoActivityReward.objects.create(
                         user=user,
                         redpack_event=redpack,
@@ -2025,6 +2026,7 @@ class XunleiTreasureAPIView(APIView):
                         left_times=1,
                         join_times=1,
                         channel='xunlei9',
+                        p2p_amount=redpack.amount*1000,
                         has_sent=False,
                 )
             else:
@@ -2035,7 +2037,6 @@ class XunleiTreasureAPIView(APIView):
                         left_times=1,
                         join_times=1,
                         channel='xunlei9',
-                        p2p_amount=100,
                         has_sent=False,
                 )
 
@@ -2055,7 +2056,7 @@ class XunleiTreasureAPIView(APIView):
                 when_dist=1,
                 left_times=1,
                 join_times=1,
-                p2p_amount=experience.amount,
+                p2p_amount=experience.amount*1000,
                 channel='xunlei9',
                 has_sent=False,
         )
@@ -2077,7 +2078,7 @@ class XunleiTreasureAPIView(APIView):
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
-                p2p_amount=redpack.amount,
+                p2p_amount=redpack.amount*1000,
                 has_sent=False,
         )
 
@@ -2089,7 +2090,7 @@ class XunleiTreasureAPIView(APIView):
             records = WanglibaoActivityReward.objects.only('user__id', 'p2p_amount', 'user__wanglibaouserprofile__phone') \
                 .select_related('user__wanglibaouserprofile') \
                 .filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
-            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(record.p2p_amount)} for record in records]
+            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(float(record.p2p_amount)/1000)} for record in records]
             to_json_response = {
                 'ret_code': 1005,
                 'data': data,
@@ -2129,17 +2130,16 @@ class XunleiTreasureAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
-            json_to_response = {
-                'code': 1001,
-                'message': u'用户不是在活动期内从迅雷渠道过来的用户'
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
-
         _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name)
-        activitys = _activitys if _activitys else self.generate_reward_activity(request.user)
-        activity_record = activitys.filter(left_times__gt=0)
+        if not _activitys:
+            if self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                activitys = self.generate_newUser_reward_activity(request.user)
+            else:
+                activitys = self.generate_oldUser_reward_activity(request.user)
+        else:
+            activitys = _activitys
 
+        activity_record = activitys.filter(left_times__gt=0)
         if activity_record.filter(left_times__gt=0).count() == 0:
             json_to_response = {
                 'code': 1002,
@@ -2163,7 +2163,7 @@ class XunleiTreasureAPIView(APIView):
                     json_to_response = {
                         'code': 0,
                         'lefts': sum_left["amount_sum"]-1,
-                        'amount': "%d" % (record.redpack_event.amount,),
+                        'amount':  str(record.redpack_event.amount),
                         'type': u'加息券',
                         'message': u'用户抽到奖品'
                     }

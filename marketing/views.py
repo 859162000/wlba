@@ -2009,7 +2009,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_three.jade'
+    template_name = ''
     wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
@@ -2055,12 +2055,14 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         self.wx_code = channel_code
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
-        device_list = ['android', 'iphone']
-        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
-        for device in device_list:
-            match = re.search(device, user_agent)
-            if match and match.group():
-                self.template_name = 'app_xunleizhuce.jade'
+        if not self.template_name:
+            self.template_name = 'xunlei_three.jade'
+            device_list = ['android', 'iphone']
+            user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+            for device in device_list:
+                match = re.search(device, user_agent)
+                if match and match.group():
+                    self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
@@ -2649,6 +2651,15 @@ class RewardDistributeAPIView(APIView):
 
         if action == "GET_REWARD":
             join_log = self.distribute_redpack(user)
+            if join_log == 'No Reward':
+                to_json_response = {
+                    'ret_code': 3001,
+                    'message': u'用户的抽奖次数已经用完了',
+                    'left': 0,
+                    'redpack': redpack_event.id
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
             to_json_response = {
                 'ret_code': 0,
                 'message': u'发奖成功',
@@ -3252,4 +3263,16 @@ class ShieldPlanView(TemplateView):
             .order_by('-status_int')[:3]
         return {
             'p2p_list': p2p_list
+        }
+
+
+class ShieldPlanH5View(TemplateView):
+    template_name = 'h5_shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+                       .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+                       .order_by('-status_int').first()
+        return {
+            'p2p': p2p_list
         }
