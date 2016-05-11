@@ -20,27 +20,33 @@ html
                         .bone-icon
                         .money-icon
                         .treasure-body
-                            .people-icon
+                            if user.is_authenticated
+                                a.people-icon
+                            else
+                                a(href="/weixin/login/?next=/activity/app_xunlei_new/").people-icon
                             .mountain-icon
-                    .user-count 请先
-                        a() 登录
-                        | ，您有
-                        a() 3
-                        | 次挖宝机会
+                    .user-count
+                        if user.is_authenticated
+                            span 您有
+                            a()#lotteryCounts
+                            | 次挖宝机会
+                        else
+                            span 请先
+                            a(href='/weixin/login/?next=/activity/app_xunlei_new/') 登录
                     .win-user
-                        .win-box
+                        .win-box(style='display:none')
                             .megaphone
                             .ul-p.clearfix
                                 ul#winList
-                                    li 恭喜 132****6426 用户，获得 1% 加息券
-                                    li 恭喜 132****6426 用户，获得 2% 加息券
-                                    li 恭喜 132****6426 用户，获得 3% 加息券
-                                    li 恭喜 132****6426 用户，获得 4% 加息券
-                                    li 恭喜 132****6426 用户，获得 5% 加息券
+                                    //li 恭喜 132****6426 用户，获得 1% 加息券
+                                    //li 恭喜 132****6426 用户，获得 2% 加息券
+                                    //li 恭喜 132****6426 用户，获得 3% 加息券
+                                    //li 恭喜 132****6426 用户，获得 4% 加息券
+                                    //li 恭喜 132****6426 用户，获得 5% 加息券
                 .app-xunlei-box2.clearfix
                     +titles('新手', '秘籍', 'New techniques')
                     .novice-welfare.clearfix
-                        mixin welfare(style, f1, f2, f3, f4, f5, f6)
+                        mixin welfare(style, f1, url, f2, f3, f4, f5, f6)
                             .welfare-box
                                 .welfare-img(class=style)
                                 .welfare-condition=f1
@@ -49,10 +55,15 @@ html
                                     label=f3
                                     span=f4
                                     label=f5
-                                a()=f6
-                        +welfare('welfare-img1', '注册送', '28888元', '体验金+', '50元', '红包', '注册领取')
-                        +welfare('welfare-img2', '首充送', '7天', '迅雷会员', '', '', '充值领取')
-                        +welfare('welfare-img3', '最高送', '250元', '现金红包+', '1年', '迅雷会员', '投资领取')
+                                if user.is_authenticated
+                                    if url == ''
+                                        url = '/weixin/recharge/?rechargeNext=/weixin/account/'
+                                    a(href=url)=f6
+                                else
+                                    a(href="/weixin/login/?next=/activity/app_xunlei_new/")=f6
+                        +welfare('welfare-img1', '注册送', '/weixin/list/', '28888元', '体验金+', '50元', '红包', '注册领取')
+                        +welfare('welfare-img2', '首充送', '', '7天', '迅雷会员', '', '', '充值领取')
+                        +welfare('welfare-img3', '最高送', 'weixin/list/', '250元', '现金红包+', '1年', '迅雷会员', '投资领取')
                 .app-xunlei-box3.clearfix
                     +titles('五步享', '收益', 'Five steps of sitting on earning')
                     .steps-img
@@ -138,7 +149,7 @@ html
                             span 9.
                             label 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
         script(src="/static/scripts/component/webview.js?v=20160429")
-        script(src="/static/scripts/mobile_activity/app_xunlei_new.js?v=20160429")
+        script(src="/static/scripts/mobile_activity/app_xunlei_new.js?v=20160429",data-init='xunlei')
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                     iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
