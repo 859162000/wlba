@@ -2165,7 +2165,7 @@ class XunleiTreasureAPIView(APIView):
                     json_to_response = {
                         'code': 0,
                         'lefts': sum_left["amount_sum"]-1,
-                        'amount': "%d" % (record.redpack_event.amount,),
+                        'amount':  str(record.redpack_event.amount),
                         'type': u'加息券',
                         'message': u'用户抽到奖品'
                     }
