@@ -15,7 +15,7 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
     re.activityRegister.activityRegisterInit({
         registerTitle :'领取迅雷会员+现金红包',    //注册框标语
         isNOShow : '1',
-        activityUrl: '/activity/xunlei/'
+        activityUrl: '/activity/xunlei_treasure/'
     });
     //显示新用户奖励
     $('#rewardDetail').on('click',function(){
