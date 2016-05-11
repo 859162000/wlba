@@ -292,7 +292,15 @@ class DuoZhuanByDateAPI(APIView):
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
             u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'
         ]).filter(soldout_time__range=(start_time, end_time))
-        p2p_data = {"totalPage":self.page, "totalCount": p2pproducts.count()}
+        count = p2pproducts.count()
+        p2p_data = {"totalCount": count}
+        if count == 0:
+            p2p_data['totalPage'] = 0
+        else:
+            n = count / int(self.pageSize)
+            if count % int(self.pageSize) != 0:
+                n = n + 1
+            p2p_data['totalPage'] = n
         p2p_list = []
         for p2p in p2pproducts:
 
