@@ -1,4 +1,4 @@
-$(function(){
+;(function(org){
     var mySwiper = new Swiper ('#swiper-container', {
       direction: 'vertical',
       loop: false,
@@ -20,12 +20,6 @@ $(function(){
         //var u = navigator.userAgent;
         //alert(u);
     };
-
-    $("div.swiper-container").one("touchstart",function(){
-        if(audioDom.paused){
-            audioDom.play();
-        }
-    });
 
     //弹层
     $("div.js-close").on("touchstart", function(){
@@ -132,8 +126,14 @@ $(function(){
                 $t.addClass("audio-close");
             }
         });
+        $("div.swiper-container").one("touchstart",function(){
+            if(audioDom.paused){
+                audioDom.play();
+            }
+        });
     }
 
+    var login = false;
     wlb.ready({
         app: function(mixins){
             function connect(data) {
@@ -159,7 +159,7 @@ $(function(){
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/new_user_gift/'});
+                    mixins.loginApp({refresh: 1, url: ''});
                 } else {
                     login = true;
                     connect(data);
@@ -174,8 +174,9 @@ $(function(){
         },
         other: function(){
             get_gift();
-            audioBox.style.display = "block";
-
+            if(audioBox){
+                audioBox.style.display = "block";
+            }
         }
     })
-});
+})(org);
