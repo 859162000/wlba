@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
-                            OpenHouseApiView, MaiMaiView
+                            OpenHouseApiView, MaiMaiView, ShieldPlanView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -100,7 +100,7 @@ urlpatterns = patterns(
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
     url(r'^xunlei/$', TemplateView.as_view(template_name="xunlei.jade")),
-    url(r'^shield_plan/$', TemplateView.as_view(template_name="shield_plan.jade")),
+    url(r'^shield_plan/$', ShieldPlanView.as_view()),
 
 )
 
