@@ -2028,7 +2028,7 @@ class XunleiTreasureAPIView(APIView):
                         left_times=1,
                         join_times=1,
                         channel='xunlei9',
-                        p2p_amount=redpack.amount,
+                        p2p_amount=redpack.amount*1000,
                         has_sent=False,
                 )
             else:
@@ -2058,7 +2058,7 @@ class XunleiTreasureAPIView(APIView):
                 when_dist=1,
                 left_times=1,
                 join_times=1,
-                p2p_amount=experience.amount,
+                p2p_amount=experience.amount*1000,
                 channel='xunlei9',
                 has_sent=False,
         )
@@ -2080,7 +2080,7 @@ class XunleiTreasureAPIView(APIView):
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
-                p2p_amount=redpack.amount,
+                p2p_amount=redpack.amount*1000,
                 has_sent=False,
         )
 
@@ -2092,7 +2092,7 @@ class XunleiTreasureAPIView(APIView):
             records = WanglibaoActivityReward.objects.only('user__id', 'p2p_amount', 'user__wanglibaouserprofile__phone') \
                 .select_related('user__wanglibaouserprofile') \
                 .filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
-            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(record.p2p_amount)} for record in records]
+            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(record.p2p_amount/1000)} for record in records]
             to_json_response = {
                 'ret_code': 1005,
                 'data': data,
