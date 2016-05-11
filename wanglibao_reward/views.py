@@ -2092,7 +2092,7 @@ class XunleiTreasureAPIView(APIView):
             records = WanglibaoActivityReward.objects.only('user__id', 'p2p_amount', 'user__wanglibaouserprofile__phone') \
                 .select_related('user__wanglibaouserprofile') \
                 .filter(activity=self.activity_name, p2p_amount__gt=0, left_times=0)
-            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(record.p2p_amount/1000)} for record in records]
+            data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(float(record.p2p_amount)/1000)} for record in records]
             to_json_response = {
                 'ret_code': 1005,
                 'data': data,
