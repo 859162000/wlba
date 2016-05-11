@@ -38,7 +38,6 @@ from misc.models import Misc
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from marketing.utils import get_user_channel_record
 from weixin.models import WeixinUser
 import requests
 import pickle
@@ -47,7 +46,6 @@ from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote, Wan
 from wanglibao_margin.models import MarginRecord
 from marketing.utils import local_to_utc
 from wanglibao_rest.utils import split_ua
-import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -60,7 +58,7 @@ from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 from wanglibao_redis.backend import redis_backend
 from weixin.util import getMiscValue
-from wanglibao_reward.utils import getWeekBeginDay
+from wanglibao_reward.utils import getWeekBeginDay, getRedisHmdTopRanks
 import time
 
 logger = logging.getLogger('wanglibao_reward')
@@ -3381,3 +3379,22 @@ class FetchNewUserReward(APIView):
             except Exception, e:
                 logger.debug(traceback.format_exc())
         return Response({"ret_code": 0, "message": "奖励发放成功，请前往【账户】-【理财券】查看"})
+
+class HmdInvestTopRanks(APIView):
+    """
+    木材专题活动排行榜
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        # activity = Activity.objects.filter(code='hmd').first()
+        # utc_now = timezone.now()
+        # if activity.is_stopped:
+        #     return Response({"ret_code": -1, "message":"活动已经截止"})
+        # if activity.start_at > utc_now:
+        #     return Response({"ret_code": -1, "message":"活动还未开始"})
+        # if activity.end_at < utc_now:
+        #     return Response({"ret_code": -1, "message":"活动已经结束"})
+        hmd_ranks = getRedisHmdTopRanks()
+        return Response({"ret_code": 0, "hmd_ranks": hmd_ranks})
+

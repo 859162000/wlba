@@ -35,7 +35,9 @@ from marketing.send_data import send_register_data, send_idvalidate_data, send_d
 from wanglibao_reward.utils import processMarchAwardAfterP2pBuy, processAugustAwardZhaoXiangGuan
 from wanglibao_account.tasks import coop_call_back
 from wanglibao_account.utils import generate_coop_base_data
-
+from wanglibao_activity.models import Activity
+from wanglibao_reward.tasks import updateHmdRedisTopRanks
+import traceback
 # logger = logging.getLogger('wanglibao_reward')
 
 logger = get_task_logger(__name__)
@@ -105,7 +107,18 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
             "user_id": user_id, "amount": amount, "device_type": device_type,
             "order_id": order_id, "product_id": product_id,
         }, queue='celery02')
+    try:
+        checkUpdateHmdRanks(product_id)
+    except Exception, e:
+        logger.error(traceback.format_exc())
 
+def checkUpdateHmdRanks(product_id):
+    activity = Activity.objects.filter(code='hmd').first()
+    now = timezone.now()
+    if activity.start_at<=now and activity.end_at>=now:
+        product = P2PProduct.objects.get(id=product_id)
+        if product.name.find('产融通HMD'):
+            updateHmdRedisTopRanks.apply_async(kwargs={}, queue='celery02')
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
