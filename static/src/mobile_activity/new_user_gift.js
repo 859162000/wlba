@@ -159,7 +159,7 @@
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-                    mixins.loginApp({refresh: 1, url: ''});
+                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/new_user_gift/'});
                 } else {
                     login = true;
                     connect(data);
