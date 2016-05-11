@@ -2649,6 +2649,15 @@ class RewardDistributeAPIView(APIView):
 
         if action == "GET_REWARD":
             join_log = self.distribute_redpack(user)
+            if join_log == 'No Reward':
+                to_json_response = {
+                    'ret_code': 3001,
+                    'message': u'用户的抽奖次数已经用完了',
+                    'left': 0,
+                    'redpack': redpack_event.id
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
             to_json_response = {
                 'ret_code': 0,
                 'message': u'发奖成功',

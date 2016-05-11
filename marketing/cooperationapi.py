@@ -297,8 +297,8 @@ class DuoZhuanByDateAPI(APIView):
         if count == 0:
             p2p_data['totalPage'] = 0
         else:
-            n = count / self.pageSize
-            if count % self.pageSize != 0:
+            n = count / int(self.pageSize)
+            if count % int(self.pageSize) != 0:
                 n = n + 1
             p2p_data['totalPage'] = n
         p2p_list = []
