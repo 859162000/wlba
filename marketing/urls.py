@@ -223,6 +223,7 @@ urlpatterns += patterns(
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
+    url(r'^h5_shield_plan/$', TemplateView.as_view(template_name="h5_shield_plan.jade")),
 
 )
 # app with webview
