@@ -2027,6 +2027,7 @@ class XunleiTreasureAPIView(APIView):
                         left_times=1,
                         join_times=1,
                         channel='xunlei9',
+                        p2p_amount=redpack.amount,
                         has_sent=False,
                 )
             else:
@@ -2037,7 +2038,6 @@ class XunleiTreasureAPIView(APIView):
                         left_times=1,
                         join_times=1,
                         channel='xunlei9',
-                        p2p_amount=100,
                         has_sent=False,
                 )
 
