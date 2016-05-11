@@ -279,11 +279,35 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $('.popup_box').hide();
     });
 
-	$('.button').on("click",function(){
+	$('#button_1').on("click",function(){
 		org.ajax({
 			type: "post",
 			url: "/weixin/fetch_xunlei_vipcard/",
 			dataType: 'json',
+			data: {
+				type: 0
+			},
+			success: function(data){
+				if(data.ret_code!='0'){
+				//成功连接接口
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}else{
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}
+			}
+		})
+	})
+
+	$('#button_2').on("click",function(){
+		org.ajax({
+			type: "post",
+			url: "/weixin/fetch_xunlei_vipcard/",
+			dataType: 'json',
+			data: {
+				type: 1
+			},
 			success: function(data){
 				if(data.ret_code!='0'){
 				//成功连接接口
