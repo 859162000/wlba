@@ -249,7 +249,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '网利宝携手迅雷会员疯狂福利趴',
-			shareImg = host + '/static/imgs/mobile_activity/app_xunlei_welfare/300x300.jpg',
+			shareImg = host + '/static/imgs/mobile_activity/app_xunlei_welfare/300X300.jpg',
 			shareLink = host + '/activity/app_xunlei_welfare/',
 			shareMainTit = '网利宝携手迅雷会员疯狂福利趴',
 			shareBody = '迅雷会员免费领，速速前往';
@@ -274,112 +274,27 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			imgUrl: shareImg
 		})
 	})
-        $('#show_button').on('click',function(){
-            var ele = $('#show_list');
-            var curHeight = ele.height();
-            var autoHeight = ele.css('height', 'auto').height();
-            if (!ele.hasClass('down')){
-                ele.height(curHeight).animate({height: autoHeight},500,function(){
-                    ele.addClass('down');
-                });
-            }else{
-                ele.height(curHeight).animate({height: 0},500,function(){
-                    ele.removeClass('down');
-                });
-            }
-        })
 
     $('.popup_box .popup_button,.close_popup').click(function(){
         $('.popup_box').hide();
     });
 
+	$('.button').on("click",function(){
+		org.ajax({
+			type: "post",
+			url: "/weixin/fetch_xunlei_vipcard/",
+			dataType: 'json',
+			success: function(data){
+				if(data.ret_code!='0'){
+				//成功连接接口
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}else{
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}
+			}
+		})
+	})
 
-    var login = false;
-    wlb.ready({
-        app: function (mixins) {
-            function connect(data) {
-                org.ajax({
-                    url: '/accounts/token/login/ajax/',
-                    type: 'post',
-                    data: {
-                        token: data.tk,
-                        secret_key: data.secretToken,
-                        ts: data.ts
-                    },
-                    success: function (data) {
-
-                        //var url = location.href;
-                        //var times = url.split("?");
-                        //if(times[1] != 1){
-                        //    url += "?1";
-                        //    self.location.replace(url);
-                        //}
-
-                        $('#button_link').on("click",function(){
-                            org.ajax({
-                                type: "post",
-                                url: "/api/activity/zhaoxiangguan/",
-                                dataType: 'json',
-                                success: function(data){
-                                    if(data.ret_code=='1'){
-                                        $('.popup_box .main .textairport').text(''+data.message+'');
-                                        $('.popup_box').show();
-                                    }else if(data.ret_code=='0'){
-                                        if(data.tag=='标记成功'){
-                                            mixins.jumpToManageMoney();
-                                        }else{
-                                            $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                                            $('.popup_box').show();
-                                        }
-                                    }
-                                    //console.log(data)
-                                }
-
-                            })
-                        })
-                    }
-                })
-            }
-            mixins.sendUserInfo(function (data) {
-                if (data.ph == '') {
-                    login = false;
-
-                    $('#button_link').on("click",function(){
-                         mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
-                    })
-                } else {
-                    login = true;
-                    connect(data)
-
-                }
-            })
-
-        },
-        other: function(){
-            $('#button_link').on("click",function(){
-                org.ajax({
-                    type: "post",
-                    url: "/api/activity/zhaoxiangguan/",
-                    dataType: 'json',
-                    success: function(data){
-                        if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?promo_token=sy&next=/activity/app_august_phone/?promo_token=sy'
-                        }else if(data.ret_code=='1'||data.ret_code=='1001'||data.ret_code=='1002'){
-                            $('.popup_box .main .textairport').text(''+data.message+'');
-                            $('.popup_box').show();
-                        }else if(data.ret_code=='0'){
-                             if(data.tag=='标记成功'){
-                                window.location.href = '/weixin/list/?promo_token=sy'
-                            }else{
-                                $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                                $('.popup_box').show();
-                            }
-
-                        }
-                        //console.log(data)
-                    }
-                })
-            })
-        }
-    })
 })(org);
