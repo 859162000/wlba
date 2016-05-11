@@ -38,62 +38,33 @@ html
     .part-main.sp-part3
       .tit-box
         .tit-lft 金盾计划参与项目
-        a(href="#").tit-more 更多项目 >>
+        a(href="/p2p/list/").tit-more 更多项目 >>
       .list-box
-        .list-item
-          .item-tit 企业经营借款（1期）
-          .item-tit-lft
-          .item-tit-rht
-          .item-body
-            .item-price 13.0%~14.5%
-            .item-detail 预计年化收益
-            ul.item-info
-              li.item-li.item-li1
-                .day 30天
-                .detail 投资期限
-              li.item-li.item-li2
-                .day 100元
-                .detail 起投金额
-              li.item-li.item-li3
-                .day 200,000.00
-                .detail 可投金额
-            a(href="#").item-btn 立即抢购
-        .list-item
-          .item-tit 企业经营借款（1期）
-          .item-tit-lft
-          .item-tit-rht
-          .item-body
-            .item-price 13.0%~14.5%
-            .item-detail 预计年化收益
-            ul.item-info
-              li.item-li.item-li1
-                .day 30天
-                .detail 投资期限
-              li.item-li.item-li2
-                .day 100元
-                .detail 起投金额
-              li.item-li.item-li3
-                .day 200,000.00
-                .detail 可投金额
-            a(href="#").item-btn 立即抢购
-        .list-item
-          .item-tit 企业经营借款（1期）
-          .item-tit-lft
-          .item-tit-rht
-          .item-body
-            .item-price 13.0%~14.5%
-            .item-detail 预计年化收益
-            ul.item-info
-              li.item-li.item-li1
-                .day 30天
-                .detail 投资期限
-              li.item-li.item-li2
-                .day 100元
-                .detail 起投金额
-              li.item-li.item-li3
-                .day 200,000.00
-                .detail 可投金额
-            a(href="#").item-btn 立即抢购
+        for p2p in p2p_list
+          .list-item
+            .item-tit {{p2p.name}}
+            .item-tit-lft
+            .item-tit-rht
+            .item-body
+              earning_rate = str(p2p.expected_earning_rate)
+              .item-price
+                | {{earning_rate}} %
+                if p2p.activity
+                  span + {{p2p.activity.activity_rule_percent_text}} %
+              .item-detail 预计年化收益
+              ul.item-info
+                li.item-li.item-li1
+                  .day {{p2p.period}}{{p2p.pay_method|period_unit}}
+                  .detail 投资期限
+                li.item-li.item-li2
+                  .day 100元
+                  .detail 起投金额
+                li.item-li.item-li3
+                  amount = p2p.total_amount - p2p.ordered_amount
+                  .day {{amount | money_format_int}}
+                  .detail 可投金额
+              status = p2p.display_status
+              a(href="/p2p/detail/{{p2p.id}}/").item-btn {{status}}
     .sp-part4
       .part-main
         .tit-box
