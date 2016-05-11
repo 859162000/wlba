@@ -18,7 +18,8 @@ from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, Admi
 from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_p2p.forms import RequiredInlineFormSet, ContractTemplateForm
 from wanglibao_account.models import UserAddress
-from wanglibao_p2p.tasks import automatic_trade
+from wanglibao_p2p.tasks import automatic_trade, coop_product_push
+
 
 formsets.DEFAULT_MAX_NUM = 2000
 
@@ -330,7 +331,14 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         return ['amortization_count', 'soldout_time', 'make_loans_time']
 
     def save_model(self, request, obj, form, change):
-        # if obj.status == u'正在招标':
+        if obj.status in [u'正在招标', u'满标已打款']:
+            try:
+                coop_product_push.apply_async(
+                    countdown=5,
+                    kwargs={'product_id': obj.id}
+                )
+            except:
+                pass
         #     # todo remove the try except
         #     try:
         #         # 财经道购买回调

@@ -24,8 +24,9 @@ from wanglibao_p2p.utility import validate_date, validate_status, handler_pagina
 from .models import IntroducedBy
 from wanglibao_account.models import IdVerification, Binding
 from wanglibao_pay.models import Card
-from wanglibao.settings import YIRUITE_KEY
+from wanglibao.settings import YIRUITE_KEY, DUOZHUAN_TOKEN_KEY
 from wanglibao_profile.models import WanglibaoUserProfile
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -240,6 +241,119 @@ class WangDaiByDateAPI(APIView):
             p2p_list.append(temp_p2p)
 
         return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
+    
+class DuoZhuanByDateAPI(APIView):
+    """
+    多赚数据接口， 获取已经完成的列表数据
+    """
+
+    #permission_classes = (IsAdminUserOrReadOnly,)
+    permission_classes = ()
+    date = ''
+    message = ''
+    token = ''
+    page = ''
+    pageSize = ''
+    timestamp = ''
+    
+    def _check_token(self):
+        """
+        验证密钥
+        """
+        self_token = hashlib.md5("%s%s%s%s" % (self.page, self.pageSize, DUOZHUAN_TOKEN_KEY, self.timestamp)).hexdigest()
+        if self_token != self.token:
+            self.message = u'验证失败'
+        if time.time() >= int(self.timestamp):
+            if (time.time() - int(self.timestamp)) >= 300:
+                self.message = u'请求超时'
+        else:
+            if (time.time() - int(self.timestamp)) >= -300:
+                self.message = u'请求超时'
+        return self.message
+
+    def get(self, request):
+
+        date = request.GET.get('date', '')
+        self.date = date
+        self.token = request.GET.get('token', '')
+        self.page = request.GET.get('page', '')
+        self.pageSize = request.GET.get('pageSize', '')
+        self.timestamp = request.GET.get('timestamp', '')
+        if not date or not self.page or not self.pageSize or not self.timestamp or not self.token:
+            return HttpResponse(renderers.JSONRenderer().render({'message': u'错误的参数'}, 'application/json'))
+        self.message = self._check_token()
+        if self.message:
+            return HttpResponse(renderers.JSONRenderer().render({'message': self.message}, 'application/json'))
+
+        date = [int(i) for i in date.split('-')]
+        start_time = timezone.datetime(*date)
+        end_time = start_time + timezone.timedelta(days=1)
+
+        p2pproducts = P2PProduct.objects.filter(hide=False).filter(status__in=[
+            u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成'
+        ]).filter(soldout_time__range=(start_time, end_time))
+        count = p2pproducts.count()
+        p2p_data = {"totalCount": count}
+        if count == 0:
+            p2p_data['totalPage'] = 0
+        else:
+            n = count / int(self.pageSize)
+            if count % int(self.pageSize) != 0:
+                n = n + 1
+            p2p_data['totalPage'] = n
+        p2p_list = []
+        for p2p in p2pproducts:
+
+            amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
+            percent = p2p.ordered_amount / amount * 100
+            schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
+
+            for pay_method, value in WANGDAI:
+                if pay_method == p2p.pay_method:
+                    repaymentType = value
+                    break
+
+            p2pequities = p2p.equities.all()
+            subscribes = [{
+                    "subscribeUserName": eq.user.username,
+                    "amount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "validAmount": Decimal.from_float(eq.equity).quantize(Decimal('0.00')),
+                    "addDate": timezone.localtime(eq.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+                    "status": "1",
+                    "type": "0"
+                } for eq in p2pequities]
+
+            reward = p2p.activity.rule.rule_amount * 100 if p2p.activity else 0
+
+            matches = re.search(u'日计息', p2p.pay_method)
+            if matches and matches.group():
+                deadlineUnit = u"天"
+            else:
+                deadlineUnit = u"月"
+
+            temp_p2p = {
+                "projectId": str(p2p.pk),
+                "title": p2p.name,
+                "amount": amount,
+                "schedule": schedule,
+                "interestRate": '{}%'.format(Decimal.from_float(p2p.expected_earning_rate).quantize(Decimal('0.0'))+reward),
+                "deadline": str(p2p.period),
+                "deadlineUnit": deadlineUnit,
+                "reward": '{}%'.format(0),#'{}%'.format(reward),
+                "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
+                "repaymentType": str(repaymentType),
+                "subscribes": subscribes,
+                #"userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
+                "userName": md5(p2p.brief.encode('utf-8')).hexdigest(),
+                #"amountUsedDesc": strip_tags(p2p.short_usage),
+                "loanUrl": "https://{}/p2p/detail/{}".format(request.get_host(), p2p.id),
+                "warrantcom": p2p.warrant_company.name,
+                #"successTime": timezone.localtime(p2p.soldout_time).strftime("%Y-%m-%d %H:%M:%S"),
+                #"publishTime": timezone.localtime(p2p.publish_time).strftime("%Y-%m-%d %H:%M:%S")
+            }
+            p2p_list.append(temp_p2p)
+        p2p_data["borrowList"] = p2p_list
+        return HttpResponse(renderers.JSONRenderer().render(p2p_data, 'application/json'))
 
 
 P2PEYE_PAY_WAY = {

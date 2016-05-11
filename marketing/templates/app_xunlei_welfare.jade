@@ -1,0 +1,64 @@
+- load formatters
+doctype html
+html(style="background: #fff")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_xunlei_welfare.css?v=2015051101", rel="stylesheet")
+    body
+        .body_wrap.clear
+            img.banner.banner_1(src="/static/imgs/mobile_activity/app_xunlei_welfare/banner.png")
+            .section.section_1
+                .title_text
+                    img.num(src="/static/imgs/mobile_activity/app_xunlei_welfare/img_1.png")
+                    dl
+                        dt 特权一
+                        dd 活动期间内，首次绑定网利宝服务号即可领取7天迅雷会员
+            img.banner(src="/static/imgs/mobile_activity/app_xunlei_welfare/img_2.png")
+            .button#button_1 领取特权
+            .section.section_2
+                .title_text
+                    img.num(src="/static/imgs/mobile_activity/app_xunlei_welfare/img_3.png")
+                    dl
+                        dt 特权二
+                        dd 活动期间内，未投资用户单笔首次投资1000元及以上即可领取1年迅雷会员
+            img.banner.banner_3(src="/static/imgs/mobile_activity/app_xunlei_welfare/img_4.png")
+            .button#button_2 领取特权
+            img.banner.banner_4(src="/static/imgs/mobile_activity/app_xunlei_welfare/img_5.png")
+            .rule_box
+                dl
+                    dt 1.
+                    dd 活动时间：
+                dl
+                    dt 2.
+                    dd 活动期间内，首次绑定网利宝服务号即可领取7天迅雷会员，7天会员有效期至2016年7月19日；
+                dl
+                    dt 3.
+                    dd 活动期间内，未投资用户单笔首次投资1000元及以上即可领取1年迅雷会员，1年迅雷会员有效期至2016年7月20日；
+                dl
+                    dt 4.
+                    dd 相关会员奖励兑换码以服务号消息及网利宝站内信形式通知，敬请留意查看；
+                dl
+                    dt 5.
+                    dd 单项特权每个用户仅可享受一次，单个用户可同时享受两个特权；
+                dl
+                    dt 6.
+                    dd 相关兑换码使用规则请查看迅雷会员官方网站。
+                dl#ios-show(style="display:none")
+                    dt 7.
+                    dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 网利宝对此活动享有最终解释权。
+            .popup_box
+                .main
+                    .textairport
+                    .popup_button 知道了
+                    img.close_popup(src="/static/imgs/mobile_activity/app_xunlei_welfare/close_popup.png")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/mobile_activity/app_xunlei_welfare.js?v=2015051102")
+
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
