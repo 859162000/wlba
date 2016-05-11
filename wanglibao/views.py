@@ -23,6 +23,7 @@ import logging
 from weixin.base import ChannelBaseTemplate
 
 logger = logging.getLogger(__name__)
+logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class IndexView(TemplateView):
@@ -118,18 +119,48 @@ class IndexView(TemplateView):
                                                        product_id=product_id, order_by=order_by))
         return p2p_list
 
-    def _get_php_products(self):
+    def _get_php_products(self, request):
         """
         get yuelibao products display on Index page.
         :return:
         """
         month_data, assignment_data = [], []
-        month_response = requests.post(settings.PHP_INDEX_MONTH, data={}, timeout=3)
-        if month_response.status_code == 200:
-            month_data = month_response.json()
-        assignment_response = requests.post(settings.PHP_INDEX_ASSIGNMENT, data={}, timeout=3)
-        if assignment_response.status_code == 200:
-            assignment_data = assignment_response.json()
+        url = 'https://' + request.get_host() + settings.PHP_INDEX_MONTH
+        # 开发环境 端口起 7000 以上用 wltest 数据
+        logger_yuelibao.info('11111122222'*100)
+        logger_yuelibao.info('host = {}'.format(request.get_host()))
+        try:
+            if int(request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_INDEX_MONTH_DEV
+        except Exception, e:
+            logger_yuelibao.debug('not local host = {}'.format(e))
+        logger_yuelibao.info('url = {}'.format(url))
+        try:
+            month_response = requests.post(url, data={}, timeout=3)
+            if month_response.status_code == 200:
+                try:
+                    month_data = month_response.json()
+                except Exception, e:
+                    logger.debug('in _get_php_products error with {}'.format(e.message))
+        except Exception, e:
+            logger.debug('in _get_php_products error with {}'.format(e.message))
+
+        url = 'https://' + request.get_host() + settings.PHP_INDEX_ASSIGNMENT
+        try:
+            if int(request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_INDEX_ASSIGNMENT_DEV
+        except Exception, e:
+            logger_yuelibao.debug('not local host = {}'.format(e))
+        logger_yuelibao.info('url = {}'.format(url))
+        try:
+            assignment_response = requests.post(url, data={}, timeout=3)
+            if assignment_response.status_code == 200:
+                try:
+                    assignment_data = assignment_response.json()
+                except Exception, e:
+                    logger.debug('in _get_php_products error with {}'.format(e.message))
+        except Exception, e:
+            logger.debug('in _get_php_products error with {}'.format(e.message))
 
         return month_data, assignment_data
 
@@ -178,18 +209,19 @@ class IndexView(TemplateView):
         p2p_list = []
         for i in range(3):
             tmp_list = []
+            # 有加入, 没不加进list
             try:
                 tmp_list.append(p2p_lt3[i])
             except:
-                tmp_list.append([])
+                pass
             try:
                 tmp_list.append(p2p_lt6[i])
             except:
-                tmp_list.append([])
+                pass
             try:
                 tmp_list.append(p2p_gt6[i])
             except:
-                tmp_list.append([])
+                pass
 
             p2p_list.extend(tmp_list)
 
@@ -243,7 +275,7 @@ class IndexView(TemplateView):
                 for hold_info in fund_hold_info:
                     fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
-        month_data, assignment_data = self._get_php_products()
+        month_data, assignment_data = self._get_php_products(self.request)
 
         return {
             "recommend_product": recommend_product,
