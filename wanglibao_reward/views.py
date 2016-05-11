@@ -2019,6 +2019,7 @@ class XunleiTreasureAPIView(APIView):
         for _index in xrange(3):
             if _index == when_dist_redpack:
                 redpack =RedPackEvent.objects.filter(name=rewards[int(time.time()%2)]).first()
+                logger.debug('redpack:%s, amount:%s' %(redpack, redpack.amount))
                 WanglibaoActivityReward.objects.create(
                         user=user,
                         redpack_event=redpack,
