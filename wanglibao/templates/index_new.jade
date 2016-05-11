@@ -138,60 +138,63 @@ html
                         em
                     i.vertical-icon
                     label=introduce
-            +projectTitle('type-icon-1', '月利宝', '收益递增', '/ylb/monthly.php', 'new')
-            .g-plan-box.clearfix(tag=1)
-                .slide-left(tag=1)
-                .slide-right(tag=1)
-                .project-boxs
-                    .project-box-c
-                        for month in month_data
-                            .g-plan-project
-                                .g-plan-title
-                                    a(href="{{month.detail_url}}")
-                                        if  month.name == 'A'
-                                            letterS = 'a-icon'
-                                        elif month.name == 'B'
-                                            letterS = 'b-icon'
-                                        elif month.name == 'C'
-                                            letterS = 'c-icon'
-                                        elif month.name == 'D'
-                                            letterS = 'd-icon'
-                                        i.letter-icon(class=letterS)
-                                        span 月利宝{{month.name}}
-                                        label |
-                                        span {{month.short_name}}
-                                .percentage-box
-                                    if month.expected_earning_rate == month.rate_end
-                                        span {{month.expected_earning_rate}}
-                                    else
-                                        span {{month.expected_earning_rate}} ~ {{month.rate_end}}
-                                    label %
-                                .time-money.clearfix
-                                    .time-left
-                                        p.p-top {{month.period}}个月
-                                        p.p-b 项目期限
-                                    .border-left
-                                    .money-right
-                                        p.p-top {{month.total_amount | convert_to_10k}}元
-                                        p.p-b 计划金额
-                                .progress-bar.clearfix
-                                    .progress-bar-left
-                                        span(style='width:{{month.ordered_percent }}%')
-                                    .progress-bar-right {{month.ordered_percent}}%
-                                ktjes = float(month['remain_amount'])
-                                .available-amount 可投金额 {{ktjes | money_format_int}}元
-                                .go-investment
-                                    if month.display_status == '已审核'
-                                        a(href="{{month.detail_url}}") 立即投资
-                                    else
-                                        a.disable-style(href="{{month.detail_url}}") 计划满额
-                lengths = len(month_data)
-                .page-boxs
-                    span.active
-                    if lengths > 3
-                        span
-                    if lengths > 6
-                        span
+            //.aa {{month_data}}
+            if month_data
+                +projectTitle('type-icon-1', '月利宝', '收益递增', '/ylb/monthly.php', 'new')
+                .g-plan-box.clearfix(tag=1)
+                    .slide-left(tag=1)
+                    .slide-right(tag=1)
+                    .project-boxs
+                        .project-box-c
+                            for month in month_data
+                                .g-plan-project
+                                    .g-plan-title
+                                        a(href="{{month.detail_url}}")
+                                            if  month.name == 'A'
+                                                letterS = 'a-icon'
+                                            elif month.name == 'B'
+                                                letterS = 'b-icon'
+                                            elif month.name == 'C'
+                                                letterS = 'c-icon'
+                                            elif month.name == 'D'
+                                                letterS = 'd-icon'
+                                            i.letter-icon(class=letterS)
+                                            span 月利宝{{month.name}}
+                                            label |
+                                            span.short-name {{month.short_name}}
+                                    .percentage-box
+                                        if month.expected_earning_rate == month.rate_end
+                                            span {{month.expected_earning_rate}}
+                                        else
+                                            span {{month.expected_earning_rate}} ~ {{month.rate_end}}
+                                        label %
+                                    .time-money.clearfix
+                                        .time-left
+                                            p.p-top {{month.period}}个月
+                                            p.p-b 项目期限
+                                        .border-left
+                                        .money-right
+                                            jhje = float(month['total_amount'])
+                                            p.p-top {{ jhje | convert_to_10k}}元
+                                            p.p-b 计划金额
+                                    .progress-bar.clearfix
+                                        .progress-bar-left
+                                            span(style='width:{{month.ordered_percent }}%')
+                                        .progress-bar-right {{month.ordered_percent}}%
+                                    ktjes = float(month['remain_amount'])
+                                    .available-amount 可投金额 {{ktjes | money_format_int}}元
+                                    .go-investment
+                                        if month.display_status == '已审核'
+                                            a(href="{{month.detail_url}}") 立即投资
+                                        else
+                                            a.disable-style(href="{{month.detail_url}}") 计划满额
+                    lengths = len(month_data)
+                    .page-boxs
+                        span.active
+                        if lengths > 3
+                            span
+                        if lengths > 6
+                            span
             +projectTitle('type-icon-2', '散标', '选择多样', '/p2p/list/')
             .g-plan-box.clearfix(tag=2)
                 .slide-left(tag=2)
@@ -259,57 +262,58 @@ html
                         span
                     if p2pLengths > 6
                         span
-            +projectTitle('type-icon-3', '转让标', '灵活快捷', '/ylb/exchange.php', 'new')
-            .g-plan-box.clearfix(tag=3)
-                .slide-left(tag=3)
-                .slide-right(tag=3)
-                .project-boxs
-                    .project-box-c
-                        for assignment in assignment_data
-                            .g-plan-project.zqzr-project
-                                .g-plan-title
-                                    i.zrb-icon
-                                    a(href='{{assignment.detail_url}}')
-                                        span.san-title {{assignment.short_name}}
-                                    em.transfer 转
-                                        .transfer-box 查看
-                                            a(href='/ylb/exchange.php') 债权转让
-                                            | 规则
-                                .time-money.transfer-info.clearfix
-                                    .time-left
-                                        p.p-top.num {{assignment.purchaser_year_interset}}
-                                            i %
-                                        p.p-b 年化收益
-                                    .border-left
-                                    .money-right
-                                        p.p-top
-                                            i {{assignment.rate_end}}天
-                                        p.p-b 剩余期限
-                                .detail-info
-                                    p
-                                        label 原标年化：
-                                        span {{assignment.rate_end}}%
-                                    p
-                                        label 转让金额：
-                                        span {{assignment.principal_sale_amount}}元
-                                .progress-bar.clearfix
-                                    .progress-bar-left
-                                        span(style="width:{{assignment.ordered_percent}}%")
-                                    .progress-bar-right {{assignment.ordered_percent}}%
-                                ktje = float(assignment['principal_left_amount'])
-                                .available-amount 可投金额 {{ktje | money_format_int }}元
-                                .go-investment
-                                    if assignment.display_status == '正在售卖'
-                                        a.min(href="{{assignment.detail_url}}") 立即投资
-                                    else
-                                        a.min.disable-style(href="{{assignment.detail_url}}") 转让完成
-                assignmenLlengths = len(assignment_data)
-                .page-boxs
-                    span.active
-                    if assignmenLlengths > 3
-                        span
-                    if assignmenLlengths > 6
-                        span
+            if assignment_data
+                +projectTitle('type-icon-3', '转让标', '灵活快捷', '/ylb/exchange.php', 'new')
+                .g-plan-box.clearfix(tag=3)
+                    .slide-left(tag=3)
+                    .slide-right(tag=3)
+                    .project-boxs
+                        .project-box-c
+                            for assignment in assignment_data
+                                .g-plan-project.zqzr-project
+                                    .g-plan-title
+                                        i.zrb-icon
+                                        a(href='{{assignment.detail_url}}')
+                                            span.san-title {{assignment.short_name}}
+                                        em.transfer 转
+                                            .transfer-box 查看
+                                                a(href='/ylb/exchange.php') 债权转让
+                                                | 规则
+                                    .time-money.transfer-info.clearfix
+                                        .time-left
+                                            p.p-top.num {{assignment.purchaser_year_interset}}
+                                                i %
+                                            p.p-b 年化收益
+                                        .border-left
+                                        .money-right
+                                            p.p-top
+                                                i {{assignment.rate_end}}天
+                                            p.p-b 剩余期限
+                                    .detail-info
+                                        p
+                                            label 原标年化：
+                                            span {{assignment.rate_end}}%
+                                        p
+                                            label 转让金额：
+                                            span {{assignment.principal_sale_amount}}元
+                                    .progress-bar.clearfix
+                                        .progress-bar-left
+                                            span(style="width:{{assignment.ordered_percent}}%")
+                                        .progress-bar-right {{assignment.ordered_percent}}%
+                                    ktje = float(assignment['principal_left_amount'])
+                                    .available-amount 可投金额 {{ktje | money_format_int }}元
+                                    .go-investment
+                                        if assignment.display_status == '正在售卖'
+                                            a.min(href="{{assignment.detail_url}}") 立即投资
+                                        else
+                                            a.min.disable-style(href="{{assignment.detail_url}}") 转让完成
+                    assignmenLlengths = len(assignment_data)
+                    .page-boxs
+                        span.active
+                        if assignmenLlengths > 3
+                            span
+                        if assignmenLlengths > 6
+                            span
 
     .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-news
