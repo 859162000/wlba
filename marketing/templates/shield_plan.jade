@@ -50,7 +50,7 @@ html
               .item-price
                 | {{earning_rate}} %
                 if p2p.activity
-                  span + {{p2p.activity.activity_rule_percent_text}} %
+                  span + <span class="blue">{{p2p.activity.activity_rule_percent_text}} %</span>
               .item-detail 预计年化收益
               ul.item-info
                 li.item-li.item-li1
@@ -71,7 +71,7 @@ html
           .tit-lft 金盾计划专项资金
           a(href="javascript:void(0);").tit-more.js-file 查看相关文件 >>
         .circle-box
-          .circle-num 12,329,222.06
+          .circle-num 1234.80 <span class="l-txt">万元</span>
           .circle-promote 可启动资金(元)
     .sp-part5.part-main
       .tit1 【定位】“金盾计划”的推出对平台的风控体系有什么影响？
@@ -88,8 +88,14 @@ html
       .tit1 【规模】金盾计划在上线之初有多少资金？资金规模是否可以覆盖风险？
       .detail 金盾计划上线初期，网利宝针对成功撮合的借款项目，根据每笔借款项目的风险等级，按成交金额的一定比例向合作机构拟提了超1千万的专项资金保证该计划顺利运行。在此专项资金可覆盖风险的范围内，金盾计划将最大限度降低不良债权给相关投资用户带来的损失，后续随着平台交易量的不断增加，网利宝会在此基础上建立、健全此专项资金收购不良债权的各项机制，吸引更多第三方机构、优质融资客户自愿加入 “金盾计划”，扩充此专项资金的储备额度，尽力维护网利宝投资用户的权益。
 
+    .sp-alt
+      img(src="/static/imgs/pc_activity/shield_plan/file.jpg")
+
     include global/g_footer
     include include/tracking
+    script.
+      var v = new Date().getTime()
+      require(['/static/js/shield_plan.js?v='+v])
 
 
 
