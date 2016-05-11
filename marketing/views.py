@@ -3262,3 +3262,15 @@ class ShieldPlanView(TemplateView):
         return {
             'p2p_list': p2p_list
         }
+
+
+class ShieldPlanH5View(TemplateView):
+    template_name = 'h5_shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+                       .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+                       .order_by('-status_int').first()
+        return {
+            'p2p': p2p_list
+        }

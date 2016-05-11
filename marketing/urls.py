@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
-                            OpenHouseApiView, MaiMaiView, ShieldPlanView
+                            OpenHouseApiView, MaiMaiView, ShieldPlanView, ShieldPlanH5View
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -222,8 +222,8 @@ urlpatterns += patterns(
     # url(r'^app_xunlei_welfare/$', TemplateView.as_view(template_name="app_xunlei_welfare.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
-    #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
-    url(r'^h5_shield_plan/$', TemplateView.as_view(template_name="h5_shield_plan.jade")),
+    # url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
+    url(r'^h5_shield_plan/$', ShieldPlanH5View.as_view()),
 
 )
 # app with webview
