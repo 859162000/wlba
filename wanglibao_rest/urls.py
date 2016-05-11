@@ -291,7 +291,7 @@ urlpatterns += patterns(
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
     url(r'^geetest/$', GeetestAPIView.as_view()),
     url(r'^activity/konggang/$', KongGangAPIView.as_view()),
-    url(r'^/xunlei/treasure/$', XunleiTreasureAPIView.as_view()),
+    url(r'^xunlei/treasure/$', XunleiTreasureAPIView.as_view()),
     url(r'^activity/newusergift/$', FetchNewUserReward.as_view()),
     url(r'^activity/zhaoxiangguan/$', ZhaoXiangGuanAPIView.as_view()),
 )

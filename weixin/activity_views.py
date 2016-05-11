@@ -11,7 +11,7 @@ from django.contrib.auth import login as auth_login, logout
 from django.core.urlresolvers import reverse
 import logging
 import base64,urllib
-import datetime
+import datetime, time
 import traceback
 from wanglibao_account.backends import invite_earning
 from weixin.models import UserDailyActionRecord, SeriesActionActivity, SeriesActionActivityRule, WeixinUser, WeiXinUserActionRecord
@@ -24,6 +24,7 @@ from wanglibao_redpack.backends import _send_message_for_hby
 from experience_gold.backends import SendExperienceGold
 from wanglibao_rest.utils import split_ua
 from marketing.models import Reward
+from marketing.utils import local_to_utc
 from wanglibao_activity.backends import _keep_reward_record, _send_message_template
 from wanglibao_activity.models import Activity
 from tasks import sentCustomerMsg
@@ -691,17 +692,18 @@ class FetchXunleiCardAward(APIView):
 
         w_user = WeixinUser.objects.filter(user=user).first()
         if not w_user:
-            return Response({"ret_code": -1, "message":"需绑定服务号"})
+            return Response({"ret_code": -1, "message":"请绑定服务号"})
         reward = None
         if type == 0:#bind vip card
             bind_action_record = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='bind').first()
-            if bind_action_record and datetime.datetime.utcfromtimestamp(bind_action_record.create_time)>=activity.start_at and datetime.datetime.utcfromtimestamp(bind_action_record.create_time)<=activity.end_at:
+            create_time = local_to_utc(datetime.datetime.fromtimestamp(bind_action_record.create_time))
+            if bind_action_record and create_time>=activity.start_at and create_time<=activity.end_at:
                 reward = self.getReward("7天迅雷会员")
             else:
                 return Response({"ret_code": -1, "message":"首次绑定服务号为活动期内的用户才可领取"})
         if type == 1:#invest vip card
-            p2pRecord = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by("+create_time").first()
-            if p2pRecord.create_time >=activity.start_at and p2pRecord.create_time<=activity.end_at and float(p2pRecord.amount)>=1000:
+            p2pRecord = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by("create_time").first()
+            if p2pRecord and p2pRecord.create_time >=activity.start_at and p2pRecord.create_time<=activity.end_at and float(p2pRecord.amount)>=1000:
                 reward = self.getReward("1年迅雷会员")
             else:
                 return Response({"ret_code": -1, "message":"活动期内为首次投资，并且投资金额不低于1000元"})
@@ -734,7 +736,7 @@ class FetchXunleiCardAward(APIView):
                 "openid":w_user.openid,
             },
                 queue='celery02')
-        return Response({"ret_code": 0, "msg": 'ok'})
+        return Response({"ret_code": 0, "message": '恭喜您，奖励领取成功～'})
 
 
 
