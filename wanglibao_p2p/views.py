@@ -813,9 +813,9 @@ class HMDP2PListView(APIView):
         if len(p2p_products)>0:
             p2p_product = p2p_products[0]
             # p2p_product["end_time"]
-        return {
+        return Response({
             'p2p_product': p2p_product,
-        }
+        })
 
 
 
