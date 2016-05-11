@@ -2009,7 +2009,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_three.jade'
+    template_name = ''
     wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
@@ -2055,12 +2055,14 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         self.wx_code = channel_code
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
-        device_list = ['android', 'iphone']
-        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
-        for device in device_list:
-            match = re.search(device, user_agent)
-            if match and match.group():
-                self.template_name = 'app_xunleizhuce.jade'
+        if not self.template_name:
+            self.template_name = 'xunlei_three.jade'
+            device_list = ['android', 'iphone']
+            user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+            for device in device_list:
+                match = re.search(device, user_agent)
+                if match and match.group():
+                    self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
