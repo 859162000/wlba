@@ -626,6 +626,7 @@ class WeixinCoopLogin(TemplateView):
             form = BiSouYiRegisterForm(self.request.session, action='old_login')
             if form.is_valid():
                 phone = form.get_phone()
+                next = form.get_other()
 
         return {
             'context': context,
