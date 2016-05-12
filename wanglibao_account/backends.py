@@ -98,6 +98,13 @@ class ProductionIDVerifyBackEnd(object):
             record = records.first()
             return record, None
 
+        id_number_len = len(str(id_number))
+        if not(id_number_len == 15 or id_number_len == 18):
+            message = u'身份证长度不合法'
+            record = IdVerification(id_number=id_number, name=name, is_valid=False, description=message)
+            record.save()
+            return record, message
+
         request = u"""<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:nci="http://www.nciic.com.cn" xmlns:fin="http://schemas.datacontract.org/2004/07/Finance.EPM">
                <soapenv:Header/>
@@ -389,6 +396,10 @@ def get_verify_result(id_number, name):
 
     verify_result = False
     id_photo = None
+
+    id_number_len = len(str(id_number))
+    if not(id_number_len == 15 or id_number_len == 18):
+        return verify_result, id_photo, u'身份证长度不合法'
 
     # 身份证合法性校验
     # check_result, _error = check_id_card(id_number)
