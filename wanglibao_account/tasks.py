@@ -32,7 +32,7 @@ LOCAL_VAR = locals()
 #         CoopCallback(channel).process_all_callback(user_id, act, order_id)
 
 
-def process_amortize(amortizations, product_id, sync_id):
+def process_amortize(amortizations, product_id, sync_id, amo_act):
     logger.info("Enter process_amortize >>>>>>>>>>>> with product_id[%s]" % product_id)
     user_amo_list = list()
     for amo in amortizations:
@@ -60,9 +60,11 @@ def process_amortize(amortizations, product_id, sync_id):
                     setattr(user_amo, k, v)
                 user_amo.save()
             user_amo_list.append(user_amo)
-            response_data = save_to_margin(amo)
-            logger.info("process_amortize save_to_margin amo[%s] result: [%s]" % (amo, response_data))
-            if user_amo.term == 1:
+
+            if (amo_act == 'plan' and amo['term'] == 1) or amo_act == 'amortize':
+                response_data = save_to_margin(amo)
+                logger.info("process_amortize save_to_margin amo[%s] result: [%s]" % (amo, response_data))
+
                 response_data = save_to_p2p_equity(amo)
                 logger.info("process_amortize save_to_p2p_equity amo[%s] result: [%s]" % (amo, response_data))
         else:
@@ -234,7 +236,8 @@ def process_amortizations_push_callback(req_data):
 
     if p2p_product:
         amortizations = json.loads(req_data['amortizations'])
-        process_amortize(amortizations=amortizations, product_id=product_id, sync_id=sync_id)
+        amo_act = req_data['amo_act']
+        process_amortize(amortizations=amortizations, product_id=product_id, sync_id=sync_id, amo_act=amo_act)
         # .apply_async(
         # kwargs={'amortizations': amortizations, 'product_id': product_id, 'sync_id': sync_id})
 
