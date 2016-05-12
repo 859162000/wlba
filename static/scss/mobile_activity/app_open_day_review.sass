@@ -240,7 +240,8 @@
   .ranking_wrap
     width: 100%
     background: url("/static/imgs/mobile_activity/app_open_day_review/banner_2.jpg") no-repeat
-    background-size: cover
+    background-size: 100%
+    box-shadow: 0 -5px #000
     dl
       text-align: center
       color: #fff
@@ -288,7 +289,8 @@
     .ranking_list
       width: 80%
       display: block
-      margin: 0.4rem auto 0
+      margin: 0.4rem auto 0.75rem
+      box-shadow: 0 1px 0.375rem #000
       ul
         width: 100%
         display: block
@@ -303,10 +305,13 @@
           border-bottom: 1px #dfdfdf solid
           .img
             width: 17.5%
+            min-width: 3.25rem
             float: left
             height: 1.5rem
             display: block
-
+            img
+              margin: 0 auto
+              display: block
           .yuan
             display: block
             height: 0.625rem
@@ -319,7 +324,6 @@
           .phone
             float: left
             width: 27.5%
-            padding-left: 10%
             height: 1.5rem
             line-height: 1.5rem
             font-size: 0.55rem
@@ -337,12 +341,179 @@
         li.first
           height: 3.25rem
           background: #F66252
+          box-shadow: 0 3px #000
           .img
             height: 3.25rem
             img
-              width: 100%
-              vertical-align: middle
-              display: table-cell
+              width: 2.625rem
+              position: relative
+              top: 0.3125rem
+          .phone
+            color: #fff
+            line-height: 3.25rem
+            height: 3.25rem
+          .money
+            color: #fff
+            line-height: 3.25rem
+            height: 3.25rem
+        li.second
+          height: 3rem
+          background: #E8EDF0
+          .img
+            height: 3rem
+            img
+              width: 2.15rem
+              position: relative
+              top: 0.425rem
+          .phone
+            line-height: 3rem
+            height: 3rem
+          .money
+            line-height: 3rem
+            height: 3rem
+        li.third
+          height: 2.65rem
+          background: #F3F5F6
+          .img
+            height: 2.65rem
+            img
+              width: 1.35rem
+              position: relative
+              top: 0.65rem
+              left: 0
+          .phone
+            line-height: 2.65rem
+            height: 2.65rem
+          .money
+            line-height: 2.65rem
+            height: 2.65rem
+    .careful_text
+      font-size: 0.6rem
+      line-height: 1.2rem
+      color: #585757
+      width: 80%
+      display: block
+      margin: 0 auto 0.375rem
+      max-height: 9999rem
+  .section_margin
+    margin-top: 0.75rem
+  .ranking_box
+    position: relative
+    width: 100%
+    display: inline-block
+    padding-bottom: 0.85rem
+    .ranking_box_list
+      width: 90%
+      display: inline-block
+      margin: 0 0 0 5%
+      padding-top: 2.75rem
+      font-size: 0
+      .box
+        width: 100%
+        padding-bottom: 0.25rem
+        display: inline-block
+        .img
+          width: 27%
+          min-width: 2.35rem
+          display: block
+          float: left
+          img
+            display: block
+            margin: 0 auto
+            width: 2.35rem
+          p
+            text-align: center
+            color: #F04F3B
+            font-size: 0.5rem
+            line-height: 1rem
+        .img_4
+          position: relative
+          top: 0.4rem
+          left: 0
+        .data_text
+          float: left
+          margin-left: 10%
+          display: block
+          color: #585757
+          font-size: 0.6rem
+          line-height: 2.05rem
+          @media screen and (max-width: 370px)
+            margin-left: 0.55rem
+          @media screen and (max-device-width: 370px)
+            margin-left: 0.55rem
+          span
+            color: #F14C37
+            font-size: 1.8rem
+            line-height: 2.05rem
+            font-weight: 100
+            padding: 0 0.5rem
+        .data_text_5
+          margin-left: 9.5%
+          span
+            padding: 0 0.5rem 0 0
+
+
+  .red_title
+    width: 4.35rem
+    height: 1rem
+    background: url("/static/imgs/mobile_activity/app_open_day_review/red_top.png") no-repeat
+    display: block
+    position: absolute
+    left: 50%
+    top: -0.15rem
+    z-index: 2
+    color: #fff
+    font-size: 0.6rem
+    line-height: 1rem
+    text-align: center
+    margin-left: -2.175rem
+  .insert_text
+    width: 100%
+    padding-left: 4%
+    color: #585757
+    font-size: 0.6rem
+    height: 2.15rem
+    line-height: 2.15rem
+  .p2p_products_box
+    position: relative
+    width: 100%
+    display: inline-block
+    .total_amount_num
+      font-size: 1.05rem
+      font-style: normal
+      color: #6b6b6b
+    .red_title
+      left: 0.75rem
+      background: url("/static/imgs/mobile_activity/app_open_day_review/ic_home_novice.png") no-repeat
+      width: 2.6rem
+      height: 0.8rem
+      top: -0.125rem
+      font-size: 0.4rem
+      line-height: 0.8rem
+      margin-left: 0
+    .section-head .head-tit
+      margin-left: 1rem
+      color: #ccc
+    .section-head
+      padding-top: 0.3rem
+      border-bottom: none
+    .section-body .body-right .btn-body
+      width: 2.8rem
+      height: 2.8rem
+      line-height: 2.8rem
+      border-radius: 50%
+      border-width: 2px !important
+      font-size: 0.65rem
+    .section-body .profit-math .profit-num
+      font-size: 1.2rem
+    .prpfit-add,.profit-sign,.profit-num
+      color: #f26a6a
+    .profit-addNum,.profit-addNumsign
+      color: #4e7cda
+    .prpfit-add
+      font-size: 1rem
+      padding: 0 0.1rem
+
 
 
 
