@@ -58,7 +58,7 @@ from wanglibao_activity import backends as activity_backends
 from wanglibao_activity.tasks import check_activity_task
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_redis.backend import redis_backend
-from .common import get_p2p_list
+from .common import get_p2p_list, get_name_contains_p2p_list
 from wanglibao.templatetags.formatters import safe_phone_str
 import logging
 
@@ -798,5 +798,25 @@ def check_invalid_new_user_product(p2p, user):
     """
     error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
     return error_new_user
+
+class HMDP2PListView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        p2p_products = []
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+        p2p_product = {}
+        if len(p2p_products)>0:
+            p2p_product = p2p_products[0]
+            # p2p_product["end_time"]
+        return {
+            'p2p_product': p2p_product,
+        }
+
+
 
 

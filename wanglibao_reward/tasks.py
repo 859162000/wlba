@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from wanglibao.celery import app
-from utils import sendWechatPhoneRewardByRegister, getTodayTop10Ranks, getYesterdayTop10Ranks
+from utils import sendWechatPhoneRewardByRegister, getTodayTop10Ranks, getYesterdayTop10Ranks,updateRedisHmdRanks
 from wanglibao_account.auth_backends import User
 from wanglibao_redis.backend import redis_backend
 from misc.models import Misc
@@ -78,4 +78,7 @@ def sendYesterdayTopRankAward():
                             rank_reward_record.save()
                     break
 
+@app.task
+def updateHmdRedisTopRanks():
+    updateRedisHmdRanks()
 

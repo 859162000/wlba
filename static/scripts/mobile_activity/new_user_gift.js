@@ -217,7 +217,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;$(function(){
+;;(function(org){
     var mySwiper = new Swiper ('#swiper-container', {
       direction: 'vertical',
       loop: false,
@@ -239,12 +239,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         //var u = navigator.userAgent;
         //alert(u);
     };
-
-    $("div.swiper-container").one("touchstart",function(){
-        if(audioDom.paused){
-            audioDom.play();
-        }
-    });
 
     //弹层
     $("div.js-close").on("touchstart", function(){
@@ -351,8 +345,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 $t.addClass("audio-close");
             }
         });
+        $("div.swiper-container").one("touchstart",function(){
+            if(audioDom.paused){
+                audioDom.play();
+            }
+        });
     }
 
+    var login = false;
     wlb.ready({
         app: function(mixins){
             function connect(data) {
@@ -378,7 +378,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-                    mixins.loginApp();
+                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/new_user_gift/'});
                 } else {
                     login = true;
                     connect(data);
@@ -393,8 +393,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         },
         other: function(){
             get_gift();
-            audioBox.style.display = "block";
-
+            if(audioBox){
+                audioBox.style.display = "block";
+            }
         }
     })
-});
+})(org);
