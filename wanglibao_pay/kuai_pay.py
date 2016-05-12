@@ -1195,6 +1195,11 @@ class KuaiShortPay:
             bank = Bank.objects.filter(gate_id=gate_id).first()
             if not bank or not bank.kuai_code.strip():
                 return {"ret_code":201151, "message":"不支持该银行"}
+            if len(card_no) != 10 and Card.objects.filter(user=user, 
+                    bank=bank, is_bind_kuai=True):
+                return {"ret_code": 201154, 
+                        "message":"一个银行不能绑定多张卡，如需继续绑定，请联系客服解绑旧卡"}
+
         #fix bink new bank card warning message
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
