@@ -6,7 +6,7 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    link(rel="stylesheet",href="/static/styles/pc_activity/shield_plan.css")
+    link(rel="stylesheet",href="/static/styles/pc_activity/shield_plan.css?v=20160512")
   body(style="background:#fff").shield-plan
     include global/g_nav
     .sp-banner
@@ -89,7 +89,10 @@ html
       .detail 金盾计划上线初期，网利宝针对成功撮合的借款项目，根据每笔借款项目的风险等级，按成交金额的一定比例向合作机构拟提了超1千万的专项资金保证该计划顺利运行。在此专项资金可覆盖风险的范围内，金盾计划将最大限度降低不良债权给相关投资用户带来的损失，后续随着平台交易量的不断增加，网利宝会在此基础上建立、健全此专项资金收购不良债权的各项机制，吸引更多第三方机构、优质融资客户自愿加入 “金盾计划”，扩充此专项资金的储备额度，尽力维护网利宝投资用户的权益。
 
     .sp-alt
-      img(src="/static/imgs/pc_activity/shield_plan/file.jpg")
+      .sp-box
+        .sp-close.js-sp-close
+          img(src="/static/imgs/pc_activity/shield_plan/icon_close_web.png")
+        img(src="/static/imgs/pc_activity/shield_plan/file.jpg")
 
     include global/g_footer
     include include/tracking

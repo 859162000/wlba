@@ -9,11 +9,12 @@
   });
 
   require(['jquery'], function($) {
+
       $("a.js-file").on("click", function(){
-        $("div.sp-alt").css("display", "-webkit-box");
+          $("div.sp-alt").show();
       });
-      $("div.sp-alt").on("click", function(){
-         $(this).hide();
+      $("div.js-sp-close").on("click", function(){
+          $(this).parents(".sp-alt").hide();
       });
   });
 }).call(this);
