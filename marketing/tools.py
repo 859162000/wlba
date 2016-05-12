@@ -117,7 +117,7 @@ def checkUpdateHmdRanks(product_id):
     now = timezone.now()
     if activity.start_at<=now and activity.end_at>=now:
         product = P2PProduct.objects.get(id=product_id)
-        if product.name.find('产融通HMD'):
+        if product.name.find('产融通HMD')!=-1:
             updateHmdRedisTopRanks.apply_async(kwargs={}, queue='celery02')
 
 def weixin_redpack_distribute(user):
