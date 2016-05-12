@@ -401,14 +401,17 @@
     position: relative
     width: 100%
     display: inline-block
+    padding-bottom: 0.85rem
     .ranking_box_list
-      width: 80%
+      width: 90%
       display: inline-block
-      margin: 0 0 0 10%
+      margin: 0 0 0 5%
       padding-top: 2.75rem
+      font-size: 0
       .box
         width: 100%
-        float: left
+        padding-bottom: 0.25rem
+        display: inline-block
         .img
           width: 27%
           min-width: 2.35rem
@@ -422,20 +425,33 @@
             text-align: center
             color: #F04F3B
             font-size: 0.5rem
-            line-height: 1.2rem
+            line-height: 1rem
+        .img_4
+          position: relative
+          top: 0.4rem
+          left: 0
         .data_text
           float: left
-          margin-left: 0.75rem
+          margin-left: 10%
           display: block
           color: #585757
           font-size: 0.6rem
           line-height: 2.05rem
+          @media screen and (max-width: 370px)
+            margin-left: 0.55rem
+          @media screen and (max-device-width: 370px)
+            margin-left: 0.55rem
           span
             color: #F14C37
             font-size: 1.8rem
             line-height: 2.05rem
             font-weight: 100
             padding: 0 0.5rem
+        .data_text_5
+          margin-left: 9.5%
+          span
+            padding: 0 0.5rem 0 0
+
 
   .red_title
     width: 4.35rem
@@ -451,7 +467,52 @@
     line-height: 1rem
     text-align: center
     margin-left: -2.175rem
-
+  .insert_text
+    width: 100%
+    padding-left: 4%
+    color: #585757
+    font-size: 0.6rem
+    height: 2.15rem
+    line-height: 2.15rem
+  .p2p_products_box
+    position: relative
+    width: 100%
+    display: inline-block
+    .total_amount_num
+      font-size: 1.05rem
+      font-style: normal
+      color: #6b6b6b
+    .red_title
+      left: 0.75rem
+      background: url("/static/imgs/mobile_activity/app_open_day_review/ic_home_novice.png") no-repeat
+      width: 2.6rem
+      height: 0.8rem
+      top: -0.125rem
+      font-size: 0.4rem
+      line-height: 0.8rem
+      margin-left: 0
+    .section-head .head-tit
+      margin-left: 1rem
+      color: #ccc
+    .section-head
+      padding-top: 0.3rem
+      border-bottom: none
+    .section-body .body-right .btn-body
+      width: 2.8rem
+      height: 2.8rem
+      line-height: 2.8rem
+      border-radius: 50%
+      border-width: 2px !important
+      font-size: 0.65rem
+    .section-body .profit-math .profit-num
+      font-size: 1.2rem
+    .prpfit-add,.profit-sign,.profit-num
+      color: #f26a6a
+    .profit-addNum,.profit-addNumsign
+      color: #4e7cda
+    .prpfit-add
+      font-size: 1rem
+      padding: 0 0.1rem
 
 
 
