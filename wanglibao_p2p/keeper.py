@@ -32,6 +32,7 @@ from wanglibao_profile.models import RepeatPaymentUser, RepeatPaymentUserRecords
 
 logger = logging.getLogger(__name__)
 
+
 class ProductKeeper(KeeperBaseMixin):
 
     def __init__(self, product, order_id=None):
@@ -407,7 +408,9 @@ class AmortizationKeeper(KeeperBaseMixin):
                 if settled_sub_amos:
                     from .tasks import coop_amortizations_push
                     coop_amortizations_push.apply_async(
-                        kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
+                        kwargs={'amortizations': settled_sub_amos,
+                                'product_id': product.id,
+                                'amo_act': 'plan'})
         except:
             pass
 
@@ -619,6 +622,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                     logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
                         sub_amo.user, sub_amo.principal, product.id
                     ))
+
                 try:
                     weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
         #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
@@ -673,7 +677,9 @@ class AmortizationKeeper(KeeperBaseMixin):
                 if settled_sub_amos:
                     from .tasks import coop_amortizations_push
                     coop_amortizations_push.apply_async(
-                        kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
+                        kwargs={'amortizations': settled_sub_amos,
+                                'product_id': product.id,
+                                'amo_act': 'amortize'})
             except:
                 pass
 
