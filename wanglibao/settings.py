@@ -135,6 +135,7 @@ WSGI_APPLICATION = 'wanglibao.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
+# Comment by hb on 2016-05-12
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -163,6 +164,16 @@ if ENV_ALPHA_DEPLOY:
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
         'HOST': '192.168.20.236',
+    }
+
+# Add by hb on 2016-05-12 for Override mysq.cnf if exists
+if ENV == ENV_PRODUCTION:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wlb_channel',
+        'USER': 'leon_channel',
+        'PASSWORD': '4E6K2oQWjXDI',
+        'HOST': 'rdsohvmt0mrexk7kuxau1.mysql.rds.aliyuncs.com',
     }
 
 import sys
