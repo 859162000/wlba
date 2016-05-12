@@ -3396,8 +3396,11 @@ class HmdInvestTopRanks(APIView):
         # if activity.end_at < utc_now:
         #     return Response({"ret_code": -1, "message":"活动已经结束"})
         hmd_ranks = getRedisHmdTopRanks()
+        uids = [rank['user'] for rank in hmd_ranks]
+        userprofiles = WanglibaoUserProfile.objects.filter(user__in=uids).all()
         for rank in hmd_ranks:
-            userprofile = WanglibaoUserProfile.objects.filter(user=rank.user).first()
-            rank.phone=userprofile.phone
+            for userprofile in userprofiles:
+                if userprofile.user_id == rank['user']:
+                    rank['phone'] = safe_phone_str(userprofile.phone)
         return Response({"ret_code": 0, "hmd_ranks": hmd_ranks})
 
