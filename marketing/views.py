@@ -3279,7 +3279,7 @@ class ShieldPlanH5View(TemplateView):
         }
 
 class HMDP2PListView(TemplateView):
-
+    p2p_list_url_name = ""
     def get_context_data(self, **kwargs):
         p2p_products = []
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")
@@ -3288,7 +3288,9 @@ class HMDP2PListView(TemplateView):
         p2p_products.extend(p2p_repayment_list)
         p2p_products.extend(p2p_finished_list)
 
-
+        p2p_list_url = settings.CALLBACK_HOST+reverse(self.p2p_list_url_name)
+        print p2p_list_url
         return {
             'p2p_products': p2p_products[0:1],
+            "p2p_list_url":p2p_list_url
         }

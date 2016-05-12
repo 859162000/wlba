@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015050402")
+        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015050404")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
@@ -23,16 +23,17 @@ html.no-js(lang="en-gb")
                             .time_text 2016年5月12日-5月18日
                     .ranking_list
                         ul
-                            //li.first!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li.second!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li.third!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li.first!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li.second!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li.third!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                        .ul_footer
                 .section_box_2
                     .section_box_2_main
                         .box
@@ -72,7 +73,7 @@ html.no-js(lang="en-gb")
                 .section_box_3
                     .title_text
                         span 红木贷项目列表：
-                        a(href='#') 更多>>
+                        a(href='/p2p/list/') 更多>>
                     .section_box_3_main
                         .span8
                           for product in p2p_products
@@ -372,6 +373,6 @@ html.no-js(lang="en-gb")
 
         include global/g_footer
 script.
-    require(['/static/js/open_day_review.js?v=2015051201'])
+    require(['/static/js/open_day_review.js?v=2015051202'])
 
                                                                     
