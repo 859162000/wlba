@@ -101,8 +101,37 @@
         })
     }
 
+    var login = false;
     wlb.ready({
         app: function (mixins) {
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
+                    }
+                })
+            }
+            mixins.sendUserInfo(function (data) {
+                if (data.ph == '') {
+                    login = false;
+                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/h5_shield_plan/'});
+                } else {
+                    login = true;
+                    connect(data);
+                }
+            });
             mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小"});
         },
         other: function(){
