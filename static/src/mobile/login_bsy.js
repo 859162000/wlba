@@ -77,8 +77,11 @@ import { check } from './mixins/from_validation'
             })
             .then((result)=> {
                 console.log('login success');
-                const next_url = getQueryStringByName('next');
-                window.location.href = next_url ? decodeURIComponent(decodeURIComponent(next_url)) : '/weixin/account/';
+                //const next_url = getQueryStringByName('next');
+                //window.location.href = next_url ? decodeURIComponent(decodeURIComponent(next_url)) : '/weixin/account/';
+                const next_url1 = getQueryStringByName('next'),
+                    next_url2 = $(".js-next-url").val();
+                window.location.href = next_url2 ?  decodeURIComponent(decodeURIComponent(next_url2)) : (next_url1 ? decodeURIComponent(decodeURIComponent(next_url1)) : '/weixin/account/');
             })
             .catch((res) => {
                 if (res['status'] == 403) {

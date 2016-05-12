@@ -44,7 +44,7 @@ from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import (detect_identifier_type, create_user, generate_contract, update_coop_order,
-                                     generate_bisouyi_content, generate_bisouyi_sign)
+                                     generate_bisouyi_content, generate_bisouyi_sign, generate_coop_base_data)
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.serializers import UserSerializer
@@ -82,6 +82,7 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha, BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.tasks import common_callback_for_post
+from common.tools import MyHttpsAdapter
 
 import requests
 
@@ -2830,10 +2831,10 @@ class BiSouYiRegisterApi(APIView):
 
     def post(self, request):
         form = BiSouYiRegisterForm(self.request.session, action='register')
-        oauth_data = {
-            'pcode': settings.BISOUYI_PCODE,
-            'status': 0,
-        }
+        # oauth_data = {
+        #     'pcode': settings.BISOUYI_PCODE,
+        #     'status': 0,
+        # }
         if form.is_valid():
             if form.check_sign():
                 response_data = user_register(request)
@@ -2848,12 +2849,12 @@ class BiSouYiRegisterApi(APIView):
                     # 处理第三方渠道的用户信息
                     CoopRegister(request).all_processors_for_user_register(user, channel_code)
 
-                    start_time = timezone.localtime(timezone.now())
-                    end_time = start_time + datetime.timedelta(seconds=599)
-                    oauth_data['token'] = access_token
-                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['status'] = 1
+                    # start_time = timezone.localtime(timezone.now())
+                    # end_time = start_time + datetime.timedelta(seconds=599)
+                    # oauth_data['token'] = access_token
+                    # oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['status'] = 1
 
                     response_data = {
                         'ret_code': 10000,
@@ -2871,7 +2872,7 @@ class BiSouYiRegisterApi(APIView):
                 'message': form.errors.values()[0][0],
             }
 
-        response_data['oauth_data'] = json.dumps(oauth_data)
+        # response_data['oauth_data'] = json.dumps(oauth_data)
 
         logger.info("BiSouYiRegisterApi process result: %s" % response_data)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
@@ -2883,10 +2884,10 @@ class BiSouYiRegisterView(TemplateView):
 
     def get_context_data(self, **kwargs):
         form = BiSouYiRegisterForm(self.request.session, action='register')
-        oauth_data = {
-            'pcode': settings.BISOUYI_PCODE,
-            'status': 0,
-        }
+        # oauth_data = {
+        #     'pcode': settings.BISOUYI_PCODE,
+        #     'status': 0,
+        # }
         if form.is_valid():
             if form.check_sign():
                 phone = form.get_phone()
@@ -2913,12 +2914,12 @@ class BiSouYiRegisterView(TemplateView):
                     auth_user = authenticate(identifier=phone, password=password)
                     auth_login(self.request, auth_user)
 
-                    start_time = timezone.localtime(timezone.now())
-                    end_time = start_time + datetime.timedelta(seconds=599)
-                    oauth_data['token'] = access_token
-                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['status'] = 1
+                    # start_time = timezone.localtime(timezone.now())
+                    # end_time = start_time + datetime.timedelta(seconds=599)
+                    # oauth_data['token'] = access_token
+                    # oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['status'] = 1
 
                     response_data = {
                         'ret_code': 10000,
@@ -2944,7 +2945,7 @@ class BiSouYiRegisterView(TemplateView):
                 'next_url': settings.SITE_URL,
             }
 
-        response_data['oauth_data'] = json.dumps(oauth_data)
+        # response_data['oauth_data'] = json.dumps(oauth_data)
 
         logger.info("BiSouYiRegisterView process result: %s" % response_data)
         return response_data
@@ -2956,10 +2957,10 @@ class BiSouYiLoginApi(APIView):
     def post(self, request):
         form = BiSouYiRegisterForm(self.request.session, action='old_login')
         p_code = settings.BISOUYI_PCODE
-        oauth_data = {
-            'pcode': p_code,
-            'status': 0,
-        }
+        # oauth_data = {
+        #     'pcode': p_code,
+        #     'status': 0,
+        # }
         if form.is_valid():
             if form.check_sign():
                 response_data = user_login(request)
@@ -2982,6 +2983,7 @@ class BiSouYiLoginApi(APIView):
                     }
 
                     content = generate_bisouyi_content(content_data)
+                    callback_data = json.dumps({'content': content})
 
                     headers = {
                         'Content-Type': 'application/json',
@@ -2992,15 +2994,40 @@ class BiSouYiLoginApi(APIView):
                     # 授权回调
                     common_callback_for_post.apply_async(
                         kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL,
-                                'params': json.dumps(content_data),
+                                'params': callback_data,
                                 'channel': channel_code, 'headers': headers})
 
-                    start_time = timezone.localtime(timezone.now())
-                    end_time = start_time + datetime.timedelta(seconds=599)
-                    oauth_data['token'] = access_token
-                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['status'] = 1
+                    try:
+                        base_data = generate_coop_base_data('register')
+                        act_data = {
+                            'client_id': client_id,
+                            'bid': '',
+                            'phone': phone,
+                            'btype': 'wanglibao',
+                            'user_id': user.id,
+                            'access_token': access_token,
+                            'account': '',
+                        }
+                        data = dict(base_data, **act_data)
+                        s = requests.Session()
+                        s.mount('https://', MyHttpsAdapter(max_retries=5))
+                        res = s.post(url=settings.CHANNEL_CENTER_CALL_BACK_URL,
+                                     data=data,
+                                     verify=False)
+                        if res.status_code == 200:
+                            result = res.json()
+                            logger.info("register_call_back connected return [%s]" % result)
+                        else:
+                            logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+                    except Exception, e:
+                        logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
+
+                    # start_time = timezone.localtime(timezone.now())
+                    # end_time = start_time + datetime.timedelta(seconds=599)
+                    # oauth_data['token'] = access_token
+                    # oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['status'] = 1
 
                     response_data = {
                         'ret_code': 10000,
@@ -3022,7 +3049,7 @@ class BiSouYiLoginApi(APIView):
                 'message': form.errors.values()[0][0],
             }
 
-        response_data['oauth_data'] = json.dumps(oauth_data)
+        # response_data['oauth_data'] = json.dumps(oauth_data)
         logger.info("BiSouYiLoginApi process result: %s" % response_data)
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
