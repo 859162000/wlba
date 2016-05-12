@@ -1,16 +1,14 @@
 # coding=utf-8
 
 import re
-import ssl
 import logging
 import datetime
 import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.poolmanager import PoolManager
 from django.conf import settings
 from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
+from common.tools import MyHttpsAdapter
 
 
 logger = logging.getLogger("wanglibao_account")
@@ -176,7 +174,11 @@ class ProductionIDVerifyV2BackEnd(object):
         records = IdVerification.objects.filter(id_number=id_number, name=name)
         if records.exists():
             record = records.first()
-            return record, None
+            if record.description == u'该用户未满18周岁':
+                if not check_age_for_id(id_number):
+                    return record, None
+            else:
+                return record, None
 
         verify_result, id_photo, message = get_verify_result(id_number, name)
 
@@ -253,16 +255,6 @@ def parse_id_verify_response_v2(text):
         'id_photo': id_photo,
         'message': message,
     }
-
-
-class MyHttpsAdapter(HTTPAdapter):
-    """指定https请求时使用TLSv1版本"""
-
-    def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(num_pools=connections,
-                                       maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 
 def check_birth_date_for_id(id_number):

@@ -24,12 +24,13 @@ include include/activityTop2
       //  span.xm-com.xm-icon4
       .xunlei-login
         p.success-pop 恭喜已完成网利宝注册
-        p.success-pop 并与您的迅雷账号绑定成功
-        p.accounts-pop.mt10 迅雷账号：123456
-        p.accounts-pop 网利宝账号：1234567
+        if nickname != '' and nickname != null
+            p.success-pop 并与您的迅雷账号绑定成功
+            p.accounts-pop.mt10 迅雷账号：{{nickname}}
+        p.accounts-pop 网利宝账号：{{user.wanglibaouserprofile.phone}}
         .login-btns
             .lio-img
-            a(href='') 登&nbsp;&nbsp;&nbsp;&nbsp;录
+            a(href='/accounts/home/') 进入我的账户
         p.reminder 温馨提示：
         .reminder-content.clearfix
             span 1.
@@ -39,24 +40,6 @@ include include/activityTop2
             label 一旦绑定，不可随意解绑，否则影响会员奖励发放。
 
     else
-        .xunlei-login-v(style="display:none")
-            p.regist-reward 完成首充和首投后，
-                span 会员奖励
-                | 将直接发放
-            .regist-c
-                p.wlb-re 请登录迅雷账号，完成网利宝帐号注册：
-                .xunlei-account
-                    input.xl-account(type="text", name="identifier", placeholder="请输入迅雷账号")
-                    input.xl-pwd(type="text", name="identifier", placeholder="密码")
-                .login-q.clearfix
-                    label(for="auto")
-                        input(type="checkbox", name="", id="auto")
-                        | 下次自动登录
-                    a() 忘记密码
-                .xunlei-login-btn
-                    a() 登&nbsp;&nbsp;&nbsp;&nbsp;录
-                .go-register-xl
-                    a() 注册帐号
         .denelu-form#denglu
             #aug-center
                 .off-form#off-form ×
@@ -103,4 +86,4 @@ include include/activityTop2
                 button#register_submit.button-account.span10.xun-zhuce(type='button')
               .space-vertical-s
             p.xun-p 已有账号,
-              a(href="/accounts/login/") 立即登录
+              a(href="javascript:void(0)")#goLogin 立即登录

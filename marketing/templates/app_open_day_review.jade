@@ -11,6 +11,25 @@ html(style="background: #fff")
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
         .body_wrap.clear
             img.banner(src='/static/imgs/mobile_activity/app_open_day_review/banner.png')
+            .section.section_2
+                .ranking_wrap
+                    dl
+                        dt 红木专场大放送
+                        dd!='人气王<span>重礼</span>悬赏'
+                    .red_box
+                        img(src='/static/imgs/mobile_activity/app_open_day_review/red_box.png')
+                        span 2016年5月12日-5月18日
+                    p.ranking_title_top “产融通HMD”  类项目累计排行榜
+                    .ranking_list
+                        ul
+                            li.first
+                                .img
+                                    img(src='/static/imgs/mobile_activity/app_open_day_review/no_1.png')
+                            li
+                                .img
+                                    img.yuan(src='/static/imgs/mobile_activity/app_open_day_review/yuan.png')
+                                .phone 132****04
+                                .money 2,400,000
             .section.section_1
                 .big_title.big_title_1 “产业银行”的业务模式
                 .line_red

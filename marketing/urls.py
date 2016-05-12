@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
-                            OpenHouseApiView, MaiMaiView
+                            OpenHouseApiView, MaiMaiView, ShieldPlanView, ShieldPlanH5View, HMDP2PListView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -94,12 +94,13 @@ urlpatterns = patterns(
     url(r'^wangli_vip/$', TemplateView.as_view(template_name="wangli_vip.jade")),
     url(r'^august_phone/$', TemplateView.as_view(template_name="august_phone.jade")),
     url(r'^april_mobilization/$', TemplateView.as_view(template_name="april_mobilization.jade")),
-    url(r'^open_day_review/$', TemplateView.as_view(template_name="open_day_review.jade")),
+    url(r'^open_day_review/$', HMDP2PListView.as_view(template_name="open_day_review.jade")),
     url(r'^center_film_ticket/$', TemplateView.as_view(template_name="center_film_ticket.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
-    url(r'^xunlei/$', TemplateView.as_view(template_name="xunlei.jade")),
+    url(r'^xunlei_treasure/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei.jade")),
+    url(r'^shield_plan/$', ShieldPlanView.as_view()),
 
 )
 
@@ -215,11 +216,14 @@ urlpatterns += patterns(
     url(r'^h5_recruit/$', TemplateView.as_view(template_name="h5_recruit.jade")),
     url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
     url(r'^new_user_gift/$', TemplateView.as_view(template_name="new_user_gift.jade")),
-    url(r'^app_xunlei_new/$', TemplateView.as_view(template_name="app_xunlei_new.jade")),
-    url(r'^app_open_day_review/$', TemplateView.as_view(template_name="app_open_day_review.jade")),
+    url(r'^app_xunlei_treasure/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunlei_new.jade")),
+    url(r'^app_open_day_review/$', HMDP2PListView.as_view(template_name="app_open_day_review.jade")),
+    url(r'^app_center_film_ticket/$', TemplateView.as_view(template_name="app_center_film_ticket.jade")),
+    # url(r'^app_xunlei_welfare/$', TemplateView.as_view(template_name="app_xunlei_welfare.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
-    #url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
+    # url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
+    url(r'^h5_shield_plan/$', ShieldPlanH5View.as_view()),
 
 )
 # app with webview

@@ -145,7 +145,7 @@ urlpatterns += patterns(
     url(r'activity/si_bind_login/$', activity_views.WechatShareInviteBindTemplate.as_view(template_name="invite_redpacket_bind.jade"), name="si_bind_login"),
     # url(r'^activity/invite/$', fwh_login_required(activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),login_url='/weixin/activity/si_bind_login/'),name='hby_weixin_invite'),
     url(r'^activity/invite/$', activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),name='hby_weixin_invite'),
-
+    url(r'^app_xunlei_welfare/$', fwh_login_required(TemplateView.as_view(template_name="app_xunlei_welfare.jade"), login_url='/weixin/sub_login_redirect/')),
 )
 #h5活动页面
 urlpatterns += patterns(

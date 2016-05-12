@@ -30,26 +30,29 @@ html
                         .mountain-icon
                         .prompt-icon
                         .gold-icon
-                    .user-count 请先
-                        a() 登录
-                        | ，您有
-                        a() 3
-                        | 次挖宝机会
+                    .user-count
+                        if user.is_authenticated
+                            span 您有
+                            a()#lotteryCounts
+                            | 次挖宝机会
+                        else
+                            span 请先
+                            a(href='/accounts/login/?next=/activity/xunlei_treasure/') 登录
                     .win-user
-                        .win-box
+                        .win-box(style='display:none')
                             .megaphone
                             .ul-p.clearfix
                                 ul#winList
-                                    li 恭喜 132****6426 用户，获得 1% 加息券
-                                    li 恭喜 132****6426 用户，获得 2% 加息券
-                                    li 恭喜 132****6426 用户，获得 3% 加息券
-                                    li 恭喜 132****6426 用户，获得 4% 加息券
-                                    li 恭喜 132****6426 用户，获得 5% 加息券
+                                    //li 恭喜 132****6426 用户，获得 1% 加息券
+                                    //li 恭喜 132****6426 用户，获得 2% 加息券
+                                    //li 恭喜 132****6426 用户，获得 3% 加息券
+                                    //li 恭喜 132****6426 用户，获得 4% 加息券
+                                    //li 恭喜 132****6426 用户，获得 5% 加息券
             .xunlei-box2.clearfix
                 .xunlei-content.clearfix
                     +titles('新手', '秘籍', 'New techniques')
                     .novice-welfare.clearfix
-                        mixin welfare(style, f1, f2, f3, f4, f5, f6, style1)
+                        mixin welfare(style, f1, url f2, f3, f4, f5, f6, style1)
                             .welfare-box(class=style1)
                                 .welfare-img(class=style)
                                 .welfare-condition=f1
@@ -58,10 +61,13 @@ html
                                     label=f3
                                     span=f4
                                     label=f5
-                                a(href='javascript:void(0)').userAction=f6
-                        +welfare('welfare-img1', '注册送', '28888元', '体验金+', '50元', '红包', '注册领取')
-                        +welfare('welfare-img2', '首充送', '7天', '迅雷会员', '', '', '充值领取')
-                        +welfare('welfare-img3', '最高送', '250元', '现金红包+', '1年', '迅雷会员', '投资领取', 'welfare-box-last')
+                                if user.is_authenticated
+                                    a(href=url)=f6
+                                else
+                                    a(href='javascript:void(0)').userAction=f6
+                        +welfare('welfare-img1', '注册送', '/', '28888元', '体验金+', '50元', '红包', '注册领取')
+                        +welfare('welfare-img2', '首充送', '/pay/banks/', '7天', '迅雷会员', '', '', '充值领取')
+                        +welfare('welfare-img3', '最高送', '/p2p/list/', '250元', '现金红包+', '1年', '迅雷会员', '投资领取', 'welfare-box-last')
             .xunlei-box3.clearfix
                 .xunlei-content.clearfix
                     +titles('五步享', '收益', 'Five steps of sitting on earning')
@@ -107,7 +113,7 @@ html
                     +titles('活动', '说明', 'Activity instructions')
                     .explain-list
                         p 1. 活动时间：2016年3月1日开始；
-                        p 2. 手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌迅雷渠道新老用户均可参与；
+                        p 2. 手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌网利宝新老用户均可参与；
                         p 3. 新用户注册为网利宝用户即得28888元体验金，体验金专享1天10%年化收益；
                             span#rewardDetail 新用户奖励
                         .explain-min(style='display:none')
@@ -123,26 +129,34 @@ html
                         p 8. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
         .alert-box(style='display:none')
             .alert-top
+            a(href='javascript:void(0)')#close-modal.close-modal.close-btn
             .alert-content
-                .jiaxiquan(style='display:none')
-                    p 人品大爆发，1%加息券已经
+                .jiaxiquan.alert-c#jxq(style='display:none')
+                    p 人品大爆发，
+                        span 1
+                        | %加息券已经
                     p 悄悄的在您的账户中！
-                    a(href="javascript:void(0)") 太棒了
-                .tiyanjin(style='display:none')
+                    a(href="javascript:void(0)").close-alert-box 太棒了
+                .tiyanjin.alert-c#tyj(style='display:none')
                     p 人世间最美好的事情
-                    p 莫不过如此，88元体验金
+                    p 莫不过如此，
+                        span 88
+                        | 元体验金
                     p 已经在您的账户中！
-                    a(href="javascript:void(0)") 太棒了
-                .wzj(style='display:none')
+                    a(href="javascript:void(0)").close-alert-box 太棒了
+                .wzj.alert-c#no1(style='display:none')
                     p 佛说：前世的500次回眸
                     p 才换得今世的一次中奖，淡定！
-                    a(href="javascript:void(0)") 再试一次
-                .wzj1(style='display:none')
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#no2(style='display:none')
                     p 大奖何时有？把酒问青天！
-                    a(href="javascript:void(0)") 再试一次
-                .wzj1
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#no3(style='display:none')
                     p 大奖下回见，网利宝天天见！
-                    a(href="javascript:void(0)") 再试一次
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#noChance(style='display:none')
+                    p 客官，您的挖奖机会已经用光！
+                    a(href="javascript:void(0)").close-alert-box 知道了
                 .cont-img(style='display:none')
                 .despair
         include global/g_footer

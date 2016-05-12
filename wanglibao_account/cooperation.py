@@ -79,6 +79,7 @@ import json
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest.utils import generate_bajinshe_sign
 from wanglibao_p2p.utility import get_p2p_equity, get_user_margin
+from common.tools import MyHttpsAdapter
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -2022,12 +2023,16 @@ class BaJinSheRegister(CoopRegister):
                     'account': getattr(user, 'account', ''),
                 }
                 data = dict(base_data, **act_data)
-                res = requests.post(url=self.call_back_url, data=data)
+                s = requests.Session()
+                s.mount('https://', MyHttpsAdapter(max_retries=5))
+                res = s.post(url=self.call_back_url,
+                             data=data,
+                             verify=False)
                 if res.status_code == 200:
                     result = res.json()
                     logger.info("register_call_back connected return [%s]" % result)
                 else:
-                    logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+                    logger.info("%s connected status code[%s]" % (self.call_back_url, res.status_code))
             except Exception, e:
                 logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
             else:

@@ -14,14 +14,13 @@ from collections import defaultdict
 from decimal import Decimal
 import time
 from weixin.models import WeixinUser
-from wanglibao_p2p.models import P2PEquity
+from wanglibao_p2p.models import P2PEquity, Earning, P2PRecord, P2PProduct
 from django.db import transaction
 from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from wanglibao_p2p.models import P2PRecord
 from django.views.generic import TemplateView
 from django.http.response import HttpResponse, Http404, HttpResponseRedirect
 from mock_generator import MockGenerator
@@ -30,7 +29,7 @@ from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
 from weixin.base import OpenIdBaseAPIView, BaseWeixinTemplate
-from wanglibao_sms.models import *
+# from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
 from marketing.tops import Top
@@ -44,9 +43,8 @@ from common.tools import FileObject
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
-from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao.templatetags.formatters import safe_phone_str
+# from wanglibao.templatetags.formatters import safe_phone_str
 from order.models import Order
 from order.utils import OrderHelper
 from rest_framework.response import Response
@@ -61,7 +59,6 @@ from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record, utype_is_mobile, utype_is_app
-from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
@@ -89,6 +86,7 @@ from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
 from wanglibao_rest.utils import get_client_ip
 from marketing.utils import get_channel_record
+from wanglibao_p2p.common import get_name_contains_p2p_list
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2012,7 +2010,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_three.jade'
+    template_name = ''
     wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
@@ -2058,12 +2056,14 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         self.wx_code = channel_code
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
-        device_list = ['android', 'iphone']
-        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
-        for device in device_list:
-            match = re.search(device, user_agent)
-            if match and match.group():
-                self.template_name = 'app_xunleizhuce.jade'
+        if not self.template_name:
+            self.template_name = 'xunlei_three.jade'
+            device_list = ['android', 'iphone']
+            user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+            for device in device_list:
+                match = re.search(device, user_agent)
+                if match and match.group():
+                    self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
@@ -2444,7 +2444,7 @@ class RewardDistributeAPIView(APIView):
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
         #self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
-        self.rates = (5, 9.2, 10.8, 10.5, 9.5, 11, 9, 15, 20)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.rates = (5, 8, 12, 7, 13, 11, 9, 15, 20)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
@@ -2652,6 +2652,15 @@ class RewardDistributeAPIView(APIView):
 
         if action == "GET_REWARD":
             join_log = self.distribute_redpack(user)
+            if join_log == 'No Reward':
+                to_json_response = {
+                    'ret_code': 3001,
+                    'message': u'用户的抽奖次数已经用完了',
+                    'left': 0,
+                    'redpack': redpack_event.id
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
             to_json_response = {
                 'ret_code': 0,
                 'message': u'发奖成功',
@@ -3223,6 +3232,7 @@ class OpenHouseApiView(TemplateView):
 
         return {}
 
+
 class MaiMaiView(TemplateView):
     template_name = 'app_maimaiIndex.jade'
 
@@ -3242,4 +3252,43 @@ class MaiMaiView(TemplateView):
         return {
             'token': token,
             'channel': channel
+        }
+
+
+class ShieldPlanView(TemplateView):
+    template_name = 'shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+            .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+            .order_by('-status_int')[:3]
+        return {
+            'p2p_list': p2p_list
+        }
+
+
+class ShieldPlanH5View(TemplateView):
+    template_name = 'h5_shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+                       .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+                       .order_by('-status_int').first()
+        return {
+            'p2p': p2p_list
+        }
+
+class HMDP2PListView(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        p2p_products = []
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+
+
+        return {
+            'p2p_products': p2p_products[0:1],
         }

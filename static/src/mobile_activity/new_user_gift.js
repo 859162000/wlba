@@ -1,4 +1,4 @@
-$(function(){
+;(function(org){
     var mySwiper = new Swiper ('#swiper-container', {
       direction: 'vertical',
       loop: false,
@@ -20,26 +20,6 @@ $(function(){
         //var u = navigator.userAgent;
         //alert(u);
     };
-
-    //音乐
-    var audioBox = document.getElementById("js-audio"),
-        audioDom = audioBox.getElementsByTagName("audio")[0];
-    $(audioBox).on("touchstart", function(){
-        var $t = $(this);
-        if(audioDom.paused){
-            audioDom.play();
-            $t.removeClass("audio-close");
-        }else{
-            audioDom.pause();
-            $t.addClass("audio-close");
-        }
-    });
-
-    $("div.swiper-container").one("touchstart",function(){
-        if(audioDom.paused){
-            audioDom.play();
-        }
-    });
 
     //弹层
     $("div.js-close").on("touchstart", function(){
@@ -132,6 +112,28 @@ $(function(){
         });
     }
 
+    //音乐
+    var audioBox = document.getElementById("js-audio");
+    if(audioBox){
+        var audioDom = audioBox.getElementsByTagName("audio")[0];
+        $(audioBox).on("touchstart", function(){
+            var $t = $(this);
+            if(audioDom.paused){
+                audioDom.play();
+                $t.removeClass("audio-close");
+            }else{
+                audioDom.pause();
+                $t.addClass("audio-close");
+            }
+        });
+        $("div.swiper-container").one("touchstart",function(){
+            if(audioDom.paused){
+                audioDom.play();
+            }
+        });
+    }
+
+    var login = false;
     wlb.ready({
         app: function(mixins){
             function connect(data) {
@@ -157,7 +159,7 @@ $(function(){
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-                    mixins.loginApp({refresh:1, url:''});
+                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/new_user_gift/'});
                 } else {
                     login = true;
                     connect(data);
@@ -172,6 +174,9 @@ $(function(){
         },
         other: function(){
             get_gift();
+            if(audioBox){
+                audioBox.style.display = "block";
+            }
         }
     })
-});
+})(org);

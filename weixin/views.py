@@ -73,6 +73,7 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao_redis.backend import redis_backend
 from misc.views import MiscRecommendProduction
 from marketing.utils import pc_data_generator
+from wanglibao_account.forms import BiSouYiRegisterForm
 # from wanglibao_invite.models import WechatInviteRelation
 
 logger = logging.getLogger("weixin")
@@ -619,9 +620,18 @@ class WeixinCoopLogin(TemplateView):
                 pass
         next = self.request.GET.get('next', '')
         next = urllib.unquote(next.encode('utf-8'))
+
+        phone = ''
+        if token == 'bisouyi':
+            form = BiSouYiRegisterForm(self.request.session, action='old_login')
+            if form.is_valid():
+                phone = form.get_phone()
+                next = form.get_other()
+
         return {
             'context': context,
-            'next': next
+            'next': next,
+            'phone': phone,
             }
 
 
@@ -1033,7 +1043,9 @@ class P2PListView(TemplateView):
         except Exception:
             p2p_products = paginator.page(paginator.num_pages)
 
-        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
+        now = timezone.now()
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True)\
+            .filter(Q(is_long_used=True) | Q(start_at__lt=now, end_at__gt=now)).order_by('-priority')[:3]
 
         return {
             'results': p2p_products[:10],
