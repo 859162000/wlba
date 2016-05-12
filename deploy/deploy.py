@@ -102,7 +102,8 @@ def deploy_channel_action():
         rs = run("ps aux|grep supervisord|grep -v 'grep'")
         print yellow("view server process and check the process exists")
         if rs.return_code == 0:
-            sudo("supervisorctl restart all")
+            sudo("supervisorctl restart channel_web")
+            sudo("supervisorctl restart channel_task")
         else:
             sudo("supervisord -c /etc/supervisord.conf")
         rs = run("ps aux|grep wanglibao|grep -v 'grep'")

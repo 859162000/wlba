@@ -170,7 +170,7 @@ if ENV_ALPHA_DEPLOY:
 if ENV == ENV_PRODUCTION:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'wanglibao_channel',
+        'NAME': 'wlb_channel',
         'USER': 'leon_channel',
         'PASSWORD': '4E6K2oQWjXDI',
         'HOST': 'rdsohvmt0mrexk7kuxau1.mysql.rds.aliyuncs.com',
