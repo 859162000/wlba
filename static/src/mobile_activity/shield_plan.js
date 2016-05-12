@@ -57,7 +57,7 @@
         wx.ready(function () {
             var host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
             var shareImg = host + '/static/imgs/mobile_activity/shield_plan/share.png',
-                shareLink = host + '/activity/weixin_lifestyle/',
+                shareLink = host + '/activity/h5_shield_plan/',
                 shareMainTit = shareTit,
                 shareBody = '投资无多少 安全无大小';
             //分享给微信好友
