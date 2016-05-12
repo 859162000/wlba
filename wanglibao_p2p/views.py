@@ -3,6 +3,7 @@
 from operator import itemgetter
 from decimal import Decimal
 import datetime
+import pytz
 
 from django.contrib.admin.views.decorators import staff_member_required
 # from django.contrib.auth.models import User
@@ -61,7 +62,6 @@ from wanglibao_redis.backend import redis_backend
 from .common import get_p2p_list, get_name_contains_p2p_list
 from wanglibao.templatetags.formatters import safe_phone_str
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -799,6 +799,8 @@ def check_invalid_new_user_product(p2p, user):
     error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
     return error_new_user
 
+from marketing.utils import local_to_utc
+
 class HMDP2PListView(APIView):
     permission_classes = ()
 
@@ -812,7 +814,9 @@ class HMDP2PListView(APIView):
         p2p_product = {}
         if len(p2p_products)>0:
             p2p_product = p2p_products[0]
-            # p2p_product["end_time"]
+            end_time = p2p_product["end_time"]
+            new_end_time = end_time.astimezone(pytz.timezone("Asia/Shanghai"))
+            p2p_product["end_time_local"]=new_end_time.replace(tzinfo=None).strftime("%Y/%m/%d %H:%M:%S")
         return Response({
             'p2p_product': p2p_product,
         })
