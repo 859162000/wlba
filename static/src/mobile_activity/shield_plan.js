@@ -6,33 +6,30 @@
         $(this).hide();
     });
 
-    var scrollTop = false;
-    function scrollEvent(){
-        var top = document.body.scrollTop;
-        var lft = $(".circle-icon-lft"),
-            rht = $(".circle-icon-rht");
-        //var setEvent = null;
-        //console.log(top);
-        if( top> 2780 && top < 3500){
-            scrollTop = true;
-            rht.animate({height: "100%"},function(){
-                lft.css("display","block").animate({height: "100%"},500);
-            },500);
-        }else if(top<2300 || top>3500){
-            if(scrollTop){
-                scrollTop = false;
-                //clearTimeout(setEvent);
-                lft.animate({height: 0},function(){
-                    lft.css("display","none");
-                    rht.animate({height: 0},500);
-                },500);
-            }
-        }
-    }
-    scrollEvent();
-    $("body.h5-shield-plan").on("touchmove", function(){
-        scrollEvent();
-    });
+    //var scrollTop = false;
+    //function scrollEvent(){
+    //    var top = document.body.scrollTop;
+    //    var dom = $(".js-circle-alt");
+    //    //var setEvent = null;
+    //    var circle_top = $("div.js-circle-box").offset().top,
+    //        height = screen.height;
+    //    $(".js-num-box").html(top+"<br />,"+circle_top+"<br />,"+height+"<br />,"+(circle_top-height-400));
+    //    if(top > (circle_top-height-400) && top < circle_top){
+    //        //alert(top);
+    //        scrollTop = true;
+    //        dom.addClass("circle-alt-an");
+    //    }else if(top<(circle_top-height) || top>(circle_top+500)){
+    //        if(scrollTop){
+    //            scrollTop = false;
+    //            //clearTimeout(setEvent);
+    //            dom.removeClass("circle-alt-an");
+    //        }
+    //    }
+    //}
+    //scrollEvent();
+    //$("body.h5-shield-plan").on("touchmove", function(){
+    //    scrollEvent();
+    //});
     function weixin_share(shareTit,fn){
         //alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
