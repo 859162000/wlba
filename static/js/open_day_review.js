@@ -103,6 +103,7 @@
                     var json_one;
                     if(json.hmd_ranks.length()>0){
                         for(var i=0; i<json.hmd_ranks.length; i++) {
+
                             json_one = json.hmd_ranks[i];
                             if (json_one != '') {
                                 var number = fmoney(json_one.amount__sum, 0);
