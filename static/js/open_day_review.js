@@ -108,7 +108,6 @@
                             if (i < 3) {
                                 if (i == 0) {
                                     rankingList.push(['<li class="first">'].join(''));
-                                    li.first!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
                                 } else if (i == 1) {
                                     rankingList.push(['<li class="second">'].join(''));
                                 } else if (i == 2) {
