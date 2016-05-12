@@ -23,16 +23,16 @@ html.no-js(lang="en-gb")
                             .time_text 2016年5月12日-5月18日
                     .ranking_list
                         ul
-                            li.first!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li.second!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li.third!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
-                            li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li.first!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li.second!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li.third!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
                         .ul_footer
                 .section_box_2
                     .section_box_2_main
@@ -73,7 +73,10 @@ html.no-js(lang="en-gb")
                 .section_box_3
                     .title_text
                         span 红木贷项目列表：
-                        a(href='/p2p/list/') 更多>>
+                        if p2p_list_url!= null
+                            a(href='{{p2p_list_url}}') 更多>>
+                        else
+                            a(href='/p2p/list/') 更多>>
                     .section_box_3_main
                         .span8
                           for product in p2p_products
