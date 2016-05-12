@@ -74,25 +74,59 @@
                 $(this).parent().parent().find('.big_photo_img').attr('src',data_src);
             });
 
-            //$.ajax({
-            //    url: '/api/hmd_list/',
-            //    type: 'get',
-            //    success: function (data1) {
-			//
-            //        $('#product_name').text(data1.short_name);
-            //        $('#display_status').text(data1.display_status);
-			//
-            //        $('#end_time_local').text('剩余：'+data1.end_time_local);
-			//
-			//
-            //    },error: function(data1){
-            //        $('.popup_box .text').text(data1.message);
-            //        $('.popup_box .popup_button').hide();
-            //        time_count = 3;
-            //        time_intervalId = setInterval(timerFunction, 1000);
-            //        time_intervalId;
-            //    }
-            //})
+        function fmoney(s, type) {
+            if (/[^0-9\.]/.test(s))
+                return "0";
+            if (s == null || s == "")
+                return "0";
+            s = s.toString().replace(/^(\d*)$/, "$1.");
+            s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+            s = s.replace(".", ",");
+            var re = /(\d)(\d{3},)/;
+            while (re.test(s))
+                s = s.replace(re, "$1,$2");
+            s = s.replace(/,(\d\d)$/, ".$1");
+            if (type == 0) {// 不带小数位(默认是有小数位)
+                var a = s.split(".");
+                if (a[1] == "00") {
+                    s = a[0];
+                }
+            }
+            return s;
+        }
+
+            $.ajax({
+                url: '/api/activity/hmd_invest_ranks/',
+                type: 'get',
+                success: function (data1) {
+                    var rankingList = [];
+                    var json_one;
+                    for(var i=0; i<json.hmd_ranks.length; i++) {
+                        json_one = json.hmd_ranks[i];
+                        if (json_one != '') {
+                            var number = fmoney(json_one.amount__sum, 0);
+                            if (i < 3) {
+                                if (i == 0) {
+                                    rankingList.push(['<li class="first">'].join(''));
+                                    li.first!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                                } else if (i == 1) {
+                                    rankingList.push(['<li class="second">'].join(''));
+                                } else if (i == 2) {
+                                    rankingList.push(['<li class="third">'].join(''));
+                                }
+                                rankingList.push(['<span class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</span><span class="num">'+number+'</span">'].join(''));
+
+                            } else {
+                                var i_num = i + 1;
+                                rankingList.push(['<li><span class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</span><span class="num">'+number+'</span"></li>'].join(''));
+                            }
+                        }
+                    }
+                    $('.ranking_list ul').html(rankingList.join(''));
+                },error: function(data1){
+
+                }
+            })
 
 
             var fetchCookie, setCookie;
