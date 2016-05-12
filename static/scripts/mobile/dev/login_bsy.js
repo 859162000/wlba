@@ -84,8 +84,11 @@ webpackJsonp([6],[
 	            return login('/api/bisouyi/login/?promo_token=bisouyi');
 	        }).then(function (result) {
 	            console.log('login success');
-	            var next_url = (0, _api.getQueryStringByName)('next');
-	            window.location.href = next_url ? decodeURIComponent(decodeURIComponent(next_url)) : '/weixin/account/';
+	            //const next_url = getQueryStringByName('next');
+	            //window.location.href = next_url ? decodeURIComponent(decodeURIComponent(next_url)) : '/weixin/account/';
+	            var next_url1 = (0, _api.getQueryStringByName)('next'),
+	                next_url2 = $(".js-next-url").val();
+	            window.location.href = next_url2 ? decodeURIComponent(decodeURIComponent(next_url2)) : next_url1 ? decodeURIComponent(decodeURIComponent(next_url1)) : '/weixin/account/';
 	        }).catch(function (res) {
 	            if (res['status'] == 403) {
 	                (0, _ui.signModel)('请勿重复提交');

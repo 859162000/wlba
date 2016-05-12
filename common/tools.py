@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 import re
+import ssl
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
 
 
 try:
@@ -115,3 +118,13 @@ class FileObject(object):
     def __init__(self, content, size):
         self.file = content
         self.size = size
+
+
+class MyHttpsAdapter(HTTPAdapter):
+    """指定https请求时使用TLSv1版本"""
+
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(num_pools=connections,
+                                       maxsize=maxsize,
+                                       block=block,
+                                       ssl_version=ssl.PROTOCOL_TLSv1)
