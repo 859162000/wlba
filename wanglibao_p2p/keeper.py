@@ -365,7 +365,9 @@ class AmortizationKeeper(KeeperBaseMixin):
             if settled_sub_amos:
                 from .tasks import coop_amortizations_push
                 coop_amortizations_push.apply_async(
-                    kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
+                    kwargs={'amortizations': settled_sub_amos,
+                            'product_id': product.id,
+                            'amo_act': 'plan'})
 
     # def __generate_useramortization(self, equities):
     #     """
@@ -635,7 +637,9 @@ class AmortizationKeeper(KeeperBaseMixin):
             if settled_sub_amos:
                 from .tasks import coop_amortizations_push
                 coop_amortizations_push.apply_async(
-                    kwargs={'amortizations': settled_sub_amos, 'product_id': product.id})
+                    kwargs={'amortizations': settled_sub_amos,
+                            'product_id': product.id,
+                            'amo_act': 'amortize'})
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(
