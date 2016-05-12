@@ -706,7 +706,7 @@ class FetchXunleiCardAward(APIView):
             if p2pRecord and p2pRecord.create_time >=activity.start_at and p2pRecord.create_time<=activity.end_at and float(p2pRecord.amount)>=1000:
                 reward = self.getReward("1年迅雷会员")
             else:
-                return Response({"ret_code": -1, "message":"活动期内为首次投资，并且投资金额不低于1000元"})
+                return Response({"ret_code": -1, "message":"您不满足领取条件~"})
         if not reward:
             return Response({"ret_code": -1, "message":"奖品已经领完"})
         try:
