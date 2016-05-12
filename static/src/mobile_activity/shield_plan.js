@@ -12,13 +12,15 @@
     //    var dom = $(".js-circle-alt");
     //    //var setEvent = null;
     //    var circle_top = $("div.js-circle-box").offset().top,
-    //        height = screen.height;
-    //    $(".js-num-box").html(top+"<br />,"+circle_top+"<br />,"+height+"<br />,"+(circle_top-height-400));
-    //    if(top > (circle_top-height-400) && top < circle_top){
+    //        height = window.innerHeight || document.documentElement.clientHeight,
+    //        domH = dom.height();
+    //    $(".js-num-box").html(top+" circle_top:"+circle_top+" height:"+height+"<br />circle_top+domH:"+(circle_top+domH-height)+" dom.height:"+dom.height());
+    //    //console.log(top >= circle_top && top < (circle_top+domH));
+    //    if(top > (circle_top+domH-height) && top < (circle_top+domH+height)){
     //        //alert(top);
     //        scrollTop = true;
     //        dom.addClass("circle-alt-an");
-    //    }else if(top<(circle_top-height) || top>(circle_top+500)){
+    //    }else if(top<(circle_top-height) || top>(circle_top+domH+height)){
     //        if(scrollTop){
     //            scrollTop = false;
     //            //clearTimeout(setEvent);
@@ -34,6 +36,8 @@
         //alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
         var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+        var winHost = window.location.href;
+        var debug = winHost.split("debug=")[1];
         org.ajax({
             type: 'GET',
             url: weiURL,
@@ -41,7 +45,7 @@
             success: function (data) {
                 //请求成功，通过config注入配置信息,
                 wx.config({
-                    debug: false,
+                    debug: debug,
                     appId: data.appId,
                     timestamp: data.timestamp,
                     nonceStr: data.nonceStr,
@@ -51,8 +55,7 @@
             }
         });
         wx.ready(function () {
-            var winHost = window.location.href,
-                host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
+            var host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
             var shareImg = host + '/static/imgs/mobile_activity/shield_plan/share.png',
                 shareLink = host + '/activity/weixin_lifestyle/',
                 shareMainTit = shareTit,
