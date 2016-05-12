@@ -147,7 +147,7 @@ html
                     .project-boxs
                         .project-box-c
                             for month in month_data
-                                .g-plan-project
+                                .g-plan-project.ylb-project
                                     .g-plan-title
                                         a(href="{{month.detail_url}}")
                                             if  month.name == 'A'
@@ -166,7 +166,7 @@ html
                                         if month.expected_earning_rate == month.rate_end
                                             span {{month.expected_earning_rate}}
                                         else
-                                            span {{month.expected_earning_rate}} ~ {{month.rate_end}}
+                                            span {{month.expected_earning_rate}}~{{month.rate_end}}
                                         label %
                                     .time-money.clearfix
                                         .time-left
