@@ -24,7 +24,7 @@ from wanglibao_feedback.views import FeedbackViewSet
 # from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTrustViewSet, \
 #     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
-    P2PProductDetailView, RepaymentAPIView, HMDP2PListView
+    P2PProductDetailView, RepaymentAPIView
 from wanglibao_pay.third_pay import TheOneCardAPIView
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView,
                                  YeePayAppPayView, YeePayAppPayCallbackView, YeePayAppPayCompleteView, WithdrawAPIView,
@@ -294,7 +294,6 @@ urlpatterns += patterns(
     url(r'^xunlei/treasure/$', XunleiTreasureAPIView.as_view()),
     url(r'^activity/newusergift/$', FetchNewUserReward.as_view()),
     url(r'^activity/zhaoxiangguan/$', ZhaoXiangGuanAPIView.as_view()),
-    url(r'^hmd_list/$', HMDP2PListView.as_view())
 )
 
 # app端改版新接口
