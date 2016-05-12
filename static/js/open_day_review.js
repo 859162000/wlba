@@ -1,14 +1,15 @@
 (function() {
     require.config({
         paths: {
-            jquery: 'lib/jquery.min'
+            jquery: 'lib/jquery.min',
+            'underscore': 'lib/underscore-min'
         },
         shim: {
             'jquery.modal': ['jquery']
+
         }
     });
-    require(['jquery'],
-        function($, re) {
+    require(['jquery', 'lib/countdown'], function($, countdown) {
 
             var csrfSafeMethod, getCookie, sameOrigin,
                 getCookie = function (name) {
@@ -73,26 +74,104 @@
                 $(this).parent().parent().find('.big_photo_img').attr('src',data_src);
             });
 
+        function fmoney(s, type) {
+            if (/[^0-9\.]/.test(s))
+                return "0";
+            if (s == null || s == "")
+                return "0";
+            s = s.toString().replace(/^(\d*)$/, "$1.");
+            s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+            s = s.replace(".", ",");
+            var re = /(\d)(\d{3},)/;
+            while (re.test(s))
+                s = s.replace(re, "$1,$2");
+            s = s.replace(/,(\d\d)$/, ".$1");
+            if (type == 0) {// 不带小数位(默认是有小数位)
+                var a = s.split(".");
+                if (a[1] == "00") {
+                    s = a[0];
+                }
+            }
+            return s;
+        }
+
             $.ajax({
-                url: '/api/hmd_list/',
+                url: '/api/activity/hmd_invest_ranks/',
                 type: 'get',
-                success: function (data1) {
+                success: function (json) {
+                    var rankingList = [];
+                    var json_one;
+                    for(var i=0; i<json.hmd_ranks.length; i++) {
+                        json_one = json.hmd_ranks[i];
+                        if (json_one != '') {
+                            var number = fmoney(json_one.amount__sum, 0);
+                            if (i < 3) {
+                                if (i == 0) {
+                                    rankingList.push(['<li class="first">'].join(''));
+                                } else if (i == 1) {
+                                    rankingList.push(['<li class="second">'].join(''));
+                                } else if (i == 2) {
+                                    rankingList.push(['<li class="third">'].join(''));
+                                }
+                                rankingList.push(['<span class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</span><span class="num">'+number+'</span">'].join(''));
 
-                    $('#product_name').text(data1.short_name);
-                    $('#display_status').text(data1.display_status);
-
-                    $('#end_time_local').text('剩余：'+data1.end_time_local);
-
-
+                            } else {
+                                var i_num = i + 1;
+                                rankingList.push(['<li><span class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</span><span class="num">'+number+'</span"></li>'].join(''));
+                            }
+                        }
+                    }
+                    $('.ranking_list ul').html(rankingList.join(''));
                 },error: function(data1){
-                    $('.popup_box .text').text(data1.message);
-                    $('.popup_box .popup_button').hide();
-                    time_count = 3;
-                    time_intervalId = setInterval(timerFunction, 1000);
-                    time_intervalId;
+
                 }
             })
 
+
+            var fetchCookie, setCookie;
+            $('.container').on('click', '.panel-p2p-product', function() {
+              var url;
+              url = $('.panel-title-bar a', $(this)).attr('href');
+              return window.location.href = url;
+            });
+            $('.p2pinfo-list-box').on('mouseenter', function(e) {
+              var target;
+              target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
+              return $('#' + target).show();
+            }).on('mouseleave', function(e) {
+              var target;
+              target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
+              return $('#' + target).hide();
+            }).on('click', function() {
+              var url;
+              url = $('.p2pinfo-title-content>a', $(this)).attr('href');
+              return window.location.href = url;
+            });
+            fetchCookie = function(name) {
+              var arr, reg;
+              reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+              if (arr = document.cookie.match(reg)) {
+                return unescape(arr[2]);
+              } else {
+                return null;
+              }
+            };
+            setCookie = function(key, value, day) {
+              var date;
+              date = new Date();
+              date.setTime(date.getTime() + day * 24 * 60 * 60 * 1000);
+              document.cookie = key + "=" + value + ";expires=" + date.toGMTString();
+              return console.log(document.cookie);
+            };
+            $('.p2p-body-close').on('click', function() {
+              $('.p2p-mask-warp').hide();
+              return setCookie('p2p_mask', 'show', 15);
+            });
+            return (function(canShow) {
+              if (!canShow) {
+                return $('.p2p-mask-warp').show();
+              }
+            })(fetchCookie('p2p_mask'));
         })
 
 }).call(this);

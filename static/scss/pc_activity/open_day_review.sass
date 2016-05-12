@@ -648,19 +648,20 @@
       z-index: 2
       position: absolute
       right: 122px
-      background: url("/static/imgs/pc_activity/open_day_review/ranking_list_bg.png") no-repeat
+      //background: url("/static/imgs/pc_activity/open_day_review/ranking_list_bg.png") no-repeat
       width: 533px
-      height: 678px
+      //height: 678px
       disply: block
       ul
         width: 100%
-        padding: 9px 0 0 164px
+        padding: 9px 0 0 0
         font-size: 0
         li
-          height: 28px
-          margin-top: 22px
+          height: 50px
           width: 100%
           display: inline-block
+          background: url("/static/imgs/pc_activity/open_day_review/no_05.png") no-repeat
+          padding: 12px 0 20px 164px
           span
             line-height: 28px
             color: #7f8184
@@ -675,13 +676,24 @@
             width: 158px
             float: left
         li.first
-          margin-top: 45px
+          height: 120px
+          padding-top: 50px
+          background: url("/static/imgs/pc_activity/open_day_review/no_01.png") no-repeat
           span
             color: #fff
         li.second
-          margin-top: 75px
+          height: 90px
+          padding-top: 40px
+          background: url("/static/imgs/pc_activity/open_day_review/no_02.png") no-repeat
         li.third
-          margin: 66px 0 21px
+          height: 90px
+          padding-top: 36px
+          background: url("/static/imgs/pc_activity/open_day_review/no_03.png") no-repeat
+      .ul_footer
+        background: url("/static/imgs/pc_activity/open_day_review/no_07.png") no-repeat
+        height: 19px
+        width: 100%
+        clear: both
   .section_box_3
     width: 1113px
     margin: 0 auto 64px
@@ -709,9 +721,9 @@
     .section_box_3_main
       width: 1113px
       height: 325px
-      background: url("/static/imgs/pc_activity/open_day_review/section_box_bg.png") no-repeat
+      //background: url("/static/imgs/pc_activity/open_day_review/section_box_bg.png") no-repeat
       display: block
-      padding: 40px 17px 0
+      //padding: 40px 17px 0
       .product_name
         padding: 0 0 0 37px
         line-height: 34px
@@ -831,4 +843,8 @@
       color: #7f8184
       font-size: 16px
 
-
+  .span8, .bank-card--info-value
+    font-size: 12px
+  .span8, .bank-card--info-value
+    width: 100%
+    margin-right: 0

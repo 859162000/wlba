@@ -44,7 +44,7 @@ html(style="width: 100%;height: auto;position: relative")
           earning_rate = str(p2p.expected_earning_rate)
           .item-price {{earning_rate}}%
             if p2p.activity
-              | + <span class="blue">{{p2p.activity.activity_rule_percent_text}}%</span>
+              | + <span class="blue">{{p2p.activity.rule.percent_text}}%</span>
           .item-detail 预计年化收益
           ul.item-info
             li.item-li.item-li1
@@ -67,11 +67,13 @@ html(style="width: 100%;height: auto;position: relative")
         .tit-lft 金盾计划专项资金
         a(href="javascript:void(0);").tit-more.js-file 查看相关文件 >>
       .circle-box.js-circle-box
-        .circle-num 1234.80 <span class="l-txt">万元</span>
-        .circle-promote 可启动资金(元)
-        i.circle-icon-bg
-        i.circle-icon.circle-icon-lft
-        i.circle-icon.circle-icon-rht
+        .circle-bg
+        //.circle-alt.js-circle-alt
+        //  .circle-alt-lft
+        //  .circle-alt-rht
+        .circle-tct-box
+          .circle-num 12,329,222.06
+          .circle-promote 可启动资金(元)
     .sp-part5
       .tit1 【定位】“金盾计划”的推出对平台的风控体系有什么影响？
       .detail 尽管监管层禁止平台自担保，但一直鼓励平台采取有效措施保证投资用户的利益。“金盾计划”与业内常规的担保手段不同，是以维护用户权益为目的推出的专项资金，专门用于收购线上逾期或违约的不良项目。做为风险处理的方式之一，金盾计划与平台其他风控手段共同作用，尽可能降低用户投资的风险。
@@ -86,7 +88,7 @@ html(style="width: 100%;height: auto;position: relative")
       .detail 如果线上项目发生违约，金盾计划最迟将在该项目到期之日之后的第30个自然日当日收购该项目债权。在收购不良债权的动作发生之前，期间利息按照该项目原定的年化收益率支付投资人。为提升这笔专项资金的透明度，网利宝会每月定期披露金盾计划的具体金额，供投资人监督。
       .tit1 【规模】金盾计划在上线之初有多少资金？资金规模是否可以覆盖风险？
       .detail 金盾计划上线初期，网利宝针对成功撮合的借款项目，根据每笔借款项目的风险等级，按成交金额的一定比例向合作机构拟提了超1千万的专项资金保证该计划顺利运行。在此专项资金可覆盖风险的范围内，金盾计划将最大限度降低不良债权给相关投资用户带来的损失，后续随着平台交易量的不断增加，网利宝会在此基础上建立、健全此专项资金收购不良债权的各项机制，吸引更多第三方机构、优质融资客户自愿加入 “金盾计划”，扩充此专项资金的储备额度，尽力维护网利宝投资用户的权益。
-
+    //.js-num-box(style="position:fixed; top:0; left:0; width:8rem; height:8rem; background:#000; color:#fff;")
     .sp-alt
       img(src="/static/imgs/mobile_activity/shield_plan/file.jpg")
 

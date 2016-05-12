@@ -1,3 +1,24 @@
+@keyframes spRotateAn
+  0%
+    transform: rotate(0deg)
+  99%
+    transform: rotate(180deg)
+    opacity: 1
+  100%
+    transform: rotate(180deg)
+    opacity: 0
+@-webkit-keyframes spRotateAn
+  0%
+    -webkit-transform: rotate(0deg)
+  99%
+    -webkit-transform: rotate(180deg)
+    opacity: 1
+  100%
+    -webkit-transform: rotate(180deg)
+    opacity: 0
+@mixin spRotateAn($d:0.1s)
+  animation: spRotateAn 1s $d linear forwards
+  -webkit-animation: spRotateAn 1s $d linear forwards
 .h5-shield-plan
   color: #666
   .sp-banner
@@ -80,6 +101,10 @@
         border-bottom: 0.25rem dotted #E5E5E5
         height: 2.75rem
         line-height: 2.75rem
+        overflow: hidden
+        text-overflow: ellipsis
+        padding: 0 1rem
+        white-space: nowrap
       .item-tit-lft, .item-tit-rht
         position: absolute
         width: 1.2rem
@@ -149,7 +174,7 @@
             vertical-align: middle
   .sp-part4
     background: #373F74
-    padding: 55px 0
+    padding: 1.25rem 0
     color: #fff
     .tit-box
       border-bottom-color: #545E9F
@@ -158,6 +183,7 @@
     .circle-box
       width: 10.25rem
       height: 10.25rem
+      border-radius: 10rem
       text-align: center
       color: #fff
       margin: 3.15rem auto 3.625rem
@@ -170,30 +196,51 @@
       .circle-promote
         margin-top: 0.5rem
         font-size: 0.55rem
-    .circle-icon-bg, .circle-icon
-      background: url("/static/imgs/pc_activity/shield_plan/circle_jdjh.png") center center no-repeat
-      display: block
+    .circle-tct-box
       position: absolute
       top: 0
       left: 0
       width: 100%
       height: 100%
-    .circle-icon-bg
-      background-size: cover
-      opacity: 0.4
-    .circle-icon-lft, .circle-icon-rht
-      width: 50%
-      height: 0
-    .circle-icon-lft
-      display: none
+      z-index: 3
+    .circle-bg, .circle-alt
+      width: 100%
+      height: 100%
+      border-radius: 50%
+      position: absolute
+      top: 0
       left: 0
-      top: auto
-      bottom: 0
-      background-position: left bottom
-    .circle-icon-rht
-      background-position: right top
-      left: auto
+      background: url("/static/imgs/mobile_activity/shield_plan/circle_jdjh.png") center center no-repeat
+      background-size: contain
+      z-index: 1
+    .circle-alt
+      opacity: 0.6
+    .circle-alt-lft, .circle-alt-rht
+      position: absolute
+      width: 50%
+      height: 100%
+      top: 0
+    .circle-alt-lft
+      left: 0
+      overflow: hidden
+      border-radius: 10rem 0 0 10rem
+    .circle-alt-lft:after, .circle-alt-rht:after
+      background: #373f74
+      display: block
+      content: ""
+      width: 100%
+      height: 100%
+    .circle-alt-rht
       right: 0
+      overflow: hidden
+      border-radius: 0 10rem 10rem 0
+    .circle-alt-an
+      .circle-alt-lft:after
+        transform-origin: right center
+        +spRotateAn($d:1.1s)
+      .circle-alt-rht:after
+        transform-origin: left center
+        +spRotateAn()
   .sp-part5
     padding: 0 1rem 3.75rem
     max-height: 100%
