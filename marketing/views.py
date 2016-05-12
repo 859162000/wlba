@@ -3287,8 +3287,9 @@ class HMDP2PListView(TemplateView):
         p2p_products.extend(p2p_full_list)
         p2p_products.extend(p2p_repayment_list)
         p2p_products.extend(p2p_finished_list)
-
-        p2p_list_url = settings.CALLBACK_HOST+reverse(self.p2p_list_url_name)
+        p2p_list_url = ""
+        if self.p2p_list_url_name:
+            p2p_list_url = settings.CALLBACK_HOST+reverse(self.p2p_list_url_name)
         print p2p_list_url
         return {
             'p2p_products': p2p_products[0:1],
