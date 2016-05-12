@@ -2032,7 +2032,7 @@ class BaJinSheRegister(CoopRegister):
                     result = res.json()
                     logger.info("register_call_back connected return [%s]" % result)
                 else:
-                    logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+                    logger.info("%s connected status code[%s]" % (self.call_back_url, res.status_code))
             except Exception, e:
                 logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
             else:
