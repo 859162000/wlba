@@ -272,55 +272,55 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/mysite.log',
+            'filename': '/var/log/wanglibao/channel_mysite.log',
             'formatter': 'verbose'
         },
         'marketing': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/marketing.log',
+            'filename': '/var/log/wanglibao/channel_marketing.log',
             'formatter': 'verbose'
         },
         'wanglibao_account': {  #add by yihen@20151113
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/wanglibao_account.log',
+            'filename': '/var/log/wanglibao/channel_account.log',
             'formatter': 'verbose'
         },
         'wanglibao_rest': {  #add by yihen@20151028
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/wanglibao_rest.log',
+            'filename': '/var/log/wanglibao/channel_rest.log',
             'formatter': 'verbose'
         },
         'wanglibao_cooperation': {  #add by yihen@20150915
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
+            'filename': '/var/log/wanglibao/channel_cooperation.log',
             'formatter': 'verbose'
         },
         'wanglibao_oauth2': {  #add by yihen@20151028
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/wanglibao_oauth2.log',
+            'filename': '/var/log/wanglibao/channel_oauth2.log',
             'formatter': 'verbose'
         },
         'wanglibao_p2p': {  # add by chenweibin@20160328
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/wanglibao_p2p.log',
+            'filename': '/var/log/wanglibao/channel_p2p.log',
             'formatter': 'verbose'
         },
         'wanglibao_tasks': {  # add by chenweibin@20160328
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/wanglibao_tasks.log',
+            'filename': '/var/log/wanglibao/channel_tasks.log',
             'formatter': 'verbose'
         },
         'common': {  # add by chenweibin@20160328
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/common.log',
+            'filename': '/var/log/wanglibao/channel_common.log',
             'formatter': 'verbose'
         },
     },
@@ -417,17 +417,7 @@ SWAGGER_SETTINGS = {
 # Celery configuration
 
 # Now since the rabbitmq installed in localhost, we use guest
-if ENV == ENV_PRODUCTION:
-    # FixMe,　修改正式环境broker
-    BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
-elif ENV == ENV_STAGING:
-    BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.1.242:5672/wanglibao')
-elif ENV == ENV_ALPHA:
-    BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.20.233:5672/wanglibao')
-else:
-    # FixMe,　修改测试环境broker　URL, 如果DEBUG is False, 需添加静态文件配置，否则后台管理页面无法加载
-    # BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
-    BROKER_URL = env.get('BROKER_URL', 'amqp://wanglibao:wanglibank@192.168.1.242:5672/wanglibao')
+BROKER_URL = env.get('BROKER_URL', 'amqp://guest:guest@localhost//')
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
