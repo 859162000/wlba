@@ -1,6 +1,6 @@
 - load formatters
 doctype html
-html(style="background: #fff")
+html(style="background: #f4f4f4")
     head
         title 网利宝
         include include/app_head
@@ -72,6 +72,18 @@ html(style="background: #fff")
                                     img.yuan(src='/static/imgs/mobile_activity/app_open_day_review/yuan.png')
                                 .phone 132****04
                                 .money 2,400,000
+                    .careful_text 注：<br>1、活动期间，投资带有“产融通HMD”开头的项目，投资金额才能进入累计排行。<br>2、投资额相同的情况下，按照投资时间先后顺序进行排名。
+            .section.section_2.section_margin
+                .ranking_box
+                    .red_title 重礼悬赏
+                    .ranking_box_list
+                        .box
+                            .img
+                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_1.png')
+                                p 1 名
+                            p.data_text!='价值<span>2000</span>元红木制品'
+            .section.section_2
+
             .section.section_1
                 .big_title.big_title_1 “产业银行”的业务模式
                 .line_red
