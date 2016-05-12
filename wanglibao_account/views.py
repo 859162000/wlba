@@ -3006,6 +3006,7 @@ class BiSouYiLoginApi(APIView):
                     }
 
                     content = generate_bisouyi_content(content_data)
+                    callback_data = json.dumps({'content': content})
 
                     headers = {
                         'Content-Type': 'application/json',
@@ -3016,7 +3017,7 @@ class BiSouYiLoginApi(APIView):
                     # 授权回调
                     common_callback_for_post.apply_async(
                         kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL,
-                                'params': json.dumps(content_data),
+                                'params': callback_data,
                                 'channel': channel_code, 'headers': headers})
 
                     start_time = timezone.localtime(timezone.now())
