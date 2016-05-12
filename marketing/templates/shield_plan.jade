@@ -61,7 +61,7 @@ html
                   .detail 起投金额
                 li.item-li.item-li3
                   amount = p2p.total_amount - p2p.ordered_amount
-                  .day {{amount | money_format_int}}
+                  .day {{amount | money_format_int}}元
                   .detail 可投金额
               status = p2p.display_status
               a(href="/p2p/detail/{{p2p.id}}/").item-btn {{status}}
