@@ -1,14 +1,15 @@
 (function() {
     require.config({
         paths: {
-            jquery: 'lib/jquery.min'
+            jquery: 'lib/jquery.min',
+            'underscore': 'lib/underscore-min'
         },
         shim: {
             'jquery.modal': ['jquery']
+
         }
     });
-    require(['jquery'],
-        function($, re) {
+    require(['jquery', 'lib/countdown'], function($, countdown) {
 
             var csrfSafeMethod, getCookie, sameOrigin,
                 getCookie = function (name) {
@@ -73,26 +74,71 @@
                 $(this).parent().parent().find('.big_photo_img').attr('src',data_src);
             });
 
-            $.ajax({
-                url: '/api/hmd_list/',
-                type: 'get',
-                success: function (data1) {
+            //$.ajax({
+            //    url: '/api/hmd_list/',
+            //    type: 'get',
+            //    success: function (data1) {
+			//
+            //        $('#product_name').text(data1.short_name);
+            //        $('#display_status').text(data1.display_status);
+			//
+            //        $('#end_time_local').text('剩余：'+data1.end_time_local);
+			//
+			//
+            //    },error: function(data1){
+            //        $('.popup_box .text').text(data1.message);
+            //        $('.popup_box .popup_button').hide();
+            //        time_count = 3;
+            //        time_intervalId = setInterval(timerFunction, 1000);
+            //        time_intervalId;
+            //    }
+            //})
 
-                    $('#product_name').text(data1.short_name);
-                    $('#display_status').text(data1.display_status);
 
-                    $('#end_time_local').text('剩余：'+data1.end_time_local);
-
-
-                },error: function(data1){
-                    $('.popup_box .text').text(data1.message);
-                    $('.popup_box .popup_button').hide();
-                    time_count = 3;
-                    time_intervalId = setInterval(timerFunction, 1000);
-                    time_intervalId;
-                }
-            })
-
+            var fetchCookie, setCookie;
+            $('.container').on('click', '.panel-p2p-product', function() {
+              var url;
+              url = $('.panel-title-bar a', $(this)).attr('href');
+              return window.location.href = url;
+            });
+            $('.p2pinfo-list-box').on('mouseenter', function(e) {
+              var target;
+              target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
+              return $('#' + target).show();
+            }).on('mouseleave', function(e) {
+              var target;
+              target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
+              return $('#' + target).hide();
+            }).on('click', function() {
+              var url;
+              url = $('.p2pinfo-title-content>a', $(this)).attr('href');
+              return window.location.href = url;
+            });
+            fetchCookie = function(name) {
+              var arr, reg;
+              reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+              if (arr = document.cookie.match(reg)) {
+                return unescape(arr[2]);
+              } else {
+                return null;
+              }
+            };
+            setCookie = function(key, value, day) {
+              var date;
+              date = new Date();
+              date.setTime(date.getTime() + day * 24 * 60 * 60 * 1000);
+              document.cookie = key + "=" + value + ";expires=" + date.toGMTString();
+              return console.log(document.cookie);
+            };
+            $('.p2p-body-close').on('click', function() {
+              $('.p2p-mask-warp').hide();
+              return setCookie('p2p_mask', 'show', 15);
+            });
+            return (function(canShow) {
+              if (!canShow) {
+                return $('.p2p-mask-warp').show();
+              }
+            })(fetchCookie('p2p_mask'));
         })
 
 }).call(this);
