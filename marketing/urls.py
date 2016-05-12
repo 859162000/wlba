@@ -94,7 +94,7 @@ urlpatterns = patterns(
     url(r'^wangli_vip/$', TemplateView.as_view(template_name="wangli_vip.jade")),
     url(r'^august_phone/$', TemplateView.as_view(template_name="august_phone.jade")),
     url(r'^april_mobilization/$', TemplateView.as_view(template_name="april_mobilization.jade")),
-    url(r'^open_day_review/$', HMDP2PListView.as_view(template_name="open_day_review.jade")),
+    url(r'^open_day_review/$', HMDP2PListView.as_view(template_name="open_day_review.jade", p2p_list_url_name="p2p_list")),
     url(r'^center_film_ticket/$', TemplateView.as_view(template_name="center_film_ticket.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
