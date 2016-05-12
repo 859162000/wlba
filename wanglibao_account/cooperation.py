@@ -411,11 +411,24 @@ class BiSouYiRegister(CoopRegister):
         super(BiSouYiRegister, self).__init__(*args, **kwargs)
 
 
+class WangLiBaoRegister(CoopRegister):
+    def __init__(self, *args, **kwargs):
+        super(WangLiBaoRegister, self).__init__(*args, **kwargs)
+
+    def process_for_register(self, user):
+        """
+        用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
+        """
+        self.save_to_oauthuser(user)
+        self.save_to_access_token(user)
+
+
 # 注册第三方通道
 coop_register_processor = {
     'bajinshe': 'BaJinSheRegister',
     'renrenli': 'RenRenLiRegister',
     'bisouyi': 'BiSouYiRegister',
+    'wanglibao': 'WangLiBaoRegister',
 }
 
 

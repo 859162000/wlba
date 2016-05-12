@@ -148,7 +148,7 @@ class AccessTokenOauthView(APIView):
             if key:
                 try:
                     if sign == generate_oauth2_sign(user_id, client_id, key):
-                        access_token = AccessToken.objects.filter(Q(token=token) &
+                        access_token = AccessToken.objects.filter(Q(token=token, user_id=user_id) &
                                                                   (Q(expires__gte=now()) |
                                                                    Q(client__token_expire_switch=False)))
                         if access_token.exists():
