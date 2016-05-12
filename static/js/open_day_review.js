@@ -73,7 +73,25 @@
                 $(this).parent().parent().find('.big_photo_img').attr('src',data_src);
             });
 
+            $.ajax({
+                url: '/api/hmd_list/',
+                type: 'get',
+                success: function (data1) {
 
+                    $('#product_name').text(data1.short_name);
+                    $('#display_status').text(data1.display_status);
+
+                    $('#end_time_local').text('剩余：'+data1.end_time_local);
+
+
+                },error: function(data1){
+                    $('.popup_box .text').text(data1.message);
+                    $('.popup_box .popup_button').hide();
+                    time_count = 3;
+                    time_intervalId = setInterval(timerFunction, 1000);
+                    time_intervalId;
+                }
+            })
 
         })
 
