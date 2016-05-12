@@ -98,7 +98,7 @@
             $.ajax({
                 url: '/api/activity/hmd_invest_ranks/',
                 type: 'get',
-                success: function (data1) {
+                success: function (json) {
                     var rankingList = [];
                     var json_one;
                     for(var i=0; i<json.hmd_ranks.length; i++) {
