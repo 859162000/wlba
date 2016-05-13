@@ -41,6 +41,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_invite.invite_common import ShareInviteRegister
 from wanglibao_account import message as inside_message
 from wanglibao_p2p.models import P2PRecord
+from django.db import IntegrityError
 
 logger = logging.getLogger("weixin")
 # https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
@@ -686,7 +687,10 @@ class FetchXunleiCardAward(APIView):
         type = int(type)
 
         code = activity.code+"_"+str(type)
-        activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, activity_code=code)
+        try:
+            activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, activity_code=code)
+        except IntegrityError, e:
+            return Response({"ret_code":-1, "message":"系统忙，请重试"})
         if activity_reward_record.status:
             return Response({"ret_code": -1, "message":"您已经领取过"})
 

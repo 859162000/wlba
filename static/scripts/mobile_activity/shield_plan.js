@@ -251,11 +251,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     //$("body.h5-shield-plan").on("touchmove", function(){
     //    scrollEvent();
     //});
+    var winHost = window.location.href;
+    var host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
     function weixin_share(shareTit,fn){
         //alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
         var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
-        var winHost = window.location.href;
         var debug = winHost.split("debug=")[1];
         org.ajax({
             type: 'GET',
@@ -274,7 +275,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         });
         wx.ready(function () {
-            var host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
             var shareImg = host + '/static/imgs/mobile_activity/shield_plan/share.png',
                 shareLink = host + '/activity/h5_shield_plan/',
                 shareMainTit = shareTit,
@@ -323,8 +323,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     function goBuy(){
         $(".js-go-buy").on("touchstart",function(){
             var self = $(this),
-                url = self.attr("data-src");
-            window.location.href = url;
+                bug_url = self.attr("data-src");
+            window.location.href = bug_url;
         });
     }
 
@@ -358,7 +358,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     $(".js-go-buy").on("touchstart",function() {
                         mixins.loginApp({
                             refresh: 1,
-                            url: 'https://staging.wanglibao.com/activity/h5_shield_plan/'
+                            url: host+'/activity/h5_shield_plan/'
                         });
                     });
                 } else {
@@ -366,7 +366,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     connect(data);
                 }
             });
-            mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小", image: 'https://staging.wanglibao.com/static/imgs/mobile_activity/shield_plan/share.png'});
+            mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小", image: host+'/static/imgs/mobile_activity/shield_plan/share.png'});
         },
         other: function(){
             goBuy();

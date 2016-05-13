@@ -4,9 +4,12 @@
   width: 100%
   font-size: 0
   overflow: hidden
-  .banner
+  .banner_img
     width: 100%
-    display: block
+    display: inline-block
+    .banner
+      width: 100%
+      display: block
   .section_1
     background: #fafafa
     box-shadow: 0 0 3px 2px #dcdcdc
@@ -15,6 +18,9 @@
     margin-bottom: 0.75rem
   .section_2
     background: #fff
+  .section_first
+    background: none
+
   .section
     display: inline-block
     width: 100%
@@ -165,7 +171,8 @@
           width: 19.2%
     .line_gray_1
       margin-bottom: 1.15rem
-    .section_box8
+    .section_box8,.talk_box
+
       position: relative
       display: inline-block
       width: 100%
@@ -244,8 +251,7 @@
   .ranking_wrap
     width: 100%
     background: url("/static/imgs/mobile_activity/app_open_day_review/banner_2.jpg") no-repeat
-    background-size: 100%
-    box-shadow: 0 -5px #000
+    background-size: 100% auto
     dl
       text-align: center
       color: #fff
@@ -281,8 +287,9 @@
         position: absolute
         left: 0
         top: 50%
-        margin-top: -0.45rem
+        margin-top: -0.3rem
         z-index: 2
+        height: 0.9rem
     .ranking_title_top
       width: 100%
       line-height: 0.9rem
@@ -395,11 +402,14 @@
       font-size: 0.6rem
       line-height: 1.2rem
       color: #585757
-      width: 80%
+      width: 100%
+      padding: 1rem 10%
       display: block
+      background: #fff
       margin: 0 auto 0.375rem
       max-height: 9999rem
   .section_margin
+
     margin-top: 0.75rem
   .ranking_box
     position: relative
@@ -468,13 +478,28 @@
     line-height: 1rem
     text-align: center
     margin-left: -2.175rem
+    background-size: cover
   .insert_text
     width: 100%
-    padding-left: 4%
+    padding: 0 1rem
     color: #585757
     font-size: 0.6rem
     height: 2.15rem
     line-height: 2.15rem
+    span
+      color: #585757
+      font-size: 0.6rem
+      height: 2.15rem
+      line-height: 2.15rem
+      float: left
+    span.app_link
+      float: right
+    a
+      color: #585757
+      font-size: 0.6rem
+      height: 2.15rem
+      line-height: 2.15rem
+      float: right
   .p2p_products_box
     position: relative
     width: 100%
@@ -571,7 +596,7 @@
     position: relative
     width: 100%
     display: inline-block
-    padding: 2.125rem 5% 1.4rem
+    padding: 1.8rem 5% 1.4rem
     font-size: 0
     p
       width: 100%
@@ -601,6 +626,9 @@
       font-size: 18px
       background: #fff
       width: 90%
+      box-shadow: 0 0.1rem 0.3rem #cfcfcf
+      border-radius: 0.25rem
+
     .swiper-pagination
       display: block
       bottom: 1.45rem
@@ -620,6 +648,91 @@
         display: block
         width: 89%
         padding-bottom: 2.75rem
+    .swiper-pagination-bullet
+      width: 0.35rem
+      height: 0.35rem
+      background: #b6b6b6
+      border-radius: 50%
+    .swiper-pagination-bullet-active
+      width: 1.8rem
+      height: 0.35rem
+      background: #E5493A
+      border-radius: 0.35rem
+    .swiper-container-horizontal>.swiper-pagination .swiper-pagination-bullet
+      margin: 0 0.2rem
+
+  .section
+    .photo_text
+      text-align: left
+      color: #585757
+      text-indent: 2rem
+    .section_box8,.talk_box
+      padding-top: 2.6rem
+      .pagination
+        margin-top: 2rem
+        position: relative
+        bottom: 0
+      .swiper-slide
+        text-align: center
+        background: #fff
+        width: 90%
+        box-shadow: 0 0.1rem 0.3rem #cfcfcf
+        border-radius: 0.25rem
+      .swiper-pagination-bullet
+        width: 0.35rem
+        height: 0.35rem
+        background: #b6b6b6
+        border-radius: 50%
+      .swiper-pagination-bullet-active
+        width: 1.8rem
+        height: 0.35rem
+        background: #E5493A
+        border-radius: 0.35rem
+      .swiper-container-horizontal>.swiper-pagination .swiper-pagination-bullet
+        margin: 0 0.2rem
+    .talk_box
+      padding-top: 0
+      .swiper-slide
+        text-align: center
+        background: none
+        width: 90%
+        box-shadow: none
+        border-radius: 0
+      .box
+        margin-bottom: 0
+        .people_text
+          font-size: 0.75rem
+          line-height: 1.5rem
+          color: #585757
+          width: 83%
+          display: block
+          margin: 0 auto
+          height: 14rem
+
+          @media screen and (max-device-width: 400px)
+            height: 15rem
+          @media screen and (max-width: 400px)
+            height: 15rem
+          @media screen and (max-device-width: 370px)
+            height: 16.5rem
+          @media screen and (max-width: 370px)
+            height: 16.5rem
+
+        .people_name
+          font-size: 0.75rem
+          line-height: 1.5rem
+          color: #585757
+          text-align: left
+          width: 83%
+          display: block
+          margin: 0 auto
+          padding-bottom: 0.75rem
+  .section_last
+    border-bottom: none
+    padding-bottom: 3.5rem
+    margin-bottom: 0
+
+
 
 
 
