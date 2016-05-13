@@ -142,6 +142,7 @@ def register_ok(user_id, device):
             "user_id": user_id, "device_type":device_type,
         }, queue='celery02')
 
+
 @app.task
 def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -159,6 +160,7 @@ def idvalidate_ok(user_id, device):
             send_idvalidate_data.apply_async(kwargs={
                 "user_id": user_id, "device_type":device_type,
             }, queue='celery02')
+
 
 @app.task
 def deposit_ok(user_id, amount, device, order_id):
@@ -231,6 +233,7 @@ def deposit_ok(user_id, amount, device, order_id):
             "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
         }, queue='celery02')
 
+
 @app.task
 def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -288,6 +291,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
         send_withdraw_data.apply_async(kwargs={
             "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
         }, queue='celery02')
+
 
 @app.task
 def calc_broker_commission(product_id):
