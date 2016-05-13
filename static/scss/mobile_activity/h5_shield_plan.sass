@@ -1,0 +1,325 @@
+@keyframes spRotateAn
+  0%
+    transform: rotate(0deg)
+  99%
+    transform: rotate(180deg)
+    opacity: 1
+  100%
+    transform: rotate(180deg)
+    opacity: 0
+@-webkit-keyframes spRotateAn
+  0%
+    -webkit-transform: rotate(0deg)
+  99%
+    -webkit-transform: rotate(180deg)
+    opacity: 1
+  100%
+    -webkit-transform: rotate(180deg)
+    opacity: 0
+@mixin spRotateAn($d:0.1s)
+  animation: spRotateAn 1s $d linear forwards
+  -webkit-animation: spRotateAn 1s $d linear forwards
+
+//@keyframes spin-circle
+//  0%
+//    transform: rotate(0deg)
+//  100%
+//    transform: rotate(360deg)
+//@-webkit-keyframes spin-circle
+//  0%
+//    -webkit-transform: rotate(0deg)
+//  100%
+//    -webkit-transform: rotate(360deg)
+//@keyframes second-half-hide
+//  0%
+//    opacity: 1
+//  50%, 100%
+//    opacity: 0
+//@-webkit-keyframes second-half-hide
+//  0%
+//    opacity: 1
+//  50%, 100%
+//    opacity: 0
+//@keyframes second-half-show
+//  0%
+//    opacity: 0
+//  50%, 100%
+//    opacity: 1
+//@-webkit-keyframes second-half-show
+//  0%
+//    opacity: 0
+//  50%, 100%
+//    opacity: 1
+//@mixin halfHide($t:0.8s)
+//  animation: second-half-hide $t steps(1, end) forwards
+//  -webkit-animation: second-half-hide $t steps(1, end) forwards
+//@mixin halfShow($t:0.8s)
+//  animation: second-half-show $t steps(1, end )  forwards
+//  -webkit-animation: second-half-show $t steps(1, end )  forwards
+.h5-shield-plan
+  color: #666
+  .sp-banner
+    width: 100%
+    img
+      width: 100%
+      vertical-align: middle
+  .sp-part2
+    background: #373F74 url("/static/imgs/mobile_activity/shield_plan/background_h5.png") center bottom no-repeat
+    background-size: cover
+    padding: 1.5rem 0
+    color: #fff
+    .yellow-circle
+      width: 0.4rem
+      height: 0.4rem
+      border-radius: 0.4rem
+      background: #FFDF5F
+      margin: 0 auto 0.4rem
+    .part-tit
+      font-size: 0.825rem
+      width: 100%
+      text-align: center
+      margin-bottom: 0.75rem
+    .part-info
+      font-size: 0.6rem
+      padding: 0 1rem
+      line-height: 0.9rem
+      max-height: 100%
+    .part-guide
+      text-align: center
+      margin: 1.325rem auto
+    .part-num
+      display: -webkit-box
+      margin: 0 1rem 2.5rem
+      .num-box
+        -webkit-box-flex: 1
+        text-align: center
+      .num
+        display: block
+        width: 1.5rem
+        height: 1.5rem
+        text-align: center
+        line-height: 1.5rem
+        border-radius: 1.5rem
+        background: #5868D9
+        color: #fff
+        font-size: 0.9rem
+        margin: 0 auto 1rem
+      .txt
+        font-size: 0.75rem
+        line-height: 1rem
+    .part-num1
+      .num-box
+        width: 33.33%
+    .part-num2
+      .num-box
+        width: 50%
+  .tit-box
+    border-bottom: 1px solid #E5E5E5
+    height: 1.25rem
+    margin: 0 1rem
+    .tit-lft
+      font-size: 0.65rem
+      float: left
+    .tit-more
+      float: right
+      font-size: 0.65rem
+      line-height: 1rem
+      text-align: right
+  .sp-part3
+    padding: 1rem 0 2.8rem
+    .list-box
+      margin: 2rem 0.5rem 0
+      overflow: hidden
+      position: relative
+      .item-tit
+        font-size: 0.75rem
+        text-align: center
+        border: 1px solid #E5E5E5
+        border-bottom: 0.25rem dotted #E5E5E5
+        height: 2.75rem
+        line-height: 2.75rem
+        overflow: hidden
+        text-overflow: ellipsis
+        padding: 0 1rem
+        white-space: nowrap
+      .item-tit-lft, .item-tit-rht
+        position: absolute
+        width: 1.2rem
+        height: 1.2rem
+        border-radius: 1rem
+        border: 1px solid #E5E5E5
+        background: #fff
+        top: 2rem
+      .item-tit-lft
+        left: -0.75rem
+      .item-tit-rht
+        right: -0.75rem
+      .item-body
+        border: 1px solid #E5E5E5
+        border-top: 0
+        padding: 0.5rem 0.875rem 0.5rem
+        .item-price
+          font-size: 2rem
+          text-align: center
+          color: #DB493F
+          .blue
+            color: #1f8ccd
+        .item-detail
+          font-size: 0.6rem
+          color: #9B9B9B
+          text-align: center
+        .item-info
+          overflow: hidden
+          margin-top: 0.75rem
+          .item-li
+            width: 30%
+            float: left
+            text-align: center
+            line-height: 1rem
+          .day
+            font-size: 0.825rem
+            color: #7B7878
+          .detail
+            font-size: 0.6rem
+            color: #999
+          .item-li2
+            width: 32%
+          .item-li3
+            width: 38%
+        .item-btn
+          width: 100%
+          border-radius: 0.2rem
+          background: #DB493F
+          color: #fff
+          text-align: center
+          font-size: 0.825rem
+          display: block
+          margin-top: 0.75rem
+          height: 2rem
+          line-height: 2rem
+        .item-promote
+          font-size: 0.6rem
+          color: #89ABE3
+          text-align: center
+          margin-top: 0.75rem
+          .icon_bao
+            display: inline-block
+            width: 1.3rem
+            height: 1.3rem
+            background: url("/static/imgs/mobile_activity/shield_plan/icon_bao.png") center center no-repeat
+            background-size: 100%
+            vertical-align: middle
+  .sp-part4
+    background: #373F74
+    padding: 1.25rem 0
+    color: #fff
+    .tit-box
+      border-bottom-color: #545E9F
+    .tit-more
+      color: #fff
+    .circle-box
+      width: 10.25rem
+      height: 10.25rem
+      border-radius: 10rem
+      text-align: center
+      color: #fff
+      margin: 3.15rem auto 3.625rem
+      position: relative
+      .circle-num
+        padding-top: 4.1rem
+        font-size: 0.9rem
+      .l-txt
+        font-size: 0.6rem
+      .circle-promote
+        margin-top: 0.5rem
+        font-size: 0.55rem
+    .circle-txt-box
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      z-index: 8
+    .circle-bg, .circle-alt
+      width: 100%
+      height: 100%
+      border-radius: 50%
+      position: absolute
+      top: 0
+      left: 0
+      background: url("/static/imgs/mobile_activity/shield_plan/circle_jdjh.png") center center no-repeat
+      background-size: contain
+      z-index: 1
+    .circle-alt
+      opacity: 0.6
+      z-index: 2
+    .circle-alt-lft, .circle-alt-rht
+      position: absolute
+      width: 50%
+      height: 100%
+      top: 0
+      z-index: 2
+    .circle-alt-lft
+      left: 0
+      overflow: hidden
+      border-radius: 10rem 0 0 10rem
+    .circle-alt-lft:after, .circle-alt-rht:after
+      background: #373f74
+      display: block
+      content: ""
+      width: 100%
+      height: 100%
+    .circle-alt-rht
+      right: 0
+      overflow: hidden
+      border-radius: 0 10rem 10rem 0
+    .circle-alt-an
+      z-index: 2
+      .circle-alt-lft:after
+        transform-origin: right center
+        -webkit-transform-origin: right center
+        +spRotateAn($d:1.1s)
+      .circle-alt-rht:after
+        transform-origin: left center
+        -webkit-transform-origin: left center
+        +spRotateAn()
+  .sp-part5
+    padding: 0 1rem 3.75rem
+    max-height: 100%
+    line-height: 0.9rem
+    .tit1
+      color: #333
+      margin-top: 1.5rem
+      font-size: 0.6rem
+    .detail
+      font-size: 0.65rem
+      margin-top: 0.75rem
+    ul.detail
+      list-style: disc
+      padding-left: 0.9rem
+  .sp-alt
+    display: none
+    position: fixed
+    left: 0
+    top: 0
+    background: rgba(0, 0, 0, 0.7)
+    width: 100%
+    height: 100%
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    z-index: 99
+    text-align: center
+    padding: 0 1rem
+    img
+      max-height: 100%
+      max-width: 100%
+  @keyframes heightAn
+    0%
+      transform: rotate(360deg)
+    100%
+      transform: rotate(0deg)
+  .circle-animate
+    .circle-icon-lft, .circle-icon-rht
+      height: 100%
+
+

@@ -226,13 +226,14 @@ class P2POperator(object):
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (product.id, e.message))
 
-            try:
-                from .tasks import coop_product_push
-                coop_product_push.apply_async(
-                    kwargs={'product_id': product.id}
-                )
-            except:
-                pass
+            # Comment by hb on 2016-05-13
+            #try:
+            #    from .tasks import coop_product_push
+            #    coop_product_push.apply_async(
+            #        kwargs={'product_id': product.id}, queue='celery02'
+            #    )
+            #except:
+            #    pass
 
         print('Getting products with status 正在招标 and end time earlier than now')
         for product in P2PProduct.objects.filter(status=u'正在招标', end_time__lte=timezone.now()):
@@ -350,13 +351,14 @@ class P2POperator(object):
                 messages_list.append(messages.product_failed(equity.user.wanglibaouserprofile.name, product))
             ProductKeeper(product).fail()
 
-        try:
-            from .tasks import coop_product_push
-            coop_product_push.apply_async(
-                kwargs={'product_id': product.id}
-            )
-        except:
-            pass
+        # Comment by hb on 2016-05-13
+        # try:
+        #     from .tasks import coop_product_push
+        #     coop_product_push.apply_async(
+        #         kwargs={'product_id': product.id}
+        #     )
+        # except:
+        #     pass
 
         user_ids = {}.fromkeys(user_ids).keys()
         if phones:
