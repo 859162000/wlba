@@ -107,7 +107,7 @@
 		slidesPerView: 'auto',
         centeredSlides: true,
         paginationClickable: true,
-        spaceBetween: 20,
+        spaceBetween: 10,
 		autoHeight: false
 	});
     var swiper_2 = new Swiper('.swiper2', {
@@ -115,7 +115,7 @@
 		slidesPerView: 'auto',
         centeredSlides: true,
         paginationClickable: true,
-        spaceBetween: 20,
+        spaceBetween: 10,
 		autoHeight: false
 	});
 
@@ -124,7 +124,7 @@
         slidesPerView: 'auto',
         centeredSlides: true,
         paginationClickable: true,
-        spaceBetween: 20,
+        spaceBetween: 10,
 		autoHeight: false
     });
 

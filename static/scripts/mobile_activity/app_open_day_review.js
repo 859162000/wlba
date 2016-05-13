@@ -326,7 +326,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		slidesPerView: 'auto',
         centeredSlides: true,
         paginationClickable: true,
-        spaceBetween: 20,
+        spaceBetween: 10,
 		autoHeight: false
 	});
     var swiper_2 = new Swiper('.swiper2', {
@@ -334,7 +334,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		slidesPerView: 'auto',
         centeredSlides: true,
         paginationClickable: true,
-        spaceBetween: 20,
+        spaceBetween: 10,
 		autoHeight: false
 	});
 
@@ -343,7 +343,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         slidesPerView: 'auto',
         centeredSlides: true,
         paginationClickable: true,
-        spaceBetween: 20,
+        spaceBetween: 10,
 		autoHeight: false
     });
 
