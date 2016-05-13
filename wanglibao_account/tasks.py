@@ -13,7 +13,7 @@ from wanglibao_margin.forms import MarginRecordForm
 from wanglibao_margin.utils import save_to_margin
 from wanglibao_pay.forms import PayInfoForm
 from wanglibao_p2p.forms import P2PRecordForm, UserAmortizationForm, P2PProductForm
-from wanglibao_p2p.utils import save_to_p2p_equity, update_p2p_product_ordered_amount
+from wanglibao_p2p.utils import save_to_p2p_equity
 from wanglibao_p2p.tasks import process_channel_product_push
 from wanglibao_p2p.models import P2PProduct, UserAmortization
 from wanglibao_redis.backend import RedisBackend
@@ -122,12 +122,12 @@ def process_purchase_callback(req_data):
             p2p_record = p2p_record_form.save()
 
             # 更新标的已投金额
-            product_id = p2p_record.product.id
-            update_p2p_product_ordered_amount(product_id, p2p_record.product_balance_after)
+            # product_id = p2p_record.product.id
+            # update_p2p_product_ordered_amount(product_id, p2p_record.product_balance_after)
             # 推送标的信息到第三方
-            process_channel_product_push.apply_async(
-                kwargs={'product_id': product_id}
-            )
+            # process_channel_product_push.apply_async(
+            #     kwargs={'product_id': product_id}
+            # )
 
             save_margin_response_data = save_to_margin(req_data)
             save_equity_response_data = save_to_p2p_equity(req_data)
@@ -269,6 +269,7 @@ def process_amortizations_push_callback(req_data):
 def process_products_push_callback(req_data):
     products = json.loads(req_data['products'])
     sync_id = req_data["sync_id"]
+    is_product_update = False
     for product in products:
         product['sync_id'] = sync_id
         product['publish_time'] = str_to_utc(product['publish_time'])
@@ -285,6 +286,7 @@ def process_products_push_callback(req_data):
 
         product_instance = P2PProduct.objects.filter(pk=product['id']).first()
         if product_instance:
+            is_product_update = True
             if ((product_instance.status == product['status'] and
                  product_instance.ordered_amount == product['ordered_amount']) or
                     sync_id < product_instance.sync_id):
@@ -302,16 +304,14 @@ def process_products_push_callback(req_data):
                     setattr(product_instance, k, v)
                 product_instance.save()
 
-            # 推送标的信息到第三方
-            process_channel_product_push.apply_async(
-                kwargs={'product_id': product_instance.id}
-            )
+            # 正在招标的标的信息做redis缓存
+            if product_instance.status == u'正在招标':
+                redis = RedisBackend()
+                if redis._is_available():
+                    redis.set_p2p_product_detail(product_instance)
 
-        # 正在招标的标的信息做redis缓存
-        if product_instance.status == u'正在招标':
-            redis = RedisBackend()
-            if redis._is_available():
-                redis.set_p2p_product_detail(product_instance)
+            # 推送标的信息到第三方
+            process_channel_product_push(product=product_instance, is_product_update=is_product_update)
         else:
             message = product_form.errors
             logger.info("process_products_push data[%s] invalid with form error: [%s]" % (product, message))

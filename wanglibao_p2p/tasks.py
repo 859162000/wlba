@@ -20,7 +20,7 @@ _LOCALS = locals()
 
 
 @app.task
-def bajinshe_product_push(product=None, product_list=None):
+def bajinshe_product_push(product=None, product_list=None, is_product_update=False):
     push_url = settings.BAJINSHE_PRODUCT_PUSH_URL
     coop_id = settings.BAJINSHE_COOP_ID
     order_id = '%s_0000' % now().strftime("%Y%m%d%H%M%S")
@@ -54,7 +54,7 @@ def bajinshe_product_push(product=None, product_list=None):
 
 
 @app.task
-def bisouyi_product_push(product=None, product_list=None):
+def bisouyi_product_push(product=None, product_list=None, is_product_update=False):
     product_data_list = list()
     product_data_status_list = list()
     if not product:
@@ -70,13 +70,14 @@ def bisouyi_product_push(product=None, product_list=None):
         product_data_list.append(product_data)
         product_data_status_list.append(product_status_data)
 
-    bisouyi_callback(settings.BISOUYI_PRODUCT_PUSH_URL, product_data_list, 'bisouyi', async_callback=False)
-
-    bisouyi_callback(settings.BISOUYI_PRODUCT_STATUS_PUSH_URL, product_data_status_list, 'bisouyi')
+    if is_product_update:
+        bisouyi_callback(settings.BISOUYI_PRODUCT_STATUS_PUSH_URL, product_data_status_list, 'bisouyi')
+    else:
+        bisouyi_callback(settings.BISOUYI_PRODUCT_PUSH_URL, product_data_list, 'bisouyi', async_callback=False)
 
 
 @app.task
-def process_channel_product_push(product_id=None, product=None):
+def process_channel_product_push(product_id=None, product=None, is_product_update=False):
     push_product_channels = settings.PUSH_PRODUCT_CHANNELS
     if push_product_channels:
         product_list = None
@@ -92,6 +93,6 @@ def process_channel_product_push(product_id=None, product=None):
             processor_name = '%s_product_push' % channel.lower()
             try:
                 processor = _LOCALS[processor_name]
-                processor(product=product, product_list=product_list)
+                processor(product=product, product_list=product_list, is_product_update=is_product_update)
             except Exception, e:
                 logger.warning("process_channel_product_push dispatch %s raise error: %s" % (processor_name, e))

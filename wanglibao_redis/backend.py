@@ -62,11 +62,12 @@ class RedisBackend(object):
     def set_p2p_product_detail(self, product):
         product_id = product.id
         product = serialize_instance(product)
-        self._set('channel_p2p_product_detail_{0}'.format(product_id), product)
+        self._set('channel_p2p_product_detail_{0}'.format(product_id), json.dumps(product))
 
     def get_p2p_product_detail(self, product_id):
         p2p_product = self._get('channel_p2p_product_detail_{0}'.format(product_id))
         if p2p_product:
+            p2p_product = json.loads(p2p_product)
             p2p_product = deserialize_instance(P2PProduct, p2p_product)
 
         return p2p_product
