@@ -172,7 +172,7 @@ def process_product_update_callback(req_data):
             setattr(product_instance, k, v)
 
         # 推送标的信息到第三方
-        process_channel_product_push(product=product_instance)
+        process_channel_product_push(product=product_instance, is_product_update=True)
 
         # 标的信息做redis缓存
         redis = RedisBackend()
