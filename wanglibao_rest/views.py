@@ -27,7 +27,7 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_redpack.models import RedPackEvent
 from random import randint
 from wanglibao_sms.tasks import send_messages
-from wanglibao_account.utils import create_user
+from wanglibao_account.utils import create_user, generate_bisouyi_content, generate_bisouyi_sign
 from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
@@ -44,17 +44,17 @@ from wanglibao_sms import messages, backends
 from django.utils import timezone
 # from wanglibao_account import message as inside_message
 from misc.models import Misc
-from wanglibao_account.forms import IdVerificationForm, verify_captcha
+from wanglibao_account.forms import IdVerificationForm, verify_captcha, BiSouYiRegisterForm
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import split_ua, get_client_ip
-from django.http import HttpResponseRedirect
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid, get_introduce_by_for_phone)
+from wanglibao_rest import utils as rest_utils
+from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
 from marketing.utils import local_to_utc, get_channel_record
 from django.conf import settings
-from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from wanglibao_margin.models import MarginRecord
@@ -64,12 +64,27 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
+from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
+from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 from wanglibao.settings import GEETEST_ID, GEETEST_KEY
 
 logger = logging.getLogger('wanglibao_rest')
+
+
+def generate_random_password(length):
+    if length < 0:
+        raise Exception(u"生成随机密码的长度有误")
+
+    random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    password = ""
+    index = 0
+    while index < length:
+            password += str(random_list[randint(0,len(random_list)-1)])
+            index += 1
+    return password
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -263,18 +278,6 @@ class WeixinSendRegisterValidationCodeView(APIView):
 class RegisterAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
-    def generate_random_password(self, length):
-        if length < 0:
-            raise Exception("生成随机密码的长度有误")
-
-        random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = ""
-        index = 0
-        while index < length:
-                password += str(random_list[randint(0,len(random_list)-1)])
-                index += 1
-        return password
-
     def post(self, request, *args, **kwargs):
         """ 
             modified by: Yihen@20150812
@@ -292,7 +295,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         password = password.strip()
         validate_code = validate_code.strip()
         if request.DATA.get('IGNORE_PWD', '') and not password:
-            password = self.generate_random_password(6)
+            password = generate_random_password(6)
             logger.debug('系统为用户 %s 生成的随机密码是：%s' % (identifier, password))
 
         if not identifier or not password or not validate_code:
@@ -410,6 +413,7 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
+
         try:
             register_channel = request.DATA.get('register_channel', '').strip()
             if register_channel and register_channel == 'fwh':
@@ -419,6 +423,7 @@ class RegisterAPIView(DecryptParmsAPIView):
                     bindUser(w_user, request.user)
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
+
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
@@ -1739,8 +1744,8 @@ class BidHasBindingForChannel(APIView):
     permission_classes = ()
 
     def get(self, request, channel_code, bid):
-        binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
-        if binding:
+        has_binding = has_binding_for_bid(channel_code, bid)
+        if has_binding:
             response_data = {
                 'ret_code': 10001,
                 'message': u'该bid已经绑定'
@@ -1752,6 +1757,17 @@ class BidHasBindingForChannel(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class LandOpenApi(APIView):
+    """
+    渠道跳转页
+    """
+
+    permission_classes = ()
+
+    def post(self, request):
+        return landpage_view(request)
 
 
 class CoopPvApi(APIView):
@@ -1800,6 +1816,89 @@ class CoopPvApi(APIView):
 
             logger.info("%s pv api process result: %s" % (channel_code, response_data["message"]))
             return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class OauthUserRegisterApi(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        channel_code = request.GET.get('promo_token')
+        if channel_code:
+            data = request.session
+            form = OauthUserRegisterForm(data)
+            if form.is_valid():
+                channel_code = form.cleaned_data['channel_code']
+                coop_key_str = '%s_COOP_KEY' % channel_code.upper()
+                coop_key = getattr(settings, coop_key_str, None)
+                coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
+                if coop_sign_check(coop_key):
+                    phone = form.cleaned_data['phone']
+                    password = generate_random_password(6)
+                    user = create_user(phone, password, "")
+                    if user:
+                        client_id = form.cleaned_data['client_id']
+                        channel_code = form.cleaned_data['channel_code']
+                        device = split_ua(request)
+                        # if device['device_type'] == "pc":
+                        #     auth_user = authenticate(identifier=phone, password=password)
+                        #     auth_login(request, auth_user)
+
+                        send_messages.apply_async(kwargs={
+                            "phones": [phone, ],
+                            "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                        })
+
+                        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                        coop_register_processor = getattr(rest_utils, 'process_%s_register' % channel_code.lower(), None)
+                        if coop_register_processor:
+                            response_data = coop_register_processor(request, user, phone, client_id, channel_code)
+
+                            # 处理第三方渠道的用户信息
+                            CoopRegister(request).all_processors_for_user_register(user, channel_code)
+                        else:
+                            response_data = {
+                                'ret_code': 50001,
+                                'message': 'api error',
+                            }
+                    else:
+                        response_data = {
+                            'ret_code': 10009,
+                            'message': u'注册失败',
+                        }
+                else:
+                    response_data = {
+                        'ret_code': 10008,
+                        'message': u'签名错误',
+                    }
+            else:
+                form_error = form.errors.values()[0][0]
+                response_data = {
+                    'ret_code': 10010,
+                    'message': form_error,
+                }
+
+                if response_data['message'] == u'该手机号已经注册':
+                    if channel_code == 'renrenli':
+                        response_data['ret_code'] = 100
+        else:
+            response_data = {
+                'ret_code': 50002,
+                'message': u'非法请求',
+            }
+
+        if channel_code == 'renrenli':
+            response_data['Code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['Tip'] = response_data['message']
+            response_data.pop('message')
+        elif channel_code == 'bajinshe':
+            response_data['code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['message']
+            response_data.pop('message')
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
 class GeetestAPIView(APIView):
@@ -1870,3 +1969,86 @@ class ActivityUserInfoUploadApi(APIView):
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
+
+class AccessUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
+    permission_classes = ()
+
+    def post(self, request):
+        logger.info("enter AccessUserExistsApi with data [%s], [%s]" % (request.REQUEST, request.body))
+
+        form = AccessUserExistsForm(request.session)
+        channel_code = request.GET.get('promo_token')
+
+        if form.is_valid():
+            phone = form.cleaned_data['phone']
+            user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+            introduce_by = get_introduce_by_for_phone(phone, channel_code)
+            coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
+            sign_is_ok = coop_sign_check()
+            coop_exists_processor = getattr(rest_utils, 'process_%s_user_exists' % channel_code.lower(), None)
+            response_data = coop_exists_processor(user, introduce_by, phone, sign_is_ok)
+        else:
+            response_data = {
+                'ret_code': 10020,
+                'message': form.errors.values()[0][0],
+            }
+
+        if channel_code == 'bajinshe':
+            response_data['code'] = response_data['ret_code']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['message']
+            response_data.pop('message')
+
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
+    permission_classes = ()
+
+    def post(self, request):
+        form = BiSouYiRegisterForm(request.session, action='select')
+        content_data = dict()
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                _type = 0 if user else 1
+                user_type = u'是' if user else u'否'
+                public_data = {
+                    'code': 10000,
+                    'status': 1,
+                    'message': 'success',
+                }
+                content_data = {
+                    'yaccount': user_type,
+                    'mobile': phone,
+                    'type': _type,
+                    'pcode': settings.BISOUYI_PCODE,
+                }
+            else:
+                public_data = {
+                    'code': 10010,
+                    'status': 0,
+                    'message': u'无效签名',
+                }
+        else:
+            public_data = {
+                'code': 10020,
+                'status': 0,
+                'message': form.errors.values()[0][0],
+            }
+
+        content = generate_bisouyi_content(content_data)
+        client_id = settings.BISOUYI_CLIENT_ID
+        sign = generate_bisouyi_sign(content)
+        public_data['content'] = content
+
+        http_response = HttpResponse(json.dumps(public_data), status=200, content_type='application/json')
+        http_response['cid'] = client_id
+        http_response['sign'] = sign
+
+        return http_response

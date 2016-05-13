@@ -235,6 +235,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
     'weixin.auth_backend.OpenidAuthBackend',
+    'wanglibao_account.auth_backends.CoopAccessTokenBackend'
 )
 import django.contrib.auth.backends
 
@@ -622,6 +623,7 @@ CELERY_QUEUES = {
     "celery": {"exchange": "celery", "routing_key": "celery"},
     "celery01": {"exchange": "celery01", "routing_key": "celery01"},
     "celery02": {"exchange": "celery02", "routing_key": "celery02"},
+    # "coop_celery": {"exchange": "coop_celery", "routing_key": "coop_celery"},
 }
 
 from datetime import timedelta, datetime
@@ -734,7 +736,12 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_unavailable_3_days',
         'schedule': crontab(minute=0, hour=11),
     },
-    #每天发放昨天的排名奖励, by HMM
+    # 定期向渠道中心推送标的信息
+    # 'p2p_product_push_to_coop': {
+    #     'task': 'wanglibao_p2p.tasks.coop_product_push',
+    #     'schedule': timedelta(hours=1),
+    # },
+    # 每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
         'schedule': crontab(minute=0, hour=1),
@@ -1252,6 +1259,46 @@ if ENV == ENV_PRODUCTION:
 else:
     YZCJ_CALL_BACK_URL = 'http://42.62.0.122:8080/jeecms/wanglibaoBg.jspx'
 
+# 八金社
+BAJINSHE_CHANNEL_CODE = 'bajinshe'
+if ENV == ENV_PRODUCTION:
+    BAJINSHE_CLIENT_ID = '3718adaf32719e2641d6'
+    BAJINSHE_COOP_KEY = '770f7de58365496813c7dcc66796d6434023bf99'
+else:
+    BAJINSHE_CLIENT_ID = '7cbb6aeb381b780edfa2'
+    BAJINSHE_COOP_KEY = '4762c2c53ed701597c1d6cf3b409ff87c3f04f98'
+
+# 人人利
+RENRENLI_CHANNEL_CODE = 'renrenli'
+if ENV == ENV_PRODUCTION:
+    RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
+    RENRENLI_COOP_KEY = ''
+else:
+    RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
+    RENRENLI_COOP_KEY = 'wanglibaorrl'
+
+
+# 比搜益
+BISOUYI_CHANNEL_CODE = 'bisouyi'
+if ENV == ENV_PRODUCTION:
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
+    BISOUYI_SIGN_KEY = ''
+    BISOUYI_COOP_KEY = ''
+    BISOUYI_PCODE = '10002'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
+else:
+    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
+    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
+    BISOUYI_SIGN_KEY = ''
+    BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
+    BISOUYI_PCODE = '10002'
+    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
+    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
+
 
 # 加息盒子
 JXHZ_COOP_id = 'wanglibao'
@@ -1332,6 +1379,9 @@ else:
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
 
+#多嫌接口token key
+DUOZHUAN_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
+
 # 第三方来我们这的用户名密码去获取 token
 TOKEN_CLIENTS = {
     'rong360': 'wanglibao_1116',
@@ -1381,6 +1431,23 @@ if ENV == ENV_PRODUCTION:
     PHP_INSIDE_MESSAGES_LIST = "http://123.57.146.238/message.php/message/list"
     PHP_INSIDE_MESSAGE_READ = 'http://123.57.146.238/message.php/message'
     PHP_INSIDE_MESSAGE_READ_ALL = 'http://123.57.146.238/message.php/message/0'
+
+# 渠道数据中心平台认证授权密钥
+CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
+if ENV == ENV_PRODUCTION:
+    OAUTH2_URL = 'https://channel.wanglibao.com/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'https://channel.wanglibao.com/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'https://channel.wanglibao.com/oauth2/access_token/'
+    PUSH_COOP_TOKEN_URL = 'https://channel.wanglibao.com/oauth2/push_coop_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'https://channel.wanglibao.com/oauth2/access_token/push/'
+else:
+    OAUTH2_URL = 'https://qdtest.wanglibao.com/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'https://qdtest.wanglibao.com/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/'
+    PUSH_COOP_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/push_coop_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/push/'
+
 
 if ENV == ENV_PRODUCTION:
     SITE_URL = 'https://www.wanglibao.com'

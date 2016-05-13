@@ -26,7 +26,7 @@ from wanglibao_lottery.views import LotteryListTemplateView
 urlpatterns = patterns(
     '',
     url(r'^home/$', login_required(AccountHome.as_view(),
-                                   login_url='/accounts/login/')),
+                                   login_url='/accounts/login/'), name='account_home'),
     url(r'^home/experience/$', login_required(AccountHome.as_view(),
                                               login_url='/accounts/login/')),
     url(r'^home/jiuxian/$', login_required(AccountHome.as_view(),

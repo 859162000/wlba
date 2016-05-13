@@ -26,7 +26,8 @@ env.deploy_virt_path = "/var/www/wanglibao/virt-wanglibao"
 env.git_server_address = "git clone wangli@192.168.20.231:~/wanglibao-backend"
 env.activate = "source %s/bin/activate" % env.deploy_virt_path
 env.pip_install = "pip install -r %s/requirements.txt" % env.deploy_path
-env.branch = "production5.0"
+env.branch = "pre_base_platform"
+#env.branch = "production5.0"
 #env.branch = "master"
 
 #env.environment = 'ENV_PRODUCTION'
@@ -106,6 +107,7 @@ def deploy_web_action():
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
             run("""fab config:'wanglibao/settings.py',"REDIS_HOST \= '127.0.0.1'",'REDIS_HOST \= "%s"' """%env.redis_server)
             run("fab config:'wanglibao/settings.py','staging.wanglibao.com','alpha.wanglibao.com'")
+            run("fab config:'wanglibao/settings.py','qdtest.wanglibao.com','alpha-channel.wanglibao.com'")
             json_env = json.dumps({"BROKER_URL":"amqp://wanglibao:wanglibank@%s/wanglibao"%env.mq_server})
             put(StringIO(json_env), 'env.json')
             #如果为web01
@@ -223,17 +225,17 @@ def deploy_mq_action():
             sudo("supervisorctl reload")
         run("ps aux|grep python")
 
-    print yellow("update crontab job")
-    with cd("/var/www/wanglibao"):
-        fund, income, info, cmd = config_crontab()
-        put(StringIO(fund), 'scrawl_job')
-        put(StringIO(income), 'sync_sm_income')
-        put(StringIO(info), 'sync_sm_info')
-        put(StringIO(cmd), '/tmp/tmp_tab')
-        run("chmod +x scrawl_job")
-        run("chmod +x sync_sm_income")
-        run("chmod +x sync_sm_info")
-        run("crontab /tmp/tmp_tab")
+    #print yellow("update crontab job")
+    #with cd("/var/www/wanglibao"):
+    #    fund, income, info, cmd = config_crontab()
+    #    put(StringIO(fund), 'scrawl_job')
+    #    put(StringIO(income), 'sync_sm_income')
+    #    put(StringIO(info), 'sync_sm_info')
+    #    put(StringIO(cmd), '/tmp/tmp_tab')
+    #    run("chmod +x scrawl_job")
+    #    run("chmod +x sync_sm_income")
+    #    run("chmod +x sync_sm_info")
+    #    run("crontab /tmp/tmp_tab")
 
 
 @roles("webback")

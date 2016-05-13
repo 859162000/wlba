@@ -32,6 +32,7 @@ from wanglibao_profile.models import RepeatPaymentUser, RepeatPaymentUserRecords
 
 logger = logging.getLogger(__name__)
 
+
 class ProductKeeper(KeeperBaseMixin):
 
     def __init__(self, product, order_id=None):
@@ -287,7 +288,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             # for equity in equities:
             #     self.__dispatch(equity)
             #self.__generate_useramortization(equities)
-            
+
             self.__generate_user_amortization(equities)
 
     def __generate_product_amortization(self, product):
@@ -386,6 +387,36 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
+
+        # 推送用户还款计划到渠道中心 add by chenweibin@20160328
+        # Comment by hb on 2016-05-13
+        # try:
+        #     for product_amortization in product_amortizations:
+        #         sub_amortizations = product_amortization.subs.all()
+        #         settled_sub_amos = list()
+        #         for sub_amo in sub_amortizations:
+        #             settled_sub_amos.append({
+        #                 'id': sub_amo.id,
+        #                 'product': product.id,
+        #                 'user': sub_amo.user.id,
+        #                 'term': sub_amo.term,
+        #                 'settled': sub_amo.settled,
+        #                 'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
+        #                 'principal': float(sub_amo.principal),
+        #                 'interest': float(sub_amo.interest),
+        #                 'penal_interest': float(sub_amo.penal_interest),
+        #                 'coupon_interest': float(sub_amo.coupon_interest),
+        #                 'description': sub_amo.description,
+        #             })
+        #
+        #         if settled_sub_amos:
+        #             from .tasks import coop_amortizations_push
+        #             coop_amortizations_push.apply_async(
+        #                 kwargs={'amortizations': settled_sub_amos,
+        #                         'product_id': product.id,
+        #                         'amo_act': 'plan'})
+        # except:
+        #     pass
 
     # def __generate_useramortization(self, equities):
     #     """
@@ -512,6 +543,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             phone_list = list()
             message_list = list()
+            settled_sub_amos = list()
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
@@ -594,6 +626,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                     logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
                         sub_amo.user, sub_amo.principal, product.id
                     ))
+
                 try:
                     weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
         #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
@@ -612,6 +645,26 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 except Exception,e:
                     pass
+
+                # 添加还款用户到渠道通知列表 @chenwb
+                try:
+                    settled_sub_amos.append({
+                        'id': sub_amo.id,
+                        'user': sub_amo.user.id,
+                        'product': product.id,
+                        'term': sub_amo.term,
+                        'settled': sub_amo.settled,
+                        'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
+                        'settlement_time': sub_amo.settlement_time.strftime('%Y-%m-%d %H:%M:%S'),
+                        'principal': float(sub_amo.principal),
+                        'interest': float(sub_amo.interest),
+                        'penal_interest': float(sub_amo.penal_interest),
+                        'coupon_interest': float(sub_amo.coupon_interest),
+                        'description': sub_amo.description,
+                    })
+                except:
+                    pass
+
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
@@ -622,6 +675,18 @@ class AmortizationKeeper(KeeperBaseMixin):
             })
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
+
+            # 向渠道中心发送还款用户列表通知 @chenwb
+            # Comment by hb on 2016-05-13
+            # try:
+            #     if settled_sub_amos:
+            #         from .tasks import coop_amortizations_push
+            #         coop_amortizations_push.apply_async(
+            #             kwargs={'amortizations': settled_sub_amos,
+            #                     'product_id': product.id,
+            #                     'amo_act': 'amortize'})
+            # except:
+            #     pass
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(

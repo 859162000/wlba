@@ -27,29 +27,30 @@ from wanglibao_hotlist.views import HotTrustViewSet, HotFundViewSet, MobileHotTr
     MobileHotFundViewSet, MobileMainPageViewSet, MobileMainPageP2PViewSet
 from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSet, RecordView, \
     P2PProductDetailView, RepaymentAPIView
-from wanglibao_pay.third_pay import  TheOneCardAPIView
-from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView,
-                            BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
-                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
-                            BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
-                            BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
-                            BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
-                            BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView, CheckRechargePayinfoView)
+from wanglibao_pay.third_pay import TheOneCardAPIView
+from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, BankListAPIView,
+                                 YeePayAppPayView, YeePayAppPayCallbackView, YeePayAppPayCompleteView, WithdrawAPIView,
+                                 FEEAPIView,BindPayView, KuaiShortPayCallbackView, BindPayQueryView, BindPayDelView,
+                                 BindPayDynNumView, TradeRecordAPIView, BindCardQueryView, UnbindCardView,
+                                 BindPayDepositView, BindPayDynnumNewView, BankCardDelNewView, BankListNewAPIView,
+                                 YeeShortPayCallbackView, CheckRechargePayinfoView)
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
-                            UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
-                            WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView, SendVoiceCodeNewAPIView,
-                            YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
-                            SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
-                            LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
-                            DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
-                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                            BidHasBindingForChannel, CoopPvApi, ActivityUserInfoUploadApi, GeetestAPIView)
+                                  UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
+                                  WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
+                                  SendVoiceCodeNewAPIView, YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
+                                  TestSendRegisterValidationCodeView, SendVoiceCodeTwoAPIView, MobileDownloadAPIView,
+                                  Statistics, KuaipanPurchaseListAPIView, LatestDataAPIView, ShareUrlAPIView,
+                                  TopsOfDayView, TopsOfWeekView, InvestRecord, DepositGateAPIView, PushTestView,
+                                  WeixinSendRegisterValidationCodeView, GestureAddView, GestureUpdateView,
+                                  GestureIsEnabledView, LoginAPIView, GuestCheckView, CaptchaValidationCodeView,
+                                  TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
+                                  InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
+                                  BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi,
+                                  ActivityUserInfoUploadApi, GeetestAPIView, AccessUserExistsApi, BiSouYiUserExistsApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
@@ -60,7 +61,8 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView,
                              GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView)
+from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, BiSouYiRegisterApi, BiSouYiLoginApi,
+                                     BiSouYiRegisterView)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
 from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
                                     WeixinActivityAPIView, QMBanquetRewardAPI, HMBanquetRewardAPI,
@@ -333,6 +335,12 @@ urlpatterns += patterns(
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
 )
 
+# 渠道着陆页中间跳转接口
+urlpatterns += patterns(
+    '',
+    url(r'^landpage/$', LandOpenApi.as_view()),
+)
+
 #
 urlpatterns += patterns(
     '',
@@ -351,8 +359,33 @@ urlpatterns += patterns(
     url(r'^coop_pv/(?P<channel_code>[a-z0-9A-Z_]*)/$', CoopPvApi.as_view()),
 )
 
+# oauth用户注册接口
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/register/$', OauthUserRegisterApi.as_view()),
+)
+
 # 网利宝开放日活动用户信息上报接口
 urlpatterns += patterns(
     '',
     url(r'^activity_user_info/upload/$', ActivityUserInfoUploadApi.as_view()),
+)
+
+# 比搜益接口
+urlpatterns += patterns(
+    '',
+    # 比搜益判断手机号是否已经绑定渠道或被注册
+    url(r'^bisouyi/exists/$', BiSouYiUserExistsApi.as_view()),
+    # 新用户注册
+    url(r'^bisouyi/register/$', BiSouYiRegisterApi.as_view()),
+    # 新用户一键注册接口
+    url(r'^bisouyi/one_key_register/$', BiSouYiRegisterView.as_view()),
+    # 老用户登录
+    url(r'^bisouyi/login/$', BiSouYiLoginApi.as_view()),
+)
+
+# 判断手机号是否已经绑定渠道或被注册
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/exists/$', AccessUserExistsApi.as_view()),
 )

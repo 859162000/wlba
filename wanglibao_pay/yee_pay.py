@@ -696,7 +696,7 @@ class YeeShortPay:
 
             pay_info.bank = card.bank
             pay_info.card_no = card.no
-
+            pay_info.phone_for_card = input_phone
             pay_info.request = ""
             pay_info.status = PayInfo.PROCESSING
             pay_info.account_name = profile.name
