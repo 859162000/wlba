@@ -320,6 +320,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         })
     }
 
+    function goBuy(){
+        $(".js-go-buy").on("click",function(){
+            var self = $(this),
+                url = self.attr("data-src");
+            window.location.href = url;
+        });
+    }
+
     var login = false;
     wlb.ready({
         app: function (mixins) {
@@ -339,6 +347,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             url += "?1";
                             self.location.replace(url);
                         }
+                        goBuy();
                     }
                 })
             }
@@ -361,11 +370,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小", image: 'https://staging.wanglibao.com/static/imgs/mobile_activity/shield_plan/share.png'});
         },
         other: function(){
-            $(".js-go-buy").on("click",function(){
-                var self = $(this),
-                    url = self.attr("data-src");
-                window.location.href = url;
-            });
+            goBuy();
             weixin_share("网利宝金盾计划上线，降低用户投资风险");//微信分享
         }
     });
