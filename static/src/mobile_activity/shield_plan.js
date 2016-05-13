@@ -143,6 +143,11 @@
             mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小"});
         },
         other: function(){
+            $(".js-go-buy").on("click",function(){
+                var self = $(this),
+                    url = self.attr("data-src");
+                window.location.href = url;
+            });
             weixin_share("网利宝金盾计划上线，降低用户投资风险");//微信分享
         }
     });
