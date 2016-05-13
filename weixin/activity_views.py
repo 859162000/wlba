@@ -688,7 +688,7 @@ class FetchXunleiCardAward(APIView):
 
         code = activity.code+"_"+str(type)
         try:
-            activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, create_date="2017-05-12", activity_code=code)
+            activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, activity_code=code)
         except IntegrityError, e:
             return Response({"ret_code":-1, "message":"系统忙，请重试"})
         if activity_reward_record.status:
