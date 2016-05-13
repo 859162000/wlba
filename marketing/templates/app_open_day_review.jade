@@ -1,9 +1,11 @@
 - load formatters
+- load mathfilters
 doctype html
 html(style="background: #f4f4f4")
     head
         title 网利宝
         include include/app_head
+        link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
         link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015050503", rel="stylesheet")
         - csrf_token
@@ -82,7 +84,86 @@ html(style="background: #f4f4f4")
                                 img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_1.png')
                                 p 1 名
                             p.data_text!='价值<span>2000</span>元红木制品'
+                        .box
+                            .img
+                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_2.png')
+                                p 1 名
+                            p.data_text!='价值<span>1500</span>元红木制品'
+                        .box
+                            .img
+                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_3.png')
+                                p 1 名
+                            p.data_text!='价值<span>1000</span>元红木制品'
+                        .box
+                            .img.img_4
+                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_4.png')
+                                p 20 名
+                            p.data_text!='价值<span>1000</span>元红木制品'
+                        .box
+                            .img.img_4
+                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_5.png')
+                                p 20 名
+                            p.data_text.data_text_5!='<span>10</span>元无门槛抵扣红包'
+            p.insert_text 红木贷项目列表：
             .section.section_2
+                .p2p_products_box
+                    .red_title 新手福利
+
+
+                    for product in p2p_products
+                      status = product['display_status']
+                      if product.category == '新手标'
+                        span.red_title  新手福利
+                      else
+                          if product.is_app_exclusive
+                            span.red_title  APP专享
+
+                      if status == '抢购中'
+                        listClass = 'profit-blue'
+                        btnClass = 'btn-blue'
+                      elif status == '已还款'
+                        listClass = 'profit-hui'
+                        btnClass = 'btn-grey'
+                      elif status == '还款中'
+                        listClass = 'profit-hui'
+                        btnClass = 'btn-lightblue'
+                      else
+                        listClass = 'profit-hui'
+                        btnClass = 'btn-red'
+                      .list-section
+                        a(href="/weixin/view/detail/{{product.id}}/").section-head
+
+                          span.head-tit {{product.name}}
+                        .section-body
+                          a(href="/weixin/view/detail/{{product.id}}/").body-left
+                            .body-Profit
+                              span.profit-cont
+                                .profit-math(class=listClass)
+                                  earning_rate = str(product['expected_earning_rate'])
+                                  span.profit-num {{earning_rate}}
+                                  span.profit-sign %
+                                  if product.activity
+                                    span.prpfit-add +
+                                    span.profit-addNum {{product.activity.activity_rule_percent_text}}
+                                    span.profit-addNumsign %
+                                .profit-tit 年化收益
+                            .body-time
+                              .time-num
+                                em.section-hui {{product.period}}
+                                |{{product.pay_method|period_unit}}
+                              .time-tit 投资期限
+                          .total_amount_num {{product.total_amount|convert_to_10k}}
+                          .body-right
+                            if btnClass == 'btn-blue'
+                              a(href="/weixin/view/buy/{{product.id}}/?next=/weixin/list/").btn-body(class=btnClass) {{status}}
+                            else
+                              a(href="/weixin/view/detail/{{product.id}}/").btn-body(class=btnClass) {{status}}
+                        percent = float(product['ordered_amount']) / product['total_amount'] * 100
+                        if status == '抢购中'
+                          .section-progressd(style="width:{{percent | percentage}}")
+
+
+
 
             .section.section_1
                 .big_title.big_title_1 “产业银行”的业务模式

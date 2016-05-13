@@ -19,6 +19,43 @@
 @mixin spRotateAn($d:0.1s)
   animation: spRotateAn 1s $d linear forwards
   -webkit-animation: spRotateAn 1s $d linear forwards
+
+//@keyframes spin-circle
+//  0%
+//    transform: rotate(0deg)
+//  100%
+//    transform: rotate(360deg)
+//@-webkit-keyframes spin-circle
+//  0%
+//    -webkit-transform: rotate(0deg)
+//  100%
+//    -webkit-transform: rotate(360deg)
+//@keyframes second-half-hide
+//  0%
+//    opacity: 1
+//  50%, 100%
+//    opacity: 0
+//@-webkit-keyframes second-half-hide
+//  0%
+//    opacity: 1
+//  50%, 100%
+//    opacity: 0
+//@keyframes second-half-show
+//  0%
+//    opacity: 0
+//  50%, 100%
+//    opacity: 1
+//@-webkit-keyframes second-half-show
+//  0%
+//    opacity: 0
+//  50%, 100%
+//    opacity: 1
+//@mixin halfHide($t:0.8s)
+//  animation: second-half-hide $t steps(1, end) forwards
+//  -webkit-animation: second-half-hide $t steps(1, end) forwards
+//@mixin halfShow($t:0.8s)
+//  animation: second-half-show $t steps(1, end )  forwards
+//  -webkit-animation: second-half-show $t steps(1, end )  forwards
 .h5-shield-plan
   color: #666
   .sp-banner
@@ -196,13 +233,13 @@
       .circle-promote
         margin-top: 0.5rem
         font-size: 0.55rem
-    .circle-tct-box
+    .circle-txt-box
       position: absolute
       top: 0
       left: 0
       width: 100%
       height: 100%
-      z-index: 3
+      z-index: 8
     .circle-bg, .circle-alt
       width: 100%
       height: 100%
@@ -215,11 +252,13 @@
       z-index: 1
     .circle-alt
       opacity: 0.6
+      z-index: 2
     .circle-alt-lft, .circle-alt-rht
       position: absolute
       width: 50%
       height: 100%
       top: 0
+      z-index: 2
     .circle-alt-lft
       left: 0
       overflow: hidden
@@ -235,17 +274,21 @@
       overflow: hidden
       border-radius: 0 10rem 10rem 0
     .circle-alt-an
+      z-index: 2
       .circle-alt-lft:after
         transform-origin: right center
+        -webkit-transform-origin: right center
         +spRotateAn($d:1.1s)
       .circle-alt-rht:after
         transform-origin: left center
+        -webkit-transform-origin: left center
         +spRotateAn()
   .sp-part5
     padding: 0 1rem 3.75rem
     max-height: 100%
     line-height: 0.9rem
     .tit1
+      color: #333
       margin-top: 1.5rem
       font-size: 0.6rem
     .detail
