@@ -123,15 +123,23 @@
                     }
                 })
             }
-            mixins.sendUserInfo(function (data) {
-                if (data.ph == '') {
-                    login = false;
-                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/h5_shield_plan/'});
-                } else {
-                    login = true;
-                    connect(data);
+            $(".js-go-buy").on("click",function(){
+                var self = $(this),
+                    url = self.attr("data-src");
+                if(login){
+                    window.location.href = url;
                 }
+                mixins.sendUserInfo(function (data) {
+                    if (data.ph == '') {
+                        login = false;
+                        mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/h5_shield_plan/'});
+                    } else {
+                        login = true;
+                        connect(data);
+                    }
+                });
             });
+
             mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小"});
         },
         other: function(){
