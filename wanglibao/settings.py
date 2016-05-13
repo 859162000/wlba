@@ -457,9 +457,10 @@ SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
 
+# Redis配置
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
-REDIS_DB = 0
+REDIS_DB = 1
 REDIS_PASSWORD = 'wanglibank_redis'
 
 # Chanel settings
@@ -549,3 +550,10 @@ if ENV == ENV_PRODUCTION:
     WLB_URL = 'https://www.wanglibao.com'
 else:
     WLB_URL = 'https://staging.wanglibao.com'
+
+
+# 产品推送渠道列表
+if ENV in (ENV_PRODUCTION, ENV_PREPRODUCTION):
+    PUSH_PRODUCT_CHANNELS = ['bajinshe', ]
+else:
+    PUSH_PRODUCT_CHANNELS = ['bajinshe', 'bisouyi', ]

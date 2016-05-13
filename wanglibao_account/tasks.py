@@ -16,6 +16,7 @@ from wanglibao_p2p.forms import P2PRecordForm, UserAmortizationForm, P2PProductF
 from wanglibao_p2p.utils import save_to_p2p_equity, update_p2p_product_ordered_amount
 from wanglibao_p2p.tasks import process_channel_product_push
 from wanglibao_p2p.models import P2PProduct, UserAmortization
+from wanglibao_redis.backend import RedisBackend
 from .cooperation import CoopCallback
 from .forms import UserForm, UserValidateForm
 
@@ -149,23 +150,34 @@ def process_purchase_callback(req_data):
 
 
 def process_product_update_callback(req_data):
-    product = json.loads(req_data["product"])
-    product_id = product['id']
-    product_instance = P2PProduct.objects.filter(pk=product_id).first()
-    if product_instance:
-        if 'product_balance_after' in product:
-            product_balance_after = product['product_balance_after']
-            product['ordered_amount'] = float(product_instance.total_amount) - float(product_balance_after)
-            product.pop('product_balance_after', None)
+    product_data = json.loads(req_data["product"])
+    product_id = product_data['id']
 
-        for k, v in product.iteritems():
+    # 从reids中取出产品实例
+    product_instance = None
+    redis = RedisBackend()
+    if redis._is_available():
+        product_instance = redis.get_p2p_product_detail(product_id)
+
+    if not product_instance:
+        product_instance = P2PProduct.objects.filter(pk=product_id).first()
+
+    if product_instance:
+        if 'product_balance_after' in product_data:
+            product_balance_after = product_data['product_balance_after']
+            product_data['ordered_amount'] = float(product_instance.total_amount) - float(product_balance_after)
+            product_data.pop('product_balance_after', None)
+
+        for k, v in product_data.iteritems():
             setattr(product_instance, k, v)
-        product_instance.save()
 
         # 推送标的信息到第三方
-        process_channel_product_push.apply_async(
-            kwargs={'product_id': product_instance.id}
-        )
+        process_channel_product_push(product=product_instance)
+
+        # 标的信息做redis缓存
+        redis = RedisBackend()
+        if redis._is_available():
+            redis.set_p2p_product_detail(product_instance)
 
         response_data = {
             'message': 'success',
@@ -294,6 +306,12 @@ def process_products_push_callback(req_data):
             process_channel_product_push.apply_async(
                 kwargs={'product_id': product_instance.id}
             )
+
+        # 正在招标的标的信息做redis缓存
+        if product_instance.status == u'正在招标':
+            redis = RedisBackend()
+            if redis._is_available():
+                redis.set_p2p_product_detail(product_instance)
         else:
             message = product_form.errors
             logger.info("process_products_push data[%s] invalid with form error: [%s]" % (product, message))

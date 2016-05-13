@@ -76,20 +76,22 @@ def bisouyi_product_push(product=None, product_list=None):
 
 
 @app.task
-def process_channel_product_push(product_id=None):
-    product = None
-    product_list = None
-    if not product_id:
-        product_list = P2PProduct.objects.filter(~Q(status__in=(u'已完成', u'流标')) |
-                                                 (Q(status=u'已完成') &
-                                                  Q(make_loans_time__isnull=False) &
-                                                  Q(make_loans_time__gte=now()-timezone.timedelta(days=1))))
-    else:
-        product = P2PProduct.objects.filter(pk=product_id).first()
+def process_channel_product_push(product_id=None, product=None):
+    push_product_channels = settings.PUSH_PRODUCT_CHANNELS
+    if push_product_channels:
+        product_list = None
+        if not product_id and not product:
+            product_list = P2PProduct.objects.filter(~Q(status__in=(u'已完成', u'流标')) |
+                                                     (Q(status=u'已完成') &
+                                                      Q(make_loans_time__isnull=False) &
+                                                      Q(make_loans_time__gte=now()-timezone.timedelta(days=1))))
+        elif not product:
+            product = P2PProduct.objects.filter(pk=product_id).first()
 
-    for k, v in _LOCALS.iteritems():
-        if k.lower().find('_product_push') != -1 and k != 'process_channel_product_push':
+        for channel in push_product_channels:
+            processor_name = '%s_product_push' % channel.lower()
             try:
-                v(product=product, product_list=product_list)
+                processor = _LOCALS[processor_name]
+                processor(product=product, product_list=product_list)
             except Exception, e:
-                logger.warning("process_channel_product_push dispatch %s raise error: %s" % (k, e))
+                logger.warning("process_channel_product_push dispatch %s raise error: %s" % (processor_name, e))
