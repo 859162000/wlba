@@ -140,7 +140,7 @@
                 });
             });
 
-            mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小"});
+            mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小", image: 'https://staging.wanglibao.com/static/imgs/mobile_activity/shield_plan/share.png'});
         },
         other: function(){
             $(".js-go-buy").on("click",function(){
