@@ -77,28 +77,29 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         }, queue='celery02')
 
     # Add by chenwb for send data to channel-center
-    try:
-        base_data = generate_coop_base_data('product_update')
-        product = {'id': product_id,
-                   'product_balance_after': product_balance_after}
-        act_data = {
-            'product': json.dumps(product)
-        }
-        data = dict(base_data, **act_data)
-        coop_call_back.apply_async(
-            kwargs={'params': data},
-            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
-
-        if is_full:
-            try:
-                from wanglibao_p2p.tasks import coop_product_push
-                coop_product_push.apply_async(
-                    kwargs={'product_id': product_id}
-                )
-            except:
-                pass
-    except:
-        pass
+    # Comment by hb on 2016-05-13
+    # try:
+    #     base_data = generate_coop_base_data('product_update')
+    #     product = {'id': product_id,
+    #                'product_balance_after': product_balance_after}
+    #     act_data = {
+    #         'product': json.dumps(product)
+    #     }
+    #     data = dict(base_data, **act_data)
+    #     coop_call_back.apply_async(
+    #         kwargs={'params': data},
+    #         queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
+    #
+    #     if is_full:
+    #         try:
+    #             from wanglibao_p2p.tasks import coop_product_push
+    #             coop_product_push.apply_async(
+    #                 kwargs={'product_id': product_id}, queue='celery02'
+    #             )
+    #         except:
+    #             pass
+    # except:
+    #     pass
 
 
 
