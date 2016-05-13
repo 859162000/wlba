@@ -7,20 +7,21 @@ html(style="background: #f4f4f4")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015051302", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015051304", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
         .body_wrap.clear
-            img.banner(src='/static/imgs/mobile_activity/app_open_day_review/banner.png')
-            .section.section_2
+            .banner_img
+                img.banner(src='/static/imgs/mobile_activity/app_open_day_review/banner.png')
+            .section.section_2.section_first
                 .ranking_wrap
                     dl
                         dt 红木专场大放送
                         dd!='人气王<span>重礼</span>悬赏'
                     .red_box
                         img(src='/static/imgs/mobile_activity/app_open_day_review/red_box.png')
-                        span 2016年5月12日-5月18日
+                        span 2016年5月17日 - 5月23日
                     p.ranking_title_top “产融通HMD”  类项目累计排行榜
                     .ranking_list
                         ul
@@ -68,7 +69,7 @@ html(style="background: #f4f4f4")
                             .img.img_4
                                 img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_4.png')
                                 p 20 名
-                            p.data_text!='价值<span>1000</span>元红木制品'
+                            p.data_text!='价值<span>700</span>元红木制品'
                         .box
                             .img.img_4
                                 img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_5.png')
@@ -128,7 +129,7 @@ html(style="background: #f4f4f4")
                                 em.section-hui {{product.period}}
                                 |{{product.pay_method|period_unit}}
                               .time-tit 投资期限
-                          .total_amount_num {{product.total_amount|convert_to_10k}}
+                          //.total_amount_num {{product.total_amount|convert_to_10k}}
                           .body-right
                             if btnClass == 'btn-blue'
                               a(href="/weixin/view/buy/{{product.id}}/?next=/weixin/list/").btn-body(class=btnClass) {{status}}
@@ -143,7 +144,7 @@ html(style="background: #f4f4f4")
                     .red_title 用户须知
                     dl
                         dt 1、
-                        dd 活动时间：2016年5月12日0:00 － 5月18日23:59。
+                        dd 活动时间：2016年5月17日0:00 - 5月23日23:59。
                     dl
                         dt 2、
                         dd 活动期间，投资带有“产融通HMD”开头的项目，投资金额才会进入累计排行。
@@ -158,10 +159,10 @@ html(style="background: #f4f4f4")
                         dd 20名普惠奖励，红包无使用门槛，活动结束后三个工作日内下发，有效期领取之日7天有效。
 
             .section.section_1
-                .big_title.big_title_1 “产业银行”的业务模式
+                .big_title.big_title_1 “产业金融”的业务模式
                 .line_red
-                p.text.text_1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网利宝凭借丰富的金融行业经验、互联网优势，在业内创立了“产业银行”的商业模式，即以产业为切入点、在细分领域深耕，通过产融结合的方式，挖掘产业链中优质中小企业的融资需求。与消费信贷相比，网利宝在获取优质资产方面的优势主要体现在两个方面。一是网利宝不依靠传统的担保、小贷公司推荐债权，而是借助产业龙头的行业积累主动挖掘，建立一条稳定、可靠的渠道;二是在中国个人征信不健全的环境下，网利宝专注企业贷，通过管控质押物，更易确保借款企业按时还款，降低用户投资风险。
-                p.text.text_2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2014 年 8 月上线来，网利宝在车房贷、物流货运、红木、珠宝、金融仓储等细分产业进行了深度布局，建立了一个稳定的、挖掘优质资产的渠道，先后服务近 2000 家中小企业，截至2016年4月末完成了 50 多亿交易额，拥有近 150 万用户。
+                p.text.text_1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网利宝凭借丰富的金融行业经验、互联网优势，在业内创立了“产业金融”的商业模式，即以产业为切入点、在细分领域深耕，通过产融结合的方式，挖掘产业链中优质中小企业的融资需求。与消费信贷相比，网利宝在获取优质资产方面的优势主要体现在两个方面。一是网利宝不依靠传统的担保、小贷公司推荐债权，而是借助产业龙头的行业积累主动挖掘，建立一条稳定、可靠的渠道;二是在中国个人征信不健全的环境下，网利宝专注企业贷，通过管控质押物，更易确保借款企业按时还款，降低用户投资风险。
+                p.text.text_2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2014 年 8 月上线来，网利宝在车房贷、物流货运、木材、珠宝、金融仓储等细分产业进行了深度布局，建立了一个稳定的、挖掘优质资产的渠道，先后服务近 2000 家中小企业，截至2016年4月末完成了 50 多亿交易额，拥有近 150 万用户。
 
 
 
@@ -272,7 +273,7 @@ html(style="background: #f4f4f4")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015051305")
+        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015051307")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
