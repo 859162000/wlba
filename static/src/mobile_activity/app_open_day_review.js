@@ -91,7 +91,7 @@
 
 						} else {
 							var i_num = i + 1;
-							rankingList.push(['<li><div class="img"><img src="/static/imgs/mobile_activity/app_open_day_review/yuan.png"></div><div class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</div><div class="money">'+number+'</div"></li>'].join(''));
+							rankingList.push(['<li><div class="img"><img class="yuan" src="/static/imgs/mobile_activity/app_open_day_review/yuan.png"></div><div class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</div><div class="money">'+number+'</div"></li>'].join(''));
 						}
 					}
 				}
