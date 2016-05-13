@@ -146,7 +146,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
         return null;
     }
     var promo_token = getUrlParam("promo_token");
-    if(promo_token == 'wdty'){
+    if(promo_token == 'wdty518'){
         $('.wdty,.page').show();
     }
 });

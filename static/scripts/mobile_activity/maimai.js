@@ -231,9 +231,22 @@ org.mmIndex = (function(org){
         checkState: null,
         intervalId: null,
         init: function(){
+            lib._promotoken();
             lib._submit();
             lib.listen();
             $(document.body).trigger('from:captcha');
+        },
+        _promotoken : function(){
+            var promo_token = lib._getUrlParam("promo_token");
+            if(promo_token == 'wdty518'){
+                $('.maimai-rule').attr('href','/activity/maimai_rules/?promo_token=wdty518');
+            }
+        },
+        _getUrlParam : function(name){
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r!=null) return unescape(r[2]);
+            return null;
         },
          _confirm: function (title, certainName, callback, callbackData) {
             if ($('.confirm-warp').length > 0) {
@@ -525,6 +538,31 @@ org.mmIndex = (function(org){
             })
         },
 
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.mmRule = (function(org){
+    var lib = {
+        init: function () {
+            lib._promotoken();
+        },
+        _promotoken: function () {
+            var promo_token = lib._getUrlParam("promo_token");
+            if (promo_token == 'wdty518') {
+                $('.wdty').show();
+            }else{
+                $('.other').show();   
+            }
+        },
+        _getUrlParam: function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        },
     }
     return {
         init : lib.init
