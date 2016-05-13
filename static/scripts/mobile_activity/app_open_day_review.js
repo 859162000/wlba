@@ -281,4 +281,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		grabCursor: true
 	});
 
+	var swiper_4 = new Swiper('.swiper_big', {
+        pagination: '.swiper-pagination',
+        slidesPerView: 'auto',
+        centeredSlides: true,
+        paginationClickable: true,
+        spaceBetween: 10,
+		autoHeight: false
+    });
+
 })(org);
