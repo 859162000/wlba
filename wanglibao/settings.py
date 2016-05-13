@@ -1230,8 +1230,8 @@ else:
 # 八金社
 BAJINSHE_CHANNEL_CODE = 'bajinshe'
 if ENV == ENV_PRODUCTION:
-    BAJINSHE_CLIENT_ID = '7cbb6aeb381b780edfa2'
-    BAJINSHE_COOP_KEY = ''
+    BAJINSHE_CLIENT_ID = '3718adaf32719e2641d6'
+    BAJINSHE_COOP_KEY = '770f7de58365496813c7dcc66796d6434023bf99'
 else:
     BAJINSHE_CLIENT_ID = '7cbb6aeb381b780edfa2'
     BAJINSHE_COOP_KEY = '4762c2c53ed701597c1d6cf3b409ff87c3f04f98'
@@ -1354,17 +1354,15 @@ if ENV == ENV_PRODUCTION:
 
 
 # 渠道数据中心平台认证授权密钥
+CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
+CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
 if ENV == ENV_PRODUCTION:
-    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
-    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
-    OAUTH2_URL = 'https://qdtest.wanglibao.com/oauth2/auth/'
-    CHANNEL_CENTER_CALL_BACK_URL = 'https://qdtest.wanglibao.com/api/dispatch/'
-    COOP_ACCESS_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/'
-    PUSH_COOP_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/push_coop_token/'
-    COOP_ACCESS_TOKEN_PUSH_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/push/'
+    OAUTH2_URL = 'https://channel.wanglibao.com/oauth2/auth/'
+    CHANNEL_CENTER_CALL_BACK_URL = 'https://channel.wanglibao.com/api/dispatch/'
+    COOP_ACCESS_TOKEN_URL = 'https://channel.wanglibao.com/oauth2/access_token/'
+    PUSH_COOP_TOKEN_URL = 'https://channel.wanglibao.com/oauth2/push_coop_token/'
+    COOP_ACCESS_TOKEN_PUSH_URL = 'https://channel.wanglibao.com/oauth2/access_token/push/'
 else:
-    CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
-    CHANNEL_CENTER_CALL_BACK_KEY = 'jIzNGRrd2xi'
     OAUTH2_URL = 'https://qdtest.wanglibao.com/oauth2/auth/'
     CHANNEL_CENTER_CALL_BACK_URL = 'https://qdtest.wanglibao.com/api/dispatch/'
     COOP_ACCESS_TOKEN_URL = 'https://qdtest.wanglibao.com/oauth2/access_token/'
