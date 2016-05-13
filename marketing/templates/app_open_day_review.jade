@@ -107,8 +107,6 @@ html(style="background: #f4f4f4")
             p.insert_text 红木贷项目列表：
             .section.section_2
                 .p2p_products_box
-                    .red_title 新手福利
-
 
                     for product in p2p_products
                       status = product['display_status']
@@ -147,6 +145,7 @@ html(style="background: #f4f4f4")
                                     span.profit-addNum {{product.activity.activity_rule_percent_text}}
                                     span.profit-addNumsign %
                                 .profit-tit 年化收益
+                            //.body-time-line
                             .body-time
                               .time-num
                                 em.section-hui {{product.period}}
@@ -162,20 +161,55 @@ html(style="background: #f4f4f4")
                         if status == '抢购中'
                           .section-progressd(style="width:{{percent | percentage}}")
 
+            .section.section_2.section_margin
+                .user_notes
+                    .red_title 重礼悬赏
 
-
+                    p 用户须知：
+                    dl
+                        dt 1、
+                        dd 活动时间：2016年5月12日0:00 － 5月18日23:59。
+                    dl
+                        dt 2、
+                        dd 活动期间，投资带有“产融通HMD”开头的项目，投资金额才会进入累计排行。
+                    dl
+                        dt 3、
+                        dd 获奖用户以投资“产融通HMD”类项目累计金额为准。
+                    dl
+                        dt 4、
+                        dd 实物奖品在活动结束后在三个工作内由客服通知并发放。
+                    dl
+                        dt 5、
+                        dd 20名普惠奖励，红包无使用门槛，活动结束后三个工作日内下发，有效期领取之日7天有效。
 
             .section.section_1
                 .big_title.big_title_1 “产业银行”的业务模式
                 .line_red
                 p.text.text_1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网利宝凭借丰富的金融行业经验、互联网优势，在业内创立了“产业银行”的商业模式，即以产业为切入点、在细分领域深耕，通过产融结合的方式，挖掘产业链中优质中小企业的融资需求。与消费信贷相比，网利宝在获取优质资产方面的优势主要体现在两个方面。一是网利宝不依靠传统的担保、小贷公司推荐债权，而是借助产业龙头的行业积累主动挖掘，建立一条稳定、可靠的渠道;二是在中国个人征信不健全的环境下，网利宝专注企业贷，通过管控质押物，更易确保借款企业按时还款，降低用户投资风险。
                 p.text.text_2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2014 年 8 月上线来，网利宝在车房贷、物流货运、红木、珠宝、金融仓储等细分产业进行了深度布局，建立了一个稳定的、挖掘优质资产的渠道，先后服务近 2000 家中小企业，截至2016年4月末完成了 50 多亿交易额，拥有近 150 万用户。
-            .section.section_2
-                .big_title.big_title_1 木材为网利宝重点深耕产业之一
-                .line_red
-                .small_title.small_title_1 为什么深耕木材行业？
-                .line_gray
-                img.advantage_wrap(src='/static/imgs/mobile_activity/app_open_day_review/advantage_wrap.png')
+
+
+
+            .section.section_2.section_big
+                .section_big_main
+                    .big_title.big_title_1 木材为重点深耕产业之一
+                    .line_red
+
+
+                    .swiper-container.swiper_big
+                        .swiper-wrapper
+                            .swiper-slide
+                                .small_title 为什么深耕木材行业？
+                                .line_gray
+                                img.advantage_wrap_1(src='/static/imgs/mobile_activity/app_open_day_review/advantage_wrap.png')
+                            .swiper-slide
+                                .small_title 主要业务范围？
+                                .line_gray
+                                img.advantage_wrap_1(src='/static/imgs/mobile_activity/app_open_day_review/advantage_wrap_2.png')
+                                //.section_text.section_text_1!='全国 4 大木材生产集散地:  <br><span>1、河北大城&nbsp;&nbsp;2、浙江东阳&nbsp;&nbsp;3、福建仙游&nbsp;&nbsp;4、广东观澜</span>'
+                        .swiper-pagination
+
+
             .section.section_1
                 .small_title.small_title_2 主要业务范围？
                 .line_gray
@@ -311,8 +345,9 @@ html(style="background: #f4f4f4")
                             .people_text 一天的考察结束了，在回来的路途中我想了很多。互联网金融的关健是做好风控、保护投资者利益，而网利宝的高层都是从事金融行业多年，术有专攻这方面让投资者放心。通过实地考察木材质押物、 参观家具成品，让我体会到了木材之所以经久不衰，带给我们的不仅仅是美，更多的是工艺与智慧的传承，让我们期待网利宝做得更好！
                         img.people_bottom(src='/static/imgs/mobile_activity/app_open_day_review/people_footer.png')
         script(src='/static/src/mobile/lib/weixin/wx.js')
-        script(src='/static/js/lib/swiper.min.js')
-        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015050502")
+        script(src='/static/js/lib/swiper_new_min.js')
+        script(src="/static/scripts/mobile_activity/app_open_day_review.js?v=2015050503")
+
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
         //        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
