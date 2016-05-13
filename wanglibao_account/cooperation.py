@@ -2043,10 +2043,11 @@ class BaJinSheRegister(CoopRegister):
         logger.info("%s-Enter purchase_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
         p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id, catalog=u'申购').values().first()
         if p2p_record:
-            p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            create_time = p2p_record['create_time']
+            p2p_record['create_time'] = create_time.strftime('%Y-%m-%d %H:%M:%S')
             p2p_record['amount'] = float(p2p_record['amount'])
             p2p_record['product'] = p2p_record['product_id']
-            base_data = generate_coop_base_data('purchase')
+            base_data = generate_coop_base_data('purchase', create_time)
 
             margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')
             margin_record = margin_record_query.values().first()
@@ -2074,7 +2075,8 @@ class BaJinSheRegister(CoopRegister):
                                           status=PayInfo.SUCCESS,
                                           order_id=order_id).select_related('margin_record').first()
         if pay_info:
-            base_data = generate_coop_base_data('recharge')
+            create_time = pay_info.create_time
+            base_data = generate_coop_base_data('recharge', create_time)
             pay_info_data = {
                 'type': pay_info.type,
                 'uuid': pay_info.uuid,
@@ -2086,7 +2088,7 @@ class BaJinSheRegister(CoopRegister):
                 'status': pay_info.status,
                 'user': pay_info.user.id,
                 'order_id': pay_info.order.id,
-                'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'create_time': create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             margin_record = pay_info.margin_record
             margin_record_data = {

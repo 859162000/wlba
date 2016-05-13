@@ -840,15 +840,19 @@ def coop_base_sign(channel, _time, key):
     return sign
 
 
-def generate_coop_base_data(act):
+def generate_coop_base_data(act, sync_time=None):
     channel = 'base'
-    utc_timestamp = get_current_utc_timestamp()
+    if sync_time:
+        utc_timestamp = get_current_utc_timestamp(sync_time)
+    else:
+        utc_timestamp = get_current_utc_timestamp()
+
     data = {
         'sign': coop_base_sign(channel, utc_timestamp, settings.CHANNEL_CENTER_CALL_BACK_KEY),
         'time': utc_timestamp,
         'act': act,
         'channel': channel,
-        'sync_id': float(time.time()),
+        'sync_id': float(utc_timestamp),
     }
     return data
 
