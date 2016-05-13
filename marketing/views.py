@@ -14,14 +14,13 @@ from collections import defaultdict
 from decimal import Decimal
 import time
 from weixin.models import WeixinUser
-from wanglibao_p2p.models import P2PEquity
+from wanglibao_p2p.models import P2PEquity, Earning, P2PRecord, P2PProduct
 from django.db import transaction
 from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from wanglibao_p2p.models import P2PRecord
 from django.views.generic import TemplateView
 from django.http.response import HttpResponse, Http404, HttpResponseRedirect
 from mock_generator import MockGenerator
@@ -44,7 +43,6 @@ from wanglibao_account.utils import FileObject
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
-from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao.templatetags.formatters import safe_phone_str
 from order.models import Order
@@ -60,8 +58,7 @@ from wanglibao_account import message as inside_message
 from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
-from marketing.utils import get_user_channel_record
-from wanglibao_p2p.models import EquityRecord
+from marketing.utils import get_user_channel_record, utype_is_mobile, utype_is_app
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
@@ -3204,6 +3201,22 @@ class CustomerAccount2015ApiView(APIView):
         return HttpResponse(json.dumps(resp, sort_keys=True), content_type='application/json')
 
 
+class OpenHouseApiView(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        is_mobile = utype_is_mobile(self.request)
+        if is_mobile:
+            self.template_name = 'app_open_house.jade'
+        else:
+            self.template_name = 'open_house.jade'
+
+        if utype_is_app(self.request):
+            self.template_name = 'h5_open_house.jade'
+
+        return {}
+
+
 class MaiMaiView(TemplateView):
     template_name = 'app_maimaiIndex.jade'
 
@@ -3224,3 +3237,28 @@ class MaiMaiView(TemplateView):
             'token': token,
             'channel': channel
         }
+
+
+class ShieldPlanView(TemplateView):
+    template_name = 'shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+            .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+            .order_by('-status_int')[:3]
+        return {
+            'p2p_list': p2p_list
+        }
+
+
+class ShieldPlanH5View(TemplateView):
+    template_name = 'h5_shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+                       .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+                       .order_by('-status_int').first()
+        return {
+            'p2p': p2p_list
+        }
+
