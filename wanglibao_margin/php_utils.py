@@ -627,7 +627,8 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
                     Q(redpack__event__period__lte=period*30, redpack__event__period_type='day_gte') |
                     # 不限制时间的优惠券
                     Q(Q(redpack__event__period=0)))\
-            .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+            .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount',
+                                                                       'redpack__event__unavailable_at')
         for record in records:
             redpack = record.redpack
             if redpack.status == "invalid":
@@ -667,7 +668,8 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
                         Q(redpack__event__period=period*30, redpack__event__period_type='day') |
                         Q(redpack__event__period__lte=period*30, redpack__event__period_type='day_gte') |
                         Q(Q(redpack__event__period=0)))\
-                .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
+                .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount',
+                                                                          'redpack__event__unavailable_at')
 
             for coupon in coupons:
                 if coupon.order_id:
