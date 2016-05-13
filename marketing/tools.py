@@ -79,13 +79,10 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
     # Add by chenwb for send data to channel-center
     try:
         if is_full:
-            try:
-                from wanglibao_p2p.tasks import coop_product_push
-                coop_product_push.apply_async(
-                    kwargs={'product_id': product_id}
-                )
-            except:
-                pass
+            from wanglibao_p2p.tasks import coop_product_push
+            coop_product_push.apply_async(
+                kwargs={'product_id': product_id}
+            )
         else:
             base_data = generate_coop_base_data('product_update')
             product = {'id': product_id,

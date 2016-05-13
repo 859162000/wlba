@@ -386,33 +386,34 @@ class AmortizationKeeper(KeeperBaseMixin):
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
         # 推送用户还款计划到渠道中心 add by chenweibin@20160328
-        try:
-            for product_amortization in product_amortizations:
-                sub_amortizations = product_amortization.subs.all()
-                settled_sub_amos = list()
-                for sub_amo in sub_amortizations:
-                    settled_sub_amos.append({
-                        'id': sub_amo.id,
-                        'product': product.id,
-                        'user': sub_amo.user.id,
-                        'term': sub_amo.term,
-                        'settled': sub_amo.settled,
-                        'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
-                        'principal': float(sub_amo.principal),
-                        'interest': float(sub_amo.interest),
-                        'penal_interest': float(sub_amo.penal_interest),
-                        'coupon_interest': float(sub_amo.coupon_interest),
-                        'description': sub_amo.description,
-                    })
-
-                if settled_sub_amos:
-                    from .tasks import coop_amortizations_push
-                    coop_amortizations_push.apply_async(
-                        kwargs={'amortizations': settled_sub_amos,
-                                'product_id': product.id,
-                                'amo_act': 'plan'})
-        except:
-            pass
+        # Comment by hb on 2016-05-13
+        # try:
+        #     for product_amortization in product_amortizations:
+        #         sub_amortizations = product_amortization.subs.all()
+        #         settled_sub_amos = list()
+        #         for sub_amo in sub_amortizations:
+        #             settled_sub_amos.append({
+        #                 'id': sub_amo.id,
+        #                 'product': product.id,
+        #                 'user': sub_amo.user.id,
+        #                 'term': sub_amo.term,
+        #                 'settled': sub_amo.settled,
+        #                 'term_date': sub_amo.term_date.strftime('%Y-%m-%d %H:%M:%S'),
+        #                 'principal': float(sub_amo.principal),
+        #                 'interest': float(sub_amo.interest),
+        #                 'penal_interest': float(sub_amo.penal_interest),
+        #                 'coupon_interest': float(sub_amo.coupon_interest),
+        #                 'description': sub_amo.description,
+        #             })
+        #
+        #         if settled_sub_amos:
+        #             from .tasks import coop_amortizations_push
+        #             coop_amortizations_push.apply_async(
+        #                 kwargs={'amortizations': settled_sub_amos,
+        #                         'product_id': product.id,
+        #                         'amo_act': 'plan'})
+        # except:
+        #     pass
 
     # def __generate_useramortization(self, equities):
     #     """
@@ -673,15 +674,16 @@ class AmortizationKeeper(KeeperBaseMixin):
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
             # 向渠道中心发送还款用户列表通知 @chenwb
-            try:
-                if settled_sub_amos:
-                    from .tasks import coop_amortizations_push
-                    coop_amortizations_push.apply_async(
-                        kwargs={'amortizations': settled_sub_amos,
-                                'product_id': product.id,
-                                'amo_act': 'amortize'})
-            except:
-                pass
+            # Comment by hb on 2016-05-13
+            # try:
+            #     if settled_sub_amos:
+            #         from .tasks import coop_amortizations_push
+            #         coop_amortizations_push.apply_async(
+            #             kwargs={'amortizations': settled_sub_amos,
+            #                     'product_id': product.id,
+            #                     'amo_act': 'amortize'})
+            # except:
+            #     pass
 
     def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(
