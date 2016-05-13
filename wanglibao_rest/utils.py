@@ -156,9 +156,10 @@ def generate_oauth2_sign(user_id, client_id, key):
     return sign
 
 
-def get_current_utc_timestamp():
+def get_current_utc_timestamp(_time=None):
     time_format = '%Y-%m-%d %H:%M:%S'
-    utc_time = timezone.now().strftime(time_format)
+    _time = _time or timezone.now()
+    utc_time = _time.strftime(time_format)
     utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
     return utc_timestamp
 
