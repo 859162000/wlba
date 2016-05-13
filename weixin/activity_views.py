@@ -686,7 +686,7 @@ class FetchXunleiCardAward(APIView):
         type = int(type)
 
         code = activity.code+"_"+str(type)
-        activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, activity_code=code)
+        activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, create_date="2017-05-12", activity_code=code)
         if activity_reward_record.status:
             return Response({"ret_code": -1, "message":"您已经领取过"})
 
