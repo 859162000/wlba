@@ -321,14 +321,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 
     function goBuy(){
-        $(".js-go-buy").on("click",function(){
+        $(".js-go-buy").on("touchstart",function(){
             var self = $(this),
                 url = self.attr("data-src");
             window.location.href = url;
         });
     }
 
-    var login = false;
+    //var login = false;
     wlb.ready({
         app: function (mixins) {
             function connect(data) {
@@ -354,15 +354,15 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
-                    login = false;
-                    $(".js-go-buy").on("click",function() {
+                    //login = false;
+                    $(".js-go-buy").on("touchstart",function() {
                         mixins.loginApp({
                             refresh: 1,
                             url: 'https://staging.wanglibao.com/activity/h5_shield_plan/'
                         });
                     });
                 } else {
-                    login = true;
+                    //login = true;
                     connect(data);
                 }
             });
