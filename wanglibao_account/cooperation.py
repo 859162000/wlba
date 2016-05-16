@@ -1440,6 +1440,33 @@ class JuChengRegister(CoopRegister):
                     "content": u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
                     "mtype": "activity"
                 })
+class ZhongYingRegister(CoopRegister):
+
+    def __init__(self, request):
+        super(ZhongYingRegister, self).__init__(request)
+        self.c_code = 'zypwt'
+        self.invite_code = 'zypwt'
+        self.token = 'zypwt'
+        self.request = request
+
+    def register_call_back(self, user):
+        for _index in xrange(2):
+            reward = Reward.objects.filter(type='中影票务通', is_used=False).first()
+            if not reward:
+                return
+            send_messages.apply_async(kwargs={
+                "phones": [user.wanglibaouserprofile.phone, ],
+                "messages": [u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,), ]
+            })
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"演出门票赠送",
+                "content": u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,),
+                "mtype": "activity"
+            })
+
+    def purchase_call_back(self, user, order_id):
+        pass
 
 class HappyMonkeyRegister(CoopRegister):
     def __init__(self, request):
