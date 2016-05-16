@@ -220,7 +220,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;
 (function(org) {
 
-
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
 		type : 'GET',
@@ -291,7 +290,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         //}
 
                         $('#get_ticket').click(function() {
-                            $.ajax({
+                            org.ajax({
                                 url: '/api/activity/zhongying/',
                                 type: 'post',
                                 success: function (data) {
@@ -331,7 +330,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         },
         other: function(){
             $('#get_ticket').click(function() {
-                $.ajax({
+                org.ajax({
                     url: '/api/activity/zhongying/',
                     type: 'post',
                     success: function (data) {
@@ -352,6 +351,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         }
     })
+
 
     $('.section_5_box p span').on('click',function(){
         var ele = $('.section_5_box .slide_text');

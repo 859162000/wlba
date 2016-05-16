@@ -1,7 +1,6 @@
 
 (function(org) {
 
-
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
 		type : 'GET',
@@ -72,7 +71,7 @@
                         //}
 
                         $('#get_ticket').click(function() {
-                            $.ajax({
+                            org.ajax({
                                 url: '/api/activity/zhongying/',
                                 type: 'post',
                                 success: function (data) {
@@ -112,7 +111,7 @@
         },
         other: function(){
             $('#get_ticket').click(function() {
-                $.ajax({
+                org.ajax({
                     url: '/api/activity/zhongying/',
                     type: 'post',
                     success: function (data) {
@@ -133,6 +132,7 @@
             })
         }
     })
+
 
     $('.section_5_box p span').on('click',function(){
         var ele = $('.section_5_box .slide_text');

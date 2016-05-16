@@ -1,0 +1,59 @@
+- load formatters
+doctype html
+html(style="background: #fff")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_pretty_reach_home.css?v=2015051601", rel="stylesheet")
+    body
+        .body_wrap.clear
+            img.banner.banner_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/banner_1.png')
+            img.banner.banner_2(src='/static/imgs/mobile_activity/app_pretty_reach_home/banner_2.png')
+            img.title_big.title_big_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/title_big_1.png')
+            .cheats_box
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_1.png')
+                    dl
+                        dt 轻松注册
+                        dd 注册网利宝并完成实名认证
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_2.png')
+                    dl
+                        dt 充值到账
+                        dd 充值资金到<br>网利宝帐号
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_3.png')
+                    dl
+                        dt 首次投资
+                        dd 金额≥3000元
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_4.png')
+                    dl
+                        dt 面部护理
+                        dd 丁香花蕾平衡清爽护理投资成功后网利宝站内信发送
+            img.button(src='/static/imgs/mobile_activity/app_pretty_reach_home/button.png')
+            img.title_big.title_big_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/title_big_2.png')
+            .section.section_1
+                .section_title 定期理财
+                .section_main.section_main_1
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_5.png')
+                    .text_box
+                        .text_line.text_1!='6<span class="small">%</span> <span class="line"></span> 13<span class="small">%</span>'
+                        .text_line.text_2 年化利率
+                        .text_line.text_3 短期灵活、中期方便、长期优选
+            .popup_box
+                .main
+                    .textairport
+                    .popup_button 知道了
+                    img.close_popup(src="/static/imgs/mobile_activity/app_pretty_reach_home/close_popup.png")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_pretty_reach_home.js?v=2015051605")
+        - csrf_token
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
