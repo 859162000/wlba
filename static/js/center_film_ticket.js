@@ -54,6 +54,7 @@
         hasCallBack : true,
         callBack: function(){
             location.reload();
+
         }
       });
       /*注册结束*/
