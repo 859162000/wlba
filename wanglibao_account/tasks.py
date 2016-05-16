@@ -42,25 +42,31 @@ def process_amortize(amortizations, product_id, sync_id, amo_act):
         term = amo['term']
         amo_instance = UserAmortization.objects.filter(user_id=user_id, product_id=product_id, term=term).first()
         if amo_instance:
-            amo['settlement_time'] = str_to_utc(amo['settlement_time'])
+            if amo['settled']:
+                amo['settlement_time'] = str_to_utc(amo['settlement_time'])
             user_amo_form = UserAmortizationForm(amo, instance=amo_instance)
         else:
             amo['term_date'] = str_to_utc(amo['term_date'])
             user_amo_form = UserAmortizationForm(amo)
 
         if user_amo_form.is_valid():
+            user_amo = None
             if amo_instance:
                 user_amo = user_amo_form.save()
             else:
-                user = User.objects.get(pk=user_id)
-                amo['user'] = user
-                p2p_product = P2PProduct.objects.get(pk=amo['product'])
-                amo['product'] = p2p_product
-                user_amo = UserAmortization()
-                for k, v in amo.iteritems():
-                    setattr(user_amo, k, v)
-                user_amo.save()
-            user_amo_list.append(user_amo)
+                user = User.objects.filter(pk=user_id).first()
+                if user:
+                    amo['user'] = user
+                    p2p_product = P2PProduct.objects.filter(pk=amo['product']).first()
+                    if p2p_product:
+                        amo['product'] = p2p_product
+                        user_amo = UserAmortization()
+                        for k, v in amo.iteritems():
+                            setattr(user_amo, k, v)
+                        user_amo.save()
+
+            if user_amo:
+                user_amo_list.append(user_amo)
 
             if (amo_act == 'plan' and amo['term'] == 1) or amo_act == 'amortize':
                 response_data = save_to_margin(amo)
