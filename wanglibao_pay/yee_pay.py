@@ -343,6 +343,7 @@ class YeeShortPay:
         self.BIND_PAY_REQUEST = settings.YEE_SHORT_BIND_PAY_REQUEST
         self.YEE_CALLBACK = settings.YEE_SHORT_CALLBACK
         self.UNBIND_CARD = settings.YEE_URL + '/api/bankcard/unbind'
+        self.QUERY_TRX_RESULT = settings.YEE_URL + '/api/query/order' 
 
     def _sign(self, dic):
         values = self._sort(dic)
