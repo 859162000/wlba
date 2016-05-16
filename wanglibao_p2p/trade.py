@@ -353,7 +353,8 @@ class P2POperator(object):
         try:
             from .tasks import coop_product_push
             coop_product_push.apply_async(
-                kwargs={'product_id': product.id}
+                kwargs={'product_id': product.id},
+                queue='celery02'
             )
         except:
             pass
@@ -408,7 +409,8 @@ class P2POperator(object):
                 try:
                     from .tasks import coop_product_push
                     coop_product_push.apply_async(
-                        kwargs={'product_id': product.id}
+                        kwargs={'product_id': product.id},
+                        queue='celery02'
                     )
                 except:
                     pass

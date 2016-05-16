@@ -411,7 +411,8 @@ class AmortizationKeeper(KeeperBaseMixin):
                     coop_amortizations_push.apply_async(
                         kwargs={'amortizations': settled_sub_amos,
                                 'product_id': product.id,
-                                'amo_act': 'plan'})
+                                'amo_act': 'plan'},
+                        queue='celery02')
         except:
             pass
 
@@ -681,7 +682,8 @@ class AmortizationKeeper(KeeperBaseMixin):
                     coop_amortizations_push.apply_async(
                         kwargs={'amortizations': settled_sub_amos,
                                 'product_id': product.id,
-                                'amo_act': 'amortize'})
+                                'amo_act': 'amortize'},
+                        queue='celery02')
             except:
                 pass
 

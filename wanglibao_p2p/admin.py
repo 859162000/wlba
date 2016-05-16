@@ -335,7 +335,8 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
             try:
                 coop_product_push.apply_async(
                     countdown=5,
-                    kwargs={'product_id': obj.id}
+                    kwargs={'product_id': obj.id},
+                    queue='celery02'
                 )
             except:
                 pass

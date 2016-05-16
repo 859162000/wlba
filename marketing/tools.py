@@ -81,7 +81,8 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         if is_full:
             from wanglibao_p2p.tasks import coop_product_push
             coop_product_push.apply_async(
-                kwargs={'product_id': product_id}
+                kwargs={'product_id': product_id},
+                queue='celery02'
             )
         else:
             base_data = generate_coop_base_data('product_update')
