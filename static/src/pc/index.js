@@ -119,24 +119,24 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
         }, 200);
     });
 
-
-    $('.bonus-icon').on('click', function () {
-        $('.bonus-img,.page').show();
-    });
-    $('.close').on('click', function () {
-        $('.bonus-img,.page').hide();
-    });
-
-    function wxShareIcon() {
-        var docleft = document.body.clientWidth;
-        var left = (docleft - $('.bonus-icon').width());
-        $('.bonus-icon').css({'left': left});
-    }
-
-    //wxShareIcon()
-    window.onresize = function () {
-        wxShareIcon();
-    };
+    //
+    //$('.bonus-icon').on('click', function () {
+    //    $('.bonus-img,.page').show();
+    //});
+    //$('.close').on('click', function () {
+    //    $('.bonus-img,.page').hide();
+    //});
+    //
+    //function wxShareIcon() {
+    //    var docleft = document.body.clientWidth;
+    //    var left = (docleft - $('.bonus-icon').width());
+    //    $('.bonus-icon').css({'left': left});
+    //}
+    //
+    ////wxShareIcon()
+    //window.onresize = function () {
+    //    wxShareIcon();
+    //};
 
     //page
     var leftV = 60, index0 = 0, index1 = 0, index2 = 0, index = 0;
