@@ -461,20 +461,20 @@
     color: $t-d11
     margin-left: 8px
     vertical-align: middle
-    margin-right: 10px
+    margin-right: 2px
   em
     width: 24px
     height: 10px
     vertical-align: top
     @include home-sprite(new_icon)
     display: inline-block
-    margin: 0 12px 0 0
   .vertical-icon
     width: 2px
     height: 16px
     display: inline-block
     @include home-sprite(shu)
     vertical-align: middle
+    margin-left: 9px
   label
     color: #999
     font-size: $font-m
@@ -540,6 +540,7 @@
           @include home-sprite(new_user_icon)
         .g-plan-title
           text-align: center
+          position: relative
           .letter-icon
             width: 22px
             height: 22px
@@ -631,13 +632,22 @@
             background: #f0871d
           em.long-term
             background: #f25a46
-          em.transfer
+          .transfer-boxs
             width: 18px
-            background: #fff
-            border: 1px solid #477ced
-            color: #477ced
-            border-radius: 5px
-            position: relative
+            height: 16px
+            position: absolute
+            top: 3px
+            right: 0
+            &:hover
+              .transfer-box
+                display: block
+            i.transfer
+              background: #fff
+              border: 1px solid #477ced
+              color: #477ced
+              border-radius: 5px
+              padding: 3px
+              cursor: pointer
             .transfer-box
               width: 122px
               height: 38px
@@ -656,7 +666,11 @@
               background: #477ced
               color: #fff
           label
-            color: #ccc
+            @include home-sprite(split)
+            width: 3px
+            height: 19px
+            display: inline-block
+            vertical-align: middle
         .increase-interest-box
           position: absolute
           width: 100%
@@ -715,6 +729,8 @@
           .p-top
             font-size: $font-xxl
             color: $t-d11
+            span
+              font-size: 26px
           .p-b
             font-size: $font-s
             color: #999
@@ -754,30 +770,31 @@
             color: $t-d11
         .progress-bar
           padding: 10px 0 0
-          .progress-bar-left
+          .progress-bar-box
             float: left
             width: 190px
-            height: 4px
-            background: $bg-d7
-            border-radius: 3px
-            position: relative
-            margin-top: 7px
-            span
-              width: 20%
-              background: #f25a46
-              border-radius: 3px
-              display: inline-block
+            .available-amount
+              color: #999999
+              font-size: 11px
+            .progress-bar-left
               height: 4px
-              position: absolute
-              left: 0
-              top: 0
+              background: $bg-d7
+              border-radius: 3px
+              position: relative
+              margin-top: 7px
+              span
+                width: 20%
+                background: #f25a46
+                border-radius: 3px
+                display: inline-block
+                height: 4px
+                position: absolute
+                left: 0
+                top: 0
           .progress-bar-right
             color: $t-d11
             font-size: $font-s
             float: right
-        .available-amount
-          color: #999999
-          font-size: 11px
         .go-investment
           margin-top: 20px
           text-align: center
@@ -797,7 +814,7 @@
             background: #c7c7c7
       .ylb-project
         padding: 20px 0
-        .time-money,.available-amount
+        .time-money
           padding: 0 55px
         .progress-bar
           padding: 10px 55px 0

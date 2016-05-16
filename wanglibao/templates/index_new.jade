@@ -138,7 +138,6 @@ html
                         em
                     i.vertical-icon
                     label=introduce
-            //.aa {{month_data}}
             if month_data
                 +projectTitle('type-icon-1', '月利宝', '收益递增', '/ylb/monthly.php', 'new')
                 .g-plan-box.clearfix(tag=1)
@@ -160,7 +159,7 @@ html
                                                 letterS = 'd-icon'
                                             i.letter-icon(class=letterS)
                                             span 月利宝{{month.name}}
-                                            label |
+                                            label
                                             span.short-name {{month.short_name}}
                                     activity_rates = float(month['activity_rate'])
                                     if activity_rates > 0
@@ -184,11 +183,12 @@ html
                                             p.p-top {{ jhje | convert_to_10k}}元
                                             p.p-b 计划金额
                                     .progress-bar.clearfix
-                                        .progress-bar-left
-                                            span(style='width:{{month.ordered_percent }}%')
+                                        .progress-bar-box
+                                            .progress-bar-left
+                                                span(style='width:{{month.ordered_percent }}%')
+                                            ktjes = float(month['remain_amount'])
+                                            .available-amount 可投金额 {{ktjes | money_format_int}}元
                                         .progress-bar-right {{month.ordered_percent}}%
-                                    ktjes = float(month['remain_amount'])
-                                    .available-amount 可投金额 {{ktjes | money_format_int}}元
                                     .go-investment
                                         if month.display_status == '已审核'
                                             a(href="{{month.detail_url}}") 立即投资
@@ -252,10 +252,11 @@ html
                                             i 万元
                                 .progress-bar.clearfix
                                     percent = float(p2p.ordered_amount) / p2p.total_amount * 100
-                                    .progress-bar-left
-                                        span(style='width:{{percent | percentage}}')
+                                    .progress-bar-box
+                                        .progress-bar-left
+                                            span(style='width:{{percent | percentage}}')
+                                        .available-amount 可投金额 {{amount | money_format_int}}元
                                     .progress-bar-right {{percent | percentage}}
-                                .available-amount 可投金额 {{amount | money_format_int}}元
                                 .go-investment
                                     if p2p.display_status == '抢购中'
                                         a.min(href='/p2p/detail/{{p2p.id}}') 立即投资
@@ -281,7 +282,8 @@ html
                                         i.zrb-icon
                                         a(href='{{assignment.detail_url}}')
                                             span.san-title {{assignment.short_name}}
-                                        em.transfer 转
+                                        .transfer-boxs
+                                            i.transfer 转
                                             .transfer-box 查看
                                                 a(href='/help/') 债权转让
                                                 | 规则
@@ -293,7 +295,8 @@ html
                                         .border-left
                                         .money-right
                                             p.p-top
-                                                i {{assignment.remaining_time}}天
+                                                span {{assignment.remaining_time}}
+                                                i 天
                                             p.p-b 剩余期限
                                     .detail-info
                                         p
@@ -303,11 +306,12 @@ html
                                             label 转让金额：
                                             span {{assignment.principal_sale_amount}}元
                                     .progress-bar.clearfix
-                                        .progress-bar-left
-                                            span(style="width:{{assignment.ordered_percent}}%")
+                                        .progress-bar-box
+                                            .progress-bar-left
+                                                span(style="width:{{assignment.ordered_percent}}%")
+                                            ktje = float(assignment['principal_left_amount'])
+                                            .available-amount 可投金额 {{ktje | money_format_int }}元
                                         .progress-bar-right {{assignment.ordered_percent}}%
-                                    ktje = float(assignment['principal_left_amount'])
-                                    .available-amount 可投金额 {{ktje | money_format_int }}元
                                     .go-investment
                                         if assignment.display_status == '正在售卖'
                                             a.min(href="{{assignment.detail_url}}") 立即投资

@@ -178,14 +178,6 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
         }
     })
 
-
-    $('.transfer').hover(function(){
-        $(this).find('.transfer-box').show();
-    }, function(event){
-        $(this).find('.transfer-box').hide();
-    })
-
-
     $('.page-boxs span').on('click',function(){
         var self = $(this)
         if(!self.hasClass('onClick')) {
