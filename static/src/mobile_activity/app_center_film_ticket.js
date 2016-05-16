@@ -73,7 +73,7 @@
 
                         $('#get_ticket').click(function() {
                             $.ajax({
-                                url: '/aip/user_exists/',
+                                url: '/api/activity/zhongying/',
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
@@ -113,7 +113,7 @@
         other: function(){
             $('#get_ticket').click(function() {
                 $.ajax({
-                    url: '/aip/user_exists/',
+                    url: '/api/activity/zhongying/',
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
