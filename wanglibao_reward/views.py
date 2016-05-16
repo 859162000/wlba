@@ -3414,7 +3414,7 @@ class ZhongYingAPIView(APIView):
                 'ret_code': 1000,
                 'message': u'用户没有登录'
             }
-            return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         Introducedby = IntroducedBy.objects.filter(user_id=request.user.id).first()
         if not (Introducedby and Introducedby.channel and Introducedby.channel.name == 'zypwt'):
@@ -3422,7 +3422,7 @@ class ZhongYingAPIView(APIView):
                 'ret_code': 1001,
                 'message': u'您不符合领奖规则'
             }
-            return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购').order_by('create_time').first()
 
@@ -3431,18 +3431,18 @@ class ZhongYingAPIView(APIView):
                 'ret_code': 1002,
                 'message': u'您不符合领奖规则'
             }
-            return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         if p2p_record.amount < 3000:
             json_to_response = {
                 'ret_code': 1003,
                 'message': u'您不符合领奖规则'
             }
-            return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         if p2p_record.amount >= 3000:
             json_to_response = {
                 'ret_code': 1004,
                 'message': u'奖品已经发放'
             }
-            return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
