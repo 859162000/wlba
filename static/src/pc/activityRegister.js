@@ -119,7 +119,7 @@
                         }
                     }
                 });
-                count = 5;
+                count = 180;
                 $(element).attr('disabled', 'disabled').addClass('buttonDisabled');
                 $('.voice-validate').attr('disabled', 'disabled');
                 timerFunction = function() {

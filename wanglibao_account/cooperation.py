@@ -770,16 +770,16 @@ class FUBARegister(CoopRegister):
             # 根据支付方式判定周期是否为1月以上标的
             # pay_method = p2p_record.product.pay_method
             # if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-            # 如果首次投资金额大于或等于5000则回调
-            if p2p_record.amount >= 5000:
+            # 如果首次投资金额大于或等于1000则回调
+            if p2p_record.amount >= 10000:
                 # 如果结算时间过期了则不执行回调
-                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-                if earliest_settlement_time:
-                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                    current_time = datetime.datetime.now()
-                    # 如果上次访问的时间是在30天前则不更新访问时间
-                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                        return
+                # earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
+                # if earliest_settlement_time:
+                #     earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                #     current_time = datetime.datetime.now()
+                #     # 如果上次访问的时间是在30天前则不更新访问时间
+                #     if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                #         return
 
                 order_id = p2p_record.order_id
                 goodsprice = 100
@@ -798,14 +798,17 @@ class FUBARegister(CoopRegister):
                     'status': status,
                     'uid': binding.bid,
                 }
+
                 common_callback.apply_async(
-                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
                 # 记录开始结算时间
-                if not binding.extra:
-                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
-                    if earliest_settlement_time:
-                        binding.extra = earliest_settlement_time
-                        binding.save()
+                # if not binding.extra:
+                #     # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                #     if earliest_settlement_time:
+                #         binding.extra = earliest_settlement_time
+                #         binding.save()
 
 
 class YunDuanRegister(CoopRegister):
