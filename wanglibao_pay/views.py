@@ -1316,14 +1316,13 @@ class CardConfigTemplateView(TemplateView):
         return [self._get_wangli_card(c, wangli_cards) for c in card_num_list] 
 
     def get_context_data(self, **kwargs):
-        print '*'* 50, self.request.GET
         phone = self.request.GET.get('phone')
-        profile = WanglibaoUserProfile.objects.get(phone=phone)
-        user = profile.user
         # 电话页面 
         if not phone:
             return {'phone': None}
 
+        profile = WanglibaoUserProfile.objects.get(phone=phone)
+        user = profile.user
         # 解绑快钱卡
         user_id = self.request.GET.get('user_id')
         card_num = self.request.GET.get('card_num')
