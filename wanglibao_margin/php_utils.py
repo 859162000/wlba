@@ -146,7 +146,7 @@ class PhpMarginKeeper(MarginKeeper):
             amount = Decimal(amount)
             check_amount(amount)
 
-            margin = Margin.objects.get(user=user)
+            margin = Margin.objects.select_for_update().get(user=user)
             margin_before = margin.margin
 
             if status == 0:
