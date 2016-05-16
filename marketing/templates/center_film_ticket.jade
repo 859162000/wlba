@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/center_film_ticket.css?v=2016050401")
+        link(rel="stylesheet",href="/static/styles/pc_activity/center_film_ticket.css?v=2016051601")
         - csrf_token
     body(style="background:#222")
         include global/g_nav
@@ -30,7 +30,7 @@ html.no-js(lang="en-gb")
                         img(src='/static/imgs/pc_activity/center_film_ticket/img_4.png')
                         .box_text 4.领取2张通兑券(仅限200张)<br>投资成功后网利宝站内信发送
                 .clear
-                .section_button 立即领取
+                .section_button#get_ticket 立即领取
             .section.section_2
                 img.title_big(src='/static/imgs/pc_activity/center_film_ticket/section_title_1.png')
                 .section_2_box
@@ -52,7 +52,7 @@ html.no-js(lang="en-gb")
                     dl.dl
                         dt 年化利率
                         dd 短期灵活、中期方便、长期优选
-                    .section_button 立即投资
+                    a.section_button(href='/p2p/list/') 立即投资
             .section.section_4
                 .section_4_box
                     img.title_big(src='/static/imgs/pc_activity/center_film_ticket/section_title_3.png')
@@ -92,8 +92,13 @@ html.no-js(lang="en-gb")
                         p.indent_2 &nbsp;&nbsp;b. 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
                         p.indent_2 &nbsp;&nbsp;c. 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
                     p 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+            .popup_box
+                .main
+                    .textairport
+                    .popup_button 知道了
+                    img.close_popup(src="/static/imgs/pc_activity/center_film_ticket/close_popup.png")
         include global/g_footer
 script.
-    require(['/static/js/center_film_ticket.js?v=2016050401'])
+    require(['/static/js/center_film_ticket.js?v=2016051601'])
 
                                                                     
