@@ -692,6 +692,9 @@
         .mt40
           margin-top: 40px
           .project-introduction
+            overflow: hidden
+            text-overflow: ellipsis
+            white-space: nowrap
             label
               font-size: $font-s
               color: #999
@@ -702,8 +705,8 @@
               text-overflow: ellipsis
               white-space: nowrap
               width: 170px
-              display: inline-block
-              vertical-align: middle
+              //display: inline-block
+              //vertical-align: middle
               i
                 font-size: $font-m
           span.profit
