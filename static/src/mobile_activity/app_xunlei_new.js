@@ -117,8 +117,8 @@ org.xunlei = (function(org){
             },30)
         },
         _luckDraw : function(){
-            $('.people-icon').on('click',function(){
-                var self = $(this);
+            $('.people-icon,.mountain-icon').on('click',function(){
+                var self = $('.people-icon');
                 if(count == 0) {
                     count = 1;
                     org.ajax({

@@ -45,11 +45,11 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
         }
     })
     //挖宝
-    $('.people-icon').on('click',function(){
+    $('.people-icon,.mountain-icon').on('click',function(){
         if($('#userStatus').val() == 'False'){
             $('body,html').animate({scrollTop: 0}, 600);
         }else{
-            var self = $(this);
+            var self = $('.people-icon');
             if(count == 0) {
                 count = 1;
                 $.ajax({
