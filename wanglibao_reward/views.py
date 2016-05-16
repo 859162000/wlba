@@ -3420,7 +3420,7 @@ class ZhongYingAPIView(APIView):
         if not (Introducedby and Introducedby.channel and Introducedby.channel.name == 'zypwt'):
             json_to_response = {
                 'ret_code': 1001,
-                'message': u'用户不是来自合法的渠道'
+                'message': u'您不符合领奖规则'
             }
             return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -3429,14 +3429,14 @@ class ZhongYingAPIView(APIView):
         if not p2p_record:
             json_to_response = {
                 'ret_code': 1002,
-                'message': u'您还没有进行投资,请去投资领奖'
+                'message': u'您不符合领奖规则'
             }
             return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         if p2p_record.amount < 3000:
             json_to_response = {
                 'ret_code': 1003,
-                'message': u'不符合领奖规则'
+                'message': u'您不符合领奖规则'
             }
             return False, HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
