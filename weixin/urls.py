@@ -6,6 +6,7 @@ from wanglibao_activity.views import WeixinGGLTemplate
 import views, activity_views, manage_views, sub_views, base, main_views
 from experience_gold.views import ExperienceGoldView
 from common.decorators import fwh_login_required
+from marketing.views import HMDP2PListView
 
 urlpatterns = patterns(
     '',
@@ -140,6 +141,11 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^app_xunlei_welfare/$', fwh_login_required(TemplateView.as_view(template_name="app_xunlei_welfare.jade"), login_url='/weixin/sub_login_redirect/')),
+)
+#h5活动页面
+urlpatterns += patterns(
+    '',
+    url(r'^fwh_open_day_review/$', HMDP2PListView.as_view(template_name="app_open_day_review.jade", p2p_list_url_name="fwh_p2p_list")),
 )
 # 微信管理后台
 urlpatterns += patterns(
