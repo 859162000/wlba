@@ -124,7 +124,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
         $('.bonus-img,.page').show();
     });
     $('.close').on('click', function () {
-        $('.bonus-img,.page').hide();
+        $('.bonus-img,.page,.wdty').hide();
     });
 
     function wxShareIcon() {
@@ -137,4 +137,16 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
     window.onresize = function () {
         wxShareIcon();
     };
+
+    //网贷天眼
+    function getUrlParam(name){
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r!=null) return unescape(r[2]);
+        return null;
+    }
+    var promo_token = getUrlParam("promo_token");
+    if(promo_token == 'wdty518'){
+        $('.wdty,.page').show();
+    }
 });
