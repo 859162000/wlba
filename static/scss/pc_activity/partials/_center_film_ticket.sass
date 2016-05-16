@@ -279,3 +279,49 @@
       .slide_text
         display: none
         overflow: hidden
+  .popup_box
+    position: fixed
+    left: 0
+    top: 0
+    width: 100%
+    height: 100%
+    z-index: 999
+    display: none
+    background: rgba(0,0,0,0.7)
+    .main
+      width: 400px
+      position: absolute
+      left: 50%
+      top: 50%
+      margin: -50px 0 0 -200px
+      float: none
+      background: #fff
+      border-radius: 20px
+      z-index: 99
+      padding-bottom: 35px
+      .textairport
+        width: 100%
+        text-align: center
+        line-height: 20px
+        font-size: 18px
+        padding: 75px 20px 46px
+        color: #666
+      .popup_button
+        margin: 0 auto
+        width: 100px
+        height: 30px
+        line-height: 30px
+        text-align: center
+        display: block
+        background: #ff5252
+        border-radius: 10px
+        color: #fff
+        font-size: 18px
+      .close_popup
+        position: absolute
+        right: 10px
+        top: 10px
+        z-index: 999
+        width: 20px
+        height: 20px
+        display: block
