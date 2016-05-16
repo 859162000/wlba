@@ -120,23 +120,23 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
     });
 
 
-    $('.bonus-icon').on('click', function () {
-        $('.bonus-img,.page').show();
-    });
+    //$('.bonus-icon').on('click', function () {
+    //    $('.bonus-img,.page').show();
+    //});
     $('.close').on('click', function () {
-        $('.bonus-img,.page,.wdty').hide();
+        $('.page,.wdty').hide();
     });
-
-    function wxShareIcon() {
-        var docleft = document.body.clientWidth;
-        var left = (docleft - $('.bonus-icon').width());
-        $('.bonus-icon').css({'left': left});
-    }
+    //
+    //function wxShareIcon() {
+    //    var docleft = document.body.clientWidth;
+    //    var left = (docleft - $('.bonus-icon').width());
+    //    $('.bonus-icon').css({'left': left});
+    //}
 
     //wxShareIcon()
-    window.onresize = function () {
-        wxShareIcon();
-    };
+    //window.onresize = function () {
+    //    wxShareIcon();
+    //};
 
     //网贷天眼
     function getUrlParam(name){
