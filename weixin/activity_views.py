@@ -7,13 +7,14 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.utils import timezone
 from django.template import Template, Context
+from django.contrib.auth import login as auth_login, logout
+from django.core.urlresolvers import reverse
 import logging
-import base64
-import datetime
+import base64,urllib
+import datetime, time
 import traceback
-import json
 from wanglibao_account.backends import invite_earning
-from weixin.models import UserDailyActionRecord, SeriesActionActivity, SeriesActionActivityRule, WeixinUser
+from weixin.models import UserDailyActionRecord, SeriesActionActivity, SeriesActionActivityRule, WeixinUser, WeiXinUserActionRecord
 from experience_gold.models import ExperienceEventRecord
 from util import process_user_daily_action
 from wanglibao_reward.models import ActivityRewardRecord
@@ -23,9 +24,20 @@ from wanglibao_redpack.backends import _send_message_for_hby
 from experience_gold.backends import SendExperienceGold
 from wanglibao_rest.utils import split_ua
 from marketing.models import Reward
+from marketing.utils import local_to_utc
 from wanglibao_activity.backends import _keep_reward_record, _send_message_template
+from wanglibao_activity.models import Activity
 from tasks import sentCustomerMsg
-
+from weixin.models import WeixinAccounts
+from weixin.util import redirectToJumpPage, getOrCreateWeixinUser, getMiscValue
+from wechatpy.oauth import WeChatOAuth
+from wechatpy.exceptions import WeChatException
+from experience_gold.models import ExperienceEvent
+from .forms import OpenidAuthenticationForm
+from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_account import message as inside_message
+from wanglibao_p2p.models import P2PRecord
+from django.db import IntegrityError
 
 logger = logging.getLogger("weixin")
 # https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
@@ -373,6 +385,92 @@ class GetSignShareInfo(APIView):
                 experience_record = ExperienceEventRecord.objects.get(id=share_record.experience_record_id)
                 share_info['amount']=experience_record.event.amount
         return Response({"ret_code": 0, "data": data})
+
+class FetchXunleiCardAward(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def getReward(self, type):
+        with transaction.atomic():
+            reward = Reward.objects.select_for_update().filter(type=type, is_used=False).first()
+            if reward:
+                reward.is_used = True
+                reward.save()
+            return reward
+
+    def post(self, request):
+        user = request.user
+        activity = Activity.objects.filter(code="fkflr").first()
+        if not activity:
+            return Response({"ret_code": -1, "message":"没有该活动"})
+        if activity.is_stopped:
+            return Response({"ret_code": -1, "message":"活动已经截止"})
+        now = timezone.now()
+        if activity.start_at > now:
+            return Response({"ret_code": -1, "message":"活动还未开始"})
+        if activity.end_at < now:
+            return Response({"ret_code": -1, "message":"活动已经结束"})
+        type = request.POST.get('type')
+        if not type or not type.isdigit() or int(type) not in (0, 1):
+            return Response({"ret_code": -1, "message":"type error"})
+        type = int(type)
+
+        code = activity.code+"_"+str(type)
+        try:
+            activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, activity_code=code)
+        except IntegrityError, e:
+            return Response({"ret_code":-1, "message":"系统忙，请重试"})
+        if activity_reward_record.status:
+            return Response({"ret_code": -1, "message":"您已经领取过"})
+
+        w_user = WeixinUser.objects.filter(user=user).first()
+        if not w_user:
+            return Response({"ret_code": -1, "message":"请绑定服务号"})
+        reward = None
+        if type == 0:#bind vip card
+            bind_action_record = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='bind').first()
+            create_time = local_to_utc(datetime.datetime.fromtimestamp(bind_action_record.create_time))
+            if bind_action_record and create_time>=activity.start_at and create_time<=activity.end_at:
+                reward = self.getReward("七天迅雷会员")
+            else:
+                return Response({"ret_code": -1, "message":"您不是首次绑定用户哦～"})
+        if type == 1:#invest vip card
+            p2pRecord = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by("create_time").first()
+            if p2pRecord and p2pRecord.create_time >=activity.start_at and p2pRecord.create_time<=activity.end_at and float(p2pRecord.amount)>=1000:
+                reward = self.getReward("一年迅雷会员")
+            else:
+                return Response({"ret_code": -1, "message":"您不满足领取条件~"})
+        if not reward:
+            return Response({"ret_code": -1, "message":"奖品已经领完"})
+        try:
+            with transaction.atomic():
+                record = ActivityRewardRecord.objects.select_for_update().get(id=activity_reward_record.id)
+                if record.status:
+                    reward.is_used=False
+                    reward.save()
+                    return Response({"ret_code": -1, "message":"您已经领取过"})
+                record.activity_desc = 'xunleivip reward_id=%s'%reward.id
+                record.status = True
+                record.save()
+        except Exception, e:
+            reward.is_used=False
+            reward.save()
+            logger.debug(traceback.format_exc())
+            return Response({"ret_code": -1, "message":"系统繁忙"})
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": request.user.id,
+            "title": reward.type,
+            "content": reward.content,
+            "mtype": "activity"
+        })
+        sentCustomerMsg.apply_async(kwargs={
+            #奖励发放通知  奖励名称 奖品兑换码  会员有效期
+                "txt":"奖励发放通知\n奖励名称：%s\n有效期至：%s\n兑换码：%s\n请在会员有效期内至迅雷会员官网进行兑换"%(reward.type, timezone.localtime(reward.end_time).strftime("%Y年%m月%d日"), reward.content), #\n兑换码:%s
+                "openid":w_user.openid,
+            },
+                queue='celery02')
+        return Response({"ret_code": 0, "message": '恭喜您，奖励领取成功～'})
+
+
 
 
 
