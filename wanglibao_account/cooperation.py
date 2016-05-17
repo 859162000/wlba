@@ -1452,24 +1452,25 @@ class ZhongYingRegister(CoopRegister):
         self.token = 'zypwt'
         self.request = request
 
-    def register_call_back(self, user):
-        for _index in xrange(2):
-            reward = Reward.objects.filter(type='中影票务通', is_used=False).first()
-            if not reward:
-                return
-            send_messages.apply_async(kwargs={
-                "phones": [user.wanglibaouserprofile.phone, ],
-                "messages": [u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,), ]
-            })
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": user.id,
-                "title": u"演出门票赠送",
-                "content": u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,),
-                "mtype": "activity"
-            })
-
     def purchase_call_back(self, user, order_id):
-        pass
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            for _index in xrange(2):
+                reward = Reward.objects.filter(type='中影票务通', is_used=False).first()
+                if not reward:
+                    return
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,), ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"演出门票赠送",
+                    "content": u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,),
+                    "mtype": "activity"
+                })
 
 class HappyMonkeyRegister(CoopRegister):
     def __init__(self, request):
