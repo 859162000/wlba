@@ -2043,7 +2043,7 @@ class XunleiTreasureAPIView(APIView):
         WanglibaoRewardJoinRecord.objects.create(
                 user=user,
                 activity_code='xunlei_treasure',
-                remain_chance=1
+                remain_chance=3
         )
 
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
@@ -2090,7 +2090,7 @@ class XunleiTreasureAPIView(APIView):
         WanglibaoRewardJoinRecord.objects.create(
             user=user,
             activity_code='xunlei_treasure',
-            remain_chance=1
+            remain_chance=3
         )
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
@@ -2153,7 +2153,7 @@ class XunleiTreasureAPIView(APIView):
 
         with transaction.atomic():
             join_record = WanglibaoRewardJoinRecord.objects.filter(user=request.user,activity_code='xunlei_treasure').first()
-            if activity_record.filter(left_times__gt=0).count() == 0:
+            if join_record.remain_chance==0 or activity_record.filter(left_times__gt=0).count() == 0:
                 json_to_response = {
                     'code': 1002,
                     'messge': u'用户的抽奖机会已经用完了',
@@ -2195,7 +2195,7 @@ class XunleiTreasureAPIView(APIView):
                 record.left_times = 0
                 record.has_sent = True
                 record.save()
-            join_record.left_times = 0
+            join_record.remain_chance -= 1
             join_record.save()
         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
