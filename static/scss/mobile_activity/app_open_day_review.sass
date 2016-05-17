@@ -426,6 +426,9 @@
         width: 100%
         padding-bottom: 0.25rem
         display: inline-block
+        .big_img
+          float: left
+          display: block 
         .img
           width: 27%
           min-width: 2.35rem
@@ -596,8 +599,13 @@
     position: relative
     width: 100%
     display: inline-block
-    padding: 1.8rem 4% 1.4rem
+    padding: 1.8rem 5% 1.4rem
     font-size: 0
+    @media screen and (max-width: 370px)
+      padding: 1.8rem 4% 1.4rem
+    @media screen and (max-device-width: 370px)
+      padding: 1.8rem 4% 1.4rem
+
     p
       width: 100%
       line-height: 1.2rem
