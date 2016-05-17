@@ -19,7 +19,7 @@ from user_agents import parse
 
 from marketing.models import IntroducedBy
 from wanglibao import settings
-from wanglibao_account.models import Message
+from wanglibao_account.models import Message, UserAddress
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper, check_amount
 from wanglibao_margin.models import Margin, MarginRecord, MonthProduct, PhpRefundRecord
@@ -665,6 +665,53 @@ def get_unread_msgs(user_id):
         res = response.json()
         if res['code'] == 'success':
             ret.update(status=1, unread_num=res['data'])
+
+    return ret
+
+
+def get_addresses(user_id):
+    """
+        获取用户的收货地址
+    :param user_id:
+    :return:
+    """
+    ret = dict()
+    address_list = []
+    if not user_id:
+        ret.update(status=0, msg=u'Unauthorized')
+        return ret
+    try:
+        addresses = UserAddress.objects.filter(user=user_id).order_by('-id')
+        for address in addresses:
+            address_info = {}
+            address_info.update(name=address.name, phone_number=address.phone_number, address=address.address,
+                                is_default=address.is_default, postcode=address.postcode, id=address.id,
+                                province=address.province, city=address.city, area=address.area)
+            address_list.append(address_info)
+
+        ret.update(status=1, addresses=address_list)
+    except Exception, e:
+        ret.update(status=0, msg=str(e))
+
+    return ret
+
+
+def get_mall_locked_amount(user):
+    """
+    获取用户购买商品锁定的金额
+    :param user_id:
+    :return:
+    """
+    ret = dict()
+    if not user:
+        ret.update(status=0, msg=u'Unauthorized')
+        return ret
+    try:
+        amount = MonthProduct.objects.filter(user=user, red_packet=-1).aggregate(Sum('amount'))['amount__sum'] or 0
+
+        ret.update(status=1, amount=amount)
+    except Exception, e:
+        ret.update(status=0, msg=e.message)
 
     return ret
 

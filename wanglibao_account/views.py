@@ -22,13 +22,13 @@ from django.contrib.auth import login as auth_login, REDIRECT_FIELD_NAME
 from django.db.models import Sum, Q
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm, AuthenticationForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
-from django.shortcuts import resolve_url, render_to_response
+from django.shortcuts import resolve_url
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -41,11 +41,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
     ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,ManualModifyPhoneForm
-from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
+from marketing.models import IntroducedBy, Channels
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
 from wanglibao_sms.tasks import send_messages
-from wanglibao_sms import messages as sms_messages
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
@@ -56,8 +55,8 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
-from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
-    AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
+from wanglibao_p2p.models import P2PRecord, P2PEquity, UserAmortization, Earning, \
+    AmortizationRecord, P2PProductContract, AutomaticPlan, AutomaticManager
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, \
@@ -311,7 +310,9 @@ def password_change(request,
 
 
 class PasswordCheckView(DecryptParmsAPIView):
+
     permission_classes = ()
+
     def post(self, request, **kwargs):
         identifier = self.params.get("identifier", "")
         password = self.params.get("password", "")
@@ -319,18 +320,18 @@ class PasswordCheckView(DecryptParmsAPIView):
         # password = request.DATA.get("password", "")
 
         if not identifier or not password:
-            return Response({"token":False, "message":u"登录密码错误，请重试"})
+            return Response({"token":False, "message": u"登录密码错误，请重试"})
 
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token":False, "message":u"登录密码错误，请重试"})
+            return Response({"token": False, "message": u"登录密码错误，请重试"})
         if not user.is_active:
-            return Response({"token":False, "message":u"用户已被关闭"})
+            return Response({"token": False, "message": u"用户已被关闭"})
         if user.wanglibaouserprofile.frozen:
-            return Response({"token":False, "message":u"用户已被冻结"})
+            return Response({"token": False, "message": u"用户已被冻结"})
 
-        return Response({'token':True, 'message':u'用户认证成功'})
+        return Response({'token': True, 'message': u'用户认证成功'})
 
 
 class PasswordResetValidateView(TemplateView):
@@ -341,6 +342,7 @@ class PasswordResetValidateView(TemplateView):
 
 
 class PasswordResetGetIdentifierView(TemplateView):
+
     template_name = 'password_reset.jade'
 
     def post(self, request, **kwargs):
@@ -754,10 +756,11 @@ class AccountInviteAPIView(APIView):
             return Response({"ret_code":0, "data":res})
 
         for x in introduces:
-            invite = {"name":x.user.wanglibaouserprofile.name,
-                    "phone":safe_phone_str(x.user.wanglibaouserprofile.phone),
-                    "created_at":timezone.get_current_timezone().normalize(x.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "is_id_valid":x.user.wanglibaouserprofile.id_is_valid}
+            invite = {"name": x.user.wanglibaouserprofile.name,
+                      "phone": safe_phone_str(x.user.wanglibaouserprofile.phone),
+                      "created_at": timezone.get_current_timezone().normalize(x.created_at).strftime(
+                              "%Y-%m-%d %H:%M:%S"),
+                      "is_id_valid": x.user.wanglibaouserprofile.id_is_valid}
             info = PayInfo.objects.filter(user=x.user, type="D", status=u"成功").first()
             if not info:
                 invite['pay'] = False
@@ -769,7 +772,7 @@ class AccountInviteAPIView(APIView):
             else:
                 invite['buy'] = True
             res.append(invite)
-        return Response({"ret_code":0, "data":res})
+        return Response({"ret_code": 0, "data": res})
 
 
 class AccountInviteAllGoldAPIView(APIView):
@@ -778,8 +781,8 @@ class AccountInviteAllGoldAPIView(APIView):
     def post(self, request, **kwargs):
         dic = account_backends.broker_invite_list(request.user)
         users = dic['users']
-        first_amount, first_earning, second_amount, second_earning = dic['first_amount'],\
-                dic['first_earning'], dic['second_amount'], dic['second_earning']
+        first_amount, first_earning, second_amount, second_earning = \
+            dic['first_amount'], dic['first_earning'], dic['second_amount'], dic['second_earning']
         first_count, second_count = dic['first_count'], dic['second_count']
         first_intro = dic['first_intro']
         commission = dic['commission']
@@ -793,10 +796,11 @@ class AccountInviteAllGoldAPIView(APIView):
             else:
                 first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
 
-        return Response({"ret_code":0, "first":{"amount":first_amount,
-                        "earning":first_earning, "count":first_count, "intro":first_intro},
-                        "second":{"amount":second_amount, "earning":second_earning,
-                        "count":second_count}, "count":len(introduces)})
+        return Response({"ret_code": 0,
+                         "first": {"amount": first_amount, "earning": first_earning,
+                                   "count": first_count, "intro": first_intro},
+                         "second": {"amount": second_amount, "earning": second_earning, "count": second_count},
+                         "count": len(introduces)})
 
 
 class AccountInviteIncomeAPIView(APIView):
@@ -804,7 +808,7 @@ class AccountInviteIncomeAPIView(APIView):
 
     def post(self, request, **kwargs):
         earning = account_backends.invite_earning(request.user)
-        return Response({"ret_code":0, "earning":earning})
+        return Response({"ret_code": 0, "earning": earning})
 
 
 class AccountInviteHikeAPIView(APIView):
@@ -826,9 +830,9 @@ class AccountInviteHikeAPIView(APIView):
         else:
             product_id = prot.product_id
 
-        return Response({"ret_code":0, "intro_nums":nums, "hikes":hikes,
-                        "call_charge":30, "total_hike":"0.1%", "calls":callfee,
-                        "amount":amount, "product_id":product_id})
+        return Response({"ret_code": 0, "intro_nums": nums, "hikes": hikes,
+                        "call_charge": 30, "total_hike": "0.1%", "calls": callfee,
+                        "amount": amount, "product_id": product_id})
 
 
 class AccountP2PRecordAPI(APIView):

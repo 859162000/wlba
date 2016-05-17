@@ -133,8 +133,6 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                                                              is_used=True).order_by('-id')
 
             # activity_rules = activity_rules.exclude(activity__is_lottery=True)  等需要开放优化功能的时候，放开 add by yihen
-            if settings.ENV == settings.ENV_DEV:
-                yuelibao_logger.info('in activity!!!!! activity_rules = {},'.format(activity_rules))
             if activity_rules:
                 for rule in activity_rules:
                     # 邀请好友时才启用
