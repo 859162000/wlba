@@ -417,32 +417,70 @@
     display: inline-block
     padding-bottom: 0.85rem
     .ranking_box_list
-      width: 90%
+      width: 100%
       display: inline-block
-      margin: 0 0 0 5%
       padding-top: 2.75rem
+
       font-size: 0
       .box
         width: 100%
-        padding-bottom: 0.25rem
+        padding-bottom: 2rem
+
         display: inline-block
         .big_img
           float: left
           display: block
-          width: 34.5%
+          width: 40%
           margin-left: 11%
         .data_box
           float: left
           padding-left: 5.5%
-          width: 54.5%
+          width: 49%
+
           .text_1
-            font-size: 0.7rem
+            font-size: 0.85rem
             line-height: 1.25rem
             color: #585757
-          .data_text
-            font-size: 2.4rem
-            line-height: 2.8rem
+            width: 100%
+            padding: 0
+            @media screen and (max-device-width: 370px)
+              font-size: 0.7rem
+              line-height: 1rem
+            @media screen and (max-width: 370px)
+              font-size: 0.7rem
+              line-height: 1rem
+          .text_data
+            font-size: 0.8rem
+            line-height: 1.25rem
+
             color: #585757
+            width: 100%
+            padding: 0.2rem 0
+            span
+              font-size: 2.4rem
+              line-height: 2.8rem
+              padding-right: 0.5rem
+              color: #F14C37
+              font-weight: 100
+              @media screen and (max-device-width: 370px)
+                font-size: 1.8rem
+                line-height: 2rem
+              @media screen and (max-width: 370px)
+                font-size: 1.8rem
+                line-height: 2rem
+          .text_2
+            font-size: 0.85rem
+            line-height: 1.25rem
+            color: #585757
+            width: 100%
+            padding-bottom: 0
+            @media screen and (max-device-width: 370px)
+              font-size: 0.7rem
+              line-height: 1rem
+            @media screen and (max-width: 370px)
+              font-size: 0.7rem
+              line-height: 1rem
+
         .img
           width: 27%
           min-width: 2.35rem
