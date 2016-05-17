@@ -40,8 +40,10 @@ class RedPackEvent(models.Model):
     period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=(
         ('month', u'月'),
         ('month_gte', u'月及以上'),
+        ('month_lte', u'月及以下'),
         ('day', u'日'),
         ('day_gte', u'日及以上'),
+        ('day_lte', u'日及以下'),
     ), blank=True)
     p2p_id = models.IntegerField(default=0, verbose_name=u"P2P标id,数字格式")
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
