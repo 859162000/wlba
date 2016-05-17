@@ -101,7 +101,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     if event.period:
                         event_period = int(event.period)
                         period_type = event.period_type if event.period_type else 'month'
-                        product_period = product['period']
+                        product_period = int(product['period'])
                         pay_method = product['pay_method']
                         if period_type == 'month' or period_type == 'day':
                             if product_period != event_period:
@@ -115,7 +115,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                 elif period_type == 'month_lte':
                                     if event_period * 30 < product_period:
                                         continue
-                                else:
+                                elif period_type == 'day_lte':
+                                    if event_period < product_period:
+                                        continue
+                                elif period_type == 'day_gte':
                                     if event_period > product_period:
                                         continue
                             else:
@@ -125,7 +128,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                 elif period_type == 'month_lte':
                                     if event_period < product_period:
                                         continue
-                                else:
+                                elif period_type == 'day_lte':
+                                    if event_period < product_period * 30:
+                                        continue
+                                elif period_type == 'day_gte':
                                     if event_period > product_period * 30:
                                         continue
                         # if p2p_id:
@@ -191,7 +197,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         if event.period:
                             event_period = int(event.period)
                             period_type = event.period_type if event.period_type else 'month'
-                            product_period = product['period']
+                            product_period = int(product['period'])
                             pay_method = product['pay_method']
                             if period_type == 'month' or period_type == 'day':
                                 if product_period != event_period:
@@ -205,7 +211,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                     elif period_type == 'month_lte':
                                         if event_period * 30 < product_period:
                                             continue
-                                    else:
+                                    elif period_type == 'day_lte':
+                                        if event_period < product_period:
+                                            continue
+                                    elif period_type == 'day_gte':
                                         if event_period > product_period:
                                             continue
                                 else:
@@ -215,7 +224,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                     elif period_type == 'month_lte':
                                         if event_period < product_period:
                                             continue
-                                    else:
+                                    elif period_type == 'day_lte':
+                                        if event_period < product_period * 30:
+                                            continue
+                                    elif period_type == 'day_gte':
                                         if event_period > product_period * 30:
                                             continue
 
