@@ -714,6 +714,7 @@ class BaJinSheCallback(CoopCallback):
 
     def get_amortize_data(self, **kwargs):
         user_amo = kwargs['user_amo']
+        user_amos = kwargs['user_amos']
         equity = kwargs['equity']
         bid = kwargs['bid']
         user_phone = kwargs['user_phone']
@@ -742,25 +743,14 @@ class BaJinSheCallback(CoopCallback):
         }
 
         reward_data_list = list()
-        if user_amo.settled:
-            if int(user_amo.term) > 1:
-                user_amos = UserAmortization.objects.filter(product=product, user=user_amo.user).order_by('term')
-                for user_amo in user_amos:
-                    reward_data = {
-                        'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
-                        'income': float(user_amo.interest),
-                        'principal': float(user_amo.principal),
-                        'incomeState': income_state,
-                    }
-                    reward_data_list.append(reward_data)
-            else:
-                reward_data = {
-                    'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
-                    'income': float(user_amo.interest),
-                    'principal': float(user_amo.principal),
-                    'incomeState': income_state,
-                }
-                reward_data_list.append(reward_data)
+        for user_amo in user_amos:
+            reward_data = {
+                'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
+                'income': float(user_amo.interest),
+                'principal': float(user_amo.principal),
+                'incomeState': income_state,
+            }
+            reward_data_list.append(reward_data)
 
         act_data['reward'] = reward_data_list
 
@@ -810,6 +800,7 @@ class BaJinSheCallback(CoopCallback):
                     'period': period,
                     'period_type': period_type,
                     'profit_methods': profit_methods,
+                    'user_amos': user_amos,
                 }
                 term_mark = list()
                 if user_amo.settled:
@@ -824,11 +815,12 @@ class BaJinSheCallback(CoopCallback):
                 else:
                     for user_amo in user_amos:
                         term_mark.append(str(user_amo.term))
-                        get_amortize_arg['user_amo'] = user_amo
-                        get_amortize_arg['state'] = 5
-                        get_amortize_arg['income_state'] = 1
-                        act_data = self.get_amortize_data(**get_amortize_arg)
-                        act_data_list.append(act_data)
+                        if user_amo.term == 1:
+                            get_amortize_arg['user_amo'] = user_amo
+                            get_amortize_arg['state'] = 5
+                            get_amortize_arg['income_state'] = 1
+                            act_data = self.get_amortize_data(**get_amortize_arg)
+                            act_data_list.append(act_data)
 
                 data['tran'] = act_data_list
                 data = json.dumps(data)
