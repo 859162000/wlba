@@ -723,7 +723,6 @@ class BaJinSheCallback(CoopCallback):
         product = kwargs['product']
         profit_methods = kwargs['profit_methods']
         state = kwargs['state']
-        income_state = kwargs['income_state']
 
         act_data = {
             'investmentPid': equity.id,
@@ -744,6 +743,7 @@ class BaJinSheCallback(CoopCallback):
 
         reward_data_list = list()
         for user_amo in user_amos:
+            income_state = 2 if user_amo.settled else 1
             reward_data = {
                 'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
                 'income': float(user_amo.interest),
@@ -805,7 +805,6 @@ class BaJinSheCallback(CoopCallback):
                 term_mark = list()
                 if user_amo.settled:
                     get_amortize_arg['user_amo'] = user_amo
-                    get_amortize_arg['income_state'] = 2
                     if user_amo.term == user_amo.terms:
                         get_amortize_arg['state'] = 1
                     else:
@@ -818,7 +817,6 @@ class BaJinSheCallback(CoopCallback):
                         if user_amo.term == 1:
                             get_amortize_arg['user_amo'] = user_amo
                             get_amortize_arg['state'] = 5
-                            get_amortize_arg['income_state'] = 1
                             act_data = self.get_amortize_data(**get_amortize_arg)
                             act_data_list.append(act_data)
 
