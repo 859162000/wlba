@@ -10,8 +10,8 @@ import traceback
 from django.utils import timezone
 from django.db.models import Sum
 from django.contrib.auth.models import User
-from common.utils import product_period_to_days, save_to_callback_record
-from common.tools import utc_to_local_timestamp
+from common.utils import save_to_callback_record
+from common.tools import utc_to_local_timestamp, now
 from common.tasks import common_callback
 from marketing.utils import get_channel_record, get_user_channel_record
 from wanglibao_account.models import Binding
@@ -739,6 +739,7 @@ class BaJinSheCallback(CoopCallback):
             'state': state,
             'purchases': timezone.localtime(equity.created_at).strftime('%Y%m%d%H%M%S'),
             'channel': 'bjs',
+            'bearingDate': timezone.localtime(now()).strftime('%Y%m%d%H%M%S'),
         }
 
         reward_data_list = list()
@@ -753,9 +754,6 @@ class BaJinSheCallback(CoopCallback):
             reward_data_list.append(reward_data)
 
         act_data['reward'] = reward_data_list
-
-        if state != 5:
-            act_data['bearingDate'] = timezone.localtime(user_amo.settlement_time).strftime('%Y%m%d%H%M%S')
 
         return act_data
 
