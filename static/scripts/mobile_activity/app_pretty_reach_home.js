@@ -219,6 +219,15 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;
 (function(org) {
+    var h5_user_static;
+    org.ajax({
+        url: '/api/user_login/',
+        type: 'post',
+        success: function(data1) {
+            h5_user_static = data1.login;
+        }
+    });
+    var login = false;
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
@@ -239,11 +248,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '网利宝携手中影票务通送福利',
-			shareImg = host + '/static/imgs/mobile_activity/app_center_film_ticket/300x300.jpg',
-			shareLink = host + '/activity/app_center_film_ticket/?promo_token=sy',
-			shareMainTit = '网利宝携手中影票务通送福利',
-			shareBody = '票房最强档 网利宝请您看';
+			shareName = '网利宝携手迅雷会员疯狂福利趴',
+			shareImg = host + '/static/imgs/mobile_activity/app_xunlei_welfare/300X300.jpg',
+			shareLink = host + '/activity/app_xunlei_welfare/',
+			shareMainTit = '网利宝携手迅雷会员疯狂福利趴',
+			shareBody = '迅雷会员免费领，速速前往';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -253,7 +262,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝携手中影票务通送福利',
+			title: '网利宝携手迅雷会员疯狂福利趴',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -266,113 +275,50 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		})
 	})
 
-
-    var login = false;
-    wlb.ready({
-        app: function (mixins) {
-            mixins.shareData({title: '网利宝携手中影票务通送福利', content: '票房最强档 网利宝请您看'});
-            function connect(data) {
-                org.ajax({
-                    url: '/accounts/token/login/ajax/',
-                    type: 'post',
-                    data: {
-                        token: data.tk,
-                        secret_key: data.secretToken,
-                        ts: data.ts
-                    },
-                    success: function (data) {
-
-                        //var url = location.href;
-                        //var times = url.split("?");
-                        //if(times[1] != 1){
-                        //    url += "?1";
-                        //    self.location.replace(url);
-                        //}
-
-                        $('#get_ticket').click(function() {
-                            org.ajax({
-                                url: '/api/activity/zhongying/',
-                                type: 'post',
-                                success: function (data) {
-                                    if(data.ret_code=='1000'){
-                                        mixins.loginApp({refresh:1, url:'/activity/app_center_film_ticket/?promo_token=zypwt'});
-                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'){
-                                        $('.popup_box .main .textairport').text(''+data.message+'');
-                                        $('.popup_box').show();
-                                    }else if(data.ret_code=='1002'||data.ret_code=='1004'){
-                                        $('.popup_box .main .textairport').text(''+data.message+'');
-                                        $('.popup_box').show();
-                                    }else{
-                                        $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                                        $('.popup_box').show();
-                                    }
-                                }
-                            })
-                        })
-                    }
-                })
-            }
-            mixins.sendUserInfo(function (data) {
-                if (data.ph == '') {
-                    login = false;
-
-
-                    $('#get_ticket').click(function() {
-                        mixins.loginApp({refresh:1, url:'/activity/app_center_film_ticket/?promo_token=zypwt'});
-                    });
-                } else {
-                    login = true;
-                    connect(data)
-
-                }
-            })
-
-        },
-        other: function(){
-            $('#get_ticket').click(function() {
-                org.ajax({
-                    url: '/api/activity/zhongying/',
-                    type: 'post',
-                    success: function (data) {
-                        if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/login/?promo_token=zypwt&next=/activity/app_center_film_ticket/?promo_token=zypwt'
-                        }else if(data.ret_code=='1001'||data.ret_code=='1002'){
-                            $('.popup_box .main .textairport').text(''+data.message+'');
-                            $('.popup_box').show();
-                        }else if(data.ret_code=='1002'||data.ret_code=='1004'){
-                            $('.popup_box .main .textairport').text(''+data.message+'');
-                            $('.popup_box').show();
-                        }else{
-                            $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                            $('.popup_box').show();
-                        }
-                    }
-                })
-            })
-        }
-    })
-
-
-    $('.section_5_box p span').on('click',function(){
-        var ele = $('.section_5_box .slide_text');
-        var curHeight = ele.height();
-        var autoHeight = ele.css('height', 'auto').height();
-        if (!ele.hasClass('down')){
-            $('.section_5_box p span').addClass('open');
-            ele.height(curHeight).animate({height: autoHeight},500,function(){
-                ele.addClass('down');
-
-            });
-        }else{
-            $('.section_5_box p span').removeClass('open');
-            ele.height(curHeight).animate({height: 0},500,function(){
-                ele.removeClass('down');
-
-            });
-        }
-    });
-
-    $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
+    $('.popup_box .popup_button,.close_popup').click(function(){
         $('.popup_box').hide();
     });
+
+	$('#button_1').on("click",function(){
+		org.ajax({
+			type: "post",
+			url: "/weixin/fetch_xunlei_vipcard/",
+			dataType: 'json',
+			data: {
+				type: 0
+			},
+			success: function(data){
+				if(data.ret_code!='0'){
+				//成功连接接口
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}else{
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}
+			}
+		})
+	})
+
+	$('#button_2').on("click",function(){
+		org.ajax({
+			type: "post",
+			url: "/weixin/fetch_xunlei_vipcard/",
+			dataType: 'json',
+			data: {
+				type: 1
+			},
+			success: function(data){
+				if(data.ret_code!='0'){
+				//成功连接接口
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}else{
+					$('.popup_box .main .textairport').text(''+data.message+'');
+					$('.popup_box').show();
+				}
+			}
+		})
+	})
+
 })(org);

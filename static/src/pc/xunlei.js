@@ -15,7 +15,15 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
     re.activityRegister.activityRegisterInit({
         registerTitle :'领取迅雷会员+现金红包',    //注册框标语
         isNOShow : '1',
-        activityUrl: '/activity/xunlei_treasure/'
+        activityUrl: '/activity/xunlei_treasure/',
+        hasCallBack: true,
+        callBack: function () {
+            if ($('#ret_code').val() == '10000') {
+                window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao";
+            }else {
+                history.go(0);
+            }
+        }
     });
     //显示新用户奖励
     $('#rewardDetail').on('click',function(){
@@ -37,20 +45,20 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
         }
     })
     //挖宝
-    $('.people-icon').on('click',function(){
+    $('.people-icon,.mountain-icon').on('click',function(){
         if($('#userStatus').val() == 'False'){
             $('body,html').animate({scrollTop: 0}, 600);
         }else{
-            var self = $(this);
-            $.ajax({
-                url: '/api/xunlei/treasure/',
-                dataType: 'json',
-                type: 'post',
-                data: {},
-                success: function (data) {
-                    if(count == 0){
-                        count = 1;
-                        if(data.code == 1002){
+            var self = $('.people-icon');
+            if(count == 0) {
+                count = 1;
+                $.ajax({
+                    url: '/api/xunlei/treasure/',
+                    dataType: 'json',
+                    type: 'post',
+                    data: {},
+                    success: function (data) {
+                        if (data.code == 1002) {
                             $('#lotteryCounts').text(0);
                             $('.alert-box').modal({
                                 modalClass: 'alert-box-c',
@@ -58,43 +66,45 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
                                 showClose: false
                             })
                             $('#noChance').show();
-                        }else if(data.code == 0){
+                        } else if (data.code == 0) {
                             $('#lotteryCounts').text(data.lefts);
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 self.addClass('people-icon2');
-                                setTimeout(function(){
+                                setTimeout(function () {
                                     self.addClass('people-icon3');
-                                    count = 0;
-                                    setTimeout(function() {
+                                    setTimeout(function () {
                                         $('.alert-box').modal({
                                             modalClass: 'alert-box-c',
                                             closeClass: 'close-btn',
                                             showClose: false
                                         })
                                         self.removeClass('people-icon2 people-icon3');
-                                        if(data.type == '加息券'){
-                                            $('#jxq').show();$('#jxq').find('span').text(data.amount);
-                                        }else{
-                                            $('#tyj').show();$('#tyj').find('span').text(data.amount);
+                                        if (data.type == '加息券') {
+                                            $('#jxq').show();
+                                            $('#jxq').find('span').text(data.amount);
+                                        } else {
+                                            $('#tyj').show();
+                                            $('#tyj').find('span').text(data.amount);
                                         }
                                         winList();
-                                    },200)
-                                },500)
-                            },300)
-                        }else if(data.code == 1){
+                                        clearInterval(timer);
+                                    }, 200)
+                                }, 500)
+                            }, 300)
+                        } else if (data.code == 1) {
                             $('#lotteryCounts').text(data.lefts);
                             $('.alert-box').modal({
                                 modalClass: 'alert-box-c',
                                 closeClass: 'close-btn',
                                 showClose: false
                             })
-                            var array = ['no1','no2','no3'],
-                                random = parseInt(3*Math.random());
-                            $('#'+array[random]).show();
+                            var array = ['no1', 'no2', 'no3'],
+                                random = parseInt(3 * Math.random());
+                            $('#' + array[random]).show();
                         }
                     }
-                }
-            })
+                })
+            }
         }
     })
     //关闭弹框
@@ -138,8 +148,10 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
         })
     }
     //滚动
+    var timer;
     function scroll(){
-        var timer,i= 1;
+        var i= 1;
+        clearInterval(timer);
         timer=setInterval(function(){
             if (-parseInt($('#winList').css('top'))>=$('#winList li').height()){
                 $('#winList li').eq(0).appendTo($('#winList'));

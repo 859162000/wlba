@@ -1,4 +1,4 @@
-var count = 0;
+var count = 0, timer;
 org.ui = (function(){
     var lib = {
         _alert: function(txt, callback,btn){
@@ -104,7 +104,7 @@ org.xunlei = (function(org){
             })
         },
         _listScroll : function(){
-            var timer,i= 1,j=2;
+            var i= 1,j=2;
             timer=setInterval(function(){
                 if (-parseInt($('#winList').css('top'))>=$('#winList li').height()){
                     $('#winList li').eq(0).appendTo($('#winList'));
@@ -117,46 +117,46 @@ org.xunlei = (function(org){
             },30)
         },
         _luckDraw : function(){
-            $('.people-icon').on('click',function(){
-                var self = $(this);
-                org.ajax({
-                    url: '/api/xunlei/treasure/',
-                    dataType: 'json',
-                    type: 'post',
-                    data: {},
-                    success: function (data) {
-                        if(count == 0){
-                            count = 1;
-                            if(data.code == 1002){
-                               $('#lotteryCounts').text(0);
-                               org.ui.alert('<div class="two-line-sty"><p class="mtO">客官，您的挖奖机会已经用光！</p></div>', '', '知道了')
-                            }else if(data.code == 0){
+            $('.people-icon,.mountain-icon').on('click',function(){
+                var self = $('.people-icon');
+                if(count == 0) {
+                    count = 1;
+                    org.ajax({
+                        url: '/api/xunlei/treasure/',
+                        dataType: 'json',
+                        type: 'post',
+                        data: {},
+                        success: function (data) {
+                            if (data.code == 1002) {
+                                $('#lotteryCounts').text(0);
+                                org.ui.alert('<div class="two-line-sty"><p class="mtO">客官，您的挖奖机会已经用光！</p></div>', '', '知道了')
+                            } else if (data.code == 0) {
                                 $('#lotteryCounts').text(data.lefts);
-                                setTimeout(function(){
+                                setTimeout(function () {
                                     self.addClass('people-icon2');
-                                    setTimeout(function(){
+                                    setTimeout(function () {
                                         self.addClass('people-icon3');
-                                        count = 0;
-                                         setTimeout(function() {
+                                        setTimeout(function () {
                                             self.removeClass('people-icon2 people-icon3');
-                                            if(data.type == '加息券'){
-                                                org.ui.alert('<div class="two-line-sty"><p>人品大爆发，'+ data.amount +'%加息券已经悄悄的在您的账户中！</p></div>', '', '太棒了')
-                                            }else{
-                                                org.ui.alert('<div class="two-line-sty"><p>人世间最美好的事情莫不过如此，'+ data.amount +'元体验金已经在您的账户中！</p></div>', '', '太棒了')
+                                            if (data.type == '加息券') {
+                                                org.ui.alert('<div class="two-line-sty"><p>人品大爆发，' + data.amount + '%加息券已经悄悄的在您的账户中！</p></div>', '', '太棒了')
+                                            } else {
+                                                org.ui.alert('<div class="two-line-sty"><p>人世间最美好的事情莫不过如此，' + data.amount + '元体验金已经在您的账户中！</p></div>', '', '太棒了')
                                             }
                                             lib._getWinList();
-                                        },200)
-                                    },500)
-                                },300)
-                            }else if(data.code == 1){
+                                            clearInterval(timer);
+                                        }, 200)
+                                    }, 500)
+                                }, 300)
+                            } else if (data.code == 1) {
                                 $('#lotteryCounts').text(data.lefts);
-                                var array = ['<p>佛说：前世的500次回眸<br/>才换得今世的一次中奖，淡定！</p>','<p class="mtO">大奖何时有？把酒问青天！</p>','<p class="mtO">大奖下回见，网利宝天天见！</p>'],
-                                    random = parseInt(3*Math.random());
-                                org.ui.alert('<div class="two-line-sty">'+ array[random] +'</div>', '', '再试一次')
+                                var array = ['<p>佛说：前世的500次回眸<br/>才换得今世的一次中奖，淡定！</p>', '<p class="mtO">大奖何时有？把酒问青天！</p>', '<p class="mtO">大奖下回见，网利宝天天见！</p>'],
+                                    random = parseInt(3 * Math.random());
+                                org.ui.alert('<div class="two-line-sty">' + array[random] + '</div>', '', '再试一次')
                             }
                         }
-                    }
-                })
+                    })
+                }
             })
         }
     }
