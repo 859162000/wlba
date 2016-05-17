@@ -2040,6 +2040,12 @@ class XunleiTreasureAPIView(APIView):
                         has_sent=False,
                 )
 
+        WanglibaoRewardJoinRecord.objects.create(
+                user=user,
+                activity_code='xunlei_treasure',
+                remain_chance=1
+        )
+
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
     def generate_newUser_reward_activity(self, user):
@@ -2067,8 +2073,8 @@ class XunleiTreasureAPIView(APIView):
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
-                has_sent=False,
-        )
+                has_sent=False,)
+
         redpack = RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first()
         WanglibaoActivityReward.objects.create(
                 user=user,
@@ -2079,9 +2085,13 @@ class XunleiTreasureAPIView(APIView):
                 join_times=1,
                 channel='xunlei9',
                 p2p_amount=redpack.amount*1000,
-                has_sent=False,
-        )
+                has_sent=False,)
 
+        WanglibaoRewardJoinRecord.objects.create(
+            user=user,
+            activity_code='xunlei_treasure',
+            remain_chance=1
+        )
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
     def get(self, request):
@@ -2148,7 +2158,8 @@ class XunleiTreasureAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         else:
             with transaction.atomic():
-                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
+                join_record = WanglibaoRewardJoinRecord.objects.filter(user=request.user,activity_code='xunlei_treasure').first()
+                record = WanglibaoActivityReward.objects.filter(pk=activity_record.first().id, has_sent=False).first()
                 sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
                 has_sent = False
                 if record and record.experience:
@@ -2183,6 +2194,8 @@ class XunleiTreasureAPIView(APIView):
                     record.left_times = 0
                     record.has_sent = True
                     record.save()
+                join_record.left_times = 0
+                join_record.save()
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class WeixinActivityAPIView(APIView):
