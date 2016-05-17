@@ -2150,53 +2150,54 @@ class XunleiTreasureAPIView(APIView):
             activitys = _activitys
 
         activity_record = activitys.filter(left_times__gt=0)
-        if activity_record.filter(left_times__gt=0).count() == 0:
-            json_to_response = {
-                'code': 1002,
-                'messge': u'用户的抽奖机会已经用完了',
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        else:
-            with transaction.atomic():
-                join_record = WanglibaoRewardJoinRecord.objects.filter(user=request.user,activity_code='xunlei_treasure').first()
-                record = WanglibaoActivityReward.objects.filter(pk=activity_record.first().id, has_sent=False).first()
-                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
-                has_sent = False
-                if record and record.experience:
-                    json_to_response = {
-                        'code': 0,
-                        'lefts': sum_left["amount_sum"]-1,
-                        'amount': "%d" % (record.experience.amount,),
-                        'type': u'体验金',
-                        'message': u'用户抽到奖品'
-                    }
-                    SendExperienceGold(request.user).send(record.experience.id)
-                    has_sent = True
 
-                if record and record.redpack_event:
-                    json_to_response = {
-                        'code': 0,
-                        'lefts': sum_left["amount_sum"]-1,
-                        'amount':  str(record.redpack_event.amount),
-                        'type': u'加息券',
-                        'message': u'用户抽到奖品'
-                    }
-                    redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
-                    has_sent = True
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.filter(user=request.user,activity_code='xunlei_treasure').first()
+            if activity_record.filter(left_times__gt=0).count() == 0:
+                json_to_response = {
+                    'code': 1002,
+                    'messge': u'用户的抽奖机会已经用完了',
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-                if has_sent == False:
-                    json_to_response = {
-                        'code': 1,
-                        'lefts': sum_left["amount_sum"]-1,
-                        'message': u'此次没有得到奖品'
-                    }
-                if record:
-                    record.left_times = 0
-                    record.has_sent = True
-                    record.save()
-                join_record.left_times = 0
-                join_record.save()
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+            record = WanglibaoActivityReward.objects.filter(pk=activity_record.first().id, has_sent=False).first()
+            sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+            has_sent = False
+            if record and record.experience:
+                json_to_response = {
+                    'code': 0,
+                    'lefts': sum_left["amount_sum"]-1,
+                    'amount': "%d" % (record.experience.amount,),
+                    'type': u'体验金',
+                    'message': u'用户抽到奖品'
+                }
+                SendExperienceGold(request.user).send(record.experience.id)
+                has_sent = True
+
+            if record and record.redpack_event:
+                json_to_response = {
+                    'code': 0,
+                    'lefts': sum_left["amount_sum"]-1,
+                    'amount':  str(record.redpack_event.amount),
+                    'type': u'加息券',
+                    'message': u'用户抽到奖品'
+                }
+                redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
+                has_sent = True
+
+            if has_sent == False:
+                json_to_response = {
+                    'code': 1,
+                    'lefts': sum_left["amount_sum"]-1,
+                    'message': u'此次没有得到奖品'
+                }
+            if record:
+                record.left_times = 0
+                record.has_sent = True
+                record.save()
+            join_record.left_times = 0
+            join_record.save()
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class WeixinActivityAPIView(APIView):
     permission_classes = ()
