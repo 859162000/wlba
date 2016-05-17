@@ -85,13 +85,19 @@ def list_msg(params, user):
             if resp['code'] == 'success':
                 count = len(resp['data'])
                 data = resp['data']
-                messages = Message.objects.all()[:count]
-
+                # 创建 count 个 obj
+                try:
+                    all_messages = Message.objects.all()[:count]
+                except Exception, e:
+                    all_messages = Message.objects.all()[:1000]
+                    logger.debug('本地站内信条数不够!!!!!! exception = '.format(e.message))
+                messages = all_messages[(pagenum-1)*pagesize:pagenum*pagesize]
                 # 把 data 的数据 赋值都展示的messages 对象
-                index = 0
+                index = (pagenum - 1) * 10
                 for message in messages:
                     message.id = data[index]['id']
                     message.read_status = True if data[index]['read_status'] == str(1) else False
+                    message.message_text.mtype = data[index]['mtype']
                     message.message_text.title = data[index]['title']
                     message.message_text.content = data[index]['content']
                     message.message_text.created_at = int(data[index]['created_at'])
@@ -312,11 +318,12 @@ def send_one(user_id, title, content, mtype, push_type="in"):
         _send(user, msgTxt, push_type)
         return True
     elif settings.PHP_INSIDE_MESSAGE_SWITCH == 2:
-        # 本地备份
-        logger.info('inside message args, title = {}, content = {}, mtype = {}'.format(title, content, mtype))
+        # 本地备份 从sqs 里面获取参数! 避免数据丢失.
+        logger.info('in send_one, inside message args, title = {}, content = {}, mtype = {}'.format(title, content, mtype))
         msgTxt = create(title, content, mtype)
         if not msgTxt:
-            return False
+            logger.debug('in send_one, local save failed! args, title = {}, content = {}, mtype = {}'.
+                         format(title, content, mtype))
 
         user = User.objects.filter(pk=user_id).first()
         if not user:

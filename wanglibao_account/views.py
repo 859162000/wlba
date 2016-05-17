@@ -1312,6 +1312,8 @@ class MessageView(TemplateView):
             else:
                 messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
 
+            messages_list.extend(messages)
+
         else:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                      data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
