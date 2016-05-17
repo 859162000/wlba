@@ -2151,7 +2151,7 @@ class XunleiTreasureAPIView(APIView):
                 record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
                 sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
                 has_sent = False
-                if record.experience:
+                if record and record.experience:
                     json_to_response = {
                         'code': 0,
                         'lefts': sum_left["amount_sum"]-1,
@@ -2162,7 +2162,7 @@ class XunleiTreasureAPIView(APIView):
                     SendExperienceGold(request.user).send(record.experience.id)
                     has_sent = True
 
-                if record.redpack_event:
+                if record and record.redpack_event:
                     json_to_response = {
                         'code': 0,
                         'lefts': sum_left["amount_sum"]-1,
@@ -2179,10 +2179,10 @@ class XunleiTreasureAPIView(APIView):
                         'lefts': sum_left["amount_sum"]-1,
                         'message': u'此次没有得到奖品'
                     }
-
-                record.left_times = 0
-                record.has_sent = True
-                record.save()
+                if record:
+                    record.left_times = 0
+                    record.has_sent = True
+                    record.save()
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class WeixinActivityAPIView(APIView):
