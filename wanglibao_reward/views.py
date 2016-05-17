@@ -2182,6 +2182,7 @@ class XunleiTreasureAPIView(APIView):
                     'type': u'加息券',
                     'message': u'用户抽到奖品'
                 }
+                logger.debug("user:%s, redpack(%s) send" % (request.user.id, record.redpack_event))
                 redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
                 has_sent = True
 
