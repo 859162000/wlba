@@ -415,13 +415,28 @@
     position: relative
     width: 100%
     display: inline-block
-    padding-bottom: 0.85rem
+
     .ranking_box_list
       width: 100%
       display: inline-block
       padding-top: 2.75rem
 
       font-size: 0
+      .title_careful
+        width: 100%
+        clear: both
+        font-size: 0.65rem
+        line-height: 1.25rem
+        color: #585757
+        padding-bottom: 0.6rem
+        text-align: center
+        @media screen and (max-device-width: 370px)
+          font-size: 0.55rem
+          line-height: 1.25rem
+        @media screen and (max-width: 370px)
+          font-size: 0.55rem
+          line-height: 1.25rem
+
       .box
         width: 100%
         padding-bottom: 2rem
@@ -519,6 +534,9 @@
         .data_text_5
           span
             padding: 0 0.5rem 0 0
+      .box_last
+        padding-bottom: 0.9rem
+
   .red_title
     width: 4.35rem
     height: 1rem
