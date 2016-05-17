@@ -2152,7 +2152,7 @@ class XunleiTreasureAPIView(APIView):
         activity_record = activitys.filter(left_times__gt=0)
 
         with transaction.atomic():
-            join_record = WanglibaoRewardJoinRecord.objects.filter(user=request.user,activity_code='xunlei_treasure').first()
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code='xunlei_treasure').first()
             if join_record.remain_chance==0 or activity_record.filter(left_times__gt=0).count() == 0:
                 json_to_response = {
                     'code': 1002,
@@ -2195,8 +2195,11 @@ class XunleiTreasureAPIView(APIView):
                 record.left_times = 0
                 record.has_sent = True
                 record.save()
-            join_record.remain_chance -= 1
-            join_record.save()
+
+            if join_record:
+                join_record.remain_chance -= 1
+                join_record.save()
+
         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class WeixinActivityAPIView(APIView):
