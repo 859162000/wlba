@@ -7,7 +7,7 @@ html(style="background: #f4f4f4")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015051304", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015051701", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -54,34 +54,34 @@ html(style="background: #f4f4f4")
                             img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_1.png')
                             .data_box
                                 p.text_1 价值：
-                                p.data_text!='<span>2000</span>元红木制品'
+                                p.text_data!='<span>2000</span>元'
                                 p.text_2 红酸枝博古架<br>80*20*80cm
                         .box
                             img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_2.png')
                             .data_box
                                 p.text_1 价值：
-                                p.data_text!='<span>2000</span>元红木制品'
+                                p.text_data!='<span>2000</span>元'
                                 p.text_2 红酸枝手雕笔筒<br>15*13cm
                         .box
                             img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_3.png')
 
                             .data_box
                                 p.text_1 价值：
-                                p.data_text!='<span>1000</span>元红木制品'
+                                p.text_data!='<span>1000</span>元'
                                 p.text_2 红酸枝文房四宝
                         .box
                             img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_4.png')
 
                             .data_box
                                 p.text_1 价值：
-                                p.data_text!='<span>300</span>元红木制品'
+                                p.text_data!='<span>300</span>元'
                                 p.text_2 小叶紫檀手串<br>108颗
                         .box
                             img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_5.png')
 
                             .data_box
                                 p.text_1 价值：
-                                p.data_text!='<span>10</span>元红木制品'
+                                p.text_data!='<span>10</span>元'
                                 p.text_2 无门槛抵扣红包
                         p.title_careful 图片仅供参考，请以实物为准
             if p2p_list_url
