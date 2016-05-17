@@ -161,12 +161,12 @@ html
                                             span 月利宝{{month.name}}
                                             label
                                             span.short-name {{month.short_name}}
-                                    activity_rates = float(month['activity_rate'])
+                                    activity_rates = float(month['extra_rate'])
                                     if activity_rates > 0
                                         .increase-interest-box
                                             label.increase-interest
                                                 span
-                                                | {{month.activity_name}} 已+{{month.activity_rate}}%
+                                                | {{month.activity_name}} 已+{{month.extra_rate}}%
                                     .percentage-box
                                         if month.expected_earning_rate == month.rate_end
                                             span {{month.expected_earning_rate}}
