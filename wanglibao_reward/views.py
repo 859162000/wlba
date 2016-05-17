@@ -1993,7 +1993,7 @@ class XunleiTreasureAPIView(APIView):
     def __init__(self):
         super(XunleiTreasureAPIView, self).__init__()
         self.activity_name = 'xunlei_treasure'
-
+        self.start_time = '2016-05-01'
     def introduced_by_with(self, user_id, promo_token, register_time=None):
         """
             register_time:为None表示不需要关注用户的注册时间
@@ -2108,7 +2108,7 @@ class XunleiTreasureAPIView(APIView):
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
             if not self.has_generate_reward_activity(request.user.id, self.activity_name):
-                if self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                if self.introduced_by_with(request.user.id, 'xunlei9', self.start_time):
                     self.generate_newUser_reward_activity(request.user)
                 else:
                     self.generate_oldUser_reward_activity(request.user)
@@ -2132,7 +2132,7 @@ class XunleiTreasureAPIView(APIView):
 
         _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name)
         if not _activitys:
-            if self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+            if self.introduced_by_with(request.user.id, 'xunlei9', self.start_time):
                 activitys = self.generate_newUser_reward_activity(request.user)
             else:
                 activitys = self.generate_oldUser_reward_activity(request.user)
@@ -2150,6 +2150,7 @@ class XunleiTreasureAPIView(APIView):
             with transaction.atomic():
                 record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
                 sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+                has_sent = False
                 if record.experience:
                     json_to_response = {
                         'code': 0,
@@ -2159,7 +2160,9 @@ class XunleiTreasureAPIView(APIView):
                         'message': u'用户抽到奖品'
                     }
                     SendExperienceGold(request.user).send(record.experience.id)
-                elif record.redpack_event:
+                    has_sent = True
+
+                if record.redpack_event:
                     json_to_response = {
                         'code': 0,
                         'lefts': sum_left["amount_sum"]-1,
@@ -2168,8 +2171,9 @@ class XunleiTreasureAPIView(APIView):
                         'message': u'用户抽到奖品'
                     }
                     redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
+                    has_sent = True
 
-                else:
+                if has_sent == False:
                     json_to_response = {
                         'code': 1,
                         'lefts': sum_left["amount_sum"]-1,
