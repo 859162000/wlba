@@ -18,7 +18,7 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
         activityUrl: '/activity/xunlei_treasure/',
         hasCallBack: true,
         callBack: function () {
-            if ($('#ret_code').val() == '10000') {
+            if ($('#ret_code').val() != '10000') {
                 window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao";
             }else {
                 history.go(0);
