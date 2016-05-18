@@ -28,6 +28,8 @@ from wanglibao_account import message as inside_message
 from wanglibao_sms.tasks import send_messages
 
 logger = logging.getLogger('wanglibao_reward')
+HMD_INVEST_TOP_RANKS = 'hmd_invest_ranks'
+
 
 def sendWechatPhoneRewardByRegister(user, device_type="all"):
     phone = user.wanglibaouserprofile.phone
@@ -396,3 +398,25 @@ def processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount):
         })
 
         logger.info('影像投资节优惠码发送成功，user_id:%s; order_id:%s; reward_id:%s' % (user.id , order_id, reward.id))
+
+def getDBHmdTopRanks():
+   activity = Activity.objects.filter(code='hmd').first()
+   top_ranks = []
+   if activity:
+       top_ranks = P2PRecord.objects.filter(product__name__contains="产融通HMD", catalog='申购', create_time__gte=activity.start_at, create_time__lte=activity.end_at).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:10]
+   return top_ranks
+
+def getRedisHmdTopRanks():
+    try:
+        hmd_ranks = pickle.loads(redis_backend()._get(HMD_INVEST_TOP_RANKS))
+    except Exception, e:
+        hmd_ranks = []
+    return hmd_ranks
+
+def updateRedisHmdRanks():
+    try:
+        top_ranks = getDBHmdTopRanks()
+        redis = redis_backend()
+        redis._set(HMD_INVEST_TOP_RANKS, pickle.dumps(top_ranks))
+    except Exception,e:
+        logger.error("====updateRedisHmdRanks======="+e.message)

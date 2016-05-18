@@ -764,6 +764,9 @@ class YeeShortPay:
             pay_info.save()
             return res
 
+        # 绑定银行卡成功
+        card.is_bind_yee = True
+        card.save()
 
         res = self._pay_request(request, order_id, card, pay_info)
         if res['ret_code'] != 0:
@@ -775,9 +778,6 @@ class YeeShortPay:
             pay_info.save()
             return res
 
-        # 绑定银行卡成功
-        card.is_bind_yee = True
-        card.save()
 
         margin = Margin.objects.filter(user=user).first()
         return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": pay_info.amount, "margin": margin.margin}
