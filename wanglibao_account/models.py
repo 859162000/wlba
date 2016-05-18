@@ -71,7 +71,7 @@ class UserThreeOrder(models.Model):
     request_no = models.CharField(unique=True, max_length=30, verbose_name=u'请求流水号')
     result_code = models.CharField(max_length=30, blank=True, verbose_name=u'受理结果编码')
     msg = models.CharField(max_length=255, blank=True, verbose_name=u'受理结果消息')
-    created_at = models.DateTimeField(u'下单时间', auto_now_add=True)
+    created_at = models.DateTimeField(u'下单时间', auto_now=True)
     answer_at = models.DateTimeField(u'订单反馈时间', blank=True, null=True)
 
     class Meta:
@@ -286,6 +286,11 @@ class SMSModifyPhoneRecord(models.Model):
         verbose_name_plural = u'短信修改手机号'
         ordering = ('-created_at',)
 
+class GeetestModifiedTimes(models.Model):
+    identified = models.CharField(max_length=65, unique=True, verbose_name=u'验证唯一标示')
+    times = models.IntegerField(verbose_name=u'已经验证次数', default=0)
+    created_at = models.DateTimeField(verbose_name=u'首次创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(verbose_name=u'更新时间', auto_now=True)
 
 # 发给所有人
 def send_public_message(sender, instance, **kwargs):

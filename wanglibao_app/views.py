@@ -111,7 +111,7 @@ class AppActivateScoreImageAPIView(APIView):
 
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
     DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android', 'act_score_iso': 'act_score_iso'}
@@ -150,8 +150,19 @@ class AppActivateImageAPIView(APIView):
             jump_state = activate.jump_state
             link_dest = activate.link_dest
             if img_url:
-                invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
-                if activate.user_invest_limit=='-1' or (activate.user_invest_limit=='0' and not invest_flag) or (activate.user_invest_limit=='1' and invest_flag):
+                if self.DEVICE_MAP[device_type] in ("act_iso", 'act_android'):
+                    if request.user.is_authenticated():
+                        invest_flag = P2PRecord.objects.filter(user=request.user,catalog='申购').exists()
+                        if activate.user_invest_limit=='-1' or (activate.user_invest_limit=='0' and not invest_flag) or (activate.user_invest_limit=='1' and invest_flag):
+                            img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
+                            return Response({'ret_code': 0,
+                                             'message': 'ok',
+                                             'image': img_url,
+                                             'jump_state': jump_state,
+                                             'link_dest':link_dest,
+                                             'link_dest_url':activate.link_dest_h5_url,
+                                             })
+                else:
                     img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
                     return Response({'ret_code': 0,
                                      'message': 'ok',
@@ -414,21 +425,28 @@ class AppExploreView(TemplateView):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_app=True,
                                                     start_at__lte=timezone.now(),
-                                                    end_at__gt=timezone.now()
                                                     ).select_related('activity')
+
+        activity_now_shows = activity_list.filter(end_at__gt=timezone.now())
+        activity_now_shows = get_sorts_for_activity_show(activity_now_shows)
+
+        activity_overdue_shows = activity_list.filter(end_at__lte=timezone.now())
+        activity_overdue_shows = get_sorts_for_activity_show(activity_overdue_shows)
+
+        activity_list = activity_now_shows + activity_overdue_shows
 
         limit = 6
         page = 1
-
-        activity_list = get_sorts_for_activity_show(activity_list)
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
             'results': activity_list[:limit],
             'all_page': all_page,
-            'page': page
+            'page': page,
+            'pagesize': limit,
         }
+
 
 class AppManagementView(TemplateView):
     """ app管理团队 """
@@ -920,21 +938,28 @@ class AppAreaView(TemplateView):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_app=True,
                                                     start_at__lte=timezone.now(),
-                                                    end_at__gt=timezone.now()
                                                     ).select_related('activity')
+
+        activity_now_shows = activity_list.filter(end_at__gt=timezone.now())
+        activity_now_shows = get_sorts_for_activity_show(activity_now_shows)
+
+        activity_overdue_shows = activity_list.filter(end_at__lte=timezone.now())
+        activity_overdue_shows = get_sorts_for_activity_show(activity_overdue_shows)
+
+        activity_list = activity_now_shows + activity_overdue_shows
 
         limit = 6
         page = 1
-
-        activity_list = get_sorts_for_activity_show(activity_list)
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
             'results': activity_list[:limit],
             'all_page': all_page,
-            'page': page
+            'page': page,
+            'pagesize': limit,
         }
+
 
 class AppAreaApiView(APIView):
     permission_classes = ()
@@ -950,10 +975,15 @@ class AppAreaApiView(APIView):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                     is_app=True,
                                                     start_at__lte=timezone.now(),
-                                                    end_at__gt=timezone.now(),
                                                     ).select_related('activity')
 
-        activity_list = get_sorts_for_activity_show(activity_list)
+        activity_now_shows = activity_list.filter(end_at__gt=timezone.now())
+        activity_now_shows = get_sorts_for_activity_show(activity_now_shows)
+
+        activity_overdue_shows = activity_list.filter(end_at__lte=timezone.now())
+        activity_overdue_shows = get_sorts_for_activity_show(activity_overdue_shows)
+
+        activity_list = activity_now_shows + activity_overdue_shows
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
@@ -968,6 +998,7 @@ class AppAreaApiView(APIView):
         return Response({
             'html_data': html_data,
             'page': page,
+            'pagesize': pagesize,
             'all_page': all_page,
         })
 

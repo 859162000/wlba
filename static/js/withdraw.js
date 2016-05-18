@@ -19,7 +19,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
-    var addFormValidateor, geetestStatus, max_amount, min_amount, _refreshCode, _sendSMSFun, _showModal;
+    var addFormValidateor, geetestStatus, max_amount, min_amount, _refreshCode, _sendSMSFun, _showModal, _showModal1;
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
@@ -183,7 +183,10 @@
             }
           }
         } else {
-          return $('#codeError').text(result.message);
+          $('#codeError').text(result.message);
+          if (result.message === '极验验证失败') {
+            return geetestStatus = 'false';
+          }
         }
       }).success(function() {
         $('#codeError,.code-img-error').text('');
@@ -302,11 +305,20 @@
         } else {
           if (addFormValidateor.form()) {
             return $('#withdraw-form').ajaxSubmit(function(data) {
-              return tool.modalAlert({
-                title: '温馨提示',
-                msg: data.message,
-                callback_ok: _showModal
-              });
+              if (data.ret_code === 0) {
+                return tool.modalAlert({
+                  title: '温馨提示',
+                  msg: '<p style="font-size:14px;color:#333">提现申请已受理</p><p style="margin-top:5px;font-size:14px;color:#333">预计1-3个工作日到账</p>',
+                  callback_ok: _showModal1,
+                  height: '220px'
+                });
+              } else {
+                return tool.modalAlert({
+                  title: '温馨提示',
+                  msg: data.message,
+                  callback_ok: _showModal
+                });
+              }
             });
           }
         }
@@ -314,6 +326,9 @@
     });
     _showModal = function() {
       return location.reload();
+    };
+    _showModal1 = function() {
+      return window.location.href = '/accounts/transaction/withdraw/';
     };
 
     /*设置密码提交表单 */

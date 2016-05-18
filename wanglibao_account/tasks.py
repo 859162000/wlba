@@ -139,6 +139,7 @@ def jinshan_callback(url, params):
 
 @app.task
 def xunleivip_recallback(url, params, channel, order_id):
+    # 需要IP鉴权
     result = xunlei9_order_query(params)
     data = result.get('data', None)
 
@@ -169,6 +170,7 @@ def xunleivip_recallback(url, params, channel, order_id):
 
 @app.task
 def xunleivip_callback(url, params, channel, order_id):
+    # 需要IP鉴权
     logger.info("Enter %s_callback task===>>>" % channel)
     try:
         _params = urllib.urlencode(params)
@@ -218,6 +220,7 @@ def yiche_callback(url, params, channel):
 
 @app.task
 def zgdx_callback(url, params, channel):
+    # 需要IP鉴权
     logger.info("Enter %s_callback task===>>>" % channel)
     ret = None
     try:
@@ -324,16 +327,6 @@ def common_callback_for_post(url, params, channel, headers=None):
 
 
 @app.task
-def coop_callback_for_post(url, params, channel):
-    logger.info("Enter %s_callback task===>>>" % channel)
-    try:
-        logger.info(params)
-        ret = requests.post(url, data=params)
-        logger.info('%s callback url: %s' % (channel, ret.url))
-        if ret.status_code == 200:
-            logger.info('callback return: %s' % ret.json())
-        else:
-            logger.info('callback return: %s' % ret.text)
-    except Exception, e:
-        logger.info(" {'%s callback':'failed to connect'} " % channel)
-        logger.info(e)
+def coop_call_back(params):
+    # 此任务由渠道中心平台处理
+    pass

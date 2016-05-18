@@ -44,7 +44,7 @@ from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import (detect_identifier_type, create_user, generate_contract, update_coop_order,
-                                     generate_bisouyi_content, generate_bisouyi_sign)
+                                     generate_bisouyi_content, generate_bisouyi_sign, generate_coop_base_data)
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.serializers import UserSerializer
@@ -82,10 +82,13 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha, BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.tasks import common_callback_for_post
+from common.tools import MyHttpsAdapter
 
+import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
+logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class RegisterView(RegistrationView):
@@ -618,18 +621,18 @@ class AccountHomeAPIView(APIView):
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
-        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
-        fund_total_asset = 0
-        if fund_hold_info.exists():
-            for hold_info in fund_hold_info:
-                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+        # fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        # fund_total_asset = 0
+        # if fund_hold_info.exists():
+        #     for hold_info in fund_hold_info:
+        #         fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
         today = timezone.datetime.today()
-        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user,
-                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user,
-                            date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+        # total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
+        # fund_income_week = DailyIncome.objects.filter(user=user,
+        #                     date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        # fund_income_month = DailyIncome.objects.filter(user=user,
+        #                     date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         # 当月免费提现次数
         fee_config = WithdrawFee().get_withdraw_fee_config()
@@ -641,7 +644,7 @@ class AccountHomeAPIView(APIView):
             withdraw_free_count = 0
 
         res = {
-            'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
+            'total_asset': float(p2p_total_asset),  # 总资产
             'p2p_total_asset': float(p2p_total_asset),  # p2p总资产
             'p2p_margin': float(p2p_margin),  # P2P余额
             'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
@@ -651,10 +654,10 @@ class AccountHomeAPIView(APIView):
             'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
             'p2p_total_interest': float(p2p_total_interest + p2p_total_coupon_interest),  # P2P总收益
 
-            'fund_total_asset': float(fund_total_asset),  # 基金总资产
-            'fund_total_income': float(total_income),  # 基金累积收益
-            'fund_income_week': float(fund_income_week),  # 基金近一周收益(元)
-            'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
+            'fund_total_asset': float(0.00),  # 基金总资产
+            'fund_total_income': float(0.00),  # 基金累积收益
+            'fund_income_week': float(0.00),  # 基金近一周收益(元)
+            'fund_income_month': float(0.00),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
             'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
@@ -1273,21 +1276,44 @@ class MessageView(TemplateView):
     template_name = 'message.jade'
 
     def get_context_data(self, **kwargs):
+
         listtype = self.request.GET.get("listtype")
+        messages = []
+        messages_list = []
 
         if not listtype or listtype not in ("read", "unread", "all"):
             listtype = 'all'
 
-        if listtype == "unread":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
-                '-message_text__created_at')
-        elif listtype == "read":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by(
-                '-message_text__created_at')
-        else:
-            messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
+        if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+            if listtype == "unread":
+                messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
+                    '-message_text__created_at')
+            elif listtype == "read":
+                messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by(
+                    '-message_text__created_at')
+            else:
+                messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
 
-        messages_list = []
+        else:
+            response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
+                                     data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
+            if response.status_code == 200:
+                resp = response.json()
+                if resp['code'] == 'success':
+                    count = len(resp['data'])
+                    data = resp['data']
+                    messages = Message.objects.all()[:count]
+
+                    # 把 data 的数据 赋值都展示的messages 对象
+                    index = 0
+                    for message in messages:
+                        message.id = data[index]['id']
+                        message.read_status = data[index]['read_status']
+                        message.message_text.title = data[index]['title']
+                        message.message_text.content = data[index]['content']
+                        message.message_text.created_at = int(data[index]['created_at'])
+                        index += 1
+
         messages_list.extend(messages)
 
         limit = 10
@@ -1330,6 +1356,57 @@ class MessageDetailAPIView(APIView):
         result = inside_message.sign_read(request.user, message_id)
         return Response(result)
 
+def verified_user_login(phone, ip, action=None):
+    from wanglibao_account.models import GeetestModifiedTimes
+    phone_times = 'login_verified_phone_times_%s' % (phone,)
+    ip_times = 'login_verified_ip_times_%s' % (ip,)
+    with transaction.atomic():
+        phone_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=phone_times).first()
+        if not phone_record:
+            try:
+                phone_record = GeetestModifiedTimes.objects.create(
+                    identified=phone_times,
+                    times=0)
+            except Exception:
+                logger.debug('极验验证手机验证次数创建数据记录失败')
+
+        if action == 'reset':
+            phone_record.times = 0
+            phone_verified_times = 0
+            phone_record.save()
+        else:
+            phone_verified_times = phone_record.times
+            phone_record.times = phone_verified_times + 1
+            phone_record.save()
+
+    with transaction.atomic():
+        ip_record = GeetestModifiedTimes.objects.select_for_update().filter(identified=ip_times).first()
+        if not ip_record:
+            try:
+                ip_record = GeetestModifiedTimes.objects.create(
+                        identified=ip_times,
+                        times=0)
+            except Exception:
+                logger.debug('极验验证IP验证次数创建数据记录失败')
+
+        if action == 'reset':
+            ip_record.times = 0
+            ip_record.save()
+            ip_verified_times = 0
+        else:
+            ip_verified_times = ip_record.times
+            ip_record.times = ip_verified_times + 1
+            ip_record.save()
+
+    if phone_verified_times >= 2:
+        # Modify by hb on 2016-04-26
+        #return False, u'用户名或密码错误2次以上'
+        return False, u'用户名或密码错误，请拖动图形验证'
+    if ip_verified_times >= 5:
+        # Modify by hb on 2016-04-26
+        #return False, u'同一IP失败5次以上'
+        return False, u'用户名或密码错误，请拖动图形验证。'
+    return True, 'success'
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -1343,10 +1420,14 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
         return json.dumps(res)
 
     if request.method == "POST":
+        client_ip = request.META['HTTP_X_FORWARDED_FOR'] if request.META.get('HTTP_X_FORWARDED_FOR', None) else request.META.get('HTTP_X_REAL_IP', None)
 
         if request.is_ajax():
             form = authentication_form(request, data=request.POST)
+            identifier = request.POST.get('identifier', None)
             if form.is_valid():
+                # 用户的登录次数,存储在session中,用户登录成功后,清零用户的登录次数
+                verified_user_login(identifier, client_ip, 'reset')
                 auth_login(request, form.get_user())
 
                 if request.POST.has_key('remember_me'):
@@ -1355,7 +1436,19 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                     request.session.set_expiry(1800)
                 return HttpResponse(messenger('done', user=request.user))
             else:
-                return HttpResponseForbidden(messenger(form.errors))
+                # 用户的登录次数失败后,处理对应的session
+                if request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
+                    result, msg = verified_user_login(identifier, client_ip)
+                    if not result:
+                        json_response = {
+                            'ret_code': '7001',
+                            'message': msg
+                        }
+                        return HttpResponse(json.dumps(json_response), content_type='application/json')
+                    else:
+                        return HttpResponseForbidden(messenger(form.errors))
+                else:
+                    return HttpResponseForbidden(messenger(form.errors))
         else:
             return HttpResponseForbidden('not valid ajax request')
     else:
@@ -2219,7 +2312,10 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = json.loads(request.POST)
+                if channel_code == 'zgdx':
+                    params = json.loads(request.body)
+                else:
+                    params = request.POST
                 request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
@@ -2673,9 +2769,6 @@ class MarginRecordsAPIView(APIView):
         return Response(res)
 
 
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
 def user_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
     def messenger(message, user=None):
         res = dict()
@@ -2762,10 +2855,10 @@ class BiSouYiRegisterApi(APIView):
 
     def post(self, request):
         form = BiSouYiRegisterForm(self.request.session, action='register')
-        oauth_data = {
-            'pcode': settings.BISOUYI_PCODE,
-            'status': 0,
-        }
+        # oauth_data = {
+        #     'pcode': settings.BISOUYI_PCODE,
+        #     'status': 0,
+        # }
         if form.is_valid():
             if form.check_sign():
                 response_data = user_register(request)
@@ -2780,12 +2873,12 @@ class BiSouYiRegisterApi(APIView):
                     # 处理第三方渠道的用户信息
                     CoopRegister(request).all_processors_for_user_register(user, channel_code)
 
-                    start_time = timezone.localtime(timezone.now())
-                    end_time = start_time + datetime.timedelta(seconds=599)
-                    oauth_data['token'] = response_data['access_token']
-                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['status'] = 1
+                    # start_time = timezone.localtime(timezone.now())
+                    # end_time = start_time + datetime.timedelta(seconds=599)
+                    # oauth_data['token'] = access_token
+                    # oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['status'] = 1
 
                     response_data = {
                         'ret_code': 10000,
@@ -2803,22 +2896,95 @@ class BiSouYiRegisterApi(APIView):
                 'message': form.errors.values()[0][0],
             }
 
-        response_data['oauth_data'] = json.dumps(oauth_data)
+        # response_data['oauth_data'] = json.dumps(oauth_data)
 
-        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        logger.info("BiSouYiRegisterApi process result: %s" % response_data)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+
+class BiSouYiRegisterView(TemplateView):
+
+    template_name = 'one_key_register_bisouyi.jade'
+
+    def get_context_data(self, **kwargs):
+        form = BiSouYiRegisterForm(self.request.session, action='register')
+        # oauth_data = {
+        #     'pcode': settings.BISOUYI_PCODE,
+        #     'status': 0,
+        # }
+        if form.is_valid():
+            if form.check_sign():
+                phone = form.get_phone()
+                password = generate_random_password(6)
+                user = create_user(phone, password, "")
+                if user:
+                    access_token = utils.long_token()
+                    account = form.get_account()
+                    user.access_token = access_token
+                    user.account = account
+                    channel_code = form.cleaned_data['channel_code']
+
+                    send_messages.apply_async(kwargs={
+                        "phones": [phone, ],
+                        "messages": [u'您已成功注册网利宝,用户名为'+phone+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                    })
+
+                    # 处理第三方渠道的用户信息
+                    CoopRegister(self.request).all_processors_for_user_register(user, channel_code)
+
+                    device = utils.split_ua(self.request)
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                    auth_user = authenticate(identifier=phone, password=password)
+                    auth_login(self.request, auth_user)
+
+                    # start_time = timezone.localtime(timezone.now())
+                    # end_time = start_time + datetime.timedelta(seconds=599)
+                    # oauth_data['token'] = access_token
+                    # oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['status'] = 1
+
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': 'success',
+                        'next_url': form.get_other(),
+                    }
+                else:
+                    response_data = {
+                        'ret_code': 10012,
+                        'message': u'用户创建失败',
+                        'next_url': settings.SITE_URL,
+                    }
+            else:
+                response_data = {
+                    'ret_code': 10011,
+                    'message': u'无效签名',
+                    'next_url': settings.SITE_URL,
+                }
+        else:
+            response_data = {
+                'ret_code': 10010,
+                'message': form.errors.values()[0][0],
+                'next_url': settings.SITE_URL,
+            }
+
+        # response_data['oauth_data'] = json.dumps(oauth_data)
+
+        logger.info("BiSouYiRegisterView process result: %s" % response_data)
+        return response_data
 
 
 class BiSouYiLoginApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        form = BiSouYiRegisterForm(self.request.session)
+        form = BiSouYiRegisterForm(self.request.session, action='old_login')
         p_code = settings.BISOUYI_PCODE
-        oauth_data = {
-            'pcode': p_code,
-            'status': 0,
-        }
+        # oauth_data = {
+        #     'pcode': p_code,
+        #     'status': 0,
+        # }
         if form.is_valid():
             if form.check_sign():
                 response_data = user_login(request)
@@ -2841,6 +3007,7 @@ class BiSouYiLoginApi(APIView):
                     }
 
                     content = generate_bisouyi_content(content_data)
+                    callback_data = json.dumps({'content': content})
 
                     headers = {
                         'Content-Type': 'application/json',
@@ -2851,15 +3018,40 @@ class BiSouYiLoginApi(APIView):
                     # 授权回调
                     common_callback_for_post.apply_async(
                         kwargs={'url': settings.BISOUYI_OATUH_PUSH_URL,
-                                'params': json.dumps(content_data),
+                                'params': callback_data,
                                 'channel': channel_code, 'headers': headers})
 
-                    start_time = timezone.localtime(timezone.now())
-                    end_time = start_time + datetime.timedelta(seconds=599)
-                    oauth_data['token'] = access_token
-                    oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
-                    oauth_data['status'] = 1
+                    try:
+                        base_data = generate_coop_base_data('register')
+                        act_data = {
+                            'client_id': client_id,
+                            'bid': '',
+                            'phone': phone,
+                            'btype': 'wanglibao',
+                            'user_id': user.id,
+                            'access_token': access_token,
+                            'account': '',
+                        }
+                        data = dict(base_data, **act_data)
+                        s = requests.Session()
+                        s.mount('https://', MyHttpsAdapter(max_retries=5))
+                        res = s.post(url=settings.CHANNEL_CENTER_CALL_BACK_URL,
+                                     data=data,
+                                     verify=False)
+                        if res.status_code == 200:
+                            result = res.json()
+                            logger.info("register_call_back connected return [%s]" % result)
+                        else:
+                            logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+                    except Exception, e:
+                        logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
+
+                    # start_time = timezone.localtime(timezone.now())
+                    # end_time = start_time + datetime.timedelta(seconds=599)
+                    # oauth_data['token'] = access_token
+                    # oauth_data['stime'] = start_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['etime'] = end_time.strftime('%Y%m%d%H%M%S')
+                    # oauth_data['status'] = 1
 
                     response_data = {
                         'ret_code': 10000,
@@ -2869,7 +3061,7 @@ class BiSouYiLoginApi(APIView):
 
                     user_phone = user.wanglibaouserprofile.phone
                     if phone != user_phone:
-                        logger.warning("BiSouYiRegisterApi query phone[%s] not eq user phone[%s]" % (phone, user_phone))
+                        logger.warning("BiSouYiLoginApi query phone[%s] not eq user phone[%s]" % (phone, user_phone))
             else:
                 response_data = {
                     'ret_code': 10011,
@@ -2881,7 +3073,7 @@ class BiSouYiLoginApi(APIView):
                 'message': form.errors.values()[0][0],
             }
 
-        response_data['oauth_data'] = json.dumps(oauth_data)
-        logger.info("BiSouYiRegisterApi process result: %s" % response_data['message'])
+        # response_data['oauth_data'] = json.dumps(oauth_data)
+        logger.info("BiSouYiLoginApi process result: %s" % response_data)
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

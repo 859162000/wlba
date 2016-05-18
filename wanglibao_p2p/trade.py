@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 
 from django.db import transaction
 from django.utils import timezone
 from marketing import tools
-#from marketing.models import IntroducedBy, Reward, RewardRecord
+# from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 from django.conf import settings
-#from wanglibao.templatetags.formatters import safe_phone_str
+# from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_reward.views import RewardDistributer
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -22,10 +22,6 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
-import logging
-# from wanglibao_account.utils import CjdaoUtils
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
 import json, datetime
 
@@ -38,6 +34,7 @@ from weixin.tasks import sentTemplate
 
 
 logger = logging.getLogger('wanglibao_account')
+
 
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
@@ -65,6 +62,7 @@ class P2PTrader(object):
     def purchase(self, amount, redpack=0, platform=u''):
         description = u'购买P2P产品 %s %s 份' % (self.product.short_name, amount)
         is_full = False
+        product_balance_after = 0
         if self.user.wanglibaouserprofile.frozen:
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
@@ -99,7 +97,8 @@ class P2PTrader(object):
 
             OrderHelper.update_order(Order.objects.get(pk=self.order_id), user=self.user, status=u'份额确认', amount=amount)
 
-            if product_record.product_balance_after <= 0:
+            product_balance_after = product_record.product_balance_after
+            if product_balance_after <= 0:
                 is_full = True
 
         # fix@chenweibin, add order_id
@@ -109,7 +108,8 @@ class P2PTrader(object):
                          (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
             tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
                                                    "device": self.device, "order_id": self.order_id,
-                                                   "product_id": self.product.id, "is_full": is_full})
+                                                   "product_id": self.product.id, "is_full": is_full,
+                                                   "product_balance_after": product_balance_after})
         except Exception, reason:
             logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
             pass
@@ -223,6 +223,14 @@ class P2POperator(object):
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (product.id, e.message))
 
+            # try:
+            #     from .tasks import coop_product_push
+            #     coop_product_push.apply_async(
+            #         kwargs={'product_id': product.id}
+            #     )
+            # except:
+            #     pass
+
         print('Getting products with status 正在招标 and end time earlier than now')
         for product in P2PProduct.objects.filter(status=u'正在招标', end_time__lte=timezone.now()):
             try:
@@ -246,28 +254,33 @@ class P2POperator(object):
         Automatic().auto_trade()
 
     @classmethod
-    #@transaction.commit_manually
+    # @transaction.commit_manually
     def preprocess_for_settle(cls, product):
         cls.logger.info('Enter pre process for settle for product: %d: %s', product.id, product.name)
 
         # Create an order to link all changes
         order = OrderHelper.place_order(order_type=u'满标状态预处理', status=u'开始', product_id=product.id)
-        if product.status != u'满标已打款':
-            raise P2PException(u'产品状态(%s)不是(满标已打款)' % product.status)
+
         with transaction.atomic():
             # Generate the amotization plan and contract for each equity(user)
-            amo_keeper = AmortizationKeeper(product, order_id=order.id)
+            # 重新查询并锁定产品记录
+            product_lock = P2PProduct.objects.select_for_update().get(pk=product.id)
 
+            if product_lock.status != u'满标已打款':
+                raise P2PException(u'产品状态(%s)不是(满标已打款)' % product_lock.status)
+
+            amo_keeper = AmortizationKeeper(product_lock, order_id=order.id)
+
+            # 生成用户还款计划
             amo_keeper.generate_amortization_plan(savepoint=False)
 
             # for equity in product.equities.all():
             #     EquityKeeper(equity.user, equity.product, order_id=order.id).generate_contract(savepoint=False)
             # EquityKeeperDecorator(product, order.id).generate_contract(savepoint=False)
 
-            product = P2PProduct.objects.get(pk=product.id)
-            product.status = u'满标待审核'
-            product.make_loans_time = timezone.now()
-            product.save()
+            product_lock.status = u'满标待审核'
+            product_lock.make_loans_time = timezone.now()
+            product_lock.save()
 
     @classmethod
     def settle(cls, product):
@@ -339,6 +352,14 @@ class P2POperator(object):
                 messages_list.append(messages.product_failed(equity.user.wanglibaouserprofile.name, product))
             ProductKeeper(product).fail()
 
+        try:
+            from .tasks import coop_product_push
+            coop_product_push.apply_async(
+                kwargs={'product_id': product.id}
+            )
+        except:
+            pass
+
         user_ids = {}.fromkeys(user_ids).keys()
         if phones:
             send_messages.apply_async(kwargs={
@@ -385,6 +406,14 @@ class P2POperator(object):
 
                 # 将标信息从还款中的redis列表中挪到已完成的redis列表
                 cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
+
+                try:
+                    from .tasks import coop_product_push
+                    coop_product_push.apply_async(
+                        kwargs={'product_id': product.id}
+                    )
+                except:
+                    pass
 
     @classmethod
     def settle_hike(cls, product):

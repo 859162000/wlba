@@ -193,7 +193,7 @@ webpackJsonp([14],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback();
+	        callback && callback();
 	    });
 	};
 
@@ -445,7 +445,7 @@ webpackJsonp([14],[
 	    phone: function phone(str) {
 	        var phone = parseInt($.trim(str)),
 	            error = '请输入正确的手机号',
-	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0123456789])[0-9]{8}$/);
 
 	        if (re.test(phone)) {
 	            return [true, ''];
@@ -453,9 +453,8 @@ webpackJsonp([14],[
 	        return [false, error];
 	    },
 	    password: function password(str) {
-	        var error = '密码为6-20位数字/字母/符号/区分大小写',
-	            re = new RegExp(/^\d{6,20}$/);
-	        if (6 < $.trim(str).length && $.trim(str).length < 20) {
+	        var error = '密码为6-20位数字/字母/符号/区分大小写';
+	        if (6 <= $.trim(str).length && $.trim(str).length <= 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];

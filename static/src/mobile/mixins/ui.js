@@ -11,7 +11,7 @@ export const Alert = (text, callback) =>{
 
     $button.on('click', () => {
         $alert.hide();
-        callback();
+        callback && callback();
     })
 }
 

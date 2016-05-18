@@ -14,14 +14,13 @@ from collections import defaultdict
 from decimal import Decimal
 import time
 from weixin.models import WeixinUser
-from wanglibao_p2p.models import P2PEquity
+from wanglibao_p2p.models import P2PEquity, Earning, P2PRecord, P2PProduct
 from django.db import transaction
 from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
-from wanglibao_p2p.models import P2PRecord
 from django.views.generic import TemplateView
 from django.http.response import HttpResponse, Http404, HttpResponseRedirect
 from mock_generator import MockGenerator
@@ -30,7 +29,7 @@ from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
 from weixin.base import OpenIdBaseAPIView, BaseWeixinTemplate
-from wanglibao_sms.models import *
+# from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
 from marketing.tops import Top
@@ -40,13 +39,12 @@ from wanglibao_reward.models import WanglibaoWeixinRelative
 from wanglibao_profile.models import Account2015
 from weixin.models import WeixinAccounts
 import cStringIO
-from wanglibao_account.utils import FileObject
+from common.tools import FileObject
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
-from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao.templatetags.formatters import safe_phone_str
+# from wanglibao.templatetags.formatters import safe_phone_str
 from order.models import Order
 from order.utils import OrderHelper
 from rest_framework.response import Response
@@ -61,7 +59,6 @@ from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record, utype_is_mobile, utype_is_app
-from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
@@ -88,6 +85,8 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
 from weixin.base import ChannelBaseTemplate
 from wanglibao_rest.utils import get_client_ip
+from marketing.utils import get_channel_record
+from wanglibao_p2p.common import get_name_contains_p2p_list
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2011,7 +2010,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_three.jade'
+    template_name = ''
     wx_code = ''
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
@@ -2057,12 +2056,14 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         self.wx_code = channel_code
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
-        device_list = ['android', 'iphone']
-        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
-        for device in device_list:
-            match = re.search(device, user_agent)
-            if match and match.group():
-                self.template_name = 'app_xunleizhuce.jade'
+        if not self.template_name:
+            self.template_name = 'xunlei_three.jade'
+            device_list = ['android', 'iphone']
+            user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+            for device in device_list:
+                match = re.search(device, user_agent)
+                if match and match.group():
+                    self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
@@ -2442,7 +2443,8 @@ class RewardDistributeAPIView(APIView):
         self.activity = None
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
-        self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        #self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.rates = (5, 8, 12, 7, 13, 11, 9, 15, 20)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
@@ -2507,7 +2509,7 @@ class RewardDistributeAPIView(APIView):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        rate = 50
+        rate = 20
 
         for item in self.rates:
             if sent_count%(100/item)==0:
@@ -2650,6 +2652,15 @@ class RewardDistributeAPIView(APIView):
 
         if action == "GET_REWARD":
             join_log = self.distribute_redpack(user)
+            if join_log == 'No Reward':
+                to_json_response = {
+                    'ret_code': 3001,
+                    'message': u'用户的抽奖次数已经用完了',
+                    'left': 0,
+                    'redpack': redpack_event.id
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
             to_json_response = {
                 'ret_code': 0,
                 'message': u'发奖成功',
@@ -2700,41 +2711,49 @@ class HappyMonkeyAPIView(APIView):
             (0, 20): u'幸福猴66元体验金',
             (21, 40): u'幸福猴166元体验金',
             (41, 60): u'幸福猴566元体验金',
-            (61, 100000000): u'幸福猴866体验金'
+            (61, 100000000): u'幸福猴866元体验金'
         }
         phone = request.POST.get('phone', None)
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
         # 是否是登录用户
         if not request.user.is_authenticated():
-            if phone and user:
-                pass
-            else:
-                to_json_response = {
-                    'ret_code': 1000,
-                    'message': u'用户没有登录',
-                }
-                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        today = time.strftime("%Y-%m-%d", time.localtime())
-        user = user.user if user else request.user
-        #今天用户已经玩过了
-        reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
-        if reward and today == str(reward.create_at)[:10]:
             to_json_response = {
-                'ret_code': 1001,
-                'message': u'每一个用户,一天只能玩一次',
+                'ret_code': 1000,
+                'message': u'用户没有登录',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        today = datetime.now().strftime("%Y-%m-%d")
+        user = user.user if user else request.user
 
         #今天用户没有玩过
         with transaction.atomic():
             logger.debug('enter transaction atomic')
             join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=user, activity_code=self.token).first()
             if not join_record:
-                join_record = WanglibaoRewardJoinRecord.objects.create(
-                    user=user,
-                    activity_code=self.token,
-                    remain_chance=1)
+                try:
+                    join_record = WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code=self.token,
+                        remain_chance=1)
+                except Exception:
+                    to_json_response = {
+                        'ret_code': 1001,
+                        'message': u'每一个用户,一天只能玩一次',
+                    }
+                    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            #今天用户已经玩过了
+            reward = ActivityReward.objects.filter(channel=self.token, user=user).last()
+            timestamp = time.mktime(time.strptime(reward.create_at.strftime("%Y-%m-%d %M:%H:%S"), "%Y-%m-%d %M:%H:%S"))
+            res = datetime.datetime.utcfromtimestamp(timestamp)+datetime.timedelta(hours=8)
+            res = res.strftime("%Y-%m-%d %H:%M:%S")
+            if reward and today == str(res)[:10]:
+                to_json_response = {
+                    'ret_code': 1001,
+                    'message': u'每一个用户,一天只能玩一次',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
             total = int(request.POST.get('total', None))
             exp_name = ''
@@ -3212,3 +3231,67 @@ class OpenHouseApiView(TemplateView):
             self.template_name = 'h5_open_house.jade'
 
         return {}
+
+
+class MaiMaiView(TemplateView):
+    template_name = 'app_maimaiIndex.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = ''
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
+        return {
+            'token': token,
+            'channel': channel
+        }
+
+
+class ShieldPlanView(TemplateView):
+    template_name = 'shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+            .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+            .order_by('-status_int')[:3]
+        return {
+            'p2p_list': p2p_list
+        }
+
+
+class ShieldPlanH5View(TemplateView):
+    template_name = 'h5_shield_plan.jade'
+
+    def get_context_data(self, **kwargs):
+        p2p_list = P2PProduct.objects.defer('extra_data').select_related('activity__rule') \
+                       .filter(hide=False, publish_time__lte=timezone.now()).filter(status_int__gt=7) \
+                       .order_by('-status_int').first()
+        return {
+            'p2p': p2p_list
+        }
+
+class HMDP2PListView(TemplateView):
+    p2p_list_url_name = ""
+    def get_context_data(self, **kwargs):
+        p2p_products = []
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+        p2p_list_url = ""
+        if self.p2p_list_url_name:
+            p2p_list_url = settings.CALLBACK_HOST+reverse(self.p2p_list_url_name)
+        print p2p_list_url
+        return {
+            'p2p_products': p2p_products[0:1],
+            "p2p_list_url":p2p_list_url
+        }

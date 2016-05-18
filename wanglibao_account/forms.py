@@ -26,6 +26,7 @@ from marketing.models import LoginAccessToken
 from django.conf import settings
 from wanglibao_profile.models import USER_TYPE
 from report.crypto import Aes
+from common.tools import StrQuote
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -511,7 +512,7 @@ class BiSouYiRegisterForm(forms.Form):
         content = self.cleaned_data['content']
         try:
             ase = Aes()
-            decrypt_text = ase.decrypt(settings.BISOUYI_AES_KEY, content)
+            decrypt_text = ase.decrypt(settings.BISOUYI_AES_KEY, content, mode_tag='ECB')
             content_data = json.loads(decrypt_text)
         except Exception, e:
             logger.info("BiSouYiRegisterForm clean_content raise error: %s" % e)
@@ -524,32 +525,35 @@ class BiSouYiRegisterForm(forms.Form):
                 if 'mobile' in content_data:
                     phone = str(content_data['mobile'])
                     if detect_identifier_type(phone) == 'phone':
-                        users = User.objects.filter(wanglibaouserprofile__phone=phone)
-                        if not users.exists() or self.action != 'register':
-                            if 'other' in content_data:
-                                if 'account' in content_data:
-                                    if self.action == 'login':
-                                        if 'token' not in content_data:
-                                            raise forms.ValidationError(
-                                                code=10020,
-                                                message=u'content没有包含token'
-                                            )
-                                    return content, content_data
+                        if self.action != 'select':
+                            users = User.objects.filter(wanglibaouserprofile__phone=phone)
+                            if not users.exists() or self.action != 'register':
+                                if 'other' in content_data:
+                                    if 'account' in content_data:
+                                        if self.action == 'login':
+                                            if 'token' not in content_data:
+                                                raise forms.ValidationError(
+                                                    code=10020,
+                                                    message=u'content没有包含token'
+                                                )
+                                        return content, content_data
+                                    else:
+                                        raise forms.ValidationError(
+                                            code=10019,
+                                            message=u'content没有包含account'
+                                        )
                                 else:
                                     raise forms.ValidationError(
-                                        code=10019,
-                                        message=u'content没有包含account'
+                                        code=10018,
+                                        message=u'content没有包含other'
                                     )
                             else:
                                 raise forms.ValidationError(
-                                    code=10018,
-                                    message=u'content没有包含other'
+                                    code=10017,
+                                    message=u'该手机号已被抢注'
                                 )
                         else:
-                            raise forms.ValidationError(
-                                code=10017,
-                                message=u'该手机号已被抢注'
-                            )
+                            return content, content_data
                     else:
                         raise forms.ValidationError(
                             code=10014,
@@ -571,7 +575,7 @@ class BiSouYiRegisterForm(forms.Form):
         return phone
 
     def get_other(self):
-        other = self.cleaned_data['content'][1]['other']
+        other = self.cleaned_data['content'][1]['other'] or settings.SITE_URL
         return other
 
     def get_account(self):
@@ -583,9 +587,14 @@ class BiSouYiRegisterForm(forms.Form):
         return token
 
     def check_sign(self):
+        quote = StrQuote()
         client_id = self.cleaned_data['client_id']
         sign = self.cleaned_data['sign']
         content = self.cleaned_data['content'][0]
+
+        if self.action != 'select':
+            content = quote.quote_plus(content)
+
         local_sign = hashlib.md5(str(client_id) + settings.BISOUYI_CLIENT_SECRET + content).hexdigest()
         if sign != local_sign:
             return False

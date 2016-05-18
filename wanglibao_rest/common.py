@@ -19,14 +19,15 @@ class DecryptParmsAPIView(APIView):
             # logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
             method = request.method.lower()
             self.params = {}
-            request_params = {}
-            if method == "get":
-                request_params = request.GET
-            if method == "post":
-                request_params = request.DATA
+            self.request_params = getattr(self, "request_params", {})
+            if not self.request_params:
+                if method == "get":
+                    self.request_params = request.GET
+                if method == "post":
+                    self.request_params = request.DATA
 
             token_key = ""
-            for k, v in request_params.iteritems():
+            for k, v in self.request_params.iteritems():
                 if k == 'param':
                     self.params[k] = {}
                     if type(v) is unicode:
@@ -49,4 +50,13 @@ class DecryptParmsAPIView(APIView):
                     self.params[key] = getDecryptedContent(token_key, content, int(length))
         except Exception, e:
             logger.debug("===decrypt in wanglibao_rest.common====error:%s"%e.message)
+
+class PHPDecryptParmsAPIView(DecryptParmsAPIView):
+    def initial(self, request, *args, **kwargs):
+        """
+        Runs anything that needs to occur prior to calling the method handler.
+        """
+        self.request_params={}
+        super(PHPDecryptParmsAPIView, self).initial(request, args, kwargs)
+
 

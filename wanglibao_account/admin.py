@@ -258,7 +258,8 @@ class BindingAdmin(admin.ModelAdmin):
                                   order_prefix)
 
     def save_model(self, request, obj, form, change):
-        if obj.detect_callback is True and obj.btype == 'xunlei9':
+        # 如果渠道为迅雷用户则执行用户回调补发
+        if obj.detect_callback is True and obj.btype in ('xunlei9', 'mxunlei'):
             obj.detect_callback = False
             order_list = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
             if order_list.exists():
@@ -345,12 +346,19 @@ class UserAddressAdmin(admin.ModelAdmin):
 
 class UserThreeOrderAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ("user", "order_on", "request_no", "result_code", "created_at")
+    list_display = ("user", "order_on", "request_no", "result_code", 'msg', "answer_at", "created_at")
     search_fields = ('user__wanglibaouserprofile__phone', "request_no")
     raw_id_fields = ('user', )
 
+    def has_add_permission(self, request):
+        return False
+
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
 
 class UserSourceAdmin(admin.ModelAdmin):
     list_display = ['keyword', 'website', 'created_at']
@@ -363,7 +371,7 @@ class UserSourceAdmin(admin.ModelAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        return  False
+        return False
 
 admin.site.register(UserSource, UserSourceAdmin)
 

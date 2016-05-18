@@ -250,6 +250,11 @@ webpackJsonp([1],[
 	                    return;
 	                }
 	                if (result.error_number > 0) {
+	                    if (result.error_number == 2) {
+	                        return (0, _ui.Alert)(result.message, function () {
+	                            window.location.href = "/weixin/regist/first/";
+	                        });
+	                    }
 	                    return (0, _ui.Alert)(result.message);
 	                }
 	            },
@@ -367,7 +372,7 @@ webpackJsonp([1],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback();
+	        callback && callback();
 	    });
 	};
 
@@ -646,7 +651,7 @@ webpackJsonp([1],[
 	    phone: function phone(str) {
 	        var phone = parseInt($.trim(str)),
 	            error = '请输入正确的手机号',
-	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0123456789])[0-9]{8}$/);
 
 	        if (re.test(phone)) {
 	            return [true, ''];
@@ -654,9 +659,8 @@ webpackJsonp([1],[
 	        return [false, error];
 	    },
 	    password: function password(str) {
-	        var error = '密码为6-20位数字/字母/符号/区分大小写',
-	            re = new RegExp(/^\d{6,20}$/);
-	        if (6 < $.trim(str).length && $.trim(str).length < 20) {
+	        var error = '密码为6-20位数字/字母/符号/区分大小写';
+	        if (6 <= $.trim(str).length && $.trim(str).length <= 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];
@@ -783,7 +787,7 @@ webpackJsonp([1],[
 	        key: 'createInput',
 	        value: function createInput() {
 	            var HASH = this.hash();
-	            var input_body = '<input type=\'tel\' name=' + HASH + ' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
+	            var input_body = '<input type=\'tel\' name=' + HASH + ' style=\'opacity:0;\' id=' + HASH + ' oncontextmenu=\'return false\' value=\'\' onpaste=\'return false\' oncopy=\'return false\' oncut=\'return false\' autocomplete=\'off\'  maxlength=\'6\' minlength=\'6\' />';
 	            this.$layout.append(input_body);
 	            this.$input = $('#' + HASH);
 	        }

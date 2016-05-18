@@ -5,8 +5,13 @@ html(style="background: #f6f6f6")
     title 网利宝
     include include/app_head
   body
+    input(type='hidden', name='token', value='{{token}}')
     .maimai-banner
-      img(src='/static/imgs/mobile_activity/app_maimai/banner.png')
+      if channel and channel.image
+        img(src='/media/{{channel.image}}')
+      else
+        img(src='/static/imgs/mobile_activity/app_maimai/man.jpg')
+
       a(href='/activity/maimai_rules/').maimai-rule 活动规则
     .maimai-form
       input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
@@ -34,9 +39,12 @@ html(style="background: #f6f6f6")
             p=bodyTxt2
 
 
-        +li('trust', '信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资')
-        +li('safe', '安全', '第三方资金托管', '阳光保险承保资金安全')
-        +li('authority', '权威', '华尔街精英金融团队', 'IT数据风控系统')
-        +li('profit', '高收益', '30余倍银行活期收益', '100元起投')
-
-    script(data-init='mmIndex', src="/static/scripts/mobile_activity/dist/maimai.js?v=201511061")
+        +li('trust', '信赖', '0逾期', '百万用户的共同选择')
+        +li('authority', '实力', 'IDG资本A轮投资', '鸿利光电B轮投资')
+        +li('safe', '风控', '抵押、质押或保证担保', '金盾计划收购逾期违约债权')
+        +li('profit', '好收益', '100元起投', '预期年化6-13%')
+    include include/confirm
+    script(data-init='mmIndex', src="/static/scripts/mobile_activity/dist/maimai.js?v=20160513")
+    script.
+      var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+      document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F8b9c036b173399804571158d081d6480' type='text/javascript'%3E%3C/script%3E"));

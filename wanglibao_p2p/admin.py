@@ -16,9 +16,10 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminP2PList, AdminPrepayment
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_p2p.forms import RequiredInlineFormSet,ContractTemplateForm
+from wanglibao_p2p.forms import RequiredInlineFormSet, ContractTemplateForm
 from wanglibao_account.models import UserAddress
 from wanglibao_p2p.tasks import automatic_trade, coop_product_push
+
 
 formsets.DEFAULT_MAX_NUM = 2000
 
@@ -330,7 +331,14 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         return ['amortization_count', 'soldout_time', 'make_loans_time']
 
     def save_model(self, request, obj, form, change):
-        # if obj.status == u'正在招标':
+        if obj.status == u'正在招标':
+            try:
+                coop_product_push.apply_async(
+                    countdown=5,
+                    kwargs={'product_id': obj.id}
+                )
+            except:
+                pass
         #     # todo remove the try except
         #     try:
         #         # 财经道购买回调
@@ -339,10 +347,6 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
         #     except:
         #         pass
         super(P2PProductAdmin, self).save_model(request, obj, form, change)
-
-        if obj.status == u'正在招标':
-            products = P2PProduct.objects.filter(pk=obj.id)
-            coop_product_push(products)
 
         """
         # 停止这个入口，从watch进入自动投标
@@ -705,7 +709,7 @@ class WarrantCompanyAdmin(admin.ModelAdmin):
 
 class ProductTypeAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('name', 'description', 'priority')
+    list_display = ('name', 'description', 'priority', 'fiance_type')
 
     def has_delete_permission(self, request, obj=None):
         return False

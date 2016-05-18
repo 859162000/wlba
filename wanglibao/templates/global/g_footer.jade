@@ -7,12 +7,12 @@
         .about
           .about-list
             .about-tit 公司信息
-            a(href="/about/") 关于我们
+            //a(href="/about/") 关于我们
             a(href="/news/list/") 媒体报道
             a(href="/dynamic/") 网利动态
             a(href="/announcement/") 网站公告
             a(href="/hiring/") 加入我们
-          .about-list
+          //.about-list
             .about-tit 商务合作
             a(href="http://lianmeng.wanglibao.com/") 网利联盟
             a(href="/finance/") 贷款专区
@@ -33,11 +33,7 @@
               i.icon.iconfont.icon-weibos.green
               | 关注微博
             a(href="http://weibo.com/u/5000682691").follow-img.ft-weibo
-        //.follow.follow-weibo
-          .follow-list
-            .follow-title
-              i.icon.iconfont.icon-weibos
-              a(href="http://weibo.com/u/5000682691").ft-weibo 网利宝官方微博
+
       .span4.ft-mod.line-mod3
         .footer-ex-warp
           .footer-ex
@@ -52,19 +48,15 @@
 
     .footer-authentication
       .atn-list
-        a(href='https://www.instantssl.com/wildcard-ssl.html', class='atn-ssl', target='_blank')
+        a(href='https://www.geotrust.com/', class='atn-ssl', target='_blank')
         a(href='http://www.itrust.org.cn/Home/Index/itrust_certifi?wm=1091876832', class='atn-internet', target='_blank')
         a(href='https://credit.szfw.org/CX20150611010303010832.html', class='atn-trust', target='_blank')
-        a(key ="564e795befbfb0089e77490e",logo_size="124x47", logo_type="business", href="http://www.anquan.org", id='safes')
-          span#kx-mask-safes
-          script( src="https://static.anquan.org/static/outer/js/aq_auth.js")
+        a(href='http://www.anquan.org/authenticate/cert/?site=www.wanglibao.com&at=business', class='atn-anquan', target='_blank')
         style.
-          .kx-verify-warp{position: relative;display: inline-block;margin-left: -3px;}
-          #kx_verify img{height: 50px;}
-          #kx-mask, #kx-mask-safes{position: absolute; top: 0; left: 0; display:inline-block; width:128px; height:50px;background: #000;opacity: 0.3;filter: alpha(opacity=70); cursor: pointer;z-index: 22;}
-          #safes {position: relative}
-          #kx-mask-safes{width: 140px}
-          #safes img{width: 100%;display: block;height:100%;}
+          .kx-verify-warp{position: relative;display: inline-block;margin-left: -3px;width:128px; height:50px;}
+          #kx_verify img{height: 100%; width: 100%; display:block;}
+          #kx-mask {position: absolute; top: 0; left: 0; display:inline-block; width:140px; height:100%;background: #000;opacity: 0.3;filter: alpha(opacity=70); cursor: pointer;z-index: 22;}
+          #kx_verify_link{position: relative}
         span.kx-verify-warp
           span#kx-mask
           span#kx_verify

@@ -315,7 +315,7 @@
       <div class="man"></div>
       <div class="lost_text"></div>
       <div class="paper"></div>
-      <a class="back_home" href='https://www.wanglibao.com/'></a>
+      <a class="back_home" href='/'></a>
       <div class="circular_2"></div>
       <div class="circular_3"></div>
     </div>
@@ -329,18 +329,19 @@
     <div class="money"></div>
 	</div>
 
-    <script type="application/javascript">
-        var t = 5;
-        function countDown(){
-            var timeSpan = document.getElementById("span_timer");
-            t-- ;
-            timeSpan.innerHTML = t;
-            if(t <= 0){
-                location.href = "/";
-                clearInterval(inter);
-            }
-        };
-        //var inter = setInterval(countDown,1000);
+    <script>
+		window.onload=function() {
+			var t = 3;
+
+			function countDown() {
+				t--;
+				if (t <= 0) {
+					location.href = "/";
+					clearInterval(inter);
+				}
+			};
+			var inter = setInterval(countDown, 1000);
+		}
     </script>
 </body>
 </html>

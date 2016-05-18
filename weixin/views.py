@@ -12,7 +12,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Q
-from rest_framework.permissions import IsAuthenticated
 import functools
 import re
 import random
@@ -60,6 +59,7 @@ from misc.models import Misc
 from wechatpy.parser import parse_message
 from wechatpy.messages import BaseMessage, TextMessage
 import datetime, time
+import base64
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
@@ -67,10 +67,15 @@ from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from wanglibao_profile.models import WanglibaoUserProfile
 from weixin.tasks import detect_product_biding, sentTemplate
-from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record, process_user_daily_action
-from weixin.util import FWH_UNBIND_URL, filter_emoji
+from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_scene_record, process_user_daily_action, getMiscValue
+from weixin.util import FWH_UNBIND_URL, filter_emoji, get_weixin_code_url
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_redis.backend import redis_backend
+from misc.views import MiscRecommendProduction
+from marketing.utils import pc_data_generator
+from wanglibao_account.forms import BiSouYiRegisterForm
+# from wanglibao_invite.models import WechatInviteRelation
+
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
@@ -145,7 +150,7 @@ class WeixinJoinView(View):
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
-        logger.debug("entering post=============================/weixin/join/%s"%fromUserName)
+        logger.debug("fromUserName:%s; MsgType:%s; Event:%s; EventKey:%s"%(fromUserName, msg._data.get('MsgType', "=="), msg._data.get('Event', "=="), msg._data.get('EventKey', "==")))
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
         w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
         user = w_user.user
@@ -285,7 +290,7 @@ class WeixinJoinView(View):
                 for sub_service in sub_services:
                     txt += ("【" + sub_service.key + "】" + sub_service.describe + '\n')
 
-                sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
+                sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True, service__is_open=True)
                 if sub_records.exists():
                     txt += u'已经订阅的项目：\n'
                     sub_records = sub_records.order_by('service').all()
@@ -454,11 +459,12 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt = bindUser(w_user, user)
-                    channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
-                    if channel:
-                        scene_id = channel.code
-                    reply = create_reply(txt, self.msg)
+                    scene_id, reply = self.process_digital_code(w_user, user, channel_digital_code)
+                    # rs, txt = bindUser(w_user, user)
+                    # channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
+                    # if channel:
+                    #     scene_id = channel.code
+                    # reply = create_reply(txt, self.msg)
         if not old_subscribe and w_user.subscribe:
             w_user.scene_id = scene_id
             w_user.save()
@@ -473,6 +479,32 @@ class WeixinJoinView(View):
                 txt = u"您的微信当前绑定的网利宝帐号为：%s"%user.wanglibaouserprofile.phone
             reply = create_reply(txt, self.msg)
         return reply
+
+    def process_digital_code(self, w_user, user, channel_digital_code):
+        share_invite_fwh_config = getMiscValue("share_invite_fwh_config")
+        #share_invite_fwh_config = {"share_invite_digital_codes":[000], "articles":{"000":[{"image":"","url":"p={fp}","title":"","description":""}]}}
+        channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
+        share_invite_digital_codes = share_invite_fwh_config["share_invite_digital_codes"]
+        scene_id = channel_digital_code
+        if channel:
+            scene_id = channel.code
+        if channel_digital_code in share_invite_digital_codes:
+            inviter = user
+            from wanglibao_profile.models import WanglibaoUserProfile
+            profile = WanglibaoUserProfile.objects.filter(user=inviter).first()
+            # WechatInviteRelation.objects.get_or_create(inviter=inviter, w_user_invited=w_user)
+            articles = share_invite_fwh_config["articles"][channel_digital_code]
+            for article in articles:
+                article['url'] = settings.CALLBACK_HOST + article['url'].format(fp=base64.b64encode(profile.phone+"="))
+                article['url'] = get_weixin_code_url(article['url'])
+            reply = create_reply(articles, self.msg)
+        else:
+            rs, txt = bindUser(w_user, user)
+            reply = create_reply(txt, self.msg)
+
+        return scene_id, reply
+
+
 
     def getSubscribeArticle(self):
         big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
@@ -588,9 +620,18 @@ class WeixinCoopLogin(TemplateView):
                 pass
         next = self.request.GET.get('next', '')
         next = urllib.unquote(next.encode('utf-8'))
+
+        phone = ''
+        if token == 'bisouyi':
+            form = BiSouYiRegisterForm(self.request.session, action='old_login')
+            if form.is_valid():
+                phone = form.get_phone()
+                next = form.get_other()
+
         return {
             'context': context,
-            'next': next
+            'next': next,
+            'phone': phone,
             }
 
 
@@ -619,6 +660,41 @@ class WeixinRegister(TemplateView):
             'phone': phone,
             'next' : next
         }
+
+class ChannelRegister(TemplateView):
+    template_name = 'channel_register.jade'
+
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = 'weixin'
+
+        if token:
+            channel = get_channel_record(token)
+        else:
+            channel = None
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        next = self.request.GET.get('next', '')
+        return {
+            'token': token,
+            'channel': channel,
+            'next': next,
+            'site_data': site_data
+        }
+
 
 
 class WeixinCoopRegister(TemplateView):
@@ -967,7 +1043,9 @@ class P2PListView(TemplateView):
         except Exception:
             p2p_products = paginator.page(paginator.num_pages)
 
-        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
+        now = timezone.now()
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True)\
+            .filter(Q(is_long_used=True) | Q(start_at__lt=now, end_at__gt=now)).order_by('-priority')[:3]
 
         return {
             'results': p2p_products[:10],
@@ -1450,7 +1528,6 @@ class AuthorizeCode(APIView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
         else:
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
-        logger.debug("---------------------------AuthorizeCode::oauth.authorize_url==%s"%oauth.authorize_url)
         return redirect(oauth.authorize_url)
 
 
@@ -1460,7 +1537,6 @@ class AuthorizeUser(APIView):
         account_id = self.request.GET.get('state', "0")
         try:
             account = None
-            logger.debug("AuthorizeUser---------------------------%s, path:::%s"%(account_id, request.get_full_path()))
             weixin_account = WeixinAccounts.getByOriginalId(account_id)
             if weixin_account:
                 account = weixin_account.db_account
@@ -1511,7 +1587,6 @@ class AuthorizeUser(APIView):
                 if save_user:
                     w_user.save()
             except IntegrityError, e:
-                logger.debug("=========================并发了====")
                 logger.debug(traceback.format_exc())
 
             appendkeys = []
@@ -1646,6 +1721,35 @@ class GenerateQRSceneTicket(APIView):
         logger.debug("code does not exist")
         return Response({'errcode':-2, 'errmsg':"code does not exist", "qrcode_url":weixin_account.qrcode_url})
 
+class GenerateInviteQRSceneTicket(APIView):
+    permission_classes = ()
+    def get(self, request):
+        original_id = request.GET.get('original_id')
+        inviter_phone = request.GET.get('fp', "")
+        channel_code = request.GET.get('code')
+        if not original_id  or not channel_code:
+            return Response({'errcode':-1, 'errmsg':"-1"})
+        weixin_account = WeixinAccounts.getByOriginalId(original_id)
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
+        if inviter_phone:
+            inviter_phone = base64.b64decode(inviter_phone + '=')[0:-1]#base64.b64encode(inviter_phone+"=")[0:-1]
+            inviter_profile = WanglibaoUserProfile.objects.filter(phone=inviter_phone).first()
+
+            channel = WeiXinChannel.objects.filter(code=channel_code).first()
+            if channel:
+                scene_id = str(inviter_profile.user.id) + str(channel.digital_code)
+                scene_id = int(scene_id)
+                # print int(request.user.id)
+                qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
+                # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
+                try:
+                    rs = client.qrcode.create(qrcode_data)
+                    qrcode_url = client.qrcode.get_url(rs.get('ticket'))
+                except WeChatException,e:
+                    logger.debug("'errcode':%s, 'errmsg':%s"%(e.errcode, e.errmsg))
+                    return Response({'errcode':e.errcode, 'errmsg':e.errmsg, "qrcode_url":weixin_account.qrcode_url})
+                return Response({'qrcode_url':qrcode_url})
+        return Response({'errcode':-1, 'errmsg':"inviter_phone is null or channel not exist", "qrcode_url":weixin_account.qrcode_url})
 
 
 class GenerateQRLimitSceneTicket(APIView):

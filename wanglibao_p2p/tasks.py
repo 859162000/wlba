@@ -24,12 +24,15 @@ from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
 from wanglibao_account.utils import generate_coop_base_data
-from wanglibao_account.tasks import common_callback_for_post
+from wanglibao_account.tasks import coop_call_back
 from marketing.utils import get_user_channel_record
 from django.conf import settings
-from wanglibao_p2p.utility import get_user_margin, get_p2p_equity
+from wanglibao_p2p.utility import get_user_margin, get_p2p_equity, GlobalVar
+from wanglibao_redis.backend import redis_backend
+
 
 logger = get_task_logger(__name__)
+
 
 @app.task
 def p2p_watchdog():
@@ -37,9 +40,32 @@ def p2p_watchdog():
 
 
 @app.task
+def p2p_prepayment(product_id, penal_interest, repayment_type, flag_date):
+    """
+    提前还款任务
+    :param product_id, 产品id
+    :param penal_interest, 罚息
+    :param repayment_type, 类型 daily, monthly
+    :param flag_date, 还款日期
+    """
+    from prepayment import PrepaymentHistory
+    from dateutil import parser
+
+    flag_date = parser.parse(flag_date)
+
+    p2p = P2PProduct.objects.filter(pk=product_id).first()
+    if p2p:
+        payment = PrepaymentHistory(p2p, flag_date)
+        payment.prepayment(penal_interest, repayment_type, flag_date)
+    else:
+        return
+
+
+@app.task
 def delete_old_product_amortization(pa_list):
     time.sleep(10)
     ProductAmortization.objects.filter(id__in=pa_list).delete()
+
 
 @app.task
 def process_paid_product(product_id):
@@ -50,6 +76,7 @@ def process_paid_product(product_id):
     except:
         print('p2p process_for_settle error: ' + str(p2p))
         logger.error('p2p process_for_settle error: ' + str(p2p))
+
 
 @app.task
 def full_send_message(product_name):
@@ -73,6 +100,7 @@ def full_send_message(product_name):
         "content":msg,
         "mtype":"fullbid"
     })
+
 
 @app.task
 def build_earning(product_id):
@@ -182,6 +210,7 @@ def p2p_auto_published_by_publish_time(pay_method, period):
         products.publish_time = timezone.now()
         products.save()
 
+
 @app.task
 def p2p_auto_ready_for_settle():
     """
@@ -217,15 +246,17 @@ def p2p_auto_ready_for_settle():
 
 
 @app.task
-def coop_product_push(products=None):
+def coop_product_push(product_id=None):
     product_query_status = [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核',
                             u'满标已审核', u'还款中', u'流标']
-    if not products:
+    if not product_id:
         products = P2PProduct.objects.filter(~Q(types__name=u'还款等额兑奖') &
                                              (Q(status__in=product_query_status) |
                                               (Q(status=u'已完成') &
                                                Q(make_loans_time__isnull=False) &
                                                Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+    else:
+        products = P2PProduct.objects.filter(pk=product_id)
 
     products = products.values('id', 'version', 'category', 'types__name', 'name',
                                'short_name', 'serial_number', 'status', 'period',
@@ -236,7 +267,27 @@ def coop_product_push(products=None):
                                'limit_per_user', 'warrant_company__name')
 
     product_list = [product for product in products]
+    # redis = redis_backend()
+    push_product_list = list()
     for product in product_list:
+        # 对比redis缓存标的状态
+        # if redis.redis and redis.redis.ping():
+        #     redis_product_status_key = '_product_%s_status' % product['id']
+        #     redis_product_status = redis._get(redis_product_status_key)
+        #     if redis_product_status:
+        #         redis_product_status = json.loads(redis_product_status)
+        #         status = redis_product_status.get('status', None)
+        #         ordered_amount = redis_product_status.get('ordered_amount', None)
+        #         if product['status'] == status and product['ordered_amount'] == ordered_amount:
+        #             continue
+        #     else:
+        #         redis_product_status = {
+        #             'status': product['status'],
+        #             'ordered_amount': product['ordered_amount'],
+        #         }
+        #         redis_product_status = json.dumps(redis_product_status)
+        #         redis._set(redis_product_status_key, redis_product_status)
+
         product['types'] = product['types__name']
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -250,34 +301,48 @@ def coop_product_push(products=None):
         else:
             product.pop('make_loans_time', None)
 
-    if product_list:
+        push_product_list.append(product)
+
+    if push_product_list:
         base_data = generate_coop_base_data('products_push')
         act_data = {
-            'products': json.dumps(product_list)
+            'products': json.dumps(push_product_list)
         }
         data = dict(base_data, **act_data)
-        common_callback_for_post.apply_async(
-            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_products_push'})
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
 
 
 @app.task
-def coop_amortizations_push(amortizations, product_id):
+def coop_amortizations_push(amortizations, product_id, amo_act):
+    logger.info("Enter coop_amortizations_push for product id[%s]" % product_id)
     amortization_list = list()
     amo_terms = ProductAmortization.objects.filter(product_id=product_id).count()
     for amo in amortizations:
-        channel = get_user_channel_record(amo["user_id"])
-        if channel:
+        user_id = amo["user"]
+        channel = get_user_channel_record(user_id)
+        if channel and channel.code in ['bisouyi', 'bajinshe', 'renrenli']:
             amo['terms'] = amo_terms
-            amo['margin'] = json.dumps(get_user_margin(amo["user_id"]))
-            amo['equity'] = json.dumps(get_p2p_equity(amo["user_id"], product_id))
+            if (amo_act == 'plan' and amo['term'] == 1) or amo_act == 'amortize':
+                amo['margin'] = json.dumps(get_user_margin(user_id))
+                amo['equity'] = json.dumps(get_p2p_equity(user_id, product_id))
+
             amortization_list.append(amo)
 
     if amortization_list:
         base_data = generate_coop_base_data('amortizations_push')
         act_data = {
             'product_id': product_id,
-            'amortizations': json.dumps(amortization_list)
+            'amortizations': json.dumps(amortization_list),
+            'amo_act': amo_act,
         }
         data = dict(base_data, **act_data)
-        common_callback_for_post.apply_async(
-            kwargs={'url': settings.CHANNEL_CENTER_CALL_BACK_URL, 'params': data, 'channel': 'coop_amos_push'})
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
+
+# 只在程序初始化时执行
+# if GlobalVar.get_push_status() is False:
+#     coop_product_push.apply_async()
+#     GlobalVar.set_push_status(True)

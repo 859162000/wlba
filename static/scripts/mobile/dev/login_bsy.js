@@ -81,11 +81,14 @@ webpackJsonp([6],[
 	    $submit.on('click', function () {
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
-	            return login('/weixin/api/login/');
+	            return login('/api/bisouyi/login/?promo_token=bisouyi');
 	        }).then(function (result) {
 	            console.log('login success');
-	            var next_url = (0, _api.getQueryStringByName)('next');
-	            window.location.href = next_url ? decodeURIComponent(decodeURIComponent(next_url)) : '/weixin/account/';
+	            //const next_url = getQueryStringByName('next');
+	            //window.location.href = next_url ? decodeURIComponent(decodeURIComponent(next_url)) : '/weixin/account/';
+	            var next_url1 = (0, _api.getQueryStringByName)('next'),
+	                next_url2 = $(".js-next-url").val();
+	            window.location.href = next_url2 ? decodeURIComponent(decodeURIComponent(next_url2)) : next_url1 ? decodeURIComponent(decodeURIComponent(next_url1)) : '/weixin/account/';
 	        }).catch(function (res) {
 	            if (res['status'] == 403) {
 	                (0, _ui.signModel)('请勿重复提交');
@@ -125,7 +128,7 @@ webpackJsonp([6],[
 
 	    $button.on('click', function () {
 	        $alert.hide();
-	        callback();
+	        callback && callback();
 	    });
 	};
 
@@ -377,7 +380,7 @@ webpackJsonp([6],[
 	    phone: function phone(str) {
 	        var phone = parseInt($.trim(str)),
 	            error = '请输入正确的手机号',
-	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+	            re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0123456789])[0-9]{8}$/);
 
 	        if (re.test(phone)) {
 	            return [true, ''];
@@ -385,9 +388,8 @@ webpackJsonp([6],[
 	        return [false, error];
 	    },
 	    password: function password(str) {
-	        var error = '密码为6-20位数字/字母/符号/区分大小写',
-	            re = new RegExp(/^\d{6,20}$/);
-	        if (6 < $.trim(str).length && $.trim(str).length < 20) {
+	        var error = '密码为6-20位数字/字母/符号/区分大小写';
+	        if (6 <= $.trim(str).length && $.trim(str).length <= 20) {
 	            return [true, ''];
 	        }
 	        return [false, error];

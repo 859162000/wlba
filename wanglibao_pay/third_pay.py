@@ -215,7 +215,7 @@ def withdraw(request):
             return {"ret_code": 20073, "message": u'银行卡号有多张重复,请联系客服'}
 
         # 检测银行卡在以前的提现记录中是否为同一个用户
-        payinfo_record = PayInfo.objects.filter(card_no=card.no).order_by('-create_time').first()
+        payinfo_record = PayInfo.objects.filter(card_no=card.no, type='W').order_by('-create_time').first()
         if payinfo_record:
             if payinfo_record.user != user:
                 return {"ret_code": 20074, "message": u'银行卡号与身份信息不符,请联系客服'}
@@ -283,6 +283,13 @@ def withdraw(request):
         pay_info.save()
         return {"ret_code": 20065, 'message': u'余额不足'}
 
+def _need_validation_for_qpay(card):
+    need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
+    if need_sms and need_sms.value == '1' and card.bank.channel == 'kuaipay':
+        need_validation_for_qpay = True
+    else:
+        need_validation_for_qpay = False
+    return need_validation_for_qpay
 
 def card_bind_list(request):
     # 查询已经绑定支付渠道的银行卡列表
@@ -306,12 +313,7 @@ def card_bind_list(request):
             min_amount = fee_config.get('min_amount')
             max_amount = fee_config.get('max_amount')
 
-            need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
             for card in cards:
-                if need_sms and need_sms.value == '1' and card.is_bind_kuai:
-                    need_validation_for_qpay = True
-                else:
-                    need_validation_for_qpay = False
                 base_dict = {
                     "card_id": card.id,
                     'bank_id': card.bank.code,
@@ -319,7 +321,7 @@ def card_bind_list(request):
                     'gate_id': card.bank.gate_id,
                     'storable_no': card.no[:6] + card.no[-4:],
                     'is_the_one_card': card.is_the_one_card,
-                    'need_validation_for_qpay': need_validation_for_qpay
+                    'need_validation_for_qpay': _need_validation_for_qpay(card)
                 }
 
                 if user.wanglibaouserprofile.phone == '15011488086':
@@ -505,10 +507,12 @@ def bind_pay_deposit(request):
         stop_no_sms_channel = Misc.objects.filter(
                 key='kuai_qpay_stop_no_sms_channel').first()  
         if stop_no_sms_channel and stop_no_sms_channel.value == '1' and \
-                len(card_no) == 10 and not request.post.get('mode'): 
+                len(card_no) == 10 and not request.DATA.get('mode'): 
                     # mode != vcode_for_qpay
-            return {'ret_code': 20022,
-                    'message': u'部分银行支付安全升级，需更新到最新版本才能使用，快去更新吧'}
+            # Modify by hb on 2016-04-28
+            #return {'ret_code': 201183,
+            return {'ret_code': 201181,
+                    'message': u'该银行支付升级，请更新App版本'}
         result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, 
                                         device_type, ip, request, mode=mode)
 
@@ -609,6 +613,21 @@ def process_for_bind_card(user, card, req_res, request):
 def yee_callback(request):
     return YeeShortPay().pay_callback(request)
 
+def query_trx(order_id):
+    pay_info = PayInfo.objects.get(order_id=order_id)
+    trx_result = None
+    try:
+        if pay_info.channel == 'yeepay_bind':
+            trx_result = YeeShortPay().query_trx_result(order_id)
+        elif pay_info.channel == 'kuaipay':
+            trx_result = KuaiShortPay().query_trx_result(order_id)
+    except:
+        logger.exception('query_trx %s failed:'%order_id)
+    pay_info.is_checked = True
+    if trx_result:
+        pay_info.check_response = trx_result['raw_response']
+    pay_info.save()
+    return trx_result
 
 
 #######################################同卡进出 start###############################
@@ -673,6 +692,8 @@ class TheOneCardAPIView(APIView):
     def get(self, request):
         card = TheOneCard(request.user).get()
         serializer = CardSerializer(card)
+        serializer.data.update(
+            {'need_validation_for_qpay': _need_validation_for_qpay(card)})
         return Response(serializer.data)
 
     def put(self, request):
@@ -701,21 +722,3 @@ class TheOneCardAPIView(APIView):
         return Response({'status_code': 0})
 
 #######################################同卡进出 end###############################
-
-def query_trx(order_id):
-    pay_info = PayInfo.objects.get(order_id=order_id)
-    if pay_info.channel == 'yeepay_bind':
-        return YeeShortPay().query_trx_result(order_id)
-    elif pay_info.channel == 'kuaipay':
-        return KuaiShortPay().query_trx_result(order_id)
-    else:
-        return None
-
-
-
-
-
-
-
-
-

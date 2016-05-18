@@ -9,7 +9,7 @@ html(style="background: #f5f5f5")
       a(href="javascript:history.go(-1)")
         span 返回
         
-        
+    input(type="hidden", value="{{ next }}").js-next-url
     .wx-login-logos
       .wx-head-red-space
       .wx-head-logo
@@ -19,7 +19,10 @@ html(style="background: #f5f5f5")
       .wx-input-public.wx-login-input-space
         .wx-input-icon
           .phone
-        input(type='tel', name='identifier', placeholder= '请输入手机号', data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off').wx-input-main
+        if phone
+          input(type='tel', name='identifier', placeholder= '请输入手机号', data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off', value="{{ phone }}", disabled="true", style="background:none;").wx-input-main
+        else
+          input(type='tel', name='identifier', placeholder= '请输入手机号', data-icon='wx-input-icon', data-operation='wx-clear-input', autocomplete='off', value="").wx-input-main
         .wx-operation-icon.wx-clear-input
 
       .wx-input-public.wx-login-input-space
@@ -42,7 +45,7 @@ html(style="background: #f5f5f5")
     include include/ui_model/mobile_alert
     include include/tracking
 
-    script(src='/static/src/mobile/lib/Bsy-Oauth.min.1.0.js')
+    //script(src='/static/src/mobile/lib/Bsy-Oauth.min.1.0.js')
     script(src='/static/scripts/mobile/dev/vendor.zepto.js?20160406')
-    script(src='/static/scripts/mobile/dev/login_bsy.js?20160406')
+    script(src='/static/scripts/mobile/dev/login_bsy.js?20160429')
     //script(data-init='login', src="/static/scripts/mobile/dist/mobile.js?v=20151106")

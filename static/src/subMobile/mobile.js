@@ -201,12 +201,11 @@ org.ui = (function () {
                 $('.confirm-certain').text(certainName);
                 $('.confirm-warp').show();
 
-                $('.confirm-cancel').on('click', function (e) {
+                $('.confirm-cancel').off("click").on('click', function (e) {
                     $('.confirm-warp').hide();
                 })
-                $('.confirm-certain').on('click', function (e) {
+                $('.confirm-certain').off("click").on('click', function (e) {
                     $('.confirm-warp').hide();
-
                     if (callback) {
                         callbackData ? callback(callbackData) : callback();
                     }
@@ -277,6 +276,7 @@ org.ui = (function () {
                             }
                         ],$self);
                     }
+
                     var disabledBg = 'rgba(219,73,63,.5)', activeBg = 'rgba(219,73,63,1)';
                     if (options.submitStyle) {
                         disabledBg = options.submitStyle.disabledBg || 'rgba(219,73,63,.5)';
@@ -287,11 +287,11 @@ org.ui = (function () {
             });
 
             //用户名一键清空
-            $('.identifier-edit').on('click', function (e) {
+            $('.identifier-edit').off("click").on('click', function (e) {
                 $(this).siblings().val('').trigger('input');
             });
             //密码隐藏显示
-            $('.password-handle').on('click', function () {
+            $('.password-handle').off("click").on('click', function () {
                 if ($(this).hasClass('hide-password')) {
                     $(this).addClass('show-password').removeClass('hide-password');
                     $(this).siblings().attr('type', 'text');
@@ -310,7 +310,10 @@ org.ui = (function () {
                     }else{
                         targetDom = $('.'+ops[i].target);
                     }
-                    targetDom.addClass(ops[i].addName).removeClass(ops[i].reMove);
+                    if(ops[i].reMove){
+                       targetDom.addClass(ops[i].addName).removeClass(ops[i].reMove);
+                    }
+
                 });
             }
             var returnCheckArr = function () {
@@ -595,7 +598,8 @@ org.regist = (function (org) {
                         'validate_code': $validation.val(),
                         'invite_code': token,
                         'tid': tid,
-                        'invite_phone': invite_phone
+                        'invite_phone': invite_phone,
+                        'register_channel': 'fwh'
                     },
                     beforeSend: function () {
                         $submit.text('注册中,请稍等...');
@@ -734,6 +738,9 @@ org.detail = (function (org) {
          */
         _share: function(obj,hide){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideMenuItems'];
+            var host = window.location.search,
+                wxDebug = host.split('debug=')[1];
+            wxDebug = wxDebug ? wxDebug : false;
             org.ajax({
                 type : 'GET',
                 url : lib.weiURL,
@@ -741,7 +748,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: false,
+                        debug: wxDebug,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -1228,7 +1235,6 @@ org.recharge = (function (org) {
     var lib = {
         $recharge: $('button[name=submit]'),
         $amount: $("input[name='amount']"),
-        $vcode: $('input[name=vcode]'),
         $card_no: $("input[name='card_no']"),
         $recharge_body: $('.recharge-main'),
         $load: $(".recharge-loding"),
@@ -1237,9 +1243,120 @@ org.recharge = (function (org) {
         $card_warp: $('.card-warp'),
         $bank_name: $(".bank-txt-name"),
         data: null,
+        isValidate: false,
+        order_id: '',
+        token: '',
         init: function () {
             lib.the_one_card();
             lib._close_alt($(".continue-rechare"));
+        },
+        /**
+         * 表单验证
+         * @private
+         */
+        _check_form: function(res){
+            var $amount = $("input[name=amount]"),
+                $validation = $("input[name=validation]"),
+                $submit = $("#recharge"),
+                $phoneBtn = $('.request-check'),
+                isTimes = false;
+
+            var limitMenoy = res.bank.bank_limit.second_one;
+            if(!lib.isValidate){
+                $submit.removeAttr("disabled");
+                return;
+            }
+            $(".js-validate").show();
+            org.ui.focusInput({
+                submit: $submit,
+                inputList: [
+                    {target: $amount, required: true},
+                    {target: $validation, required: true}
+                ]
+            });
+
+            //充值金额
+            $amount.on("input", function(){
+                var self = $(this);
+                if(self.val()*1 > limitMenoy){
+                    org.ui.showSign("该银行单笔限额5万元");
+                    $phoneBtn.attr('disabled',"true").removeClass('regist-alreay-request').addClass("regist-validation-disable");
+                }else if(isTimes){
+                    $phoneBtn.attr('disabled',"true").removeClass('regist-alreay-request').addClass("regist-validation-disable");
+                }else{
+                    $phoneBtn.removeAttr('disabled');
+                }
+            });
+            //手机验证码
+            $phoneBtn.on('click', function () {
+                var $that = $(this), //保存指针
+                    count = 60,  //60秒倒计时
+                    intervalId; //定时器
+                if($that.hasClass("regist-validation-disable")){
+                    return;
+                }
+                //倒计时
+                var timerFunction = function () {
+                    if (count >= 1) {
+                        isTimes = true;
+                        count--;
+                        return $that.text(count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        isTimes = false;
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-validation-disable');
+                        org.ui.showSign("倒计时失效，请重新获取");
+                        //return lib._captcha_refresh();
+                    }
+                };
+
+                var card_no = res.no,
+                    gate_id = res.bank.gate_id,
+                    amount = $amount.val() * 1;
+                amount = amount ? amount : 0;
+                var sort_card = card_no.slice(0, 6) + card_no.slice(-4);
+
+                $that.attr('disabled', 'disabled').addClass('regist-validation-disable');
+                org.ajax({
+                    url: '/api/pay/deposit_new/',
+                    data: {
+                        phone: '',
+                        trade_pwd: '',
+                        card_no: sort_card,
+                        gate_id: gate_id,
+                        amount: amount,
+                        mode: 'vcode_for_qpay'
+                    },
+                    type: 'POST',
+                    beforeSend: function(){
+                        $that.text('发送中……');
+                    },
+                    success: function(data){
+                        if(data.message && data.message!="ok"){
+                            clearInterval(intervalId);
+                            org.ui.showSign(data.message);
+                            $that.text('获取验证码').removeAttr('disabled').removeClass('regist-validation-disable');
+                        }else{
+                            org.ui.showSign('短信已发送，请注意查收！');
+                            lib.order_id = data.order_id;
+                            lib.token = data.token;
+                            timerFunction();
+                            intervalId = setInterval(timerFunction, 1000);
+                        }
+                    },
+                    error: function (xhr) {
+                        clearInterval(intervalId);
+                        isTimes = true;
+                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-validation-disable');
+                        var result = JSON.parse(xhr.responseText);
+                        var str = result ? result.message : "系统异常，请稍后再试";
+                        org.ui.showSign(str);
+                        //lib._captcha_refresh();
+                    }
+                });
+
+            });
+
         },
         /**
          * 判断有没有同卡进出的卡
@@ -1251,7 +1368,9 @@ org.recharge = (function (org) {
                 url: '/api/pay/the_one_card/',
                 success: function (data) {
                     //同卡进出
-                   _self.on_card_operation(data);
+                    _self.on_card_operation(data);
+                    lib.isValidate = data.need_validation_for_qpay;
+                    lib._check_form(data);
                 },
                 error: function (data) {
                     //没有同卡进出
@@ -1297,19 +1416,23 @@ org.recharge = (function (org) {
          */
         _rechargeThe_one_card: function () {
             var _self = this;
-            _self.$recharge.on('click', function () {
+            _self.$recharge.off('click').on('click', function () {
                 var
                     card_no = _self.data.no,
                     gate_id = _self.data.bank.gate_id,
                     amount = _self.$amount.val() * 1;
-
+                var $this = $(this);
                 var sort_card = card_no.slice(0, 6) + card_no.slice(-4);
 
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
                 }
+                if(lib.order_id === "" && lib.token === ""){
+                    return org.ui.showSign('请先获取验证码');
+                }
 
                 var data = {
+                    url: "/api/pay/deposit_new/",
                     data: {
                         phone: '',
                         card_no: sort_card,
@@ -1317,9 +1440,10 @@ org.recharge = (function (org) {
                         gate_id: gate_id
                     },
                     beforeSend: function () {
-                        _self.$recharge.attr('disabled', true).text("充值中..");
+                        $this.attr('disabled', true).text("充值中..");
                     },
                     success: function (entry_operation, result) {
+                        //org.ui.alert("success:"+result.ret_code);
                         entry_operation.hide_loading();
                         entry_operation.clear();
                         entry_operation.hide();
@@ -1340,8 +1464,6 @@ org.recharge = (function (org) {
                         if (result.ret_code > 0) {
                             return org.ui.alert(result.message);
                         }
-
-
                     },
                     error: function (data) {
                         if (data.status >= 403) {
@@ -1349,9 +1471,19 @@ org.recharge = (function (org) {
                         }
                     },
                     complete: function () {
-                        _self.$recharge.removeAttr('disabled').text("充值");
+                        $this.removeAttr('disabled').text("立即充值");
                     }
-
+                };
+                if(lib.isValidate) {
+                    data.url = '/api/pay/cnp/dynnum_new/';
+                    data.data = {
+                        phone: '',
+                        vcode: $("input[name=validation].count-input").val(),
+                        order_id: lib.order_id,
+                        token: lib.token,
+                        amount: amount,
+                        mode: 'qpay_with_sms'
+                    };
                 }
                 org.ui.confirm("充值金额为" + amount, '确认充值', lib._trade_pwd_seach, data);
 
@@ -1470,7 +1602,7 @@ org.recharge = (function (org) {
         _rechargeSingleStep: function (operation, data) {
             org.ajax({
                 type: 'POST',
-                url: '/api/pay/deposit_new/',
+                url: data.url,
                 data: data.data,
                 beforeSend: function () {
                     data.beforeSend && data.beforeSend()
@@ -2131,7 +2263,7 @@ org.trade_back = (function (org) {
             e.stopPropagation();
         });
 
-        this.$input.on('input', function(){
+        this.$input.off('input').on('input', function(){
             $('.circle').hide();
             _self.decide('input')
         });
@@ -2788,6 +2920,397 @@ org.checkIn = (function(org){
     }
 })(org);
 
+//红包雨
+org.redpacket = (function(org){
+    var lib = {
+        init: function(){
+            lib._checkFrom();
+            lib._getCode();
+            lib.shareOk();
+        },
+        _getCode: function(){
+            var is_bind = $("input.is_bind").val(),
+                fphone = $("input.fphone").val(),
+                original_id = $("input.original_id").val(),
+                weixin_channel = $("input.weixin_channel_code").val();
+            var imgDom = $("img.js-share-sign");
+            if(is_bind=="False" && $(".redpacket-index").length < 1){
+                org.ajax({
+                    url: '/weixin/api/generate/qr_invite_scene_ticket/',
+                    type: 'get',
+                    data: {
+                        'original_id': original_id,
+                        'fp': fphone,
+                        'code': weixin_channel
+                    },
+                    dataType: 'json',
+                    success: function(data){
+                        if(data.qrcode_url){
+                            imgDom.attr("src", data.qrcode_url);
+                        }
+                    }
+                });
+            }
+        },
+        _checkFrom: function () {
+            var share_alt = $("section.redpacket-share-alt");
+            //分享　引导
+            $("div.js-share-btn").on("click",function(){
+                share_alt.show();
+            });
+            share_alt.on("click",function(){
+                $(this).hide();
+            });
+
+            //打开红包雨
+            $("div.js-open-redpacket").on("click", function(){
+                var self = $(this);
+                if(self.prop("disabeld")){
+                    return;
+                }
+                org.ajax({
+                    url: '/weixin/fetch_hby_reward/',
+                    type: 'post',
+                    data: '',
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.prop("disabeld",true).text("正在提交……");
+                    },
+                    success: function (data) {
+                        if(data.ret_code != 0){
+                            org.ui.alert(data.msg);
+                            return;
+                        }
+                        window.location.reload();
+                    },
+                    error: function () {
+                        alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.prop("disabeld",false).text("打开红包雨");
+                    }
+
+                });
+            });
+        },
+        shareFn: function(){
+            var html = '<div class="invite-share-ok">' +
+                '<div class="share-mian">' +
+                '<div class="share-img"></div>' +
+                '<div class="share-btn-box"><a href="javascript:void(0);">知道了</a></div>' +
+                '</dvi>' +
+                '</div>';
+            var $body = $('body'),
+                dom = $body.find(".invite-share-ok");
+            dom.length > 0 ? dom.css("display", "-webkit-box") : $body.append(html);
+            $body.on("click", ".share-btn-box a", function(){
+                $(this).parents(".invite-share-ok").hide();
+            });
+        },
+        shareOk: function(){
+            var url = $("input.share_url").val(),
+                price = $(".js-reward-price").text();
+            var num = 10000,
+                host = 'https://staging.wanglibao.com/';
+
+            if(price){
+                num = price.substring(0,price.length-1)*1;
+            }
+            var share = {shareImg: host+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ num +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
+            org.detail.share(share, true);
+            //org.detail.share(share, false);
+        }
+    }
+    return {
+        init: lib.init
+    }
+})(org);
+
+//红包雨 绑定微信
+org.redpacket_bind = (function(org){
+    var lib = {
+        $captcha_img: $("#captcha"),
+        $captcha_key: $("input[name='captcha_0']"),
+        $login_box: $(".js-invite-login"),
+        $regist_box: $(".js-invite-regist"),
+        $bind_box: $(".js-invite-bind"),
+        init: function(){
+            lib._checkFrom();
+            lib._captcha_refresh();
+            //刷新验证码
+            lib.$captcha_img.on('click', function () {
+                lib._captcha_refresh();
+            });
+            var winH = window.innerHeight;
+            $("body.service-redpacket-login").css("min-height",winH);
+        },
+        _captcha_refresh: function () {
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function (res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_key.val(res['key']);
+            });
+        },
+        check_validate: function(){　//检验
+            var check = {
+                identifier: function (val) {
+                    var isRight = false,
+                        re = new RegExp(/^1[0-9]{10}$/);
+                    re.test($.trim(val)) ? isRight = true : (org.ui.showSign('请输入正确的手机号'), isRight = false);
+                    return isRight;
+                },
+                password: function(val){
+                    var str = $.trim(val),
+                        isRight = false;
+                    (str.length < 6 || str.length > 20) ? (org.ui.showSign('密码为6-20位数字/字母/符号/区分大小写'), isRight = false) : isRight = true;
+                    return isRight;
+                },
+                isEmpty: function(val){
+                    var isRight = false;
+                    $.trim(val) === "" ? (org.ui.showSign('请完整填写信息'), isRight = false) : isRight = true;
+                    return isRight;
+                }
+            };
+            return {
+                'identifier': check.identifier,
+                'password': check.password,
+                'isEmpty': check.isEmpty
+            }
+        },
+        _checkFrom: function () {
+            var $phone = lib.$bind_box.find("input.tel-inp"),
+                $submit = lib.$bind_box.find('button.js-bind-btn');
+
+            org.ui.focusInput({
+                submit: $submit,
+                inputList: [
+                    {target: $phone, required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': '#cbcbcb',
+                    'activeBg': '#DB493F'
+                }
+            });
+
+
+            $submit.on("click", function(){
+                var $phoneNamber = $.trim($phone.val()),
+                    self = $(this);
+
+                if(!lib.check_validate()['identifier']($phoneNamber)){
+                    return false;
+                }
+                org.ajax({
+                    url: '/api/user_exists/'+$phoneNamber+'/',
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.attr("disabled",true).text("提交中……").css("background","#cbcbcb");
+                    },
+                    success: function (data) {
+                        lib.$bind_box.hide();
+                        if(data.existing){
+                            lib.redpacket_login($phoneNamber);
+                        }else{
+                            lib.redpacket_regist($phoneNamber);
+                        }
+                    },
+                    error: function (xhr) {
+                        org.ui.alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.removeAttr("disabled").text("下一步").css("background","rgb(219, 73, 63)");
+                    }
+                });
+            });
+        },
+        redpacket_login: function(tel){//登录
+            lib.$login_box.find(".mian-protome").html("输入密码，登录" + tel.substring(0,3) + "****" + tel.substring(8,11) + "账户");
+            lib.$login_box.show();
+            var $pwd = lib.$login_box.find("input.first-pwd"),
+                $submit = $("button.js-login-btn");
+            org.ui.focusInput({
+                submit: $submit,
+                inputList: [
+                    {target: $pwd, required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': '#cbcbcb',
+                    'activeBg': '#DB493F'
+                }
+            });
+            $submit.on("click",function(){
+                var pwdVal = $pwd.val(),
+                    self = $(this);
+                if(!lib.check_validate().password(pwdVal)) return;
+                org.ajax({
+                    url: '/weixin/api/fwh_login/',
+                    type: 'post',
+                    data: {
+                        'identifier': tel,
+                        'password': $.trim(pwdVal)
+                    },
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.attr("disabled",true).text("正在登录……").css("background","#cbcbcb");
+                    },
+                    success: function (data) {
+                        if(data.re_code != 0){
+                            window.location.href = "/weixin/jump_page/?message="+data.errmessage;
+                        }else{
+                            window.location.href = $("input.next-url").val();
+                        }
+                    },
+                    error: function (xhr) {
+                        org.ui.alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.removeAttr("disabled").text("登录并绑定微信").css("background","rgb(219, 73, 63)");
+                    }
+                });
+            });
+        },
+        redpacket_regist: function(tel){//注册
+            lib.$regist_box.find(".mian-protome").html("输入密码，登录" + tel.substring(0,3) + "****" + tel.substring(8,11) + "账户");
+            lib.$regist_box.show();
+            var $agreeBox = lib.$regist_box.find(".regist-protocol-div"),
+                $submit = lib.$regist_box.find("button.js-regist-btn"),
+                $validate = lib.$regist_box.find("input.validate_inp"),
+                $pwd = lib.$regist_box.find("input.first-pwd"),
+                $captcha_0 = lib.$regist_box.find("input[name=captcha_0]"),
+                $captcha_1 = lib.$regist_box.find("input[name=captcha_1]"),
+                $getValidate = lib.$regist_box.find('button.wx-validation-btn');
+            //注册协议
+            lib.$regist_box.find(".agreement").on("click", function(e){
+                console.log(41);
+                e.preventDefault();
+                $agreeBox.show();
+                setTimeout(function(){
+                   $agreeBox.css("top",0);
+                },0);
+            });
+            $agreeBox.find(".cancel-xiyie").on("click", function(e){
+                e.preventDefault();
+                $agreeBox.css("top",'100%');
+                setTimeout(function(){
+                   $agreeBox.css('display', 'none');
+                },200);
+            });
+            //input
+            org.ui.focusInput({
+                submit: $submit,
+                inputList: [
+                    {target: $validate, required: true},
+                    {target: $captcha_1, required: true},
+                    {target: $pwd, required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': '#cbcbcb',
+                    'activeBg': '#DB493F'
+                }
+            });
+            org.ui.focusInput({
+                submit: $getValidate,
+                inputList: [
+                    {target: $captcha_1, required: true}
+                ],
+                submitStyle: {
+                    'disabledBg': 'none',
+                    'activeBg': 'none'
+                }
+            });
+
+            //获取验证码
+            $getValidate.on('click', function () {
+                var $that = $(this), //保存指针
+                    count = 60,  //60秒倒计时
+                    intervalId; //定时器
+
+                if (!lib.check_validate()['identifier'](tel, 'phone')) return; //号码不符合退出
+                $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
+                org.ajax({
+                    url: '/api/phone_validation_code/register/' + tel + '/',
+                    type: 'POST',
+                    data: {
+                        captcha_0: $captcha_0.val(),
+                        captcha_1: $captcha_1.val()
+                    },
+                    error: function (xhr) {
+                        clearInterval(intervalId);
+                        var result = JSON.parse(xhr.responseText);
+                        org.ui.showSign(result.message);
+                        $that.text('点击获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        lib._captcha_refresh();
+                    }
+                });
+                //倒计时
+                var timerFunction = function () {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text(count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        return lib._captcha_refresh();
+                    }
+                };
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            });
+
+            //提交
+            $submit.on("click", function(){
+                var isSubmit = true,
+                    self = $(this);
+                $.each([$validate, $pwd], function(i, t){
+                    var name = t.attr('name'),
+                        val = t.val();
+                    var fun = lib.check_validate()[name] ? lib.check_validate()[name] : lib.check_validate()['isEmpty'];
+                    if(!fun(val)){
+                        return isSubmit = false;
+                    }
+                });
+                if(!isSubmit) return false;
+                org.ajax({
+                    url: '/api/register/',
+                    type: 'POST',
+                    data: {
+                        'identifier': tel,
+                        'password': $pwd.val(),
+                        'captcha_0': $captcha_0.val(),
+                        'captcha_1': $captcha_1.val(),
+                        'validate_code': $validate.val(),
+                        'register_channel': 'fwh',
+                        'IGNORE_PWD': 1
+                    },
+                    dataType: 'json',
+                    beforeSend: function (xhr, settings) {
+                        self.attr("disabled",true).text("提交中……").css("background","#cbcbcb");
+                    },
+                    success: function (data) {
+                        if(data.ret_code != 0){
+                            org.ui.showSign(data.message);
+                            $submit.text('注册并绑定服务号');
+                        }else{
+                            window.location.href = $("input.next-url").val();
+                        }
+                    },
+                    error: function (xhr) {
+                        org.ui.alert("系统繁忙，请稍后再试");
+                    },
+                    complete: function () {
+                        self.removeAttr("disabled").text("注册并绑定服务号").css("background","rgb(219, 73, 63)");
+                    }
+                });
+            });
+        }
+    };
+    return {
+        init: lib.init
+    }
+})(org);
+
+
 ;(function(org){
     $.each($('script'), function(){
         var src = $(this).attr('src');
@@ -2998,28 +3521,28 @@ function isAwards(k){//判断抽奖是第几项
         case 0.2:
             is = 1;
             break;
-        case 0.3:
+        case 0.4:
             is = 2;
             break;
-        case 0.4:
+        case 0.5:
             is = 3;
             break;
-        case 1:
+        case 0.8:
             is = 4;
             break;
-        case 1.5:
+        case 1.0:
             is = 5;
             break;
-        case 25:
+        case 1.2:
             is = 6;
             break;
-        case 2:
+        case 1.5:
             is = 7;
             break;
-        case 6:
+        case 1.8:
             is = 8;
             break;
-        case 10:
+        case 2.0:
             is = 9;
             break;
         default :
@@ -3038,6 +3561,7 @@ org.awardEvent = (function(org){ //微信抽奖
             url: '/api/weixin/distribute/redpack/',
             dataType: 'json',
             data: {"action": obj,"openid": $("#openid").val()},
+            //data: {"action": obj,"openid": "oILFQt3q9C-SqnZRlUTYvhgQUHYE"},
             success: function(data){
                 fn(data);
                 awardsNum = data.left;

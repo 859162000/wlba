@@ -11,6 +11,11 @@ if(process.env.NODE_ENV == 'pro'){
     BUILD_PATH = 'scripts/mobile/pro';
 }
 
+/*
+ * 文件输出会按照字母开头，重新排序编译，
+ * 添加文件时，为了避免过多文件重新被编译修改，最好将文件以（z开头）排到最后 这样就只会编译新文件和 zepto文件
+ *
+ */
 
 module.exports = {
     entry: {
@@ -30,7 +35,7 @@ module.exports = {
         received_month: path.resolve(JS_PATH, 'received_month'),
         process_authentication: path.resolve(JS_PATH, 'process_authentication'),
         process_addbank: path.resolve(JS_PATH, 'process_addbank'),
-
+        //channel_register: path.resolve(JS_PATH, 'channel_register'),
         vendor: [path.resolve(JS_PATH, 'lib/zepto/zepto'),path.resolve(JS_PATH, 'lib/polyfill.min')]
     },
     output: {

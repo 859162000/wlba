@@ -31,6 +31,7 @@ import base64
 from wanglibao_pay.pay import PayOrder, PayMessage
 from wanglibao_rest.utils import split_ua
 # from wanglibao_account.cooperation import CoopRegister
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -341,7 +342,8 @@ class YeeShortPay:
         self.BIND_CARD_QUERY = settings.YEE_SHORT_BIND_CARD_QUERY
         self.BIND_PAY_REQUEST = settings.YEE_SHORT_BIND_PAY_REQUEST
         self.YEE_CALLBACK = settings.YEE_SHORT_CALLBACK
-        self.QUERY_TRX_RESULT = settings.YEE_SHORT_QUERY_TRX_RESULT
+        self.UNBIND_CARD = settings.YEE_URL + '/api/bankcard/unbind'
+        self.QUERY_TRX_RESULT = settings.YEE_URL + '/api/query/order' 
 
     def _sign(self, dic):
         values = self._sort(dic)
@@ -555,6 +557,27 @@ class YeeShortPay:
             return {'ret_code': 21110, 'message': '易宝支付解绑请联系客服'}
         return {'ret_code': 0, 'message': 'ok'}
 
+    def unbind_card(self, user, mcard):
+        """解绑，但有如下限制：解绑后只能绑原卡，或者绑原卡只是预留号码变更的"""
+        res = self.bind_card_query(user)
+        yee_bindid = identitytype = identityid = ''
+        if 'data' in res and 'cardlist' in res['data']:
+            identityid = res['data']['identityid']
+            identitytype = res['data']['identitytype']
+            for card in res['data']['cardlist']:
+                if mcard.no.startswith(card['card_top']) \
+                        and mcard.no.endswith(card['card_last']):
+                    yee_bindid = card['bindid']
+                    break
+        if yee_bindid:
+            post = dict()
+            post['merchantaccount'] = self.MER_ID
+            post['bindid'] = yee_bindid
+            post['identitytype'] = identitytype
+            post['identityid'] = identityid
+            print '*'*100, self.UNBIND_CARD
+            return self._request_yee(url=self.UNBIND_CARD, data=post)
+
     def _pay_request(self, request, order_id, card, pay_info):
         """ 支付请求 """
         post = dict()
@@ -705,6 +728,7 @@ class YeeShortPay:
 
             pay_info.bank = card.bank
             pay_info.card_no = card.no
+            pay_info.phone_for_card = input_phone
             
             #根据银行卡号的前几位匹配银行列表信息是否属于该银行, 是不做处理，不是返回异常消息
             cards_info = pay_info.bank.cards_info.split(',')
@@ -954,13 +978,35 @@ class YeeShortPay:
 
         return rs
 
+    def query_trx_result(self, order_id):
+        res = self._query_trx_result(order_id)
+        res_data = res.get('data')
+
+        code = res_data.get('errorcode')
+        message = res_data.get('errormsg')
+        last_card_no = res_data.get('lastno')
+        try:
+            amount = Decimal(res_data.get('amount')) / 100
+            amount = amount.quantize(Decimal('0.01'))
+        except:
+            amount = None
+
+        if not code and last_card_no and amount:
+            code = '0'
+
+        return {'code': code,
+                'message': message,
+                'last_card_no': last_card_no,
+                'amount': amount,
+                'raw_response': res_data}
+ 
     def sync_bind_card(self, user):
         """
         同步一个用户的所有卡列表
         """
 
         # 查询易宝已经绑定卡
-        res = YeeShortPay().bind_card_query(user=user)
+        res = self.bind_card_query(user=user)
         if res['ret_code'] not in (0, 20011): return res
         if 'data' in res and 'cardlist' in res['data']:
             yee_card_no_list = []
@@ -973,32 +1019,3 @@ class YeeShortPay:
             Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
             Card.objects.filter(is_bind_kuai=False, is_bind_yee=False,
                                 is_the_one_card=True).update(is_the_one_card=False)
-
-    def query_trx_result(self, order_id):
-        res = self._query_trx_result(order_id)
-        res_data = res.get('data')
-
-        code = res_data.get('errorcode')
-        message = res_data.get('errormsg')
-        last_card_no = res_data.get('lastno')
-        amount = res_data.get('amount')
-
-        if not code and last_card_no and amount:
-            code = '0'
-
-        return {'code': code,
-                'message': message,
-                'last_card_no': last_card_no,
-                'amount': amount}
-
-
-
-
-
-
-
-
-
-
-
-    

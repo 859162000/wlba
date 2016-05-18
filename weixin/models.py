@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import datetime
 import collections
-
+import logging
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -15,7 +15,8 @@ from wanglibao.fields import JSONFieldUtf8
 from .common.wechat import gen_token
 from wechatpy.client import WeChatClient
 from wechatpy.client.api.qrcode import WeChatQRCode
-import logging
+
+from wanglibao_p2p.models import FINANCES
 
 
 
@@ -125,7 +126,6 @@ class Account(models.Model):
         :param lang: Preferred language code, optional
         :return: JSON data
         """
-        logger.debug("-get_user_info**********************app_id:%s,app_secret:%s"%(self.app_id, self.app_secret))
         access_token = self.access_token
         client = WeChatClient(self.app_id, self.app_secret)
         return client._get(
@@ -332,8 +332,6 @@ class WeixinAccounts(object):
     def getByOriginalId(cls, original_id):
         if not cls.data:
             cls.append_account()
-        logger.debug("original_id::%s"%original_id)
-        logger.debug("cls.data::%s"%cls.data)
         for key, account_info in cls.data.items():
             if account_info['id'].strip() == original_id.strip():
                 return cls(key)
@@ -432,11 +430,13 @@ class SubscribeService(models.Model):
     SERVICE_TYPES = (
         (0, u'月标上线通知'),
         (1, u'天标上线通知'),
+        (2, u'融资类型通知')
     )
     key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
     describe = models.CharField(u'服务描述', max_length=256)
     type = models.IntegerField(u'类型', default=0, choices=SERVICE_TYPES)
     num_limit = models.IntegerField(u'数值限制', default=0)
+    finance_type = models.CharField(u'融资类型', choices=FINANCES, null=True, max_length=32)
     channel = models.CharField(u'从哪里订阅的服务', choices=CHANNELS, max_length=32)
     is_open = models.BooleanField(u'是否开启服务', default=False)
 
@@ -556,8 +556,8 @@ class WeiXinUserActionRecord(models.Model):
         ('unbind', u'解除绑定'),
         ('sign_in', u'用户签到'),
     )
-    w_user_id = models.IntegerField(default=0)#models.ForeignKey(WeixinUser, null=True)
-    user_id = models.IntegerField(default=0)#models.ForeignKey(User, null=True)
+    w_user_id = models.IntegerField(default=0, db_index=True)#models.ForeignKey(WeixinUser, null=True)
+    user_id = models.IntegerField(default=0, db_index=True)#models.ForeignKey(User, null=True)
     action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
     action_describe = models.CharField(u'动作描述', max_length=64)
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})

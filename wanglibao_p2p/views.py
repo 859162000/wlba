@@ -3,11 +3,12 @@
 from operator import itemgetter
 from decimal import Decimal
 import datetime
+import pytz
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.db.models import Q, Sum
-from django.db import transaction
+# from django.db import transaction
 from django.template import RequestContext
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
@@ -19,10 +20,10 @@ from rest_framework import generics, renderers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import SiteData
+# from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_account.cooperation import CoopRegister
-from wanglibao_p2p.amortization_plan import get_amortization_plan
+# from wanglibao_account.cooperation import CoopRegister
+# from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
@@ -51,14 +52,18 @@ from django.core.urlresolvers import reverse
 import re
 from celery.execute import send_task
 
-import pickle
+# import pickle
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
+from wanglibao_activity.tasks import check_activity_task
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_redis.backend import redis_backend
 from .common import get_p2p_list
 from wanglibao.templatetags.formatters import safe_phone_str
+import logging
+logger = logging.getLogger(__name__)
+
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -327,7 +332,13 @@ class AuditProductView(TemplateView):
         })
 
         # 满标审核时检测活动规则
-        activity_backends.check_activity(request.user, 'p2p_audit', 'all', 0, pk)
+        # activity_backends.check_activity(request.user, 'p2p_audit', 'all', 0, pk)
+        check_activity_task.apply_async(kwargs={
+            "user_id": request.user.id,
+            "trigger_node": 'p2p_audit',
+            "device_type": 'all',
+            "product_id": pk,
+        }, queue='celery02')
 
         return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 
@@ -337,7 +348,7 @@ class AuditAmortizationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
-        #page = kwargs.get('page', 1)
+        # page = kwargs.get('page', 1)
         page = self.request.GET.get('page', 1)
 
         p2p_amortization = ProductAmortization.objects.filter(pk=pk).first()
@@ -364,7 +375,7 @@ class AuditEquityView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
-        #page = kwargs.get('page', 1)
+        # page = kwargs.get('page', 1)
         page = self.request.GET.get('page', 1)
 
         p2p = P2PProduct.objects.filter(pk=pk).first()
@@ -550,8 +561,8 @@ class P2PListView(TemplateView):
         show_slider = False
         if p2p_done_list:
             show_slider = True
-            p2p_earning = sorted(p2p_done_list, key=lambda x: (-x['expected_earning_rate'], x['available_amount']))
-            p2p_period = sorted(p2p_done_list, key=lambda x: (x['period'], x['available_amount']))
+            p2p_earning = sorted(p2p_done_list, key=lambda x: (-x['expected_earning_rate_total'], x['available_amount']))
+            p2p_period = sorted(p2p_done_list, key=lambda x: (x['period_days'], x['available_amount']))
             p2p_amount = sorted(p2p_done_list, key=itemgetter('completion_rate'), reverse=True)
         else:
             p2p_earning = p2p_period = p2p_amount = []
@@ -730,29 +741,46 @@ class RepaymentAPIView(APIView):
         else:
             penal_interest = Decimal(penal_interest)
 
-        id = request.POST.get('id')
+        product_id = request.POST.get('id')
 
-        p2p = P2PProduct.objects.filter(pk=id)
-        p2p = p2p[0]
-
-        from dateutil import parser
-        flag_date = parser.parse(repayment_date)
+        if not product_id or not repayment_date:
+            result = {
+                'errno': 1,
+            }
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
         try:
-            payment = PrepaymentHistory(p2p, flag_date)
             if repayment_now == '1':
-                record = payment.prepayment(penal_interest, repayment_type, flag_date)
+                # 将提前还款的代码放入后台任务中执行
+                from .tasks import p2p_prepayment
+                p2p_prepayment.apply_async(kwargs={
+                    'product_id': product_id,
+                    'penal_interest': penal_interest,
+                    'repayment_type': repayment_type,
+                    'flag_date': repayment_date,
+                })
+                result = {
+                    'errno': 0,
+                    # 'errmessage': u'提前还款任务已提交,请等待任务完成后查看标的状态'
+                }
+                # record = payment.prepayment(penal_interest, repayment_type, flag_date)
             else:
+                from dateutil import parser
+                
+                flag_date = parser.parse(repayment_date)
+                p2p = P2PProduct.objects.filter(pk=product_id).first()
+                payment = PrepaymentHistory(p2p, flag_date)
                 record = payment.get_product_repayment(Decimal(0), repayment_type, flag_date)
 
-            result = {
+                result = {
                     'errno': 0,
                     'principal': record.principal,
                     'interest': record.interest,
                     'penal_interest': record.penal_interest,
                     'date': repayment_date
-                    }
+                }
         except PrepaymentException:
+            logger.exception(u"还款计划有问题:")
             result = {
                     'errno': 1,
                     'errmessage': u'你的还款计划有问题'
@@ -770,5 +798,7 @@ def check_invalid_new_user_product(p2p, user):
     """
     error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
     return error_new_user
+
+
 
 

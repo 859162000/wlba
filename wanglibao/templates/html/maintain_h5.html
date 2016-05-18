@@ -154,7 +154,7 @@
 <body style="background-color:#f5f5f5">
   <div id="wrap">
     <div class="main">
-      <img class="banner" src='/static/imgs/mobile/404/banner_2.png'/>
+      <img class="banner" src='/static/imgs/mobile/404/banner_2.png?v=2015050501'/>
       <img class="rocket" src='/static/imgs/mobile/404/iconfront_rocket.png'/>
       <img class="circular" src='/static/imgs/mobile/404/circular.png'/>
     </div>
@@ -170,23 +170,15 @@
     </div>
   </div>
     <script>
-        window.onload=function(){
-
-          var time_count = 5;
-          var time_intervalId;
-          var timerFunction = function () {
-              if (time_count > 1) {
-                  time_count--;
-                  return
-              } else {
-                  clearInterval(time_intervalId);
-                  window.location.href = '/weixin/list/'
-              }
-          };
-    	//time_intervalId = setInterval(timerFunction, 1000);
-        //time_intervalId;
-        }
-
+        var t = 3;
+        function countDown(){
+            t-- ;
+            if(t <= 0){
+                location.href = "http://www.wanglibao.com";
+                clearInterval(inter);
+            }
+        };
+        //var inter = setInterval(countDown,1000);
     </script>
 </body>
 </html>
