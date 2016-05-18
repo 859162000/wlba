@@ -554,6 +554,6 @@ else:
 
 # 产品推送渠道列表
 if ENV in (ENV_PRODUCTION, ENV_PREPRODUCTION):
-    PUSH_PRODUCT_CHANNELS = ['bajinshe', ]
+    PUSH_PRODUCT_CHANNELS = ['bajinshe', 'bisouyi']
 else:
     PUSH_PRODUCT_CHANNELS = ['bajinshe', 'bisouyi', ]
