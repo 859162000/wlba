@@ -102,6 +102,8 @@ urlpatterns = patterns(
     url(r'^xunlei_treasure/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei.jade")),
     url(r'^shield_plan/$', ShieldPlanView.as_view()),
 
+
+
 )
 
 # app URL
