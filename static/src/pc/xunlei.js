@@ -25,6 +25,27 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
             }
         }
     });
+    if(($('#userStatus').val() == 'True') && ($('#ret_code').val() == '10000')){
+        var token = getQueryString('promo_token'),xid = getQueryString('xluserid'),timer = getQueryString('time'),sig = getQueryString('sign'),name = getQueryString('nickname');
+        $.ajax({
+            type: "POST",
+            url: "/activity/thunder/binding/",
+            data: {
+                'promo_token': token,
+                'xluserid': xid,
+                'time': timer,
+                'sign': sig,
+                'nickname': name
+
+            },
+            success: function (data) {
+                if (data.ret_code == 10002 || data.ret_code == 10000) {
+                    $('.xunlei-accounts-info').show();
+                }
+            }
+        });
+    }
+
     //显示新用户奖励
     $('#rewardDetail').on('click',function(){
         $('.explain-min').slideToggle("slow");
@@ -162,5 +183,13 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
                 $('#winList').css({'top':-i+'px'})
             }
         },30)
+    }
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
     }
 })
