@@ -37,6 +37,7 @@ from wanglibao_account.tasks import coop_call_back
 from wanglibao_account.utils import generate_coop_base_data
 from wanglibao_activity.models import Activity
 from wanglibao_reward.tasks import updateHmdRedisTopRanks
+from wanglibao_reward.models import WanglibaoRewardJoinRecord
 import traceback
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -174,14 +175,23 @@ def register_ok(user_id, device):
 def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
-
-    # 活动检测
-    # activity_backends.check_activity(user, 'validation', device_type)
-    check_activity_task.apply_async(kwargs={
-        "user_id": user.id,
-        "trigger_node": 'validation',
-        "device_type": device_type,
-    }, queue='celery02')
+    try:
+        join_record, _ = WanglibaoRewardJoinRecord.objects.get_or_create(user=user, activity_code='idvalidate_ok', defaults={"remain_chance":1})
+        if join_record.remain_chance > 0:
+            with transaction.atomic():
+                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().get(id=join_record.id)
+                if join_record.remain_chance>0:
+                    # 活动检测
+                    # activity_backends.check_activity(user, 'validation', device_type)
+                    check_activity_task.apply_async(kwargs={
+                        "user_id": user.id,
+                        "trigger_node": 'validation',
+                        "device_type": device_type,
+                    }, queue='celery02')
+                    join_record.remain_chance=0
+                    join_record.save()
+    except Exception, e:
+        logger.debug(traceback.format_exc())
 
     try:
         utils.log_clientinfo(device, "validation", user_id)
