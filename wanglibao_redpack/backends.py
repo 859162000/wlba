@@ -147,7 +147,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     "unavailable_at": stamp(end_time), "event_id": event.id,
                     "period": event.period,
                     "period_type": period_type_event,
-                    "period_name": period_name.get(event.period_type),
+                    "period_name": event.period + period_name.get(event.period_type),
                     "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                     "highest_amount": event.highest_amount, "order_by": 2
                 }
@@ -242,7 +242,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         "unavailable_at": stamp(end_time), "event_id": event.id,
                         "period": event.period,
                         "period_type": period_type_event,
-                        "period_name": period_name.get(event.period_type),
+                        "period_name": event.period + period_name.get(event.period_type),
                         "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 1
                     }
