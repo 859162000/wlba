@@ -26,41 +26,45 @@ class RedPackEvent(models.Model):
         根据红包规则创建不同的派发红包活动，创建有/无兑换码的活动
         兑换码红包不搞自动派发，如果是自动派发兑换码红包，需要更多的考虑(如前几名有红包，派发完就没有了)
     """
-    name = models.CharField(max_length=30, verbose_name=u'优惠券活动名字')
-    rtype = models.CharField(max_length=20, verbose_name=u'优惠券类型', choices=(
-                            ("direct", u"直抵红包"),
-                            ("percent", u"投资百分比红包"),
-                            ("interest_coupon", u"加息券")
-    ), default="直抵红包")
-    amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
-    invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
-    p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
-    period = models.IntegerField(default=0, max_length=200, verbose_name=u'限定产品期限', blank=True,
-                                 help_text=u"填写整数数字")
-    period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=(
+    EVENT_TYPE = (
+        ("direct", u"直抵红包"),
+        ("percent", u"投资百分比红包"),
+        ("interest_coupon", u"加息券"),
+    )
+    PERIOD_TYPE = (
         ('month', u'月'),
         ('month_gte', u'月及以上'),
         ('month_lte', u'月及以下'),
         ('day', u'日'),
         ('day_gte', u'日及以上'),
         ('day_lte', u'日及以下'),
-    ), blank=True)
+    )
+    GIVE_MODE = (
+        ("nil", u"零门槛(兑换码)"),
+        ("activity", u"活动奖励"),
+        ("register", u"注册"),
+        ("validation", u"实名认证"),
+        ("first_buy", u"首次投资"),
+        ("first_pay", u"首次充值"),
+        ('buy', u'投资'),
+        ('pay', u'充值'),
+        ('p2p_audit', u'满标审核'),
+        ('repaid', u'还款'),
+        ('first_bind_weixin', u'首次绑定微信'),
+    )
+    name = models.CharField(max_length=30, verbose_name=u'优惠券活动名字')
+    rtype = models.CharField(max_length=20, verbose_name=u'优惠券类型', choices=EVENT_TYPE, default="直抵红包")
+    amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
+    invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
+    p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
+    period = models.IntegerField(default=0, max_length=200, verbose_name=u'限定产品期限', blank=True,
+                                 help_text=u"填写整数数字")
+    period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=PERIOD_TYPE, blank=True)
     p2p_id = models.IntegerField(default=0, verbose_name=u"P2P标id,数字格式")
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
-    give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=(
-                                ("nil", u"零门槛(兑换码)"),
-                                ("activity", u"活动奖励"),
-                                ("register", u"注册"),
-                                ("validation", u"实名认证"),
-                                ("first_buy", u"首次投资"),
-                                ("first_pay", u"首次充值"),
-                                ('buy', u'投资'),
-                                ('pay', u'充值'),
-                                ('p2p_audit', u'满标审核'),
-                                ('repaid', u'还款'),
-                                ('first_bind_weixin', u'首次绑定微信')), default=u"注册")
+    give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=GIVE_MODE, default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="",
@@ -88,12 +92,14 @@ class RedPack(models.Model):
     """
         无兑换码一条记录
     """
+    R_STATUS = (
+        ("invalid", u"作废"),
+        ("used", u"已兑换"),
+        ("unused", u"未兑换"),
+    )
     event = models.ForeignKey(RedPackEvent)
     token = models.CharField(max_length=20, verbose_name=u"兑换码", null=False, default="", db_index=True)
-    status = models.CharField(max_length=20, verbose_name=u"兑换状态", choices=(
-                                ("invalid", "作废"),
-                                ("used", "已兑换"),
-                                ("unused", "未兑换"),), default="unused")
+    status = models.CharField(max_length=20, verbose_name=u"兑换状态", choices=R_STATUS, default="unused")
 
     class Meta:
         verbose_name = u"优惠券列表"
@@ -106,7 +112,6 @@ class RedPack(models.Model):
 class RedPackRecord(models.Model):
     redpack = models.ForeignKey(RedPack, verbose_name=u"优惠券")
     user = models.ForeignKey(User, verbose_name=u"用户")
-    #rule = models.ForeignKey(Rule, verbose_name=u"规则")
     change_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"兑换平台")
     apply_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"使用平台")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
