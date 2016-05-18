@@ -418,7 +418,7 @@ class YueLiBaoCheck(APIView):
         ret = dict()
 
         product_id = request.POST.get('productId')
-        period = request.POST.get('period')
+        period = int(request.POST.get('period'))
         logger.info('in YueLiBaoCheck, product_id = {}, period = {}'.format(product_id, period))
 
         try:
@@ -440,9 +440,9 @@ class YueLiBaoCheck(APIView):
                     buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
-                if period > 3:
+                if period >= 3:
                     calc_php_commission(product_id)
-                    logger.info(u'全民淘金数据写入: {}\n'.format(product_id))
+                    logger.info(u'period = {}, 全民淘金数据写入: {}\n'.format(period, product_id))
 
                 ret.update(status=1,
                            msg='success')

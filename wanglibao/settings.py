@@ -1423,6 +1423,11 @@ PHP_INDEX_ASSIGNMENT = '/ylb/finnal.php?method=listzqAll'
 PHP_INDEX_MONTH_DEV = 'https://wltest.wanglibao.com/ylb/finnal.php?method=projectPcpool'
 PHP_INDEX_ASSIGNMENT_DEV = 'https://wltest.wanglibao.com/ylb/finnal.php?method=listzqAll'
 
+# 月利宝 APP 端信息展示.    host + 地址
+PHP_APP_INDEX_DATA = '/ylb/api/python.php'
+PHP_APP_INDEX_DATA_DEV = 'http://zhangfu.dev.wanglibao.com/api/python.php'
+
+
 if ENV == ENV_PRODUCTION:
     PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
     PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'

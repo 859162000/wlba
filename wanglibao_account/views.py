@@ -6,7 +6,7 @@ from django.contrib.sites.models import get_current_site
 from django.template.response import TemplateResponse
 from django.utils.http import is_safe_url
 
-from wanglibao_margin.php_utils import set_cookie, get_php_redis_principle
+from wanglibao_margin.php_utils import set_cookie, get_php_redis_principle, get_php_index_data
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
 import logging
@@ -634,6 +634,20 @@ class AccountHomeAPIView(APIView):
         php_principle = get_php_redis_principle(user.pk)
         p2p_unpayed_principle += php_principle
 
+        # 增加从PHP项目来的 昨日收益, 累计收益, 待收收益
+        url = 'https://' + request.get_host() + settings.PHP_APP_INDEX_DATA
+        try:
+            if int(request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+        try:
+            index_data = get_php_index_data(url, user.id)
+        except Exception, e:
+            index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
+            logger_yuelibao.debug(u'月利宝地址请求失败!!! exception = {}'.format(e.message))
+
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
@@ -644,10 +658,10 @@ class AccountHomeAPIView(APIView):
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user,
-                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user,
-                            date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(
+                user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(
+                user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         # 当月免费提现次数
         fee_config = WithdrawFee().get_withdraw_fee_config()
@@ -665,8 +679,11 @@ class AccountHomeAPIView(APIView):
             'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
             'p2p_withdrawing': float(p2p_withdrawing),  # P2P提现中冻结金额
             'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
-            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest),  # p2p总待收益
-            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
+            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest) +
+                                         float(index_data['unPaidIncome']),  # p2p总待收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest +
+                                             p2p_total_paid_coupon_interest) +
+                                       float(index_data['paidIncome']),  # P2P总累积收益
             'p2p_total_interest': float(p2p_total_interest + p2p_total_coupon_interest),  # P2P总收益
 
             'fund_total_asset': float(fund_total_asset),  # 基金总资产
@@ -675,7 +692,7 @@ class AccountHomeAPIView(APIView):
             'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
-            'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
+            'p2p_income_yesterday': float(p2p_income_yesterday) + float(index_data['yesterdayIncome']),  # 昨日到账收益
             'withdraw_free_count': withdraw_free_count,  # 当月免费提现次数
 
         }

@@ -156,7 +156,8 @@ class PhpMarginKeeper(MarginKeeper):
                 margin_uninvested = margin.uninvested  # 初始未投资余额
                 uninvested = margin.uninvested - amount  # 未投资金额 - 投资金额 = 未投资余额计算结果
                 margin.uninvested = uninvested if uninvested >= 0 else Decimal('0.00')  # 未投资余额计算结果<0时,结果置0
-                margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested  # 未投资余额计算结果<0时,未投资冻结金额等于+初始未投资余额
+                margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested
+                # 未投资余额计算结果<0时,未投资冻结金额等于+初始未投资余额
             margin.save()
             record = self.tracer(catalog, amount, margin.margin, description, margin_before=margin_before)
             return record
@@ -310,7 +311,7 @@ class PhpMarginKeeper(MarginKeeper):
         :param category                 类型, 0 月利宝; 1 债转
         :param principal:           本金
         :param interest:            利息
-        :param : t0_interest        罚息    penal_interest ---> t0_interest    t+0 补息   # 月利宝平台无罚息
+        :param t0_interest        罚息    penal_interest ---> t0_interest    t+0 补息   # 月利宝平台无罚息
         :param coupon_interest:     红包加息
         :param platform_interest:   平台加息
         :param refund_id:           订单号(唯一值)
@@ -391,7 +392,7 @@ def get_user_info(request, session_id=None, token=None):
     get user's base info to php server.
     :param request:
     :param session_id:
-    :param session_id:
+    :param token:
     :return: token:
     from_channel, 登录渠道 . 如 :PC
     isAdmin
@@ -478,8 +479,9 @@ def get_margin_info(user_id):
             margin_withdrawing = user.margin.withdrawing
             total_amount = margin + margin_freeze + margin_withdrawing + unpaid_principle
 
-            return {'state': True, 'margin': margin, 'total_amount': total_amount, 'unpayed_principle': unpaid_principle,
-                    'margin_freeze': margin_freeze, 'margin_withdrawing': margin_withdrawing}
+            return {'state': True, 'margin': margin, 'total_amount': total_amount,
+                    'unpayed_principle': unpaid_principle, 'margin_freeze': margin_freeze,
+                    'margin_withdrawing': margin_withdrawing}
     except Exception, e:
         print e
 
@@ -556,18 +558,42 @@ def get_php_redis_principle(user_id):
     """
     try:
         url = settings.PHP_UNPAID_PRINCIPLE
-        response = requests.post(url, data={'user_id': user_id}).json()
+        response = requests.post(url, data={'user_id': user_id}, timeout=3).json()
         try:
             if response.get('total_amount'):
                 return decimal.Decimal(response.get('total_amount')).quantize(Decimal('0.01'))
             else:
                 return 0
         except Exception, e:
-            print e
+            logger.debug('in get_php_redis_principle, error with : {}'.format(e.message))
             return 0
     except Exception, e:
-        print e
+        logger.debug('in get_php_redis_principle, error with : {}'.format(e.message))
         return 0
+
+
+def get_php_index_data(url, user_id):
+    """
+    首页展示信息
+    :param url:       = 'https://' + request.get_host() + settings.PHP_APP_INDEX_DATA
+    :param user_id:
+    :return: {u'code': 1,
+              u'data': [{u'paidIncome': 3607.42, u'unPaidIncome': 3616.43, u'yesterdayIncome': 0}]}
+    """
+    try:
+        response = requests.post(url, data={'userId': user_id}, timeout=3).json()
+        try:
+            if response.get('code') == 1:
+                return response.get('data')
+            else:
+                logger.debug('in get_php_index_data, code != 1')
+                return {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
+        except Exception, e:
+            logger.debug('in get_php_index_data, error with : {}'.format(e.message))
+            return {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
+    except Exception, e:
+        logger.debug('in get_php_index_data, error with : {}'.format(e.message))
+        return {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
 
 
 def get_unread_msgs(user_id):

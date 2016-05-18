@@ -128,7 +128,6 @@ class IndexView(TemplateView):
         month_data, assignment_data = [], []
         url = 'https://' + request.get_host() + settings.PHP_INDEX_MONTH
         # 开发环境 端口起 7000 以上用 wltest 数据
-        logger_yuelibao.info('11111122222'*100)
         logger_yuelibao.info('host = {}'.format(request.get_host()))
         try:
             if int(request.get_host().split(':')[1]) > 7000:
