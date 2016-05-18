@@ -97,6 +97,7 @@ class P2PProduct(models.Model):
     class Meta:
         verbose_name = u'P2P产品'
         verbose_name_plural = u'P2P产品'
+        ordering = ['-sync_id', '-id']
 
     def __unicode__(self):
         return u'%s<%s>' % (self.id, self.name)
