@@ -23,7 +23,7 @@ def count_msg(params, user):
     if not listtype or listtype not in ("read", "unread", "all"):
         return {"ret_code": 30071, "message": "参数输入错误"}
 
-    if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+    if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
         if listtype == "unread":
             count = Message.objects.filter(target_user=user, read_status=False, notice=True).count()
         elif listtype == "read":
@@ -33,7 +33,7 @@ def count_msg(params, user):
         return {"ret_code": 0, "message": "ok", "count": count}
 
     else:
-        logger.info('in PHP_INSIDE_MESSAGE_SWITCH != 1')
+        logger.info('in count_msg, PHP_INSIDE_MESSAGE_LIST_SWITCH != 1')
         try:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                      data={'uid': user.id, 'read_status': listtype}, timeout=3)
@@ -66,7 +66,7 @@ def list_msg(params, user):
     if not 1 <= pagenum < 100 or not 1 <= pagesize <= 50:
         return {"ret_code": 30083, "message": "参数输入错误"}
 
-    if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+    if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
         if listtype == "unread":
             msgs = Message.objects.filter(target_user=user, read_status=False, notice=True
                                           ).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
@@ -77,6 +77,7 @@ def list_msg(params, user):
             msgs = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
 
     else:
+        logger.info('in list_msg PHP_INSIDE_MESSAGE_LIST_SWITCH != 1')
         messages = []
         response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                  data={'uid': user.id, 'read_status': listtype}, timeout=3)
@@ -143,9 +144,11 @@ def sign_read(user, message_id):
         标记消息已读
     """
     if int(message_id) == 0:
-        if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+        if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
             Message.objects.filter(target_user=user, read_status=False).update(read_status=True, read_at=long(time.time()))
-        else:
+        # else:
+            # 改成不管怎么样都要更新 消息中心的数据
+        try:
             url = settings.PHP_INSIDE_MESSAGE_READ_ALL
             response = requests.post(url,
                                      data={'uid': user.id}, timeout=3)
@@ -155,8 +158,11 @@ def sign_read(user, message_id):
                     return {"ret_code": 0, "message": "ok"}
             else:
                 return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
+        except Exception, e:
+            logger.debug('in sign_read, read [ all ] php inside message error with {}'.format(e.message))
+
     else:
-        if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+        if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
             msg = Message.objects.filter(target_user=user).filter(pk=message_id).first()
             if msg and not msg.read_status:
                 msg.read_status = True
@@ -164,7 +170,9 @@ def sign_read(user, message_id):
                 msg.save()
             elif not msg:
                 return {"ret_code": 30091, "message": "消息不存在"}
-        else:
+        # else:
+            # 改成 不管怎么样都要读
+        try:
             url = settings.PHP_INSIDE_MESSAGE_READ
             response = requests.post(url,
                                      data={'uid': user.id, 'mid': message_id}, timeout=3)
@@ -175,6 +183,8 @@ def sign_read(user, message_id):
                     return {"ret_code": 0, "message": "ok"}
             else:
                 return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
+        except Exception, e:
+            logger.debug('in sign_read, read php inside message error with {}'.format(e.message))
 
 
 def create(title, content, mtype):

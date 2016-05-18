@@ -1400,6 +1400,11 @@ if ENV == ENV_PRODUCTION:
 PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
 PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
 
+# 控制显示站内信的地方, PHP消息中心还是主站.
+# 1 -------> 主站自己, 同时更新消息中心
+# 2 -------> 显示消息中心
+PHP_INSIDE_MESSAGE_LIST_SWITCH = 1
+
 # 控制发送站内信的地方, PHP消息中心还是主站.
 # 1 -------> 主站自己发
 # 2 -------> 主站发, 然后通知消息中心也发一份

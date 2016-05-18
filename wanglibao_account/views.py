@@ -1319,7 +1319,7 @@ class MessageView(TemplateView):
         if not listtype or listtype not in ("read", "unread", "all"):
             listtype = 'all'
 
-        if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+        if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
             if listtype == "unread":
                 messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
                     '-message_text__created_at')
@@ -1332,6 +1332,7 @@ class MessageView(TemplateView):
             messages_list.extend(messages)
 
         else:
+            logger.info('in MessageView, PHP_INSIDE_MESSAGE_LIST_SWITCH != 1')
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                      data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
             if response.status_code == 200:
