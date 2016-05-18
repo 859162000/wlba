@@ -17,14 +17,22 @@ html
     .maimai-rule-warp
       .maimai-itme
         .maimai-title 使用规则
-        ul
+        ul.other(style='display:none')
           li 1. 新用户通过此页面注册为网利宝用户即得28888元体验金，体验金专享1天10%年化收益；
           li 2. 活动期间新用户注册即送50元红包(满5000元可用，限1月以上标期，领取之日起7天有效)；
           li 3. 用户首次投资满额送以下红包，红包3月标及以上使用，领取之日起15天有效；
           li a. 1000元≤首次投资＜5000元，送100元直抵红包（满15000元可直抵使用）
           li b. 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
           li c. 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
+        ul.wdty(style='display:none')
+          li 活动时间：2016年5月18日至2016年5月28日
+          li 注册送：活动期间内新用户注册为网利宝用户即可获得签证码一个
+          li 认证送：活动期间内完成认证即可获得签证码两个
+          li 首投送：活动期间内首次投资500元及以上即可获得签证码三个
+          li 满额送：理财节期间新用户投资1000元及以上再送签证码一个
+          li 注：该活动仅限通过本活动页面完成相关行为的用户领取，满足条件用户请下载网利宝APP或登录PC端查看站内信
 
     .maimai-rule-btn
       a(href="javascript:history.go(-1)").maimai-form-btn 我知道了
+  script(data-init='mmRule', src="/static/scripts/mobile_activity/dist/maimai.js?v=20160513")
 
