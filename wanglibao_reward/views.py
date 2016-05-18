@@ -1993,7 +1993,7 @@ class XunleiTreasureAPIView(APIView):
     def __init__(self):
         super(XunleiTreasureAPIView, self).__init__()
         self.activity_name = 'xunlei_treasure'
-
+        self.start_time = '2016-05-01'
     def introduced_by_with(self, user_id, promo_token, register_time=None):
         """
             register_time:为None表示不需要关注用户的注册时间
@@ -2040,6 +2040,12 @@ class XunleiTreasureAPIView(APIView):
                         has_sent=False,
                 )
 
+        WanglibaoRewardJoinRecord.objects.create(
+                user=user,
+                activity_code='xunlei_treasure',
+                remain_chance=3
+        )
+
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
     def generate_newUser_reward_activity(self, user):
@@ -2067,8 +2073,8 @@ class XunleiTreasureAPIView(APIView):
                 left_times=1,
                 join_times=1,
                 channel='xunlei9',
-                has_sent=False,
-        )
+                has_sent=False,)
+
         redpack = RedPackEvent.objects.filter(name=redpack_rewards[no_dist_redpack]).first()
         WanglibaoActivityReward.objects.create(
                 user=user,
@@ -2079,9 +2085,13 @@ class XunleiTreasureAPIView(APIView):
                 join_times=1,
                 channel='xunlei9',
                 p2p_amount=redpack.amount*1000,
-                has_sent=False,
-        )
+                has_sent=False,)
 
+        WanglibaoRewardJoinRecord.objects.create(
+            user=user,
+            activity_code='xunlei_treasure',
+            remain_chance=3
+        )
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
     def get(self, request):
@@ -2108,7 +2118,7 @@ class XunleiTreasureAPIView(APIView):
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
             if not self.has_generate_reward_activity(request.user.id, self.activity_name):
-                if self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                if self.introduced_by_with(request.user.id, 'xunlei9', self.start_time):
                     self.generate_newUser_reward_activity(request.user)
                 else:
                     self.generate_oldUser_reward_activity(request.user)
@@ -2132,7 +2142,7 @@ class XunleiTreasureAPIView(APIView):
 
         _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name)
         if not _activitys:
-            if self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+            if self.introduced_by_with(request.user.id, 'xunlei9', self.start_time):
                 activitys = self.generate_newUser_reward_activity(request.user)
             else:
                 activitys = self.generate_oldUser_reward_activity(request.user)
@@ -2140,46 +2150,58 @@ class XunleiTreasureAPIView(APIView):
             activitys = _activitys
 
         activity_record = activitys.filter(left_times__gt=0)
-        if activity_record.filter(left_times__gt=0).count() == 0:
-            json_to_response = {
-                'code': 1002,
-                'messge': u'用户的抽奖机会已经用完了',
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        else:
-            with transaction.atomic():
-                record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
-                sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
-                if record.experience:
-                    json_to_response = {
-                        'code': 0,
-                        'lefts': sum_left["amount_sum"]-1,
-                        'amount': "%d" % (record.experience.amount,),
-                        'type': u'体验金',
-                        'message': u'用户抽到奖品'
-                    }
-                    SendExperienceGold(request.user).send(record.experience.id)
-                elif record.redpack_event:
-                    json_to_response = {
-                        'code': 0,
-                        'lefts': sum_left["amount_sum"]-1,
-                        'amount':  str(record.redpack_event.amount),
-                        'type': u'加息券',
-                        'message': u'用户抽到奖品'
-                    }
-                    redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
 
-                else:
-                    json_to_response = {
-                        'code': 1,
-                        'lefts': sum_left["amount_sum"]-1,
-                        'message': u'此次没有得到奖品'
-                    }
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().filter(user=request.user, activity_code='xunlei_treasure').first()
+            if join_record.remain_chance==0 or activity_record.filter(left_times__gt=0).count() == 0:
+                json_to_response = {
+                    'code': 1002,
+                    'messge': u'用户的抽奖机会已经用完了',
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+            record = WanglibaoActivityReward.objects.filter(pk=activity_record.first().id, has_sent=False).first()
+            sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
+            has_sent = False
+            if record and record.experience:
+                json_to_response = {
+                    'code': 0,
+                    'lefts': sum_left["amount_sum"]-1,
+                    'amount': "%d" % (record.experience.amount,),
+                    'type': u'体验金',
+                    'message': u'用户抽到奖品'
+                }
+                SendExperienceGold(request.user).send(record.experience.id)
+                has_sent = True
+
+            if record and record.redpack_event:
+                json_to_response = {
+                    'code': 0,
+                    'lefts': sum_left["amount_sum"]-1,
+                    'amount':  str(record.redpack_event.amount),
+                    'type': u'加息券',
+                    'message': u'用户抽到奖品'
+                }
+                logger.debug("user:%s, redpack(%s) send" % (request.user.id, record.redpack_event))
+                redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
+                has_sent = True
+
+            if has_sent == False:
+                json_to_response = {
+                    'code': 1,
+                    'lefts': sum_left["amount_sum"]-1,
+                    'message': u'此次没有得到奖品'
+                }
+            if record:
                 record.left_times = 0
                 record.has_sent = True
                 record.save()
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+            if join_record:
+                join_record.remain_chance -= 1
+                join_record.save()
+
+        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class WeixinActivityAPIView(APIView):
     permission_classes = ()
@@ -3404,3 +3426,45 @@ class HmdInvestTopRanks(APIView):
                     rank['phone'] = safe_phone_str(userprofile.phone)
         return Response({"ret_code": 0, "hmd_ranks": hmd_ranks})
 
+
+class ZhongYingAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        Introducedby = IntroducedBy.objects.filter(user_id=request.user.id).first()
+        if not (Introducedby and Introducedby.channel and Introducedby.channel.name == 'zypwt'):
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'您不符合领奖规则'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购').order_by('create_time').first()
+
+        if not p2p_record:
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'您不符合领奖规则'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if p2p_record.amount < 3000:
+            json_to_response = {
+                'ret_code': 1003,
+                'message': u'您不符合领奖规则'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if p2p_record.amount >= 3000:
+            json_to_response = {
+                'ret_code': 1004,
+                'message': u'奖品已经发放'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')

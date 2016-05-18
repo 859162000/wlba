@@ -46,26 +46,6 @@ logger = get_task_logger(__name__)
 
 @app.task
 def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False, product_balance_after=0):
-    base_data = generate_coop_base_data('product_update')
-    product = {'id': product_id,
-               'product_balance_after': product_balance_after}
-    act_data = {
-        'product': json.dumps(product)
-    }
-    data = dict(base_data, **act_data)
-    coop_call_back.apply_async(
-        kwargs={'params': data},
-        queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
-
-    if is_full:
-        try:
-            from wanglibao_p2p.tasks import coop_product_push
-            coop_product_push.apply_async(
-                kwargs={'product_id': product_id}
-            )
-        except:
-            pass
-
     # fix@chenweibi, add order_id
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
@@ -112,6 +92,27 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         checkUpdateHmdRanks(product_id)
     except Exception, e:
         logger.error(traceback.format_exc())
+
+    try:
+        if is_full:
+                from wanglibao_p2p.tasks import coop_product_push
+                coop_product_push.apply_async(
+                    kwargs={'product_id': product_id}
+                )
+        else:
+            base_data = generate_coop_base_data('product_update')
+            product = {'id': product_id,
+                       'product_balance_after': product_balance_after}
+            act_data = {
+                'product': json.dumps(product)
+            }
+            data = dict(base_data, **act_data)
+            coop_call_back.apply_async(
+                kwargs={'params': data},
+                queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
+    except:
+        pass
+
 
 def checkUpdateHmdRanks(product_id):
     activity = Activity.objects.filter(code='hmd').first()

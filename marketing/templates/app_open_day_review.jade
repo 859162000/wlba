@@ -7,7 +7,7 @@ html(style="background: #f4f4f4")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015051304", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_open_day_review.css?v=2015051702", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -21,7 +21,7 @@ html(style="background: #f4f4f4")
                         dd!='人气王<span>重礼</span>悬赏'
                     .red_box
                         img(src='/static/imgs/mobile_activity/app_open_day_review/red_box.png')
-                        span 2016年5月17日 - 5月23日
+                        span 2016年5月18日 - 5月24日
                     p.ranking_title_top “产融通HMD”  类项目累计排行榜
                     .ranking_list
                         ul
@@ -51,30 +51,39 @@ html(style="background: #f4f4f4")
                     .red_title 重礼悬赏
                     .ranking_box_list
                         .box
-                            .img
-                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_1.png')
-                                p 1 名
-                            p.data_text!='价值<span>2000</span>元红木制品'
+                            img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_1.png')
+                            .data_box
+                                p.text_1 价值：
+                                p.text_data!='<span>2000</span>元'
+                                p.text_2 红酸枝博古架<br>80*20*80cm
                         .box
-                            .img
-                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_2.png')
-                                p 1 名
-                            p.data_text!='价值<span>1500</span>元红木制品'
+                            img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_2.png')
+                            .data_box
+                                p.text_1 价值：
+                                p.text_data!='<span>1500</span>元'
+                                p.text_2 红酸枝手雕笔筒<br>15*13cm
                         .box
-                            .img
-                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_3.png')
-                                p 1 名
-                            p.data_text!='价值<span>1000</span>元红木制品'
+                            img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_3.png')
+
+                            .data_box
+                                p.text_1 价值：
+                                p.text_data!='<span>1000</span>元'
+                                p.text_2 红酸枝文房四宝
                         .box
-                            .img.img_4
-                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_4.png')
-                                p 20 名
-                            p.data_text!='价值<span>700</span>元红木制品'
-                        .box
-                            .img.img_4
-                                img(src='/static/imgs/mobile_activity/app_open_day_review/paiming_5.png')
-                                p 20 名
-                            p.data_text.data_text_5!='<span>10</span>元无门槛抵扣红包'
+                            img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_4.png')
+
+                            .data_box
+                                p.text_1 价值：
+                                p.text_data!='<span>300</span>元'
+                                p.text_2 小叶紫檀手串<br>108颗
+                        .box.box_last
+                            img.big_img(src='/static/imgs/mobile_activity/app_open_day_review/prize_img_5.png')
+
+                            .data_box
+                                p.text_1 价值：
+                                p.text_data!='<span>10</span>元'
+                                p.text_2 无门槛抵扣红包
+                        p.title_careful 图片仅供参考，请以实物为准
             if p2p_list_url
                 p.insert_text
                     span 红木贷项目列表：
@@ -144,7 +153,7 @@ html(style="background: #f4f4f4")
                     .red_title 用户须知
                     dl
                         dt 1、
-                        dd 活动时间：2016年5月17日0:00 - 5月23日23:59。
+                        dd 活动时间：2016年5月18日 0:00 - 5月24日 23:59。
                     dl
                         dt 2、
                         dd 活动期间，投资带有“产融通HMD”开头的项目，投资金额才会进入累计排行。

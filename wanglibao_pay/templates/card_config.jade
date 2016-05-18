@@ -17,8 +17,13 @@ head
             }else {
                 var kuai_code = kuai_code_td.text()
             }
+            if ($(unbind_button).attr('class')== 'unbind_kuai_button'){
+                var unbind_channel = 'kuaipay' 
+            } else if ($(unbind_button).attr('class')== 'unbind_yee_button'){
+                var unbind_channel = 'yeepay'
+            }
             $.get(window.location, {'user_id': user_id, 'card_num': card_num, 'kuai_code':
-                                    kuai_code});
+                                    kuai_code, 'unbind_channel': unbind_channel});
             window.location.reload();
         }
 
@@ -82,7 +87,7 @@ body
                                 for bank_kuai_code, bank_name in banks_info
                                     option(value=bank_kuai_code) {{ bank_name }}
                     td 
-                        button(type='button', class='unbind_button',
+                        button(type='button', class='unbind_kuai_button',
                                 onclick='unbind_card(this)') 解绑
         table.table
             tr 
@@ -91,16 +96,19 @@ body
                 th 易宝卡号
                 th 网利卡号
                 th 银行
+                th 解除绑定
             for card_num, card in yee_cards
-                if card
-                    tr
-                        td {{ card_num }}
+                tr
+                    if card
+                        td(class='card_num') {{ card_num }}
                         td {{ card.no }}
                         td {{ card.bank.name }}
-                else
-                    tr
+                    else
                         td {{ card_num }}
 
+                    td 
+                        button(type='button', class='unbind_yee_button',
+                                onclick='unbind_card(this)') 解绑
     else
       form(method="GET" action='')
          .form-row

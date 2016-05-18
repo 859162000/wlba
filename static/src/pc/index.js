@@ -126,14 +126,14 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
     $('.close').on('click', function () {
         $('.bonus-img,.page,.wdty').hide();
     });
-
+    //
     function wxShareIcon() {
         var docleft = document.body.clientWidth;
         var left = (docleft - $('.bonus-icon').width());
         $('.bonus-icon').css({'left': left});
     }
 
-    //wxShareIcon()
+    wxShareIcon()
     window.onresize = function () {
         wxShareIcon();
     };

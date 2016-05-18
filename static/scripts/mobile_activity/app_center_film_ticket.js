@@ -220,7 +220,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;
 (function(org) {
 
-
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
 		type : 'GET',
@@ -240,11 +239,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '网利宝影像投资节送福利喽',
-			shareImg = host + '/static/imgs/mobile_activity/app_august_phone/300x300.jpg',
-			shareLink = host + '/activity/app_august_phone/?promo_token=sy',
-			shareMainTit = '网利宝影像投资节送福利喽',
-			shareBody = '全民福利 火速领取';
+			shareName = '网利宝携手中影票务通送福利',
+			shareImg = host + '/static/imgs/mobile_activity/app_center_film_ticket/300x300.jpg',
+			shareLink = host + '/activity/app_center_film_ticket/?promo_token=sy',
+			shareMainTit = '网利宝携手中影票务通送福利',
+			shareBody = '票房最强档 网利宝请您看';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -254,7 +253,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝影像投资节送福利喽',
+			title: '网利宝携手中影票务通送福利',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -271,6 +270,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     var login = false;
     wlb.ready({
         app: function (mixins) {
+            mixins.shareData({title: '网利宝携手中影票务通送福利', content: '票房最强档 网利宝请您看'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -289,26 +289,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         //    self.location.replace(url);
                         //}
 
-                        $('#button_link').on("click",function(){
+                        $('#get_ticket').click(function() {
                             org.ajax({
-                                type: "post",
-                                url: "/api/activity/zhaoxiangguan/",
-                                dataType: 'json',
-                                success: function(data){
-                                    if(data.ret_code=='1'){
+                                url: '/api/activity/zhongying/',
+                                type: 'post',
+                                success: function (data) {
+                                    if(data.ret_code=='1000'){
+                                        mixins.loginApp({refresh:1, url:'/activity/app_center_film_ticket/?promo_token=zypwt'});
+                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
-                                    }else if(data.ret_code=='0'){
-                                        if(data.tag=='标记成功'){
-                                            mixins.jumpToManageMoney();
-                                        }else{
-                                            $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                                            $('.popup_box').show();
-                                        }
+                                    }else if(data.ret_code=='1002'||data.ret_code=='1004'){
+                                        $('.popup_box .main .textairport').text(''+data.message+'');
+                                        $('.popup_box').show();
+                                    }else{
+                                        $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                                        $('.popup_box').show();
                                     }
-                                    //console.log(data)
                                 }
-
                             })
                         })
                     }
@@ -318,9 +316,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 if (data.ph == '') {
                     login = false;
 
-                    $('#button_link').on("click",function(){
-                         mixins.loginApp({refresh:1, url:'/activity/app_august_phone/?promo_token=sy'});
-                    })
+
+                    $('#get_ticket').click(function() {
+                        mixins.loginApp({refresh:1, url:'/activity/app_center_film_ticket/?promo_token=zypwt'});
+                    });
                 } else {
                     login = true;
                     connect(data)
@@ -330,32 +329,29 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
         },
         other: function(){
-            $('#button_link').on("click",function(){
+            $('#get_ticket').click(function() {
                 org.ajax({
-                    type: "post",
-                    url: "/api/activity/zhaoxiangguan/",
-                    dataType: 'json',
-                    success: function(data){
+                    url: '/api/activity/zhongying/',
+                    type: 'post',
+                    success: function (data) {
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?promo_token=sy&next=/activity/app_august_phone/?promo_token=sy'
-                        }else if(data.ret_code=='1'||data.ret_code=='1001'||data.ret_code=='1002'){
+                            window.location.href = '/weixin/login/?promo_token=zypwt&next=/activity/app_center_film_ticket/?promo_token=zypwt'
+                        }else if(data.ret_code=='1001'||data.ret_code=='1002'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
-                        }else if(data.ret_code=='0'){
-                             if(data.tag=='标记成功'){
-                                window.location.href = '/weixin/list/?promo_token=sy'
-                            }else{
-                                $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                                $('.popup_box').show();
-                            }
-
+                        }else if(data.ret_code=='1002'||data.ret_code=='1004'){
+                            $('.popup_box .main .textairport').text(''+data.message+'');
+                            $('.popup_box').show();
+                        }else{
+                            $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                            $('.popup_box').show();
                         }
-                        //console.log(data)
                     }
                 })
             })
         }
     })
+
 
     $('.section_5_box p span').on('click',function(){
         var ele = $('.section_5_box .slide_text');
@@ -374,5 +370,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
             });
         }
-    })
+    });
+
+    $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
+        $('.popup_box').hide();
+    });
 })(org);

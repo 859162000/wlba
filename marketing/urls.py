@@ -102,6 +102,8 @@ urlpatterns = patterns(
     url(r'^xunlei_treasure/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei.jade")),
     url(r'^shield_plan/$', ShieldPlanView.as_view()),
 
+
+
 )
 
 # app URL
@@ -222,6 +224,7 @@ urlpatterns += patterns(
     url(r'^app_center_film_ticket/$', TemplateView.as_view(template_name="app_center_film_ticket.jade")),
     url(r'^app_xunlei_welfare/$', TemplateView.as_view(template_name="app_xunlei_welfare.jade")),
     url(r'^new_user_gift/$', login_required(TemplateView.as_view(template_name="server_new_user_gift.jade"), login_url="/accounts/login/")),
+    url(r'^app_pretty_reach_home/$', TemplateView.as_view(template_name="app_pretty_reach_home.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
     # url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),

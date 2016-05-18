@@ -1084,7 +1084,14 @@ class LoginAPIView(DecryptParmsAPIView):
         password = self.params.get("password", "")
 
         if not identifier or not password:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+            return Response({"token":"false", "message":u"用户名或密码不可为空"}, status=400)
+
+        from wanglibao_account.models import GeetestModifiedTimes
+        geetest_record = GeetestModifiedTimes.objects.filter(identified=identifier).first()
+        if not geetest_record:
+            geetest_record = GeetestModifiedTimes.objects.create(
+                identifier=identifier,
+                times=0)
 
         # add by ChenWeiBin@20160113
         profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
@@ -1094,7 +1101,10 @@ class LoginAPIView(DecryptParmsAPIView):
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token": "false", "message": u"用户名或密码错误"}, status=400)
+            geetest_record.times += 1
+            display_pic = 'true' if geetest_record.times>2 else 'false'
+            geetest_record.save()
+            return Response({"token": "false", "message": u"用户名或密码错误", "display_pic":display_pic}, status=400)
         if not user.is_active:
             return Response({"token": "false", "message": u"用户已被关闭"}, status=400)
         if user.wanglibaouserprofile.frozen:
@@ -1129,6 +1139,8 @@ class LoginAPIView(DecryptParmsAPIView):
         # if not created:
         #     token.delete()
         #     token, created = Token.objects.get_or_create(user=user)
+        geetest_record.times = 0
+        geetest_record.save()
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 
