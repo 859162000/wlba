@@ -1249,23 +1249,17 @@ else:
 # 比搜益
 BISOUYI_CHANNEL_CODE = 'bisouyi'
 if ENV == ENV_PRODUCTION:
-    BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
-    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
-    BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
-    BISOUYI_SIGN_KEY = ''
-    BISOUYI_COOP_KEY = ''
+    BISOUYI_CLIENT_ID = 'BSY_WLB_PROD_10002'
+    BISOUYI_CLIENT_SECRET = 'TOKEN_A_Tmmn898bts'
+    BISOUYI_AES_KEY = 'SECRET_A_501mng6'
     BISOUYI_PCODE = '10002'
-    BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
-    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
+    BISOUYI_OATUH_PUSH_URL = 'http://app.bisouyi.com:8082/bsy-pop-web/openapi/p2p/account/oauth'
 else:
     BISOUYI_CLIENT_ID = 'BSY_WLB_Test_10002'
     BISOUYI_CLIENT_SECRET = 'TOKEN_A_Test_k0t8m'
     BISOUYI_AES_KEY = 'SECRET_WLB_aes66'
-    BISOUYI_SIGN_KEY = ''
-    BISOUYI_COOP_KEY = '89ccf30c29e340371af1ea821ac3013cb1f17b2a'
     BISOUYI_PCODE = '10002'
     BISOUYI_OATUH_PUSH_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/oauth'
-    BISOUYI_VALID_CALLBACK_URL = 'http://180.168.75.226:60000/bsy-pop-web/openapi/p2p/account/certify'
 
 
 # 加息盒子
