@@ -59,6 +59,8 @@ class P2PProduct(models.Model):
 
     sync_id = models.FloatField(u'同步id(时间戳)', default=0)
 
+    activity_amount = models.DecimalField(u'返现活动数额', max_digits=20, decimal_places=4, default=0)
+
     # def save(self, *args, **kwargs):
     #     if self.status == u'流标':
     #         self.flow_time = now()
