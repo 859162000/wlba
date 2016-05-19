@@ -309,7 +309,7 @@ class YueLiBaoBuy(APIView):
 
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
-                                                  'device_type': device['device_type']})
+                                                  'device_type': device['device_type']}, queue='celery_ylb')
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
@@ -643,7 +643,7 @@ class AssignmentOfClaimsBuy(APIView):
             )
 
             assignment_buy.apply_async(
-                kwargs={'buyer_token': buyer_token, 'seller_token': seller_token})
+                kwargs={'buyer_token': buyer_token, 'seller_token': seller_token}, queue='celery_ylb')
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
