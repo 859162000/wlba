@@ -37,7 +37,8 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_rest.utils import get_current_utc_timestamp
 from report.crypto import Aes
 from common.tools import FileObject
-
+from wanglibao_account.models import IdVerification
+from wanglibao_account.backends import check_age_for_id
 
 logger = logging.getLogger(__name__)
 
@@ -129,16 +130,37 @@ def create_user(identifier, password, nickname, user_type='0'):
     return user
 
 
-def verify_id(name, id_number):
+def verify_id(user, name, id_number):
     backend = settings.ID_VERIFY_BACKEND
     class_name = backend.split('.')[-1]
+    if class_name not in ('TestIDVerifyBackEnd', 'ProductionIDVerifyBackEnd', 'ProductionIDVerifyV2BackEnd', 'ProductionIDVerifyV1&V2AutoBackEnd'):
+        raise NameError("The specific backend not implemented")
 
+    id_number_len = len(str(id_number))
+    if not(id_number_len == 15 or id_number_len == 18):
+        message = u'身份证长度不合法'
+        record = IdVerification(id_number=id_number, name=name, is_valid=False, description=message)
+        record.save()
+        return record, message
+
+    records = IdVerification.objects.filter(id_number=id_number, name=name)
+    if records.exists():
+        record = records.first()
+        if class_name == 'TestIDVerifyBackEnd':
+            return record, None
+        if record.description == u'该用户未满18周岁':
+            if not check_age_for_id(id_number):
+                return record, None
+        else:
+            return record, None
+
+    verify_result = None
     if class_name == 'TestIDVerifyBackEnd':
-        return TestIDVerifyBackEnd.verify(name, id_number)
+        verify_result = TestIDVerifyBackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyBackEnd':
-        return ProductionIDVerifyBackEnd.verify(name, id_number)
+        verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyV2BackEnd':
-        return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+        verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
         key = 'valid_count_v1'
         valid_v1_total = settings.VALID_V1_TOTAL
@@ -157,12 +179,23 @@ def verify_id(name, id_number):
             else:
                 redis._set(key, valid_v1_total)
                 logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
-                return ProductionIDVerifyBackEnd.verify(name, id_number)
+                verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
         else:
             logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
-            return ProductionIDVerifyV2BackEnd.verify(name, id_number)
-    else:
-        raise NameError("The specific backend not implemented")
+            verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
+
+    message = verify_result.get('description')
+    record = IdVerification()
+    record.id_number = id_number
+    record.name = name
+    record.is_valid = verify_result.get('is_valid')
+    record.description = message
+    if record.is_valid:
+        message = None
+        if verify_result.get('id_photo'):
+            record.id_photo.save('%s.jpg' % id_number, verify_result.get('id_photo'), save=True)
+    record.save()
+    return record, message
 
 
 def generate_contract(equity, template_name=None, equities=None):
