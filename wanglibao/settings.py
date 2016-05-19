@@ -1391,6 +1391,7 @@ if ENV == ENV_PRODUCTION:
 
 
 # settings for PHP
+
 PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
 PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
 
@@ -1415,6 +1416,8 @@ PHP_INSIDE_MESSAGES_LIST = "http://192.168.20.248/message.php/message/list"
 PHP_INSIDE_MESSAGE_READ = 'http://192.168.20.248/message.php/message'
 PHP_INSIDE_MESSAGE_READ_ALL = 'http://192.168.20.248/message.php/message/0'
 
+# 待收本金 BASE url
+PHP_UNPAID_PRINCIPLE_BASE = '/ylb/py_interface.php?action=getPrincipal'
 # 月利宝首页展示      host + 地址
 PHP_INDEX_MONTH = '/ylb/finnal.php?method=projectPcpool'
 PHP_INDEX_ASSIGNMENT = '/ylb/finnal.php?method=listzqAll'

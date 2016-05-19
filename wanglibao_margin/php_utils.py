@@ -422,7 +422,14 @@ def get_user_info(request, session_id=None, token=None):
                              message=u'get user error.')
             return user_info
 
-        margin_info = get_margin_info(user.id)
+        url = 'https://' + request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        try:
+            if int(request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger.info(u'不是开发环境 = {}'.format(e.message))
+
+        margin_info = get_margin_info(user.id, url)
 
         user_info.update(user_id=user.pk,
                          username=user.wanglibaouserprofile.phone,
@@ -450,9 +457,10 @@ def get_user_info(request, session_id=None, token=None):
     return user_info
 
 
-def get_margin_info(user_id):
+def get_margin_info(user_id, url=None):
     """
     :param user_id:
+    :param url  : 用于根据host 获取 待收本金url
     :return: 用户可用余额
     0.00 总资产(元) = 0.00 可用余额 + 0.00 待收本金 + 0.00 投资冻结 + 0.00 提现冻结
     """
@@ -471,7 +479,7 @@ def get_margin_info(user_id):
                     unpaid_principle += equity.unpaid_principal  # 待收本金
 
             # 增加从PHP项目来的月利宝待收本金
-            php_principle = get_php_redis_principle(user.pk)
+            php_principle = get_php_redis_principle(user.pk, url)
             unpaid_principle += php_principle
 
             margin = user.margin.margin
@@ -550,14 +558,16 @@ def calc_php_commission(product_id):
             php_commission(user, product_id, start, end)
 
 
-def get_php_redis_principle(user_id):
+def get_php_redis_principle(user_id, url=None):
     """
     从redis 或者 api接口 得到用户的待收本金
     :param user_id:
+    :param url:     增加url 参数, 根据host 确定目标 url
     :return: 1000   代收本金
     """
     try:
-        url = settings.PHP_UNPAID_PRINCIPLE
+        if not url:
+            url = settings.PHP_UNPAID_PRINCIPLE
         response = requests.post(url, data={'user_id': user_id}, timeout=3).json()
         try:
             if response.get('total_amount'):

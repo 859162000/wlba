@@ -103,7 +103,14 @@ class GetMarginInfo(APIView):
     def get(self, request):
 
         user_id = self.request.REQUEST.get('userId')
-        margin = get_margin_info(user_id)
+        url = 'https://' + request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        try:
+            if int(self.request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger.info(u'不是开发环境 = {}'.format(e.message))
+
+        margin = get_margin_info(user_id, url)
 
         return HttpResponse(renderers.JSONRenderer().render(margin, 'application/json'))
 

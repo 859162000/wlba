@@ -198,6 +198,7 @@ def save_margin_to_redis(sender, **kwargs):
                 unpayed_principle += equity.unpaid_principal  # 待收本金
 
         # 增加从PHP项目来的月利宝待收本金
+        # TODO 根据host 确定 url
         from wanglibao_margin.php_utils import get_php_redis_principle
         php_principle = get_php_redis_principle(user.pk)
         unpayed_principle += php_principle

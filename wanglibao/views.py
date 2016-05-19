@@ -265,7 +265,14 @@ class IndexView(TemplateView):
                 unpayed_principle += equity.unpaid_principal
 
             # 增加从PHP项目来的月利宝待收本金
-            php_principle = get_php_redis_principle(user.pk)
+            url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+            try:
+                if int(self.request.get_host().split(':')[1]) > 7000:
+                    url = settings.PHP_APP_INDEX_DATA_DEV
+            except Exception, e:
+                logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+            php_principle = get_php_redis_principle(user.pk, url)
             unpayed_principle += php_principle
 
             p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
