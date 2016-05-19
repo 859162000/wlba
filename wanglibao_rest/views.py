@@ -1090,7 +1090,7 @@ class LoginAPIView(DecryptParmsAPIView):
         geetest_record = GeetestModifiedTimes.objects.filter(identified=identifier).first()
         if not geetest_record:
             geetest_record = GeetestModifiedTimes.objects.create(
-                identifier=identifier,
+                identified=identifier,
                 times=0)
 
         # add by ChenWeiBin@20160113
