@@ -292,6 +292,7 @@ def coop_product_push(product_id=None):
         product['types'] = product['types__name']
         activity_amount = product['activity__rule__rule_amount'] or 0
         product['activity_amount'] = float(activity_amount) * 100
+        product.pop('activity__rule__rule_amount', None)
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -369,6 +370,7 @@ def coop_product_push_for_manual():
         product['types'] = product['types__name']
         activity_amount = product['activity__rule__rule_amount'] or 0
         product['activity_amount'] = float(activity_amount) * 100
+        product.pop('activity__rule__rule_amount', None)
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -389,6 +391,7 @@ def coop_product_push_for_manual():
             'products': json.dumps(push_product_list)
         }
         data = dict(base_data, **act_data)
+        print push_product_list, ">>>>>>>>>>>>>>>>>>>>aaa"
         coop_call_back.apply_async(
             kwargs={'params': data},
             queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
