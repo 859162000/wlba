@@ -12,10 +12,14 @@ from wanglibao.views import IndexView, SecurityView, PartnerView
     # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
     ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView, \
-    Rong360P2PListView, Rong360TokenView
+    Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
+from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
+    YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
+    AssignmentBuyFail, GetUnreadMgsNum, YueLiBaoBuyStatus, AssignmentBuyStatus, GetUserUnreadMgsNum, GetRedPacks, \
+    SendRedPacks, GetAPPUser, CheckAppTradePassword, GetAjaxRedPacks, GetIOSRedPacks
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -27,8 +31,6 @@ from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDate
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser, DuoZhuanByDateAPI
 from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
     AppShareViewSuccess, AppShareViewError, RockFinanceQRCodeView
-from wanglibao_activity.decorators import decorator_include
-from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
 from wanglibao_sms.views import ArriveRate
 
@@ -180,6 +182,12 @@ urlpatterns += patterns(
     url(r'^api/loans/success/$', MidaiSuccessView.as_view()),
     url(r'^api/loans/new/$', MidaiNewView.as_view()),
 
+    # 西瓜理财
+    url(r'^api/xglcApi/onSaleProduct/$', XiguaP2PListView.as_view()),
+    url(r'^api/xglcApi/productStateInfo/$', XiguaP2PQueryView.as_view()),
+
+    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
+
     #url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
     url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
     url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
@@ -188,6 +196,37 @@ urlpatterns += patterns(
 
     url(r'^rock/finance/qrcode/$', RockFinanceQRCodeView.as_view(), name="qrcode"),
 
+    # urls for php api by zhoudong
+    url(r'^php/get_user/$', GetUserInfo.as_view(), name='php_user_info'),
+    # url(r'^php/margin/$', GetMarginInfo.as_view(), name='php_margin_info'),
+    # 单条站内信
+    url(r'^php/send_message/inside/$', SendInsideMessage.as_view(), name='php_send_inside_message'),
+    url(r'^php/unread_messages/$', GetUnreadMgsNum.as_view(), name='php_unread_messages'),
+    url(r'^api/php/unread_messages/$', GetUserUnreadMgsNum.as_view(), name='php_self_unread_messages'),
+    # 发送短信, 是否是营销类传参数 ext 分开.
+    url(r'^php/send_messages/$', SendMessages.as_view(), name='php_send_messages'),
+
+    url(r'^php/trade_password/$', CheckTradePassword.as_view(), name='php_trade_password'),
+    url(r'^php/app/trade_password/$', CheckAppTradePassword.as_view(), name='php_app_trade_password'),
+    url(r'^php/redpacks/list/$', GetRedPacks.as_view(), name='php_unused_redpacks'),
+    url(r'^php/redpacks/list/ios/$', GetIOSRedPacks.as_view(), name='php_unused_redpacks'),
+    url(r'^php/redpacks/ajax/list/$', GetAjaxRedPacks.as_view(), name='php_unused_redpacks_ajax'),
+
+    url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
+    url(r'^php/yue/fail/$', YueLiBaoBuyFail.as_view(), name='php_buy_yuelibao_fail'),
+    url(r'^php/yue/status/$', YueLiBaoBuyStatus.as_view(), name='php_buy_yuelibao_status'),
+    url(r'^php/yue/check/$', YueLiBaoCheck.as_view(), name='php_check_yuelibao'),
+    url(r'^php/yue/cancel/$', YueLiBaoCancel.as_view(), name='php_cancel_yuelibao'),
+    url(r'^php/yue/refund/$', YueLiBaoRefund.as_view(), name='php_refund_yuelibao'),
+
+    url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_buy_assignment'),
+    url(r'^php/assignment/status/$', AssignmentBuyStatus.as_view(), name='php_buy_assignment_status'),
+    url(r'^php/assignment/fail/$', AssignmentBuyFail.as_view(), name='php_buy_assignment_fail'),
+    url(r'^php/redpacks/send/$', SendRedPacks.as_view(), name='send_redpacks_by_push'),
+
+    url(r'^php/app/user/get/$', GetAPPUser.as_view(), name='get_app_user'),
+
+    # url(r'^php/logout/$', logout_with_cookie, name='php_logout_cookie'),
 )
 
 # 短信

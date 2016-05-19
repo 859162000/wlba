@@ -3,6 +3,7 @@
 
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
+# from wanglibao_account.decorators import login_required
 from wanglibao_pay.views import BankListView, PayCallback, WithdrawCompleteView, WithdrawCallback, PayView, WithdrawView, \
     PayCompleteView, WithdrawTransactions, WithdrawRedirectView,\
     YeeProxyPayCompleteView, BankListForRegisterView, CardConfigTemplateView

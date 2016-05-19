@@ -105,7 +105,7 @@ html
         .panel-title-bar
           .panel-title 动作
         .well
-          form(method="POST", action="{{request.url}}").pull-left
+          .pull-left(data-url='{{request.url}}')
             -csrf_token
             if p2p.total_amount != product_plan_amount
               button(style="width:450px; height:40px; font-size:16px; background:#FF3333;")

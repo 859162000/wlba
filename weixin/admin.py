@@ -67,6 +67,12 @@ class SeriesActionActivityAdmin(admin.ModelAdmin):
 class SeriesActionActivityRuleAdmin(admin.ModelAdmin):
     list_display = ('id','rule_name', 'rule_description', 'gift_type', 'redpack', 'reward', 'is_used')
 
+class SeriesActionActivityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'code', 'description', 'action_type', 'days', 'start_at', 'end_at', 'is_stopped')
+
+class SeriesActionActivityRuleAdmin(admin.ModelAdmin):
+    list_display = ('id','rule_name', 'rule_description', 'gift_type', 'redpack', 'reward', 'is_used')
+
 admin.site.register(Account, AccountAdmin)
 admin.site.register(QrCode, QrCodeAdmin)
 admin.site.register(SubscribeService, SubscribeServiceAdmin)

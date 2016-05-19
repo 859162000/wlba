@@ -7,7 +7,9 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from django.utils import timezone
 from views import P2PEquity
 from collections import OrderedDict
+import logging
 
+logger = logging.getLogger(__name__)
 
 def safe_phone(phone):
     return phone[:3] + '*' * (len(phone) - 4 - 3) + phone[-4:]
@@ -90,21 +92,23 @@ class P2PProductSerializer(ModelSerializerExtended):
         # is_login = True
         # if not self.request.user.is_authenticated():
         #     is_login = False
-
-        for section_key in extra_data:
-            for item_key in extra_data[section_key]:
-                # if not item_key:
-                #     if not is_login:
-                #         extra_data[section_key][section_key] = u'请登录后查看'
-                #     else:
-                #         extra_data[section_key][section_key] = extra_data[section_key][item_key]
-                #     del extra_data[section_key][item_key]
-                # else:
-                #     if not is_login:
-                #         extra_data[section_key][item_key] = u'请登录后查看'
-                if not item_key:
-                    extra_data[section_key][section_key] = extra_data[section_key][item_key]
-                    del extra_data[section_key][item_key]
+        try:
+            for section_key in extra_data:
+                for item_key in extra_data[section_key]:
+                    # if not item_key:
+                    #     if not is_login:
+                    #         extra_data[section_key][section_key] = u'请登录后查看'
+                    #     else:
+                    #         extra_data[section_key][section_key] = extra_data[section_key][item_key]
+                    #     del extra_data[section_key][item_key]
+                    # else:
+                    #     if not is_login:
+                    #         extra_data[section_key][item_key] = u'请登录后查看'
+                    if not item_key:
+                        extra_data[section_key][section_key] = extra_data[section_key][item_key]
+                        del extra_data[section_key][item_key]
+        except:
+            logger.error('parse extra data failed:' + str(value))
 
 
 

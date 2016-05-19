@@ -19,6 +19,7 @@ module.exports = function( grunt ) {
                 files: {
                     'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
                     'scripts/subMobile/mobile.js': ['src/subMobile/lib/zepto/zepto.js', 'src/subMobile/mobile.js'],
+                    'scripts/subMobile/scratch.js': ['src/subMobile/lib/Lottery.js', 'src/subMobile/scratch.js'],
                     'scripts/app/lib/jquery.num.js': ['src/app/lib/jquery.min.js', 'src/app/lib/jquery.animateNumber.min.js'],
                 }
             }
@@ -44,6 +45,12 @@ module.exports = function( grunt ) {
                         cwd: 'scripts/app/',
                         src: '*.js',
                         dest: 'scripts/app/dist/'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'scripts/component/',
+                        src: '*.js',
+                        dest: 'scripts/component/dist/'
                     },
                 ]
 

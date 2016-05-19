@@ -1,5 +1,12 @@
 # encoding: utf-8
+import base64
+
 import datetime
+from django.contrib.sites.models import get_current_site
+from django.template.response import TemplateResponse
+from django.utils.http import is_safe_url
+
+from wanglibao_margin.php_utils import set_cookie, get_php_redis_principle, get_php_index_data
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
 import logging
@@ -11,12 +18,12 @@ import urllib
 from random import randint
 from decimal import Decimal
 from django.contrib import auth
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import login as auth_login, REDIRECT_FIELD_NAME
 from django.db.models import Sum, Q
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
+from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm, AuthenticationForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
@@ -88,6 +95,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
+logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class RegisterView(RegistrationView):
@@ -508,6 +516,17 @@ class AccountHome(TemplateView):
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal
 
+        # 增加从PHP项目来的月利宝待收本金
+        url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        try:
+            if int(self.request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+        php_principle = get_php_redis_principle(user.pk, url)
+        unpayed_principle += php_principle
+
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
         total_asset = p2p_total_asset
@@ -618,6 +637,31 @@ class AccountHomeAPIView(APIView):
         p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
         p2p_unpayed_principle = unpayed_principle  # P2P待收本金
 
+        # 增加从PHP项目来的月利宝待收本金
+        url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        try:
+            if int(self.request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+        php_principle = get_php_redis_principle(user.pk, url)
+        p2p_unpayed_principle += php_principle
+
+        # 增加从PHP项目来的 昨日收益, 累计收益, 待收收益
+        url = 'https://' + request.get_host() + settings.PHP_APP_INDEX_DATA
+        try:
+            if int(request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+        try:
+            index_data = get_php_index_data(url, user.id)
+        except Exception, e:
+            index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
+            logger_yuelibao.debug(u'月利宝地址请求失败!!! exception = {}'.format(e.message))
+
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
         fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
@@ -628,10 +672,10 @@ class AccountHomeAPIView(APIView):
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user,
-                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user,
-                            date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_week = DailyIncome.objects.filter(
+                user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(
+                user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         # 当月免费提现次数
         fee_config = WithdrawFee().get_withdraw_fee_config()
@@ -649,8 +693,11 @@ class AccountHomeAPIView(APIView):
             'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
             'p2p_withdrawing': float(p2p_withdrawing),  # P2P提现中冻结金额
             'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
-            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest),  # p2p总待收益
-            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
+            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest) +
+                                         float(index_data['unPaidIncome']),  # p2p总待收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest +
+                                             p2p_total_paid_coupon_interest) +
+                                       float(index_data['paidIncome']),  # P2P总累积收益
             'p2p_total_interest': float(p2p_total_interest + p2p_total_coupon_interest),  # P2P总收益
 
             'fund_total_asset': float(fund_total_asset),  # 基金总资产
@@ -659,7 +706,7 @@ class AccountHomeAPIView(APIView):
             'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
-            'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
+            'p2p_income_yesterday': float(p2p_income_yesterday) + float(index_data['yesterdayIncome']),  # 昨日到账收益
             'withdraw_free_count': withdraw_free_count,  # 当月免费提现次数
 
         }
@@ -911,6 +958,16 @@ class AccountP2PAssetAPI(APIView):
         p2p_freeze = user.margin.freeze
         p2p_withdrawing = user.margin.withdrawing
         p2p_unpayed_principle = unpayed_principle
+        # 增加从PHP项目来的月利宝待收本金
+        url = 'https://' + request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        try:
+            if int(self.request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+        php_principle = get_php_redis_principle(user.pk, url)
+        p2p_unpayed_principle += php_principle
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
@@ -1275,22 +1332,49 @@ class MessageView(TemplateView):
     template_name = 'message.jade'
 
     def get_context_data(self, **kwargs):
+
         listtype = self.request.GET.get("listtype")
+        messages = []
+        messages_list = []
 
         if not listtype or listtype not in ("read", "unread", "all"):
             listtype = 'all'
 
-        if listtype == "unread":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
-                '-message_text__created_at')
-        elif listtype == "read":
-            messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by(
-                '-message_text__created_at')
-        else:
-            messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
+        if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
+            if listtype == "unread":
+                messages = Message.objects.filter(target_user=self.request.user, read_status=False, notice=True).order_by(
+                    '-message_text__created_at')
+            elif listtype == "read":
+                messages = Message.objects.filter(target_user=self.request.user, read_status=True, notice=True).order_by(
+                    '-message_text__created_at')
+            else:
+                messages = Message.objects.filter(target_user=self.request.user).order_by('-message_text__created_at')
 
-        messages_list = []
-        messages_list.extend(messages)
+            messages_list.extend(messages)
+
+        else:
+            logger.info('in MessageView, PHP_INSIDE_MESSAGE_LIST_SWITCH != 1')
+            response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
+                                     data={'uid': self.request.user.id, 'read_status': listtype}, timeout=3)
+            if response.status_code == 200:
+                resp = response.json()
+                if resp['code'] == 'success':
+                    count = len(resp['data'])
+                    data = resp['data']
+                    messages = Message.objects.all()[:count]
+
+                    # 把 data 的数据 赋值都展示的messages 对象
+                    index = 0
+                    for message in messages:
+                        message.id = data[index]['id']
+                        message.read_status = data[index]['read_status']
+                        message.message_text.mtype = data[index]['mtype']
+                        message.message_text.title = data[index]['title']
+                        message.message_text.content = data[index]['content']
+                        message.message_text.created_at = int(data[index]['created_at'])
+                        index += 1
+
+                messages_list.extend(messages)
 
         limit = 10
         paginator = Paginator(messages_list, limit)
@@ -1326,10 +1410,15 @@ class MessageCountAPIView(APIView):
 
 
 class MessageDetailAPIView(APIView):
+    """
+    ret = {"ret_code":0, "message":"ok"}
+
+    """
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, message_id):
         result = inside_message.sign_read(request.user, message_id)
+
         return Response(result)
 
 def verified_user_login(phone, ip, action=None):
@@ -1410,7 +1499,12 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                     request.session.set_expiry(604800)
                 else:
                     request.session.set_expiry(1800)
-                return HttpResponse(messenger('done', user=request.user))
+                response = HttpResponse(messenger('done', user=request.user))
+                # 这个不是实时的
+                # set_cookie(response, 'session_bak',
+                #            request.COOKIES.get('sessionid', 'session_has_not_initialized_yet'))
+                set_cookie(response, 'session_bak', request.session.session_key)
+                return response
             else:
                 # 用户的登录次数失败后,处理对应的session
                 if request.POST.get('identifier'):  # 用户可能没有输入任何信息就提交了form表单
@@ -1633,6 +1727,51 @@ class P2PAmortizationAPI(APIView):
                 return u'已回款'
         else:
             return u'待回款'
+
+
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def login_for_redirect(request, template_name='registration/login.html',
+                       redirect_field_name=REDIRECT_FIELD_NAME,
+                       authentication_form=AuthenticationForm,
+                       current_app=None, extra_context=None):
+    """
+    Displays the login form and handles the login action.
+    """
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    if redirect_to.startswith('base64'):
+        logger_yuelibao.info('yuelibao!!!!!!!!!!!!!!!')
+        redirect_to = base64.b64decode(redirect_to[6:])
+        logger_yuelibao.info('redirect to {}'.format(redirect_to))
+
+    if request.method == "POST":
+        form = authentication_form(request, data=request.POST)
+        if form.is_valid():
+
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+            # Okay, security check complete. Log the user in.
+            auth_login(request, form.get_user())
+
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = authentication_form(request)
+
+    current_site = get_current_site(request)
+
+    context = {
+        'form': form,
+        redirect_field_name: redirect_to,
+        'site': current_site,
+        'site_name': current_site.name,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
 
 
 @login_required

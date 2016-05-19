@@ -190,7 +190,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        #'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -446,6 +446,18 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_sms.log',
             'formatter': 'verbose'
         },
+        'wanglibao_margin': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/yuelibao.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_inside_messages': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/inside_messages.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -494,7 +506,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_margin': {
-            'handlers': ['file'],
+            'handlers': ['file', 'wanglibao_margin'],
             'level': 'DEBUG',
         },
         'wanglibao_lottery': {
@@ -533,9 +545,15 @@ LOGGING = {
             'handlers': ['file', 'console'],
             'level': 'DEBUG'
         },
+        'wanglibao_inside_messages': {
+            'handlers': ['file', 'wanglibao_inside_messages'],
+            'level': 'DEBUG',
+        },
     }
 }
 
+# set session for PHP cross domain.
+SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
@@ -647,7 +665,7 @@ CELERYBEAT_SCHEDULE = {
 
     # add by lili: 全民佣金收入短信/站内信每日定时发送
     'all_invite_earning_data': {
-        'task': 'marketing.tools.send_income_message_sms',
+        'task': 'marketing.tools.send_commission_income_message_sms',
         'schedule': crontab(minute=0, hour=20)
     },
     # add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
@@ -726,6 +744,20 @@ CELERYBEAT_SCHEDULE = {
     # 每天发放昨天的排名奖励, by HMM
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
+        'schedule': crontab(minute=0, hour=1),
+    },
+    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    # 'redpack_status_task_check': {
+    #     'task': 'marketing.tools.check_redpack_status',
+    #     'schedule': crontab(minute=0, hour=11),
+    # },
+    # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    'month_product_buy_task_check': {
+        'task': 'wanglibao_margin.tasks.buy_month_product',
+        'schedule': timedelta(minutes=1),
+    },
+    'assignment_buy_task_check': {
+        'task': 'wanglibao_margin.tasks.assignment_buy',
         'schedule': crontab(minute=30, hour=0),
     },
     # 每十分钟去第三方更新当天的在5分钟之前开始且还在处理中的pay_info的处理结果
@@ -1294,6 +1326,17 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = 'wanglibank_redis'
 
+PHP_REDIS_HOST = '192.168.20.241'
+PHP_REDIS_PORT = 6379
+PHP_REDIS_DB = 0
+PHP_REDIS_PASSWORD = 'wanglibao_ylb.com'
+
+if ENV == ENV_PRODUCTION:
+    PHP_REDIS_HOST = '10.172.83.189'
+    PHP_REDIS_PORT = 6379
+    PHP_REDIS_DB = 0
+    PHP_REDIS_PASSWORD = 'wanglibao_ylb.com'
+
 # CACHES = {
 #     'default': {
 #         'BACKEND': 'redis_cache.RedisCache',
@@ -1346,6 +1389,55 @@ DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
 
+
+# settings for PHP
+
+PHP_UNPAID_PRINCIPLE = 'https://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
+
+# 控制显示站内信的地方, PHP消息中心还是主站.
+# 1 -------> 主站自己, 同时更新消息中心
+# 2 -------> 显示消息中心
+PHP_INSIDE_MESSAGE_LIST_SWITCH = 1
+
+# 控制发送站内信的地方, PHP消息中心还是主站.
+# 1 -------> 主站自己发
+# 2 -------> 主站发, 然后通知消息中心也发一份
+# 3 -------> 测试成功后, 站内信功能转交给消息中心
+PHP_INSIDE_MESSAGE_SWITCH = 2
+
+# PHP 发送站内信地址
+PHP_SEND_INSIDE_MESSAGE = "http://192.168.20.248/message.php/message/inside"
+# PHP 查询未读数量
+PHP_UNREAD_MESSAGES_COUNT = "http://192.168.20.248/message.php/message/count"
+# PHP 站内信显示
+PHP_INSIDE_MESSAGES_LIST = "http://192.168.20.248/message.php/message/list"
+# PHP 读站内信
+PHP_INSIDE_MESSAGE_READ = 'http://192.168.20.248/message.php/message'
+PHP_INSIDE_MESSAGE_READ_ALL = 'http://192.168.20.248/message.php/message/0'
+
+# 待收本金 BASE url
+PHP_UNPAID_PRINCIPLE_BASE = '/ylb/py_interface.php?action=getPrincipal'
+# 月利宝首页展示      host + 地址
+PHP_INDEX_MONTH = '/ylb/finnal.php?method=projectPcpool'
+PHP_INDEX_ASSIGNMENT = '/ylb/finnal.php?method=listzqAll'
+# 月利宝首页展示 dev 地址
+PHP_INDEX_MONTH_DEV = 'https://wltest.wanglibao.com/ylb/finnal.php?method=projectPcpool'
+PHP_INDEX_ASSIGNMENT_DEV = 'https://wltest.wanglibao.com/ylb/finnal.php?method=listzqAll'
+
+# 月利宝 APP 端信息展示.    host + 地址
+PHP_APP_INDEX_DATA = '/ylb/api/python.php'
+PHP_APP_INDEX_DATA_DEV = 'http://zhangfu.dev.wanglibao.com/api/python.php'
+
+
+if ENV == ENV_PRODUCTION:
+    PHP_UNPAID_PRINCIPLE = 'https://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+    PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'
+    PHP_SEND_INSIDE_MESSAGE = "http://123.57.146.238/message.php/message/inside"
+    PHP_UNREAD_MESSAGES_COUNT = "http://123.57.146.238/message.php/message/count"
+    PHP_INSIDE_MESSAGES_LIST = "http://123.57.146.238/message.php/message/list"
+    PHP_INSIDE_MESSAGE_READ = 'http://123.57.146.238/message.php/message'
+    PHP_INSIDE_MESSAGE_READ_ALL = 'http://123.57.146.238/message.php/message/0'
 
 # 渠道数据中心平台认证授权密钥
 CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'

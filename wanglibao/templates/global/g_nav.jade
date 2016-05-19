@@ -60,7 +60,7 @@
           else
             i.user-icon-img
           span.user-text 我的账户
-          i.icon.iconfont.icon-down
+          i.icon.iconfont.icon-down-new
         ul.g-nav-user-nav#minNavs
           mixin liItem(url, text)
             li
@@ -71,24 +71,47 @@
           +liItem('/accounts/transaction/p2p/', '交易记录')
 
     .g-nav-box
-      mixin nav-item(name, link, news)
+      mixin nav-item(className, name, link, smallNav, news)
+        if smallNav == 'list'
+            link = 'javascript:void(0)'
         if activeItem == name
-            a.highlight(href=link)= name
+          .g-nav-list(class=className)
+            a.highlight(href=link, class='nav-a')= name
               if news
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
+              if smallNav == 'list'
+                  i.icon.iconfont.icon-down-new
+            if smallNav == 'list'
+              ul.g-nav-user-nav.list-nav-hover
+                mixin smallNav(url, text)
+                  li
+                    a(href=url)=text
+                +smallNav('/ylb/monthly.php', '月利宝')
+                +smallNav('/p2p/list/', '散标')
+                +smallNav('/ylb/exchange.php', '转让标')
+
         else
-            a(href=link)= name
-              if news
-                img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
+            .g-nav-list(class=className)
+              a(href=link, class='nav-a')= name
+                if news
+                  img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
+                if smallNav == 'list'
+                  i.icon.iconfont.icon-down-new
+              if smallNav == 'list'
 
-      +nav-item('首页', '/')
-      +nav-item('理财专区', '/p2p/list/')
-      +nav-item('贷款专区', '/finance/')
-      +nav-item('风险控制', '/security')
+                ul.g-nav-user-nav.list-nav-hover
+                  mixin smallNav(url, text)
+                    li
+                      a(href=url)=text
+                  +smallNav('/ylb/monthly.php', '月利宝')
+                  +smallNav('/p2p/list/', '散标')
+                  +smallNav('/ylb/exchange.php', '转让标')
 
-      +nav-item('关于我们', '/about/')
+      +nav-item('nav-index', '首页', '/')
+      +nav-item('nav-p2p', '理财专区', '', 'list')
+      +nav-item('nav-dai', '风险控制', '/security')
+      +nav-item('nav-area', '平台数据', '/data_cube/')
+      +nav-item('nav-security', '关于我们', '/about/')
 
 
   .g-nav-multicolour-line
-
-

@@ -71,9 +71,9 @@ urlpatterns = patterns(
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
 
-    url(r'^login/$', 'django.contrib.auth.views.login',
+    url(r'^login/$', 'wanglibao_account.views.login_for_redirect',
         {
-            "template_name": "login_test.jade",
+            "template_name": "loginAndRegister.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
     url(r'^token/login/ajax/$', 'wanglibao_account.views.ajax_token_login'),

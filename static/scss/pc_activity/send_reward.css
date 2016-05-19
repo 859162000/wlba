@@ -1,0 +1,295 @@
+.clear {
+  clear: both; }
+
+#body_wrap {
+  width: 100%; }
+
+.banner {
+  width: 100%;
+  height: 944px;
+  background: url("/static/imgs/pc_activity/send_reward/banner.jpg") no-repeat center;
+  padding-top: 420px; }
+  .banner .main {
+    width: 1086px;
+    margin: 0 auto;
+    display: block;
+    float: none; }
+    .banner .main .title_1 {
+      width: 100%;
+      text-align: center;
+      line-height: 36px;
+      font-size: 30px;
+      color: #fff; }
+    .banner .main .step_wrap {
+      width: 942px;
+      display: block;
+      margin: 0 auto;
+      height: 230px;
+      padding-top: 90px; }
+      .banner .main .step_wrap dl {
+        float: left;
+        display: block;
+        width: 136px;
+        height: 136px;
+        border: 2px #a03acc solid;
+        border-radius: 50%; }
+        .banner .main .step_wrap dl dt {
+          width: 55px;
+          height: 78px;
+          display: block;
+          margin: 0 auto;
+          padding-top: 26px; }
+        .banner .main .step_wrap dl dt.one {
+          background: url("/static/imgs/pc_activity/send_reward/step_1.png") no-repeat center bottom; }
+        .banner .main .step_wrap dl dt.two {
+          background: url("/static/imgs/pc_activity/send_reward/step_2.png") no-repeat center bottom; }
+        .banner .main .step_wrap dl dt.three {
+          background: url("/static/imgs/pc_activity/send_reward/step_3.png") no-repeat center bottom; }
+        .banner .main .step_wrap dl dt.four {
+          background: url("/static/imgs/pc_activity/send_reward/step_4.png") no-repeat center bottom; }
+        .banner .main .step_wrap dl dd {
+          text-align: center;
+          font-weight: 100;
+          font-size: 22px;
+          color: #e7207d;
+          padding-top: 4px;
+          height: 34px;
+          line-height: 30px; }
+      .banner .main .step_wrap .arrow {
+        float: left;
+        display: block;
+        width: 22px;
+        height: 89px;
+        margin: 0 52px;
+        background: url("/static/imgs/pc_activity/send_reward/arrow_ico.png") no-repeat center bottom;
+        padding-top: 52px; }
+    .banner .main .title_2 {
+      width: 100%;
+      text-align: center;
+      line-height: 36px;
+      font-size: 30px;
+      color: #cbacff;
+      padding-top: 36px;
+      height: 72px; }
+    .banner .main .text_1 {
+      width: 100%;
+      text-align: center;
+      line-height: 22px;
+      font-size: 18px;
+      color: #cbacff;
+      padding: 22px 0 30px;
+      height: 74px; }
+    .banner .main .text_2 {
+      width: 95%;
+      text-align: center;
+      height: 60px;
+      margin: 0 auto;
+      display: block; }
+      .banner .main .text_2 .text {
+        line-height: 60px;
+        display: inline-block;
+        font-size: 18px;
+        color: #bfa1f1;
+        height: 60px;
+        padding: 0 50px;
+        background: #1d002f;
+        border-radius: 40px; }
+      .banner .main .text_2 span {
+        line-height: 60px;
+        display: inline-block;
+        font-size: 18px;
+        color: #fcd812;
+        height: 60px;
+        background: #1d002f;
+        border-radius: 40px; }
+      .banner .main .text_2 span.line {
+        margin: 0 10px;
+        font-size: 24px; }
+      .banner .main .text_2 span.see_info {
+        cursor: pointer; }
+    .banner .main .title_3 {
+      width: 100%;
+      line-height: 24px;
+      text-align: center;
+      font-size: 14px;
+      color: #bfa1f1; }
+
+.code_wrap {
+  width: 100%;
+  padding-top: 25px;
+  height: 315px;
+  clear: both;
+  position: relative;
+  left: 0;
+  top: 0; }
+  .code_wrap .bg {
+    width: 100%;
+    height: 290px;
+    background: #333; }
+  .code_wrap .main {
+    width: 1110px;
+    display: block;
+    height: 315px;
+    margin: 0 auto;
+    position: absolute;
+    left: 50%;
+    margin-left: -555px;
+    top: 0;
+    z-index: 2;
+    background: url("/static/imgs/pc_activity/double_eggs/code_wrap_bg.png") no-repeat; }
+  .code_wrap .code {
+    position: absolute;
+    right: 95px;
+    top: 122px;
+    width: 110px;
+    height: 110px;
+    z-index: 2;
+    display: block; }
+  .code_wrap .text {
+    width: 150px;
+    height: 30px;
+    line-height: 30px;
+    position: absolute;
+    right: 75px;
+    top: 232px;
+    z-index: 2;
+    text-align: center;
+    font-size: 10px;
+    color: #fff; }
+
+.main_wrap_1 {
+  background: url("/static/imgs/pc_activity/send_reward/main_wrap_1.jpg") no-repeat; }
+
+.main_wrap {
+  width: 100%;
+  clear: both;
+  height: 378px; }
+  .main_wrap .body_main {
+    width: 1088px;
+    display: block;
+    margin: 0 auto;
+    position: relative;
+    height: 300px; }
+    .main_wrap .body_main .line_bg_1 {
+      position: absolute;
+      left: -200px;
+      top: -63px;
+      background: url("/static/imgs/pc_activity/send_reward/line_bg_1.png") no-repeat;
+      width: 87px;
+      height: 125px;
+      display: block; }
+    .main_wrap .body_main .title {
+      font-size: 22px;
+      color: #bfa1f1;
+      line-height: 36px;
+      padding: 40px 0;
+      text-align: left; }
+      .main_wrap .body_main .title span {
+        font-size: 22px;
+        padding: 0 10px;
+        height: 36px;
+        line-height: 36px;
+        background: #bfa1f1;
+        color: #27053d;
+        border-radius: 30px;
+        margin-right: 6px; }
+    .main_wrap .body_main .box_wrap {
+      width: 100%;
+      height: 222px; }
+      .main_wrap .body_main .box_wrap .box {
+        float: left;
+        display: block;
+        border: 2px #8b62af solid;
+        border-radius: 6px;
+        width: 270px;
+        height: 218px;
+        margin-right: 130px; }
+        .main_wrap .body_main .box_wrap .box dl {
+          width: 185px;
+          height: 115px;
+          border-radius: 6px;
+          margin: 27px auto 20px;
+          display: block;
+          overflow: hidden; }
+          .main_wrap .body_main .box_wrap .box dl dt {
+            width: 100%;
+            height: 38px; }
+          .main_wrap .body_main .box_wrap .box dl dt.one {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_1.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #4e7cda; }
+          .main_wrap .body_main .box_wrap .box dl dt.two {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_2.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #a3bd1b; }
+          .main_wrap .body_main .box_wrap .box dl dt.three {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_3.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #f835a6; }
+          .main_wrap .body_main .box_wrap .box dl dt.four {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_4.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #3548d1; }
+          .main_wrap .body_main .box_wrap .box dl dt.five {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_5.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #2cb776; }
+          .main_wrap .body_main .box_wrap .box dl dt.six {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_6.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #ff7a73; }
+          .main_wrap .body_main .box_wrap .box dl dt.seven {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_1.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #4e7cda; }
+          .main_wrap .body_main .box_wrap .box dl dt.eight {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_2.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #a3bd1b; }
+          .main_wrap .body_main .box_wrap .box dl dt.nine {
+            background-image: url("/static/imgs/pc_activity/send_reward/reward_7.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #d86713; }
+          .main_wrap .body_main .box_wrap .box dl dd {
+            background: #fff;
+            text-align: center;
+            font-size: 19px;
+            color: #27053d;
+            line-height: 24px;
+            padding-top: 20px;
+            height: 77px; }
+        .main_wrap .body_main .box_wrap .box .button {
+          width: 215px;
+          height: 40px;
+          font-size: 18px;
+          color: #fff;
+          display: block;
+          margin: 0 auto;
+          text-align: center;
+          line-height: 40px;
+          background-image: url("/static/imgs/pc_activity/send_reward/button.png");
+          cursor: pointer; }
+        .main_wrap .body_main .box_wrap .box .button:hover {
+          background-image: url("/static/imgs/pc_activity/send_reward/button_hover.png"); }
+      .main_wrap .body_main .box_wrap .box_three {
+        margin-right: 0; }
+
+/*# sourceMappingURL=send_reward.css.map */

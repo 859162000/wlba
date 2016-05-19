@@ -206,7 +206,7 @@ def yiche_callback(url, params, channel):
     try:
         logger.info(params)
         ret = requests.post(url, data=params)
-        logger.info('%s callback url: %s'% (channel, ret.url))
+        logger.info('%s callback url: %s' % (channel, ret.url))
         logger.info('callback return: %s' % (ret.text))
     except Exception, e:
         logger.info(" {'%s callback':'failed to connect'} " % channel)
