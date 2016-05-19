@@ -291,7 +291,7 @@ def coop_product_push(product_id=None):
 
         product['types'] = product['types__name']
         activity_amount = product['activity__rule__rule_amount'] or 0
-        product['activity_amount'] = float(activity_amount)
+        product['activity_amount'] = float(activity_amount) * 100
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -368,7 +368,7 @@ def coop_product_push_for_manual():
     for product in product_list:
         product['types'] = product['types__name']
         activity_amount = product['activity__rule__rule_amount'] or 0
-        product['activity_amount'] = float(activity_amount)
+        product['activity_amount'] = float(activity_amount) * 100
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
