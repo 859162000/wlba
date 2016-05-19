@@ -128,13 +128,11 @@ class IndexView(TemplateView):
         month_data, assignment_data = [], []
         url = 'https://' + request.get_host() + settings.PHP_INDEX_MONTH
         # 开发环境 端口起 7000 以上用 wltest 数据
-        logger_yuelibao.info('host = {}'.format(request.get_host()))
         try:
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_INDEX_MONTH_DEV
         except Exception, e:
-            logger_yuelibao.debug('not local host = {}'.format(e))
-        logger_yuelibao.info('url = {}'.format(url))
+            pass
         try:
             month_response = requests.post(url, data={}, timeout=3)
             if month_response.status_code == 200:
@@ -150,8 +148,7 @@ class IndexView(TemplateView):
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_INDEX_ASSIGNMENT_DEV
         except Exception, e:
-            logger_yuelibao.debug('not local host = {}'.format(e))
-        logger_yuelibao.info('url = {}'.format(url))
+            pass
         try:
             assignment_response = requests.post(url, data={}, timeout=3)
             if assignment_response.status_code == 200:
@@ -270,7 +267,7 @@ class IndexView(TemplateView):
                 if int(self.request.get_host().split(':')[1]) > 7000:
                     url = settings.PHP_APP_INDEX_DATA_DEV
             except Exception, e:
-                logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+                pass
 
             php_principle = get_php_redis_principle(user.pk, url)
             unpayed_principle += php_principle

@@ -108,7 +108,7 @@ class GetMarginInfo(APIView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         margin = get_margin_info(user_id, url)
 
@@ -258,9 +258,6 @@ class CheckAppTradePassword(PHPDecryptParmsAPIView):
     def post(self, request):
         trade_password = self.params.get('trade_pwd', "").strip()
         user_id = self.request.POST.get('user_id', "").strip()
-        logger.info('post uid = {}, password = {}'.format(user_id, self.request.POST.get('password')))
-        logger.info("in class CheckAppTradePassword, self.params = {}, trade_password = {}\n"
-                    .format(self.params, trade_password))
         try:
             ret = trade_pwd_check(int(user_id), trade_password)
         except Exception, e:
@@ -374,7 +371,7 @@ class YueLiBaoBuyFail(APIView):
             ret.update(status=1,
                        msg='success')
         except Exception, e:
-            logger.debug('call fail API failed with : {}\n'.format(e.message))
+            logger.debug('in YueLiBaoBuyFail, failed with : {}\n'.format(e.message))
             ret.update(status=0,
                        msg=e.message)
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
@@ -406,7 +403,6 @@ class YueLiBaoBuyStatus(APIView):
         else:
             ret.update(status=0,
                        msg='pay failed!')
-        logger.info('check yuelibao bought status: {}\n'.format(ret['msg']))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -426,7 +422,6 @@ class YueLiBaoCheck(APIView):
 
         product_id = request.POST.get('productId')
         period = int(request.POST.get('period'))
-        logger.info('in YueLiBaoCheck, product_id = {}, period = {}'.format(product_id, period))
 
         try:
             with transaction.atomic(savepoint=True):
@@ -457,7 +452,6 @@ class YueLiBaoCheck(APIView):
             logger.debug(u'月利宝id: {} 满标审核失败: {}\n'.format(product_id, e.message))
             ret.update(status=0,
                        msg=e.message)
-        logger.info('ret = {}'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -548,7 +542,7 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
-        logger.info('in refund, args = '.format(args))
+        logger.info('in YueLiBaoRefund, args = '.format(args))
 
         try:
             with transaction.atomic(savepoint=True):
@@ -755,8 +749,6 @@ class GetRedPacks(APIView):
         if request.user.id:
             uid = request.user.id
 
-        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
-
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
         if period and uid:
@@ -796,8 +788,6 @@ class GetIOSRedPacks(APIView):
 
         if request.user.id:
             uid = request.user.id
-
-        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
@@ -839,8 +829,6 @@ class GetAjaxRedPacks(APIView):
 
         if request.user.id:
             uid = request.user.id
-
-        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
