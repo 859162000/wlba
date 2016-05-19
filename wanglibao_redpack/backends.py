@@ -141,9 +141,12 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           x.created_at, event.available_at, event.unavailable_at)
                 end_time_day = end_time.strftime('%Y-%m-%d')
+                period_tmp = event.period
                 if device_type == 'ios' or device_type == 'android':
                     if app_version <= "2.9.0":
                         period_type_event = event.period_type if event.period_type not in ('month_lte', 'day_lte') else ''
+                        if device_type == 'ios':
+                            period_tmp = 0
                     else:
                         period_type_event = event.period_type
                 else:
@@ -153,9 +156,9 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     "name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                     "id": x.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                     "unavailable_at": stamp(end_time), "event_id": event.id,
-                    "period": event.period,
+                    "period": period_tmp,
                     "period_type": period_type_event,
-                    "period_name": str(event.period) + period_name.get(event.period_type, ''),
+                    "period_name": u'限' + str(event.period) + period_name.get(event.period_type, ''),
                     "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                     "highest_amount": event.highest_amount, "order_by": 2
                 }
@@ -244,9 +247,12 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                                               coupon.created_at, event.available_at, event.unavailable_at)
                     end_time_day = end_time.strftime('%Y-%m-%d')
 
+                    period_tmp = event.period
                     if device_type == 'ios' or device_type == 'android':
                         if app_version <= "2.9.0":
                             period_type_event = event.period_type if event.period_type not in ('month_lte', 'day_lte') else ''
+                            if device_type == 'ios':
+                                period_tmp = 0
                         else:
                             period_type_event = event.period_type
                     else:
@@ -256,9 +262,9 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         "name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                         "id": coupon.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
-                        "period": event.period,
+                        "period": period_tmp,
                         "period_type": period_type_event,
-                        "period_name": str(event.period) + period_name.get(event.period_type, ''),
+                        "period_name": u'限' + str(event.period) + period_name.get(event.period_type, ''),
                         "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 1
                     }
