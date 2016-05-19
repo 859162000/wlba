@@ -21,7 +21,8 @@ class UserMarginAdmin(admin.ModelAdmin):
 
 class MarginRecordAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'order_id', 'catalog', 'user', 'amount', 'description', 'margin_current', 'create_time')
+    list_display = ('id', 'order_id', 'catalog', 'user', 'amount', 'description',
+                    'freeze_before', 'freeze_after', 'margin_before', 'margin_current', 'create_time')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('user', )
     list_filter = ('catalog', )

@@ -69,7 +69,9 @@ class EmailPhoneUsernameAuthBackend(object):
             return None
 
 import time
+from hashlib import md5
 from rest_framework.authtoken.models import Token
+from marketing.models import LoginAccessToken
 from django.conf import settings
 
 def timestamp():

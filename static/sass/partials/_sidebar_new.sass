@@ -1,31 +1,7 @@
-@mixin active-style
-  color: #e7350d
-  .icon1
-    @include account-sprite(icon1_hover)
-  .icon2
-    @include account-sprite(icon2_hover)
-  .icon3
-    @include account-sprite(icon3_hover)
-  .icon4
-    @include account-sprite(icon4_hover)
-  .icon5
-    @include account-sprite(icon5_hover)
-  .icon6
-    @include account-sprite(icon6_hover)
-  .icon7
-    @include account-sprite(icon7_hover)
-  .icon8
-    @include account-sprite(icon8_hover)
-  .icon9
-    @include account-sprite(icon9_hover)
-  .icon10
-    @include account-sprite(icon10_hover)
-  .icon11
-    @include account-sprite(icon11_hover)
-  .icon12
-    @include account-sprite(icon12_hover)
-  .icon13
-    @include account-sprite(icon13_hover)
+.aside
+  background: #fff
+  margin-top: 14px
+
 .sidebar-item-title
   height: 50px
   line-height: 50px
@@ -35,6 +11,7 @@
     border-left: 3px solid #ffffff
     text-align: center
     width: 217px
+
 .activeA
   a
     color: #e7350d
@@ -63,7 +40,7 @@
         border: 0 none
       em
         width: 22px
-        height: 22px
+        height: 21px
         display: inline-block
         vertical-align: -6px
         margin-left: 49px
@@ -97,17 +74,41 @@
       i
         position: absolute
         background: red
-        border-radius: 50%
-        line-height: 12px
+        border-radius: 9px
+        line-height: 16px
         font-size: 9px
         left: 124px
         color: #ffffff
         top: 5px
-        padding: 2px
-      &:hover
-        +active-style
+        padding: 0 4px
+        height: 16px
 
   .active
     a
-      +active-style
-
+      color: #e7350d
+      .icon1
+        @include account-sprite(icon1_hover)
+      .icon2
+        @include account-sprite(icon2_hover)
+      .icon3
+        @include account-sprite(icon3_hover)
+      .icon4
+        @include account-sprite(icon4_hover)
+      .icon5
+        @include account-sprite(icon5_hover)
+      .icon6
+        @include account-sprite(icon6_hover)
+      .icon7
+        @include account-sprite(icon7_hover)
+      .icon8
+        @include account-sprite(icon8_hover)
+      .icon9
+        @include account-sprite(icon9_hover)
+      .icon10
+        @include account-sprite(icon10_hover)
+      .icon11
+        @include account-sprite(icon11_hover)
+      .icon12
+        @include account-sprite(icon12_hover)
+      .icon13
+        @include account-sprite(icon13_hover)

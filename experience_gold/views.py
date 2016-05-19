@@ -19,7 +19,7 @@ class ExperienceGoldView(TemplateView):
             template_name = "experience_gold.jade"
         elif template == 'mobile':
             template_name = 'app_experience.jade'
-        elif template == 'account':
+        elif template == 'account' or template == 'nologin':
             template_name = 'experience_account.jade'
         elif template == 'redirect':
             template_name = 'experience_redirect.jade'

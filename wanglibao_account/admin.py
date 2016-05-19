@@ -364,11 +364,15 @@ class UserSourceAdmin(admin.ModelAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        return  False
+        return False
 
 admin.site.register(UserSource, UserSourceAdmin)
 
-admin.site.unregister(User)
+try:
+    admin.site.unregister(User)
+except Exception, e:
+    print 'eeeee'*100
+    print e.message
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
 admin.site.register(VerifyCounter, VerifyCounterAdmin)

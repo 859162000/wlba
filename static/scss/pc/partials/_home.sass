@@ -475,3 +475,400 @@
   filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80)
 
 //cooperation end
+
+.project-title-box
+  margin: 40px 0 0
+  .project-type-icon
+    width: 24px
+    height: 24px
+    display: inline-block
+    vertical-align: middle
+  .type-icon-1
+    @include home-sprite(g_icon)
+  .type-icon-2
+    @include home-sprite(san_icon)
+  .type-icon-3
+    @include home-sprite(zz_icon)
+  span
+    font-size: $font-l
+    color: $t-d11
+    margin-left: 8px
+    vertical-align: middle
+    margin-right: 2px
+  em
+    width: 24px
+    height: 10px
+    vertical-align: top
+    @include home-sprite(new_icon)
+    display: inline-block
+  .vertical-icon
+    width: 2px
+    height: 16px
+    display: inline-block
+    @include home-sprite(shu)
+    vertical-align: middle
+    margin-left: 9px
+  label
+    color: #999
+    font-size: $font-m
+    vertical-align: middle
+    margin-left: 9px
+.g-plan-box
+  position: relative
+  .slide-left,.slide-right
+    width: 19px
+    height: 36px
+    display: inline-block
+    position: absolute
+    cursor: pointer
+  .slide-left
+    @include home-sprite(left)
+    left: -52px
+    top: 50%
+    &:hover
+      @include home-sprite(left_no)
+  .slide-left-no
+    @include home-sprite(left_no)
+  .slide-right
+    @include home-sprite(right)
+    right: -52px
+    top: 50%
+    &:hover
+      @include home-sprite(right_no)
+  .slide-right-no
+    @include home-sprite(right_no)
+  .project-boxs
+    width: 1100px
+    overflow-x: hidden
+    position: relative
+    height: 362px
+    .project-box-c
+      position: absolute
+      left: 0
+      top: 0
+      width: 8000px
+      .g-plan-project
+        width: 352px
+        height: 340px
+        background: $bg-d3
+        border: 1px solid $br-d2
+        padding: 20px 55px 20px
+        float: left
+        margin-right: 20px
+        position: relative
+        margin-top: 18px
+        &:hover
+          -webkit-box-shadow: #d9d9d9 2px 2px 10px
+          box-shadow: #d9d9d9 2px 2px 10px
+        .icons
+          width: 66px
+          height: 66px
+          display: inline-block
+          left: 0
+          top: 0
+          position: absolute
+        .app-share-new
+          @include home-sprite(app_icons)
+        .new-user-icon
+          @include home-sprite(new_user_icon)
+        .g-plan-title
+          text-align: center
+          position: relative
+          .letter-icon
+            width: 22px
+            height: 22px
+            display: inline-block
+            vertical-align: middle
+          .a-icon
+            @include home-sprite(a_icon)
+          .b-icon
+            @include home-sprite(b_icon)
+          .c-icon
+            @include home-sprite(c_icon)
+          .d-icon
+            @include home-sprite(d_icon)
+          .card-icon
+            width: 30px
+            height: 21px
+            display: inline-block
+            @include home-sprite(card)
+            vertical-align: middle
+          .house-icon
+            width: 28px
+            height: 22px
+            display: inline-block
+            @include home-sprite(house)
+            vertical-align: middle
+          .qy-icon
+            width: 25px
+            height: 24px
+            display: inline-block
+            @include home-sprite(san)
+            vertical-align: middle
+          .bank-icon
+            width: 29px
+            height: 20px
+            display: inline-block
+            @include home-sprite(bank)
+            vertical-align: middle
+          .gold-icon
+            width: 29px
+            height: 18px
+            display: inline-block
+            @include home-sprite(gold)
+            vertical-align: middle
+          .other-icon
+            width: 26px
+            height: 25px
+            display: inline-block
+            @include home-sprite(other)
+            vertical-align: middle
+          .zrb-icon
+            width: 23px
+            height: 24px
+            display: inline-block
+            @include home-sprite(zrb)
+            vertical-align: middle
+          span
+            color: $t-d10
+            font-size: $font-xl
+            margin: 0 7px
+            vertical-align: middle
+          span.san-title
+            width: 165px
+            overflow: hidden
+            white-space: nowrap
+            text-overflow: ellipsis
+            font-size: $font-m
+            display: inline-block
+            text-align: left
+          span.short-name
+            width: 106px
+            overflow: hidden
+            white-space: nowrap
+            text-overflow: ellipsis
+            display: inline-block
+            text-align: left
+            text-indent: 5px    
+          em
+            width: 31px
+            height: 16px
+            line-height: 16px
+            text-align: center
+            color: $t-d6
+            font-size: $font-xs
+            padding: 3px
+            border-radius: 3px
+          em.short-term
+            background: #477ced
+          em.metaphase
+            background: #f0871d
+          em.long-term
+            background: #f25a46
+          .transfer-boxs
+            width: 18px
+            height: 16px
+            position: absolute
+            top: 3px
+            right: 0
+            &:hover
+              .transfer-box
+                display: block
+            i.transfer
+              background: #fff
+              border: 1px solid #477ced
+              color: #477ced
+              border-radius: 5px
+              padding: 3px
+              cursor: pointer
+            .transfer-box
+              width: 122px
+              height: 38px
+              @include home-sprite(title)
+              font-size: $font-xs
+              color: $t-d11
+              position: absolute
+              line-height: 30px
+              top: -40px
+              left: -54px
+              display: none
+              a
+                color: #db493f
+                text-decoration: underline
+            &:hover
+              background: #477ced
+              color: #fff
+          label
+            @include home-sprite(split)
+            width: 3px
+            height: 19px
+            display: inline-block
+            vertical-align: middle
+        .increase-interest-box
+          position: absolute
+          width: 100%
+          left: 0
+          top: 56px
+          text-align: center
+          .increase-interest
+            width: auto
+            height: 20px
+            line-height: 20px
+            color: #fff
+            border-radius: 10px
+            background: #ff8400
+            padding: 3px 8px
+            font-size: 12px
+            span
+              width: 0
+              height: 0
+              border: 6px solid transparent
+              border-top: 6px solid #ff8400
+              position: absolute
+              bottom: -11px
+              left: 50%
+              margin-left: -3px
+        .percentage-box
+          color: #db493f
+          padding: 20px 0 10px
+          text-align: center
+          span
+            font-size: 46px
+          label
+            font-size: 26px
+        .mt40
+          margin-top: 40px
+          .project-introduction
+            overflow: hidden
+            text-overflow: ellipsis
+            white-space: nowrap
+            label
+              font-size: $font-s
+              color: #999
+            span
+              color: $t-d11
+              font-size: $font-xxl
+              overflow: hidden
+              text-overflow: ellipsis
+              white-space: nowrap
+              width: 170px
+              //display: inline-block
+              //vertical-align: middle
+              i
+                font-size: $font-m
+          span.profit
+            color: #db493f
+        .time-money
+          .p-top
+            font-size: $font-xxl
+            color: $t-d11
+            span
+              font-size: 26px
+          .p-b
+            font-size: $font-s
+            color: #999
+          .time-left
+            width: 108px
+            float: left
+            text-align: center
+          .border-left
+            border-left: 1px solid #ebebeb
+            height: 50px
+            display: inline-block
+            float: left
+            margin-top: 8px
+          .money-right
+            width: 112px
+            float: left
+            text-align: right
+        .transfer-info
+          margin-top: 30px
+          .num
+            color: #db493f
+          .p-top
+            i
+              font-size: $font-m
+          .time-left
+            text-align: left
+          .money-right
+            text-align: center
+            width: 130px
+        .detail-info
+          padding: 15px 0 0px
+          font-size: $font-ss
+          line-height: 23px
+          label
+            color: #999999
+          span
+            color: $t-d11
+        .progress-bar
+          padding: 10px 0 0
+          .progress-bar-box
+            float: left
+            width: 190px
+            .available-amount
+              color: #999999
+              font-size: 11px
+            .progress-bar-left
+              height: 4px
+              background: $bg-d7
+              border-radius: 3px
+              position: relative
+              margin-top: 7px
+              span
+                width: 20%
+                background: #f25a46
+                border-radius: 3px
+                display: inline-block
+                height: 4px
+                position: absolute
+                left: 0
+                top: 0
+          .progress-bar-right
+            color: $t-d11
+            font-size: $font-s
+            float: right
+        .go-investment
+          margin-top: 20px
+          text-align: center
+          a
+            width: 234px
+            height: 40px
+            line-height: 40px
+            color: $t-d6
+            font-size: $font-m
+            display: inline-block
+            background: #c7362c
+            border-radius: 5px
+          a.min
+            width: 180px
+            background: #db493f
+          a.disable-style
+            background: #c7c7c7
+      .ylb-project
+        padding: 20px 0
+        .time-money
+          padding: 0 55px
+        .progress-bar
+          padding: 10px 55px 0
+      .zqzr-project
+        padding: 30px 55px 20px
+  .page-boxs
+    margin-top: 13px
+    text-align: center
+    span
+      width: 8px
+      height: 9px
+      display: inline-block
+      @include home-sprite(dot)
+      margin-right: 30px
+      cursor: pointer
+      &:hover
+        @include home-sprite(dot_active)
+    span.active
+      @include home-sprite(dot_active)
+
+
+
+
+

@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from wanglibao.celery import app
 from .utils import send_messages as send_messages_impl
 from wanglibao_sms.views import count_messages_arrived_rate, check_arrived_rate_tasks
 from wanglibao_sms.send_php import PHPSendSMS
 
+logger = logging.getLogger('wanglibao_inside_messages')
+
 
 @app.task
 def send_messages(phones, messages, channel=1, ext=''):
+    logger.info('going to send phone message phone = {}, message = {}'.format(phones, messages))
     return send_messages_impl(phones, messages, channel=channel, ext=ext)
 
 

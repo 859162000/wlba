@@ -1,4 +1,5 @@
 # encoding: utf8
+import requests
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader, Context
@@ -8,6 +9,7 @@ from marketing.models import NewsAndReport, TimelySiteData
 from marketing.utils import pc_data_generator, utype_is_mobile
 from misc.views import MiscRecommendProduction
 from wanglibao_buy.models import FundHoldInfo
+from wanglibao_margin.php_utils import get_php_redis_principle
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
@@ -22,6 +24,7 @@ from weixin.base import ChannelBaseTemplate
 from wanglibao_rest.utils import has_register_for_phone
 
 logger = logging.getLogger(__name__)
+logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class IndexView(TemplateView):
@@ -117,6 +120,50 @@ class IndexView(TemplateView):
                                                        product_id=product_id, order_by=order_by))
         return p2p_list
 
+    def _get_php_products(self, request):
+        """
+        get yuelibao products display on Index page.
+        :return:
+        """
+        month_data, assignment_data = [], []
+        url = 'https://' + request.get_host() + settings.PHP_INDEX_MONTH
+        # 开发环境 端口起 7000 以上用 wltest 数据
+        logger_yuelibao.info('host = {}'.format(request.get_host()))
+        try:
+            if int(request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_INDEX_MONTH_DEV
+        except Exception, e:
+            logger_yuelibao.debug('not local host = {}'.format(e))
+        logger_yuelibao.info('url = {}'.format(url))
+        try:
+            month_response = requests.post(url, data={}, timeout=3)
+            if month_response.status_code == 200:
+                try:
+                    month_data = month_response.json()
+                except Exception, e:
+                    logger.debug('in _get_php_products error with {}'.format(e.message))
+        except Exception, e:
+            logger.debug('in _get_php_products error with {}'.format(e.message))
+
+        url = 'https://' + request.get_host() + settings.PHP_INDEX_ASSIGNMENT
+        try:
+            if int(request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_INDEX_ASSIGNMENT_DEV
+        except Exception, e:
+            logger_yuelibao.debug('not local host = {}'.format(e))
+        logger_yuelibao.info('url = {}'.format(url))
+        try:
+            assignment_response = requests.post(url, data={}, timeout=3)
+            if assignment_response.status_code == 200:
+                try:
+                    assignment_data = assignment_response.json()
+                except Exception, e:
+                    logger.debug('in _get_php_products error with {}'.format(e.message))
+        except Exception, e:
+            logger.debug('in _get_php_products error with {}'.format(e.message))
+
+        return month_data, assignment_data
+
     def get_context_data(self, **kwargs):
         # 需要过滤的标id
         exclude_pid = list()
@@ -158,6 +205,26 @@ class IndexView(TemplateView):
         p2p_gt6 = self.get_products(period=9, product_id=exclude_pid)
         getmore = True
 
+        # 短,中,长期 各选一个为一组, 排成3组
+        p2p_list = []
+        for i in range(3):
+            tmp_list = []
+            # 有加入, 没不加进list
+            try:
+                tmp_list.append(p2p_lt3[i])
+            except:
+                pass
+            try:
+                tmp_list.append(p2p_lt6[i])
+            except:
+                pass
+            try:
+                tmp_list.append(p2p_gt6[i])
+            except:
+                pass
+
+            p2p_list.extend(tmp_list)
+
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         # 新闻页面只有4个固定位置
         news_and_reports = NewsAndReport.objects.all().order_by('-score', '-created_at')[:4]
@@ -196,12 +263,26 @@ class IndexView(TemplateView):
             unpayed_principle = 0
             for equity in p2p_equities:
                 unpayed_principle += equity.unpaid_principal
+
+            # 增加从PHP项目来的月利宝待收本金
+            url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+            try:
+                if int(self.request.get_host().split(':')[1]) > 7000:
+                    url = settings.PHP_APP_INDEX_DATA_DEV
+            except Exception, e:
+                logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+            php_principle = get_php_redis_principle(user.pk, url)
+            unpayed_principle += php_principle
+
             p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
             fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
             if fund_hold_info.exists():
                 for hold_info in fund_hold_info:
                     fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+
+        month_data, assignment_data = self._get_php_products(self.request)
 
         return {
             "recommend_product": recommend_product,
@@ -216,7 +297,10 @@ class IndexView(TemplateView):
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
             'p2p_total_asset': float(p2p_total_asset + fund_total_asset),
-            'index': True
+            'index': True,
+            'month_data': month_data,
+            'assignment_data': assignment_data,
+            'p2p_list': p2p_list
         }
 
     def get(self, request, *args, **kwargs):

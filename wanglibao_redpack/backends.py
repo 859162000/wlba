@@ -2,6 +2,9 @@
 # encoding:utf-8
 
 import sys
+
+from wanglibao_margin.models import MonthProduct
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -273,6 +276,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 obj['amount'] /= 100.0
 
             if x.order_id:
+                # 增加对月利宝使用过的红包处理
                 pr = P2PRecord.objects.filter(order_id=x.order_id).first()
                 if pr:
                     obj.update({"product": pr.product.name, "apply_at": stamp(x.apply_at),

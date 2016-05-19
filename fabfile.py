@@ -13,6 +13,7 @@ from config.nginx_conf import generate_conf
 
 env.apache_conf = 'config/apache.conf'
 env.nginx_listen_on_80 = True
+env.nginx_listen_on_http = False
 env.migrate = True
 env.supervisord = True
 
@@ -86,6 +87,7 @@ def staging():
 
     env.mysql = True
     env.nginx_listen_on_80 = False
+    env.nginx_listen_on_http = True
 
     env.environment = "ENV_STAGING"
 
@@ -361,7 +363,8 @@ def generate_nginx_conf():
 
     conf_content = generate_conf(apps=apps,
                                  upstream_port=str(env.apache_binding_port),
-                                 listen_on_80=env.nginx_listen_on_80)
+                                 listen_on_80=env.nginx_listen_on_80,
+                                 listen_on_http=env.nginx_listen_on_http)
     put(StringIO(conf_content), "/etc/nginx/sites-available/wanglibao-proxy.conf", use_sudo=True)
     #sudo('rm -f /etc/nginx/sites-enabled/*')
     sudo('rm -f /etc/nginx/sites-enabled/wanglibao-proxy.conf')

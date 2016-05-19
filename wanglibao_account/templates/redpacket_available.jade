@@ -65,10 +65,12 @@ block main
               else
                 td {{red_packet.highest_amount}}元
               td 仅限一次
+
               if red_packet.method == '-'
                 td {{red_packet.amount}}元
               else
                 td 投资额{{red_packet.amount | percentage_number_two}}%
+
               if red_packet.invest_amount == 0
                 td 无
               else

@@ -312,7 +312,12 @@ def card_bind_list(request):
             min_amount = fee_config.get('min_amount')
             max_amount = fee_config.get('max_amount')
 
+            need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
             for card in cards:
+                if need_sms and need_sms.value == '1' and card.is_bind_kuai:
+                    need_validation_for_qpay = True
+                else:
+                    need_validation_for_qpay = False
                 base_dict = {
                     "card_id": card.id,
                     'bank_id': card.bank.code,

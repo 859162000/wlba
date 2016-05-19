@@ -204,7 +204,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         _onMenuShareTimeline:function(ops,suFn,canFn){
             wx.onMenuShareTimeline(lib._setShareData(ops,suFn,canFn));
         },
-        _onMenuShareQQ:function(){
+        _onMenuShareQQ:function(ops,suFn,canFn){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
     }
@@ -233,6 +233,10 @@ org.test = (function(org){
               document.addEventListener('WebViewJavascriptBridgeReady', function() {
                 callback(WebViewJavascriptBridge)
               }, false)
+              var u = navigator.userAgent;
+              if(u.indexOf('wlbAPP') <= -1){
+                  window.location.href =' /weixin/login/?next=' + $("input[name='next']").val()
+              }
             }
           }
 
@@ -251,11 +255,13 @@ org.test = (function(org){
               log('JS got a message', message)
               var data = { 'Javascript Responds':'收到' }
               log('JS responding with', data)
-              responseCallback(data)
+              responseCallback(data);
             });
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
+
+              $('#log1').html('=============');
               org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
@@ -265,9 +271,11 @@ org.test = (function(org){
                   ts: responsejson.ts
                 },
                 success: function(data){
+                  $('#log2').html('ajax success');
                   window.location.href = $("input[name='next']").val();
                 },
                 error: function(data){
+                  $('#log3').html('ajax error');
                   window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
@@ -300,6 +308,7 @@ org.scratch = (function(org){
           }
 
           connectWebViewJavascriptBridge(function(bridge) {
+
             var uniqueId = 1
             function log(message, data) {
               var log = document.getElementById('log')
@@ -310,12 +319,12 @@ org.scratch = (function(org){
               else { log.appendChild(el) }
             }
 
-            bridge.init(function(message, responseCallback) {
+           /* bridge.init(function(message, responseCallback) {
               log('JS got a message', message)
               var data = { 'Javascript Responds':'收到' }
               log('JS responding with', data)
               responseCallback(data)
-            });
+            });*/
 
             //登陆
               $('#login').on('click',function(){

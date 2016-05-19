@@ -20,7 +20,7 @@ def convert_to_10k(value):
     Convert the number into 10k or 10000k based string
     """
     value = int(float(value))
-    return u'%s 万' % (value/10000)
+    return u'%s万' % (value/10000)
 
 @register.filter
 def money(value):

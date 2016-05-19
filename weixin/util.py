@@ -193,6 +193,21 @@ def getAccountInfo(user):
     p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
     p2p_unpayed_principle = unpayed_principle  # P2P待收本金
 
+    # 增加从PHP项目来的月利宝待收本金
+    try:
+        from wanglibao_margin.php_utils import get_php_redis_principle
+        url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        try:
+            if int(self.request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger.info(u'不是开发环境 = {}'.format(e.message))
+
+        php_principle = get_php_redis_principle(user.pk, url)
+        p2p_unpayed_principle += php_principle
+    except Exception, e:
+        logger.debug('in getAccountInfo, PHP 待收本金 出错: {}'.format(e.message))
+
     p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
     fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)

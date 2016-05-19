@@ -366,8 +366,8 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
                         $('#loginForm').find('.loginError').show().text(xhr.message);
                     }
                 }else{
-                    var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
-                    window.location.href = next;
+                    var redirect = $('input[name=next]').val();
+                    window.location.href = !!redirect ? redirect : '/';
                 }
                 $('.gt_refresh_tips').click();$('#loginPwd').val('').focus();statusV = 0;
             }).fail(function (xhr) {
