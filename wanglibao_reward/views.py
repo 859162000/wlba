@@ -60,7 +60,7 @@ from wanglibao_sms.tasks import send_sms_msg_one
 import traceback
 from wanglibao_redis.backend import redis_backend
 from weixin.util import getMiscValue
-from wanglibao_reward.utils import getWeekBeginDay
+from wanglibao_reward.utils import getWeekBeginDay, getRedisHmdTopRanks
 import time
 
 logger = logging.getLogger('wanglibao_reward')
@@ -3188,3 +3188,28 @@ class FetchNewUserReward(APIView):
             except Exception, e:
                 logger.debug(traceback.format_exc())
         return Response({"ret_code": 0, "message": "奖励发放成功，请前往【账户】-【理财券】查看"})
+
+class HmdInvestTopRanks(APIView):
+    """
+    木材专题活动排行榜
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        # activity = Activity.objects.filter(code='hmd').first()
+        # utc_now = timezone.now()
+        # if activity.is_stopped:
+        #     return Response({"ret_code": -1, "message":"活动已经截止"})
+        # if activity.start_at > utc_now:
+        #     return Response({"ret_code": -1, "message":"活动还未开始"})
+        # if activity.end_at < utc_now:
+        #     return Response({"ret_code": -1, "message":"活动已经结束"})
+        hmd_ranks = getRedisHmdTopRanks()
+        uids = [rank['user'] for rank in hmd_ranks]
+        userprofiles = WanglibaoUserProfile.objects.filter(user__in=uids).all()
+        for rank in hmd_ranks:
+            for userprofile in userprofiles:
+                if userprofile.user_id == rank['user']:
+                    rank['phone'] = safe_phone_str(userprofile.phone)
+        return Response({"ret_code": 0, "hmd_ranks": hmd_ranks})
+

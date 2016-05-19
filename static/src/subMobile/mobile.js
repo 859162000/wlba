@@ -738,6 +738,9 @@ org.detail = (function (org) {
          */
         _share: function(obj,hide){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ', 'hideMenuItems'];
+            var host = window.location.search,
+                wxDebug = host.split('debug=')[1];
+            wxDebug = wxDebug ? wxDebug : false;
             org.ajax({
                 type : 'GET',
                 url : lib.weiURL,
@@ -745,7 +748,7 @@ org.detail = (function (org) {
                 success : function(data) {
                     //请求成功，通过config注入配置信息,
                     wx.config({
-                        debug: false,
+                        debug: wxDebug,
                         appId: data.appId,
                         timestamp: data.timestamp,
                         nonceStr: data.nonceStr,
@@ -2930,7 +2933,7 @@ org.redpacket = (function(org){
                 fphone = $("input.fphone").val(),
                 original_id = $("input.original_id").val(),
                 weixin_channel = $("input.weixin_channel_code").val();
-            var imgDom = $("#js-share-sign");
+            var imgDom = $("img.js-share-sign");
             if(is_bind=="False" && $(".redpacket-index").length < 1){
                 org.ajax({
                     url: '/weixin/api/generate/qr_invite_scene_ticket/',
@@ -3004,11 +3007,18 @@ org.redpacket = (function(org){
                 $(this).parents(".invite-share-ok").hide();
             });
         },
-        shareOk: function(price){
-            var url = window.location.protocol +"//" + window.location.host;
-            price = price ? price : "X";
-            var share = {shareImg: url+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url+'', shareMainTit:'网利宝红包花雨季，我今天接了'+ price +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
+        shareOk: function(){
+            var url = $("input.share_url").val(),
+                price = $(".js-reward-price").text();
+            var num = 10000,
+                host = 'https://staging.wanglibao.com/';
+
+            if(price){
+                num = price.substring(0,price.length-1)*1;
+            }
+            var share = {shareImg: host+'/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png',shareLink:url, shareMainTit:'网利宝红包花雨季，我今天接了'+ num +'元现金', shareBody:'每天一场下给你', success:lib.shareFn};
             org.detail.share(share, true);
+            //org.detail.share(share, false);
         }
     }
     return {
@@ -3146,7 +3156,7 @@ org.redpacket_bind = (function(org){
                     },
                     success: function (data) {
                         if(data.re_code != 0){
-                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                            window.location.href = "/weixin/jump_page/?message="+data.errmessage;
                         }else{
                             window.location.href = $("input.next-url").val();
                         }
@@ -3511,28 +3521,28 @@ function isAwards(k){//判断抽奖是第几项
         case 0.2:
             is = 1;
             break;
-        case 0.3:
+        case 0.4:
             is = 2;
             break;
-        case 0.4:
+        case 0.5:
             is = 3;
             break;
-        case 1:
+        case 0.8:
             is = 4;
             break;
-        case 1.5:
+        case 1.0:
             is = 5;
             break;
-        case 25:
+        case 1.2:
             is = 6;
             break;
-        case 2:
+        case 1.5:
             is = 7;
             break;
-        case 6:
+        case 1.8:
             is = 8;
             break;
-        case 10:
+        case 2.0:
             is = 9;
             break;
         default :
@@ -3551,6 +3561,7 @@ org.awardEvent = (function(org){ //微信抽奖
             url: '/api/weixin/distribute/redpack/',
             dataType: 'json',
             data: {"action": obj,"openid": $("#openid").val()},
+            //data: {"action": obj,"openid": "oILFQt3q9C-SqnZRlUTYvhgQUHYE"},
             success: function(data){
                 fn(data);
                 awardsNum = data.left;

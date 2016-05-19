@@ -770,16 +770,16 @@ class FUBARegister(CoopRegister):
             # 根据支付方式判定周期是否为1月以上标的
             # pay_method = p2p_record.product.pay_method
             # if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-            # 如果首次投资金额大于或等于5000则回调
-            if p2p_record.amount >= 5000:
+            # 如果首次投资金额大于或等于1000则回调
+            if p2p_record.amount >= 10000:
                 # 如果结算时间过期了则不执行回调
-                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-                if earliest_settlement_time:
-                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                    current_time = datetime.datetime.now()
-                    # 如果上次访问的时间是在30天前则不更新访问时间
-                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                        return
+                # earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
+                # if earliest_settlement_time:
+                #     earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                #     current_time = datetime.datetime.now()
+                #     # 如果上次访问的时间是在30天前则不更新访问时间
+                #     if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                #         return
 
                 order_id = p2p_record.order_id
                 goodsprice = 100
@@ -798,14 +798,15 @@ class FUBARegister(CoopRegister):
                     'status': status,
                     'uid': binding.bid,
                 }
+
                 common_callback.apply_async(
                     kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
                 # 记录开始结算时间
-                if not binding.extra:
-                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
-                    if earliest_settlement_time:
-                        binding.extra = earliest_settlement_time
-                        binding.save()
+                # if not binding.extra:
+                #     # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                #     if earliest_settlement_time:
+                #         binding.extra = earliest_settlement_time
+                #         binding.save()
 
 
 class YunDuanRegister(CoopRegister):
@@ -1261,6 +1262,7 @@ class KongGangRegister(CoopRegister):
                        u'服务地址请访问： www.trvok.com 查询，请使用时在机场贵宾服务台告知【空港易行】并出示此短信' \
                        u'，凭券号于现场验证后核销，券号：%s。如需咨询休息室具体位置可直接拨打空港易行客服热线:' \
                        u'4008131888，有效期：2016-4-15至2017-3-20；【网利科技】' % (reward.type, reward.content)
+
             send_messages.apply_async(kwargs={
                 "phones": [user.wanglibaouserprofile.phone, ],
                 "messages": [send_msg,],
@@ -2043,10 +2045,11 @@ class BaJinSheRegister(CoopRegister):
         logger.info("%s-Enter purchase_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
         p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id, catalog=u'申购').values().first()
         if p2p_record:
-            p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            create_time = p2p_record['create_time']
+            p2p_record['create_time'] = create_time.strftime('%Y-%m-%d %H:%M:%S')
             p2p_record['amount'] = float(p2p_record['amount'])
             p2p_record['product'] = p2p_record['product_id']
-            base_data = generate_coop_base_data('purchase')
+            base_data = generate_coop_base_data('purchase', create_time)
 
             margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')
             margin_record = margin_record_query.values().first()
@@ -2074,7 +2077,8 @@ class BaJinSheRegister(CoopRegister):
                                           status=PayInfo.SUCCESS,
                                           order_id=order_id).select_related('margin_record').first()
         if pay_info:
-            base_data = generate_coop_base_data('recharge')
+            create_time = pay_info.create_time
+            base_data = generate_coop_base_data('recharge', create_time)
             pay_info_data = {
                 'type': pay_info.type,
                 'uuid': pay_info.uuid,
@@ -2086,7 +2090,7 @@ class BaJinSheRegister(CoopRegister):
                 'status': pay_info.status,
                 'user': pay_info.user.id,
                 'order_id': pay_info.order.id,
-                'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'create_time': create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             margin_record = pay_info.margin_record
             margin_record_data = {

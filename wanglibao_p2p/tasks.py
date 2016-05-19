@@ -346,3 +346,44 @@ def coop_amortizations_push(amortizations, product_id, amo_act):
 # if GlobalVar.get_push_status() is False:
 #     coop_product_push.apply_async()
 #     GlobalVar.set_push_status(True)
+
+
+@app.task
+def coop_product_push_for_manual():
+    products = P2PProduct.objects.filter(status=u'正在招标').select_related('types')
+    products = products.values('id', 'version', 'category', 'types__name', 'name',
+                               'short_name', 'serial_number', 'status', 'period',
+                               'brief', 'expected_earning_rate', 'excess_earning_rate',
+                               'excess_earning_description', 'pay_method', 'amortization_count',
+                               'repaying_source', 'total_amount', 'ordered_amount',
+                               'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
+                               'limit_per_user', 'warrant_company__name')
+
+    product_list = [product for product in products]
+
+    push_product_list = list()
+    for product in product_list:
+        product['types'] = product['types__name']
+        product['warrant_company'] = product['warrant_company__name']
+        product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
+        product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
+        if product['soldout_time']:
+            product['soldout_time'] = product['soldout_time'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            product.pop('soldout_time', None)
+        if product['make_loans_time']:
+            product['make_loans_time'] = product['make_loans_time'].strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            product.pop('make_loans_time', None)
+
+        push_product_list.append(product)
+
+    if push_product_list:
+        base_data = generate_coop_base_data('products_push')
+        act_data = {
+            'products': json.dumps(push_product_list)
+        }
+        data = dict(base_data, **act_data)
+        coop_call_back.apply_async(
+            kwargs={'params': data},
+            queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')

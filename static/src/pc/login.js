@@ -1,7 +1,7 @@
 require.config({
     paths: {
         'jquery.placeholder': 'lib/jquery.placeholder',
-        'csrf' : 'model/csrf',
+        'csrf' : 'model/csrf'
         //'jquery.cookie': 'lib/jquery.cookie'
     },
     shim: {
