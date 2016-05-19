@@ -516,6 +516,10 @@ class AppRecommendViewSet(PaginatedModelViewSet):
     serializer_class = P2PProductSerializer
     paginate_by = 1
 
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST', 'HEAD']
+
     def get_queryset(self):
         qs = super(AppRecommendViewSet, self).get_queryset()
 
