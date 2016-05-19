@@ -425,7 +425,7 @@ def id_validate(user, name, id_number):
     verify_counter.count = F('count') + 1
     verify_counter.save()
 
-    if error or not verify_record.is_valid:
+    if error or not verify_record or not verify_record.is_valid:
         return {"ret_code": 30054, "error_number": ErrorNumber.unknown_error, "message": u"验证失败，请重试或联系客服 4008-588-066"}
 
     user.wanglibaouserprofile.id_number = id_number

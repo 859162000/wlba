@@ -135,54 +135,55 @@ def verify_id(user, name, id_number):
     class_name = backend.split('.')[-1]
     if class_name not in ('TestIDVerifyBackEnd', 'ProductionIDVerifyBackEnd', 'ProductionIDVerifyV2BackEnd', 'ProductionIDVerifyV1&V2AutoBackEnd'):
         raise NameError("The specific backend not implemented")
-
+    verify_result = None
     id_number_len = len(str(id_number))
     if not(id_number_len == 15 or id_number_len == 18):
-        message = u'身份证长度不合法'
-        record = IdVerification(id_number=id_number, name=name, is_valid=False, description=message)
-        record.save()
-        return record, message
-
-    records = IdVerification.objects.filter(id_number=id_number, name=name)
-    if records.exists():
-        record = records.first()
-        if class_name == 'TestIDVerifyBackEnd':
-            return record, None
-        if record.description == u'该用户未满18周岁':
-            if not check_age_for_id(id_number):
+        # message = u'身份证长度不合法'
+        # record = IdVerification(id_number=id_number, name=name, is_valid=False, description=message)
+        # record.save()
+        # return record, message
+        verify_result = {"is_valid":False, "description":u'身份证长度不合法'}
+    else:
+        records = IdVerification.objects.filter(id_number=id_number, name=name)
+        if records.exists():
+            record = records.first()
+            if class_name == 'TestIDVerifyBackEnd':
                 return record, None
-        else:
-            return record, None
-
-    verify_result = None
-    if class_name == 'TestIDVerifyBackEnd':
-        verify_result = TestIDVerifyBackEnd.verify(name, id_number)
-    elif class_name == 'ProductionIDVerifyBackEnd':
-        verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
-    elif class_name == 'ProductionIDVerifyV2BackEnd':
-        verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
-    elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
-        key = 'valid_count_v1'
-        valid_v1_total = settings.VALID_V1_TOTAL
-        redis = redis_backend()
-        if redis.redis and redis.redis.ping():
-            if redis._exists(key):
-                valid_v1_count = redis._get(key)
-                valid_v1_count = int(valid_v1_count)
-                if valid_v1_count <= 0:
-                    logger.info(">>>>>>>>>>>>>user valid auto used v2 v1_count[%s]" % valid_v1_count)
-                    return ProductionIDVerifyV2BackEnd.verify(name, id_number)
-                else:
-                    redis._set(key, valid_v1_count - 1)
-                    logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % (valid_v1_count - 1,))
-                    return ProductionIDVerifyBackEnd.verify(name, id_number)
+            if record.description == u'该用户未满18周岁':
+                if not check_age_for_id(id_number):
+                    return record, None
             else:
-                redis._set(key, valid_v1_total)
-                logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
-                verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
-        else:
-            logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
+                return record, None
+
+
+        if class_name == 'TestIDVerifyBackEnd':
+            verify_result = TestIDVerifyBackEnd.verify(name, id_number)
+        elif class_name == 'ProductionIDVerifyBackEnd':
+            verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
+        elif class_name == 'ProductionIDVerifyV2BackEnd':
             verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
+        elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
+            key = 'valid_count_v1'
+            valid_v1_total = settings.VALID_V1_TOTAL
+            redis = redis_backend()
+            if redis.redis and redis.redis.ping():
+                if redis._exists(key):
+                    valid_v1_count = redis._get(key)
+                    valid_v1_count = int(valid_v1_count)
+                    if valid_v1_count <= 0:
+                        logger.info(">>>>>>>>>>>>>user valid auto used v2 v1_count[%s]" % valid_v1_count)
+                        return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+                    else:
+                        redis._set(key, valid_v1_count - 1)
+                        logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % (valid_v1_count - 1,))
+                        return ProductionIDVerifyBackEnd.verify(name, id_number)
+                else:
+                    redis._set(key, valid_v1_total)
+                    logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
+                    verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
+            else:
+                logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
+                verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
 
     message = verify_result.get('description')
     record = IdVerification()
