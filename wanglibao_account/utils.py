@@ -186,6 +186,7 @@ def verify_id(user, name, id_number):
 
     message = verify_result.get('description')
     record = IdVerification()
+    record.user = user
     record.id_number = id_number
     record.name = name
     record.is_valid = verify_result.get('is_valid')

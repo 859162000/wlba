@@ -419,8 +419,6 @@ def id_validate(user, name, id_number):
     try:
         from wanglibao_account.utils import verify_id
         verify_record, error = verify_id(user, name, id_number)
-        verify_record.user = user
-        verify_record.save()
     except:
         return {"ret_code": 30054, "error_number": ErrorNumber.unknown_error, "message": u"验证失败，请重试或联系客服 4008-588-066"}
 
