@@ -355,15 +355,15 @@ html
                   img(src="/media/{{news.image}}", alt="p2p理财")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
-    a.bonus-icon
-    .bonus-img(style='display:none')
-      .weixin_btn
-      .close
+    //a.bonus-icon
+    //.bonus-img(style='display:none')
+    //  .weixin_btn
+    //  .close
     .wdty(style='display:none')
         a.investment-btn(href='/accounts/register/') 立即领取
         .close
     .page(style='display:none')
     include global/g_footer
     script.
-      require(["/static/src/pc/index.js?v=20160516"])
+      require(["/static/src/pc/index.js?v=20160519"])
     include include/tracking
