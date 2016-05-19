@@ -290,7 +290,7 @@ def coop_product_push(product_id=None):
         #         redis._set(redis_product_status_key, redis_product_status)
 
         product['types'] = product['types__name']
-        product['activity_amount'] = product['activity__rule__rule_amount'] or 0
+        product['activity_amount'] = float(product['activity__rule__rule_amount']) or 0
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -366,7 +366,7 @@ def coop_product_push_for_manual():
     push_product_list = list()
     for product in product_list:
         product['types'] = product['types__name']
-        product['activity_amount'] = product['activity__rule__rule_amount'] or 0
+        product['activity_amount'] = float(product['activity__rule__rule_amount']) or 0
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
