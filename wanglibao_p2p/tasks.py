@@ -254,9 +254,10 @@ def coop_product_push(product_id=None):
                                              (Q(status__in=product_query_status) |
                                               (Q(status=u'已完成') &
                                                Q(make_loans_time__isnull=False) &
-                                               Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))).select_related('types')
+                                               Q(make_loans_time__gte=timezone.now()-timezone.timedelta(days=1))))
+                                             ).select_related('types', 'activity__rule')
     else:
-        products = P2PProduct.objects.filter(pk=product_id)
+        products = P2PProduct.objects.filter(pk=product_id).select_related('types', 'activity__rule')
 
     products = products.values('id', 'version', 'category', 'types__name', 'name',
                                'short_name', 'serial_number', 'status', 'period',
@@ -264,7 +265,7 @@ def coop_product_push(product_id=None):
                                'excess_earning_description', 'pay_method', 'amortization_count',
                                'repaying_source', 'total_amount', 'ordered_amount',
                                'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
-                               'limit_per_user', 'warrant_company__name')
+                               'limit_per_user', 'warrant_company__name', 'activity__rule__rule_amount')
 
     product_list = [product for product in products]
     # redis = redis_backend()
@@ -289,6 +290,9 @@ def coop_product_push(product_id=None):
         #         redis._set(redis_product_status_key, redis_product_status)
 
         product['types'] = product['types__name']
+        activity_amount = product['activity__rule__rule_amount'] or 0
+        product['activity_amount'] = float(activity_amount) * 100
+        product.pop('activity__rule__rule_amount', None)
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -350,20 +354,23 @@ def coop_amortizations_push(amortizations, product_id, amo_act):
 
 @app.task
 def coop_product_push_for_manual():
-    products = P2PProduct.objects.filter(status=u'正在招标').select_related('types')
+    products = P2PProduct.objects.filter(status=u'正在招标').select_related('types', 'activity__rule')
     products = products.values('id', 'version', 'category', 'types__name', 'name',
                                'short_name', 'serial_number', 'status', 'period',
                                'brief', 'expected_earning_rate', 'excess_earning_rate',
                                'excess_earning_description', 'pay_method', 'amortization_count',
                                'repaying_source', 'total_amount', 'ordered_amount',
                                'publish_time', 'end_time', 'soldout_time', 'make_loans_time',
-                               'limit_per_user', 'warrant_company__name')
+                               'limit_per_user', 'warrant_company__name', 'activity__rule__rule_amount')
 
     product_list = [product for product in products]
 
     push_product_list = list()
     for product in product_list:
         product['types'] = product['types__name']
+        activity_amount = product['activity__rule__rule_amount'] or 0
+        product['activity_amount'] = float(activity_amount) * 100
+        product.pop('activity__rule__rule_amount', None)
         product['warrant_company'] = product['warrant_company__name']
         product['publish_time'] = product['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
         product['end_time'] = product['end_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -384,6 +391,7 @@ def coop_product_push_for_manual():
             'products': json.dumps(push_product_list)
         }
         data = dict(base_data, **act_data)
+        print push_product_list, ">>>>>>>>>>>>>>>>>>>>aaa"
         coop_call_back.apply_async(
             kwargs={'params': data},
             queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')

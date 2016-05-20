@@ -427,7 +427,7 @@ def get_user_info(request, session_id=None, token=None):
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         margin_info = get_margin_info(user.id, url)
 
@@ -615,7 +615,7 @@ def get_unread_msgs(user_id):
     ret = dict()
     if not user_id:
         return {}
-    if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+    if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
         try:
             unread_num = Message.objects.filter(target_user=user_id, read_status=False, notice=True).count()
             ret.update(status=1, unread_num=unread_num)
@@ -852,4 +852,3 @@ def send_redpacks(event_id, user_ids):
         return {'status': 1, 'msg': 'success!'}
     except Exception, e:
         return {'status': 0, 'msg': 'send red_packs error: {}'.format(str(e))}
-    logger.debug("{} ".format(timezone.now()))

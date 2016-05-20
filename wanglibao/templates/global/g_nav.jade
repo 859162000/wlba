@@ -71,13 +71,13 @@
           +liItem('/accounts/transaction/p2p/', '交易记录')
 
     .g-nav-box
-      mixin nav-item(className, name, link, smallNav, news)
+      mixin nav-item(className, name, link, smallNav, news_tmp)
         if smallNav == 'list'
             link = 'javascript:void(0)'
         if activeItem == name
           .g-nav-list(class=className)
             a.highlight(href=link, class='nav-a')= name
-              if news
+              if news_tmp
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
               if smallNav == 'list'
                   i.icon.iconfont.icon-down-new
@@ -93,7 +93,7 @@
         else
             .g-nav-list(class=className)
               a(href=link, class='nav-a')= name
-                if news
+                if news_tmp
                   img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
                 if smallNav == 'list'
                   i.icon.iconfont.icon-down-new

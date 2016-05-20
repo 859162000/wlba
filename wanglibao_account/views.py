@@ -95,7 +95,6 @@ import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
-logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class RegisterView(RegistrationView):
@@ -467,7 +466,7 @@ class ResetPassword(TemplateView):
         if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 10 * 60:
             user.set_password(password1)
             user.save()
-            
+
             # 清除session
             try:
                 del request.session['phone_validated_time']
@@ -522,7 +521,7 @@ class AccountHome(TemplateView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         unpayed_principle += php_principle
@@ -643,7 +642,7 @@ class AccountHomeAPIView(APIView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         p2p_unpayed_principle += php_principle
@@ -654,13 +653,12 @@ class AccountHomeAPIView(APIView):
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         try:
             index_data = get_php_index_data(url, user.id)
         except Exception, e:
             index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
-            logger_yuelibao.debug(u'月利宝地址请求失败!!! exception = {}'.format(e.message))
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
@@ -964,7 +962,7 @@ class AccountP2PAssetAPI(APIView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         p2p_unpayed_principle += php_principle
@@ -1741,9 +1739,7 @@ def login_for_redirect(request, template_name='registration/login.html',
     """
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if redirect_to.startswith('base64'):
-        logger_yuelibao.info('yuelibao!!!!!!!!!!!!!!!')
         redirect_to = base64.b64decode(redirect_to[6:])
-        logger_yuelibao.info('redirect to {}'.format(redirect_to))
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)

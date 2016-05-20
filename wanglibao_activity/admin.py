@@ -430,7 +430,7 @@ admin.site.register(ActivityTemplates, ActivityTemplatesAdmin)
 
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityRule, ActivityRuleAdmin)
-admin.site.register(ActivityRecord, ActivityRecordAdmin)
+# admin.site.register(ActivityRecord, ActivityRecordAdmin)
 
 admin.site.register(ActivityShow, ActivityShowAdmin)
 admin.site.register(ActivityBannerPosition, ActivityBannerPosAdmin)
