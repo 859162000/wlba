@@ -6,17 +6,204 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015050402")
+        link(rel="stylesheet",href="/static/styles/pc_activity/open_day_review.css?v=2015051702")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
         .body_wrap.clear
             .banner
+            .section.section_2
+                .section_box_1
+                    .top_text “产融通HMD”  类项目累计排行榜
+                    .banner_img
+                        .banner_box
+                            dl
+                                dt 红木专场大放送
+                                dd!='人气王<span>重礼</span>悬赏'
+                            .time_text 2016年5月18日 - 5月24日
+                    .ranking_list
+                        ul
+                            //li.first!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li.second!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li.third!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                            //li!='<span class="phone">132****04</span><span class="num">2,400,000</span>'
+                        .ul_footer
+                    .careful_text 注：活动期间，投资带有“产融通HMD”开头的项目，投资金额才能进入累计排行。<br>投资额相同的情况下，按照投资时间先后顺序进行排名。
+                .section_box_2
+                    .section_box_2_main
+                        .box
+                            .top_title 第一名
+                            .top_line
+                            dl
+                                dt!='价值<span>2000</span>元'
+                                dd 红酸枝博古架（80*20*80cm）
+                            img.prize_img.prize_img_1(src='/static/imgs/pc_activity/open_day_review/prize_img_1.png')
+                        .line
+                        .box
+                            .top_title 第二名
+                            .top_line
+                            dl
+                                dt!='价值<span>1500</span>元'
+                                dd 红酸枝手雕笔筒（15*13cm）
+                            img.prize_img.prize_img_2(src='/static/imgs/pc_activity/open_day_review/prize_img_2.png')
+                        .line
+                        .box
+                            .top_title 第三名
+                            .top_line
+                            dl
+                                dt!='价值<span>1000</span>元'
+                                dd 红酸枝文房四宝
+                            img.prize_img.prize_img_3(src='/static/imgs/pc_activity/open_day_review/prize_img_3.png')
+                        .line
+                        .box
+                            .top_title 幸运奖7名
+                            .top_line
+                            dl
+                                dt!='价值<span>300</span>元'
+                                dd 小叶紫檀手串（108颗）
+                            img.prize_img.prize_img_4(src='/static/imgs/pc_activity/open_day_review/prize_img_4.png')
+                        .line
+                        .box.last_box
+                            .top_title 普惠奖20名
+                            .top_line
+                            dl
+                                dt!='价值<span>10</span>元'
+                                dd 无门槛抵扣红包
+                            img.prize_img.prize_img_5(src='/static/imgs/pc_activity/open_day_review/prize_img_5.png')
+                        p.title_careful 图片仅供参考，请以实物为准
+                .section_box_3
+                    .title_text
+                        span 红木贷项目列表：
+                        if p2p_list_url
+                            a(href='{{p2p_list_url}}') 更多>>
+                        else
+                            a(href='/p2p/list/') 更多>>
+                    .section_box_3_main
+                        .span8
+                          for product in p2p_products
+                            status = product['display_status']
+                            .panel-p2p-product
+                              .shadow-inner
+                                .panel-title-bar
+                                  if product.category == '票据'
+                                    .bill-icon.di 票
+                                  elif product.warrant_company
+                                    .warrant-icon.di 担
+                                  a(href="/p2p/detail/{{product.id}}")
+                                    if product.category == '新手标'
+                                        .new-user.mt12
+                                    else
+                                        if product.is_app_exclusive
+                                            .app-icon.mt9
+                                    | {{product.name}}
+                                .panel-content
+                                  //if product.is_taojin
+                                    .goldIcon
+                                  .row
+                                    .span2.align-center
+                                      p
+                                        em {{product.total_amount | money_format_int}}
+                                      p 融资金额(元)
+                                    .span2.align-center
+                                      p
+                                        em {{product.period}}
+                                        span.font-l {{product.pay_method|period_unit}}
+                                      p 还款期限
+                                    .span3.align-center
+                                      p
+                                        earning_rate = str(product['expected_earning_rate'])
+                                        em.highlight {{earning_rate}}
+                                        span.highlight.font-m %
+                                        if product.activity
+                                          em.highlight +
+                                          span.xunlei-vip-rate(title="{{product.activity.activity_name}}") {{product.activity.activity_rule_percent_text}}%
+                                            span.xunlei-vip-tip(title="{{product.activity.activity_name}}") {{product.activity.activity_name}}
+                                      p 年化收益
+                                    .span2.align-center
+                                      p
+                                        amount = product['total_amount'] - product['ordered_amount']
+                                        em {{amount | money_format_int}}
+                                      p 可投资金额(元)
+                                    .span3-omega.align-right
+                                      p
+                                        if status == '抢购中'
+                                          a.button-home(href="/p2p/detail/{{product.id}}/")
+                                            span.icon-p2p-home.purcharsing
+                                            {{status}}
+                                        else
+                                          a.button-home-disabled(href="javascript:void(0)", disabled)
+                                            if status == '已还款'
+                                              span.icon-p2p-home.finished
+                                            elif status == '还款中'
+                                              span.icon-p2p-home.payment
+                                            else
+                                              span.icon-p2p-home.audit
+
+                                            {{status}}
+
+                                      if status == '抢购中'
+                                        p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
+                                          span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
+                                      else
+                                        p
+
+                                .panel-p2p--footer
+                                  .row
+                                    .span4
+                                      span 进度：
+                                      .progress-container
+                                        percent = float(product['ordered_amount']) / product['total_amount'] * 100
+                                        if status == '抢购中' or status == '满标审核'
+                                          .progress-indicator(style="width:{{percent | percentage}}")
+                                        else
+                                          .progress-indicator(style="width:{{percent | percentage}}")
+
+                                      if status == '抢购中' or status == '满标审核'
+                                        span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                                      else
+                                        span &nbsp;&nbsp; {{percent | percentage}}
+
+                                    .span4.align-left
+                                      if product.category == '证大速贷'
+                                        span 本息保障: &nbsp;&nbsp;
+                                        span.d3-text {{product.warrant_company_name}}
+                                      elif product.category == '票据'
+                                        span 承兑行: &nbsp;&nbsp;
+                                        span.red-text {{product.warrant_company_name}}
+                                        span &nbsp;&nbsp;无条件兑付
+                                      else
+                                        span 合作机构: &nbsp;&nbsp;
+                                        span.d3-text {{product.warrant_company_name}}
+
+                                    .span4-omega.align-right
+                                      span 还款方式: &nbsp;&nbsp;
+                                      span.d3-text {{product.display_payback_method}}
+                                if status == '还款中'
+                                  .panel-p2p-stamp
+                                if status == '已还款'
+                                  .panel-p2p-finished
+                            .space-vertical-sm
+
+                    .small_title.small_title_9 用户须知
+                    .line_gray
+                    .user_notes
+                        p!=' 1、活动时间：<span>2016年5月18日 0:00 - 5月24日 23:59。</span>'
+                        p 2、活动期间，投资带有“产融通HMD”开头的项目，投资金额才会进入累计排行。
+                        p 3、获奖用户以投资“产融通HMD”类项目累计金额为准。
+                        p 4、实物奖品在活动结束后在三个工作内由客服通知并发放。
+                        p 5、20名普惠奖励，红包无使用门槛，活动结束后三个工作日内下发，有效期领取之日7天有效。
+
             .section.section_1
-                .big_title.big_title_1 “产业银行”的业务模式
+                .big_title.big_title_1 “产业金融”的业务模式
                 .line_red
-                p.text.text_1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网利宝凭借丰富的金融行业经验、互联网优势，在业内创立了“产业银行”的商业模式，即以产业为切入点、在细分领域深耕，通过产融结合的方式，挖掘产业链中优质中小企业的融资需求。与消费信贷相比，网利宝在获取优质资产方面的优势主要体现在两个方面。一是网利宝不依靠传统的担保、小贷公司推荐债权，而是借助产业龙头的行业积累主动挖掘，建立一条稳定、可靠的渠道;二是在中国个人征信不健全的环境下，网利宝专注企业贷，通过管控质押物，更易确保借款企业按时还款，降低用户投资风险。
-                p.text.text_2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2014 年 8 月上线来，网利宝在车房贷、物流货运、红木、珠宝、金融仓储等细分产业进行了深度布局，建立了一个稳定的、挖掘优质资产的渠道，先后服务近 2000 家中小企业，截至2016年4月末完成了 50 多亿交易额，拥有近 150 万用户。
+                p.text.text_1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网利宝凭借丰富的金融行业经验、互联网优势，在业内创立了“产业金融”的商业模式，即以产业为切入点、在细分领域深耕，通过产融结合的方式，挖掘产业链中优质中小企业的融资需求。与消费信贷相比，网利宝在获取优质资产方面的优势主要体现在两个方面。一是网利宝不依靠传统的担保、小贷公司推荐债权，而是借助产业龙头的行业积累主动挖掘，建立一条稳定、可靠的渠道;二是在中国个人征信不健全的环境下，网利宝专注企业贷，通过管控质押物，更易确保借款企业按时还款，降低用户投资风险。
+                p.text.text_2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2014 年 8 月上线来，网利宝在车房贷、物流货运、木材、珠宝、金融仓储等细分产业进行了深度布局，建立了一个稳定的、挖掘优质资产的渠道，先后服务近 2000 家中小企业，截至2016年4月末完成了 50 多亿交易额，拥有近 150 万用户。
             .section.section_2
                 .big_title.big_title_4 木材为重点深耕产业之一
                 .line_red
@@ -28,21 +215,18 @@ html.no-js(lang="en-gb")
                         .img.img_1
                         .title_text 行业市场
                     .box.box_2
-                        .text 传统金融机构很少涉足
-                        .img.img_2
-                        .title_text 金融渗透
-                    .box.box_3
                         .text 资金灵活
-                        .img.img_3
+                        .img.img_2
                         .title_text 市场周转周期
+                    .box.box_3
+                        .text 业内存在价格相对稳定的木材品种<br>且易于管控、适合做质押担保
+                        .img.img_3
+                        .title_text 价格
                     .box.box_4
-                        .text 行业内存在相对较高利润率的木材品种
-                        .img.img_4
-                        .title_text 盈利空间
-                    .box.box_5
                         .text 团队拥有多年专业积累、产业资源积累
-                        .img.img_5
+                        .img.img_4
                         .title_text 木材风控团队
+
             .section.section_1
                 .small_title.small_title_2 主要业务范围？
                 .line_gray
@@ -107,7 +291,7 @@ html.no-js(lang="en-gb")
                         .text 与行业内知名金融仓储企业<br>合作，建立仓库;
                     .box
                         .img.img_2
-                        .text 合作伙伴提供专业质押物<br>仓储监管服务;
+                        .text 合作伙伴提供专业质押物<br>“7*24小时”仓储监管服务；
                     .box
                         .img.img_3
                         .text 合作伙伴提供<br>质押物回购服务;
@@ -199,6 +383,6 @@ html.no-js(lang="en-gb")
 
         include global/g_footer
 script.
-    require(['/static/js/open_day_review.js?v=2015050401'])
+    require(['/static/js/open_day_review.js?v=2015051307'])
 
                                                                     

@@ -35,7 +35,10 @@ from marketing.send_data import send_register_data, send_idvalidate_data, send_d
 from wanglibao_reward.utils import processMarchAwardAfterP2pBuy, processAugustAwardZhaoXiangGuan
 from wanglibao_account.tasks import coop_call_back
 from wanglibao_account.utils import generate_coop_base_data
-
+from wanglibao_activity.models import Activity
+from wanglibao_reward.tasks import updateHmdRedisTopRanks
+from wanglibao_reward.models import WanglibaoRewardJoinRecord
+import traceback
 # logger = logging.getLogger('wanglibao_reward')
 
 logger = get_task_logger(__name__)
@@ -43,26 +46,6 @@ logger = get_task_logger(__name__)
 
 @app.task
 def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False, product_balance_after=0):
-    base_data = generate_coop_base_data('product_update')
-    product = {'id': product_id,
-               'product_balance_after': product_balance_after}
-    act_data = {
-        'product': json.dumps(product)
-    }
-    data = dict(base_data, **act_data)
-    coop_call_back.apply_async(
-        kwargs={'params': data},
-        queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
-
-    if is_full:
-        try:
-            from wanglibao_p2p.tasks import coop_product_push
-            coop_product_push.apply_async(
-                kwargs={'product_id': product_id}
-            )
-        except:
-            pass
-
     # fix@chenweibi, add order_id
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
@@ -105,7 +88,39 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
             "user_id": user_id, "amount": amount, "device_type": device_type,
             "order_id": order_id, "product_id": product_id,
         }, queue='celery02')
+    try:
+        checkUpdateHmdRanks(product_id)
+    except Exception, e:
+        logger.error(traceback.format_exc())
 
+    try:
+        if is_full:
+                from wanglibao_p2p.tasks import coop_product_push
+                coop_product_push.apply_async(
+                    kwargs={'product_id': product_id}
+                )
+        else:
+            base_data = generate_coop_base_data('product_update')
+            product = {'id': product_id,
+                       'product_balance_after': product_balance_after}
+            act_data = {
+                'product': json.dumps(product)
+            }
+            data = dict(base_data, **act_data)
+            coop_call_back.apply_async(
+                kwargs={'params': data},
+                queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
+    except:
+        pass
+
+
+def checkUpdateHmdRanks(product_id):
+    activity = Activity.objects.filter(code='hmd').first()
+    now = timezone.now()
+    if activity.start_at<=now and activity.end_at>=now:
+        product = P2PProduct.objects.get(id=product_id)
+        if product.name.find('产融通HMD')!=-1:
+            updateHmdRedisTopRanks.apply_async(kwargs={}, queue='celery02')
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
@@ -161,6 +176,26 @@ def register_ok(user_id, device):
 def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
+
+    # Modify by huomeimei & hb for Concurrent-Limit on 2016-05-19
+    if not user:
+        logger.error("Invalid user_id [%s]" % (user_id))
+        return
+    try:
+        join_record, _ = WanglibaoRewardJoinRecord.objects.get_or_create(user=user, activity_code='idvalidate_ok', defaults={"remain_chance":1})
+        if join_record.remain_chance < 1:
+            logger.error("Already idvalidate_ok [%s]" % (user_id))
+            return
+        with transaction.atomic():
+            join_record = WanglibaoRewardJoinRecord.objects.select_for_update().get(id=join_record.id)
+            if join_record.remain_chance < 1:
+                logger.error("Already idvalidate_ok [%s]" % (user_id))
+                return
+            join_record.remain_chance=0
+            join_record.save()
+    except Exception, e:
+        logger.debug(traceback.format_exc())
+        return
 
     # 活动检测
     # activity_backends.check_activity(user, 'validation', device_type)

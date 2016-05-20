@@ -79,6 +79,7 @@ import json
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest.utils import generate_bajinshe_sign
 from wanglibao_p2p.utility import get_p2p_equity, get_user_margin
+from common.tools import MyHttpsAdapter
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -769,16 +770,16 @@ class FUBARegister(CoopRegister):
             # 根据支付方式判定周期是否为1月以上标的
             # pay_method = p2p_record.product.pay_method
             # if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
-            # 如果首次投资金额大于或等于5000则回调
-            if p2p_record.amount >= 5000:
+            # 如果首次投资金额大于或等于1000则回调
+            if p2p_record.amount >= 10000:
                 # 如果结算时间过期了则不执行回调
-                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-                if earliest_settlement_time:
-                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                    current_time = datetime.datetime.now()
-                    # 如果上次访问的时间是在30天前则不更新访问时间
-                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                        return
+                # earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
+                # if earliest_settlement_time:
+                #     earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                #     current_time = datetime.datetime.now()
+                #     # 如果上次访问的时间是在30天前则不更新访问时间
+                #     if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                #         return
 
                 order_id = p2p_record.order_id
                 goodsprice = 100
@@ -797,14 +798,17 @@ class FUBARegister(CoopRegister):
                     'status': status,
                     'uid': binding.bid,
                 }
+
                 common_callback.apply_async(
-                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
                 # 记录开始结算时间
-                if not binding.extra:
-                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
-                    if earliest_settlement_time:
-                        binding.extra = earliest_settlement_time
-                        binding.save()
+                # if not binding.extra:
+                #     # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                #     if earliest_settlement_time:
+                #         binding.extra = earliest_settlement_time
+                #         binding.save()
 
 
 class YunDuanRegister(CoopRegister):
@@ -1440,6 +1444,64 @@ class JuChengRegister(CoopRegister):
                     "mtype": "activity"
                 })
 
+class XiaoMeiRegister(CoopRegister):
+
+    def __init__(self, request):
+        super(ZhongYingRegister, self).__init__(request)
+        self.c_code = 'zypwt'
+        self.invite_code = 'zypwt'
+        self.token = 'zypwt'
+        self.request = request
+
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            for _index in xrange(2):
+                reward = Reward.objects.filter(type='中影票务通', is_used=False).first()
+                if not reward:
+                    return
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,), ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"演出门票赠送",
+                    "content": u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,),
+                    "mtype": "activity"
+                })
+
+
+class ZhongYingRegister(CoopRegister):
+
+    def __init__(self, request):
+        super(ZhongYingRegister, self).__init__(request)
+        self.c_code = 'xmdj2'
+        self.invite_code = 'xmdj2'
+        self.token = 'xmdj2'
+        self.request = request
+
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            reward = Reward.objects.filter(type='小美到家', is_used=False).first()
+            if not reward:
+                return
+            send_messages.apply_async(kwargs={
+                "phones": [user.wanglibaouserprofile.phone, ],
+                "messages": [u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,), ]
+            })
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"演出门票赠送",
+                "content": u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,),
+                "mtype": "activity"
+            })
+
 class HappyMonkeyRegister(CoopRegister):
     def __init__(self, request):
         super(HappyMonkeyRegister, self).__init__(request)
@@ -2060,12 +2122,16 @@ class BaJinSheRegister(CoopRegister):
                     'account': getattr(user, 'account', ''),
                 }
                 data = dict(base_data, **act_data)
-                res = requests.post(url=self.call_back_url, data=data)
+                s = requests.Session()
+                s.mount('https://', MyHttpsAdapter(max_retries=5))
+                res = s.post(url=self.call_back_url,
+                             data=data,
+                             verify=False)
                 if res.status_code == 200:
                     result = res.json()
                     logger.info("register_call_back connected return [%s]" % result)
                 else:
-                    logger.info("oauth_token_login connected status code[%s]" % res.status_code)
+                    logger.info("%s connected status code[%s]" % (self.call_back_url, res.status_code))
             except Exception, e:
                 logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
             else:
@@ -2076,10 +2142,11 @@ class BaJinSheRegister(CoopRegister):
         logger.info("%s-Enter purchase_call_back for user[%s], order_id[%s]" % (channel.code, user.id, order_id))
         p2p_record = P2PRecord.objects.filter(user_id=user.id, order_id=order_id, catalog=u'申购').values().first()
         if p2p_record:
-            p2p_record['create_time'] = p2p_record['create_time'].strftime('%Y-%m-%d %H:%M:%S')
+            create_time = p2p_record['create_time']
+            p2p_record['create_time'] = create_time.strftime('%Y-%m-%d %H:%M:%S')
             p2p_record['amount'] = float(p2p_record['amount'])
             p2p_record['product'] = p2p_record['product_id']
-            base_data = generate_coop_base_data('purchase')
+            base_data = generate_coop_base_data('purchase', create_time)
 
             margin_record_query = MarginRecord.objects.filter(order_id=p2p_record['order_id'], catalog=u'交易冻结')
             margin_record = margin_record_query.values().first()
@@ -2107,7 +2174,8 @@ class BaJinSheRegister(CoopRegister):
                                           status=PayInfo.SUCCESS,
                                           order_id=order_id).select_related('margin_record').first()
         if pay_info:
-            base_data = generate_coop_base_data('recharge')
+            create_time = pay_info.create_time
+            base_data = generate_coop_base_data('recharge', create_time)
             pay_info_data = {
                 'type': pay_info.type,
                 'uuid': pay_info.uuid,
@@ -2119,7 +2187,7 @@ class BaJinSheRegister(CoopRegister):
                 'status': pay_info.status,
                 'user': pay_info.user.id,
                 'order_id': pay_info.order.id,
-                'create_time': pay_info.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'create_time': create_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             margin_record = pay_info.margin_record
             margin_record_data = {
@@ -2350,7 +2418,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          JiaXiHZRegister]
+                          JiaXiHZRegister, ZhongYingRegister]
 
 
 # ######################第三方用户查询#####################

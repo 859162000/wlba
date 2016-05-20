@@ -3,6 +3,7 @@
 from operator import itemgetter
 from decimal import Decimal
 import datetime
+import pytz
 
 from django.contrib.admin.views.decorators import staff_member_required
 # from django.contrib.auth.models import User
@@ -61,7 +62,6 @@ from wanglibao_redis.backend import redis_backend
 from .common import get_p2p_list
 from wanglibao.templatetags.formatters import safe_phone_str
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -798,5 +798,7 @@ def check_invalid_new_user_product(p2p, user):
     """
     error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
     return error_new_user
+
+
 
 

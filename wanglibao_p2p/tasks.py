@@ -315,24 +315,27 @@ def coop_product_push(product_id=None):
 
 
 @app.task
-def coop_amortizations_push(amortizations, product_id):
+def coop_amortizations_push(amortizations, product_id, amo_act):
     logger.info("Enter coop_amortizations_push for product id[%s]" % product_id)
     amortization_list = list()
     amo_terms = ProductAmortization.objects.filter(product_id=product_id).count()
     for amo in amortizations:
         user_id = amo["user"]
         channel = get_user_channel_record(user_id)
-        if channel:
+        if channel and channel.code in ['bisouyi', 'bajinshe', 'renrenli']:
             amo['terms'] = amo_terms
-            amo['margin'] = json.dumps(get_user_margin(user_id))
-            amo['equity'] = json.dumps(get_p2p_equity(user_id, product_id))
+            if (amo_act == 'plan' and amo['term'] == 1) or amo_act == 'amortize':
+                amo['margin'] = json.dumps(get_user_margin(user_id))
+                amo['equity'] = json.dumps(get_p2p_equity(user_id, product_id))
+
             amortization_list.append(amo)
 
     if amortization_list:
         base_data = generate_coop_base_data('amortizations_push')
         act_data = {
             'product_id': product_id,
-            'amortizations': json.dumps(amortization_list)
+            'amortizations': json.dumps(amortization_list),
+            'amo_act': amo_act,
         }
         data = dict(base_data, **act_data)
         coop_call_back.apply_async(

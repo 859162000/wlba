@@ -6,37 +6,39 @@
         $(this).hide();
     });
 
-    var scrollTop = false;
-    function scrollEvent(){
-        var top = document.body.scrollTop;
-        var lft = $(".circle-icon-lft"),
-            rht = $(".circle-icon-rht");
-        //var setEvent = null;
-        //console.log(top);
-        if( top> 2780 && top < 3500){
-            scrollTop = true;
-            rht.animate({height: "100%"},function(){
-                lft.css("display","block").animate({height: "100%"},500);
-            },500);
-        }else if(top<2300 || top>3500){
-            if(scrollTop){
-                scrollTop = false;
-                //clearTimeout(setEvent);
-                lft.animate({height: 0},function(){
-                    lft.css("display","none");
-                    rht.animate({height: 0},500);
-                },500);
-            }
-        }
-    }
-    scrollEvent();
-    $("body.h5-shield-plan").on("touchmove", function(){
-        scrollEvent();
-    });
+    //var scrollTop = false;
+    //function scrollEvent(){
+    //    var top = document.body.scrollTop;
+    //    var dom = $(".js-circle-alt");
+    //    //var setEvent = null;
+    //    var circle_top = $("div.js-circle-box").offset().top,
+    //        height = window.innerHeight || document.documentElement.clientHeight,
+    //        domH = dom.height();
+    //    $(".js-num-box").html(top+" circle_top:"+circle_top+" height:"+height+"<br />circle_top+domH:"+(circle_top+domH-height)+" dom.height:"+dom.height());
+    //    //console.log(top >= circle_top && top < (circle_top+domH));
+    //    if(top > (circle_top+domH-height) && top < (circle_top+domH+height)){
+    //        //alert(top);
+    //        scrollTop = true;
+    //        dom.addClass("circle-alt-an");
+    //    }else if(top<(circle_top-height) || top>(circle_top+domH+height)){
+    //        if(scrollTop){
+    //            scrollTop = false;
+    //            //clearTimeout(setEvent);
+    //            dom.removeClass("circle-alt-an");
+    //        }
+    //    }
+    //}
+    //scrollEvent();
+    //$("body.h5-shield-plan").on("touchmove", function(){
+    //    scrollEvent();
+    //});
+    var winHost = window.location.href;
+    var host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
     function weixin_share(shareTit,fn){
         //alert(shareTit);
         var weiURL = '/weixin/api/jsapi_config/';
         var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
+        var debug = winHost.split("debug=")[1];
         org.ajax({
             type: 'GET',
             url: weiURL,
@@ -44,7 +46,7 @@
             success: function (data) {
                 //请求成功，通过config注入配置信息,
                 wx.config({
-                    debug: false,
+                    debug: debug,
                     appId: data.appId,
                     timestamp: data.timestamp,
                     nonceStr: data.nonceStr,
@@ -54,10 +56,8 @@
             }
         });
         wx.ready(function () {
-            var winHost = window.location.href,
-                host = winHost.substring(0,winHost.indexOf('/activity')) || winHost.substring(0,winHost.indexOf('/weixin'));
             var shareImg = host + '/static/imgs/mobile_activity/shield_plan/share.png',
-                shareLink = host + '/activity/weixin_lifestyle/',
+                shareLink = host + '/activity/h5_shield_plan/',
                 shareMainTit = shareTit,
                 shareBody = '投资无多少 安全无大小';
             //分享给微信好友
@@ -100,5 +100,58 @@
             })
         })
     }
-	weixin_share("网利宝金盾计划上线，降低用户投资风险");//微信分享
+
+    function goBuy(){
+        $(".js-go-buy").on("touchstart",function(){
+            var self = $(this),
+                bug_url = self.attr("data-src");
+            window.location.href = bug_url;
+        });
+    }
+
+    //var login = false;
+    wlb.ready({
+        app: function (mixins) {
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
+                        goBuy();
+                    }
+                })
+            }
+
+            mixins.sendUserInfo(function (data) {
+                if (data.ph == '') {
+                    //login = false;
+                    $(".js-go-buy").on("touchstart",function() {
+                        mixins.loginApp({
+                            refresh: 1,
+                            url: host+'/activity/h5_shield_plan/'
+                        });
+                    });
+                } else {
+                    //login = true;
+                    connect(data);
+                }
+            });
+            mixins.shareData({title: "网利宝金盾计划上线，降低用户投资风险", content: "投资无多少 安全无大小", image: host+'/static/imgs/mobile_activity/shield_plan/share.png'});
+        },
+        other: function(){
+            goBuy();
+            weixin_share("网利宝金盾计划上线，降低用户投资风险");//微信分享
+        }
+    });
 })(org);

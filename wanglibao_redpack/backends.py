@@ -39,7 +39,6 @@ def local_datetime(dt):
 
 def stamp(dt):
     return long(time.mktime(local_datetime(dt).timetuple()))
-    #return long(time.mktime(dt.timetuple()))
 
 
 def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_version=''):
@@ -51,6 +50,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         return {"ret_code": 0, "packages": packages}
 
     device_type = _decide_device(device_type)
+    period_name = dict(RedPackEvent.PERIOD_TYPE)
     if status == "available":
         packages = {"available": []}
         # if not product_id or product_id == 0:
@@ -98,7 +98,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     if event.period:
                         event_period = int(event.period)
                         period_type = event.period_type if event.period_type else 'month'
-                        product_period = product['period']
+                        product_period = int(product['period'])
                         pay_method = product['pay_method']
                         if period_type == 'month' or period_type == 'day':
                             if product_period != event_period:
@@ -109,15 +109,27 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                 if period_type == 'month_gte':
                                     if event_period * 30 > product_period:
                                         continue
-                                else:
+                                elif period_type == 'month_lte':
+                                    if event_period * 30 < product_period:
+                                        continue
+                                elif period_type == 'day_lte':
+                                    if event_period < product_period:
+                                        continue
+                                elif period_type == 'day_gte':
                                     if event_period > product_period:
                                         continue
                             else:
                                 if period_type == 'month_gte':
                                     if event_period > product_period:
                                         continue
-                                else:
-                                    if event_period > pay_method * 30:
+                                elif period_type == 'month_lte':
+                                    if event_period < product_period:
+                                        continue
+                                elif period_type == 'day_lte':
+                                    if event_period < product_period * 30:
+                                        continue
+                                elif period_type == 'day_gte':
+                                    if event_period > product_period * 30:
                                         continue
                         # if p2p_id:
                         #     if p2p_id != p2p_res_id:
@@ -126,12 +138,24 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           x.created_at, event.available_at, event.unavailable_at)
                 end_time_day = end_time.strftime('%Y-%m-%d')
+                period_tmp = event.period
+                if device_type == 'ios' or device_type == 'android':
+                    if app_version <= "2.9.0":
+                        period_type_event = event.period_type if event.period_type not in ('month_lte', 'day_lte') else ''
+                        if device_type == 'ios' and event.period_type in ('month_lte', 'day_lte'):
+                            period_tmp = 0
+                    else:
+                        period_type_event = event.period_type
+                else:
+                    period_type_event = event.period_type
 
                 obj = {
                     "name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                     "id": x.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                     "unavailable_at": stamp(end_time), "event_id": event.id,
-                    "period": event.period, "period_type": event.period_type,
+                    "period": period_tmp,
+                    "period_type": period_type_event,
+                    "period_name": u'限' + str(event.period) + period_name.get(event.period_type, ''),
                     "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                     "highest_amount": event.highest_amount, "order_by": 2
                 }
@@ -182,7 +206,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         if event.period:
                             event_period = int(event.period)
                             period_type = event.period_type if event.period_type else 'month'
-                            product_period = product['period']
+                            product_period = int(product['period'])
                             pay_method = product['pay_method']
                             if period_type == 'month' or period_type == 'day':
                                 if product_period != event_period:
@@ -193,26 +217,50 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                     if period_type == 'month_gte':
                                         if event_period * 30 > product_period:
                                             continue
-                                    else:
+                                    elif period_type == 'month_lte':
+                                        if event_period * 30 < product_period:
+                                            continue
+                                    elif period_type == 'day_lte':
+                                        if event_period < product_period:
+                                            continue
+                                    elif period_type == 'day_gte':
                                         if event_period > product_period:
                                             continue
                                 else:
                                     if period_type == 'month_gte':
                                         if event_period > product_period:
                                             continue
-                                    else:
-                                        if event_period > pay_method * 30:
+                                    elif period_type == 'month_lte':
+                                        if event_period < product_period:
+                                            continue
+                                    elif period_type == 'day_lte':
+                                        if event_period < product_period * 30:
+                                            continue
+                                    elif period_type == 'day_gte':
+                                        if event_period > product_period * 30:
                                             continue
 
                     start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                               coupon.created_at, event.available_at, event.unavailable_at)
                     end_time_day = end_time.strftime('%Y-%m-%d')
+                    period_tmp = event.period
+                    if device_type == 'ios' or device_type == 'android':
+                        if app_version <= "2.9.0":
+                            period_type_event = event.period_type if event.period_type not in ('month_lte', 'day_lte') else ''
+                            if device_type == 'ios' and event.period_type in ('month_lte', 'day_lte'):
+                                period_tmp = 0
+                        else:
+                            period_type_event = event.period_type
+                    else:
+                        period_type_event = event.period_type
 
                     obj = {
                         "name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                         "id": coupon.id, "invest_amount": event.invest_amount, 'end_time_day': end_time_day,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
-                        "period": event.period, "period_type": event.period_type,
+                        "period": period_tmp,
+                        "period_type": period_type_event,
+                        "period_name": u'限' + str(event.period) + period_name.get(event.period_type, ''),
                         "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 1
                     }
@@ -258,13 +306,25 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             else:
                 p2p_types_id = 0
                 p2p_types_name = ''
+            period_tmp = event.period
+            if device_type == 'ios' or device_type == 'android':
+                if app_version <= "2.9.0":
+                    period_type_event = event.period_type if event.period_type not in ('month_lte', 'day_lte') else ''
+                    if device_type == 'ios' and event.period_type in ('month_lte', 'day_lte'):
+                        period_tmp = 0
+                else:
+                    period_type_event = event.period_type
+            else:
+                period_type_event = event.period_type
 
             obj = {
                 "name": event.name, "receive_at": stamp(x.created_at),
                 "available_at": stamp(start_time), "unavailable_at": stamp(end_time),
                 "id": x.id, "invest_amount": event.invest_amount, "amount": event.amount, "event_id": event.id,
                 "highest_amount": event.highest_amount,
-                "period": event.period, "period_type": event.period_type,
+                "period": period_tmp,
+                "period_type": period_type_event,
+                "period_name": str(event.period) + period_name.get(event.period_type, ''),
                 "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                 "method": REDPACK_RULE[event.rtype], "order_by": order_by
             }

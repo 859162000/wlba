@@ -108,5 +108,5 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
 
 admin.site.register(RedPack, RedPackAdmin)
 admin.site.register(RedPackEvent, RedPackEventAdmin)
-admin.site.register(RedPackRecord, RedPackRecordAdmin)
+# admin.site.register(RedPackRecord, RedPackRecordAdmin)
 # admin.site.register(InterestHike, InterestHikeAdmin)

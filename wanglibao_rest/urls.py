@@ -62,10 +62,10 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, BiSouYiRegisterApi, BiSouYiLoginApi,
                                      BiSouYiRegisterView)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
-from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
+from wanglibao_reward.views import (ZhongYingAPIView, WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
                                     WeixinActivityAPIView, QMBanquetRewardAPI, HMBanquetRewardAPI,
                                     Lantern_FetchRewardAPI, FetchMarchAwardAPI, XunleiTreasureAPIView,
-                                    AprilAwardApi, KongGangAPIView, FetchNewUserReward, ZhaoXiangGuanAPIView,)
+                                    AprilAwardApi, KongGangAPIView, FetchNewUserReward, ZhaoXiangGuanAPIView,HmdInvestTopRanks)
 from marketing.views import CustomerAccount2015ApiView
 
 router = DefaultRouter()
@@ -294,6 +294,9 @@ urlpatterns += patterns(
     url(r'^xunlei/treasure/$', XunleiTreasureAPIView.as_view()),
     url(r'^activity/newusergift/$', FetchNewUserReward.as_view()),
     url(r'^activity/zhaoxiangguan/$', ZhaoXiangGuanAPIView.as_view()),
+    url(r'^activity/zhongying/$', ZhongYingAPIView.as_view()),
+    url(r'^activity/xiaomei/$', ZhongYingAPIView.as_view()),
+    url(r'^activity/hmd_invest_ranks/$', HmdInvestTopRanks.as_view()),
 )
 
 # app端改版新接口

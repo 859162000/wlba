@@ -41,6 +41,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_invite.invite_common import ShareInviteRegister
 from wanglibao_account import message as inside_message
 from wanglibao_p2p.models import P2PRecord
+from django.db import IntegrityError
 
 logger = logging.getLogger("weixin")
 # https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
@@ -686,7 +687,10 @@ class FetchXunleiCardAward(APIView):
         type = int(type)
 
         code = activity.code+"_"+str(type)
-        activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, activity_code=code)
+        try:
+            activity_reward_record, _ = ActivityRewardRecord.objects.get_or_create(user=user, activity_code=code)
+        except IntegrityError, e:
+            return Response({"ret_code":-1, "message":"系统忙，请重试"})
         if activity_reward_record.status:
             return Response({"ret_code": -1, "message":"您已经领取过"})
 
@@ -698,15 +702,15 @@ class FetchXunleiCardAward(APIView):
             bind_action_record = WeiXinUserActionRecord.objects.filter(user_id=user.id, action_type='bind').first()
             create_time = local_to_utc(datetime.datetime.fromtimestamp(bind_action_record.create_time))
             if bind_action_record and create_time>=activity.start_at and create_time<=activity.end_at:
-                reward = self.getReward("7天迅雷会员")
+                reward = self.getReward("七天迅雷会员")
             else:
-                return Response({"ret_code": -1, "message":"首次绑定服务号为活动期内的用户才可领取"})
+                return Response({"ret_code": -1, "message":"您不是首次绑定用户哦～"})
         if type == 1:#invest vip card
             p2pRecord = P2PRecord.objects.filter(user=request.user, catalog=u'申购').order_by("create_time").first()
             if p2pRecord and p2pRecord.create_time >=activity.start_at and p2pRecord.create_time<=activity.end_at and float(p2pRecord.amount)>=1000:
-                reward = self.getReward("1年迅雷会员")
+                reward = self.getReward("一年迅雷会员")
             else:
-                return Response({"ret_code": -1, "message":"活动期内为首次投资，并且投资金额不低于1000元"})
+                return Response({"ret_code": -1, "message":"您不满足领取条件~"})
         if not reward:
             return Response({"ret_code": -1, "message":"奖品已经领完"})
         try:

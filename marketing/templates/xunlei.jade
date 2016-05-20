@@ -37,9 +37,9 @@ html
                             | 次挖宝机会
                         else
                             span 请先
-                            a(href='/accounts/login/?next=/activity/xunlei/') 登录
+                            a(href='/accounts/login/?next=/activity/xunlei_treasure/') 登录
                     .win-user
-                        .win-box
+                        .win-box(style='display:none')
                             .megaphone
                             .ul-p.clearfix
                                 ul#winList
@@ -52,7 +52,7 @@ html
                 .xunlei-content.clearfix
                     +titles('新手', '秘籍', 'New techniques')
                     .novice-welfare.clearfix
-                        mixin welfare(style, f1, f2, f3, f4, f5, f6, style1)
+                        mixin welfare(style, f1, url f2, f3, f4, f5, f6, style1)
                             .welfare-box(class=style1)
                                 .welfare-img(class=style)
                                 .welfare-condition=f1
@@ -61,10 +61,13 @@ html
                                     label=f3
                                     span=f4
                                     label=f5
-                                a(href='javascript:void(0)').userAction=f6
-                        +welfare('welfare-img1', '注册送', '28888元', '体验金+', '50元', '红包', '注册领取')
-                        +welfare('welfare-img2', '首充送', '7天', '迅雷会员', '', '', '充值领取')
-                        +welfare('welfare-img3', '最高送', '250元', '现金红包+', '1年', '迅雷会员', '投资领取', 'welfare-box-last')
+                                if user.is_authenticated
+                                    a(href=url)=f6
+                                else
+                                    a(href='javascript:void(0)').userAction=f6
+                        +welfare('welfare-img1', '注册送', '/', '28888元', '体验金+', '50元', '红包', '注册领取')
+                        +welfare('welfare-img2', '首充送', '/pay/banks/', '7天', '迅雷会员', '', '', '充值领取')
+                        +welfare('welfare-img3', '最高送', '/p2p/list/', '250元', '现金红包+', '1年', '迅雷会员', '投资领取', 'welfare-box-last')
             .xunlei-box3.clearfix
                 .xunlei-content.clearfix
                     +titles('五步享', '收益', 'Five steps of sitting on earning')
@@ -110,7 +113,7 @@ html
                     +titles('活动', '说明', 'Activity instructions')
                     .explain-list
                         p 1. 活动时间：2016年3月1日开始；
-                        p 2. 手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌迅雷渠道新老用户均可参与；
+                        p 2. 手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌网利宝新老用户均可参与；
                         p 3. 新用户注册为网利宝用户即得28888元体验金，体验金专享1天10%年化收益；
                             span#rewardDetail 新用户奖励
                         .explain-min(style='display:none')
@@ -159,4 +162,4 @@ html
         include global/g_footer
         include include/tracking
     script.
-        require(['/static/src/pc/xunlei.js?v=20160426'])
+        require(['/static/src/pc/xunlei.js?v=20160518'])

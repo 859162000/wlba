@@ -1,16 +1,14 @@
 # coding=utf-8
 
 import re
-import ssl
 import logging
 import datetime
 import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.poolmanager import PoolManager
 from django.conf import settings
 from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
+from common.tools import MyHttpsAdapter
 
 
 logger = logging.getLogger("wanglibao_account")
@@ -80,26 +78,22 @@ class TestIDVerifyBackEnd(object):
 
     @classmethod
     def verify(cls, name, id_number):
-        records = IdVerification.objects.filter(id_number=id_number, name=name)
-        if records.exists():
-            record = records.first()
-            return record, None
-
-        record = IdVerification(id_number=id_number, name=name, is_valid=True)
-        record.save()
-
-        return record, None
+        # records = IdVerification.objects.filter(id_number=id_number, name=name)
+        # if records.exists():
+        #     record = records.first()
+        #     return record, None
+        #
+        # record = IdVerification(id_number=id_number, name=name, is_valid=True)
+        # record.save()
+        #
+        # return record, None
+        return {"is_valid": True, "description": None}
 
 
 class ProductionIDVerifyBackEnd(object):
 
     @classmethod
     def verify(cls, name, id_number):
-        records = IdVerification.objects.filter(id_number=id_number, name=name)
-        if records.exists():
-            record = records.first()
-            return record, None
-
         request = u"""<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:nci="http://www.nciic.com.cn" xmlns:fin="http://schemas.datacontract.org/2004/07/Finance.EPM">
                <soapenv:Header/>
@@ -160,12 +154,8 @@ class ProductionIDVerifyBackEnd(object):
                     message = u'响应数据解析失败'
                     logger.info("ProductionIDVerifyBackEnd parse reponse text failed with data[%s]" % response.text)
 
-        record = IdVerification(id_number=id_number, name=name, is_valid=verify_result, description=message)
-        record.save()
-
-        message = None if record.is_valid else message
-
-        return record, message
+        message = None if verify_result else message
+        return {"is_valid": verify_result, "description": message}
 
 
 class ProductionIDVerifyV2BackEnd(object):
@@ -173,31 +163,8 @@ class ProductionIDVerifyV2BackEnd(object):
 
     @classmethod
     def verify(cls, name, id_number):
-        records = IdVerification.objects.filter(id_number=id_number, name=name)
-        if records.exists():
-            record = records.first()
-            if record.description == u'该用户未满18周岁':
-                if not check_age_for_id(id_number):
-                    return record, None
-            else:
-                return record, None
-
         verify_result, id_photo, message = get_verify_result(id_number, name)
-
-        record = IdVerification()
-        record.id_number = id_number
-        record.name = name
-        record.is_valid = verify_result
-        record.description = message
-
-        if verify_result:
-            message = None
-            if id_photo:
-                record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
-
-        record.save()
-
-        return record, message
+        return {"is_valid":verify_result, "description":message, "id_photo":id_photo}
 
 
 def parse_id_verify_response_v2(text):
@@ -257,16 +224,6 @@ def parse_id_verify_response_v2(text):
         'id_photo': id_photo,
         'message': message,
     }
-
-
-class MyHttpsAdapter(HTTPAdapter):
-    """指定https请求时使用TLSv1版本"""
-
-    def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(num_pools=connections,
-                                       maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 
 def check_birth_date_for_id(id_number):
@@ -401,6 +358,10 @@ def get_verify_result(id_number, name):
 
     verify_result = False
     id_photo = None
+
+    id_number_len = len(str(id_number))
+    if not(id_number_len == 15 or id_number_len == 18):
+        return verify_result, id_photo, u'身份证长度不合法'
 
     # 身份证合法性校验
     # check_result, _error = check_id_card(id_number)

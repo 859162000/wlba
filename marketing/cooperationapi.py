@@ -123,6 +123,7 @@ class WangDaiListAPI(APIView):
         p2pproducts = P2PProduct.objects.filter(hide=False).filter(status=u'正在招标')
 
         p2p_list = []
+        repaymentType = ''
         for p2p in p2pproducts:
             # 计算进度
             amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
@@ -130,6 +131,15 @@ class WangDaiListAPI(APIView):
             schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
 
             for pay_method, value in WANGDAI:
+                if p2p.pay_method == u'日计息一次性还本付息':
+                    repaymentType = 1
+                    break
+                if p2p.pay_method == u'日计息月付息到期还本':
+                    repaymentType = 5
+                    break
+                if p2p.pay_method == u'先息后本':
+                    repaymentType = 9
+                    break
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
@@ -190,6 +200,7 @@ class WangDaiByDateAPI(APIView):
         ]).filter(soldout_time__range=(start_time, end_time))
 
         p2p_list = []
+        repaymentType = ''
         for p2p in p2pproducts:
 
             amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
@@ -197,6 +208,15 @@ class WangDaiByDateAPI(APIView):
             schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
 
             for pay_method, value in WANGDAI:
+                if p2p.pay_method == u'日计息一次性还本付息':
+                    repaymentType = 1
+                    break
+                if p2p.pay_method == u'日计息月付息到期还本':
+                    repaymentType = 5
+                    break
+                if p2p.pay_method == u'先息后本':
+                    repaymentType = 9
+                    break
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
@@ -242,6 +262,16 @@ class WangDaiByDateAPI(APIView):
 
         return HttpResponse(renderers.JSONRenderer().render(p2p_list, 'application/json'))
     
+PAY_METHOD_CHOICES = (
+    (u'到期还本付息', 1),
+    (u'等额本息', 2),
+    (u'按月付息', 5),
+    (u'按季度付息', 7),
+    (u'日计息一次性还本付息', 8),
+    (u'日计息月付息到期还本', 9),
+    (u'先息后本', 3)
+)
+
 class DuoZhuanByDateAPI(APIView):
     """
     多赚数据接口， 获取已经完成的列表数据
@@ -302,13 +332,14 @@ class DuoZhuanByDateAPI(APIView):
                 n = n + 1
             p2p_data['totalPage'] = n
         p2p_list = []
+        repaymentType = ''
         for p2p in p2pproducts:
 
             amount = Decimal.from_float(p2p.total_amount).quantize(Decimal('0.00'))
             percent = p2p.ordered_amount / amount * 100
             schedule = '{}%'.format(percent.quantize(Decimal('0.0'), 'ROUND_DOWN'))
 
-            for pay_method, value in WANGDAI:
+            for pay_method, value in PAY_METHOD_CHOICES:
                 if pay_method == p2p.pay_method:
                     repaymentType = value
                     break
@@ -339,7 +370,7 @@ class DuoZhuanByDateAPI(APIView):
                 "interestRate": '{}%'.format(Decimal.from_float(p2p.expected_earning_rate).quantize(Decimal('0.0'))+reward),
                 "deadline": str(p2p.period),
                 "deadlineUnit": deadlineUnit,
-                "reward": '{}%'.format(0),#'{}%'.format(reward),
+                "reward": '{}'.format(reward),
                 "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
                 "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
