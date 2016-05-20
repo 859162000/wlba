@@ -3468,3 +3468,46 @@ class ZhongYingAPIView(APIView):
                 'message': u'奖品已经发放'
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+class XiaoMeiAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        Introducedby = IntroducedBy.objects.filter(user_id=request.user.id).first()
+        if not (Introducedby and Introducedby.channel and Introducedby.channel.name == 'xmdj2'):
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'您不符合领奖规则'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购').order_by('create_time').first()
+
+        if not p2p_record:
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'您不符合领奖规则'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if p2p_record.amount < 3000:
+            json_to_response = {
+                'ret_code': 1003,
+                'message': u'您不符合领奖规则'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if p2p_record.amount >= 3000:
+            json_to_response = {
+                'ret_code': 1004,
+                'message': u'奖品已经发放'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+

@@ -1443,7 +1443,8 @@ class JuChengRegister(CoopRegister):
                     "content": u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
                     "mtype": "activity"
                 })
-class ZhongYingRegister(CoopRegister):
+
+class XiaoMeiRegister(CoopRegister):
 
     def __init__(self, request):
         super(ZhongYingRegister, self).__init__(request)
@@ -1471,6 +1472,35 @@ class ZhongYingRegister(CoopRegister):
                     "content": u'【网利科技】您已成功获得影票兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
+
+
+class ZhongYingRegister(CoopRegister):
+
+    def __init__(self, request):
+        super(ZhongYingRegister, self).__init__(request)
+        self.c_code = 'xmdj2'
+        self.invite_code = 'xmdj2'
+        self.token = 'xmdj2'
+        self.request = request
+
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            reward = Reward.objects.filter(type='小美到家', is_used=False).first()
+            if not reward:
+                return
+            send_messages.apply_async(kwargs={
+                "phones": [user.wanglibaouserprofile.phone, ],
+                "messages": [u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,), ]
+            })
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": user.id,
+                "title": u"演出门票赠送",
+                "content": u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,),
+                "mtype": "activity"
+            })
 
 class HappyMonkeyRegister(CoopRegister):
     def __init__(self, request):
