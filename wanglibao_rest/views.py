@@ -1859,8 +1859,10 @@ class GeetestAPIView(APIView):
             challenge = request.POST.get(gt.FN_CHALLENGE, '')
             validate = request.POST.get(gt.FN_VALIDATE, '')
             seccode = request.POST.get(gt.FN_SECCODE, '')
-            status = request.session[gt.GT_STATUS_SESSION_KEY]
-            user_id = request.session["user_id"]
+            try:
+                status = request.session[gt.GT_STATUS_SESSION_KEY]
+            except KeyError:  #第一步的预处理可能会报错,导致session没有设置
+                status = 0
             if status:
                 result = gt.success_validate(challenge, validate, seccode)
             else:
