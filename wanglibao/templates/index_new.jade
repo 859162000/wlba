@@ -222,7 +222,7 @@ html
                                     elif p2p.types.name == '一般企业贷' or p2p.types.name == '珠宝贷' or p2p.types.name == '艺术品贷' or p2p.types.name == '红木贷'
                                         i.qy-icon
                                     elif p2p.types.name == '黄金标'
-                                        i.glod-icon
+                                        i.gold-icon
                                     elif p2p.types.name == '过桥周转业务'
                                         i.bank-icon
                                     else
@@ -261,7 +261,7 @@ html
                                     if p2p.display_status == '抢购中'
                                         a.min(href='/p2p/detail/{{p2p.id}}') 立即投资
                                     else
-                                        a.mindisable-style(href='/p2p/detail/{{p2p.id}}') {{p2p.display_status}}
+                                        a.min.disable-style(href='/p2p/detail/{{p2p.id}}') {{p2p.display_status}}
                 p2pLengths = len(p2p_list)
                 .page-boxs
                     span.active
