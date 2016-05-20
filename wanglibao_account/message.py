@@ -143,20 +143,19 @@ def sign_read(user, message_id):
     if int(message_id) == 0:
         if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
             Message.objects.filter(target_user=user, read_status=False).update(read_status=True, read_at=long(time.time()))
-        # else:
-            # 改成不管怎么样都要更新 消息中心的数据
-        try:
-            url = settings.PHP_INSIDE_MESSAGE_READ_ALL
-            response = requests.post(url,
-                                     data={'uid': user.id}, timeout=3)
-            if response.status_code == 200:
-                resp = response.json()
-                if resp['code'] == 'success':
-                    return {"ret_code": 0, "message": "ok"}
-            else:
-                return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
-        except Exception, e:
-            logger.debug('in sign_read, read [ all ] php inside message error with {}'.format(e.message))
+        else:
+            try:
+                url = settings.PHP_INSIDE_MESSAGE_READ_ALL
+                response = requests.post(url,
+                                         data={'uid': user.id}, timeout=3)
+                if response.status_code == 200:
+                    resp = response.json()
+                    if resp['code'] == 'success':
+                        return {"ret_code": 0, "message": "ok"}
+                else:
+                    return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
+            except Exception, e:
+                logger.debug('in sign_read, read [ all ] php inside message error with {}'.format(e.message))
 
     else:
         if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
@@ -167,21 +166,20 @@ def sign_read(user, message_id):
                 msg.save()
             elif not msg:
                 return {"ret_code": 30091, "message": "消息不存在"}
-        # else:
-            # 改成 不管怎么样都要读
-        try:
-            url = settings.PHP_INSIDE_MESSAGE_READ
-            response = requests.post(url,
-                                     data={'uid': user.id, 'mid': message_id}, timeout=3)
+        else:
+            try:
+                url = settings.PHP_INSIDE_MESSAGE_READ
+                response = requests.post(url,
+                                         data={'uid': user.id, 'mid': message_id}, timeout=3)
 
-            if response.status_code == 200:
-                resp = response.json()
-                if resp['code'] == 'success':
-                    return {"ret_code": 0, "message": "ok"}
-            else:
-                return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
-        except Exception, e:
-            logger.debug('in sign_read, read php inside message error with {}'.format(e.message))
+                if response.status_code == 200:
+                    resp = response.json()
+                    if resp['code'] == 'success':
+                        return {"ret_code": 0, "message": "ok"}
+                else:
+                    return {"ret_code": 10000, "message": u"状态码 = {}".format(response.status_code)}
+            except Exception, e:
+                logger.debug('in sign_read, read php inside message error with {}'.format(e.message))
 
 
 def create(title, content, mtype):
