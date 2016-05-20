@@ -180,7 +180,7 @@ var wlb = (function () {
 
             var options = this._setData(data, callback);
 
-            this.bridge.callHandler('rechargeApp', function (response) {
+            this.bridge.callHandler('rechargeApp', options.post, function (response) {
                 options.callback && options.callback(response);
             });
         }
