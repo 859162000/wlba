@@ -3,6 +3,7 @@ include include/activityTop2
 .wrap#ganjiwang-banner
   .gold2
     input#userStatus(type='hidden',value='{{ user.is_authenticated }}')
+    input(type='hidden',value='{{ret_code}}')#ret_code
     if user.is_authenticated
       //#ganjiwang-model
       //    .banner-form#ganjiwang-welcome
@@ -85,7 +86,6 @@ include include/activityTop2
                   | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
                   .form-row-error
                 button#register_submit.button-account.span10.xun-zhuce(type='button')
-                input(type='hidden',value='{{ret_code}}')#ret_code
                 if ret_code != '10000'
                     p.xunlei-account 为确保迅雷奖励正确发放，请点击【立即注册】与您的迅雷帐号绑定
               .space-vertical-s
