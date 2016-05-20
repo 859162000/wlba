@@ -1,8 +1,12 @@
 wlb.ready({
     app: function (mixins) {
-        mixins.rechargeApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/app_detail'})
+        $('#recharge').on('click',function(){
+            mixins.rechargeApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/experience/app_detail'})
+        })
     },
     other: function () {
-        //org.feast.init()
+        $('#recharge').on('click',function(){
+            window.location.href = '/weixin/recharge/';
+        })
     }
 })
