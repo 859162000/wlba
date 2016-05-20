@@ -1674,7 +1674,7 @@ class XunleiVipRegister(CoopRegister):
                 # logger.debug('save user %s to binding'%user)
 
                 # 绑定成功后站内信通知用户
-                phone = user.wanglibaouserprofile.phone
+                phone = get_phone_for_coop(user.id)
                 message_content = sms_alert_binding_xunlei(phone, channel_account)
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
