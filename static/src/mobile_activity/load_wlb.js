@@ -4,7 +4,7 @@
         isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
         isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
 
-    $('#down-btn').on('click', function () {
+    $('#js-down-btn').on('click', function () {
         if (ua.match(/MicroMessenger/i) == "micromessenger") {
             window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
         } else {
