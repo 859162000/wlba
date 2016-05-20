@@ -28,7 +28,7 @@ include include/activityTop2
             p.success-pop 并与您的迅雷账号绑定成功
             p.accounts-pop.mt10 迅雷账号：
                 span.xunlei-name
-        p.accounts-pop 网利宝账号：{{user.wanglibaouserprofile.phone}}
+        p.accounts-pop 网利宝账号：{{user.wanglibaouserprofile.phone | safe_phone_new }}
         .login-btns
             .lio-img
             a(href='/accounts/home/') 进入我的账户
