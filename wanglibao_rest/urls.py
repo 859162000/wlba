@@ -295,6 +295,7 @@ urlpatterns += patterns(
     url(r'^activity/newusergift/$', FetchNewUserReward.as_view()),
     url(r'^activity/zhaoxiangguan/$', ZhaoXiangGuanAPIView.as_view()),
     url(r'^activity/zhongying/$', ZhongYingAPIView.as_view()),
+    url(r'^activity/xiaomei/$', ZhongYingAPIView.as_view()),
     url(r'^activity/hmd_invest_ranks/$', HmdInvestTopRanks.as_view()),
 )
 
