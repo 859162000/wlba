@@ -1418,7 +1418,7 @@ PHP_APP_INDEX_DATA_DEV = 'http://zhangfu.dev.wanglibao.com/api/python.php'
 
 
 if ENV == ENV_PRODUCTION:
-    PHP_UNPAID_PRINCIPLE = 'https://beta.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+    PHP_UNPAID_PRINCIPLE = 'https://www.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
     PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'
     PHP_SEND_INSIDE_MESSAGE = "http://10.172.164.154/message.php/message/inside"
     PHP_UNREAD_MESSAGES_COUNT = "http://10.172.164.154/message.php/message/count"
