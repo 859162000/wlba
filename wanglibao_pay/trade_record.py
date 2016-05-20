@@ -77,6 +77,7 @@ def _withdraw_record(user, pagesize, pagenum, app_version):
             "amount": x.total_amount,
             "created_at": util.fmt_dt_normal(util.local_datetime(x.create_time)),
             "status": x.status,
+            "error_message": x.error_message,
             "confirm_time": util.fmt_dt_normal(x.confirm_time),
             "card_no": x.card_no,
             "fee": fee,
