@@ -241,7 +241,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = location.protocol+"//"+location.host,
 			shareName = '网利宝携手中影票务通送福利',
 			shareImg = host + '/static/imgs/mobile_activity/app_center_film_ticket/300x300.jpg',
-			shareLink = host + '/activity/app_center_film_ticket/?promo_token=sy',
+			shareLink = host + '/activity/app_center_film_ticket/?promo_token=zypwt',
 			shareMainTit = '网利宝携手中影票务通送福利',
 			shareBody = '票房最强档 网利宝请您看';
 		//分享给微信好友

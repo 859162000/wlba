@@ -241,7 +241,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = location.protocol+"//"+location.host,
 			shareName = '网利宝携手小美到家0元请你做美容！',
 			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300x300.jpg',
-			shareLink = host + '/activity/app_pretty_reach_home/?promo_token=sy',
+			shareLink = host + '/activity/app_pretty_reach_home/?promo_token=xmdj2',
 			shareMainTit = '网利宝携手小美到家0元请你做美容！',
 			shareBody = '召唤素颜美肌，赶紧来领！';
 		//分享给微信好友
@@ -291,11 +291,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
                         $('#get_ticket').click(function() {
                             org.ajax({
-                                url: '/api/activity/zhongying/',
+                                url: '/api/activity/xiaomei/',
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
-                                        mixins.loginApp({refresh:1, url:'/activity/app_center_film_ticket/?promo_token=zypwt'});
+                                        mixins.loginApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
                                     }else if(data.ret_code=='1001'||data.ret_code=='1002'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
@@ -318,7 +318,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 
                     $('#get_ticket').click(function() {
-                        mixins.loginApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=zypwt'});
+                        mixins.loginApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
                     });
                 } else {
                     login = true;
@@ -331,11 +331,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         other: function(){
             $('#take_prize').click(function() {
                 org.ajax({
-                    url: '/api/activity/zhongying/',
+                    url: '/api/activity/xiaomei/',
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/login/?promo_token=zypwt&next=/activity/app_pretty_reach_home/?promo_token=zypwt'
+                            window.location.href = '/weixin/login/?promo_token=zypwt&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
                         }else if(data.ret_code=='1001'||data.ret_code=='1002'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
