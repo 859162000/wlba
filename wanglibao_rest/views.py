@@ -554,7 +554,7 @@ class IdValidateAPIView(APIView):
         user = request.user
 
         res = id_validate(user, name, id_number)
-        if res.get("ret_code")!=0:
+        if res.get("ret_code")==0:
             device = split_ua(request)
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
