@@ -261,7 +261,7 @@ html
                                     if p2p.display_status == '抢购中'
                                         a.min(href='/p2p/detail/{{p2p.id}}') 立即投资
                                     else
-                                        a.mindisable-style(href='/p2p/detail/{{p2p.id}}') {{p2p.display_status}}
+                                        a.min.disable-style(href='/p2p/detail/{{p2p.id}}') {{p2p.display_status}}
                 p2pLengths = len(p2p_list)
                 .page-boxs
                     span.active
