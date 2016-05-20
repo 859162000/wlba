@@ -418,7 +418,7 @@ def id_validate(user, name, id_number):
         return {"ret_code": 30053, "error_number": ErrorNumber.id_verify_times_error, "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066"}
     try:
         from wanglibao_account.utils import verify_id
-        verify_record, error = verify_id(user, name, id_number)
+        verify_record, error = verify_id(name, id_number, user=user)
     except:
         return {"ret_code": 30054, "error_number": ErrorNumber.unknown_error, "message": u"验证失败，请重试或联系客服 4008-588-066"}
 

@@ -130,7 +130,7 @@ def create_user(identifier, password, nickname, user_type='0'):
     return user
 
 
-def verify_id(user, name, id_number):
+def verify_id(name, id_number, user=None):
     backend = settings.ID_VERIFY_BACKEND
     class_name = backend.split('.')[-1]
     if class_name not in ('TestIDVerifyBackEnd', 'ProductionIDVerifyBackEnd', 'ProductionIDVerifyV2BackEnd', 'ProductionIDVerifyV1&V2AutoBackEnd'):
@@ -192,7 +192,8 @@ def verify_id(user, name, id_number):
 
             message = verify_result.get('description')
             # record = IdVerification()
-            record.user = user
+            if user:
+                record.user = user
             record.id_number = id_number
             record.name = name
             record.is_valid = verify_result.get('is_valid')
