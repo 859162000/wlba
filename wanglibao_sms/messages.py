@@ -510,6 +510,11 @@ def sms_alert_unbanding_xunlei(reward_dsct, url):
     return content.format(reward_dsct, url)
 
 
+def sms_alert_binding_xunlei(phone, xl_account):
+    content = u"在参与迅雷会员活动中，您的网利宝帐号{}与迅雷帐号{}绑定成功，感谢您对我们的支持与关注！"
+    return content.format(phone, xl_account)
+
+
 @suffix
 def changed_mobile_success(user_name):
     """

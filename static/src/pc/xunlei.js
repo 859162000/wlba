@@ -40,6 +40,7 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
             },
             success: function (data) {
                 if (data.ret_code == 10002 || data.ret_code == 10000) {
+                    $('.xunlei-name').text(data.nickname)
                     $('.xunlei-accounts-info').show();
                 }
             }
