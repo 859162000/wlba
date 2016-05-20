@@ -18,7 +18,6 @@ def count_msg(params, user):
     """
         计算消息条数
     """
-    logger.info('in count message!!!!!!')
     listtype = params.get("listtype", "").strip()
     if not listtype or listtype not in ("read", "unread", "all"):
         return {"ret_code": 30071, "message": "参数输入错误"}
@@ -33,7 +32,6 @@ def count_msg(params, user):
         return {"ret_code": 0, "message": "ok", "count": count}
 
     else:
-        logger.info('in count_msg, PHP_INSIDE_MESSAGE_LIST_SWITCH != 1')
         try:
             response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                      data={'uid': user.id, 'read_status': listtype}, timeout=3)
@@ -77,7 +75,6 @@ def list_msg(params, user):
             msgs = Message.objects.filter(target_user=user).order_by('-message_text__created_at')[(pagenum-1)*pagesize:pagenum*pagesize]
 
     else:
-        logger.info('in list_msg PHP_INSIDE_MESSAGE_LIST_SWITCH != 1')
         messages = []
         response = requests.post(settings.PHP_INSIDE_MESSAGES_LIST,
                                  data={'uid': user.id, 'read_status': listtype}, timeout=3)
@@ -316,7 +313,6 @@ def send_one(user_id, title, content, mtype, push_type="in"):
     """
         给某个人发送站内信（需要推送时也在这里写）
     """
-    logger.info('going to send message ! user_id = {}'.format(user_id))
     if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
         msgTxt = create(title, content, mtype)
         if not msgTxt:
@@ -329,7 +325,6 @@ def send_one(user_id, title, content, mtype, push_type="in"):
         return True
     elif settings.PHP_INSIDE_MESSAGE_SWITCH == 2:
         # 本地备份 从sqs 里面获取参数! 避免数据丢失.
-        logger.info('in send_one, inside message args, title = {}, content = {}, mtype = {}'.format(title, content, mtype))
         msgTxt = create(title, content, mtype)
         if not msgTxt:
             logger.debug('in send_one, local save failed! args, title = {}, content = {}, mtype = {}'.
@@ -349,9 +344,8 @@ def send_one(user_id, title, content, mtype, push_type="in"):
             else:
                 return False
         except Exception, e:
-            logger.debug('exception = {}'.format(e.message))
-            logger.debug('failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
-                user_id, mtype, title, content
+            logger.debug('in send_one, failed info, e = {}! uid = {}, mtype = {}, title = {}, content = {}'.format(
+                e.message, user_id, mtype, title, content
             ))
             return False
 
@@ -378,7 +372,6 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
     """
         批量发送站内信, users is a user_id list.
     """
-    logger.info('going to send message ! user_ids = {}'.format(users))
     if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
         if not isinstance(msgTxt, MessageText):
             msgTxt = create(title, content, mtype)
@@ -408,9 +401,8 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
                 return False
 
         except Exception, e:
-            logger.debug('exception = {}'.format(e.message))
-            logger.debug('send batch failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
-                users, mtype, title, content
+            logger.debug('send batch failed info = {}, uid = {}, mtype = {}, title = {}, content = {}'.format(
+                e.message, users, mtype, title, content
             ))
 
             return False
@@ -426,9 +418,8 @@ def send_batch(users, title=None, content=None, mtype=None, msgTxt=None, push_ty
                 return False
 
         except Exception, e:
-            logger.debug('exception = {}'.format(e.message))
-            logger.debug('send batch failed info, uid = {}, mtype = {}, title = {}, content = {}'.format(
-                users, mtype, title, content
+            logger.debug('send batch failed info = {}, uid = {}, mtype = {}, title = {}, content = {}'.format(
+                e.message, users, mtype, title, content
             ))
             return False
 
