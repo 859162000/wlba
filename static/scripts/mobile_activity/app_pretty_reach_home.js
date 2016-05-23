@@ -289,7 +289,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         //    self.location.replace(url);
                         //}
 
-                        $('#take_prize').click(function() {
+                        $('#take_prize,#take_prize_2').click(function() {
                             org.ajax({
                                 url: '/api/activity/xiaomei/',
                                 type: 'post',
@@ -317,7 +317,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     login = false;
 
 
-                    $('#take_prize').click(function() {
+                    $('#take_prize,#take_prize_2').click(function() {
                         mixins.loginApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
                     });
                 } else {
@@ -329,7 +329,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
         },
         other: function(){
-            $('#take_prize').click(function() {
+            $('#take_prize,#take_prize_2').click(function() {
                 org.ajax({
                     url: '/api/activity/xiaomei/',
                     type: 'post',
