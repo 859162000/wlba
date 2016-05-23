@@ -185,7 +185,7 @@ def generate_bisouyi_product_data(product, action):
             'progress': round(product.completion_rate, 2),
             'rdate': product.publish_time.strftime("%Y-%m-%d %H:%M:%S"),
             'edate': product.end_time.strftime("%Y-%m-%d %H:%M:%S"),
-            'launchmoney': float(product.limit_per_user),
+            'launchmoney': float(100),
             'remainmoney': float(product.remain_amount),
             'repayment': pay_method,
             'guarantee': product.warrant_company,
