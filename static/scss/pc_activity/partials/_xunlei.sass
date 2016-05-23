@@ -1,0 +1,466 @@
+@mixin xunlei-content
+  width: 1100px
+  margin: 0 auto
+@mixin line-height($heightValue: 0 )
+  height: $heightValue + px
+  line-height: $heightValue + px
+@mixin abs-pos($top: auto, $right: auto, $bottom: auto, $left: auto)
+  top: $top
+  right: $right
+  bottom: $bottom
+  left: $left
+  position: absolute
+.xunlei-login
+  width: 315px
+  height: 420px
+  background: #fff
+  float: right
+  margin-top: 55px
+  border-radius: 5px
+  padding: 30px 25px
+  .success-pop
+    color: #ff5252
+    font-size: 18px
+    text-align: center
+  .accounts-pop
+    text-align: center
+    font-size: 14px
+    color: #738289
+  .mt10
+    margin-top: 10px
+  .login-btns
+    .lio-img
+      background: url(/static/imgs/pc_activity/activity_regist.png) 0 0 no-repeat
+      width: 143px
+      height: 146px
+      margin: 0 auto
+      position: relative
+    a
+      background: #ff5252
+      border-radius: 5px
+      display: inline-block
+      color: #fff
+      font-size: 18px
+      text-align: center
+      width: 265px
+      +line-height(40)
+      margin-top: -15px
+  .reminder
+    text-align: center
+    font-size: 13px
+    color: #ff5252
+    margin-top: 15px
+  .reminder-content
+    font-size: 11px
+    color: #434343
+    span
+      float: left
+      width: 10px
+      display: inline-block
+    label
+      float: left
+      width: 245px
+      display: inline-block
+.xunlei-login-v
+  width: 315px
+  height: 420px
+  background: #fff
+  float: right
+  margin-top: 55px
+  border-radius: 5px
+  .regist-reward
+    +line-height(75)
+    font-size: 14px
+    color: #434343
+    border-bottom: 1px solid #dedede
+    padding: 0 30px
+    span
+      color: #ff5252
+  .regist-c
+    padding: 0 30px
+    .wlb-re
+      font-size: 14px
+      color: #434343
+      text-align: center
+      padding: 25px 0
+  .xunlei-account
+    input
+      +line-height(38)
+      width: 265px
+      border: 1px solid #dedede
+      border-radius: 5px
+      padding-left: 40px
+      margin-bottom: 16px
+    .xl-account
+      background: url(/static/imgs/pc_activity/activity_regist.png) -147px -82px no-repeat
+    .xl-pwd
+      background: url(/static/imgs/pc_activity/activity_regist.png) -147px -51px no-repeat
+  .login-q
+    margin: 18px 0 13px
+    label
+      font-size: 14px
+      color: #8a969c
+      float: left
+      input
+        vertical-align: -2px
+    a
+      float: right
+      color: #3ea7eb
+  .xunlei-login-btn
+    background: #ff5252
+    border-radius: 5px
+    display: inline-block
+    color: #fff
+    font-size: 18px
+    text-align: center
+    width: 265px
+    +line-height(40)
+  .go-register-xl
+    text-align: right
+    padding-top: 14px
+    a
+      color: #3ea7eb
+
+.xunlei-box
+  .part-box
+    text-align: center
+    .part-title
+      font-size: 36px
+      color: #fff
+      span
+        color: #fdfa55
+    .part-en
+      color: #db6d48
+      font-size: 30px
+    .part-icon
+      span
+        width: 49px
+        height: 28px
+        display: inline-block
+        @include xunlei_april-sprite(arrow)
+  .xunlei-box1
+    background: #d65721
+    padding-bottom: 60px
+    .xunlei-content
+      +xunlei-content
+      .mt60
+        margin-top: -60px
+      .treasure-box
+        height: 683px
+        width: 100%
+        position: relative
+        .bone-icon
+          @include xunlei_april-sprite(gutou)
+          width: 133px
+          height: 133px
+          +abs-pos('10px', '', '', '-53px')
+        .money-icon
+          position: absolute
+          @include xunlei_april-sprite(money)
+          width: 190px
+          height: 121px
+          right: -265px
+          top: -100px
+        .chest-icon
+          position: absolute
+          @include xunlei_april-sprite(liwu)
+          width: 216px
+          height: 141px
+          left: 70px
+          bottom: 20px
+        .bottom-icon
+          position: absolute
+          @include xunlei_april-sprite(bottom)
+          width: 610px
+          height: 162px
+          left: 352px
+          bottom: 25px
+        .people-icon
+          position: absolute
+          @include xunlei_april-sprite(boy1)
+          width: 440px
+          height: 552px
+          left: 333px
+          bottom: 55px
+        .people-icon2
+          @include xunlei_april-sprite(boy2)
+        .people-icon3
+          @include xunlei_april-sprite(boy3)
+        .mountain-icon
+          position: absolute
+          @include xunlei_april-sprite(shan)
+          width: 311px
+          height: 147px
+          left: 330px
+          bottom: 0
+        .prompt-icon
+          position: absolute
+          @include xunlei_april-sprite(prompt)
+          width: 217px
+          height: 170px
+          right: 45px
+          top: 20px
+        .gold-icon
+          position: absolute
+          @include xunlei_april-sprite(gold)
+          width: 193px
+          height: 119px
+          right: -70px
+          bottom: -206px
+      .user-count
+        text-align: center
+        font-size: 24px
+        color: #fff
+        padding: 35px 0
+        a
+          color: #fbf453
+          padding: 0 5px
+          border-bottom: 1px solid #fff
+      .win-user
+        .win-box
+          width: 648px
+          height: 140px
+          background: #802a00
+          border-radius: 20px
+          padding: 13px
+          margin: 0 auto
+          position: relative
+          .megaphone
+            position: absolute
+            @include xunlei_april-sprite(megaphone)
+            width: 20px
+            height: 20px
+            left: 151px
+            top: 41px  
+            z-index: 10
+          .ul-p
+            position: relative
+            overflow: hidden
+            background: #fff
+            border-radius: 20px
+            -moz-box-shadow: 0px 6px 6px #eee inset
+            -webkit-box-shadow: 0px 6px 6px #eee inset
+            box-shadow: 0x 6px 6px #eee inset
+            padding: 15px 0
+            height: 110px
+            ul
+              position: absolute
+              width: 100%
+              li
+                +line-height(43)
+                padding-left: 165px
+                span
+                  color: #ff5252
+                  font-size: 18px
+              li:nth-child(even)
+                background: #eeeeee
+  .xunlei-box2
+    background: #ca511e
+    padding: 57px 0 65px
+    .xunlei-content
+      +xunlei-content
+      .novice-welfare
+        margin-top: 37px
+        .welfare-box
+          width: 256px
+          text-align: center
+          float: left
+          margin-right: 160px
+          .welfare-img
+            width: 255px
+            height: 255px
+          @for $i from 1 through 3
+            .welfare-img#{$i}
+              @include xunlei_april-sprite(prize#{$i})
+            .welfare-condition
+              font-size: 24px
+              color: #fff
+              margin-top: 40px
+            .welfare-detail
+              color: #fff
+              margin: 5px 0 15px
+              font-size: 0
+              span
+                color: #fdfa55
+                font-size: 18px
+              label
+                font-size: 18px
+            a
+              width: 200px
+              +line-height(50)
+              background: #802a00
+              color: #fff
+              font-size: 18px
+              display: inline-block
+              border-radius: 5px
+        .welfare-box-last
+          margin-right: 0
+  .xunlei-box3
+    background: #d65721
+    padding: 60px 0
+    .xunlei-content
+      +xunlei-content
+    .regist-step
+      margin: 65px 0 20px
+      .step-box
+        width: 182px
+        float: left
+        margin-right: 65px
+        .step-left
+          @include xunlei_april-sprite(circular)
+          width: 100px
+          height: 100px
+          float: left
+          position: relative
+          span
+            width: 35px
+            height: 32px
+            display: inline-block
+            position: absolute
+            left: 50%
+            top: 50%
+            margin: -17.5px 0 0 -16px
+        @for $i from 1 through 5
+          .span#{$i}
+            @include xunlei_april-sprite(icon#{$i})
+        .step-right
+          @include xunlei_april-sprite(step)
+          width: 7px
+          height: 12px
+          display: inline-block
+          vertical-align: middle
+          float: right
+          margin-top: 45px
+      .step-box-last
+        margin-right: 0
+        width: 100px
+    .setp-font
+      span
+        font-size: 18px
+        color: #fff
+        display: inline-block
+        width: 240px
+      span.w190
+        width: 190px
+      span.w180
+        width: 180px
+        text-align: right
+      span.w250
+        width: 250px
+  .xunlei-box4
+    background: #ca511e
+    padding: 60px 0
+    .xunlei-content
+      +xunlei-content
+    .safe-list
+      margin-top: 35px
+      .safe-box
+        width: 155px
+        float: left
+        text-align: center
+        margin-right: 62px
+        .safe-img
+          width: 130px
+          height: 130px
+          margin: 0 auto
+        .safe-font
+          text-align: center
+          color: #fff
+          font-size: 18px
+          margin-top: 15px
+      .w218
+        width: 218px
+      .w166
+        width: 166px
+      @for $i from 1 through 5
+        .safe-img#{$i}
+          @include xunlei_april-sprite(safe#{$i})
+      .safe-box-last
+        margin-right: 0
+  .xunlei-box5
+    background: #d65721
+    padding: 60px 0
+    .xunlei-content
+      +xunlei-content
+      .explain-list
+        opacity: .7
+        font-size: 16px
+        margin-top: 36px
+        color: #fff
+        line-height: 31px
+        p
+          span
+            color: #fef700
+            text-decoration: underline
+            cursor: pointer
+        .explain-min
+          padding-left: 17px
+
+.alert-box
+  width: 568px
+  .alert-top
+    width: 568px
+    height: 140px
+    @include xunlei_april-sprite(alert_top)
+  .alert-content
+    height: 275px
+    background: #fff
+    border-radius: 0 0 20px 20px
+    position: relative
+    font-size: 24px
+    color: #53a3e4
+    text-align: center
+    overflow: hidden
+    .cont-img
+      position: absolute
+      width: 170px
+      height: 239px
+      @include xunlei_april-sprite(lucky)
+      left: 0
+      bottom: 0
+    .despair
+      position: absolute
+      width: 121px
+      height: 161px
+      @include xunlei_april-sprite(despair)
+      left: 0
+      bottom: -8px
+    .jiaxiquan
+      padding: 60px 0 0 120px
+    .tiyanjin
+      padding: 50px 0 0 120px
+    .wzj
+      padding: 60px 0 0 130px
+    .wzj1
+      padding: 75px 0 0 100px
+    a
+      width: 320px
+      +line-height(60)
+      background: #449be2
+      color: #fff
+      font-size: 18px
+      display: inline-block
+      border-radius: 10px
+      margin-top: 40px
+.alert-box-c
+  width: 568px
+  background: none
+.close-btn
+  width: 54px
+  height: 54px
+  top: 50px
+  @include xunlei_april-sprite(close)
+  right: 35px
+  text-indent: 999px
+  display: inline-block
+  position: absolute
+
+
+
+
+
+
+
+
+
+
