@@ -13,8 +13,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from marketing import tools
 from wanglibao import settings
 from wanglibao_account.auth_backends import User
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
@@ -287,6 +289,7 @@ class YueLiBaoBuy(APIView):
         amount_source = request.POST.get('sourceAmount')
         red_packet = request.POST.get('redPacketAmount')
         red_packet_type = request.POST.get('isRedPacket')
+        period = request.POST.get('period') or 0
         # 使用的红包id
         red_packet_id = request.POST.get('RedPacketId') or 0
 
@@ -307,6 +310,16 @@ class YueLiBaoBuy(APIView):
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
                                                   'device_type': device['device_type']}, queue='celery_ylb')
+
+            tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
+                                                   "device": device['device_type'], "order_id": trade_id,
+                                                   "product_id": product.id, "is_full": False,
+                                                   "product_balance_after": 0, "ylb_period": period})
+            try:
+                logger.debug(u"=月利宝迅雷活动= CoopRegister.process_for_purchase : [%s], [%s]" % (user.id, product.id))
+                CoopRegister(self.request).process_for_purchase_yuelibao(user, product.id)
+            except Exception, e:
+                logger.debug(u"=月利宝迅雷活动= CoopRegister.process_for_purchase Except:{}".format(e.message))
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
