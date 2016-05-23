@@ -1036,10 +1036,6 @@ class LoginAPIView(DecryptParmsAPIView):
         if profile:
             return Response({"token": "false", "message": u"企业用户请在PC端登录"}, status=400)
 
-        status, message = validate_validation_code(identifier, validate_code)
-        if status != 200:
-            return Response({"ret_code": 30023, "message": message})
-
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
