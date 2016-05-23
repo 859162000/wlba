@@ -8,13 +8,30 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding unique constraint on 'IdVerification', fields ['id_number', 'name']
-        db.create_unique(u'wanglibao_account_idverification', ['id_number', 'name'])
+        # Adding model 'IdVerification_2'
+        db.create_table(u'wanglibao_account_idverification_2', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+            ('id_number', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=32)),
+            ('id_photo', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
+            ('is_valid', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('description', self.gf('django.db.models.fields.CharField')(default='', max_length=100, blank=True)),
+            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('update_verify', self.gf('django.db.models.fields.BooleanField')(default=False)),
+        ))
+        db.send_create_signal(u'wanglibao_account', ['IdVerification_2'])
+
+        # Adding unique constraint on 'IdVerification_2', fields ['id_number', 'name']
+        db.create_unique(u'wanglibao_account_idverification_2', ['id_number', 'name'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'IdVerification', fields ['id_number', 'name']
-        db.delete_unique(u'wanglibao_account_idverification', ['id_number', 'name'])
+        # Removing unique constraint on 'IdVerification_2', fields ['id_number', 'name']
+        db.delete_unique(u'wanglibao_account_idverification_2', ['id_number', 'name'])
+
+        # Deleting model 'IdVerification_2'
+        db.delete_table(u'wanglibao_account_idverification_2')
 
 
     models = {
@@ -94,7 +111,19 @@ class Migration(SchemaMigration):
             'update_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'wanglibao_account.idverification': {
-            'Meta': {'unique_together': "(('id_number', 'name'),)", 'object_name': 'IdVerification'},
+            'Meta': {'object_name': 'IdVerification'},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'id_number': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'id_photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'is_valid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'update_verify': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
+        },
+        u'wanglibao_account.idverification_2': {
+            'Meta': {'unique_together': "(('id_number', 'name'),)", 'object_name': 'IdVerification_2'},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -143,7 +172,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.messagetext': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'MessageText'},
             'content': ('django.db.models.fields.TextField', [], {}),
-            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1463653968L', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1463980619L', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mtype': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
@@ -174,7 +203,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.userphonebook': {
             'Meta': {'object_name': 'UserPhoneBook'},
             'alert_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 5, 19, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 5, 23, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invite_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'is_invite': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
