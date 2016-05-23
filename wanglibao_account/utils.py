@@ -130,24 +130,28 @@ def create_user(identifier, password, nickname, user_type='0'):
     return user
 
 
-def verify_id(user, name, id_number):
+def verify_id(name, id_number, user=None):
     backend = settings.ID_VERIFY_BACKEND
     class_name = backend.split('.')[-1]
-    if class_name not in ('TestIDVerifyBackEnd', 'ProductionIDVerifyBackEnd', 'ProductionIDVerifyV2BackEnd', 'ProductionIDVerifyV1&V2AutoBackEnd'):
-        raise NameError("The specific backend not implemented")
+    if class_name not in ('TestIDVerifyBackEnd', 'ProductionIDVerifyBackEnd',
+                          'ProductionIDVerifyV2BackEnd', 'ProductionIDVerifyV1&V2AutoBackEnd'):
+        raise NameError("The class_name[%s] specific backend of verify_id not implemented" % class_name)
+
     verify_result = None
-    id_number_len = len(str(id_number))
+    id_number = str(id_number)
+    id_number_len = len(id_number)
     if not(id_number_len == 15 or id_number_len == 18):
         # message = u'身份证长度不合法'
         # record = IdVerification(id_number=id_number, name=name, is_valid=False, description=message)
         # record.save()
         # return record, message
-        verify_result = {"is_valid":False, "description":u'身份证长度不合法'}
+        verify_result = {"is_valid": False, "description": u'身份证长度不合法'}
     else:
-        record, create = IdVerification.objects.get_or_create(id_number=id_number, name=name, defaults={"description":u"NON"})
+        record, create = IdVerification.objects.get_or_create(id_number=id_number, name=name,
+                                                              defaults={"description": u"NON"})
         if not create:
             if record.is_valid:
-                raise Exception("已经实名通过")
+                raise Exception(u"重复实名:id_number[%s], name[%s] 该用户已经实名通过")
 
             if class_name == 'TestIDVerifyBackEnd':
                 return record, None
@@ -192,7 +196,8 @@ def verify_id(user, name, id_number):
 
             message = verify_result.get('description')
             # record = IdVerification()
-            record.user = user
+            if user:
+                record.user = user
             record.id_number = id_number
             record.name = name
             record.is_valid = verify_result.get('is_valid')
