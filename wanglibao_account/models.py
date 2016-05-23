@@ -34,6 +34,29 @@ class IdVerification(models.Model):
     def __unicode__(self):
         return u'%s %s %d' % (self.id_number, self.name, self.is_valid)
 
+class IdVerification_2(models.Model):
+    """
+    This is a table stores all id verification info. The verify method should
+    check this table first
+    """
+
+    user = models.ForeignKey(User, null=True, blank=True)
+    id_number = models.CharField(u"身份证号", max_length=128, db_index=True)
+    name = models.CharField(u"姓名", max_length=32)
+    id_photo = models.ImageField(upload_to='id_photos', blank=True, null=True,
+                                 verbose_name=u'身份证头像')
+    is_valid = models.BooleanField(u"验证结果", default=False)
+    description = models.CharField(u"验证结果描述", max_length=100, blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    update_verify = models.BooleanField(u"更新", default=False)
+
+    class Meta:
+        verbose_name_plural = u'实名认证记录'
+        unique_together = (("id_number", "name"),)
+
+    def __unicode__(self):
+        return u'%s %s %d' % (self.id_number, self.name, self.is_valid)
+
 
 class VerifyCounter(models.Model):
     """
