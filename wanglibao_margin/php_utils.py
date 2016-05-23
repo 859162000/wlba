@@ -606,6 +606,30 @@ def get_php_index_data(url, user_id):
         return {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
 
 
+def get_php_index_data_logout(url):
+    """
+    未登录时候的首页展示信息
+    :param url:       = 'https://' + request.get_host() + settings.PHP_APP_INDEX_DATA
+    :param user_id:
+    :return: {u'code': 1,
+              u'data': [{u'paidIncome': 3607.42, u'unPaidIncome': 3616.43, u'yesterdayIncome': 0}]}
+    """
+    try:
+        response = requests.post(url, data={}, timeout=3).json()
+        try:
+            if response.get('code') == 1:
+                return response.get('data')
+            else:
+                logger.debug('in get_php_index_data, code != 1')
+                return {"repaymentInfoCurrentMonth": 0, "getPaidProject": 0}
+        except Exception, e:
+            logger.debug('in get_php_index_data, error with : {}'.format(e.message))
+            return {"repaymentInfoCurrentMonth": 0, "getPaidProject": 0}
+    except Exception, e:
+        logger.debug('in get_php_index_data, error with : {}'.format(e.message))
+        return {"repaymentInfoCurrentMonth": 0, "getPaidProject": 0}
+
+
 def get_unread_msgs(user_id):
     """
         获取用户的未读站内信数量

@@ -20,7 +20,7 @@ import random
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
-from wanglibao_margin.php_utils import get_php_redis_principle
+from wanglibao_margin.php_utils import get_php_redis_principle, get_php_index_data
 from wanglibao_p2p.models import P2PEquity, P2PProduct
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_pay.third_pay import card_bind_list
@@ -78,6 +78,8 @@ from wanglibao_account.forms import BiSouYiRegisterForm
 # from wanglibao_invite.models import WechatInviteRelation
 
 logger = logging.getLogger("weixin")
+logger_yuelibao = logging.getLogger('wanglibao_margin')
+
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
 from util import FWH_LOGIN_URL
@@ -87,6 +89,7 @@ SERVICE_SUBSCRIBE = '2'
 OTHER_MENU = '3'
 OTHER_TXT = '4'
 Y_TXT = '5'
+
 
 def stamp(dt):
     return long(time.mktime(dt.timetuple()))
@@ -1222,10 +1225,24 @@ class WeixinAccountHome(TemplateView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         p2p_unpayed_principle += php_principle
+
+        # 增加从PHP项目来的 昨日收益, 累计收益, 待收收益
+        url = 'https://' + self.request.get_host() + settings.PHP_APP_INDEX_DATA
+        try:
+            if int(self.request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+
+        try:
+            index_data = get_php_index_data(url, user.id)
+        except Exception, e:
+            index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
+            logger_yuelibao.debug(u'in WeixinAccountHome, 月利宝地址请求失败!!! exception = {}'.format(e.message))
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
@@ -1244,8 +1261,10 @@ class WeixinAccountHome(TemplateView):
             'p2p_freeze': p2p_freeze,  # P2P投资中冻结金额
             'p2p_withdrawing': p2p_withdrawing,  # P2P提现中冻结金额
             'p2p_unpayed_principle': p2p_unpayed_principle,  # P2P待收本金
-            'p2p_total_unpaid_interest': p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest,  # p2p总待收益
-            'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest,  # P2P总累积收益
+            'p2p_total_unpaid_interest': p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest +
+                                         float(index_data['unPaidIncome']),  # p2p总待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest +
+                                       p2p_total_paid_coupon_interest + float(index_data['paidIncome']),  # P2P总累积收益
             'p2p_total_interest': p2p_total_interest + p2p_total_coupon_interest,  # P2P总收益
             'banner': banner,
         }
