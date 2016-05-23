@@ -136,7 +136,7 @@ def generate_bajinshe_product_data(product):
         'pid': product.id,
         'productType': 2,
         'productName': product.name[:50],
-        'apr': int(product.get_p2p_rate),
+        'apr': product.get_p2p_rate,
         'amount': product_total_amount,
         'pmType': pay_method_code,
         'minIa': 100,
