@@ -151,7 +151,7 @@ def verify_id(name, id_number, user=None):
                                                               defaults={"description": u"NON"})
         if not create:
             if record.is_valid:
-                raise Exception(u"重复实名:id_number[%s], name[%s] 该用户已经实名通过")
+                raise Exception(u"重复实名:id_number[%s], name[%s] 该用户[%s]已经实名通过"%(id_number, name, user))
 
             if class_name == 'TestIDVerifyBackEnd':
                 return record, None
