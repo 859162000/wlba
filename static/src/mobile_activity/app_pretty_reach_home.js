@@ -76,7 +76,7 @@
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
-                                        mixins.loginApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
+                                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
                                     }else if(data.ret_code=='1001'||data.ret_code=='1002'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
@@ -99,7 +99,7 @@
 
 
                     $('#take_prize,#take_prize_2').click(function() {
-                        mixins.loginApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
+                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
                     });
                 } else {
                     login = true;
@@ -116,7 +116,7 @@
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/login/?promo_token=zypwt&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
+                            window.location.href = '/weixin/regist/?promo_token=zypwt&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
                         }else if(data.ret_code=='1001'||data.ret_code=='1002'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
