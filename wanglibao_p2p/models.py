@@ -96,6 +96,10 @@ class P2PProduct(models.Model):
     def get_category_num(self):
         return self.CATEGORY_CHOICES.get(self.category, 0)
 
+    @property
+    def get_p2p_rate(self):
+        return float(self.expected_earning_rate) + float(self.activity_amount)
+
     class Meta:
         verbose_name = u'P2P产品'
         verbose_name_plural = u'P2P产品'
