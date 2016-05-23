@@ -57,6 +57,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from wanglibao_rest.utils import split_ua
 from wanglibao_redis.backend import redis_backend
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord
 
 logger = logging.getLogger(__name__)
 
@@ -538,55 +539,63 @@ class AppRecommendAPIView(APIView):
 
     def post(self, request):
         product_result = dict()
-        # 主推标
-        recommend_product_id = None
         user = request.user
+        is_p2p = False
+        recommend_product_id = None
+        misc = MiscRecommendProduction()
         if user.is_authenticated():
-            product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
-                                                    status=u'正在招标', category=u'新手标')
-            if product_new.exists():
-                if not P2PRecord.objects.filter(user=user).exists():
-                    # 不存在购买记录
-                    id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
-                    id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
-                    recommend_product_id = id_rate[0]['id']
+            # 主推标
+            if P2PRecord.objects.filter(user=user).exists():
+                # 存在购买记录
+                recommend_product_id = misc.get_recommend_product_except_new()
+                is_p2p = True
+            else:
+                # 查询是否投资过体验标
+                if ExperienceAmortization.objects.filter(user=user).exists():
+                    # 查询新手标
+                    product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
+                                                            status=u'正在招标', category=u'新手标')
+                    if product_new.exists():
+                        # 有新手标
+                        id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
+                        id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+                        recommend_product_id = id_rate[0]['id']
+                    else:
+                        recommend_product_id = misc.get_recommend_product_except_new()
+
+                    is_p2p = True
                 else:
-                    # 存在购买记录
-                    misc = MiscRecommendProduction()
-                    recommend_product_id = misc.get_recommend_product_except_new()
+                    # 未投资过体验标
+                    # 体验金可用余额
+                    now = timezone.now()
+                    e_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+                        .filter(event__available_at__lt=now, event__unavailable_at__gt=now)\
+                        .aggregate(Sum('event__amount'))
+                    if e_record.get('event__amount__sum'):
+                        e_amount = e_record.get('event__amount__sum')
+                        if e_amount < 28888:
+                            recommend_product_id = misc.get_recommend_product_except_new()
+                            is_p2p = True
+                    else:
+                        # 没有可用的体验金
+                        is_p2p = True
+
+        if is_p2p:
+            if not recommend_product_id:
+                recommend_product_id = misc.get_recommend_product_id()
+            product_result['res_type'] = 'p2p'
+            product_result['data'] = self.get_p2p(recommend_product_id)
         else:
             # 显示体验标
             product_result['res_type'] = 'experience'
-            e_product = ExperienceProduct.objects.filter(isvalid=True).first()
-            if e_product:
-                product_result['data'] = {
-                    'id': e_product.id,
-                    'product_name': e_product.name,
-                    'period': e_product.period,
-                    'expected_earning_rate': e_product.expected_earning_rate,
-                    'description': e_product.description,
-                }
-                return Response(product_result)
+            product_result['data'] = self.get_experience()
 
-        if not recommend_product_id:
-            misc = MiscRecommendProduction()
-            recommend_product_id = misc.get_recommend_product_id()
+            # 如果没有体验标则显示p2p标
+            if not product_result['data']:
+                recommend_product_id = misc.get_recommend_product_id()
+                product_result['res_type'] = 'p2p'
+                product_result['data'] = self.get_p2p(recommend_product_id)
 
-        # p2p = P2PProduct.objects.get(id=recommend_product_id)
-        product_result['data'] = redis_backend().get_cache_p2p_detail(product_id=recommend_product_id)
-
-        del product_result['data']['warrants']
-
-        amortizations = ProductAmortization.objects.filter(product_id=recommend_product_id)\
-            .values('term', 'principal', 'interest', 'penal_interest')
-        product_amortization = [{
-            'term': i.get('term'),
-            'principal': float(i.get('principal')),
-            'interest': float(i.get('interest')),
-            'penal_interest': float(i.get('penal_interest'))
-        } for i in amortizations]
-
-        product_result['data']['product_amortization'] = product_amortization
         return Response(product_result)
 
     def get_experience(self):
@@ -605,6 +614,25 @@ class AppRecommendAPIView(APIView):
             res_result = {}
 
         return res_result
+
+    def get_p2p(self, recommend_product_id):
+        """获取P2P标详细信息"""
+        p2p_result = redis_backend().get_cache_p2p_detail(product_id=recommend_product_id)
+
+        amortizations = ProductAmortization.objects.filter(product_id=recommend_product_id)\
+            .values('term', 'principal', 'interest', 'penal_interest')
+
+        product_amortization = [{
+            'term': i.get('term'),
+            'principal': float(i.get('principal')),
+            'interest': float(i.get('interest')),
+            'penal_interest': float(i.get('penal_interest'))
+        } for i in amortizations]
+
+        p2p_result['product_amortization'] = product_amortization
+        del p2p_result['warrants']
+
+        return p2p_result
 
 
 class RecommendProductManagerView(TemplateView):
