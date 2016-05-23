@@ -1,0 +1,69 @@
+- load formatters
+doctype html
+html(style="background:#5ab5f1")
+    head
+        include include/app_header.jade
+        link(href="/static/styles/mobile_activity/app_experience_detail.css?v=2016041101", rel="stylesheet")
+        body
+            - csrf_token
+            .experience-detail-box
+                .detail-boxs
+                    .new-user-icon
+                    .boxs-bg
+                        img(src='/static/imgs/mobile_activity/app_experience_detail/background_tyj.png')
+                    .box1-content
+                        p 预计年化收益
+                        p.p3
+                            span 10.0
+                            label %
+                        p 投资期限1天
+                        .line.mt1
+                        .tyj
+                            span 28888
+                            label 元
+                        .line
+                        .account-info
+                            span 您的账户余额：0.00 元
+                            a(href='javascript:void(0)')#recharge 充值
+                        .tyj-info
+                            p.money-info
+                                span.fl 投资金额：
+                                    i 1元
+                                span.fr 体验标金额：
+                                    i 28888元
+                            .end-times 回款时间：2016-03-18 10:53:07
+                            p.tyj-pop 投资1元即获28888元体验金
+                        .investment-btn
+                            a(href="javascript:void(0)") 立即投资
+                    .boxs-bg
+                        img(src='/static/imgs/mobile_activity/app_experience_detail/background_tyj_bottom.png')
+                .detail-boxs.rule-box
+                    .boxs-bg
+                        img(src='/static/imgs/mobile_activity/app_experience_detail/background_tyj.png')
+                    .rule-content
+                        .rule-detail
+                            a(href="") 详细规则
+                                i
+                        h3 产品描述
+                        .rule-c
+                            img(src='/static/imgs/mobile_activity/app_experience_detail/wallet_cpms.png').rule-icon
+                            .rule-d
+                                p 新用户投资1元，到期后享有28888元 的投资收益。体验安全 、高效的投资 服务。
+                                p 新用户在投资前需要实名认证 、绑定 银行卡才可充值1元。
+                        .line
+                        h3 如何计算收益
+                        .rule-c
+                            img(src='/static/imgs/mobile_activity/app_experience_detail/calculator_jssy.png').rule-icon
+                            .rule-d
+                                p 28888 * 10% * 1天 \ 365天＝8.02元
+                                p 本金*年化利率*标期限\1年＝收益
+                        .line
+                        h3 回款方式
+                        .rule-c
+                            img(src='/static/imgs/mobile_activity/app_experience_detail/hand_hkfs.png').rule-icon
+                            .rule-d
+                                p 到期后，8.02元的收益自动回到您的 账户余额中，可以随时手动体现，一 到三个工作日内到账。
+                    .boxs-bg
+                        img(src='/static/imgs/mobile_activity/app_experience_detail/background_tyj_bottom.png')
+    script(src="/static/scripts/component/webview.js?v=20160520")
+    script(src="/static/scripts/mobile_activity/app_experience_new.js?v=2016052001")
