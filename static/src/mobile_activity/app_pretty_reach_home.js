@@ -70,7 +70,7 @@
                         //    self.location.replace(url);
                         //}
 
-                        $('#get_ticket').click(function() {
+                        $('#take_prize').click(function() {
                             org.ajax({
                                 url: '/api/activity/xiaomei/',
                                 type: 'post',
@@ -98,7 +98,7 @@
                     login = false;
 
 
-                    $('#get_ticket').click(function() {
+                    $('#take_prize').click(function() {
                         mixins.loginApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
                     });
                 } else {
