@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.db.models import Q, Sum, Count
 from django.shortcuts import redirect, render_to_response
-from django.template import RequestContext
+# from django.template import RequestContext
 from django.views.generic import TemplateView
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
@@ -36,8 +36,8 @@ from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2P
     UserAmortization, AmortizationRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
-from wanglibao_banner.models import Banner
-from wanglibao_sms import messages as sms_messages
+# from wanglibao_banner.models import Banner
+# from wanglibao_sms import messages as sms_messages
 from wanglibao_sms.utils import send_validation_code
 # from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
@@ -45,7 +45,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
-from wanglibao_rest import utils
+# from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator, get_sorts_for_activity_show
 from wanglibao_announcement.models import AppMemorabilia
@@ -56,6 +56,7 @@ import re
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from wanglibao_rest.utils import split_ua
+from wanglibao_redis.backend import redis_backend
 
 logger = logging.getLogger(__name__)
 
@@ -522,6 +523,88 @@ class AppRecommendViewSet(PaginatedModelViewSet):
             recommend_product_id = misc.get_recommend_product_id()
 
         return qs.filter(id=recommend_product_id)
+
+
+class AppRecommendAPIView(APIView):
+    """ app查询主推标接口(新接口)
+    如果设置了主推标，按照设置的顺序显示
+    如果没有设置主推标，那就查找最近一个将要买完的显示
+    """
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST']
+
+    def post(self, request):
+        product_result = dict()
+        # 主推标
+        recommend_product_id = None
+        user = request.user
+        if user.is_authenticated():
+            product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
+                                                    status=u'正在招标', category=u'新手标')
+            if product_new.exists():
+                if not P2PRecord.objects.filter(user=user).exists():
+                    # 不存在购买记录
+                    id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
+                    id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+                    recommend_product_id = id_rate[0]['id']
+                else:
+                    # 存在购买记录
+                    misc = MiscRecommendProduction()
+                    recommend_product_id = misc.get_recommend_product_except_new()
+        else:
+            # 显示体验标
+            product_result['res_type'] = 'experience'
+            e_product = ExperienceProduct.objects.filter(isvalid=True).first()
+            if e_product:
+                product_result['data'] = {
+                    'id': e_product.id,
+                    'product_name': e_product.name,
+                    'period': e_product.period,
+                    'expected_earning_rate': e_product.expected_earning_rate,
+                    'description': e_product.description,
+                }
+                return Response(product_result)
+
+        if not recommend_product_id:
+            misc = MiscRecommendProduction()
+            recommend_product_id = misc.get_recommend_product_id()
+
+        # p2p = P2PProduct.objects.get(id=recommend_product_id)
+        product_result['data'] = redis_backend().get_cache_p2p_detail(product_id=recommend_product_id)
+
+        del product_result['data']['warrants']
+
+        amortizations = ProductAmortization.objects.filter(product_id=recommend_product_id)\
+            .values('term', 'principal', 'interest', 'penal_interest')
+        product_amortization = [{
+            'term': i.get('term'),
+            'principal': float(i.get('principal')),
+            'interest': float(i.get('interest')),
+            'penal_interest': float(i.get('penal_interest'))
+        } for i in amortizations]
+
+        product_result['data']['product_amortization'] = product_amortization
+        return Response(product_result)
+
+    def get_experience(self):
+        """获取体验标信息"""
+        from experience_gold.models import ExperienceProduct
+        e_product = ExperienceProduct.objects.filter(isvalid=True).first()
+        if e_product:
+            res_result = {
+                'id': e_product.id,
+                'product_name': e_product.name,
+                'period': e_product.period,
+                'expected_earning_rate': e_product.expected_earning_rate,
+                'description': e_product.description,
+            }
+        else:
+            res_result = {}
+
+        return res_result
 
 
 class RecommendProductManagerView(TemplateView):
