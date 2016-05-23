@@ -58,7 +58,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from wanglibao_rest.utils import split_ua
 from wanglibao_redis.backend import redis_backend
-from experience_gold.models import ExperienceAmortization, ExperienceEventRecord
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 
 logger = logging.getLogger(__name__)
 logger_yuelibao = logging.getLogger('wanglibao_margin')
@@ -545,6 +545,88 @@ class AppRecommendViewSet(PaginatedModelViewSet):
             recommend_product_id = misc.get_recommend_product_id()
 
         return qs.filter(id=recommend_product_id)
+
+
+class AppRecommendAPIView(APIView):
+    """ app查询主推标接口(新接口)
+    如果设置了主推标，按照设置的顺序显示
+    如果没有设置主推标，那就查找最近一个将要买完的显示
+    """
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST']
+
+    def post(self, request):
+        product_result = dict()
+        # 主推标
+        recommend_product_id = None
+        user = request.user
+        if user.is_authenticated():
+            product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
+                                                    status=u'正在招标', category=u'新手标')
+            if product_new.exists():
+                if not P2PRecord.objects.filter(user=user).exists():
+                    # 不存在购买记录
+                    id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
+                    id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+                    recommend_product_id = id_rate[0]['id']
+                else:
+                    # 存在购买记录
+                    misc = MiscRecommendProduction()
+                    recommend_product_id = misc.get_recommend_product_except_new()
+        else:
+            # 显示体验标
+            product_result['res_type'] = 'experience'
+            e_product = ExperienceProduct.objects.filter(isvalid=True).first()
+            if e_product:
+                product_result['data'] = {
+                    'id': e_product.id,
+                    'product_name': e_product.name,
+                    'period': e_product.period,
+                    'expected_earning_rate': e_product.expected_earning_rate,
+                    'description': e_product.description,
+                }
+                return Response(product_result)
+
+        if not recommend_product_id:
+            misc = MiscRecommendProduction()
+            recommend_product_id = misc.get_recommend_product_id()
+
+        # p2p = P2PProduct.objects.get(id=recommend_product_id)
+        product_result['data'] = redis_backend().get_cache_p2p_detail(product_id=recommend_product_id)
+
+        del product_result['data']['warrants']
+
+        amortizations = ProductAmortization.objects.filter(product_id=recommend_product_id)\
+            .values('term', 'principal', 'interest', 'penal_interest')
+        product_amortization = [{
+            'term': i.get('term'),
+            'principal': float(i.get('principal')),
+            'interest': float(i.get('interest')),
+            'penal_interest': float(i.get('penal_interest'))
+        } for i in amortizations]
+
+        product_result['data']['product_amortization'] = product_amortization
+        return Response(product_result)
+
+    def get_experience(self):
+        """获取体验标信息"""
+        from experience_gold.models import ExperienceProduct
+        e_product = ExperienceProduct.objects.filter(isvalid=True).first()
+        if e_product:
+            res_result = {
+                'id': e_product.id,
+                'product_name': e_product.name,
+                'period': e_product.period,
+                'expected_earning_rate': e_product.expected_earning_rate,
+                'description': e_product.description,
+            }
+        else:
+            res_result = {}
+
+        return res_result
 
 
 class RecommendProductManagerView(TemplateView):
