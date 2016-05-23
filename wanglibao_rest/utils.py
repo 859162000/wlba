@@ -420,7 +420,7 @@ def id_validate(user, name, id_number):
         from wanglibao_account.utils import verify_id
         verify_record, error = verify_id(name, id_number, user=user)
     except:
-        logger.exception("id_validate raise error: ")
+        logger.exception("id_validate raise error: %s"%traceback.format_exc())
         return {"ret_code": 30054, "error_number": ErrorNumber.unknown_error, "message": u"验证失败，请重试或联系客服 4008-588-066"}
 
     verify_counter.count = F('count') + 1
