@@ -1020,7 +1020,7 @@ class LoginAPIView(DecryptParmsAPIView):
     def post(self, request, *args, **kwargs):
         identifier = self.params.get("identifier", "")
         password = self.params.get("password", "")
-
+        validate_code = self.params.get("validate_code", "")
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码不可为空"}, status=400)
 
@@ -1539,6 +1539,7 @@ class InnerSysValidateID(APIView, InnerSysHandler):
             verify_record, error = verify_id(name, id)
             logger.debug('name:%s, id:%s, verifiy_record:%s, error:%s' % (name, id, verify_record, error))
         except:
+            logger.exception("InnerSysValidateID raise error: ")
             return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
         else:
             if error or not verify_record.is_valid:

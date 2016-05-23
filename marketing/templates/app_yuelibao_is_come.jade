@@ -1,0 +1,100 @@
+doctype html
+html(lang='zh')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    title 网利宝
+    meta(name='viewport', content='user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1')
+    link(rel='stylesheet', href='/static/styles/mobile_activity/app_yuelibao_is_come.css', type='text/css')
+    link(rel='stylesheet', href='/static/styles/mobile_activity/jquery.fullpage.2.7.9.min.css', type='text/css')
+    script(type='text/javascript', src='/static/js/lib/jquery.min.js')
+    script(type='text/javascript', src='/static/src/mobile_activity/lib/jquery.fullpage.2.7.9.min.js')
+  body
+    #dowebok
+      .section(style="background: url('/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_cover.png');background-size: 100% 100%")
+        .down_box
+          .down
+      .section.lcjh
+        .title(style='')
+        .content
+          | 月利宝理财计划是网利宝平台以资产包形式推出的、便捷高效的理财产品,精选一个或多个具有相同期限的优质债权组合而成。
+        .hj
+        .down_box
+          .down
+      .section.ystd
+        .title
+        .ystd_ion
+        .js_title
+          .jx T+0 当日计息
+          .lv 利率逐月递增
+          .zq 可债权转让,退出灵活
+          .qt 1000元起投,且需为1000元的整数倍
+          .fk 适用于平台的各项风控手段
+          .kb 均可以使用红包、加息券
+        .down_box
+          .down
+      .section.zqzr
+        .title
+        .content
+          | 债权转让,指投资人将在网利宝平台投资的借款项目转让给其他投资人(即受让人),并与受让人签订债权转让协议的操作。债权转让能提高投资人的资金流动性,目前只有月利宝投资项目才具有债权转让功能,投资者购买转让债权后可以再转让。
+        .ts
+        .down_box
+          .down
+      .section.sqlc
+        .title
+        .sqlc_iocn
+        ul
+          li 登陆我的账户
+          li 进入债权转让页面
+          li(style='margin-top: 2.6rem ') 设置转让信息
+          li(style='margin-top: 2.8rem ') 提交转让申请
+        .down_box
+          .down
+      .section.gmzq
+        .title
+        .sqlc_iocn
+        ul
+          li 登陆我的账户
+          li(style='margin-top: 3.7rem ') 进入债权转让页面
+          li(style='margin-top: 3.2rem ') 设置转让信息
+        .down_box
+          .down
+      .section.zrxz
+        .title
+        ol
+          li 结息日前 72 小时不能进行债权转让;
+          li 债权转让人不能购买自己的债权;
+          li 债权转让均以本金为基准,转让时通过转让本金来匹配转让债权,购买时也是通过认购本金进行购买;
+          li 申请债权转让时,债权转让人可自行设定价格,但应保证债权转让部分的收益率处于5%-24%的区间中(系统将自动给出上下限的对应金额);
+          li 债权转让过程中,系统将对债权冻结。债权出让人如需更改转让债权额度,要主动撤销当前转让后重新修改额度再提交转让申请；
+          li 债权转让的有效时间为债权转让人提出转让申请时起的3个自然日。如果超过转让有效期后没有成功转让债权,视为转让失败,系统自动撤销该部分债权的转让申请,债权回到债权转让人的网利宝账户中,但已成功转出的部分仍然有效；
+          li 在转让标售卖期间,债权转让人有权手动撤销该转让项目;
+          li 购买债权转让标不能使用理财券;
+        .zhu 注:更多规则可进入PC端帮助中心查看
+  script.
+    $(function(){
+    var autoScrolling = true;
+    if(window.innerHeight>500){
+    autoScrolling = true;
+    }else{
+    autoScrolling = false;
+    }
+    $('#dowebok').fullpage({
+    sectionsColor : ['#FFF3F3F3', '#FFF3F3F3', '#FFF3F3F3', '#F4A419','#FFF3F3F3', '#FFF3F3F3','#F4A419'],
+    autoScrolling:autoScrolling
+    });
+    $(".down_box").click(function(){
+    $.fn.fullpage.moveSectionDown();
+    });
+    });
+    (function (doc, win) {
+    var docEl = doc.documentElement,
+    resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+    recalc = function () {
+    var clientWidth = docEl.clientWidth;
+    if (!clientWidth) return;
+    docEl.style.fontSize = 20 * (clientWidth / 375) + 'px';
+    };
+    if (!doc.addEventListener) return;
+    win.addEventListener(resizeEvt, recalc, false);
+    doc.addEventListener('DOMContentLoaded', recalc, false);
+    })(document, window);
