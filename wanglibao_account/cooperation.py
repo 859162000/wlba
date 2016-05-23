@@ -1447,7 +1447,7 @@ class JuChengRegister(CoopRegister):
 class XiaoMeiRegister(CoopRegister):
 
     def __init__(self, request):
-        super(ZhongYingRegister, self).__init__(request)
+        super(XiaoMeiRegister, self).__init__(request)
         self.c_code = 'zypwt'
         self.invite_code = 'zypwt'
         self.token = 'zypwt'

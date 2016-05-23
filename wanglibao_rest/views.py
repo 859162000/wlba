@@ -1020,7 +1020,7 @@ class LoginAPIView(DecryptParmsAPIView):
     def post(self, request, *args, **kwargs):
         identifier = self.params.get("identifier", "")
         password = self.params.get("password", "")
-
+        validate_code = self.params.get("validate_code", "")
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码不可为空"}, status=400)
 
@@ -1035,6 +1035,10 @@ class LoginAPIView(DecryptParmsAPIView):
         profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
         if profile:
             return Response({"token": "false", "message": u"企业用户请在PC端登录"}, status=400)
+
+        status, message = validate_validation_code(identifier, validate_code)
+        if status != 200:
+            return Response({"ret_code": 30023, "message": message})
 
         user = authenticate(identifier=identifier, password=password)
 
