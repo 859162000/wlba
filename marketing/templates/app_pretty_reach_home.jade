@@ -4,7 +4,7 @@ html(style="background: #fff")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_pretty_reach_home.css?v=2015052003", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_pretty_reach_home.css?v=2015052004", rel="stylesheet")
     body
         .body_wrap.clear
             img.banner.banner_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/banner_1.png')
@@ -94,6 +94,8 @@ html(style="background: #fff")
                 dl#ios-show(style="display:none")
                     dt 7.
                     dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 网利宝对此活动享有最终解释权。
+            #take_prize_2 立即领取
+
             .popup_box
                 .main
                     .textairport
@@ -101,7 +103,7 @@ html(style="background: #fff")
                     img.close_popup(src="/static/imgs/mobile_activity/app_pretty_reach_home/close_popup.png")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_pretty_reach_home.js?v=2015052001")
+        script(src="/static/scripts/mobile_activity/app_pretty_reach_home.js?v=2015052002")
         - csrf_token
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,

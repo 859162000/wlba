@@ -1447,7 +1447,7 @@ class JuChengRegister(CoopRegister):
 class XiaoMeiRegister(CoopRegister):
 
     def __init__(self, request):
-        super(ZhongYingRegister, self).__init__(request)
+        super(XiaoMeiRegister, self).__init__(request)
         self.c_code = 'zypwt'
         self.invite_code = 'zypwt'
         self.token = 'zypwt'
@@ -1459,7 +1459,7 @@ class XiaoMeiRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id):
             for _index in xrange(2):
-                reward = Reward.objects.filter(type='中影票务通', is_used=False).first()
+                reward = Reward.objects.filter(type='小美到家兑换码', is_used=False).first()
                 if not reward:
                     return
                 send_messages.apply_async(kwargs={
@@ -1488,7 +1488,7 @@ class ZhongYingRegister(CoopRegister):
 
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id):
-            reward = Reward.objects.filter(type='小美到家', is_used=False).first()
+            reward = Reward.objects.filter(type='中影票务通兑换码', is_used=False).first()
             if not reward:
                 return
             send_messages.apply_async(kwargs={
@@ -2418,7 +2418,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          JiaXiHZRegister, ZhongYingRegister]
+                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister]
 
 
 # ######################第三方用户查询#####################
