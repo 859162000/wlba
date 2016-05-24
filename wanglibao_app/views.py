@@ -605,22 +605,23 @@ class AppRecommendAPIView(APIView):
             if not recommend_product_id:
                 recommend_product_id = misc.get_recommend_product_id()
             product_result['res_type'] = 'p2p'
-            product_result['data'] = self.get_p2p(recommend_product_id)
+            product_result['results'] = self.get_p2p(recommend_product_id)
         else:
             # 显示体验标
             product_result['res_type'] = 'experience'
-            product_result['data'] = self.get_experience()
+            product_result['results'] = self.get_experience()
 
             # 如果没有体验标则显示p2p标
-            if not product_result['data']:
+            if not product_result['results']:
                 recommend_product_id = misc.get_recommend_product_id()
                 product_result['res_type'] = 'p2p'
-                product_result['data'] = self.get_p2p(recommend_product_id)
+                product_result['results'] = self.get_p2p(recommend_product_id)
 
         return Response(product_result)
 
     def get_experience(self):
         """获取体验标信息"""
+        res = list()
         from experience_gold.models import ExperienceProduct
         e_product = ExperienceProduct.objects.filter(isvalid=True).first()
         if e_product:
@@ -630,14 +631,17 @@ class AppRecommendAPIView(APIView):
                 'period': e_product.period,
                 'expected_earning_rate': e_product.expected_earning_rate,
                 'description': e_product.description,
+                'url': reverse("experience_app_detail"),
             }
         else:
             res_result = {}
 
-        return res_result
+        res.append(res_result)
+        return res
 
     def get_p2p(self, recommend_product_id):
         """获取P2P标详细信息"""
+        res = list()
         p2p_result = redis_backend().get_cache_p2p_detail(product_id=recommend_product_id)
 
         amortizations = ProductAmortization.objects.filter(product_id=recommend_product_id)\
@@ -651,9 +655,28 @@ class AppRecommendAPIView(APIView):
         } for i in amortizations]
 
         p2p_result['product_amortization'] = product_amortization
-        del p2p_result['warrants']
+        p2p_result['warrant_company'] = {
+            'name': p2p_result['warrant_company_name']
+        }
 
-        return p2p_result
+        if p2p_result['activity']:
+            activity = {
+                "name": p2p_result['activity'].get('activity_name', ''),
+                "rule_amount": p2p_result['activity'].get('activity_rule_amount', 0.0)
+            }
+        else:
+            activity = {}
+
+        del p2p_result['warrants']
+        del p2p_result['warrant_company_name']
+        del p2p_result['attachments']
+        del p2p_result['activity']
+
+        p2p_result['activity'] = activity
+
+        res.append(p2p_result)
+
+        return res
 
 
 class RecommendProductManagerView(TemplateView):
