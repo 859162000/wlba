@@ -97,7 +97,8 @@ class redis_backend(object):
             p2p_results = pickle.loads(self._get('p2p_detail_{0}'.format(product_id)))
             return p2p_results
         else:
-            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标').filter(pk=product_id, hide=False).first()
+            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标')\
+                .filter(pk=product_id, hide=False, publish_time__lte=timezone.now()).first()
             if not p2p:
                 return None
 
@@ -147,22 +148,8 @@ class redis_backend(object):
                 "display_payback_method": p2p.display_payback_method,
                 "amortization_count": p2p.amortization_count,
                 "repaying_source": p2p.repaying_source,
-                "baoli_original_contract_number": p2p.baoli_original_contract_number,
-                "baoli_original_contract_name": p2p.baoli_original_contract_name,
-                "baoli_trade_relation": p2p.baoli_trade_relation,
-                "borrower_name": p2p.borrower_name,
-                "borrower_phone": p2p.borrower_phone,
-                "borrower_address": p2p.borrower_address,
-                "borrower_id_number": p2p.borrower_id_number,
-                "borrower_bankcard": p2p.borrower_bankcard,
-                "borrower_bankcard_bank_name": p2p.borrower_bankcard_bank_name,
-                "borrower_bankcard_bank_code": p2p.borrower_bankcard_bank_code,
-                "borrower_bankcard_bank_province": p2p.borrower_bankcard_bank_province,
-                "borrower_bankcard_bank_city": p2p.borrower_bankcard_bank_city,
-                "borrower_bankcard_bank_branch": p2p.borrower_bankcard_bank_branch,
                 "total_amount": p2p.total_amount,
                 "ordered_amount": p2p.ordered_amount,
-                #"extra_data": json.loads(json.dumps(p2p.extra_data)),
                 "publish_time": p2p.publish_time,
                 "end_time": end_time,
                 "soldout_time": p2p.soldout_time,

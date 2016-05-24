@@ -62,9 +62,9 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, BiSouYiRegisterApi, BiSouYiLoginApi,
                                      BiSouYiRegisterView)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
-from wanglibao_reward.views import (WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
+from wanglibao_reward.views import (XiaoMeiAPIView,ZhongYingAPIView, WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
                                     WeixinActivityAPIView, QMBanquetRewardAPI, HMBanquetRewardAPI,
-                                    Lantern_FetchRewardAPI, FetchMarchAwardAPI,
+                                    Lantern_FetchRewardAPI, FetchMarchAwardAPI, XunleiTreasureAPIView,
                                     AprilAwardApi, KongGangAPIView, FetchNewUserReward, ZhaoXiangGuanAPIView,HmdInvestTopRanks)
 from marketing.views import CustomerAccount2015ApiView
 
@@ -291,8 +291,11 @@ urlpatterns += patterns(
     url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
     url(r'^geetest/$', GeetestAPIView.as_view()),
     url(r'^activity/konggang/$', KongGangAPIView.as_view()),
+    url(r'^xunlei/treasure/$', XunleiTreasureAPIView.as_view()),
     url(r'^activity/newusergift/$', FetchNewUserReward.as_view()),
     url(r'^activity/zhaoxiangguan/$', ZhaoXiangGuanAPIView.as_view()),
+    url(r'^activity/zhongying/$', ZhongYingAPIView.as_view()),
+    url(r'^activity/xiaomei/$', XiaoMeiAPIView.as_view()),
     url(r'^activity/hmd_invest_ranks/$', HmdInvestTopRanks.as_view()),
 )
 

@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.db.models import Q, Sum, Count
 from django.shortcuts import redirect, render_to_response
-from django.template import RequestContext
+# from django.template import RequestContext
 from django.views.generic import TemplateView
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
@@ -36,8 +36,8 @@ from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2P
     UserAmortization, AmortizationRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
-from wanglibao_banner.models import Banner
-from wanglibao_sms import messages as sms_messages
+# from wanglibao_banner.models import Banner
+# from wanglibao_sms import messages as sms_messages
 from wanglibao_sms.utils import send_validation_code
 # from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
@@ -45,7 +45,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
-from wanglibao_rest import utils
+# from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator, get_sorts_for_activity_show
 from wanglibao_announcement.models import AppMemorabilia
@@ -56,6 +56,8 @@ import re
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from wanglibao_rest.utils import split_ua
+from wanglibao_redis.backend import redis_backend
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord
 
 logger = logging.getLogger(__name__)
 
@@ -493,6 +495,10 @@ class AppRecommendViewSet(PaginatedModelViewSet):
     serializer_class = P2PProductSerializer
     paginate_by = 1
 
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST', 'HEAD']
+
     def get_queryset(self):
         qs = super(AppRecommendViewSet, self).get_queryset()
 
@@ -518,6 +524,115 @@ class AppRecommendViewSet(PaginatedModelViewSet):
             recommend_product_id = misc.get_recommend_product_id()
 
         return qs.filter(id=recommend_product_id)
+
+
+class AppRecommendAPIView(APIView):
+    """ app查询主推标接口(新接口)
+    如果设置了主推标，按照设置的顺序显示
+    如果没有设置主推标，那就查找最近一个将要买完的显示
+    """
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST']
+
+    def post(self, request):
+        product_result = dict()
+        user = request.user
+        is_p2p = False
+        recommend_product_id = None
+        misc = MiscRecommendProduction()
+        if user.is_authenticated():
+            # 主推标
+            if P2PRecord.objects.filter(user=user).exists():
+                # 存在购买记录
+                recommend_product_id = misc.get_recommend_product_except_new()
+                is_p2p = True
+            else:
+                # 查询是否投资过体验标
+                if ExperienceAmortization.objects.filter(user=user).exists():
+                    # 查询新手标
+                    product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
+                                                            status=u'正在招标', category=u'新手标')
+                    if product_new.exists():
+                        # 有新手标
+                        id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
+                        id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+                        recommend_product_id = id_rate[0]['id']
+                    else:
+                        recommend_product_id = misc.get_recommend_product_except_new()
+
+                    is_p2p = True
+                else:
+                    # 未投资过体验标
+                    # 体验金可用余额
+                    now = timezone.now()
+                    e_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+                        .filter(event__available_at__lt=now, event__unavailable_at__gt=now)\
+                        .aggregate(Sum('event__amount'))
+                    if e_record.get('event__amount__sum'):
+                        e_amount = e_record.get('event__amount__sum')
+                        if e_amount < 28888:
+                            recommend_product_id = misc.get_recommend_product_except_new()
+                            is_p2p = True
+                    else:
+                        # 没有可用的体验金
+                        is_p2p = True
+
+        if is_p2p:
+            if not recommend_product_id:
+                recommend_product_id = misc.get_recommend_product_id()
+            product_result['res_type'] = 'p2p'
+            product_result['data'] = self.get_p2p(recommend_product_id)
+        else:
+            # 显示体验标
+            product_result['res_type'] = 'experience'
+            product_result['data'] = self.get_experience()
+
+            # 如果没有体验标则显示p2p标
+            if not product_result['data']:
+                recommend_product_id = misc.get_recommend_product_id()
+                product_result['res_type'] = 'p2p'
+                product_result['data'] = self.get_p2p(recommend_product_id)
+
+        return Response(product_result)
+
+    def get_experience(self):
+        """获取体验标信息"""
+        from experience_gold.models import ExperienceProduct
+        e_product = ExperienceProduct.objects.filter(isvalid=True).first()
+        if e_product:
+            res_result = {
+                'id': e_product.id,
+                'product_name': e_product.name,
+                'period': e_product.period,
+                'expected_earning_rate': e_product.expected_earning_rate,
+                'description': e_product.description,
+            }
+        else:
+            res_result = {}
+
+        return res_result
+
+    def get_p2p(self, recommend_product_id):
+        """获取P2P标详细信息"""
+        p2p_result = redis_backend().get_cache_p2p_detail(product_id=recommend_product_id)
+
+        amortizations = ProductAmortization.objects.filter(product_id=recommend_product_id)\
+            .values('term', 'principal', 'interest', 'penal_interest')
+
+        product_amortization = [{
+            'term': i.get('term'),
+            'principal': float(i.get('principal')),
+            'interest': float(i.get('interest')),
+            'penal_interest': float(i.get('penal_interest'))
+        } for i in amortizations]
+
+        p2p_result['product_amortization'] = product_amortization
+        del p2p_result['warrants']
+
+        return p2p_result
 
 
 class RecommendProductManagerView(TemplateView):
