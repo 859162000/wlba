@@ -348,6 +348,8 @@ def card_bind_list(request):
                     tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
+                else:
+                    tmp.update(base_dict)
 
                 # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
                 # bank_min_amount = bank_limit.get('bank_min_amount')
