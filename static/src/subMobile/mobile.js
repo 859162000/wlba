@@ -3026,6 +3026,7 @@ org.redpacket = (function(org){
     }
 })(org);
 
+
 //红包雨 绑定微信
 org.redpacket_bind = (function(org){
     var lib = {
