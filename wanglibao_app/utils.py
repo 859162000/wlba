@@ -72,14 +72,16 @@ class RecommendProduct(object):
             product_result['results'] = self.get_p2p(recommend_product_id)
         else:
             # 显示体验标
-            product_result['res_type'] = 'experience'
-            product_result['results'] = self.get_experience(user)
+            re_results = self.get_experience(user)
 
             # 如果没有体验标则显示p2p标
-            if not product_result['results']:
+            if len(re_results[0]) == 0:
                 recommend_product_id = misc.get_recommend_product_id()
                 product_result['res_type'] = 'p2p'
                 product_result['results'] = self.get_p2p(recommend_product_id)
+            else:
+                product_result['res_type'] = 'experience'
+                product_result['results'] = re_results
 
         return product_result, recommend_product_id
 
