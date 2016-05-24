@@ -1455,8 +1455,8 @@ class XiaoMeiRegister(CoopRegister):
 
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id):
-            for _index in xrange(2):
-                reward = Reward.objects.filter(type='小美到家兑换码', is_used=False).first()
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='小美到家兑换码', is_used=False).first()
                 if not reward:
                     return
                 send_messages.apply_async(kwargs={
@@ -1469,6 +1469,8 @@ class XiaoMeiRegister(CoopRegister):
                     "content": u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
+                reward.is_used = True
+                reward.save()
 
 
 class ZhongYingRegister(CoopRegister):
@@ -1486,19 +1488,22 @@ class ZhongYingRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
             for _index in xrange(2):
-                reward = Reward.objects.filter(type='中影票务通兑换码', is_used=False).first()
-                if not reward:
-                    return
-                send_messages.apply_async(kwargs={
-                    "phones": [user.wanglibaouserprofile.phone, ],
-                    "messages": [u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为:%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,), ]
-                })
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": user.id,
-                    "title": u"演出门票赠送",
-                    "content": u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为：%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,),
-                    "mtype": "activity"
-                })
+                with transaction.atomic():
+                    reward = Reward.objects.select_for_update().filter(type='中影票务通兑换码', is_used=False).first()
+                    if not reward:
+                        return
+                    send_messages.apply_async(kwargs={
+                        "phones": [user.wanglibaouserprofile.phone, ],
+                        "messages": [u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为:%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,), ]
+                    })
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": u"演出门票赠送",
+                        "content": u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为：%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,),
+                        "mtype": "activity"
+                    })
+                    reward.is_used = True
+                    reward.save()
 
 class HappyMonkeyRegister(CoopRegister):
     def __init__(self, request):
