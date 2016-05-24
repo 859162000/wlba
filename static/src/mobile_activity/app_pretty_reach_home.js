@@ -133,7 +133,6 @@
         }
     })
 
-
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
         var curHeight = ele.height();
