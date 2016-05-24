@@ -14,25 +14,26 @@ html(style="background:#5ab5f1")
                     .box1-content
                         p 预计年化收益
                         p.p3
-                            span 10.0
+                            span {{product.expected_earning_rate}}
                             label %
-                        p 投资期限1天
+                        p 投资期限{{product.period}}天
                         .line.mt1
                         .tyj
-                            span 28888
+                            span {{experience_amount}}
                             label 元
                         .line
                         .account-info
-                            span 您的账户余额：0.00 元
+                            span 您的账户余额：{{margin}} 元
                             a(href='javascript:void(0)')#recharge 充值
                         .tyj-info
                             p.money-info
                                 span.fl 投资金额：
                                     i 1元
                                 span.fr 体验标金额：
-                                    i 28888元
-                            .end-times 回款时间：2016-03-18 10:53:07
-                            p.tyj-pop 投资1元即获28888元体验金
+                                    i {{experience_amount}}元
+                            .end-times
+                              //| 回款时间：2016-03-18 10:53:07
+                            p.tyj-pop 投资1元即获{{experience_amount}}元体验金收益
                         .investment-btn
                             a(href="javascript:void(0)") 立即投资
                     .boxs-bg
@@ -51,12 +52,12 @@ html(style="background:#5ab5f1")
                                 p 新用户投资1元，到期后享有28888元 的投资收益。体验安全 、高效的投资 服务。
                                 p 新用户在投资前需要实名认证 、绑定 银行卡才可充值1元。
                         .line
-                        h3 如何计算收益
+                        h3 如何计算收益(示例)
                         .rule-c
                             img(src='/static/imgs/mobile_activity/app_experience_detail/calculator_jssy.png').rule-icon
                             .rule-d
-                                p 28888 * 10% * 1天 \ 365天＝8.02元
-                                p 本金*年化利率*标期限\1年＝收益
+                                p 28888 * 1天 * 10% / 360天＝8.02元
+                                p 本金*标期限*年化利率/360＝收益
                         .line
                         h3 回款方式
                         .rule-c

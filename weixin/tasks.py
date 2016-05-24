@@ -16,14 +16,16 @@ from weixin.util import sendTemplate, getMiscValue
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
+
 @app.task
-def bind_ok(openid, is_first_bind):
+def bind_ok(openid, is_first_bind, new_registed=False):
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+    user = weixin_user.user
     if is_first_bind:
         from wanglibao_activity.tasks import check_activity_task
         check_activity_task.apply_async(kwargs={
-                "user_id": weixin_user.id,
+                "user_id": user.id,
                 "trigger_node": 'first_bind_weixin',
                 "device_type": 'weixin',
                 "is_first_bind": is_first_bind,
@@ -35,10 +37,13 @@ def bind_ok(openid, is_first_bind):
                 "openid": weixin_user.openid,
                 "template_id": BIND_SUCCESS_TEMPLATE_ID,
                 "name1": "",
-                "name2": weixin_user.wanglibaouserprofile.phone,
+                "name2": user.wanglibaouserprofile.phone,
                 "time": now_str,
             })
         }, queue='celery02')
+    from wanglibao_invite.tasks import processShareInviteDailyReward
+    processShareInviteDailyReward.apply_async(
+            kwargs={'openid': openid, 'user_id': user.id, "new_registed": new_registed})
 
 
 @app.task
@@ -121,7 +126,6 @@ def sentTemplate(kwargs):
     if w_user and template and w_user.subscribe:
         sendTemplate(w_user, template)
 
-
 @app.task
 def sentCustomerMsg(txt, openid):
     fwh_info = getMiscValue("weixin_qrcode_info")
@@ -130,9 +134,10 @@ def sentCustomerMsg(txt, openid):
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
         client.message._send_custom_message({
-            "touser": openid,
-            "msgtype": "text",
-            "text": {
-                "content": txt
-            }
-        }, account="007@wanglibao400")
+                                    "touser":openid,
+                                    "msgtype":"text",
+                                    "text":
+                                    {
+                                        "content": txt
+                                    }
+                                }, account="007@wanglibao400")

@@ -74,12 +74,12 @@ from user_agents import parse
 import uuid
 import urllib
 from .utils import xunleivip_generate_sign, generate_coop_base_data
-from wanglibao_sms.messages import sms_alert_unbanding_xunlei
+from wanglibao_sms.messages import sms_alert_unbanding_xunlei, sms_alert_binding_xunlei
 import json
-from wanglibao_margin.models import MarginRecord
+from wanglibao_margin.models import MarginRecord, MonthProduct
 from wanglibao_rest.utils import generate_bajinshe_sign
 from wanglibao_p2p.utility import get_p2p_equity, get_user_margin
-from common.tools import MyHttpsAdapter
+from common.tools import MyHttpsAdapter, atr_to_atr_for_obj
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -114,6 +114,15 @@ def get_phone_for_coop(user_id):
         phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
         return phone_number[:3] + '***' + phone_number[-2:]
     except:
+        return None
+
+
+def get_first_p2p_record(user_id):
+    p2p_records = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购')
+    if p2p_records.exists():
+        p2p_record = p2p_records.order_by('create_time').first()
+        return p2p_record
+    else:
         return None
 
 
@@ -322,6 +331,15 @@ class CoopRegister(object):
         """
         pass
 
+    def purchase_call_back_yuelibao(self, user, order_id):
+        """
+        用户购买后回调（月利宝专用），一般用于用于用户首次投资之后回调第三方接口
+        :param order_id:
+        :param user:
+        :return:
+        """
+        pass
+
     def recharge_call_back(self, user, order_id):
         """
         用户充值后回调，一般用于用户首次充值之后回调第三方接口
@@ -432,6 +450,22 @@ class CoopRegister(object):
                 channel_processor.purchase_call_back(user, order_id)
         except:
             logger.exception('channel bind purchase process error for user %s'%(user.id))
+
+    def process_for_purchase_yuelibao(self, user, order_id):
+        order_id = int(order_id)
+        if order_id >= 0:
+            logger.error("enter process_for_purchase_yuelibao invalid order_id "
+                         "with user[%s] order_id[%s]" % (user.id, order_id))
+            return
+
+        order_id = abs(order_id)
+
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.purchase_call_back_yuelibao(user, order_id)
+        except:
+            logger.exception('channel bind purchase process error for user %s' % user.id)
 
     def process_for_recharge(self, user, order_id):
         try:
@@ -800,7 +834,8 @@ class FUBARegister(CoopRegister):
                 }
 
                 common_callback.apply_async(
-                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
                 # 记录开始结算时间
                 # if not binding.extra:
                 #     # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
@@ -1441,8 +1476,8 @@ class JuChengRegister(CoopRegister):
                     "mtype": "activity"
                 })
 
-class XiaoMeiRegister(CoopRegister):
 
+class XiaoMeiRegister(CoopRegister):
     def __init__(self, request):
         super(XiaoMeiRegister, self).__init__(request)
         self.c_code = 'xmdj2'
@@ -1455,8 +1490,8 @@ class XiaoMeiRegister(CoopRegister):
 
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id):
-            for _index in xrange(2):
-                reward = Reward.objects.filter(type='小美到家兑换码', is_used=False).first()
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='小美到家兑换码', is_used=False).first()
                 if not reward:
                     return
                 send_messages.apply_async(kwargs={
@@ -1469,6 +1504,8 @@ class XiaoMeiRegister(CoopRegister):
                     "content": u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
+                reward.is_used = True
+                reward.save()
 
 
 class ZhongYingRegister(CoopRegister):
@@ -1486,19 +1523,23 @@ class ZhongYingRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
             for _index in xrange(2):
-                reward = Reward.objects.filter(type='中影票务通兑换码', is_used=False).first()
-                if not reward:
-                    return
-                send_messages.apply_async(kwargs={
-                    "phones": [user.wanglibaouserprofile.phone, ],
-                    "messages": [u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为:%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,), ]
-                })
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": user.id,
-                    "title": u"演出门票赠送",
-                    "content": u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为：%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,),
-                    "mtype": "activity"
-                })
+                with transaction.atomic():
+                    reward = Reward.objects.select_for_update().filter(type='中影票务通兑换码', is_used=False).first()
+                    if not reward:
+                        return
+                    send_messages.apply_async(kwargs={
+                        "phones": [user.wanglibaouserprofile.phone, ],
+                        "messages": [u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为:%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,), ]
+                    })
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": u"演出门票赠送",
+                        "content": u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为：%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,),
+                        "mtype": "activity"
+                    })
+                    reward.is_used = True
+                    reward.save()
+
 
 class HappyMonkeyRegister(CoopRegister):
     def __init__(self, request):
@@ -1573,6 +1614,8 @@ class XunleiVipRegister(CoopRegister):
         self.external_channel_user_key = 'xluserid'
         self.coop_time_key = 'time'
         self.coop_sign_key = 'sign'
+        self.coop_nickname_key = 'nickname'
+        self.coop_account_key = 'account'
 
         if ENV == ENV_PRODUCTION:
             self.activity_start_time = dt.strptime('2016-03-30 00:00:00', "%Y-%m-%d %H:%M:%S")
@@ -1597,6 +1640,14 @@ class XunleiVipRegister(CoopRegister):
         return self.request.session.get(self.coop_sign_key, '').strip()
 
     @property
+    def channel_nickname(self):
+        return self.request.session.get(self.coop_nickname_key, '').strip()
+
+    @property
+    def channel_account(self):
+        return self.request.session.get(self.coop_account_key, '').strip()
+
+    @property
     def is_xunlei_user(self):
         # 校验迅雷用户有效性
         data = {
@@ -1613,16 +1664,27 @@ class XunleiVipRegister(CoopRegister):
         super(XunleiVipRegister, self).save_to_session()
         coop_time = self.request.GET.get(self.coop_time_key, None)
         coop_sign = self.request.GET.get(self.coop_sign_key, None)
+        coop_nickname = self.request.GET.get(self.coop_nickname_key, None)
+        coop_account = self.request.GET.get(self.coop_account_key, None)
+
         if coop_time:
             self.request.session[self.coop_time_key] = coop_time
 
         if coop_sign:
             self.request.session[self.coop_sign_key] = coop_sign
 
+        if coop_nickname:
+            self.request.session[self.coop_nickname_key] = coop_nickname
+
+        if coop_account:
+            self.request.session[self.coop_account_key] = coop_account
+
     def clear_session(self):
         super(XunleiVipRegister, self).clear_session()
         self.request.session.pop(self.coop_time_key, None)
         self.request.session.pop(self.coop_sign_key, None)
+        self.request.session.pop(self.coop_nickname_key, None)
+        self.request.session.pop(self.coop_account_key, None)
 
     def save_to_binding(self, user):
         """
@@ -1632,23 +1694,40 @@ class XunleiVipRegister(CoopRegister):
         """
 
         channel_name = self.channel_name
+        channel_user = self.channel_user
+        channel_nickname = self.channel_nickname
+        channel_account = self.channel_account
+        channel_time = self.channel_time
+        channel_sign = self.channel_sign
         if self.is_xunlei_user:
-            channel_user = self.channel_user
             bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-            if channel_name and channel_user and len(channel_user) <= bid_len:
+            if channel_name and channel_user and len(channel_user) <= bid_len and\
+                    channel_nickname and channel_account:
                 binding = Binding()
                 binding.user = user
                 binding.btype = channel_name
                 binding.bid = channel_user
+                binding.bname = channel_nickname
+                binding.baccount = channel_account
                 binding.save()
                 # logger.debug('save user %s to binding'%user)
+
+                # 绑定成功后站内信通知用户
+                phone = get_phone_for_coop(user.id)
+                message_content = sms_alert_binding_xunlei(phone, channel_account)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"【迅雷帐号绑定通知】",
+                    "content": message_content,
+                    "mtype": "activity"
+                })
+
                 return binding
 
-            logger.info("%s binding faild with user[%s], channel_user[%s]" %
-                        (channel_name, user.id, channel_user))
-        else:
-            logger.info("%s binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
-                        (channel_name, user.id, self.channel_user, self.channel_time, self.channel_sign))
+        logger.info("%s binding faild with user[%s] xluserid[%s] timestamp[%s]"
+                    "sign[%s] nickname[%s] account[%s]" %
+                    (channel_name, user.id, channel_user, channel_time, channel_sign,
+                     channel_nickname, channel_account))
 
     def binding_for_after_register(self, user):
         """
@@ -1821,7 +1900,7 @@ class XunleiVipRegister(CoopRegister):
                 'xluserid': binding.bid,
                 'time': int(time.mktime(timezone.localtime(p2p_record.create_time).timetuple())),
                 'amount': float(p2p_record.amount),
-                'orderid': p2p_record.id,
+                'orderid': p2p_record.order_id,
             }
 
             sign = xunleivip_generate_sign(data, self.coop_register_key)
@@ -1856,6 +1935,69 @@ class XunleiVipRegister(CoopRegister):
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.attain_amount_call_back_url, 'params': params, 'channel': self.c_code})
+
+    def get_first_p2p_record(self, user, order_id=None, get_or_ylb=False):
+        p2p_record = None
+        is_ylb_frist_p2p = False
+        p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if p2p_records.exists():
+            p2p_record = p2p_records.order_by('create_time').first()
+            if get_or_ylb:
+                month_product_records = MonthProduct.objects.filter(user_id=user.id)
+                if month_product_records.exists():
+                    month_product_record = month_product_records.order_by('created_at').first()
+                    if month_product_record.created_at < p2p_record.create_time:
+                        p2p_record, p2p_records = month_product_record, month_product_records
+                        is_ylb_frist_p2p = True
+                        if order_id and month_product_record.id != int(order_id):
+                            p2p_record = None
+                        else:
+                            atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'),
+                                       ('id', 'order_id')]
+                            p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
+                            for p2p_record in p2p_records:
+                                atr_to_atr_for_obj(atr_map, p2p_record)
+            else:
+                if order_id and p2p_record.order_id != int(order_id):
+                    p2p_record = None
+
+        return p2p_record, p2p_records, is_ylb_frist_p2p
+
+    def purchase_call_back_yuelibao(self, user, order_id):
+        logger.info("%s-Enter purchase_call_back_yuelibao for [%s], [%s]" %
+                    (self.c_code, user.id, order_id))
+
+        # 判断是否首次投资
+        p2p_record, p2p_records, is_ylb_frist_p2p = self.get_first_p2p_record(user, order_id, self.get_or_ylb)
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if p2p_record:
+            # 判断投资金额是否大于100
+            pay_amount = int(p2p_record.amount)
+            if pay_amount >= 1000:
+                # 判断用户是否绑定
+                if binding:
+                    data = {
+                        'sendtype': '0',
+                        'num1': 12,
+                        'act': 5170
+                    }
+                    self.xunlei_call_back(user, binding.bid, data,
+                                          self.call_back_url, p2p_record.order_id)
+                else:
+                    message_content = sms_alert_unbanding_xunlei(u"1年白金会员", XUNLEIVIP_LOGIN_URL)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": u"首次投资送1年迅雷白金会员",
+                        "content": message_content,
+                        "mtype": "activity"
+                    })
+
+        # 根据迅雷勋章活动开始时间查询
+        if self.activity_start_time <= timezone.now() <= self.activity_end_time:
+            p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
+                                             Q(create_time__lte=self.activity_end_time))
+            p2p_record = p2p_records.filter(order_id=order_id).first()
+            self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
 
 class XunleiMobileRegister(XunleiVipRegister):

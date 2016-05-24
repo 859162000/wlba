@@ -190,7 +190,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        # 'HOST': '192.168.1.242',
+        'HOST': '192.168.1.242',
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -970,6 +970,8 @@ if ENV == ENV_DEV:
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
 PROMO_TOKEN_USER_KEY = 'tid'
+
+SHARE_INVITE_KEY = "fwh_fp"
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
