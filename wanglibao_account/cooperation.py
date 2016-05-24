@@ -1950,7 +1950,6 @@ class XunleiVipRegister(CoopRegister):
             common_callback.apply_async(
                 kwargs={'url': self.attain_amount_call_back_url, 'params': params, 'channel': self.c_code})
 
-
     def purchase_call_back_yuelibao(self, user, order_id):
         logger.info("%s-Enter purchase_call_back_yuelibao for [%s], [%s]" %
                     (self.c_code, user.id, order_id))
