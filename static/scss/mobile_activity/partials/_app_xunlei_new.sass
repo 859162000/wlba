@@ -1,0 +1,270 @@
+@mixin abs-pos($top: auto, $right: auto, $bottom: auto, $left: auto)
+  top: $top
+  right: $right
+  bottom: $bottom
+  left: $left
+  position: absolute
+@mixin line-height($heightValue: 0 )
+  height: $heightValue + rem
+  line-height: $heightValue + rem
+.app-xunlei-new
+  max-height: 999999rem
+  .banner
+    width: 100%
+    display: block
+  .part-box
+    text-align: center
+    .part-title
+      font-size: .9rem
+      color: #fff
+      span
+        color: #fdfa55
+    .part-en
+      color: #db6d48
+      font-size: .7rem
+    .part-icon
+      span
+        width: .9rem
+        height: .5rem
+        display: inline-block
+        background: url(/static/imgs/mobile_activity/app_xunlei_new/arrow.png)
+        background-size: cover
+  .app-xunlei-box1
+    background: #d65721
+    .part-box
+      margin-top: -2.5rem
+    .treasure-box
+      width: 100%
+      height: 12rem
+      position: relative
+      .bone-icon
+        +abs-pos(0.2rem, auto, auto, 2rem)
+        width: 1.925rem
+        height: 2.075rem
+        background: url(/static/imgs/mobile_activity/app_xunlei_new/gutou.png)
+        background-size: cover
+      .money-icon
+        +abs-pos(-2.5rem, .75rem, auto, auto)
+        width: 2.25rem
+        height: 1.55rem
+        background: url(/static/imgs/mobile_activity/app_xunlei_new/money.png)
+        background-size: cover
+      .treasure-body
+        width: 16rem
+        height: 11.4rem
+        margin: 0 auto
+        background: url(/static/imgs/mobile_activity/app_xunlei_new/taojin.png)
+        background-size: 100% 100%
+        margin-top: .675rem
+        position: relative
+        .people-icon
+          width: 8.175rem
+          height: 10.225rem
+          background: url(/static/imgs/mobile_activity/app_xunlei_new/boy1.png)  center center no-repeat
+          background-size: cover
+          margin: 0 auto
+          display: block
+        .people-icon2
+          background: url(/static/imgs/mobile_activity/app_xunlei_new/boy2.png)  center center no-repeat
+          background-size: cover
+        .people-icon3
+          background: url(/static/imgs/mobile_activity/app_xunlei_new/boy3.png)  center center no-repeat
+          background-size: cover
+        .mountain-icon
+          +abs-pos(auto, auto, 0, 4rem)
+          width: 5.575rem
+          height: 2.275rem
+          background: url(/static/imgs/mobile_activity/app_xunlei_new/shan.png)
+          background-size: 100% 100%
+          margin: 0 auto
+    .user-count
+      text-align: center
+      font-size: .65rem
+      color: #fff
+      a
+        color: #fbf453
+        padding: 0 .125rem
+        border-bottom: 1px solid #fff
+    .win-user
+      .win-box
+        width: 89.6%
+        height: 3.55rem
+        background: #802a00
+        border-radius: .5rem
+        padding: .35rem
+        margin: .9rem auto
+        position: relative
+        font-size: .6rem
+        color: #555555
+        .megaphone
+          position: absolute
+          background: url(/static/imgs/mobile_activity/app_xunlei_new/megaphone.png)
+          background-size: 100% 100%
+          width: .5rem
+          height: .5rem
+          left: 1.3rem
+          top: .98rem
+          z-index: 10
+        .ul-p
+          position: relative
+          overflow: hidden
+          background: #fff
+          border-radius: .5rem
+          -moz-box-shadow: 0px .15rem .15rem #eee inset
+          -webkit-box-shadow: 0px .15rem .15rem #eee inset
+          box-shadow: 0x .15rem .15rem #eee inset
+          padding: .3rem 0
+          height: 2.75rem
+          ul
+            position: absolute
+            width: 100%
+            li
+              +line-height(1.125)
+              padding-left: 1.825rem
+              span
+                color: #ff5252
+                font-size: .65rem
+            li:nth-child(even)
+              background: #eeeeee
+  .app-xunlei-box2
+    background: #ca511e
+    .part-box
+      margin: 1rem 0 .6rem 0
+    .novice-welfare
+      .welfare-box
+        width: 10rem
+        text-align: center
+        margin: 0 auto
+        .welfare-img
+          width: 8.25rem
+          height: 8.25rem
+          margin: 0 auto
+        @for $i from 1 through 3
+          .welfare-img#{$i}
+            background: url(/static/imgs/mobile_activity/app_xunlei_new/prize#{$i}.png)
+            background-size: 100% 100%
+          .welfare-condition
+            font-size: .7rem
+            color: #fff
+            margin: .6rem 0 .35rem
+          .welfare-detail
+            color: #fff
+            font-size: 0
+            span
+              color: #fdfa55
+              font-size: .65rem
+            label
+              font-size: .65rem
+          a
+            width: 100%
+            +line-height(1.75)
+            background: #802a00
+            color: #fff
+            font-size: .6rem
+            display: inline-block
+            border-radius: .25rem
+            margin: .75rem 0 .9rem
+            font-weight: bold
+  .app-xunlei-box3
+    background: #d65721
+    .part-box
+      margin: 1rem 0 .6rem 0
+    .steps-img
+      text-align: center
+      margin-bottom: 1.5rem
+      img
+        width: 93%
+      .step-fonts
+        display: -webkit-box
+        width: 95%
+        margin: 0 auto
+        font-size: .6rem
+        color: #fff
+        .span
+          -webkit-box-flex: 1
+  .app-xunlei-box4
+    background: #ca511e
+    .part-box
+      margin: 1.5rem 0 .6rem 0
+    .safe-list
+      .safe-boxs
+        display: -webkit-box
+        margin-bottom: 1rem
+        .safe-box
+          text-align: center
+          -webkit-box-flex: 1
+          .safe-img
+            width: 3.25rem
+            height: 3.25rem
+            margin: 0 auto .35rem
+          .safe-font
+            text-align: center
+            color: #fff
+            font-size: .6rem
+            line-height: .625rem
+        @for $i from 1 through 5
+          .safe-img#{$i}
+            background: url(/static/imgs/mobile_activity/app_xunlei_new/safe#{$i}.png)
+            background-size: 100% 100%
+  .app-xunlei-box5
+    background: #d65721
+    .part-box
+      margin: 1.5rem 0 .6rem 0
+    .explain-list
+      opacity: .7
+      font-size: .6rem
+      color: #fff
+      line-height: .9rem
+      padding: 0 1rem
+      margin-bottom: 1.4rem
+      p
+        display: -webkit-box
+        span
+          display: block
+        label
+          display: block
+          -webkit-box-flex: 1
+          a
+            color: #fef700
+            text-decoration: underline
+            cursor: pointer
+      .explain-min
+        padding-left: .5rem
+        height: 0
+        overflow: hidden
+.xunlei-alert
+  width: 60%
+  height: 6rem
+  background: #fff
+  border-radius: .5rem
+  z-index: 1000001
+  position: fixed
+  left: 50%
+  top: 50%
+  margin: -3rem 0 0 -25%
+  line-height: .925rem
+  color: #53a3e4
+  font-size: .6rem
+  text-align: center
+  .two-line-sty
+    margin: 1rem  .5rem
+  .mtO
+    margin-top: 1.8rem
+  .one-line-sty
+    margin-top: 1rem
+  .close-alert
+    width: 6rem
+    +line-height(1.25)
+    background: #449be2
+    color: #fff
+    font-size: .6rem
+    border-radius: .5rem
+    margin: 0 auto
+  .cha
+    background: url(/static/imgs/mobile_activity/app_xunlei_new/cha.png)
+    background-size: 100% 100%
+    width: .8rem
+    height: .8rem
+    position: absolute
+    right: .375rem
+    top: .25rem

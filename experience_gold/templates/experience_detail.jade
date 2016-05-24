@@ -1,0 +1,89 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include global/g_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/experience_detail.css?v=20160406")
+    body
+        - csrf_token
+        include global/g_nav
+        .experience-detail-box.clearfix
+            .detail-box-one.clearfix
+                .new-user-icon
+                .detail-one-left.clearfix
+                    h3 新手体验标
+                    ul.clearfix
+                        li.one
+                            p
+                                span {{experience_amount}}
+                                label 元
+                            p.info-s 投资金额
+                        li.two
+                            p
+                                span {{product.period}}
+                                label 天
+                            p.info-s 还款期限
+                        li.three
+                            p
+                                span {{product.expected_earning_rate}}
+                                label %
+                            p.info-s 年化收益
+                    p.project-dec 项目描述：新用户投资1元，产品到期后享有{{experience_amount}}元的投资收益。体验安全、高效的投资服务。
+                .detail-one-right.clearfix
+                    p.profit 投资1元享
+                        span {{experience_amount}}
+                        | 超高收益
+                    p.down-fonts 本标仅限网利宝APP可投，请扫码下载
+                    .ex-download-app.mg-t-sm
+                        img(src='/static/imgs/pc_activity/experience_detail/erweima.png', alt='p2p金融').dol-app.mg-r-sm.fl
+                        .dol-btn.fl
+                          .t-d4 网利宝APP-随时随地 让钱生钱
+                          a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
+                            .span3.android-icon.bg-d8.t-d6
+                              i.icon.iconfont.icon-android
+                            .span9.btn-text.bg-d7.font-s.t-d11 Android版下载
+                          a(href='https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8').dol-btn-warp
+                            .span3.android-icon.bg-d9.t-d6
+                              i.icon.iconfont.icon-ios
+                            .span9.btn-text.bg-d7.font-s.t-d11 iPhone版下载
+            .detail-box-two.clearfix
+                .look-rule
+                    a#showRule(href="javascript:void(0)") 详细规则
+                        i
+                h3 产品描述
+                .describe-box
+                    .describe-img.img1
+                    .describe-fonts 新用户投资1元，到期后享有28888元的投资收益。体验安全 、高效的投资服务。新用户在投资前需要实名认证 、绑定银行卡才可充值1元。
+            .detail-box-two.clearfix
+                h3 如何计算收益(示例)
+                .describe-box
+                    .describe-img.img2
+                    .describe-fonts
+                        p 28888 * 1天 * 10% / 360天 ＝ 8.02元
+                        p 本金 * 标期限 * 年化利率 / 360 ＝ 收益
+            .detail-box-two.mb70.clearfix
+                h3 回款方式
+                .describe-box
+                    .describe-img.img3
+                    .describe-fonts 到期后，8.02元的收益自动回到您的账户余额中，可以随时手动体现，一到三个工作日内到账。
+        .experience-gold-rule#showRuleDetail
+            h3 体验金领取及使用说明
+            ul
+                mixin ruleDeatil(ruleTitle, ruleDetail1, ruleDetail2, ruleDetail3)
+                    li.clearfix
+                        span
+                        .experience-gold-rule-detail
+                            p.rule-title-style=ruleTitle
+                            p=ruleDetail1
+                            p=ruleDetail2
+                            p=ruleDetail3
+                +ruleDeatil('如何领取？', '1、新用户通过注册（老用户通过邀请等活动奖励）获得体验金后，体验金自动放入相应账户并发送站内信通知。')
+                +ruleDeatil('如何使用？', '1、新手注册体验金可以在相关体验标详情页投资，投资时不能使用其它理财券。体验金有效期自发放日起15天内有效。', '2、首次投资体验金均需投资一元进行换购，投资时系统将自动按体验金总额一次性投资完毕。例如，用户A注册获得28888元体验金，未使用，之后该用户通过参与活动获得10000元体验金，此时用户选择投资体验标时（两笔体验金均在有效期内），系统默认将38888元体验金全部投资。')
+                +ruleDeatil('体验金是否可提现？', '1、体验金投资项目，17点前投资当日计息，17点后投资次日计息，项目到期日17点回款。还款本金系统自动收回，利息收益自动以余额形式发放至投资人的理财专区账户。例如，新手28888元体验金，计息日为1天（含节假日），今天16：50分投资，项目立即计息，今天17：00体验金投资收益会发放到您个人账户。', '2、体验金利息收益与正常账户余额一样，可用来投资和提现。', '部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。')
+        include global/g_footer
+        script.
+            require(['/static/src/pc/experience_gold_detail.js?v=20160523'])
+

@@ -55,6 +55,7 @@ from celery.execute import send_task
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
+from wanglibao_activity.tasks import check_activity_task
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_redis.backend import redis_backend
 from .common import get_p2p_list
@@ -331,7 +332,13 @@ class AuditProductView(TemplateView):
         })
 
         # 满标审核时检测活动规则
-        activity_backends.check_activity(request.user, 'p2p_audit', 'all', 0, pk)
+        # activity_backends.check_activity(request.user, 'p2p_audit', 'all', 0, pk)
+        check_activity_task.apply_async(kwargs={
+            "user_id": request.user.id,
+            "trigger_node": 'p2p_audit',
+            "device_type": 'all',
+            "product_id": pk,
+        }, queue='celery02')
 
         return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 
@@ -341,7 +348,7 @@ class AuditAmortizationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
-        #page = kwargs.get('page', 1)
+        # page = kwargs.get('page', 1)
         page = self.request.GET.get('page', 1)
 
         p2p_amortization = ProductAmortization.objects.filter(pk=pk).first()
@@ -368,7 +375,7 @@ class AuditEquityView(TemplateView):
 
     def get_context_data(self, **kwargs):
         pk = kwargs['id']
-        #page = kwargs.get('page', 1)
+        # page = kwargs.get('page', 1)
         page = self.request.GET.get('page', 1)
 
         p2p = P2PProduct.objects.filter(pk=pk).first()
