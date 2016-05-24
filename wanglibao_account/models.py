@@ -29,6 +29,7 @@ class IdVerification(models.Model):
 
     class Meta:
         verbose_name_plural = u'实名认证记录'
+        unique_together = (("id_number", "name"),)
 
     def __unicode__(self):
         return u'%s %s %d' % (self.id_number, self.name, self.is_valid)
