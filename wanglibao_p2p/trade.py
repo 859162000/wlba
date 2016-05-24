@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 
 from django.db import transaction
 from django.utils import timezone
 from marketing import tools
-#from marketing.models import IntroducedBy, Reward, RewardRecord
+# from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 from django.conf import settings
-#from wanglibao.templatetags.formatters import safe_phone_str
+# from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_reward.views import RewardDistributer
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -22,10 +22,6 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
-import logging
-# from wanglibao_account.utils import CjdaoUtils
-# from wanglibao_account.tasks import cjdao_callback
-# from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
 import json, datetime
 

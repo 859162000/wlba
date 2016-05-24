@@ -11,6 +11,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def safe_phone(phone):
     return phone[:3] + '*' * (len(phone) - 4 - 3) + phone[-4:]
 
@@ -27,7 +28,7 @@ class P2PRecordSerializer(serializers.ModelSerializer):
 
 
 class P2PProductSerializer(ModelSerializerExtended):
-    #总收益
+    # 总收益
     total_earning = serializers.SerializerMethodField('total_earning_joined')
 
     publish_time = serializers.SerializerMethodField('publish_time_format')
@@ -46,17 +47,13 @@ class P2PProductSerializer(ModelSerializerExtended):
     class Meta:
         model = P2PProduct
         depth = 1
-        fields = ("total_earning", "id", "version", "category", "hide", "is_app_exclusive", "name", "short_name", "serial_number",
-                  "contract_serial_number", "status", "priority", "period", "brief", "expected_earning_rate",
+        fields = ("total_earning", "id", "version", "category", "hide", "is_app_exclusive",
+                  "name", "short_name", "serial_number",
+                  "contract_serial_number", "status", "priority", "period", "expected_earning_rate",
                   "excess_earning_rate", "excess_earning_description", "pay_method", "amortization_count",
-                  "repaying_source", "baoli_original_contract_number", "baoli_original_contract_name",
-                  "baoli_trade_relation", "borrower_name", "borrower_phone", "borrower_address",
-                  "borrower_id_number", "borrower_bankcard", "borrower_bankcard_bank_name",
-                  "borrower_bankcard_bank_code", "borrower_bankcard_bank_province", "borrower_bankcard_bank_city",
-                  "borrower_bankcard_bank_branch", "total_amount", "ordered_amount", "extra_data", "publish_time",
+                  "repaying_source", "total_amount", "ordered_amount", "extra_data", "publish_time",
                   "end_time", "soldout_time", "limit_per_user", "warrant_company", "usage", "short_usage",
                   "display_status", "is_taojin", "product_amortization", "activity")
-
 
     def total_earning_joined(self, obj):
         terms = get_amortization_plan(obj.pay_method).generate(obj.total_amount,
@@ -110,15 +107,11 @@ class P2PProductSerializer(ModelSerializerExtended):
         except:
             logger.error('parse extra data failed:' + str(value))
 
-
-
         return extra_data
-
 
     def pay_method_format(self, obj):
         pay_method = obj.display_payback_mapping.get(obj.pay_method)
         return pay_method
-
 
     def product_amortization_format(self, obj):
         amortizations = obj.amortizations.all()
@@ -132,7 +125,6 @@ class P2PProductSerializer(ModelSerializerExtended):
 
         return pro_amort_list
 
-
     def activity_format(self, obj):
 
         return dict(zip(('name', 'rule_amount'),
@@ -145,6 +137,7 @@ class P2PEquitySerializer(ModelSerializerExtended):
         model = P2PEquity
         fields = ('id', 'created_at')
 
+
 class P2PProductAPISerializer(ModelSerializerExtended):
     """ there noting """
     equities = P2PEquitySerializer()
@@ -153,7 +146,6 @@ class P2PProductAPISerializer(ModelSerializerExtended):
         model = P2PProduct
         deep = 1
         fields = ( "id", "version", "category", "equities")
-
 
     # def p2pequity_format(self, obj):
     #     p2pequity_list = P2PEquity.objects.filter(product__id=obj.id)
