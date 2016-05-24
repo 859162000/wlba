@@ -971,6 +971,8 @@ PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
 PROMO_TOKEN_USER_KEY = 'tid'
 
+SHARE_INVITE_KEY = "fwh_fp"
+
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 # CAPTCHA_CHALLENGE_FUNCT = 'wanglibao.helpers.random_char_challenge'
