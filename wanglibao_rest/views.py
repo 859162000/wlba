@@ -70,6 +70,7 @@ from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 from wanglibao.settings import GEETEST_ID, GEETEST_KEY
+from utils import id_validate
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -544,51 +545,21 @@ class IdValidateAPIView(APIView):
 
         name = request.DATA.get("name", "").strip()
         id_number = request.DATA.get("id_number", "").strip()
-        device = split_ua(request)
 
         if not name or not id_number:
             return Response({"ret_code": 30051, "message": u"信息输入不完整"})
 
         user = request.user
-        profile = WanglibaoUserProfile.objects.filter(user=user).first()
-        if profile.id_is_valid:
-            return Response({"ret_code": 30055, "message": u"您已认证通过，无需再认证，请重新登录查看最新状态"})
 
-        verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
+        res = id_validate(user, name, id_number)
+        if res.get("ret_code")==0:
+            device = split_ua(request)
+            tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
-        if verify_counter.count >= 3:
-            return Response({"ret_code": 30052, "message": u"验证错误次数频繁，请联系客服 4008-588-066"})
+            # 处理第三方用户实名回调
+            CoopRegister(self.request).process_for_validate(user)
 
-        id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-        if id_verify_count >= 1:
-            return Response({"ret_code": 30053, "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066"})
-
-        try:
-            verify_record, error = verify_id(name, id_number)
-            verify_record.user = user
-            verify_record.save()
-        except:
-            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
-
-        verify_counter.count = F('count') + 1
-        verify_counter.save()
-
-        if error or not verify_record.is_valid:
-            return Response({"ret_code": 30054, "message": u"验证失败，请重试或联系客服 4008-588-066"})
-
-        user.wanglibaouserprofile.id_number = id_number
-        user.wanglibaouserprofile.name = name
-        user.wanglibaouserprofile.id_is_valid = True
-        user.wanglibaouserprofile.id_valid_time = timezone.now()
-        user.wanglibaouserprofile.save()
-
-        device = split_ua(request)
-        tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
-
-        # 处理第三方用户实名回调
-        CoopRegister(self.request).process_for_validate(user)
-
-        return Response({"ret_code": 0, "message": u"验证成功"})
+        return Response({"ret_code": res.get('ret_code'), "message": res.get("message")})
 
 
 class SendVoiceCodeAPIView(APIView):
@@ -944,33 +915,6 @@ class HasValidationAPIView(APIView):
         else:
             return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
-class HasValidationAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        user = request.user
-        profile = WanglibaoUserProfile.objects.filter(user=user).first()
-        if profile.id_is_valid:
-            return Response({
-                "ret_code": 0,
-                "message": u"您已认证通过",
-                "name": profile.name,
-                "id_number": "%s************%s" % (profile.id_number[:3], profile.id_number[-3:]),
-                "id_valid_time": profile.id_valid_time if not profile.id_valid_time else redpack_backends.local_transform_str(profile.id_valid_time)
-            })
-        else:
-            return Response({"ret_code": 1, "message": u"您没有认证通过"})
-
-class HasValidationAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        user = request.user
-        profile = WanglibaoUserProfile.objects.filter(user=user).first()
-        if profile.id_is_valid:
-            return Response({"ret_code": 0, "message": u"您已认证通过"})
-        else:
-            return Response({"ret_code": 1, "message": u"您没有认证通过"})
 
 class IdValidate(APIView):
     """
@@ -1011,47 +955,13 @@ class IdValidate(APIView):
             name = form.cleaned_data['name'].strip()
             id_number = form.cleaned_data['id_number'].strip()
 
-            verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
-            if verify_counter.count >= 3:
-                return Response({
-                                    "message": u"验证错误次数频繁，请联系客服 4008-588-066",
-                                    "error_number": ErrorNumber.try_too_many_times
+            res = id_validate(user, name, id_number)
+            if res.get("ret_code")!=0:
+                 return Response({
+                                    "message": res.get("message"),
+                                    "error_number": res.get("error_number")
                                 }, status=400)
-
-            profile = WanglibaoUserProfile.objects.filter(user=user).first()
-            if profile.id_is_valid:
-                return Response({
-                    "message": u"您已认证通过，无需再认证，请重新登录查看最新状态",
-                    "error_number": ErrorNumber.try_too_many_times
-                })
-
-            id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
-            if id_verify_count >= 1:
-                return Response({
-                                    "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066",
-                                    "error_number": ErrorNumber.id_verify_times_error
-                                }, status=400)
-
-            verify_record, error = verify_id(name, id_number)
-            verify_record.user = user
-            verify_record.save()
-
-            verify_counter.count = F('count') + 1
-            verify_counter.save()
-
-            if error or not verify_record.is_valid:
-                return Response({
-                                    "message": u"验证失败，请重试或联系客服 4008-588-066",
-                                    "error_number": ErrorNumber.unknown_error
-                                }, status=400)
-
-            user.wanglibaouserprofile.id_number = id_number
-            user.wanglibaouserprofile.name = name
-            user.wanglibaouserprofile.id_is_valid = True
-            user.wanglibaouserprofile.id_valid_time = timezone.now()
-            user.wanglibaouserprofile.save()
-
             device = split_ua(request)
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
@@ -1059,6 +969,7 @@ class IdValidate(APIView):
             CoopRegister(self.request).process_for_validate(user)
 
             return Response({"validate": True}, status=200)
+
 
         else:
             return Response({
@@ -1629,6 +1540,7 @@ class InnerSysValidateID(APIView, InnerSysHandler):
             verify_record, error = verify_id(name, id)
             logger.debug('name:%s, id:%s, verifiy_record:%s, error:%s' % (name, id, verify_record, error))
         except:
+            logger.exception("InnerSysValidateID raise error: ")
             return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
         else:
             if error or not verify_record.is_valid:

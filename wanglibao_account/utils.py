@@ -36,7 +36,9 @@ from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_rest.utils import get_current_utc_timestamp
 from report.crypto import Aes
-
+from common.tools import FileObject
+from wanglibao_account.models import IdVerification
+from wanglibao_account.backends import check_age_for_id
 
 logger = logging.getLogger(__name__)
 
@@ -128,40 +130,84 @@ def create_user(identifier, password, nickname, user_type='0'):
     return user
 
 
-def verify_id(name, id_number):
+def verify_id(name, id_number, user=None):
     backend = settings.ID_VERIFY_BACKEND
     class_name = backend.split('.')[-1]
+    if class_name not in ('TestIDVerifyBackEnd', 'ProductionIDVerifyBackEnd',
+                          'ProductionIDVerifyV2BackEnd', 'ProductionIDVerifyV1&V2AutoBackEnd'):
+        raise NameError("The class_name[%s] specific backend of verify_id not implemented" % class_name)
 
-    if class_name == 'TestIDVerifyBackEnd':
-        return TestIDVerifyBackEnd.verify(name, id_number)
-    elif class_name == 'ProductionIDVerifyBackEnd':
-        return ProductionIDVerifyBackEnd.verify(name, id_number)
-    elif class_name == 'ProductionIDVerifyV2BackEnd':
-        return ProductionIDVerifyV2BackEnd.verify(name, id_number)
-    elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
-        key = 'valid_count_v1'
-        valid_v1_total = settings.VALID_V1_TOTAL
-        redis = redis_backend()
-        if redis.redis and redis.redis.ping():
-            if redis._exists(key):
-                valid_v1_count = redis._get(key)
-                valid_v1_count = int(valid_v1_count)
-                if valid_v1_count <= 0:
-                    logger.info(">>>>>>>>>>>>>user valid auto used v2 v1_count[%s]" % valid_v1_count)
-                    return ProductionIDVerifyV2BackEnd.verify(name, id_number)
-                else:
-                    redis._set(key, valid_v1_count - 1)
-                    logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % (valid_v1_count - 1,))
-                    return ProductionIDVerifyBackEnd.verify(name, id_number)
-            else:
-                redis._set(key, valid_v1_total)
-                logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
-                return ProductionIDVerifyBackEnd.verify(name, id_number)
-        else:
-            logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
-            return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+    verify_result = None
+    id_number = str(id_number)
+    id_number_len = len(id_number)
+    if not(id_number_len == 15 or id_number_len == 18):
+        # message = u'身份证长度不合法'
+        # record = IdVerification(id_number=id_number, name=name, is_valid=False, description=message)
+        # record.save()
+        # return record, message
+        verify_result = {"is_valid": False, "description": u'身份证长度不合法'}
     else:
-        raise NameError("The specific backend not implemented")
+        record, create = IdVerification.objects.get_or_create(id_number=id_number, name=name,
+                                                              defaults={"description": u"NON"})
+        if not create:
+            if record.is_valid:
+                raise Exception(u"重复实名:id_number[%s], name[%s] 该用户已经实名通过")
+
+            if class_name == 'TestIDVerifyBackEnd':
+                return record, None
+            if record.description == u'该用户未满18周岁':
+                if not check_age_for_id(id_number):
+                    return record, None
+            else:
+                return record, None
+
+        with transaction.atomic():
+            record = IdVerification.objects.select_for_update().get(id=record.id)
+            if record.is_valid or record.description not in (u'NON', u'该用户未满18周岁'):
+                raise Exception("已经实名通过or已经有未通过实名记录")
+            if class_name == 'TestIDVerifyBackEnd':
+                verify_result = TestIDVerifyBackEnd.verify(name, id_number)
+            elif class_name == 'ProductionIDVerifyBackEnd':
+                verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
+            elif class_name == 'ProductionIDVerifyV2BackEnd':
+                verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
+            elif class_name == 'ProductionIDVerifyV1&V2AutoBackEnd':
+                key = 'valid_count_v1'
+                valid_v1_total = settings.VALID_V1_TOTAL
+                redis = redis_backend()
+                if redis.redis and redis.redis.ping():
+                    if redis._exists(key):
+                        valid_v1_count = redis._get(key)
+                        valid_v1_count = int(valid_v1_count)
+                        if valid_v1_count <= 0:
+                            logger.info(">>>>>>>>>>>>>user valid auto used v2 v1_count[%s]" % valid_v1_count)
+                            return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+                        else:
+                            redis._set(key, valid_v1_count - 1)
+                            logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % (valid_v1_count - 1,))
+                            return ProductionIDVerifyBackEnd.verify(name, id_number)
+                    else:
+                        redis._set(key, valid_v1_total)
+                        logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
+                        verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
+                else:
+                    logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
+                    verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
+
+            message = verify_result.get('description')
+            # record = IdVerification()
+            if user:
+                record.user = user
+            record.id_number = id_number
+            record.name = name
+            record.is_valid = verify_result.get('is_valid')
+            record.description = message
+            if record.is_valid:
+                message = None
+                if verify_result.get('id_photo'):
+                    record.id_photo.save('%s.jpg' % id_number, verify_result.get('id_photo'), save=True)
+            record.save()
+        return record, message
 
 
 def generate_contract(equity, template_name=None, equities=None):
@@ -434,14 +480,6 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
-
-
-class FileObject(object):
-    """构造文件对象（file, size云存储所需）"""
-
-    def __init__(self, content, size):
-        self.file = content
-        self.size = size
 
 
 def base64_to_image(base64_str):
