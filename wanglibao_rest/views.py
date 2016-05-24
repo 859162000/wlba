@@ -1111,16 +1111,17 @@ class LoginAPIView(DecryptParmsAPIView):
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码不可为空"}, status=400)
 
-        res, message = verify_captcha(dic=request.POST, keep=True)
-        if not res:
-            return Response({'message': message, "type": "captcha"}, status=400)
-
         from wanglibao_account.models import GeetestModifiedTimes
         geetest_record = GeetestModifiedTimes.objects.filter(identified=identifier).first()
         if not geetest_record:
             geetest_record = GeetestModifiedTimes.objects.create(
                 identified=identifier,
                 times=0)
+
+        if geetest_record.times>2:
+            res, message = verify_captcha(dic=request.POST, keep=True)
+            if not res:
+                return Response({'message': message, "type": "captcha"}, status=400)
 
         # add by ChenWeiBin@20160113
         profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
