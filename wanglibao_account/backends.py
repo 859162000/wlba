@@ -180,11 +180,7 @@ class ProductionIDVerifyBackEnd(object):
                 except StopIteration:
                     message = u'响应数据解析失败'
                     logger.info("ProductionIDVerifyBackEnd parse reponse text failed with data[%s]" % response.text)
-        logger.info("=============================================111111")
         message = None if verify_result else message
-        logger.info("=============================================2222:message:%s"%message)
-        a = {"is_valid": verify_result, "description": message}
-        logger.info(a)
         return {"is_valid": verify_result, "description": message}
 
 
