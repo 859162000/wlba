@@ -128,3 +128,11 @@ class MyHttpsAdapter(HTTPAdapter):
                                        maxsize=maxsize,
                                        block=block,
                                        ssl_version=ssl.PROTOCOL_TLSv1)
+
+
+def atr_to_atr_for_obj(atr_map, obj):
+    for src_atr_key, dst_atr_key in atr_map:
+        src_atr = getattr(obj, src_atr_key)
+        setattr(obj, dst_atr_key, src_atr)
+
+    return obj
