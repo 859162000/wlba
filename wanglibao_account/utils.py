@@ -149,7 +149,7 @@ def verify_id(name, id_number, user=None):
     else:
         record, create = IdVerification.objects.get_or_create(id_number=id_number, name=name,
                                                               defaults={"description": u"NON"})
-        print '==============================================user,record:%s, create:%s'%(record, create)
+        logger.info('==============================================user,record:%s, create:%s'%(record, create))
         if not create:
             if record.is_valid:
                 if settings.ENV == settings.ENV_PRODUCTION:
@@ -164,7 +164,7 @@ def verify_id(name, id_number, user=None):
                     return record, None
             else:
                 return record, None
-        print '==============================================1'
+        logger.info('==============================================1')
         with transaction.atomic():
             record = IdVerification.objects.select_for_update().get(id=record.id)
             if record.is_valid or record.description not in (u'NON', u'该用户未满18周岁'):
@@ -197,7 +197,7 @@ def verify_id(name, id_number, user=None):
                 else:
                     logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
                     verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
-            print '==============================================verify_result:::::%s'%verify_result
+            logger.info('==============================================verify_result:::::%s'%verify_result)
             message = verify_result.get('description')
             # record = IdVerification()
             if user:
