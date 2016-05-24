@@ -51,7 +51,7 @@ html
                             .span9.btn-text.bg-d7.font-s.t-d11 iPhone版下载
             .detail-box-two.clearfix
                 .look-rule
-                    a(href="javascript:void(0)") 详细规则
+                    a#showRule(href="javascript:void(0)") 详细规则
                         i
                 h3 产品描述
                 .describe-box
@@ -69,5 +69,21 @@ html
                 .describe-box
                     .describe-img.img3
                     .describe-fonts 到期后，8.02元的收益自动回到您的账户余额中，可以随时手动体现，一到三个工作日内到账。
+        .experience-gold-rule#showRuleDetail
+            h3 体验金领取及使用说明
+            ul
+                mixin ruleDeatil(ruleTitle, ruleDetail1, ruleDetail2, ruleDetail3)
+                    li.clearfix
+                        span
+                        .experience-gold-rule-detail
+                            p.rule-title-style=ruleTitle
+                            p=ruleDetail1
+                            p=ruleDetail2
+                            p=ruleDetail3
+                +ruleDeatil('如何领取？', '1、新用户通过注册（老用户通过邀请等活动奖励）获得体验金后，体验金自动放入相应账户并发送站内信通知。')
+                +ruleDeatil('如何使用？', '1、新手注册体验金可以在相关体验标详情页投资，投资时不能使用其它理财券。体验金有效期自发放日起15天内有效。', '2、首次投资体验金均需投资一元进行换购，投资时系统将自动按体验金总额一次性投资完毕。例如，用户A注册获得28888元体验金，未使用，之后该用户通过参与活动获得10000元体验金，此时用户选择投资体验标时（两笔体验金均在有效期内），系统默认将38888元体验金全部投资。')
+                +ruleDeatil('体验金是否可提现？', '1、体验金投资项目，17点前投资当日计息，17点后投资次日计息，项目到期日17点回款。还款本金系统自动收回，利息收益自动以余额形式发放至投资人的理财专区账户。例如，新手28888元体验金，计息日为1天（含节假日），今天16：50分投资，项目立即计息，今天17：00体验金投资收益会发放到您个人账户。', '2、体验金利息收益与正常账户余额一样，可用来投资和提现。', '部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。')
         include global/g_footer
+        script.
+            require(['/static/src/pc/experience_gold_detail.js?v=20160523'])
 
