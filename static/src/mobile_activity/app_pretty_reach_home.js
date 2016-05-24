@@ -116,7 +116,7 @@
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?promo_token=zypwt&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
+                            window.location.href = '/weixin/regist/?promo_token=xmdj2&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
                         }else if(data.ret_code=='1001'||data.ret_code=='1002'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
@@ -132,7 +132,6 @@
             })
         }
     })
-
 
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
