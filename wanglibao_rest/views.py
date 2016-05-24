@@ -1121,7 +1121,7 @@ class LoginAPIView(DecryptParmsAPIView):
         if geetest_record.times>2:
             res, message = verify_captcha(dic=request.POST, keep=True)
             if not res:
-                return Response({'message': message, "type": "captcha"}, status=400)
+                return Response({"token":"false", 'message': message, "type": "captcha"}, status=400)
 
         # add by ChenWeiBin@20160113
         profile = WanglibaoUserProfile.objects.filter(phone=identifier, utype='3').first()
