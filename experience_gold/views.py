@@ -94,8 +94,55 @@ class ExperienceGoldView(TemplateView):
         return super(ExperienceGoldView, self).dispatch(request, *args, **kwargs)
 
 
-# class ExperienceAccountsView(TemplateView):
-#     template_name = 'experience_account.jade'
-#
-#     def get_context_data(self, **kwargs):
-#         return {}
+class ExperienceDetailView(TemplateView):
+    template_name = 'experience_detail.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        now = timezone.now()
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
+
+        experience_amount = 0
+        experience_amount_default = 28888.00
+        # 体验金可用余额
+        if user.is_authenticated():
+            experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+                .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
+            if experience_record.get('event__amount__sum'):
+                experience_amount = experience_record.get('event__amount__sum')
+            else:
+                experience_amount = experience_amount_default
+        else:
+            experience_amount = experience_amount_default
+
+        return {
+            'product': experience_product,
+            'experience_amount': experience_amount,
+        }
+
+
+class ExperienceAppDetailView(TemplateView):
+    template_name = 'app_experience_detail.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        now = timezone.now()
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
+
+        experience_amount = 0
+        experience_amount_default = 28888.00
+        # 体验金可用余额
+        if user.is_authenticated():
+            experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+                .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
+            if experience_record.get('event__amount__sum'):
+                experience_amount = experience_record.get('event__amount__sum')
+            else:
+                experience_amount = experience_amount_default
+        else:
+            experience_amount = experience_amount_default
+
+        return {
+            'product': experience_product,
+            'experience_amount': experience_amount,
+        }

@@ -5,7 +5,7 @@ from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
 
 from experience_gold.backends import ExperienceBuyAPIView, GetExperienceAPIView
-from experience_gold.views import ExperienceGoldView
+from experience_gold.views import ExperienceGoldView, ExperienceAppDetailView, ExperienceDetailView
 
 urlpatterns = patterns(
     '',
@@ -18,5 +18,7 @@ urlpatterns = patterns(
     url(r'^experience/(?P<template>(mobile|gold|redirect|nologin))/$', ExperienceGoldView.as_view(), name="experience_gold"),
 
     url(r'^experience/explain/$', TemplateView.as_view(template_name="experience_explain.jade")),
+    url(r'^experience/detail/$', ExperienceDetailView.as_view(), name="experience_detail"),
+    url(r'^experience/app_detail/$', ExperienceAppDetailView.as_view(), name="experience_app_detail"),
 )
 
