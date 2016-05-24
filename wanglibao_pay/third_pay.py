@@ -334,22 +334,20 @@ def card_bind_list(request):
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
                 tmp = dict()
                 channel = card.bank.channel
-                if channel == 'huifu' and card.is_bind_huifu:
+                if channel == 'huifu' :
                     tmp.update(base_dict)
                     if card.bank.huifu_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.huifu_bind_limit))
 
-                elif channel == 'yeepay' and card.is_bind_yee:
+                elif channel == 'yeepay' :
                     tmp.update(base_dict)
                     if card.bank.yee_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.yee_bind_limit))
 
-                elif channel == 'kuaipay' and card.is_bind_kuai:
+                elif channel == 'kuaipay':
                     tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
-                else:
-                    tmp.update(base_dict)
 
                 # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
                 # bank_min_amount = bank_limit.get('bank_min_amount')
