@@ -117,15 +117,6 @@ def get_phone_for_coop(user_id):
         return None
 
 
-def get_first_p2p_record(user_id):
-    p2p_records = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购')
-    if p2p_records.exists():
-        p2p_record = p2p_records.order_by('create_time').first()
-        return p2p_record
-    else:
-        return None
-
-
 def get_first_investment_for_coop(user_id):
     try:
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
@@ -167,6 +158,34 @@ def get_binding_time_for_coop(user_id):
         return binding_time
     except Exception, e:
         return None
+
+
+def get_first_p2p_record(user, order_id=None, get_or_ylb=False):
+    p2p_record = None
+    is_ylb_frist_p2p = False
+    p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+    if p2p_records.exists():
+        p2p_record = p2p_records.order_by('create_time').first()
+        if get_or_ylb:
+            month_product_records = MonthProduct.objects.filter(user_id=user.id)
+            if month_product_records.exists():
+                month_product_record = month_product_records.order_by('created_at').first()
+                if month_product_record.created_at < p2p_record.create_time:
+                    p2p_record, p2p_records = month_product_record, month_product_records
+                    is_ylb_frist_p2p = True
+                    if order_id and month_product_record.id != int(order_id):
+                        p2p_record = None
+                    else:
+                        atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'),
+                                   ('id', 'order_id')]
+                        p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
+                        for p2p_record in p2p_records:
+                            atr_to_atr_for_obj(atr_map, p2p_record)
+        else:
+            if order_id and p2p_record.order_id != int(order_id):
+                p2p_record = None
+
+    return p2p_record, p2p_records, is_ylb_frist_p2p
 
 
 #######################第三方用户注册#####################
@@ -452,14 +471,6 @@ class CoopRegister(object):
             logger.exception('channel bind purchase process error for user %s'%(user.id))
 
     def process_for_purchase_yuelibao(self, user, order_id):
-        order_id = int(order_id)
-        if order_id >= 0:
-            logger.error("enter process_for_purchase_yuelibao invalid order_id "
-                         "with user[%s] order_id[%s]" % (user.id, order_id))
-            return
-
-        order_id = abs(order_id)
-
         try:
             channel_processor = self.get_user_channel_processor(user)
             if channel_processor:
@@ -1616,6 +1627,7 @@ class XunleiVipRegister(CoopRegister):
         self.coop_sign_key = 'sign'
         self.coop_nickname_key = 'nickname'
         self.coop_account_key = 'account'
+        self.get_or_ylb = True
 
         if ENV == ENV_PRODUCTION:
             self.activity_start_time = dt.strptime('2016-03-30 00:00:00', "%Y-%m-%d %H:%M:%S")
@@ -1856,14 +1868,9 @@ class XunleiVipRegister(CoopRegister):
                         "mtype": "activity"
                     })
 
-    def purchase_call_back(self, user, order_id):
-        channel = get_user_channel_record(user)
-        logger.info("%s-Enter purchase_call_back for [%s], [%s]" % (channel.code, user.id, order_id))
-        # 判断是否首次投资
-        p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        p2p_record = p2p_records.order_by('create_time').first()
+    def purchase_callback(self, user, p2p_record, p2p_records, order_id):
         binding = Binding.objects.filter(user_id=user.id).first()
-        if p2p_record and p2p_record.order_id == int(order_id):
+        if p2p_record:
             # 判断投资金额是否大于100
             pay_amount = int(p2p_record.amount)
             if pay_amount >= 1000:
@@ -1892,6 +1899,13 @@ class XunleiVipRegister(CoopRegister):
             p2p_record = p2p_records.filter(order_id=order_id).first()
             self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
+    def purchase_call_back(self, user, order_id):
+        channel = get_user_channel_record(user)
+        logger.info("%s-Enter purchase_call_back for [%s], [%s]" % (channel.code, user.id, order_id))
+        # 判断是否首次投资
+        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, self.get_or_ylb)
+        self.purchase_callback(user, p2p_record, p2p_records, order_id)
+ 
     def common_purchase_call_back(self, user, p2p_record, p2p_records, binding):
         # 判断用户是否绑定
         if p2p_record and binding:
@@ -1936,68 +1950,14 @@ class XunleiVipRegister(CoopRegister):
             common_callback.apply_async(
                 kwargs={'url': self.attain_amount_call_back_url, 'params': params, 'channel': self.c_code})
 
-    def get_first_p2p_record(self, user, order_id=None, get_or_ylb=False):
-        p2p_record = None
-        is_ylb_frist_p2p = False
-        p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        if p2p_records.exists():
-            p2p_record = p2p_records.order_by('create_time').first()
-            if get_or_ylb:
-                month_product_records = MonthProduct.objects.filter(user_id=user.id)
-                if month_product_records.exists():
-                    month_product_record = month_product_records.order_by('created_at').first()
-                    if month_product_record.created_at < p2p_record.create_time:
-                        p2p_record, p2p_records = month_product_record, month_product_records
-                        is_ylb_frist_p2p = True
-                        if order_id and month_product_record.id != int(order_id):
-                            p2p_record = None
-                        else:
-                            atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'),
-                                       ('id', 'order_id')]
-                            p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
-                            for p2p_record in p2p_records:
-                                atr_to_atr_for_obj(atr_map, p2p_record)
-            else:
-                if order_id and p2p_record.order_id != int(order_id):
-                    p2p_record = None
-
-        return p2p_record, p2p_records, is_ylb_frist_p2p
 
     def purchase_call_back_yuelibao(self, user, order_id):
         logger.info("%s-Enter purchase_call_back_yuelibao for [%s], [%s]" %
                     (self.c_code, user.id, order_id))
 
         # 判断是否首次投资
-        p2p_record, p2p_records, is_ylb_frist_p2p = self.get_first_p2p_record(user, order_id, self.get_or_ylb)
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if p2p_record:
-            # 判断投资金额是否大于100
-            pay_amount = int(p2p_record.amount)
-            if pay_amount >= 1000:
-                # 判断用户是否绑定
-                if binding:
-                    data = {
-                        'sendtype': '0',
-                        'num1': 12,
-                        'act': 5170
-                    }
-                    self.xunlei_call_back(user, binding.bid, data,
-                                          self.call_back_url, p2p_record.order_id)
-                else:
-                    message_content = sms_alert_unbanding_xunlei(u"1年白金会员", XUNLEIVIP_LOGIN_URL)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id": user.id,
-                        "title": u"首次投资送1年迅雷白金会员",
-                        "content": message_content,
-                        "mtype": "activity"
-                    })
-
-        # 根据迅雷勋章活动开始时间查询
-        if self.activity_start_time <= timezone.now() <= self.activity_end_time:
-            p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
-                                             Q(create_time__lte=self.activity_end_time))
-            p2p_record = p2p_records.filter(order_id=order_id).first()
-            self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
+        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, self.get_or_ylb)
+        self.purchase_callback(user, p2p_record, p2p_records, order_id)
 
 
 class XunleiMobileRegister(XunleiVipRegister):
