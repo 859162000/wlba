@@ -194,6 +194,7 @@ def verify_id(name, id_number, user=None):
                         redis._set(key, valid_v1_total)
                         logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
                         verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
+                        logger.info('0000==============================================verify_result:::::%s'%verify_result)
                 else:
                     logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
                     verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
