@@ -292,7 +292,7 @@ def _need_validation_for_qpay(card):
     return need_validation_for_qpay
 
 def _need_rebind(card):
-    if (card.is_bind_kuai and not card.is_bind_yee and card.bank.channel == 'yeepay') \ 
+    if (card.is_bind_kuai and not card.is_bind_yee and card.bank.channel == 'yeepay') \
         or (card.is_bind_yee and not card.is_bind_kuai and card.bank.channel == 'kuaipay'):
         return True
     return False
