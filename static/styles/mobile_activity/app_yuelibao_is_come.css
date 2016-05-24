@@ -1,0 +1,279 @@
+html {
+    height: 100%;
+    width: 100%;
+    font-family: 'Heiti SC', 'Microsoft YaHei';
+    font-size: 20px;
+    outline: 0;
+    -webkit-text-size-adjust:none;
+}
+body {
+    height: 100%;
+    margin: 0;
+    -webkit-user-select: none;
+   /* position: relative;*/
+    background-color: #f5f5f5;
+}
+.lcjh .title{
+    width:15.125rem;
+    height: 2.275rem;
+    background: url(/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_bt_lcjh.png);
+    background-size: 100% 100%;
+    margin-left: 1.825rem;
+    margin-top: 1.5rem;
+}
+.lcjh .content{
+    width:15.125rem;
+    margin-left: 1.825rem;
+    font-size: 0.65rem;
+    margin-top: 2.2025rem;
+    line-height: 1.25rem;
+    color: #FF4A4A4A;
+}
+.lcjh {
+
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_rocket.png")no-repeat;
+    background-size: 75% auto;
+    background-position: bottom center;
+
+   /* position: absolute;
+    bottom: 0;*/
+}
+.fp-responsive .down_box {
+    display:none;
+}
+
+.ystd .title{
+    width: 15.1525rem;
+    height: 1.485rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_bt_td.png");
+    background-size: 100% 100%;
+    margin-left: 1.8rem;
+    margin-top: 1.5rem;
+}
+.ystd .ystd_ion{
+    width: 9.8rem;
+    height: 21.4rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_img_01.png");
+    background-size: 100% 100%;
+    margin-top: 1.5525rem;
+}
+.ystd .js_title div{
+    position: absolute;
+    font-size: 0.75rem;
+}
+.ystd .js_title .jx{
+    color: #4794C7;
+    top:5rem;
+    left: 4.5rem;
+}
+.section{
+    min-height: 504px;
+}
+.ystd .js_title .lv{
+    color: #866ECA;
+    top: 7.4rem;
+    left: 8rem;
+}
+.ystd .js_title .zq{
+    color: #F4A419;
+    top: 11rem;
+    left: 10rem;
+}
+.ystd .js_title .qt{
+    color: #A1CE32;
+    top: 17.3rem;
+    left: 10.2rem;
+}
+.ystd .js_title .fk{
+    color: #24CFF4;
+    top: 22rem;
+    left: 8rem;
+}
+.ystd .js_title .kb{
+    color: #F14C48;
+    top: 24.5rem;
+    left: 4.5rem;
+}
+.zqzr .title{
+    width: 6.55rem;
+    height: 1.475rem;
+    margin-top: 1.5rem;
+    margin-left: 6.125rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_bt_zq.png");
+    background-size: 100% 100%;
+}
+.zqzr .content{
+    width: 16.75rem;
+    margin-top: 2.41rem;
+    margin-left: 1.2rem;
+    color: #603706;
+    line-height: 1.25rem;
+    font-size: 0.65rem;
+}
+.zqzr .ts{
+    width: 15.125rem;
+    height: 12.05rem;
+    margin-left: 1.7rem;
+    margin-top: 3.5rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_img_02.png");
+    background-size: 100% 100%;
+    /*text-align: center;
+    bottom: 0;*/
+}
+.sqlc .title{
+    width: 13.825rem;
+    height: 1.375rem;
+    margin-left: 2.125rem;
+    margin-top: 1.5rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_bt_zqlc.png");
+    background-size: 100% 100%;
+}
+.gmzq .title{
+    width: 13.825rem;
+    height: 1.375rem;
+    margin-left: 2.125rem;
+    margin-top: 1.5rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_bt_buy.png");
+    background-size: 100% 100%;
+}
+.sqlc .sqlc_iocn{
+    float: left;
+    width: 8.575rem;
+    height: 18.575rem;
+    margin-left: 2.3rem;
+    margin-top: 3.165rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_img_04.png");
+    background-size: 100% 100%;
+}
+.gmzq .sqlc_iocn{
+    float: left;
+    width: 8.575rem;
+    height: 18.575rem;
+    margin-left: 2.3rem;
+    margin-top: 3.165rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_img_05.png");
+    background-size: 100% 100%;
+}
+.sqlc ul,.gmzq ul{
+    margin-left: 0.745rem;
+    font-size: 0.8025rem;
+    margin-top: 3.6rem;
+}
+.sqlc ul li,.gmzq ul li{
+    position: absolute;
+    list-style: none;
+    left:10rem
+}
+.zrxz .title{
+    width: 9.85rem;
+    height: 1.475rem;
+    margin-top: 0.885rem;
+    margin-left: 4.45rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_bt_xz.png");
+    background-size: 100% 100%;
+}
+.zrxz ol{
+    width: 16.75rem;
+    margin-top: 0.89rem;
+    padding-left: 1.4rem;
+    font-size: 0.68rem;
+    color:#603706;
+    line-height: 1.25rem;
+}
+
+.zrxz .zhu{
+    text-align: center;
+    color:#603706;
+    font-size: 0.55rem;
+    margin-top: 0.125rem;
+}
+.down_box{
+    position: absolute;
+    width: 1.25rem;
+    height: 1.1rem;
+    bottom: 6%;
+    left: 8.75rem;
+    #overflow: hidden;
+}
+.down{
+    width: 1.25rem;
+    height: 1.1rem;
+    background: url("/static/imgs/mobile_activity/app_yuelibao_is_come/ic_ylb_arrow_down.png");
+    background-size: 100% 100%;
+    animation: myfirst 1s;
+    -moz-animation: myfirst 1s; /* Firefox */
+    -webkit-animation: myfirst 1s;  /* Safari 和 Chrome */
+    -o-animation: myfirst 1s;   /* Opera */
+    animation-iteration-count:infinite;
+    -moz-animation-iteration-count:infinite;
+    -webkit-animation-iteration-count:infinite;
+    -o-animation-iteration-count:infinite;
+}
+@-moz-keyframes myfirst
+{
+    from {margin-top: 0;}
+    to {margin-top: 1.1rem;}
+}
+@-webkit-keyframes myfirst
+{
+    from {margin-top: 0;}
+    to {margin-top: 1.1rem;}
+}
+@-o-keyframes myfirst
+{
+    from {margin-top: 0;}
+    to {margin-top: 1.1rem;}
+}
+@keyframes myfirst
+{
+    from {margin-top: 0;}
+    to {margin-top: 1.1rem;}
+}
+.fp-tableCell {
+    vertical-align: top !important;
+}
+/*
+@media screen and (max-height: 480px) {
+    !*.lcjh .title{margin-top: 1rem;}
+    .lcjh .content{margin-top: 1.2025rem;}
+    .lcjh .hj{margin-top: 2.1rem}*!
+    .ystd .title{margin-top: 1.275rem}
+    .ystd .ystd_ion{width: 7.5rem;height: 15rem;}
+    .ystd .js_title .jx{top: 6.5rem;left: 3.5rem}
+    .ystd .js_title .lv{top:8.2rem;left:6rem}
+    .ystd .js_title .zq{top:10.67rem;left: 8rem;}
+    .ystd .js_title .qt{top: 15.1rem;left:8.2rem}
+    .ystd .js_title .fk{top: 18.5rem;left:6.5rem}
+    .ystd .js_title .kb{top:20.2rem;left: 3.5rem}
+    .zqzr .ts{
+        width: 15.5rem;
+        height: 8rem;
+        margin-top: 1.5rem;
+    }
+    .sqlc .sqlc_iocn{
+        height: 16rem;
+        margin-top: 1rem;
+    }
+    .sqlc ul, .gmzq ul{
+        margin-top: 1.565rem;
+    }
+    .gmzq .sqlc_iocn{
+        height: 16rem;
+        margin-top: 1rem;
+    }
+    .sqlc ul li, .gmzq ul li{
+        margin-top: 1rem;
+    }
+    .zqym{
+        margin-top: 2rem !important;
+    }
+    .zrxx{ margin-top: 2.2rem !important;}
+    .zrsq{ margin-top: 2.3rem !important;}
+    !*.zqzr .title{
+        margin-top: 1.1rem;
+    }
+    .zrxz .title{margin-top: 1rem;}
+    .zrxz ol{margin-top: 1rem;}
+    .zrxz .zhu{margin-top: 0.5rem;}*!
+}
+*/
