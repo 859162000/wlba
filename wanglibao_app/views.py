@@ -235,8 +235,8 @@ class AppRepaymentAPIView(APIView):
                     'ret_code': 0,
                     'message': 'ok',
                     'amount': float(amount) + float(index_data['paidIncome']),
-                    'income_num': float(income_num) + float(index_data['yesterdayIncome']),
-                    'income_yesterday': float(income_yesterday)
+                    'income_num': float(income_num),
+                    'income_yesterday': float(income_yesterday) + float(index_data['yesterdayIncome'])
                 })
 
             else:
@@ -250,6 +250,20 @@ class AppRepaymentAPIView(APIView):
 
                 # 增加 月利宝 产生的数据
                 index_data = get_php_index_data_logout(settings.PHP_APP_INDEX_DATA_LOGOUT_URL)
+
+                logger_yuelibao.debug('aaaaaaaaaaaaaaaaakao!')
+                logger_yuelibao.debug('in P2p!!!!!! amount = {}, income_num = {}'.format(float(amount), len(ams)))
+                logger_yuelibao.debug('index_data = {}!'.format(index_data))
+
+                ret = {
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'amount': float(amount) + float(index_data['repaymentInfoCurrentMonth']),
+                    'income_num': len(ams) + index_data['getPaidProject'],
+                    'income_yesterday': float(income_yesterday)
+                }
+
+                logger_yuelibao.debug('ret = {}!'.format(ret))
 
                 return Response({
                     'ret_code': 0,

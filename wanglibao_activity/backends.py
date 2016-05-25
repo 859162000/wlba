@@ -14,6 +14,7 @@ from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
 # from wanglibao_redpack import backends as redpack_backends
+from wanglibao import settings
 from wanglibao_margin.models import MonthProduct
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
@@ -30,6 +31,7 @@ from weixin.tasks import sentTemplate
 from wanglibao_reward.models import WanglibaoActivityReward, WanglibaoRewardJoinRecord
 
 logger = logging.getLogger(__name__)
+activity_logger = logging.getLogger('wanglibao_inside_messages')
 
 
 def get_reward_index(activity, probabilities):
@@ -151,6 +153,8 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
 def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full,
                          order_id, user_ib=None, is_first_bind_wx=False, ylb_period=0):
     """ check the trigger node """
+    if settings.ENV != settings.ENV_PRODUCTION:
+        activity_logger.info('in yuelibao activity check!!!, period = {}'.format(ylb_period))
     product_id = int(product_id)
     order_id = int(order_id)
     # 注册 或 实名认证
