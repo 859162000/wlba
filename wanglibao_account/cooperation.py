@@ -1503,7 +1503,27 @@ class XiaoMeiRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='小美到家兑换码', is_used=False).first()
+                if not reward:
+                    return
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,), ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"演出门票赠送",
+                    "content": u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,),
+                    "mtype": "activity"
+                })
+                reward.is_used = True
+                reward.save()
+
+    def purchase_call_back_yuelibao(self, user, order_id):
         p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, True, True)
+        # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='小美到家兑换码', is_used=False).first()
@@ -1532,11 +1552,32 @@ class ZhongYingRegister(CoopRegister):
         self.token = 'zypwt'
         self.request = request
 
+    def purchase_call_back_yuelibao(self, user, order_id):
+        # 判断是否首次投资
+        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, True, True)
+        if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
+            for _index in xrange(2):
+                with transaction.atomic():
+                    reward = Reward.objects.select_for_update().filter(type='中影票务通兑换码', is_used=False).first()
+                    if not reward:
+                        return
+                    send_messages.apply_async(kwargs={
+                        "phones": [user.wanglibaouserprofile.phone, ],
+                        "messages": [u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为:%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,), ]
+                    })
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": u"演出门票赠送",
+                        "content": u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为：%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,),
+                        "mtype": "activity"
+                    })
+                    reward.is_used = True
+                    reward.save()
+
     def purchase_call_back(self, user, order_id):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
-        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, True, True)
         if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
             for _index in xrange(2):
                 with transaction.atomic():
