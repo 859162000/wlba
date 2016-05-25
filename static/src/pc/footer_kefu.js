@@ -11,21 +11,6 @@ function kefu_new(){
       window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
     };
 
-    var kefu_switch_state = 'new';
-    document.getElementById('kefu_switch').onclick = function() {
-    //切换新老客服按钮
-      if(kefu_switch_state=='new'){
-        document.getElementById('kefu_link').style.display = "none";
-        document.getElementById('kefu_link_old').style.display = "";
-        kefu_switch_state = 'old';
-        document.getElementById('kefu_switch').innerHTML='切换到新客服';
-      }else{
-        document.getElementById('kefu_link').style.display = "";
-        document.getElementById('kefu_link_old').style.display = "none";
-        kefu_switch_state = 'new';
-        document.getElementById('kefu_switch').innerHTML='切换到老客服';
-      }
-    }
 }
 kefu_new();
 
