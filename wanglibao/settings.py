@@ -1432,7 +1432,7 @@ if ENV == ENV_PRODUCTION:
     PHP_INSIDE_MESSAGE_READ = 'http://10.172.164.154/message.php/message'
     PHP_INSIDE_MESSAGE_READ_ALL = 'http://10.172.164.154/message.php/message/0'
     # 未登录时候 APP 端显示的 月利宝数据
-    PHP_APP_INDEX_DATA_LOGOUT_URL = 'http://192.168.20.248:8081/api/python.php?action=projectRepayment'
+    PHP_APP_INDEX_DATA_LOGOUT_URL = 'https://www.wanglibao.com/ylb/api/python.php?action=projectRepayment'
 
 # 渠道数据中心平台认证授权密钥
 CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'
