@@ -211,7 +211,7 @@ def verify_captcha(dic, keep=False):
     captcha_1 = dic.get('captcha_1', "")
     captcha_0 = dic.get('captcha_0', "")
     if not captcha_0 and not captcha_1:
-        return True, ""
+        return False, "图片验证码为空"
 
     if not captcha_0 or not captcha_1:
         return False, u"请输入验证码"

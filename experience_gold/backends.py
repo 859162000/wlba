@@ -18,6 +18,8 @@ from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortizat
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 # from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
+from order.utils import OrderHelper
+from wanglibao_margin.marginkeeper import MarginKeeper
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +47,7 @@ class ExperienceBuyAPIView(APIView):
             return Response({'ret_code': 30001, 'message': u'体验标有误,请重试'})
 
         total_amount = 0
+        total_amount_tmp = 0
 
         # 查询用户符合条件的理财金记录
         with transaction.atomic(savepoint=True):
@@ -68,6 +71,12 @@ class ExperienceBuyAPIView(APIView):
 
             records_ids = ''
             if experience_record:
+                for i in experience_record:
+                    total_amount_tmp += i.event.amount
+
+                if total_amount_tmp < 28888 and user.margin.margin < 1:
+                    return Response({'ret_code': 30003, 'message': u'账户余额不足,请先充值'})
+
                 for record in experience_record:
                     event = record.event
                     total_amount += event.amount
@@ -97,6 +106,14 @@ class ExperienceBuyAPIView(APIView):
                     amortization.term_date = term[6] - timedelta(days=1)
 
                     amortization.save()
+
+                # 从账户中扣除 1 元
+                if total_amount >= 28888:
+                    amount = 1.00
+                    catalog = u'购买体验标'
+                    order_id = OrderHelper.place_order(user, order_type=catalog, status=u'新建').id
+                    margin_keeper = MarginKeeper(user=user, order_id=order_id)
+                    margin_keeper.reduce_margin_common(amount, catalog=catalog, description=catalog)
 
                 # 更新当前的一组流水id
                 purchase_lock_record.purchase_times += 1

@@ -45,8 +45,8 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
 
 
     //倒计时
-    if($('.recommend_time').lenght > 0){
-         var
+    if($('.recommend_time').lenght > 0) {
+        var
             time = $('.recommend_time').attr('data-update'),
             endTime = new Date(time.replace(/-/g, "/"));
         $('.recommend_time').countdown(endTime);
