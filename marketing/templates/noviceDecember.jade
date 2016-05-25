@@ -8,8 +8,19 @@ html
         - endwith
         link(rel="stylesheet",href="/static/stylesheets/noviceDecember.css?v=2016032901")
         - csrf_token
+        script.
+          function getQueryStringByName(name) {
+            var result = location.search.match(new RegExp('[\?\&]' + name + '=([^\&]+)', 'i'));
+            if (result == null || result.length < 1) {
+              return '';
+            }
+            return result[1];
+          }
+          getQueryStringByName('promo_token') == 'baidupz' ? window.location.href='http://www.wanglibao.com?promo_token=baidupz' : ''
+
     body(style="background:#fff2d5")
         include global/g_nav
+
 
         #body_wrap
            .banner_1
