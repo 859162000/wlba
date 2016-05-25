@@ -226,6 +226,23 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
+    # 从账户余额中扣钱,同时扣除充值未投资的金额
+    def reduce_margin_common(self, amount, catalog=u'购买体验标', description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            if amount > margin.margin:
+                logger.debug('扣款失败:user id: {}, amount:{}'.format(self.user.id, amount))
+                return
+            margin.margin -= amount
+            # 交易时从充值未投资中扣除投资金额, 当充值未投资金额小于零时为置为 0
+            uninvested = margin.uninvested - amount  # 未投资金额 - 投资金额 = 未投资余额计算结果
+            margin.uninvested = uninvested if uninvested > 0 else Decimal('0.00')  # 未投资余额计算结果<0时,结果置0
+            margin.save()
+            record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
+
     def __tracer(self, catalog, amount, margin_current, description=u'', order_id=None):
         if not order_id:
             order_id = self.order_id
