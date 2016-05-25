@@ -1503,7 +1503,8 @@ class XiaoMeiRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == int(order_id):
+        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, True, True)
+        if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='小美到家兑换码', is_used=False).first()
                 if not reward:
@@ -1535,6 +1536,7 @@ class ZhongYingRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
+        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, True, True)
         if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
             for _index in xrange(2):
                 with transaction.atomic():
