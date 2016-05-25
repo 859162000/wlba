@@ -87,21 +87,41 @@ html
                         status = '立即投资'
                         statusClass = 'buy-btn-xl'
                       else
-                        status = re_product.display_status
+                        status = re_product['display_status']
                         statusClass = 'un-buy-btn-xl'
                       a(href="/p2p/detail/{{re_product.id}}/", class='{{statusClass}}') {{status}}
                       amount = re_product['total_amount'] - re_product['ordered_amount']
                       .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}元
               .ac-tg-bg
           elif res_type == 'experience'
-            .ex-ac-target.mg-t-sm.bg-d3(class=invest)
-              p 新手体验标
-              p app专享 {{re_product.total_amount}}元{{re_product.product_name}}
-              p 投资金额:{{re_product.cost_amount}}
-              p 年化收益:{{re_product.expected_earning_rate}}%
-              p 期限:{{re_product.period}}天
-              p
-                a(href="/activity/experience/detail/") 立即投资
+              .ex-ac-target.mg-t-sm.bg-d3.ac-targer-uninvest
+                  .ac-tg-head.span12
+                      h3.hd-name.fl 新手体验标
+                  .ac-tg-cont
+                    a(href='/activity/experience/detail/').font-m.t-d10.tg-pro-tit
+                        span.font-l
+                            em.app-icon
+                        |{{re_product.total_amount}}元{{re_product.product_name}}
+                  .ac-tg-row.clearfix
+                      .tg-list.profit-amount
+                        span.t-d5.font-xll {{re_product.cost_amount}}
+                          span.font-m 元
+                        .t-d7.tg-bt-text 投资金额
+
+                      .tg-list.profit-warp
+                        earning_rate = str(re_product['expected_earning_rate'])
+                        .t-d2.font-m.tc
+                          span.font-xll {{re_product.expected_earning_rate}}
+                          span %
+                        .t-d7.tg-bt-text.tc 年化收益
+                      .tg-list.profit-date
+                        span.t-d5.font-xll {{re_product.period}}
+                          span.font-m 天
+                        .t-d7.tg-bt-text 还款期限
+                      .fr.buy-warp
+                          span.buy-text-r
+                              a.buy-btn-x(href="/activity/experience/detail/") 立即投资
+                  .ac-tg-bg
         .ex-rt-cont
           .ex-dc.padding-l-r-sm
             .dc-head
