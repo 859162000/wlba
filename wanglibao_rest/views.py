@@ -133,8 +133,9 @@ class SendValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            if _type == 'geetest' and not self.validate_captcha(request):
-                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            if _type == 'geetest':
+                if not self.validate_captcha(request):
+                    return Response({'message': '极验验证失败', "type":"verified"}, status=403)
 
             else:
                 from wanglibao_account.forms import verify_captcha_enhance
@@ -213,8 +214,9 @@ class SendRegisterValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            if _type == 'geetest' and not self.validate_captcha(request):
-                return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+            if _type == 'geetest':
+                if not self.validate_captcha(request):
+                    return Response({'message': '极验验证失败', "type":"verified"}, status=403)
             else:
                 from wanglibao_account.forms import verify_captcha_enhance
                 # 没有输入图片验证码信息,不让其通过
