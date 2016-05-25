@@ -206,13 +206,33 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
             if user_type in [i for i, j in USER_TYPE]:
                 return user_type
 
+def verify_captcha_enhance(dic, keep=False):
+    #add  by yihen@20160525 增强型图片验证码 前端没有传入图片验证的相关信息,不再让其通过; 防刷
+    captcha_1 = dic.get('captcha_1', "")
+    captcha_0 = dic.get('captcha_0', "")
+    if not captcha_0 and not captcha_1:
+        return False, u"图片验证码为空"
+
+    if not captcha_0 or not captcha_1:
+        return False, u"请输入验证码"
+    record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
+    if not record:
+        return False, u"图片验证码错误"
+    # if captcha_1.lower() == record.challenge.lower():
+    if captcha_1.lower() == record.response.lower():
+        try:
+            if not keep: record.delete()
+        except:
+            pass
+        return True, ""
+    else:
+        return False, u"图片验证码错误"
 
 def verify_captcha(dic, keep=False):
     captcha_1 = dic.get('captcha_1', "")
     captcha_0 = dic.get('captcha_0', "")
     if not captcha_0 and not captcha_1:
-        #modified by yihen@20160525 前端没有传入图片验证的相关信息,不再让其通过; 防刷
-        return False, u"图片验证码为空"
+        return True, ""
 
     if not captcha_0 or not captcha_1:
         return False, u"请输入验证码"
