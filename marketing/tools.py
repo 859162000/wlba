@@ -45,7 +45,7 @@ logger = get_task_logger(__name__)
 
 
 @app.task
-def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False, product_balance_after=0):
+def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False, product_balance_after=0, ylb_period=0):
     # fix@chenweibi, add order_id
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
@@ -66,7 +66,8 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         "amount": amount,
         "product_id": product_id,
         "order_id": order_id,
-        "is_full": is_full
+        "is_full": is_full,
+        "ylb_period": 0
     }, queue='celery02')
     # fix@chenweibi, add order_id
     try:
