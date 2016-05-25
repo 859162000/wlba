@@ -235,8 +235,8 @@ class AppRepaymentAPIView(APIView):
                     'ret_code': 0,
                     'message': 'ok',
                     'amount': float(amount) + float(index_data['paidIncome']),
-                    'income_num': float(income_num) + float(index_data['yesterdayIncome']),
-                    'income_yesterday': float(income_yesterday)
+                    'income_num': float(income_num),
+                    'income_yesterday': float(income_yesterday) + float(index_data['yesterdayIncome'])
                 })
 
             else:
