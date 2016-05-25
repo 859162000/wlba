@@ -32,65 +32,117 @@ html
             +intro('icon-rocket', '好收益 低门槛', '累计发放收益1.4亿+', '100元起投')
             +intro('icon-safe', '风险控制', '抵押、质押或保证担保', '阳光保险承保账户资金安全')
             +intro('icon-authority', '专业权威', '华尔街精英金融团队', 'IT数据风控系统', '第三方专业征信')
-          for product in recommend_product
-            if product.category ==  "新手标"
+          res_type = recommend_product['res_type']
+          re_product = recommend_product['results'][0]
+          if res_type == 'p2p'
+            if re_product.category ==  "新手标"
               invest = 'ac-targer-uninvest'
             else
               invest = 'ac-targer-recommend'
             .ex-ac-target.mg-t-sm.bg-d3(class=invest)
               .ac-tg-head.span12
-                if product.category == "新手标"
+                if re_product.category == "新手标"
                   h3.hd-name.fl 新手专属标
                 else
                   h3.hd-name.fl 精选推荐
                 .hd-time.fr
-                  span.recommend_time(data-update='{{product.end_time}}')
+                  span.recommend_time(data-update='{{re_product.end_time}}')
               .ac-tg-cont
-                a(href='/p2p/detail/{{product.id}}/').font-m.t-d10.tg-pro-tit
-                    if product.is_app_exclusive
+                a(href='/p2p/detail/{{re_product.id}}/').font-m.t-d10.tg-pro-tit
+                    if re_product.is_app_exclusive
                         span.font-l
                             em.app-icon
-                    |{{product.short_name}}
+                    |{{re_product.short_name}}
                 .t-d7.ac-style
-                  span.mg-r-xl 合作机构：{{product.warrant_company}}
-                  span 还款方式：{{product.display_payback_method}}
+                  span.mg-r-xl 合作机构：{{re_product.warrant_company.name}}
+                  span 还款方式：{{re_product.display_payback_method}}
                 .product-progress-warp.clearfix
                   .product-progress.product-target-progress.progress-xl.fl
-                    percent = float(product.ordered_amount) / product.total_amount * 100
+                    percent = float(re_product['ordered_amount']) / re_product['total_amount'] * 100
                     .pro-container(style="width:{{percent | percentage}}")
                   .pdt-progress-percent.t-d7.fl {{percent | percentage}}
                 .ac-tg-row.clearfix
                   .tg-list.profit-amount
-                    total_amount = product.total_amount / 10000.0
+                    total_amount = re_product['total_amount'] / 10000.0
                     span.t-d5.font-xll {{total_amount}}
                       span.font-m 万
                     .t-d7.tg-bt-text 融资金额
 
                   .tg-list.profit-warp
-                    earning_rate = str(product.expected_earning_rate)
+                    earning_rate = str(re_product['expected_earning_rate'])
                     .t-d2.font-m.tc
                       span.font-xll {{earning_rate}}
-                      if product.activity
+                      if re_product.activity
                         span +
-                        span.font-xll {{product.activity.rule.percent_text}}
+                        span.font-xll {{re_product.activity.rule_amount_text}}
                       span %
                     .t-d7.tg-bt-text.tc 年化收益
                   .tg-list.profit-date
-                    span.t-d5.font-xll {{product.period}}
-                      span.font-m {{product.pay_method|period_unit}}
+                    span.t-d5.font-xll {{re_product.period}}
+                      span.font-m {{re_product.pay_method|period_unit}}
                     .t-d7.tg-bt-text 项目期限
                   .fr.buy-warp
                     span.buy-text-r
-                      if product.display_status == '抢购中'
+                      if re_product.display_status == '抢购中'
                         status = '立即投资'
                         statusClass = 'buy-btn-xl'
                       else
-                        status = product.display_status
+                        status = re_product.display_status
                         statusClass = 'un-buy-btn-xl'
-                      a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
-                      amount = product.total_amount - product.ordered_amount
+                      a(href="/p2p/detail/{{re_product.id}}/", class='{{statusClass}}') {{status}}
+                      amount = re_product['total_amount'] - re_product['ordered_amount']
                       .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}元
               .ac-tg-bg
+          elif res_type == 'experience'
+              //p 新手体验标
+              //p app专享 {{re_product.total_amount}}元{{re_product.product_name}}
+              //p 投资金额:{{re_product.cost_amount}}
+              //p 年化收益:{{re_product.expected_earning_rate}}%
+              //p 期限:{{re_product.period}}天
+              //p
+              //  a(href="/activity/experience/detail/") 立即投资
+              .ex-ac-target.mg-t-sm.bg-d3.ac-targer-uninvest
+                  .ac-tg-head.span12
+                      h3.hd-name.fl 新手体验标
+                  .ac-tg-cont
+                    a(href='/activity/experience/detail/').font-m.t-d10.tg-pro-tit
+                        span.font-l
+                            em.app-icon
+                        |{{re_product.total_amount}}元{{re_product.product_name}}
+                  .ac-tg-row.clearfix
+                      .tg-list.profit-amount
+                        span.t-d5.font-xll {{re_product.cost_amount}}
+                          span.font-m 万
+                        .t-d7.tg-bt-text 投资金额
+
+                      .tg-list.profit-warp
+                        earning_rate = str(re_product['expected_earning_rate'])
+                        .t-d2.font-m.tc
+                          span.font-xll {{re_product.expected_earning_rate}}
+                          span %
+                        .t-d7.tg-bt-text.tc 年化收益
+                      .tg-list.profit-date
+                        span.t-d5.font-xll {{re_product.period}}
+                          span.font-m 天
+                        .t-d7.tg-bt-text 还款期限
+                      .fr.buy-warp
+                          span.buy-text-r
+                              a.buy-btn-x(href="/activity/experience/detail/") 立即投资
+                  .ac-tg-bg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         .ex-rt-cont
           .ex-dc.padding-l-r-sm

@@ -2014,7 +2014,7 @@ class XunleiTreasureAPIView(APIView):
         """这个函数必须被不断重写
             三次摇奖必中两次，中将金额 分别为88(60%), 188(30%), 888(10%)
         """
-        rewards = ['幸运宝藏0.5加息券', '幸运宝藏0.8加息券']
+        rewards = ['幸运宝藏0.5%加息券', '幸运宝藏0.8%加息券']
         when_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
         for _index in xrange(3):
             if _index == when_dist_redpack:
@@ -2051,7 +2051,7 @@ class XunleiTreasureAPIView(APIView):
         return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
 
     def generate_newUser_reward_activity(self, user):
-        redpack_rewards = ['幸运宝藏1.0加息券', '幸运宝藏1.2加息券', '幸运宝藏1.5加息券']
+        redpack_rewards = ['幸运宝藏1.0%加息券', '幸运宝藏1.2%加息券', '幸运宝藏1.5%加息券']
         goldexp_rewards = ['幸运宝藏88元体验金', '幸运宝藏158元体验金','幸运宝藏588元体验金']
         no_dist_redpack = int(time.time())%3  # 随机生成发送红包的次数, 不要把第几次发奖写死，太傻
 
