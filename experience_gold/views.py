@@ -110,8 +110,6 @@ class ExperienceDetailView(TemplateView):
                 .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
             if experience_record.get('event__amount__sum'):
                 experience_amount = experience_record.get('event__amount__sum')
-            else:
-                experience_amount = experience_amount_default
         else:
             experience_amount = experience_amount_default
 

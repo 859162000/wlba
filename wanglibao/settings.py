@@ -190,7 +190,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
-        'HOST': '192.168.1.242',
+        # 'HOST': '192.168.1.242',
     }
 
 # Add by hb on 2016-04-19 for Deploy-Aplpha
@@ -552,8 +552,10 @@ LOGGING = {
     }
 }
 
+SESSION_COOKIE_DOMAIN = None
 # set session for PHP cross domain.
-SESSION_COOKIE_DOMAIN = '.wanglibao.com'
+if ENV == ENV_PRODUCTION:
+    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
