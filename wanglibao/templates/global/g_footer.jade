@@ -39,8 +39,7 @@
           .footer-ex
             .footer-kefu
               a.ft-kefu-text#kefu_link 在线客服
-              a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", target='_blank',style='display:none').ft-kefu-text#kefu_link_old 在线客服
-              span#kefu_switch(style='margin-left:10px; line-height:40px;border: 1px #fff solid; padding: 5px; cursor:pointer') 切换到老客服
+              //a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", target='_blank').ft-kefu-text#kefu_link_old 在线客服
             .ft-kefu-worktime 工作时间 9:00 - 20:00（法定节假日除外）
             .ft-kefu-phone-txt 客服服务热线：
             .ft-kefu-phone 4008-588-066
@@ -68,8 +67,8 @@
             document.getElementById('kx-mask').onclick = function(){
               document.getElementById("kx_verify_link").click()
             };
-          script(src='/static/src/pc/footer_kefu.js')
+          script(src='/static/src/pc/footer_kefu.js?v=2015052503')
           //在线客服启动
-          script(src="http://18612250386.udesk.cn/im_client/js/udeskApi.js")
-          //在心客服主动邀请客户功能
+          //script(src="http://18612250386.udesk.cn/im_client/js/udeskApi.js")
+          //在线客服主动邀请客户功能
 
