@@ -312,7 +312,7 @@ class YueLiBaoBuy(APIView):
                                                   'device_type': device['device_type']}, queue='celery_ylb')
 
             tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
-                                                   "device": device['device_type'], "order_id": trade_id,
+                                                   "device": device, "order_id": trade_id,
                                                    "product_id": product.id, "is_full": False,
                                                    "product_balance_after": 0, "ylb_period": period})
             try:
