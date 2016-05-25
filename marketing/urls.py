@@ -214,6 +214,7 @@ urlpatterns += patterns(
     url(r'^new_user_gift/$', TemplateView.as_view(template_name="new_user_gift.jade")),
     url(r'^app_open_day_review/$', HMDP2PListView.as_view(template_name="app_open_day_review.jade")),
     url(r'^dyh_open_day_review/$', HMDP2PListView.as_view(template_name="app_open_day_review.jade", p2p_list_url_name="weixin_p2p_list")),
+    url(r'^app_yuelibao_is_come/$', HMDP2PListView.as_view(template_name="app_yuelibao_is_come.jade", p2p_list_url_name="weixin_p2p_list")),
     url(r'^app_xunlei_welfare/$', TemplateView.as_view(template_name="app_xunlei_welfare.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
