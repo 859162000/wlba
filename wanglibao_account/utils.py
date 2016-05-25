@@ -138,6 +138,7 @@ def verify_id(name, id_number, user=None):
         raise NameError("The class_name[%s] specific backend of verify_id not implemented" % class_name)
 
     verify_result = None
+    message = "NON"
     id_number = str(id_number)
     id_number_len = len(id_number)
     if not(id_number_len == 15 or id_number_len == 18):
@@ -149,7 +150,6 @@ def verify_id(name, id_number, user=None):
     else:
         record, create = IdVerification.objects.get_or_create(id_number=id_number, name=name,
                                                               defaults={"description": u"NON"})
-        logger.info('==============================================user,record:%s, create:%s'%(record, create))
         if not create:
             if record.is_valid:
                 if settings.ENV == settings.ENV_PRODUCTION:
@@ -164,7 +164,6 @@ def verify_id(name, id_number, user=None):
                     return record, None
             else:
                 return record, None
-        logger.info('==============================================1')
         with transaction.atomic():
             record = IdVerification.objects.select_for_update().get(id=record.id)
             if record.is_valid or record.description not in (u'NON', u'该用户未满18周岁'):
@@ -185,20 +184,18 @@ def verify_id(name, id_number, user=None):
                         valid_v1_count = int(valid_v1_count)
                         if valid_v1_count <= 0:
                             logger.info(">>>>>>>>>>>>>user valid auto used v2 v1_count[%s]" % valid_v1_count)
-                            return ProductionIDVerifyV2BackEnd.verify(name, id_number)
+                            verify_result =  ProductionIDVerifyV2BackEnd.verify(name, id_number)
                         else:
                             redis._set(key, valid_v1_count - 1)
                             logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % (valid_v1_count - 1,))
-                            return ProductionIDVerifyBackEnd.verify(name, id_number)
+                            verify_result =  ProductionIDVerifyBackEnd.verify(name, id_number)
                     else:
                         redis._set(key, valid_v1_total)
                         logger.info(">>>>>>>>>>>>>user valid auto used v1 v1_count[%s]" % valid_v1_total)
                         verify_result = ProductionIDVerifyBackEnd.verify(name, id_number)
-                        logger.info('0000==============================================verify_result:::::%s'%verify_result)
                 else:
                     logger.info(">>>>>>>>>>>>>redis._is_invaild user valid auto used v2")
                     verify_result = ProductionIDVerifyV2BackEnd.verify(name, id_number)
-            logger.info('==============================================verify_result:::::%s'%verify_result)
             message = verify_result.get('description')
             # record = IdVerification()
             if user:
@@ -212,7 +209,6 @@ def verify_id(name, id_number, user=None):
                 if verify_result.get('id_photo'):
                     record.id_photo.save('%s.jpg' % id_number, verify_result.get('id_photo'), save=True)
             record.save()
-        print '==============================================message:::::%s'%message
         return record, message
 
 
