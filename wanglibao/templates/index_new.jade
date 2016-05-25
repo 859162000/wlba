@@ -129,21 +129,6 @@ html
                           span.buy-text-r
                               a.buy-btn-x(href="/activity/experience/detail/") 立即投资
                   .ac-tg-bg
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         .ex-rt-cont
           .ex-dc.padding-l-r-sm
             .dc-head
@@ -180,72 +165,210 @@ html
                 .span9.btn-text.bg-d7.font-s.t-d11 iPhone版下载
     //product start
     .i-mod-wrap.mg-t-sm
-      .i-mod-product.clearfix
-        p2ptype = [{'title': '短期灵活', 'period': '标的期限1-3个月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期稳健', 'period': '标的期限3-6个月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6个月及以上', 'class': 'p2p12', 'data': p2p_gt_six}]
-        p2ptype_i = enumerate(p2ptype)
-        for idx, type in p2ptype_i
-          .pdt-item
-            .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')
-              .font-ll.padding-l-sm {{type.title}}
-              .font-s.t-d12.padding-l-sm {{type.period}}
-              //if idx >= 1
-                .pdf-type-qmtj
-
-            product = enumerate(type['data'])
-            for index, p2p in product
-              .pdt-list
-                .pdt-warp.padding-t-l-r-sm
-                  a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.t-d10
-                    if p2p.category == "新手标"
-                      span.font-l
-                        em.new-user
-                        | {{p2p.name}}
-                    else
-                      if p2p.is_app_exclusive
-                          span.font-l
-                            em.app-icon
-                            | {{p2p.name}}
-                      else
-                        span.font-l {{p2p.name}}
-                  if index == 0
-                    .t-d7.clearfix
-                      .span5.es 合作机构: {{p2p.warrant_company}}
-                      .span7.es 还款方式: {{p2p.display_payback_method}}
-                    .pdt-progress-warp.clearfix
-                      .product-progress.progress-x.fl
-                        percent = float(p2p.ordered_amount) / p2p.total_amount * 100
-                        .pro-container(style="width:{{percent | percentage}}")
-                      .pdt-progress-percent.t-d7.fl {{percent | percentage}}
-                    total_amount = p2p.total_amount / 10000.0
-                    amount = p2p.total_amount - p2p.ordered_amount
-                    .t-d7.mg-b-s {{total_amount}}万元/￥{{amount | money_format_int}}元 可投
-                  .product-footer.clearfix
-                    .span5.font-s
-                      span.t-d11.font-s 年化
-                      earning_rate = str(p2p.expected_earning_rate)
-                      span.t-d2.font-m
-                        span.font-ll {{earning_rate}}
-                        if p2p.activity
-                          span +
-                          span.font-m {{p2p.activity.rule.percent_text}}
-                        span %
-                    .span3.ct.t-d11
-                      span.font-ll {{p2p.period}}
-                      span.font-s {{p2p.pay_method|period_unit}}
-                    .span4
-                      if p2p.display_status == '抢购中'
-                        statusP2P = '立即投资'
-                        statusClassP2P = 'buy-btn-x'
-                      else
-                        statusP2P = p2p.display_status
-                        statusClassP2P = 'un-buy-btn-x'
-                      a(href="/p2p/detail/{{p2p.id}}/",class='{{statusClassP2P}}') {{statusP2P}}
-                if type == 'progress'
-                  .product-line
-                else
-                  .product-line.mg-l-r-sm
+        .i-mod-product.clearfix
+            mixin projectTitle(sty, title, introduce, url, new)
+                .project-title-box
+                    a(href=url)
+                        i.project-type-icon(class=sty)
+                        span=title
+                    if new == 'new'
+                        em
+                    i.vertical-icon
+                    label=introduce
+            if month_data
+                +projectTitle('type-icon-1', '月利宝', '收益递增', '/ylb/monthly.php', 'new')
+                .g-plan-box.clearfix(tag=1)
+                    .slide-left(tag=1)
+                    .slide-right(tag=1)
+                    .project-boxs
+                        .project-box-c
+                            for month in month_data
+                                .g-plan-project.ylb-project
+                                    .g-plan-title
+                                        a(href="{{month.detail_url}}")
+                                            if  month.name == 'A'
+                                                letterS = 'a-icon'
+                                            elif month.name == 'B'
+                                                letterS = 'b-icon'
+                                            elif month.name == 'C'
+                                                letterS = 'c-icon'
+                                            elif month.name == 'D'
+                                                letterS = 'd-icon'
+                                            i.letter-icon(class=letterS)
+                                            span 月利宝{{month.name}}
+                                            label
+                                            span.short-name {{month.short_name}}
+                                    activity_rates = float(month['extra_rate'])
+                                    if activity_rates > 0
+                                        .increase-interest-box
+                                            label.increase-interest
+                                                span
+                                                | {{month.activity_name}} 已+{{month.extra_rate}}%
+                                    .percentage-box
+                                        if month.expected_earning_rate == month.rate_end
+                                            span {{month.expected_earning_rate}}
+                                        else
+                                            span {{month.expected_earning_rate}}~{{month.rate_end}}
+                                        label %
+                                    .time-money.clearfix
+                                        .time-left
+                                            p.p-top {{month.period}}个月
+                                            p.p-b 项目期限
+                                        .border-left
+                                        .money-right
+                                            jhje = float(month['total_amount'])
+                                            p.p-top {{ jhje | convert_to_10k}}元
+                                            p.p-b 计划金额
+                                    .progress-bar.clearfix
+                                        .progress-bar-box
+                                            .progress-bar-left
+                                                span(style='width:{{month.ordered_percent }}%')
+                                            ktjes = float(month['remain_amount'])
+                                            .available-amount 可投金额 {{ktjes | money_format_int}}元
+                                        .progress-bar-right {{month.ordered_percent}}%
+                                    .go-investment
+                                        if month.display_status == '已审核'
+                                            a(href="{{month.detail_url}}") 立即投资
+                                        else
+                                            a.disable-style(href="{{month.detail_url}}") 计划满额
+                    lengths = len(month_data)
+                    .page-boxs
+                        span.active
+                        if lengths > 3
+                            span
+                        if lengths > 6
+                            span
+            +projectTitle('type-icon-2', '散标', '选择多样', '/p2p/list/')
+            .g-plan-box.clearfix(tag=2)
+                .slide-left(tag=2)
+                .slide-right(tag=2)
+                .project-boxs
+                    .project-box-c
+                        for p2p, index in p2p_list
+                            .g-plan-project
+                                if p2p.category == "新手标"
+                                    .icons.new-user-icon
+                                else
+                                    if p2p.is_app_exclusive
+                                        .icons.app-share-new
+                                .g-plan-title
+                                    if p2p.types.name == '汽车贷' or p2p.types.name == '车贷'
+                                        i.card-icon
+                                    elif p2p.types.name == '房贷'
+                                        i.house-icon
+                                    elif p2p.types.name == '一般企业贷' or p2p.types.name == '珠宝贷' or p2p.types.name == '艺术品贷' or p2p.types.name == '红木贷'
+                                        i.qy-icon
+                                    elif p2p.types.name == '黄金标'
+                                        i.gold-icon
+                                    elif p2p.types.name == '过桥周转业务'
+                                        i.bank-icon
+                                    else
+                                        i.other-icon
+                                    a(href="/p2p/detail/{{p2p.id}}")
+                                        span.san-title {{p2p.name}}
+                                    if index == 0 or index == 3 or index == 6
+                                        em.short-term 短期
+                                    elif index == 1 or index == 4 or index == 7
+                                        em.metaphase 中期
+                                    elif index == 2 or index == 5 or index == 8
+                                        em.long-term 长期
+                                .mt40
+                                    total_amount = p2p.total_amount / 10000.0
+                                    amount = p2p.total_amount - p2p.ordered_amount
+                                    if p2p.activity.rule.percent_text > 0
+                                        .interest-more
+                                            label {{p2p.activity.name}}
+                                                span
+                                    .project-introduction
+                                        label 年化收益：
+                                        span.profit {{p2p.expected_earning_rate}}
+                                            i %
+                                            if p2p.activity.rule.percent_text > 0
+                                                | +{{p2p.activity.rule.percent_text}}
+                                                i %
+                                    .project-introduction
+                                        label 项目期限：
+                                        span {{p2p.period}}
+                                            i {{p2p.pay_method|period_unit}}
+                                    .project-introduction
+                                        label 融资金额：
+                                        span {{total_amount}}
+                                            i 万元
+                                .progress-bar.clearfix
+                                    percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                                    .progress-bar-box
+                                        .progress-bar-left
+                                            span(style='width:{{percent | percentage}}')
+                                        .available-amount 可投金额 {{amount | money_format_int}}元
+                                    .progress-bar-right {{percent | percentage}}
+                                .go-investment
+                                    if p2p.display_status == '抢购中'
+                                        a.min(href='/p2p/detail/{{p2p.id}}') 立即投资
+                                    else
+                                        a.min.disable-style(href='/p2p/detail/{{p2p.id}}') {{p2p.display_status}}
+                p2pLengths = len(p2p_list)
+                .page-boxs
+                    span.active
+                    if p2pLengths > 3
+                        span
+                    if p2pLengths > 6
+                        span
+            if assignment_data
+                +projectTitle('type-icon-3', '转让标', '灵活快捷', '/ylb/exchange.php', 'new')
+                .g-plan-box.clearfix(tag=3)
+                    .slide-left(tag=3)
+                    .slide-right(tag=3)
+                    .project-boxs
+                        .project-box-c
+                            for assignment in assignment_data
+                                .g-plan-project.zqzr-project
+                                    .g-plan-title
+                                        i.zrb-icon
+                                        a(href='{{assignment.detail_url}}')
+                                            span.san-title {{assignment.short_name}}
+                                        .transfer-boxs
+                                            i.transfer 转
+                                            .transfer-box 查看
+                                                a(href='/help/') 债权转让
+                                                | 规则
+                                    .time-money.transfer-info.clearfix
+                                        .time-left
+                                            p.p-top.num {{assignment.purchaser_year_interset}}
+                                                i %
+                                            p.p-b 年化收益
+                                        .border-left
+                                        .money-right
+                                            p.p-top
+                                                span {{assignment.remaining_time}}
+                                                i 天
+                                            p.p-b 剩余期限
+                                    .detail-info
+                                        p
+                                            label 原标年化：
+                                            span {{assignment.rate_end}}%
+                                        p
+                                            label 转让金额：
+                                            span {{assignment.principal_sale_amount}}元
+                                    .progress-bar.clearfix
+                                        .progress-bar-box
+                                            .progress-bar-left
+                                                span(style="width:{{assignment.ordered_percent}}%")
+                                            ktje = float(assignment['principal_left_amount'])
+                                            .available-amount 可投金额 {{ktje | money_format_int }}元
+                                        .progress-bar-right {{assignment.ordered_percent}}%
+                                    .go-investment
+                                        if assignment.display_status == '正在售卖'
+                                            a.min(href="{{assignment.detail_url}}") 立即投资
+                                        else
+                                            a.min.disable-style(href="{{assignment.detail_url}}") 转让完成
+                    assignmenLlengths = len(assignment_data)
+                    .page-boxs
+                        span.active
+                        if assignmenLlengths > 3
+                            span
+                        if assignmenLlengths > 6
+                            span
     //product end
-
     .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-news
         ul.clearfix
