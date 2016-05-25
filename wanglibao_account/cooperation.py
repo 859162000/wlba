@@ -160,7 +160,7 @@ def get_binding_time_for_coop(user_id):
         return None
 
 
-def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_wlb=False):
+def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
     p2p_record = None
     is_ylb_frist_p2p = False
     p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
@@ -173,7 +173,7 @@ def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_wlb=False):
                 if month_product_record.created_at < p2p_record.create_time:
                     p2p_record, p2p_records = month_product_record, month_product_records
                     is_ylb_frist_p2p = True
-                    if order_id and (not is_wlb or month_product_record.id != int(order_id)):
+                    if order_id and (not is_ylb or month_product_record.id != int(order_id)):
                         p2p_record = None
                     else:
                         atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'),
@@ -182,7 +182,7 @@ def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_wlb=False):
                         for p2p_record in p2p_records:
                             atr_to_atr_for_obj(atr_map, p2p_record)
             else:
-                if order_id and (is_wlb or p2p_record.order_id != int(order_id)):
+                if order_id and (is_ylb or p2p_record.order_id != int(order_id)):
                     p2p_record = None
         else:
             if order_id and p2p_record.order_id != int(order_id):
@@ -1958,7 +1958,7 @@ class XunleiVipRegister(CoopRegister):
                     (self.c_code, user.id, order_id))
 
         # 判断是否首次投资
-        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, self.get_or_ylb, is_wlb=True)
+        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, self.get_or_ylb, is_ylb=True)
         self.purchase_callback(user, p2p_record, p2p_records, order_id)
 
 
