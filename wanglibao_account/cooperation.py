@@ -1809,10 +1809,14 @@ class XunleiVipRegister(CoopRegister):
                         self.recharge_call_back(user, pay_info.order_id)
 
                     # 处理渠道用户投资回调补发
-                    p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time')
-                    first_p2p_record = p2p_records.first()
+                    first_p2p_record, p2p_records, _ = get_first_p2p_record(user,
+                                                                            order_id=None,
+                                                                            get_or_ylb=True,
+                                                                            is_ylb=True)
+
                     if first_p2p_record and int(first_p2p_record.amount) >= 1000:
-                        self.purchase_call_back(user, first_p2p_record.order_id)
+                        self.purchase_callback(user, first_p2p_record, p2p_records,
+                                               first_p2p_record.order_id)
 
                     # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
                     if self.activity_start_time <= timezone.now() <= self.activity_end_time:
