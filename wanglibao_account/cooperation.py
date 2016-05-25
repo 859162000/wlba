@@ -181,6 +181,9 @@ def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
                         p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
                         for p2p_record in p2p_records:
                             atr_to_atr_for_obj(atr_map, p2p_record)
+                else:
+                    if order_id and (is_ylb or p2p_record.order_id != int(order_id)):
+                        p2p_record = None
             else:
                 if order_id and (is_ylb or (p2p_record and p2p_record.order_id != int(order_id))):
                     p2p_record = None
