@@ -1413,13 +1413,15 @@ PHP_UNPAID_PRINCIPLE_BASE = '/ylb/py_interface.php?action=getPrincipal'
 PHP_INDEX_MONTH = '/ylb/finnal.php?method=projectPcpool'
 PHP_INDEX_ASSIGNMENT = '/ylb/finnal.php?method=listzqAll'
 # 月利宝首页展示 dev 地址
-PHP_INDEX_MONTH_DEV = 'https://wltest.wanglibao.com/ylb/finnal.php?method=projectPcpool'
-PHP_INDEX_ASSIGNMENT_DEV = 'https://wltest.wanglibao.com/ylb/finnal.php?method=listzqAll'
+PHP_INDEX_MONTH_DEV = 'http://192.168.20.248:8081/ylb/finnal.php?method=projectPcpool'
+PHP_INDEX_ASSIGNMENT_DEV = 'http://192.168.20.248:8081/ylb/finnal.php?method=listzqAll'
 
 # 月利宝 APP 端信息展示.    host + 地址
 PHP_APP_INDEX_DATA = '/ylb/api/python.php'
 PHP_APP_INDEX_DATA_DEV = 'http://zhangfu.dev.wanglibao.com/api/python.php'
 
+# 未登录时候 APP 端显示的 当月支付金额和条数.
+PHP_APP_INDEX_DATA_LOGOUT_URL = 'http://192.168.20.248:8081/api/python.php?action=projectRepayment'
 
 if ENV == ENV_PRODUCTION:
     PHP_UNPAID_PRINCIPLE = 'https://www.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
@@ -1429,6 +1431,8 @@ if ENV == ENV_PRODUCTION:
     PHP_INSIDE_MESSAGES_LIST = "http://10.172.164.154/message.php/message/list"
     PHP_INSIDE_MESSAGE_READ = 'http://10.172.164.154/message.php/message'
     PHP_INSIDE_MESSAGE_READ_ALL = 'http://10.172.164.154/message.php/message/0'
+    # 未登录时候 APP 端显示的 月利宝数据
+    PHP_APP_INDEX_DATA_LOGOUT_URL = 'http://192.168.20.248:8081/api/python.php?action=projectRepayment'
 
 # 渠道数据中心平台认证授权密钥
 CHANNEL_CENTER_OAUTH_KEY = 'd2xiOXMwZA'

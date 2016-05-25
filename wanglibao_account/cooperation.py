@@ -164,13 +164,13 @@ def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
     p2p_record = None
     is_ylb_frist_p2p = False
     p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-    if p2p_records.exists():
+    if p2p_records.exists() or get_or_ylb:
         p2p_record = p2p_records.order_by('create_time').first()
         if get_or_ylb:
             month_product_records = MonthProduct.objects.filter(user_id=user.id)
             if month_product_records.exists():
                 month_product_record = month_product_records.order_by('created_at').first()
-                if month_product_record.created_at < p2p_record.create_time:
+                if not p2p_record or (p2p_record and month_product_record.created_at < p2p_record.create_time):
                     p2p_record, p2p_records = month_product_record, month_product_records
                     is_ylb_frist_p2p = True
                     if order_id and (not is_ylb or month_product_record.id != int(order_id)):
@@ -181,11 +181,14 @@ def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
                         p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
                         for p2p_record in p2p_records:
                             atr_to_atr_for_obj(atr_map, p2p_record)
+                else:
+                    if order_id and (is_ylb or p2p_record.order_id != int(order_id)):
+                        p2p_record = None
             else:
-                if order_id and (is_ylb or p2p_record.order_id != int(order_id)):
+                if order_id and (is_ylb or (p2p_record and p2p_record.order_id != int(order_id))):
                     p2p_record = None
         else:
-            if order_id and p2p_record.order_id != int(order_id):
+            if order_id and p2p_record and p2p_record.order_id != int(order_id):
                 p2p_record = None
 
     return p2p_record, p2p_records, is_ylb_frist_p2p
