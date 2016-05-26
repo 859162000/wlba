@@ -56,7 +56,8 @@ def _deposit_record(user, pagesize, pagenum):
             "created_at": util.fmt_dt_normal(util.local_datetime(x.create_time)),
             "status": x.status,
             "channel": "APP",
-            "balance": x.user.margin.margin
+            "balance": x.user.margin.margin,
+            "error_message": x.error_message,
         }
         if x.channel and x.channel == "huifu":
             obj['channel'] = "PC"
