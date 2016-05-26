@@ -211,44 +211,41 @@ def get_first_p2p_record_hb_modify(user, order_id=None, get_or_ylb=False, is_ylb
     return order_is_first, p2p_record, first_is_ylb
 
 
-def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
-    p2p_record = None
-    is_ylb_frist_p2p = False
-    p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-    if p2p_records.exists() or get_or_ylb:
-        p2p_record = p2p_records.order_by('create_time').first()
-        if get_or_ylb:
-            month_product_records = MonthProduct.objects.filter(user_id=user.id)
-            if month_product_records.exists():
-                month_product_record = month_product_records.order_by('created_at').first()
-                if not p2p_record or (p2p_record and month_product_record.created_at < p2p_record.create_time):
-                    p2p_record, p2p_records = month_product_record, month_product_records
-                    is_ylb_frist_p2p = True
-                    if order_id and (not is_ylb or month_product_record.id != int(order_id)):
-                        p2p_record = None
-                    else:
-                        atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'),
-                                   ('id', 'order_id')]
-                        p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
-                        for p2p_record in p2p_records:
-                            atr_to_atr_for_obj(atr_map, p2p_record)
-                else:
-                    if order_id and (is_ylb or p2p_record.order_id != int(order_id)):
-                        p2p_record = None
-            else:
-                if order_id and (is_ylb or (p2p_record and p2p_record.order_id != int(order_id))):
-                    p2p_record = None
-        else:
-            if order_id and p2p_record and p2p_record.order_id != int(order_id):
-                p2p_record = None
+# def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
+#     p2p_record = None
+#     is_ylb_frist_p2p = False
+#     p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+#     if p2p_records.exists() or get_or_ylb:
+#         p2p_record = p2p_records.order_by('create_time').first()
+#         if get_or_ylb:
+#             month_product_records = MonthProduct.objects.filter(user_id=user.id)
+#             if month_product_records.exists():
+#                 month_product_record = month_product_records.order_by('created_at').first()
+#                 if not p2p_record or (p2p_record and month_product_record.created_at < p2p_record.create_time):
+#                     p2p_record, p2p_records = month_product_record, month_product_records
+#                     is_ylb_frist_p2p = True
+#                     if order_id and (not is_ylb or month_product_record.id != int(order_id)):
+#                         p2p_record = None
+#                     else:
+#                         atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'),
+#                                    ('id', 'order_id')]
+#                         p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
+#                         for p2p_record in p2p_records:
+#                             atr_to_atr_for_obj(atr_map, p2p_record)
+#                 else:
+#                     if order_id and (is_ylb or p2p_record.order_id != int(order_id)):
+#                         p2p_record = None
+#             else:
+#                 if order_id and (is_ylb or (p2p_record and p2p_record.order_id != int(order_id))):
+#                     p2p_record = None
+#         else:
+#             if order_id and p2p_record and p2p_record.order_id != int(order_id):
+#                 p2p_record = None
 
-    return p2p_record, p2p_records, is_ylb_frist_p2p
+    # return p2p_record, p2p_records, is_ylb_frist_p2p
 
 
-def get_first_purchase_record(user_id, get_or_ylb=False, start_at=None, end_at=None):
-    """获取用户首次投资（get_or_ylb=True可兼容月利宝）"""
-    is_ylb_frist_p2p = False
-    atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
+def get_first_p2p_record(user_id, start_at=None, end_at=None):
     if start_at and end_at:
         p2p_record = P2PRecord.objects.filter(user_id=user_id,
                                               catalog=u'申购',
@@ -259,22 +256,38 @@ def get_first_purchase_record(user_id, get_or_ylb=False, start_at=None, end_at=N
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购'
                                               ).order_by('create_time').first()
 
-    if get_or_ylb:
-        if start_at and end_at:
-            month_record = MonthProduct.objects.filter(user_id=user_id,
-                                                       trade_status='PAID',
-                                                       created_at__gte=start_at,
-                                                       created_at__lt=end_at
-                                                       ).order_by('created_at').first()
-        else:
-            month_record = MonthProduct.objects.filter(user_id=user_id,
-                                                       trade_status='PAID'
-                                                       ).order_by('created_at').first()
+    return p2p_record
 
-        if not p2p_record or (p2p_record and month_record.created_at < p2p_record.create_time):
+
+def get_first_month_record(user_id, start_at=None, end_at=None):
+    atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
+    if start_at and end_at:
+        month_record = MonthProduct.objects.filter(user_id=user_id,
+                                                   trade_status='PAID',
+                                                   created_at__gte=start_at,
+                                                   created_at__lt=end_at
+                                                   ).order_by('created_at').first()
+    else:
+        month_record = MonthProduct.objects.filter(user_id=user_id,
+                                                   trade_status='PAID'
+                                                   ).order_by('created_at').first()
+
+    # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
+    p2p_record = atr_to_atr_for_obj(atr_map, month_record) if month_record else month_record
+    return p2p_record
+
+
+def get_first_purchase_record(user_id, get_or_ylb=False, start_at=None, end_at=None):
+    """获取用户首次投资（get_or_ylb=True可兼容月利宝）"""
+    is_ylb_frist_p2p = False
+    p2p_record = get_first_p2p_record(user_id, start_at=None, end_at=None)
+
+    if get_or_ylb:
+        month_record = get_first_month_record(user_id, start_at=None, end_at=None)
+        if (not p2p_record and month_record) or \
+                (p2p_record and month_record and month_record.created_at < p2p_record.create_time):
             is_ylb_frist_p2p = True
-            # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
-            p2p_record = atr_to_atr_for_obj(atr_map, month_record)
+            p2p_record = month_record
 
     return p2p_record, is_ylb_frist_p2p
 
@@ -283,58 +296,33 @@ def is_first_purchase(user_id, order_id, get_or_ylb=False, is_ylb=False, start_a
     """判断用户首次投资（get_or_ylb=True可兼容月利宝,is_ylb=True表示从月利宝入口进入）"""
 
     p2p_record = None
-    is_ylb_frist_p2p = False
-    atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
+    is_ylb_first_p2p = False
     order_id = str(order_id)
 
     if not is_ylb:
-        if start_at and end_at:
-            p2p_record = P2PRecord.objects.filter(user_id=user_id,
-                                                  catalog=u'申购',
-                                                  create_time__gte=start_at,
-                                                  create_time__lt=end_at
-                                                  ).order_by('create_time').first()
-        else:
-            p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购'
-                                                  ).order_by('create_time').first()
+        p2p_record = get_first_p2p_record(user_id, start_at=None, end_at=None)
 
         if not p2p_record or (p2p_record and str(p2p_record.order_id) != order_id):
-            return None, is_ylb_frist_p2p
+            return None, is_ylb_first_p2p
 
-    if get_or_ylb:
-        if start_at and end_at:
-            month_record = MonthProduct.objects.filter(user_id=user_id,
-                                                       trade_status='PAID',
-                                                       created_at__gte=start_at,
-                                                       created_at__lt=end_at
-                                                       ).order_by('created_at').first()
-        else:
-            month_record = MonthProduct.objects.filter(user_id=user_id,
-                                                       trade_status='PAID'
-                                                       ).order_by('created_at').first()
+        if get_or_ylb:
+            month_record = get_first_month_record(user_id, start_at=None, end_at=None)
+            if month_record and month_record.created_at < p2p_record.create_time:
+                p2p_record = None
+    elif get_or_ylb:
+        month_record = get_first_month_record(user_id, start_at=None, end_at=None)
+        if not month_record or (month_record and str(month_record.id) != order_id):
+            return None, is_ylb_first_p2p
 
-        if month_record and is_ylb and str(month_record.id) != order_id:
-            return None, is_ylb_frist_p2p
+        p2p_record = get_first_p2p_record(user_id, start_at=None, end_at=None)
 
-        if p2p_record and month_record:
-            if month_record.created_at < p2p_record.create_time:
-                if is_ylb:
-                    is_ylb_frist_p2p = True
-                    # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
-                    p2p_record = atr_to_atr_for_obj(atr_map, month_record)
-            else:
-                p2p_record = None if is_ylb else p2p_record
-        elif p2p_record:
-            p2p_record = None if is_ylb else p2p_record
-        elif month_record:
-            if is_ylb:
-                is_ylb_frist_p2p = True
-                # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
-                p2p_record = atr_to_atr_for_obj(atr_map, month_record)
-        else:
+        if p2p_record and p2p_record.create_time < month_record.created_at:
             p2p_record = None
+        else:
+            p2p_record = month_record
+            is_ylb_first_p2p = True
 
-    return p2p_record, is_ylb_frist_p2p
+    return p2p_record, is_ylb_first_p2p
 
 
 #######################第三方用户注册#####################
