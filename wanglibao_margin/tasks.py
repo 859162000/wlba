@@ -81,7 +81,7 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                                     order_id=redpack_order_id, savepoint=False)
 
                     try:
-                        tools.decide_first.apply_async(kwargs={"user_id": user, "amount": amount_source,
+                        tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
                                                                "device": device, "order_id": product.id,
                                                                "product_id": product.id, "is_full": False,
                                                                "product_balance_after": 0, "ylb_period": int(period)},
@@ -93,25 +93,11 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                     # 模拟一个request
                     request = urllib2.Request("")
                     try:
-                        logger.info(u"=月利宝迅雷活动= CoopRegister.process_for_purchase : {}, {}".
+                        logger.info(u"=遍历渠道= CoopRegister.process_for_purchase : {}, {}".
                                      format(user, product.id))
                         CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
                     except Exception, e:
-                        logger.debug(u"=月利宝迅雷活动失败= CoopRegister.process_for_purchase Except:{}".format(e))
-
-                    try:
-                        logger.info(u"=月利宝小美到家= CoopRegister.process_for_purchase : {}, {}".
-                                     format(user, product.id))
-                        XiaoMeiRegister(request).purchase_call_back_yuelibao(user, product.id)
-                    except Exception, e:
-                        logger.debug(u"=月利宝小美到家失败= CoopRegister.process_for_purchase Except:{}".format(e))
-
-                    try:
-                        logger.info(u"=月利宝中影票务通= CoopRegister.process_for_purchase : {}, {}".
-                                     format(user, product.id))
-                        ZhongYingRegister(request).purchase_call_back_yuelibao(user, product.id)
-                    except Exception, e:
-                        logger.debug(u"=月利宝中影票务通失败= CoopRegister.process_for_purchase Except:{}".format(e))
+                        logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
 
             except Exception, e:
                 logger.debug('buy month product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
