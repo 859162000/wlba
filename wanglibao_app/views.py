@@ -223,7 +223,7 @@ class AppRepaymentAPIView(APIView):
                     if int(request.get_host().split(':')[1]) > 7000:
                         url = settings.PHP_APP_INDEX_DATA_DEV
                 except Exception, e:
-                    pass
+                    logger_yuelibao.debug(u'in AppRepaymentAPIView, 月利宝地址请求失败!!! exception = {}'.format(e.message))
 
                 try:
                     index_data = get_php_index_data(url, user.id)
@@ -255,7 +255,7 @@ class AppRepaymentAPIView(APIView):
                     'ret_code': 0,
                     'message': 'ok',
                     'amount': float(amount) + float(index_data['repaymentInfoCurrentMonth']),
-                    'income_num': len(ams) + index_data['getPaidProject'],
+                    'income_num': len(ams) + int(index_data['getPaidProject']),
                     'income_yesterday': float(income_yesterday)
                 })
         except Exception, e:

@@ -14,6 +14,8 @@ from models import Activity, ActivityRule, ActivityRecord
 from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
 # from wanglibao_redpack import backends as redpack_backends
+from wanglibao import settings
+from wanglibao_account.cooperation import get_first_p2p_record
 from wanglibao_margin.models import MonthProduct
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
@@ -30,6 +32,7 @@ from weixin.tasks import sentTemplate
 from wanglibao_reward.models import WanglibaoActivityReward, WanglibaoRewardJoinRecord
 
 logger = logging.getLogger(__name__)
+activity_logger = logging.getLogger('wanglibao_inside_messages')
 
 
 def get_reward_index(activity, probabilities):
@@ -151,6 +154,8 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
 def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full,
                          order_id, user_ib=None, is_first_bind_wx=False, ylb_period=0):
     """ check the trigger node """
+    if settings.ENV != settings.ENV_PRODUCTION:
+        activity_logger.info('in yuelibao activity check!!!, period = {}'.format(ylb_period))
     product_id = int(product_id)
     order_id = int(order_id)
     # 注册 或 实名认证
@@ -192,55 +197,61 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     # 首次购买
     elif trigger_node == 'first_buy':
         # WanglibaoRewardJoinRecord, 并判断散标和月利宝是不是 已经有了首投.
-        try:
-            join_record, _ = WanglibaoRewardJoinRecord.objects.get_or_create(
-                    user=user, activity_code='first_buy_{}'.format(rule.id), defaults={"remain_chance": 1})
-            if join_record.remain_chance < 1:
-                logger.error("Already idvalidate_ok, user_id = {}".format(user.id))
-                return
-            with transaction.atomic():
-                join_record = WanglibaoRewardJoinRecord.objects.select_for_update().get(id=join_record.id)
+        is_ylb = False
+        if ylb_period:
+            is_ylb = True
+        p2p_record, p2p_records, from_ylb = get_first_p2p_record(user, order_id=order_id, get_or_ylb=True, is_ylb=is_ylb)
+
+        if p2p_record:
+            try:
+                join_record, _ = WanglibaoRewardJoinRecord.objects.get_or_create(
+                        user=user, activity_code='first_buy_{}'.format(rule.id), defaults={"remain_chance": 1})
                 if join_record.remain_chance < 1:
                     logger.error("Already idvalidate_ok, user_id = {}".format(user.id))
                     return
-                join_record.remain_chance = 0
-                join_record.save()
-        except Exception, e:
-            logger.debug('in _check_rules_trigger, exception = {}'.format(e.message))
-            return
+                with transaction.atomic():
+                    join_record = WanglibaoRewardJoinRecord.objects.select_for_update().get(id=join_record.id)
+                    if join_record.remain_chance < 1:
+                        logger.error("Already idvalidate_ok, user_id = {}".format(user.id))
+                        return
+                    join_record.remain_chance = 0
+                    join_record.save()
+            except Exception, e:
+                logger.debug('in _check_rules_trigger, exception = {}'.format(e.message))
+                return
 
-        # 这里是老平台的散标逻辑!
-        if not ylb_period:
-            if rule.is_in_date:
-                first_buy = P2PRecord.objects.filter(user=user,
-                                                     create_time__gt=rule.activity.start_at
-                                                     ).order_by('create_time').first()
+            # 这里是老平台的散标逻辑!
+            if not ylb_period:
+                if rule.is_in_date:
+                    first_buy = P2PRecord.objects.filter(user=user,
+                                                         create_time__gt=rule.activity.start_at
+                                                         ).order_by('create_time').first()
+                else:
+                    first_buy = P2PRecord.objects.filter(user=user
+                                                         ).order_by('create_time').first()
+
+                if first_buy and int(first_buy.order_id) == int(order_id):
+                    # 判断当前购买产品id是否在活动设置的id中
+                    # 这是散标才有的
+                    if product_id and not ylb_period:
+                        is_product_type_period = _check_product_type_period(product_id, rule)
+                        if product_id > 0 and rule.activity.product_ids:
+                            is_product = _check_product_id(product_id, rule.activity.product_ids)
+                            if is_product and is_product_type_period:
+                                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+                        else:
+                            if is_product_type_period:
+                                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+
+            # 月利宝的购买记录在这里!!!
+            # 月利宝没排除那些标的类型. 比如哪些标有奖励, 月利宝统一都给奖励.
             else:
-                first_buy = P2PRecord.objects.filter(user=user
-                                                     ).order_by('create_time').first()
-
-            if first_buy and int(first_buy.order_id) == int(order_id):
-                # 判断当前购买产品id是否在活动设置的id中
-                # 这是散标才有的
-                if product_id and not ylb_period:
-                    is_product_type_period = _check_product_type_period(product_id, rule)
-                    if product_id > 0 and rule.activity.product_ids:
-                        is_product = _check_product_id(product_id, rule.activity.product_ids)
-                        if is_product and is_product_type_period:
-                            _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-                    else:
-                        if is_product_type_period:
-                            _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-
-        # 月利宝的购买记录在这里!!!
-        # 月利宝没排除那些标的类型. 比如哪些标有奖励, 月利宝统一都给奖励.
-        else:
-            if rule.activity.product_cats == 'all':
-                first_buy = MonthProduct.objects.filter(user=user).order_by('created_at').first()
-                if first_buy and int(first_buy.trade_id) == int(order_id):
-                    # 符合首投, 而且月利宝的周期符合
-                    if _ylb_gift_period(rule, ylb_period):
-                        _send_gift(user, rule, device_type, is_full, amount=0)
+                if rule.activity.product_cats == 'all':
+                    first_buy = MonthProduct.objects.filter(user=user).order_by('created_at').first()
+                    if first_buy and int(first_buy.trade_id) == int(order_id):
+                        # 符合首投, 而且月利宝的周期符合
+                        if _ylb_gift_period(rule, ylb_period):
+                            _send_gift(user, rule, device_type, is_full, amount=0)
 
     # 购买
     elif trigger_node == 'buy':

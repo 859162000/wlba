@@ -1288,10 +1288,10 @@ class WeixinAccountHome(TemplateView):
             'p2p_freeze': p2p_freeze,  # P2P投资中冻结金额
             'p2p_withdrawing': p2p_withdrawing,  # P2P提现中冻结金额
             'p2p_unpayed_principle': p2p_unpayed_principle,  # P2P待收本金
-            'p2p_total_unpaid_interest': p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest +
-                                         float(index_data['unPaidIncome']),  # p2p总待收益
+            'p2p_total_unpaid_interest': p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest + Decimal(index_data['unPaidIncome']),  # p2p总待收益
+                                         index_data['unPaidIncome'],  # p2p总待收益
             'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest +
-                                       p2p_total_paid_coupon_interest + float(index_data['paidIncome']),  # P2P总累积收益
+                                       p2p_total_paid_coupon_interest + Decimal(index_data['paidIncome']),  # P2P总累积收益
             'p2p_total_interest': p2p_total_interest + p2p_total_coupon_interest,  # P2P总收益
             'banner': banner,
         }
