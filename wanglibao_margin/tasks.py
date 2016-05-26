@@ -63,11 +63,12 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                                token=token,
                                msg='success')
 
+                    user = User.objects.filter(pk=user).first()
+
                     # 如果使用红包的话, 增加红包使用记录
                     if red_packet_id and int(red_packet_id) > 0:
                         logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
                         redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
-                        user = User.objects.filter(pk=user).first()
                         redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
                                                                    product_id=product.product_id, status=u'新建').id
                         result = php_redpack_consume(red_packet_id, amount_source, user, product.id,
@@ -79,29 +80,35 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                                     result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
                                     order_id=redpack_order_id, savepoint=False)
 
-                    tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
-                                                           "device": device, "order_id": product.id,
-                                                           "product_id": product.id, "is_full": False,
-                                                           "product_balance_after": 0, "ylb_period": period})
+                    try:
+                        tools.decide_first.apply_async(kwargs={"user_id": user, "amount": amount_source,
+                                                               "device": device, "order_id": product.id,
+                                                               "product_id": product.id, "is_full": False,
+                                                               "product_balance_after": 0, "ylb_period": int(period)},
+                                                       queue='celery_ylb')
+
+                    except Exception, e:
+                        logger.debug('tools.decide_first.apply_async failed with = {} !!!'.format(e.message))
+
                     # 模拟一个request
                     request = urllib2.Request("")
                     try:
                         logger.info(u"=月利宝迅雷活动= CoopRegister.process_for_purchase : {}, {}".
-                                     format(user.id, product.id))
+                                     format(user, product.id))
                         CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
                     except Exception, e:
                         logger.debug(u"=月利宝迅雷活动失败= CoopRegister.process_for_purchase Except:{}".format(e))
 
                     try:
                         logger.info(u"=月利宝小美到家= CoopRegister.process_for_purchase : {}, {}".
-                                     format(user.id, product.id))
+                                     format(user, product.id))
                         XiaoMeiRegister(request).purchase_call_back_yuelibao(user, product.id)
                     except Exception, e:
                         logger.debug(u"=月利宝小美到家失败= CoopRegister.process_for_purchase Except:{}".format(e))
 
                     try:
                         logger.info(u"=月利宝中影票务通= CoopRegister.process_for_purchase : {}, {}".
-                                     format(user.id, product.id))
+                                     format(user, product.id))
                         ZhongYingRegister(request).purchase_call_back_yuelibao(user, product.id)
                     except Exception, e:
                         logger.debug(u"=月利宝中影票务通失败= CoopRegister.process_for_purchase Except:{}".format(e))
