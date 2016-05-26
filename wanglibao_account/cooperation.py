@@ -1646,10 +1646,9 @@ class XiaoMeiRegister(CoopRegister):
         self.request = request
 
     def purchase_call_back(self, user, order_id):
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
-
         # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
+        if p2p_record and not is_ylb_frist_p2p and p2p_record.amount >= 3000:
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='小美到家兑换码', is_used=False).first()
                 if not reward:
@@ -1668,9 +1667,9 @@ class XiaoMeiRegister(CoopRegister):
                 reward.save()
 
     def purchase_call_back_yuelibao(self, user, order_id):
-        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, True, True)
         # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True, is_ylb=True)
+        if p2p_record and is_ylb_frist_p2p and p2p_record.amount >= 3000:
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='小美到家兑换码', is_used=False).first()
                 if not reward:
@@ -1700,8 +1699,8 @@ class ZhongYingRegister(CoopRegister):
 
     def purchase_call_back_yuelibao(self, user, order_id):
         # 判断是否首次投资
-        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, True, True)
-        if p2p_record and p2p_record.order_id == int(order_id) and p2p_record.amount>=3000:
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True, is_ylb=True)
+        if p2p_record and is_ylb_frist_p2p and p2p_record.amount >= 3000:
             for _index in xrange(2):
                 with transaction.atomic():
                     reward = Reward.objects.select_for_update().filter(type='中影票务通兑换码', is_used=False).first()
@@ -1951,20 +1950,17 @@ class XunleiVipRegister(CoopRegister):
                     if pay_info and int(pay_info.amount) >= 100:
                         self.recharge_call_back(user, pay_info.order_id)
 
-                    # 处理渠道用户投资回调补发
-                    first_p2p_record, p2p_records, _ = get_first_p2p_record(user,
-                                                                            order_id=None,
-                                                                            get_or_ylb=True,
-                                                                            is_ylb=True)
-
+                    # 处理渠道用户首次投资回调补发
+                    first_p2p_record, is_ylb_frist_p2p = get_first_purchase_record(user.id, get_or_ylb=True)
                     if first_p2p_record and int(first_p2p_record.amount) >= 1000:
-                        self.purchase_callback(user, first_p2p_record, p2p_records,
-                                               first_p2p_record.order_id)
+                        self.purchase_callback(user, first_p2p_record, first_p2p_record.order_id)
 
-                    # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
+                    # 处理迅雷用户参加勋章活动期间内, 用户复投资上报补发
                     if self.activity_start_time <= timezone.now() <= self.activity_end_time:
-                        p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
-                                                         Q(create_time__lte=self.activity_end_time))
+                        p2p_records = P2PRecord.objects.filter(user=user,
+                                                               catalog=u'申购',
+                                                               create_time__gte=self.activity_start_time,
+                                                               create_time__lte=self.activity_end_time)
                         for p2p_record in p2p_records:
                             if p2p_record.id != first_p2p_record.id:
                                 self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
@@ -2064,10 +2060,10 @@ class XunleiVipRegister(CoopRegister):
                         "mtype": "activity"
                     })
 
-    def purchase_callback(self, user, p2p_record, p2p_records, order_id):
+    def purchase_callback(self, user, p2p_record, order_id):
         binding = Binding.objects.filter(user_id=user.id).first()
         if p2p_record:
-            # 判断投资金额是否大于100
+            # 判断投资金额是否大于1000
             pay_amount = int(p2p_record.amount)
             if pay_amount >= 1000:
                 # 判断用户是否绑定
@@ -2090,8 +2086,10 @@ class XunleiVipRegister(CoopRegister):
 
         # 根据迅雷勋章活动开始时间查询
         if self.activity_start_time <= timezone.now() <= self.activity_end_time:
-            p2p_records = p2p_records.filter(Q(create_time__gte=self.activity_start_time) &
-                                             Q(create_time__lte=self.activity_end_time))
+            p2p_records = P2PRecord.objects.filter(user=user,
+                                                   catalog=u'申购',
+                                                   create_time__gte=self.activity_start_time,
+                                                   create_time__lte=self.activity_end_time)
             p2p_record = p2p_records.filter(order_id=order_id).first()
             self.common_purchase_call_back(user, p2p_record, p2p_records, binding)
 
@@ -2099,8 +2097,9 @@ class XunleiVipRegister(CoopRegister):
         channel = get_user_channel_record(user)
         logger.info("%s-Enter purchase_call_back for [%s], [%s]" % (channel.code, user.id, order_id))
         # 判断是否首次投资
-        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, self.get_or_ylb)
-        self.purchase_callback(user, p2p_record, p2p_records, order_id)
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
+        if p2p_record and not is_ylb_frist_p2p:
+            self.purchase_callback(user, p2p_record, order_id)
  
     def common_purchase_call_back(self, user, p2p_record, p2p_records, binding):
         # 判断用户是否绑定
@@ -2151,8 +2150,9 @@ class XunleiVipRegister(CoopRegister):
                     (self.c_code, user.id, order_id))
 
         # 判断是否首次投资
-        p2p_record, p2p_records, is_ylb_frist_p2p = get_first_p2p_record(user, order_id, self.get_or_ylb, is_ylb=True)
-        self.purchase_callback(user, p2p_record, p2p_records, order_id)
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True, is_ylb=True)
+        if p2p_record and is_ylb_frist_p2p:
+            self.purchase_callback(user, p2p_record, order_id)
 
 
 class XunleiMobileRegister(XunleiVipRegister):

@@ -15,7 +15,7 @@ from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
 # from wanglibao_redpack import backends as redpack_backends
 from wanglibao import settings
-from wanglibao_account.cooperation import get_first_p2p_record
+from wanglibao_account.cooperation import is_first_purchase
 from wanglibao_margin.models import MonthProduct
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
@@ -200,9 +200,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         is_ylb = False
         if ylb_period:
             is_ylb = True
-        p2p_record, p2p_records, from_ylb = get_first_p2p_record(user, order_id=order_id, get_or_ylb=True, is_ylb=is_ylb)
 
-        if p2p_record:
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True, is_ylb=is_ylb)
+
+        if p2p_record and ((is_ylb and is_ylb_frist_p2p) or (not is_ylb and not is_ylb_frist_p2p)):
             try:
                 join_record, _ = WanglibaoRewardJoinRecord.objects.get_or_create(
                         user=user, activity_code='first_buy_{}'.format(rule.id), defaults={"remain_chance": 1})
