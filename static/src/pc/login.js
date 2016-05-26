@@ -399,9 +399,7 @@ require(['jquery','jquery.placeholder', 'csrf'], function( $ ,placeholder) {
     //-------------注册模块初始化-------------//
     registerInitFun = function(){
         //极验一次验证
-        //fastTestOne('regist')
-        $('.captcha-box1').show();
-        $('#check-tag').val('falses');
+        fastTestOne('regist')
        //密码type
         $('.pwdStatus').on('click',function(){
             var self = $(this);
