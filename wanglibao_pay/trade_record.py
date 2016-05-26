@@ -48,7 +48,7 @@ def detect(request):
 def _deposit_record(user, pagesize, pagenum):
     res = []
     records = PayInfo.objects.filter(user=user, type="D").select_related('user__margin')\
-                     .exclude(status=PayInfo.PROCESSING)[(pagenum-1)*pagesize:pagenum*pagesize]
+                     [(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
         obj = {
             "id": x.id,
