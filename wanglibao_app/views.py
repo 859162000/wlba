@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+from wanglibao_margin.php_utils import get_php_index_data, get_php_index_data_logout
 
 __author__ = 'zhanghe'
 
@@ -42,7 +43,7 @@ from wanglibao_sms.utils import send_validation_code
 # from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_anti.anti.anti import AntiForAllClient
-from wanglibao_account.forms import verify_captcha
+from wanglibao_account.forms import verify_captcha_enhance
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
 # from wanglibao_rest import utils
@@ -60,6 +61,8 @@ from wanglibao_redis.backend import redis_backend
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord
 
 logger = logging.getLogger(__name__)
+logger_yuelibao = logging.getLogger('wanglibao_margin')
+
 
 class AppActivateScoreImageAPIView(APIView):
     """
@@ -214,12 +217,26 @@ class AppRepaymentAPIView(APIView):
                 if income_yesterday_other.get('amount__sum'):
                     income_yesterday += income_yesterday_other.get('amount__sum')
 
+                # 增加从PHP项目来的 昨日收益, 累计收益, 待收收益
+                url = 'https://' + request.get_host() + settings.PHP_APP_INDEX_DATA
+                try:
+                    if int(request.get_host().split(':')[1]) > 7000:
+                        url = settings.PHP_APP_INDEX_DATA_DEV
+                except Exception, e:
+                    pass
+
+                try:
+                    index_data = get_php_index_data(url, user.id)
+                except Exception, e:
+                    index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
+                    logger_yuelibao.debug(u'in AppRepaymentAPIView, 月利宝地址请求失败!!! exception = {}'.format(e.message))
+
                 return Response({
                     'ret_code': 0,
                     'message': 'ok',
-                    'amount': float(amount),
+                    'amount': float(amount) + float(index_data['paidIncome']),
                     'income_num': float(income_num),
-                    'income_yesterday': float(income_yesterday)
+                    'income_yesterday': float(income_yesterday) + float(index_data['yesterdayIncome'])
                 })
 
             else:
@@ -230,11 +247,15 @@ class AppRepaymentAPIView(APIView):
                 ams = ProductAmortization.objects.filter(settlement_time__range=(start_utc, timezone.now()), settled=True)
                 for x in ams:
                     amount += x.principal + x.interest + x.penal_interest
+
+                # 增加 月利宝 产生的数据
+                index_data = get_php_index_data_logout(settings.PHP_APP_INDEX_DATA_LOGOUT_URL)
+
                 return Response({
                     'ret_code': 0,
                     'message': 'ok',
-                    'amount': float(amount),
-                    'income_num': len(ams),
+                    'amount': float(amount) + float(index_data['repaymentInfoCurrentMonth']),
+                    'income_num': len(ams) + index_data['getPaidProject'],
                     'income_yesterday': float(income_yesterday)
                 })
         except Exception, e:
@@ -636,7 +657,8 @@ class SendValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            # app端注册,没有输入图片验证码信息,不让其通过
+            res, message = verify_captcha_enhance(request.POST)
         if not res:
             return Response({"ret_code": 40044, "message": message})
 

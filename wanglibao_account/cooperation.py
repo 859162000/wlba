@@ -160,6 +160,57 @@ def get_binding_time_for_coop(user_id):
         return None
 
 
+def get_first_p2p_record_hb_modify(user, order_id=None, get_or_ylb=False, is_ylb=False):
+    order_is_first = False
+    p2p_record = None
+    first_is_ylb = None
+
+    atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
+
+    if order_id:
+        try:
+            order_id = int(order_id)
+        except:
+            logger.exception("Invalid order_id [%s]" % (order_id))
+            return False, None, None
+    else:
+        order_id = 0
+
+    if not is_ylb:
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+        if p2p_record and p2p_record.order_id==order_id:
+            order_is_first = True
+            first_is_ylb = False
+        if get_or_ylb:
+            month_product_record = MonthProduct.objects.filter(user_id=user.id, trade_status='PAID').order_by('created_at').first()
+            if month_product_record:
+                if not p2p_record or month_product_record.created_at < p2p_record.create_time:
+                    order_is_first = False
+                    if order_id==0:
+                        p2p_record = atr_to_atr_for_obj(atr_map, month_product_record)
+                        first_is_ylb = True
+    else:
+        month_product_record = MonthProduct.objects.filter(user_id=user.id, trade_status='PAID').order_by('created_at').first()
+        if (month_product_record and month_product_record.id==order_id) or order_id==0:
+            p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+            if p2p_record and p2p_record.create_time < month_product_record.created_at:
+                order_is_first = False
+                first_is_ylb = True
+                if order_id<>0:
+                    p2p_record = None
+                    first_is_ylb = None
+            elif month_product_record:
+                p2p_record = atr_to_atr_for_obj(atr_map, month_product_record)
+                first_is_ylb = True
+                if month_product_record.id==order_id:
+                    order_is_first = True
+                elif order_id!=0:
+                    p2p_record = None
+                    first_is_ylb = None
+
+    return order_is_first, p2p_record, first_is_ylb
+
+
 def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
     p2p_record = None
     is_ylb_frist_p2p = False
@@ -181,6 +232,9 @@ def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
                         p2p_record = atr_to_atr_for_obj(atr_map, p2p_record)
                         for p2p_record in p2p_records:
                             atr_to_atr_for_obj(atr_map, p2p_record)
+                else:
+                    if order_id and (is_ylb or p2p_record.order_id != int(order_id)):
+                        p2p_record = None
             else:
                 if order_id and (is_ylb or (p2p_record and p2p_record.order_id != int(order_id))):
                     p2p_record = None
@@ -1806,10 +1860,14 @@ class XunleiVipRegister(CoopRegister):
                         self.recharge_call_back(user, pay_info.order_id)
 
                     # 处理渠道用户投资回调补发
-                    p2p_records = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time')
-                    first_p2p_record = p2p_records.first()
+                    first_p2p_record, p2p_records, _ = get_first_p2p_record(user,
+                                                                            order_id=None,
+                                                                            get_or_ylb=True,
+                                                                            is_ylb=True)
+
                     if first_p2p_record and int(first_p2p_record.amount) >= 1000:
-                        self.purchase_call_back(user, first_p2p_record.order_id)
+                        self.purchase_callback(user, first_p2p_record, p2p_records,
+                                               first_p2p_record.order_id)
 
                     # 根据迅雷勋章活动开始时间查询, 处理渠道用户每次投资上报回调补发
                     if self.activity_start_time <= timezone.now() <= self.activity_end_time:
