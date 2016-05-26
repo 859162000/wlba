@@ -37,11 +37,12 @@ def check_activity_task(user_id, trigger_node, device_type, **kwargs):
         order_id = kwargs.get('order_id', 0)
         is_full = kwargs.get('is_full', False)
         is_first_bind = kwargs.get('is_first_bind', False)
+        ylb_period = kwargs.get('ylb_period', 0)
 
         try:
             from wanglibao_activity.backends import check_activity
             check_activity(user_res, trigger_node, device_type, amount=amount, product_id=product_id, order_id=order_id,
-                           is_full=is_full, is_first_bind=is_first_bind)
+                           is_full=is_full, is_first_bind=is_first_bind, ylb_period=ylb_period)
         except Exception:
             logger.exception(">>>>> check activity err")
             logger.debug(">>>>> err_date:[{}], user:[{}], trigger_node:[{}], device_type:[{}], "
