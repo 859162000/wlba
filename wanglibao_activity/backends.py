@@ -15,7 +15,7 @@ from marketing import helper
 from marketing.models import IntroducedBy, Reward, RewardRecord
 # from wanglibao_redpack import backends as redpack_backends
 from wanglibao import settings
-from wanglibao_account.cooperation import is_first_purchase
+from wanglibao_account.cooperation import get_first_p2p_record, is_first_purchase
 from wanglibao_margin.models import MonthProduct
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
@@ -111,19 +111,16 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
-            if settings.ENV == settings.ENV_DEV:
-                yuelibao_logger.info('in activity! id = {}, name = {}, description = {},'.format(
-                        activity.id, activity.name, activity.description))
 
             # if False and activity.is_lottery:
             #     handle_lottery_distribute(activity, trigger_node)
 
-            if activity.is_all_channel is False and trigger_node not in ('p2p_audit', 'repaid'):
-                if activity.channel != "":
-                    channel_list = activity.channel.split(",")
-                    channel_list = [ch for ch in channel_list if ch.strip() != ""]
-                    if channel not in channel_list:
-                        continue
+            # if activity.is_all_channel is False and trigger_node not in ('p2p_audit', 'repaid'):
+            #     if activity.channel != "":
+            #         channel_list = activity.channel.split(",")
+            #         channel_list = [ch for ch in channel_list if ch.strip() != ""]
+            #         if channel not in channel_list:
+            #             continue
             # 查询活动规则
             if trigger_node == 'invest':
                 activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True)\
@@ -136,30 +133,42 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                                                              is_used=True).order_by('-id')
 
             # activity_rules = activity_rules.exclude(activity__is_lottery=True)  等需要开放优化功能的时候，放开 add by yihen
-
+            if settings.ENV == settings.ENV_DEV:
+                yuelibao_logger.info('in activity!!!!! activity_rules = {},'.format(activity_rules))
             if activity_rules:
                 for rule in activity_rules:
                     # 邀请好友时才启用
-                    if rule.is_introduced:
-                        user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
-                        if user_ib:
-                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id,
-                                                 is_full, order_id, user_ib, is_first_bind_wx=is_first_bind,
-                                                 ylb_period=ylb_period)
+                    if not ylb_period:
+                        if rule.is_introduced:
+                            user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+                            if user_ib and not ylb_period:
+                                _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id,
+                                                     is_full, order_id, user_ib, is_first_bind_wx=is_first_bind)
+                        else:
+                            if not ylb_period:
+                                _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id,
+                                                     is_full, order_id, is_first_bind_wx=is_first_bind,)
+
                     else:
-                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full,
-                                             order_id, is_first_bind_wx=is_first_bind, ylb_period=ylb_period)
+                        if rule.is_introduced:
+                            user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+                            if user_ib:
+                                _check_rules_trigger_for_ylb(
+                                        user, rule, rule.trigger_node, device_type, amount, product_id,
+                                        is_full, order_id, is_first_bind_wx=is_first_bind, ylb_period=ylb_period)
+                        else:
+                            _check_rules_trigger_for_ylb(
+                                user, rule, rule.trigger_node, device_type, amount, product_id,
+                                is_full, order_id, is_first_bind_wx=is_first_bind, ylb_period=ylb_period)
+
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full,
-                         order_id, user_ib=None, is_first_bind_wx=False, ylb_period=0):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None, is_first_bind_wx=False):
     """ check the trigger node """
-    if settings.ENV != settings.ENV_PRODUCTION:
-        yuelibao_logger.info('in yuelibao activity check!!!, period = {}'.format(ylb_period))
     product_id = int(product_id)
     order_id = int(order_id)
     # 注册 或 实名认证
@@ -200,67 +209,20 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         _check_trade_amount(user, rule, device_type, amount, is_full)
     # 首次购买
     elif trigger_node == 'first_buy':
-        # WanglibaoRewardJoinRecord, 并判断散标和月利宝是不是 已经有了首投.
-        is_ylb = False
-        if ylb_period:
-            is_ylb = True
+        # check first pay
+        if rule.is_in_date:
 
-        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True, is_ylb=is_ylb)
+            first_buy, is_ylb_first_p2p = is_first_purchase(
+                    user.id, order_id=order_id, get_or_ylb=True, is_ylb=False,
+                    start_at=rule.activity.start_at, end_at=rule.activity.end_at)
+        else:
+            first_buy, is_ylb_first_p2p = is_first_purchase(user.id, order_id=order_id, get_or_ylb=True, is_ylb=False)
 
-        if p2p_record and ((is_ylb and is_ylb_frist_p2p) or (not is_ylb and not is_ylb_frist_p2p)):
-            try:
-                join_record, _ = WanglibaoRewardJoinRecord.objects.get_or_create(
-                        user=user, activity_code='first_buy_{}'.format(rule.id), defaults={"remain_chance": 1})
-                if join_record.remain_chance < 1:
-                    logger.error("Already idvalidate_ok, user_id = {}".format(user.id))
-                    return
-                with transaction.atomic():
-                    join_record = WanglibaoRewardJoinRecord.objects.select_for_update().get(id=join_record.id)
-                    if join_record.remain_chance < 1:
-                        logger.error("Already idvalidate_ok, user_id = {}".format(user.id))
-                        return
-                    join_record.remain_chance = 0
-                    join_record.save()
-            except Exception, e:
-                logger.debug('in _check_rules_trigger, exception = {}'.format(e.message))
-                return
-
-            # 这里是老平台的散标逻辑!
-            if not ylb_period:
-                if rule.is_in_date:
-                    first_buy = P2PRecord.objects.filter(user=user,
-                                                         create_time__gt=rule.activity.start_at
-                                                         ).order_by('create_time').first()
-                else:
-                    first_buy = P2PRecord.objects.filter(user=user
-                                                         ).order_by('create_time').first()
-
-                if first_buy and int(first_buy.order_id) == int(order_id):
-                    # 判断当前购买产品id是否在活动设置的id中
-                    # 这是散标才有的
-                    if product_id and not ylb_period:
-                        is_product_type_period = _check_product_type_period(product_id, rule)
-                        if product_id > 0 and rule.activity.product_ids:
-                            is_product = _check_product_id(product_id, rule.activity.product_ids)
-                            if is_product and is_product_type_period:
-                                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-                        else:
-                            if is_product_type_period:
-                                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-
-            # 月利宝的购买记录在这里!!!
-            # 月利宝没排除那些标的类型. 比如哪些标有奖励, 月利宝统一都给奖励.
-            else:
-                if rule.activity.product_cats == 'all':
-                    first_buy = MonthProduct.objects.filter(user=user).order_by('created_at').first()
-                    if first_buy and int(first_buy.trade_id) == int(order_id):
-                        # 符合首投, 而且月利宝的周期符合
-                        if _ylb_gift_period(rule, ylb_period):
-                            _send_gift(user, rule, device_type, is_full, amount=0)
-
-    # 购买
-    elif trigger_node == 'buy':
-        if product_id and not ylb_period:
+        if first_buy and int(first_buy.order_id) == int(order_id):
+            # Add by hb only for debug
+            if first_buy.order_id != order_id:
+                logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % (first_buy.order_id, type(first_buy.order_id), order_id, type(order_id)))
+            # 判断当前购买产品id是否在活动设置的id中
             is_product_type_period = _check_product_type_period(product_id, rule)
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -269,16 +231,24 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             else:
                 if is_product_type_period:
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-        if ylb_period and rule.activity.product_cats == 'all':
-            if _ylb_gift_period(rule, ylb_period):
-                _send_gift(user, rule, device_type, is_full, amount=0)
+
+    # 购买
+    elif trigger_node == 'buy':
+        is_product_type_period = _check_product_type_period(product_id, rule)
+        if product_id > 0 and rule.activity.product_ids:
+            is_product = _check_product_id(product_id, rule.activity.product_ids)
+            if is_product and is_product_type_period:
+                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+        else:
+            if is_product_type_period:
+                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
     # 满标审核
 
     # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
 
     elif trigger_node == 'p2p_audit':
         # 根据product_id查询出该产品中所有的持仓用户,因为持仓确认是通过任务定时执行的,因此此处不查询confirm=True
-        if product_id > 0 and not ylb_period:
+        if product_id > 0:
             if rule.activity.product_ids:
                 # 检查产品是否符合条件
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -297,15 +267,11 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                         is_amount = _check_amount(rule.min_amount, rule.max_amount, equity.equity)
                         if is_amount:
                             _send_gift(equity.user, rule, device_type, is_full, equity.equity)
-        # 满标审核, 需要在满标审核的时候发奖!
-        if ylb_period and rule.activity.product_cats == 'all':
-            if _ylb_gift_period(rule, ylb_period):
-                _send_gift(user, rule, device_type, is_full, amount=0)
     # 还款
 
     # 还款时,是给所有的持仓用户发放奖励,金额为还款本金
     elif trigger_node == 'repaid':
-        if product_id > 0 and not ylb_period:
+        if product_id > 0:
             if rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
                 if is_product:
@@ -317,10 +283,6 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                 is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
                 if is_amount:
                     _send_gift(user, rule, device_type, is_full, amount)
-        #
-        if ylb_period and rule.activity.product_cats == 'all':
-            if _ylb_gift_period(rule, ylb_period):
-                _send_gift(user, rule, device_type, is_full, amount=0)
     elif trigger_node == 'first_bind_weixin':
         if is_first_bind_wx:
             _send_gift(user, rule, device_type, is_full)
@@ -328,9 +290,54 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         return
 
 
-def _ylb_gift_period(rule, ylb_period):
+def _check_rules_trigger_for_ylb(user, rule, trigger_node, device_type, amount, product_id, is_full,
+                                 order_id, user_ib=None, is_first_bind_wx=False, ylb_period=0):
+    """ check the trigger node """
+
+    # 月利宝暂不支持: 限定P2P分类 or 启用满标累计投资 or 单标投资顺序
+    if rule.p2p_types or rule.is_total_invest or rule.ranking:
+        return
+
+    if settings.ENV != settings.ENV_PRODUCTION:
+        yuelibao_logger.info('in _check_rules_trigger_for_ylb check!!!, period = {}'.format(ylb_period))
+    order_id = int(order_id)
+
+    # 首次购买
+    if trigger_node == 'first_buy':
+        # WanglibaoRewardJoinRecord, 并判断散标和月利宝是不是 已经有了首投.
+        yuelibao_logger.info(u'首次购买 trigger_node == "first_buy"!!!, period = {}'.format(ylb_period))
+
+        if rule.is_in_date:
+            first_buy, is_ylb_first_p2p = is_first_purchase(
+                    user.id, order_id=order_id, get_or_ylb=True, is_ylb=True,
+                    start_at=rule.activity.start_at, end_at=rule.activity.end_at)
+        else:
+            first_buy, is_ylb_first_p2p = is_first_purchase(user.id, order_id=order_id, get_or_ylb=True, is_ylb=True)
+
+        if first_buy:
+            if rule.activity.product_cats == 'all' and not rule.activity.product_ids and _ylb_gift_period(rule, ylb_period):
+                # 符合首投, 而且月利宝的周期符合
+                _check_trade_amount(user, rule, device_type, amount, is_full)
+                if settings.ENV == settings.ENV_DEV:
+                    yuelibao_logger.info(u'月利宝首次购买 trigger_node == "first_buy"!!!, period = {}'.format(ylb_period))
+
+    # 购买
+    elif trigger_node == 'buy':
+        if rule.activity.product_cats == 'all' and not rule.activity.product_ids and _ylb_gift_period(rule, ylb_period):
+            if settings.ENV == settings.ENV_DEV:
+                yuelibao_logger.info(u'月利宝购买 trigger_node == "buy"!!!, period = {}'.format(ylb_period))
+            _check_trade_amount(user, rule, device_type, amount, is_full)
+
+
+def _ylb_gift_period(rule, ylb_period=0):
+
+    # 没有活动时间限制
+    if not rule.period:
+        return True
+
     rule_period_type = rule.period_type
     rule_period = rule.period
+
     if rule_period_type == 'month_gte':
         # 当"规则的月数 < 产品的月数"时符合规则
         if rule_period <= ylb_period:
@@ -1028,5 +1035,3 @@ def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):
                 "remark": remark
             })
         }, queue='celery02')
-
-
