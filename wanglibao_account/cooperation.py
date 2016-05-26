@@ -245,6 +245,92 @@ def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
     return p2p_record, p2p_records, is_ylb_frist_p2p
 
 
+def get_first_purchase_record(user_id, get_or_ylb=False, start_at=None, end_at=None):
+    """获取用户首次投资（get_or_ylb=True可兼容月利宝）"""
+    is_ylb_frist_p2p = False
+    atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
+    if start_at and end_at:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id,
+                                              catalog=u'申购',
+                                              create_time__gte=start_at,
+                                              create_time__lt=end_at
+                                              ).order_by('create_time').first()
+    else:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购'
+                                              ).order_by('create_time').first()
+
+    if get_or_ylb:
+        if start_at and end_at:
+            month_record = MonthProduct.objects.filter(user_id=user_id,
+                                                       trade_status='PAID',
+                                                       created_at__gte=start_at,
+                                                       created_at__lt=end_at
+                                                       ).order_by('created_at').first()
+        else:
+            month_record = MonthProduct.objects.filter(user_id=user_id,
+                                                       trade_status='PAID'
+                                                       ).order_by('created_at').first()
+
+        if not p2p_record or (p2p_record and month_record.created_at < p2p_record.create_time):
+            is_ylb_frist_p2p = True
+            # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
+            p2p_record = atr_to_atr_for_obj(atr_map, month_record)
+
+    return p2p_record, is_ylb_frist_p2p
+
+
+def is_first_purchase(user_id, order_id, get_or_ylb=False, is_ylb=False, start_at=None, end_at=None):
+    """判断用户首次投资（get_or_ylb=True可兼容月利宝,is_ylb=True表示从月利宝入口进入）"""
+    is_ylb_frist_p2p = False
+    atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
+    order_id = str(order_id)
+    if start_at and end_at:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id,
+                                              catalog=u'申购',
+                                              create_time__gte=start_at,
+                                              create_time__lt=end_at
+                                              ).order_by('create_time').first()
+    else:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购'
+                                              ).order_by('create_time').first()
+
+    if not is_ylb and str(p2p_record.order_id) != order_id:
+        return None, is_ylb_frist_p2p
+
+    if get_or_ylb:
+        if start_at and end_at:
+            month_record = MonthProduct.objects.filter(user_id=user_id,
+                                                       trade_status='PAID',
+                                                       created_at__gte=start_at,
+                                                       created_at__lt=end_at
+                                                       ).order_by('created_at').first()
+        else:
+            month_record = MonthProduct.objects.filter(user_id=user_id,
+                                                       trade_status='PAID'
+                                                       ).order_by('created_at').first()
+
+        if is_ylb and str(month_record.id) != order_id:
+            return None, is_ylb_frist_p2p
+
+        if p2p_record and month_record:
+            if month_record.created_at < p2p_record.create_time:
+                if is_ylb:
+                    is_ylb_frist_p2p = True
+                    p2p_record = atr_to_atr_for_obj(atr_map, month_record)
+            else:
+                p2p_record = None if is_ylb else p2p_record
+        elif p2p_record:
+            p2p_record = None if is_ylb else p2p_record
+        elif month_record:
+            if is_ylb:
+                is_ylb_frist_p2p = True
+                p2p_record = atr_to_atr_for_obj(atr_map, month_record)
+        else:
+            p2p_record = None
+
+    return p2p_record, is_ylb_frist_p2p
+
+
 #######################第三方用户注册#####################
 
 class CoopRegister(object):
