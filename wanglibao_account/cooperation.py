@@ -281,21 +281,25 @@ def get_first_purchase_record(user_id, get_or_ylb=False, start_at=None, end_at=N
 
 def is_first_purchase(user_id, order_id, get_or_ylb=False, is_ylb=False, start_at=None, end_at=None):
     """判断用户首次投资（get_or_ylb=True可兼容月利宝,is_ylb=True表示从月利宝入口进入）"""
+
+    p2p_record = None
     is_ylb_frist_p2p = False
     atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
     order_id = str(order_id)
-    if start_at and end_at:
-        p2p_record = P2PRecord.objects.filter(user_id=user_id,
-                                              catalog=u'申购',
-                                              create_time__gte=start_at,
-                                              create_time__lt=end_at
-                                              ).order_by('create_time').first()
-    else:
-        p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购'
-                                              ).order_by('create_time').first()
 
-    if not is_ylb and str(p2p_record.order_id) != order_id:
-        return None, is_ylb_frist_p2p
+    if not is_ylb:
+        if start_at and end_at:
+            p2p_record = P2PRecord.objects.filter(user_id=user_id,
+                                                  catalog=u'申购',
+                                                  create_time__gte=start_at,
+                                                  create_time__lt=end_at
+                                                  ).order_by('create_time').first()
+        else:
+            p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购'
+                                                  ).order_by('create_time').first()
+
+        if not p2p_record or (p2p_record and str(p2p_record.order_id) != order_id):
+            return None, is_ylb_frist_p2p
 
     if get_or_ylb:
         if start_at and end_at:
@@ -309,7 +313,7 @@ def is_first_purchase(user_id, order_id, get_or_ylb=False, is_ylb=False, start_a
                                                        trade_status='PAID'
                                                        ).order_by('created_at').first()
 
-        if is_ylb and str(month_record.id) != order_id:
+        if month_record and is_ylb and str(month_record.id) != order_id:
             return None, is_ylb_frist_p2p
 
         if p2p_record and month_record:
