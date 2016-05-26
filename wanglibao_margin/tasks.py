@@ -29,7 +29,7 @@ def save_to_sqs(url, data):
 
 
 @app.task
-def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=None, device_type=None, period=0):
+def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=None, device=None, period=0):
     """
     对这个购买的月利宝记录进行扣款冻结操作.
     :param token: month_product's unique token.
