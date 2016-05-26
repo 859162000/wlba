@@ -33,6 +33,7 @@ from wanglibao_reward.models import WanglibaoActivityReward, WanglibaoRewardJoin
 
 logger = logging.getLogger(__name__)
 activity_logger = logging.getLogger('wanglibao_inside_messages')
+yuelibao_logger = logging.getLogger('wanglibao_margin')
 
 
 def get_reward_index(activity, probabilities):
@@ -110,6 +111,9 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
+            if settings.ENV == settings.ENV_DEV:
+                yuelibao_logger.info('in activity! id = {}, name = {}, description = {},'.format(
+                        activity.id, activity.name, activity.description))
 
             # if False and activity.is_lottery:
             #     handle_lottery_distribute(activity, trigger_node)
@@ -141,10 +145,10 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                         if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id,
                                                  is_full, order_id, user_ib, is_first_bind_wx=is_first_bind,
-                                                 ylb_period=0)
+                                                 ylb_period=ylb_period)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full,
-                                             order_id, is_first_bind_wx=is_first_bind, ylb_period=0)
+                                             order_id, is_first_bind_wx=is_first_bind, ylb_period=ylb_period)
             else:
                 continue
     else:
@@ -155,7 +159,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                          order_id, user_ib=None, is_first_bind_wx=False, ylb_period=0):
     """ check the trigger node """
     if settings.ENV != settings.ENV_PRODUCTION:
-        activity_logger.info('in yuelibao activity check!!!, period = {}'.format(ylb_period))
+        yuelibao_logger.info('in yuelibao activity check!!!, period = {}'.format(ylb_period))
     product_id = int(product_id)
     order_id = int(order_id)
     # 注册 或 实名认证

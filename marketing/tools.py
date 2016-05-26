@@ -68,7 +68,6 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         "order_id": order_id,
         "is_full": is_full,
         "ylb_period": ylb_period
-        #"ylb_period": 0
     }, queue='celery02')
     # fix@chenweibi, add order_id
     try:
