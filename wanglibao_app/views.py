@@ -42,7 +42,7 @@ from wanglibao_sms.utils import send_validation_code
 # from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_anti.anti.anti import AntiForAllClient
-from wanglibao_account.forms import verify_captcha
+from wanglibao_account.forms import verify_captcha_enhance
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest import utils
@@ -612,7 +612,8 @@ class SendValidationCodeView(APIView):
         if not AntiForAllClient(request).anti_special_channel():
             res, message = False, u"请输入验证码"
         else:
-            res, message = verify_captcha(request.POST)
+            # app端注册,没有输入图片验证码信息,不让其通过
+            res, message = verify_captcha_enhance(request.POST)
         if not res:
             return Response({"ret_code": 40044, "message": message})
 
