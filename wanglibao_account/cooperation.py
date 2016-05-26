@@ -316,6 +316,7 @@ def is_first_purchase(user_id, order_id, get_or_ylb=False, is_ylb=False, start_a
             if month_record.created_at < p2p_record.create_time:
                 if is_ylb:
                     is_ylb_frist_p2p = True
+                    # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
                     p2p_record = atr_to_atr_for_obj(atr_map, month_record)
             else:
                 p2p_record = None if is_ylb else p2p_record
@@ -324,6 +325,7 @@ def is_first_purchase(user_id, order_id, get_or_ylb=False, is_ylb=False, start_a
         elif month_record:
             if is_ylb:
                 is_ylb_frist_p2p = True
+                # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
                 p2p_record = atr_to_atr_for_obj(atr_map, month_record)
         else:
             p2p_record = None
