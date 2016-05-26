@@ -309,7 +309,7 @@ class YueLiBaoBuy(APIView):
 
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
-                                                  'device_type': device, 'period': period}, queue='celery_ylb')
+                                                  'device': device, 'period': period}, queue='celery_ylb')
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
