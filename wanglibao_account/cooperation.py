@@ -160,6 +160,57 @@ def get_binding_time_for_coop(user_id):
         return None
 
 
+def get_first_p2p_record_hb_modify(user, order_id=None, get_or_ylb=False, is_ylb=False):
+    order_is_first = False
+    p2p_record = None
+    first_is_ylb = None
+
+    atr_map = [('created_at', 'create_time'), ('amount_source', 'amount'), ('id', 'order_id')]
+
+    if order_id:
+        try:
+            order_id = int(order_id)
+        except:
+            logger.exception("Invalid order_id [%s]" % (order_id))
+            return False, None, None
+    else:
+        order_id = 0
+
+    if not is_ylb:
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+        if p2p_record and p2p_record.order_id==order_id:
+            order_is_first = True
+            first_is_ylb = False
+        if get_or_ylb:
+            month_product_record = MonthProduct.objects.filter(user_id=user.id, trade_status='PAID').order_by('created_at').first()
+            if month_product_record:
+                if not p2p_record or month_product_record.created_at < p2p_record.create_time:
+                    order_is_first = False
+                    if order_id==0:
+                        p2p_record = atr_to_atr_for_obj(atr_map, month_product_record)
+                        first_is_ylb = True
+    else:
+        month_product_record = MonthProduct.objects.filter(user_id=user.id, trade_status='PAID').order_by('created_at').first()
+        if (month_product_record and month_product_record.id==order_id) or order_id==0:
+            p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+            if p2p_record and p2p_record.create_time < month_product_record.created_at:
+                order_is_first = False
+                first_is_ylb = True
+                if order_id<>0:
+                    p2p_record = None
+                    first_is_ylb = None
+            elif month_product_record:
+                p2p_record = atr_to_atr_for_obj(atr_map, month_product_record)
+                first_is_ylb = True
+                if month_product_record.id==order_id:
+                    order_is_first = True
+                elif order_id!=0:
+                    p2p_record = None
+                    first_is_ylb = None
+
+    return order_is_first, p2p_record, first_is_ylb
+
+
 def get_first_p2p_record(user, order_id=None, get_or_ylb=False, is_ylb=False):
     p2p_record = None
     is_ylb_frist_p2p = False
