@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 import logging
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from django.db import models
 from django.db.models import Sum
 from django.utils import timezone
@@ -99,6 +99,25 @@ class P2PProduct(models.Model):
     @property
     def get_p2p_rate(self):
         return float(self.expected_earning_rate) + float(self.activity_amount)
+
+    def get_activity_earning(self, amount):
+        CALCULATE_METHOD_MONTH = 'monthly'
+        CALCULATE_METHOD_DAY = 'daily'
+
+        pay_method_mapping = {
+            u'等额本息': CALCULATE_METHOD_MONTH,
+            u'按月付息': CALCULATE_METHOD_MONTH,
+            u'到期还本付息': CALCULATE_METHOD_MONTH ,
+            u'日计息一次性还本付息': CALCULATE_METHOD_DAY,
+            u'日计息月付息到期还本': CALCULATE_METHOD_DAY
+        }
+
+        base_period = Decimal(12)
+        if pay_method_mapping.get(self.pay_method) == CALCULATE_METHOD_DAY:
+            base_period = Decimal(360)
+
+        return Decimal(amount*self.rule_amount*(Decimal(self.period)/base_period)
+                       ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
     class Meta:
         verbose_name = u'P2P产品'
