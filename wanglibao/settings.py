@@ -552,10 +552,10 @@ LOGGING = {
     }
 }
 
-SESSION_COOKIE_DOMAIN = None
 # set session for PHP cross domain.
-if ENV == ENV_PRODUCTION:
-    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
+SESSION_COOKIE_DOMAIN = '.wanglibao.com'
+if ENV == ENV_DEV:
+    SESSION_COOKIE_DOMAIN = None
 
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
