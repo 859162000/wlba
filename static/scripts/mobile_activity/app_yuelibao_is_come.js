@@ -125,7 +125,7 @@ function weixin_share(shareTit,fn){
             shareImg = host + '/static/imgs/mobile/weChat_logo.png',
             shareLink = host + '/activity/app_yuelibao_is_come/',
             shareMainTit = shareTit,
-            shareBody = '月利宝理财计划是网利宝平台推出的优选理财计划。当日计息，月月升息，转让灵活。';
+            shareBody = '月利宝是网利宝平台推出的优选理财计划。当日计息，月月升息，转让灵活。';
         //分享给微信好友
         org.onMenuShareAppMessage({
             title: shareMainTit,
@@ -170,7 +170,7 @@ weixin_share("月利宝正式上线");//微信分享
      app: function(mixins){
         var winHost = window.location.href;
         var host = winHost.substring(0,winHost.indexOf('/activity'));
-        mixins.shareData({title: "月利宝正式上线", content: "月利宝理财计划是网利宝平台推出的优选理财计划。当日计息，月月升息，转让灵活。", image: host + "/static/imgs/mobile/weChat_logo.png"})
+        mixins.shareData({title: "月利宝正式上线", content: "月利宝是网利宝平台推出的优选理财计划。当日计息，月月升息，转让灵活。", image: host + "/static/imgs/mobile/weChat_logo.png"})
      }
  })
 })();
