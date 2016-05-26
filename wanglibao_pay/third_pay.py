@@ -326,6 +326,7 @@ def card_bind_list(request):
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
                     'storable_no': card.no[:6] + card.no[-4:],
+                    'no': card.no,
                     'is_the_one_card': card.is_the_one_card,
                     'need_validation_for_qpay': _need_validation_for_qpay(card),
                     'need_rebind': _need_rebind(card)

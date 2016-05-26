@@ -136,7 +136,8 @@ class SendValidationCodeView(APIView):
             if _type == 'geetest':
                 if not self.validate_captcha(request):
                     return Response({'message': '极验验证失败', "type":"verified"}, status=403)
-
+                else:
+                    res = True
             else:
                 from wanglibao_account.forms import verify_captcha_enhance
                 # 没有输入图片验证码信息,不让其通过
@@ -217,6 +218,8 @@ class SendRegisterValidationCodeView(APIView):
             if _type == 'geetest':
                 if not self.validate_captcha(request):
                     return Response({'message': '极验验证失败', "type":"verified"}, status=403)
+                else:
+                    res = True
             else:
                 from wanglibao_account.forms import verify_captcha_enhance
                 # 没有输入图片验证码信息,不让其通过
