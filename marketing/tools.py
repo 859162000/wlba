@@ -58,7 +58,8 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         introduced_by.save()
 
     # 活动检测
-    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full, ylb_period)
+    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full,
+                                     is_first_bind=False, ylb_period=ylb_period)
 
     # 月利宝的标不进行除发奖励外的操作.
     if ylb_period:
