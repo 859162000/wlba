@@ -219,51 +219,51 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;(function(org) {
 
-    //var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-    //org.ajax({
-		//type : 'GET',
-		//url : '/weixin/api/jsapi_config/',
-		//dataType : 'json',
-		//success : function(data) {
-		//	//请求成功，通过config注入配置信息,
-		//	wx.config({
-		//		debug: false,
-		//		appId: data.appId,
-		//		timestamp: data.timestamp,
-		//		nonceStr: data.nonceStr,
-		//		signature: data.signature,
-		//		jsApiList: jsApiList
-		//	});
-		//}
-    //});
-    //wx.ready(function(){
-		//var host = location.protocol+"//"+location.host,
-		//	shareName = '全民淘金',
-		//	shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-		//	shareLink = host + '/activity/app_gold_season/',
-		//	shareMainTit = '全民淘金',
-		//	shareBody = '人脉即财脉';
-		////分享给微信好友
-		//org.onMenuShareAppMessage({
-		//	title: shareMainTit,
-		//	desc: shareBody,
-		//	link: shareLink,
-		//	imgUrl: shareImg
-		//});
-		////分享给微信朋友圈
-		//org.onMenuShareTimeline({
-		//	title: '全民淘金',
-		//	link : shareLink,
-		//	imgUrl: shareImg
-		//})
-		////分享给QQ
-		//org.onMenuShareQQ({
-		//	title: shareMainTit,
-		//	desc: shareBody,
-		//	link : shareLink,
-		//	imgUrl: shareImg
-		//})
-    //})
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+    org.ajax({
+		type : 'GET',
+		url : '/weixin/api/jsapi_config/',
+		dataType : 'json',
+		success : function(data) {
+			//请求成功，通过config注入配置信息,
+			wx.config({
+				debug: false,
+				appId: data.appId,
+				timestamp: data.timestamp,
+				nonceStr: data.nonceStr,
+				signature: data.signature,
+				jsApiList: jsApiList
+			});
+		}
+    });
+    wx.ready(function(){
+		var host = location.protocol+"//"+location.host,
+			shareName = '全民淘金',
+			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+			shareLink = host + '/activity/app_gold_season/',
+			shareMainTit = '全民淘金',
+			shareBody = '人脉即财脉';
+		//分享给微信好友
+		org.onMenuShareAppMessage({
+			title: shareMainTit,
+			desc: shareBody,
+			link: shareLink,
+			imgUrl: shareImg
+		});
+		//分享给微信朋友圈
+		org.onMenuShareTimeline({
+			title: '全民淘金',
+			link : shareLink,
+			imgUrl: shareImg
+		})
+		//分享给QQ
+		org.onMenuShareQQ({
+			title: shareMainTit,
+			desc: shareBody,
+			link : shareLink,
+			imgUrl: shareImg
+		})
+    })
     //
     //
     //var login = false;
