@@ -239,7 +239,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '全民淘金',
-			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300x300.jpg',
+			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
 			shareLink = host + '/activity/app_gold_season/',
 			shareMainTit = '全民淘金',
 			shareBody = '人脉即财脉';
