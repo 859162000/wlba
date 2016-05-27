@@ -399,12 +399,11 @@ body .goldSeason .example .rightMain .number dl dt {
 	margin-top: 1.5em
 }
 .footer{
-    margin-top:2.5em;
     padding:1em 0;
     width:100%;
-    background:#db3b0f;
+    background:#e6cf93;
     text-align: center;
-    color: #fff;
+    color: #666;
     font-size:1.2em;
     line-height: 1.6em;
 }
@@ -421,4 +420,66 @@ body .goldSeason .example .rightMain .number dl dt {
         line-height: 1.67rem;
         font-size: 1.2rem;
     }
+}
+
+
+.activity-time {
+    width: 94%;
+    background: #db3b0f;
+    border-radius: 3px;
+    margin: 1.7rem auto 0;
+    position: relative;
+    padding: .15rem
+}
+.activity-title{
+    width: 77%;
+    top: -.6rem;
+    left: 50%;
+    margin-left: -38%;
+    position:absolute
+}
+.activity-box-c{
+    background: #fff;
+    border-radius: 3px;
+    height: 100%;
+    width: 100%;
+    font-size: .6rem;
+    color: #666;
+    padding:1.25rem .5rem;
+    line-height: 1.25rem
+}
+.activity-box-c span{
+    color: #ec551d
+}
+.mt125{
+    margin-top: 1.25rem
+}
+.icon{
+    background: url(/static/imgs/mobile_activity/app_gold_season/liwu.png);
+    background-size: 100% 100%;
+    width: 3.875rem;
+    height: 2.475rem;
+    position: absolute;
+    right:0;
+    bottom: -.6rem;
+}
+
+.prompt-c{
+    color:#ec551d;
+    font-size:.6rem;
+    text-align: center;
+    padding: 1rem 0 2rem
+}
+
+.share-btns{
+    font-size: .9rem;
+    color: #fff;
+    background:#ec551d;
+    text-align:center;
+    padding:.75rem 0;
+    position: fixed;
+    width:100%;
+    font-weight:bold;
+    bottom:0;
+    z-index:10
 }
