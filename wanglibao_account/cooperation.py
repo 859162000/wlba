@@ -748,7 +748,7 @@ class BaJinSheCallback(CoopCallback):
             reward_data = {
                 'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
                 'income': float(user_amo.interest),
-                'principal': float(user_amo.principal),
+                'principal': float(user_amo.principal) + float(product.get_activity_earning(equity.equity)),
                 'incomeState': income_state,
             }
             reward_data_list.append(reward_data)
@@ -1067,7 +1067,7 @@ class BiSouYiCallback(CoopCallback):
                         'ocode': product.id,
                         'yaccount': get_user_phone_for_coop(user_id),
                         'bdate': timezone.localtime(user_amo.settlement_time).strftime('%Y-%m-%d %H:%M:%S'),
-                        'bmoney': user_amo.get_total_amount,
+                        'bmoney': user_amo.get_total_amount + float(product.get_activity_earning(p2p_equity.equity)),
                         'ostatus': 1,
                         'pstatus': 1,
                     }
