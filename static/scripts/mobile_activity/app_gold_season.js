@@ -291,7 +291,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 }else{
                     connect(data)
                     $('.share-btns').on('click',function(){
-                        mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
+                        mixins.touchShare();
                     })
                 }
             })
