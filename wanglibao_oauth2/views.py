@@ -133,7 +133,7 @@ class AccessTokenView(AccessTokenBaseView):
                     'p2pUserId': req_data.get('channel_user'),
                     'refresh_token': default_invalid_token,
                     'code': 10000,
-                    'message': 'success',
+                    'msg': 'success',
                 }
             else:
                 response_data = {
