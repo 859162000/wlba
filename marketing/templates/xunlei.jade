@@ -1,0 +1,165 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include global/g_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/xunlei.css")
+    body()
+        - csrf_token
+        include include/activityTopNew
+        .xunlei-box.clearfix
+            mixin titles(f1, f2, en)
+                .part-box.mt60
+                        .part-title=f1
+                            span=f2
+                        .part-en=en
+                        .part-icon
+                            span
+            .xunlei-box1.clearfix
+                .xunlei-content.clearfix
+                    +titles('幸运', '宝藏', 'Fortune treasure')
+                    .treasure-box
+                        .bone-icon
+                        .money-icon
+                        .chest-icon
+                        .bottom-icon
+                        .people-icon
+                        .mountain-icon
+                        .prompt-icon
+                        .gold-icon
+                    .user-count
+                        if user.is_authenticated
+                            span 您有
+                            a()#lotteryCounts
+                            | 次挖宝机会
+                        else
+                            span 请先
+                            a(href='/accounts/login/?next=/activity/xunlei_treasure/') 登录
+                    .win-user
+                        .win-box(style='display:none')
+                            .megaphone
+                            .ul-p.clearfix
+                                ul#winList
+                                    //li 恭喜 132****6426 用户，获得 1% 加息券
+                                    //li 恭喜 132****6426 用户，获得 2% 加息券
+                                    //li 恭喜 132****6426 用户，获得 3% 加息券
+                                    //li 恭喜 132****6426 用户，获得 4% 加息券
+                                    //li 恭喜 132****6426 用户，获得 5% 加息券
+            .xunlei-box2.clearfix
+                .xunlei-content.clearfix
+                    +titles('新手', '秘籍', 'New techniques')
+                    .novice-welfare.clearfix
+                        mixin welfare(style, f1, url f2, f3, f4, f5, f6, style1)
+                            .welfare-box(class=style1)
+                                .welfare-img(class=style)
+                                .welfare-condition=f1
+                                .welfare-detail
+                                    span=f2
+                                    label=f3
+                                    span=f4
+                                    label=f5
+                                if user.is_authenticated
+                                    a(href=url)=f6
+                                else
+                                    a(href='javascript:void(0)').userAction=f6
+                        +welfare('welfare-img1', '注册送', '/', '28888元', '体验金+', '50元', '红包', '注册领取')
+                        +welfare('welfare-img2', '首充送', '/pay/banks/', '7天', '迅雷会员', '', '', '充值领取')
+                        +welfare('welfare-img3', '最高送', '/p2p/list/', '250元', '现金红包+', '1年', '迅雷会员', '投资领取', 'welfare-box-last')
+            .xunlei-box3.clearfix
+                .xunlei-content.clearfix
+                    +titles('五步享', '收益', 'Five steps of sitting on earning')
+                    .regist-step.clearfix
+                        mixin step(style, last, sty)
+                            .step-box.clearfix(class=sty)
+                                .step-left
+                                    span(class=style)
+                                if last != 'last'
+                                    .step-right
+
+                        +step('span1')
+                        +step('span2')
+                        +step('span3')
+                        +step('span4')
+                        +step('span5', 'last', 'step-box-last')
+                    .setp-font
+                        span Step1 注册帐号
+                        span Step2 实名认证
+                        span.w190 Step3 选择理财标
+                        span.w250 Step4 支付页选择红包/加息券
+                        span.w180 Step5 坐享收益
+            .xunlei-box4.clearfix
+                .xunlei-content.clearfix
+                    +titles('风险', '控制', 'Risk Management')
+                    .safe-list.clearfix
+                        mixin safe(sty, f, last , w)
+                            if w != ''
+                                .safe-box(class=w)
+                                    .safe-img(class=sty)
+                                    .safe-font=f
+                            else
+                                .safe-box(class=last)
+                                    .safe-img(class=sty)
+                                    .safe-font=f
+                        +safe('safe-img1', 'IDG资本A轮融资')
+                        +safe('safe-img2', '鸿利光电B轮融资')
+                        +safe('safe-img3', '阳光保险承保资金帐户安全', '' , 'w218')
+                        +safe('safe-img4', '预期年化收益6-13%', '' , 'w166')
+                        +safe('safe-img5', 'IT数据风控系统', 'safe-box-last')
+            .xunlei-box5.clearfix
+                .xunlei-content.clearfix
+                    +titles('活动', '说明', 'Activity instructions')
+                    .explain-list
+                        p 1. 活动时间：2016年5月26日开始；
+                        p 2. 手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌网利宝新老用户均可参与；
+                        p 3. 新用户注册为网利宝用户即得28888元体验金，体验金专享1天10%年化收益；
+                            span#rewardDetail 新用户奖励
+                        .explain-min(style='display:none')
+                            p ①活动期间新用户注册即送50元红包（满5000元可用，限1月以上标期，领取之日起7天有效）
+                            p ② 用户首次投资满额送以下红包，红包3月标及以上使用，领取之日起15天有效；
+                            p a. 1000元≤首次投资＜5000元，送100元直抵红包（满15000元可直抵使用）
+                            p b. 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
+                            p c. 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
+                        p 4. 新用户首次充值不低于100元即可获得7天迅雷会员及2%加息券（加息券领取之日起7天有效），首次投资用户不低于1000元即可获赠一年迅雷会员；
+                        p 5. 幸运宝藏中奖用户获赠随机金额体验金及加息券，体验金专享1天10%年化收益，加息券自领取之日起7天有效；
+                        p 6. 用户注册时建议根据注册提示登陆迅雷账号，以便迅雷会员奖励顺利发放；
+                        p 7. 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次且仅限散标使用，不可叠加使用，使用后无论是 否有余额均失效；
+                        p 8. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+        .alert-box(style='display:none')
+            .alert-top
+            a(href='javascript:void(0)')#close-modal.close-modal.close-btn
+            .alert-content
+                .jiaxiquan.alert-c#jxq(style='display:none')
+                    p 人品大爆发，
+                        span 1
+                        | %加息券已经
+                    p 悄悄的在您的账户中！
+                    a(href="javascript:void(0)").close-alert-box 太棒了
+                .tiyanjin.alert-c#tyj(style='display:none')
+                    p 人世间最美好的事情
+                    p 莫不过如此，
+                        span 88
+                        | 元体验金
+                    p 已经在您的账户中！
+                    a(href="javascript:void(0)").close-alert-box 太棒了
+                .wzj.alert-c#no1(style='display:none')
+                    p 佛说：前世的500次回眸
+                    p 才换得今世的一次中奖，淡定！
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#no2(style='display:none')
+                    p 大奖何时有？把酒问青天！
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#no3(style='display:none')
+                    p 大奖下回见，网利宝天天见！
+                    a(href="javascript:void(0)").close-alert-box 再试一次
+                .wzj1.alert-c#noChance(style='display:none')
+                    p 客官，您的挖奖机会已经用光！
+                    a(href="javascript:void(0)").close-alert-box 知道了
+                .cont-img(style='display:none')
+                .despair
+        include global/g_footer
+        include include/tracking
+    script.
+        require(['/static/src/pc/xunlei.js?v=20160520'])
