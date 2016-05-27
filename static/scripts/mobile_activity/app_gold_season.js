@@ -238,11 +238,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '全民淘金！',
+			shareName = '全民淘金',
 			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300x300.jpg',
 			shareLink = host + '/activity/app_gold_season/',
-			shareMainTit = '全民淘金！',
-			shareBody = '全民淘金！';
+			shareMainTit = '全民淘金',
+			shareBody = '人脉即财脉';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -252,7 +252,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '全民淘金！',
+			title: '全民淘金',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -269,7 +269,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
+            $('.share-btns').show();
+            mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -298,6 +299,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
         },
         other: function(){
+            $('.share-btns').hide();
         }
     })
 
