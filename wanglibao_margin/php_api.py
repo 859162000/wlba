@@ -289,9 +289,9 @@ class YueLiBaoBuy(APIView):
         amount_source = request.POST.get('sourceAmount')
         red_packet = request.POST.get('redPacketAmount')
         red_packet_type = request.POST.get('isRedPacket')
-        period = request.POST.get('period') or 1
+        period = request.POST.get('period', 1)
         # 使用的红包id
-        red_packet_id = request.POST.get('RedPacketId') or 0
+        red_packet_id = request.POST.get('RedPacketId', 0)
 
         try:
             user = User.objects.get(pk=user_id)
