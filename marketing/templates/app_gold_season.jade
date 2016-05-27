@@ -8,7 +8,7 @@ html
         meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
         meta(content="yes" ,name="apple-mobile-web-app-capable")
         link(href="/static/styles/mobile_activity/app_gold_season.css?v=201510133", rel="stylesheet")
-        script(src="/static/js/require.js")
+        //script(src="/static/js/require.js")
         - csrf_token
         body
             .goldSeason
@@ -84,7 +84,7 @@ html
                     img(src='/static/imgs/mobile_activity/app_gold_season/explain1.png').bg1
                     .main
                         dl
-                            dt 1、活动时间： 2015年6月23日-2016年6月30日
+                            dt 1、活动时间： 2015年6月1日-2016年6月30日
                         dl
                             dt 2、活动说明:
                             dd &nbsp;&nbsp;&nbsp;&nbsp;－邀请好友注册网利宝，若好友注册后，投资3个月以上（含3个月）项目，则享有好友投资额3‰作为邀请佣金；
@@ -117,5 +117,6 @@ html
                 .share-btns 邀请好友
             script(src='/static/src/mobile/lib/weixin/wx.js')
             script(src="/static/scripts/component/webview.js?v=20160527")
-            script.
-                require(['/static/src/mobile_activity/app_gold_season.js?v=20150527003'])
+            script(src="/static/src/app/lib/jquery.min.js")
+            script(src="/static/src/app/lib/jquery.animateNumber.min.js")
+            script(src="/static/scripts/mobile_activity/app_gold_season.js?v=201605270065411")
