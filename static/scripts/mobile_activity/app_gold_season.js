@@ -357,7 +357,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
       //分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-	org.ajax({
+	$.ajax({
 		type : 'GET',
 		url : '/weixin/api/jsapi_config/',
 		dataType : 'json',
@@ -405,7 +405,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     wlb.ready({
         app: function (mixins) {
             function connect(data) {
-                org.ajax({
+                $.ajax({
                     url: '/accounts/token/login/ajax/',
                     type: 'post',
                     data: {
@@ -425,9 +425,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     }
                 } else {
                     connect(data)
-                    //$('.share-btns').on('click',function(){
-                    //    mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
-                    //})
+                    $('.share-btns').on('click',function(){
+                        mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
+                    })
                 }
             })
         },

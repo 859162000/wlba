@@ -138,7 +138,7 @@
 
       //分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-	org.ajax({
+	$.ajax({
 		type : 'GET',
 		url : '/weixin/api/jsapi_config/',
 		dataType : 'json',
@@ -186,7 +186,7 @@
     wlb.ready({
         app: function (mixins) {
             function connect(data) {
-                org.ajax({
+                $.ajax({
                     url: '/accounts/token/login/ajax/',
                     type: 'post',
                     data: {
@@ -206,9 +206,9 @@
                     }
                 } else {
                     connect(data)
-                    //$('.share-btns').on('click',function(){
-                    //    mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
-                    //})
+                    $('.share-btns').on('click',function(){
+                        mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
+                    })
                 }
             })
         },
