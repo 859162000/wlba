@@ -3453,7 +3453,7 @@ class ZhongYingAPIView(APIView):
         month_product_record = MonthProduct.objects.filter(user_id=request.user.id).first()
         if not p2p_record:
             p2p_record = month_product_record
-
+            p2p_record.create_time = month_product_record.created_at
         if p2p_record and month_product_record and month_product_record.created_at < p2p_record.create_time:
             p2p_record = month_product_record
 
