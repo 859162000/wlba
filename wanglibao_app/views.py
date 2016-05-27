@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+from wanglibao_margin.php_utils import get_php_index_data, get_php_index_data_logout
 
 __author__ = 'zhanghe'
 
@@ -18,7 +19,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.db.models import Q, Sum, Count
 from django.shortcuts import redirect, render_to_response
-from django.template import RequestContext
+# from django.template import RequestContext
 from django.views.generic import TemplateView
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
@@ -36,8 +37,8 @@ from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2P
     UserAmortization, AmortizationRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
-from wanglibao_banner.models import Banner
-from wanglibao_sms import messages as sms_messages
+# from wanglibao_banner.models import Banner
+# from wanglibao_sms import messages as sms_messages
 from wanglibao_sms.utils import send_validation_code
 # from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
@@ -45,7 +46,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha_enhance
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
-from wanglibao_rest import utils
+# from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator, get_sorts_for_activity_show
 from wanglibao_announcement.models import AppMemorabilia
@@ -56,8 +57,12 @@ import re
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from wanglibao_rest.utils import split_ua
+from wanglibao_redis.backend import redis_backend
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord
 
 logger = logging.getLogger(__name__)
+logger_yuelibao = logging.getLogger('wanglibao_margin')
+
 
 class AppActivateScoreImageAPIView(APIView):
     """
@@ -212,12 +217,26 @@ class AppRepaymentAPIView(APIView):
                 if income_yesterday_other.get('amount__sum'):
                     income_yesterday += income_yesterday_other.get('amount__sum')
 
+                # 增加从PHP项目来的 昨日收益, 累计收益, 待收收益
+                url = 'https://' + request.get_host() + settings.PHP_APP_INDEX_DATA
+                try:
+                    if int(request.get_host().split(':')[1]) > 7000:
+                        url = settings.PHP_APP_INDEX_DATA_DEV
+                except Exception, e:
+                    logger_yuelibao.debug(u'in AppRepaymentAPIView, 月利宝地址请求失败!!! exception = {}'.format(e.message))
+
+                try:
+                    index_data = get_php_index_data(url, user.id)
+                except Exception, e:
+                    index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
+                    logger_yuelibao.debug(u'in AppRepaymentAPIView, 月利宝地址请求失败!!! exception = {}'.format(e.message))
+
                 return Response({
                     'ret_code': 0,
                     'message': 'ok',
-                    'amount': float(amount),
+                    'amount': float(amount) + float(index_data['paidIncome']),
                     'income_num': float(income_num),
-                    'income_yesterday': float(income_yesterday)
+                    'income_yesterday': float(income_yesterday) + float(index_data['yesterdayIncome'])
                 })
 
             else:
@@ -228,11 +247,15 @@ class AppRepaymentAPIView(APIView):
                 ams = ProductAmortization.objects.filter(settlement_time__range=(start_utc, timezone.now()), settled=True)
                 for x in ams:
                     amount += x.principal + x.interest + x.penal_interest
+
+                # 增加 月利宝 产生的数据
+                index_data = get_php_index_data_logout(settings.PHP_APP_INDEX_DATA_LOGOUT_URL)
+
                 return Response({
                     'ret_code': 0,
                     'message': 'ok',
-                    'amount': float(amount),
-                    'income_num': len(ams),
+                    'amount': float(amount) + float(index_data['repaymentInfoCurrentMonth']),
+                    'income_num': len(ams) + int(index_data['getPaidProject']),
                     'income_yesterday': float(income_yesterday)
                 })
         except Exception, e:
