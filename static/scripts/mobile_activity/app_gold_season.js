@@ -217,54 +217,91 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function() {
-  require.config({
-    paths: {
-        jquery: '/static/src/pc/lib/jquery.min',
-        'jquery.animateNumber': '/static/src/pc/lib/jquery.animateNumber.min'
-    },
-    shim: {
-        'jquery.animateNumber': ['jquery']
-    }
-  });
+;(function(org) {
 
-  require(['jquery','jquery.animateNumber'], function($) {
-      var csrfSafeMethod, getCookie, sameOrigin,
-          getCookie = function (name) {
-              var cookie, cookieValue, cookies, i;
-              cookieValue = null;
-              if (document.cookie && document.cookie !== "") {
-                  cookies = document.cookie.split(";");
-                  i = 0;
-                  while (i < cookies.length) {
-                      cookie = $.trim(cookies[i]);
-                      if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                          break;
-                      }
-                      i++;
-                  }
-              }
-              return cookieValue;
-          };
-      csrfSafeMethod = function (method) {
-          return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-      };
-      sameOrigin = function (url) {
-          var host, origin, protocol, sr_origin;
-          host = document.location.host;
-          protocol = document.location.protocol;
-          sr_origin = "//" + host;
-          origin = protocol + sr_origin;
-          return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-      };
-      $.ajaxSetup({
-          beforeSend: function (xhr, settings) {
-              if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                  xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-              }
-          }
-      });
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+	org.ajax({
+		type : 'GET',
+		url : '/weixin/api/jsapi_config/',
+		dataType : 'json',
+		success : function(data) {
+			//请求成功，通过config注入配置信息,
+			wx.config({
+				debug: false,
+				appId: data.appId,
+				timestamp: data.timestamp,
+				nonceStr: data.nonceStr,
+				signature: data.signature,
+				jsApiList: jsApiList
+			});
+		}
+	});
+	wx.ready(function(){
+		var host = location.protocol+"//"+location.host,
+			shareName = '全民淘金！',
+			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300x300.jpg',
+			shareLink = host + '/activity/app_gold_season/',
+			shareMainTit = '全民淘金！',
+			shareBody = '全民淘金！';
+		//分享给微信好友
+		org.onMenuShareAppMessage({
+			title: shareMainTit,
+			desc: shareBody,
+			link: shareLink,
+			imgUrl: shareImg
+		});
+		//分享给微信朋友圈
+		org.onMenuShareTimeline({
+			title: '全民淘金！',
+			link : shareLink,
+			imgUrl: shareImg
+		})
+		//分享给QQ
+		org.onMenuShareQQ({
+			title: shareMainTit,
+			desc: shareBody,
+			link : shareLink,
+			imgUrl: shareImg
+		})
+	})
+
+
+    var login = false;
+    wlb.ready({
+        app: function (mixins) {
+            mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                    }
+                })
+            }
+            mixins.sendUserInfo(function (data) {
+                if (data.ph == '') {
+                    $('.share-btns').on('click',function() {
+                        mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
+                    })
+                }else{
+                    connect(data)
+                    $('.share-btns').on('click',function(){
+                        mixins.touchShare();
+                    })
+                }
+            })
+
+        },
+        other: function(){
+        }
+    })
+
+
       var is_animate = true;
 
       function fmoney(s, type) {
@@ -317,10 +354,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       $(window).scroll(function () {
           button_fix();
       });
-      $.ajax({
+      org.ajax({
           url: '/api/gettopofearings/',
-          type: "POST"
-      }).done(function (json) {
+          type: "POST",
+          success:function(json){
           var rankingList_phone = [];
           var rankingList_amount = [];
           var json_one;
@@ -345,6 +382,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
           $('.rankingList ul.two').html(rankingList_phone.join(''));
           $('.rankingList ul.three').html(rankingList_amount.join(''));
           page_scroll();
+         }
       })
       var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
           iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
@@ -352,9 +390,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       if (ios) {
           document.getElementById('ios-show').style.display = 'block';
       }
-  })
-
-}).call(this);
-
+})(org);
 
 
