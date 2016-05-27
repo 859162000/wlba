@@ -352,12 +352,15 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       if (ios) {
           document.getElementById('ios-show').style.display = 'block';
       }
+  })
+
+}).call(this);
 
 
-
-      //分享
+//分享
+(function(org) {
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-	$.ajax({
+	org.ajax({
 		type : 'GET',
 		url : '/weixin/api/jsapi_config/',
 		dataType : 'json',
@@ -405,7 +408,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     wlb.ready({
         app: function (mixins) {
             function connect(data) {
-                $.ajax({
+                org.ajax({
                     url: '/accounts/token/login/ajax/',
                     type: 'post',
                     data: {
@@ -421,7 +424,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     $('.share-btns').on('click',function(){
-                        mixins.loginrApp({refresh:1, url:'/activity/app_gold_season/'});
+                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_gold_season/'});
                     }
                 } else {
                     connect(data)
@@ -434,9 +437,4 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         other: function(){
         }
     })
-  })
-
-}).call(this);
-
-
-
+})(org);
