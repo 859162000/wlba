@@ -141,13 +141,12 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                     if not ylb_period:
                         if rule.is_introduced:
                             user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
-                            if user_ib and not ylb_period:
+                            if user_ib:
                                 _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id,
                                                      is_full, order_id, user_ib, is_first_bind_wx=is_first_bind)
                         else:
-                            if not ylb_period:
-                                _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id,
-                                                     is_full, order_id, is_first_bind_wx=is_first_bind,)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id,
+                                                 is_full, order_id, is_first_bind_wx=is_first_bind,)
 
                     else:
                         if rule.is_introduced:

@@ -81,7 +81,7 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                                     order_id=redpack_order_id, savepoint=False)
 
                     try:
-                        tools.decide_first.apply_async(kwargs={"user_id": user, "amount": amount_source,
+                        tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
                                                                "device": device, "order_id": product.id,
                                                                "product_id": product.id, "is_full": False,
                                                                "product_balance_after": 0, "ylb_period": int(period)},
