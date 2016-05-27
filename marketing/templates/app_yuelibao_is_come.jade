@@ -2,7 +2,8 @@ doctype html
 html(lang='zh')
   head
     meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
-    title 网利宝
+    title 月利宝正式上线 
+    meta(name='description' content='月利宝理财计划是网利宝平台推出的快捷方便、退出灵活的优选理财计划。当日计息，月月升息，转让灵活。')
     meta(name='viewport', content='user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1')
     link(rel='stylesheet', href='/static/styles/mobile_activity/app_yuelibao_is_come.css', type='text/css')
     link(rel='stylesheet', href='/static/styles/mobile_activity/jquery.fullpage.2.7.9.min.css', type='text/css')
@@ -71,10 +72,15 @@ html(lang='zh')
           li 在转让标售卖期间,债权转让人有权手动撤销该转让项目;
           li 购买债权转让标不能使用理财券;
         .zhu 注:更多规则可进入PC端帮助中心查看
+  script(src="/static/src/mobile/lib/weixin/wx.js")
+  script(src='/static/scripts/component/webview.js')
+  script(src='/static/scripts/mobile_activity/app_yuelibao_is_come.js?v=201605261540')
   script.
     $(function(){
     $('#dowebok').fullpage({
     sectionsColor : ['#FFF3F3F3', '#FFF3F3F3', '#FFF3F3F3', '#F4A419','#FFF3F3F3', '#FFF3F3F3','#F4A419'],
+    recordHistory: false,
+    lockAnchors: true,
     responsiveHeight: 503
     })
     $(".down_box").click(function(){
