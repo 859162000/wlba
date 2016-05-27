@@ -264,44 +264,45 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			imgUrl: shareImg
 		})
     })
-    //
-    //
-    //var login = false;
-    //wlb.ready({
-    //    app: function (mixins) {
-    //        $('.share-btns').show();
-    //        mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
-    //        function connect(data) {
-    //            org.ajax({
-    //                url: '/accounts/token/login/ajax/',
-    //                type: 'post',
-    //                data: {
-    //                    token: data.tk,
-    //                    secret_key: data.secretToken,
-    //                    ts: data.ts
-    //                },
-    //                success: function (data) {
-    //                }
-    //            })
-    //        }
-    //        mixins.sendUserInfo(function (data) {
-    //            if (data.ph == '') {
-    //                $('.share-btns').on('click',function() {
-    //                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
-    //                })
-    //            }else{
-    //                connect(data)
-    //                $('.share-btns').on('click',function(){
-    //                    mixins.touchShare();
-    //                })
-    //            }
-    //        })
-    //
-    //    },
-    //    other: function(){
-    //        $('.share-btns').hide();
-    //    }
-    //})
+
+
+    var login = false;
+    wlb.ready({
+        app: function (mixins) {
+            //$('.share-btns').show();
+            mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
+            function connect(data) {
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data) {
+                    }
+                })
+            }
+            mixins.sendUserInfo(function (data) {
+                if (data.ph == '') {
+                    //$('.share-btns').on('click',function() {
+                    //    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
+                    //})
+                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
+                }else{
+                    connect(data)
+                    //$('.share-btns').on('click',function(){
+                    //    mixins.touchShare();
+                    //})
+                }
+            })
+
+        },
+        other: function(){
+            //$('.share-btns').hide();
+        }
+    })
 
 
       var is_animate = true;
