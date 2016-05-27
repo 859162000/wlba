@@ -1,0 +1,114 @@
+- load formatters
+doctype html
+html(style="background: #fff")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_pretty_reach_home.css?v=2015052601", rel="stylesheet")
+    body
+        .body_wrap.clear
+            img.banner.banner_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/banner_1.png')
+            img.banner.banner_2(src='/static/imgs/mobile_activity/app_pretty_reach_home/banner_2.png')
+            img.title_big.title_big_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/title_big_1.png')
+            .cheats_box
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_1.png')
+                    dl
+                        dt 轻松注册
+                        dd 注册网利宝并完成实名认证
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_2.png')
+                    dl
+                        dt 充值到账
+                        dd 充值资金到<br>网利宝帐号
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_3.png')
+                    dl
+                        dt 首次投资
+                        dd 金额≥3000元
+                .box
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_4.png')
+                    dl
+                        dt 面部护理
+                        dd 丁香花蕾平衡清爽护理投资成功后网利宝站内信发送
+            img.button#take_prize(src='/static/imgs/mobile_activity/app_pretty_reach_home/button.png')
+            img.title_big.title_big_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/title_big_2.png')
+            .section.section_1
+                .section_title 定期理财
+                .section_main.section_main_1
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_5.png')
+                    .text_box
+                        .text_line.text_1!='6<span class="small">%</span> <span class="line">一</span> 13<span class="small">%</span>'
+                        .text_line.text_2 年化利率
+                        .text_line.text_3 短期灵活、中期方便、长期优选
+            .section.section_2
+                .section_title 丁香花蕾平衡清爽护理
+                .section_main.section_main_2
+                    img(src='/static/imgs/mobile_activity/app_pretty_reach_home/img_6.png')
+                    dl
+                        dt 有机菲茨&nbsp;&nbsp;&nbsp;奢华情调
+                        dd
+                            span.left_span * 平衡皮脂
+                            span.right_span * 滋润排毒
+                        dd
+                            span.left_span * 清洁毛孔
+                            span.right_span * 去除油脂
+                        dd
+                            span.left_span * 肌肤平衡
+            img.title_big.title_big_1(src='/static/imgs/mobile_activity/app_pretty_reach_home/title_big_3.png')
+            .rule_wrap
+                dl
+                    dt 1.
+                    dd 活动时间：2016年5月24日开始；
+                dl
+                    dt 2.
+                    dd 兑换券有效期：兑换码兑换期限至2017年5月20日止，自兑换之日起30天有效；
+                dl
+                    dt 3.
+                    dd 用户通过此页面注册为网利宝用户且单笔首次投资3000元及以上即可获得丁香花蕾平衡清爽护理一次，兑换码以站内信以及短信形式通知；
+                dl
+                    dt 4.
+                    dd 手机号为网利宝唯一账户，本期新用户专享福利仅限于小美到家渠道新注册用户参与，免费体验名额有限，送完即止；
+                dl
+                    dt 5.
+                    dd!='活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益<span class="slideDown_button">新用户更多福利</span>；' 
+                .slideDown_box
+                    dl.dl_num
+                        dt ①
+                        dd 活动期间新用户注册即送50元红包（满5000元可用，限1月及以上标期，领取之日起7天有效）
+                    dl.dl_num
+                        dt ②
+                        dd 用户首次投资满额送以下红包，红包3月标及以上使用，领取之日15天有效；
+                            dl.dl_font
+                                dt a.
+                                dd 1000元≤首次投资＜5000元，送100元直抵红包（满15000元可直抵使用）
+                            dl.dl_font
+                                dt b.
+                                dd 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
+                            dl.dl_font
+                                dt c.
+                                dd 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
+                dl
+                    dt 6.
+                    dd 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                dl#ios-show(style="display:none")
+                    dt 7.
+                    dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 网利宝对此活动享有最终解释权。
+            #take_prize_2 立即领取
+
+            .popup_box
+                .main
+                    .textairport
+                    .popup_button 知道了
+                    img.close_popup(src="/static/imgs/mobile_activity/app_pretty_reach_home/close_popup.png")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_pretty_reach_home.js?v=2015052402")
+        - csrf_token
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
