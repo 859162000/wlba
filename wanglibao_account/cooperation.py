@@ -1647,7 +1647,7 @@ class XiaoMeiRegister(CoopRegister):
                 })
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
-                    "title": u"演出门票赠送",
+                    "title": u"小美兑换码赠送",
                     "content": u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
@@ -1668,7 +1668,7 @@ class XiaoMeiRegister(CoopRegister):
                 })
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
-                    "title": u"演出门票赠送",
+                    "title": u"小美兑换码赠送",
                     "content": u'【网利科技】您已成功获得小美到家兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
@@ -1700,7 +1700,7 @@ class ZhongYingRegister(CoopRegister):
                     })
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
-                        "title": u"演出门票赠送",
+                        "title": u"中影兑换码赠送",
                         "content": u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为：%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,),
                         "mtype": "activity"
                     })
@@ -1723,7 +1723,7 @@ class ZhongYingRegister(CoopRegister):
                     })
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
-                        "title": u"演出门票赠送",
+                        "title": u"中影兑换码赠送",
                         "content": u'【网利科技】恭喜您在参与中影票务通活动中获得通兑券，您的卡号及卡密分别为：%s，请按照活动页面兑换流程进行兑换，感谢您的参与！' % (reward.content,),
                         "mtype": "activity"
                     })

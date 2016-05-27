@@ -399,12 +399,11 @@ body .goldSeason .example .rightMain .number dl dt {
 	margin-top: 1.5em
 }
 .footer{
-    margin-top:2.5em;
     padding:1em 0;
     width:100%;
-    background:#db3b0f;
+    background:#e6cf93;
     text-align: center;
-    color: #fff;
+    color: #666;
     font-size:1.2em;
     line-height: 1.6em;
 }
@@ -470,4 +469,17 @@ body .goldSeason .example .rightMain .number dl dt {
     font-size:.6rem;
     text-align: center;
     padding: 1rem 0 2rem
+}
+
+.share-btns{
+    font-size: .9rem;
+    color: #fff;
+    background:#ec551d;
+    text-align:center;
+    padding:.75rem 0;
+    position: fixed;
+    width:100%;
+    font-weight:bold;
+    bottom:0;
+    z-index:10
 }
