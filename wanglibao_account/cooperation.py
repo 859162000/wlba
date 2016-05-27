@@ -1067,7 +1067,7 @@ class BiSouYiCallback(CoopCallback):
                         'ocode': product.id,
                         'yaccount': get_user_phone_for_coop(user_id),
                         'bdate': timezone.localtime(user_amo.settlement_time).strftime('%Y-%m-%d %H:%M:%S'),
-                        'bmoney': user_amo.get_total_amount,
+                        'bmoney': user_amo.get_total_amount + product.get_activity_earning(product, p2p_equity.equity),
                         'ostatus': 1,
                         'pstatus': 1,
                     }
