@@ -13,8 +13,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from marketing import tools
 from wanglibao import settings
 from wanglibao_account.auth_backends import User
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
@@ -287,6 +289,7 @@ class YueLiBaoBuy(APIView):
         amount_source = request.POST.get('sourceAmount')
         red_packet = request.POST.get('redPacketAmount')
         red_packet_type = request.POST.get('isRedPacket')
+        period = request.POST.get('period') or 1
         # 使用的红包id
         red_packet_id = request.POST.get('RedPacketId') or 0
 
@@ -306,7 +309,7 @@ class YueLiBaoBuy(APIView):
 
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
-                                                  'device_type': device['device_type']}, queue='celery_ylb')
+                                                  'device': device, 'period': period}, queue='celery_ylb')
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 

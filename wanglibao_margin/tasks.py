@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 import logging
+import urllib2
 
 import requests
 import simplejson
 from django.contrib.auth.models import User
 from django.db import transaction
 
+from marketing import tools
 from order.utils import OrderHelper
 from wanglibao import settings
 from wanglibao.celery import app
+from wanglibao_account.cooperation import CoopRegister
 
 from wanglibao_margin.models import MonthProduct, AssignmentOfClaims
 from wanglibao_margin.php_utils import PhpMarginKeeper, php_redpack_consume
@@ -26,7 +29,7 @@ def save_to_sqs(url, data):
 
 
 @app.task
-def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=None, device_type=None):
+def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=None, device=None, period=0):
     """
     对这个购买的月利宝记录进行扣款冻结操作.
     :param token: month_product's unique token.
@@ -60,19 +63,39 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                                token=token,
                                msg='success')
 
+                    user = User.objects.filter(pk=user).first()
+
                     # 如果使用红包的话, 增加红包使用记录
                     if red_packet_id and int(red_packet_id) > 0:
                         logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
                         redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
-                        user = User.objects.filter(pk=user).first()
                         redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
                                                                    product_id=product.product_id, status=u'新建').id
-                        result = php_redpack_consume(red_packet_id, amount_source, user, product.id, device_type, product.product_id)
+                        result = php_redpack_consume(red_packet_id, amount_source, user, product.id,
+                                                     device['device_type'], product.product_id)
                         if result['ret_code'] != 0:
                             raise Exception, result['message']
                         if result['rtype'] != 'interest_coupon':
-                            red_record = buyer_keeper.redpack_deposit(result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
-                                                                      order_id=redpack_order_id, savepoint=False)
+                            red_record = buyer_keeper.redpack_deposit(
+                                    result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
+                                    order_id=redpack_order_id, savepoint=False)
+
+                    try:
+                        tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
+                                                               "device": device, "order_id": product.id,
+                                                               "product_id": product.id, "is_full": False,
+                                                               "product_balance_after": 0, "ylb_period": int(period)},
+                                                       queue='celery_ylb')
+
+                    except Exception, e:
+                        logger.debug('tools.decide_first.apply_async failed with = {} !!!'.format(e.message))
+
+                    # 模拟一个request
+                    request = urllib2.Request("")
+                    try:
+                        CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
+                    except Exception, e:
+                        logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
 
             except Exception, e:
                 logger.debug('buy month product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))

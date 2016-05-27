@@ -2010,10 +2010,10 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_three.jade'
+    template_name = ''
     wx_code = ''
 
-    def check_params(self, channel_code, sign, _time, nickname, user_id):
+    def check_params(self, channel_code, sign, _time, nickname, user_id, account):
         response_data = {}
         channel_codes = ('xunlei9', 'mxunlei')
         if not channel_code or channel_code not in channel_codes:
@@ -2041,6 +2041,11 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
                 'ret_code': '10007',
                 'message': u'用户ID不存在',
             }
+        elif not account:
+            response_data = {
+                'ret_code': '10008',
+                'message': u'迅雷用户账号参数不存在',
+            }
 
         return response_data
 
@@ -2049,19 +2054,22 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         sign = params.get('sign', '').strip()
         _time = params.get('time', '').strip()
         nickname = params.get('nickname', '').strip()
+        account = params.get('account', '').strip()
         user_id = params.get('xluserid', '').strip()
         channel_code = params.get('promo_token', '').strip()
-        response_data = self.check_params(channel_code, sign, _time, nickname, user_id)
+        response_data = self.check_params(channel_code, sign, _time, nickname, user_id, account)
 
         self.wx_code = channel_code
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
-        device_list = ['android', 'iphone']
-        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
-        for device in device_list:
-            match = re.search(device, user_agent)
-            if match and match.group():
-                self.template_name = 'app_xunleizhuce.jade'
+        if not self.template_name:
+            self.template_name = 'xunlei_three.jade'
+            device_list = ['android', 'iphone']
+            user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+            for device in device_list:
+                match = re.search(device, user_agent)
+                if match and match.group():
+                    self.template_name = 'app_xunleizhuce.jade'
 
         if not response_data:
             check_data = {
@@ -2069,14 +2077,14 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
                 'xluserid': user_id,
             }
 
-            if len(nickname) > 3:
-                nickname = nickname[:3]+'...'
+            if len(account) > 3:
+                account = account[:3]+'...'
 
             if xunleivip_generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
-                    'nickname': nickname,
+                    'nickname': account,
                 }
             else:
                 response_data = {
@@ -3078,18 +3086,23 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
+        account = request.session.get('account', '').strip()
         if channel_code and (channel_code in channel_codes and channel_user
-                             and channel_time and channel_sign and nick_name):
+                             and channel_time and channel_sign and nick_name and account):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
             if not binding:
                 CoopRegister(request).process_after_binding(user)
                 binding = Binding.objects.filter(user_id=user.id).first()
                 if binding:
+                    baccount = binding.baccount or ''
+                    if len(baccount) > 3:
+                        baccount = baccount[:3]+'...'
                     response_data = {
                         'ret_code': '10000',
                         'message': u'绑定成功',
-                        'nickname': nick_name,
+                        'nickname': baccount,
+                        'xl_account': baccount,
                     }
                 else:
                     response_data = {
@@ -3097,10 +3110,14 @@ class ThunderBindingApi(APIView):
                         'message': u'绑定失败',
                     }
             else:
+                baccount = binding.baccount or ''
+                if len(baccount) > 3:
+                    baccount = baccount[:3]+'...'
                 response_data = {
                     'ret_code': '10002',
                     'message': u'该用户已绑定过',
-                    'nickname': nick_name,
+                    'nickname': baccount,
+                    'xl_account': baccount,
                 }
         else:
             response_data = {
@@ -3108,8 +3125,10 @@ class ThunderBindingApi(APIView):
                 'message': u'非法请求',
             }
 
-        logger.info("%s binding user_id[%s], promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
-                    % (user_channel.code, user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
+        logger.info("%s binding user_id[%s] promo_token[%s] xluserid[%s] time[%s] "
+                    "sign[%s] nickname[%s] account[%s] result[%s]"
+                    % (user_channel.code, user.id, channel_code, channel_user,
+                       channel_time, channel_sign, nick_name, account, response_data))
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
 

@@ -19,6 +19,7 @@ from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord, PhpIncome
+from wanglibao_activity.tasks import check_activity_task
 import datetime
 import json
 from django.db.models import Sum, Count, Q
@@ -28,7 +29,7 @@ from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEM
 
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
-from wanglibao_reward.tasks import sendWechatPhoneReward
+# from wanglibao_reward.tasks import sendWechatPhoneReward
 from marketing.send_data import send_register_data, send_idvalidate_data, send_deposit_data, send_investment_data,\
      send_withdraw_data
 from wanglibao_reward.utils import processMarchAwardAfterP2pBuy, processAugustAwardZhaoXiangGuan
@@ -44,7 +45,7 @@ logger = get_task_logger(__name__)
 
 
 @app.task
-def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False, product_balance_after=0):
+def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False, product_balance_after=0, ylb_period=0):
     # fix@chenweibi, add order_id
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
@@ -57,7 +58,12 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         introduced_by.save()
 
     # 活动检测
-    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full)
+    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full, ylb_period)
+
+    # 月利宝的标不进行除发奖励外的操作.
+    if ylb_period:
+        return
+
     # fix@chenweibi, add order_id
     try:
         utils.log_clientinfo(device, "buy", user_id, order_id, amount)
@@ -71,11 +77,11 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount)
     except Exception:
         logger.error('影像投资节优惠码发送失败')
-        pass    
+        pass
     # 往数据中心发送投资信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_investment_data.apply_async(kwargs={
-            "user_id": user_id, "amount": amount, "device_type":device_type,
+            "user_id": user_id, "amount": amount, "device_type": device_type,
             "order_id": order_id, "product_id": product_id,
         }, queue='celery02')
     try:
@@ -112,6 +118,7 @@ def checkUpdateHmdRanks(product_id):
         product = P2PProduct.objects.get(id=product_id)
         if product.name.find('产融通HMD')!=-1:
             updateHmdRedisTopRanks.apply_async(kwargs={}, queue='celery02')
+
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
@@ -151,7 +158,7 @@ def register_ok(user_id, device):
         utils.log_clientinfo(device, "register", user_id)
     except Exception:
         pass
-    #往数据中心发送注册信息数据
+    # 往数据中心发送注册信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_register_data.apply_async(kwargs={
             "user_id": user_id, "device_type":device_type,
@@ -189,11 +196,11 @@ def idvalidate_ok(user_id, device):
         utils.log_clientinfo(device, "validation", user_id)
     except Exception:
         pass
-    #往数据中心发送实名信息数据
+    # 往数据中心发送实名信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         if user.wanglibaouserprofile.id_is_valid:
             send_idvalidate_data.apply_async(kwargs={
-                "user_id": user_id, "device_type":device_type,
+                "user_id": user_id, "device_type": device_type,
             }, queue='celery02')
 
 
@@ -241,31 +248,31 @@ def deposit_ok(user_id, amount, device, order_id):
         })
 
         weixin_user = WeixinUser.objects.filter(user=user).first()
-# 亲爱的满先生，您的充值已成功
-# {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
+        # 亲爱的满先生，您的充值已成功
+        # {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
         if weixin_user:
 
             deposit_ok_time = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
             margin = Margin.objects.filter(user=user).first()
             sentTemplate.apply_async(kwargs={
-                            "kwargs":json.dumps({
-                                            "openid":weixin_user.openid,
-                                            "template_id":DEPOSIT_SUCCESS_TEMPLATE_ID,
-                                            "first":u"亲爱的%s，您的充值已成功"%user_profile.name,
-                                            "keyword1":deposit_ok_time,
-                                            "keyword2":"%s 元"%str(amount),
-                                            "keyword3":str(margin.margin),
-                                                })},
-                                            queue='celery02')
+                "kwargs": json.dumps({
+                    "openid": weixin_user.openid,
+                    "template_id": DEPOSIT_SUCCESS_TEMPLATE_ID,
+                    "first": u"亲爱的%s，您的充值已成功" % user_profile.name,
+                    "keyword1": deposit_ok_time,
+                    "keyword2": "%s 元" % str(amount),
+                    "keyword3": "%s 元" % str(margin.margin),
+                })
+            }, queue='celery02')
 
         logger.info('=deposit_ok= Success: [%s], [%s], [%s]' % (user_profile.phone, order_id, amount))
     except Exception, e:
         logger.exception('=deposit_ok= Except: [%s]' % str(e))
 
-    #往数据中心发送冲值信息数据
+    # 往数据中心发送冲值信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_deposit_data.apply_async(kwargs={
-            "user_id": user_id, "amount": amount, "device_type":device_type, "order_id": order_id,
+            "user_id": user_id, "amount": amount, "device_type": device_type, "order_id": order_id,
         }, queue='celery02')
 
 
@@ -301,30 +308,30 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
     weixin_user = WeixinUser.objects.filter(user=user).first()
     if weixin_user:
         # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
-    # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
+        # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
         now = datetime.datetime.now()
-        withdraw_ok_time = "%s前处理完毕"%(now+datetime.timedelta(days=3)).strftime('%Y年%m月%d日')
+        withdraw_ok_time = "%s前处理完毕" % (now + datetime.timedelta(days=3)).strftime('%Y年%m月%d日')
         sentTemplate.apply_async(kwargs={
-                        "kwargs":json.dumps({
-                                        "openid":weixin_user.openid,
-                                        "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
-                                        "first":u"亲爱的%s，您的提现申请已受理"%user_name,
-                                        "keyword1":"%s 元"%str(amount),
-                                        "keyword2":bank_name,
-                                        "keyword3":withdraw_ok_time,
-                                        ###"url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % order_id,
-                                            })},
-                                        queue='celery02')
+            "kwargs": json.dumps({
+                "openid": weixin_user.openid,
+                "template_id": WITH_DRAW_SUBMITTED_TEMPLATE_ID,
+                "first": u"亲爱的%s，您的提现申请已受理" % user_name,
+                "keyword1": "%s 元" % str(amount),
+                "keyword2": bank_name,
+                "keyword3": withdraw_ok_time,
+                # "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/',
+            })
+        }, queue='celery02')
 
     try:
         utils.log_clientinfo(device, "withdraw", user_id, order_id, amount)
     except Exception:
         pass
     
-    #往数据中心发送提现信息数据
+    # 往数据中心发送提现信息数据
     if settings.SEND_PHP_ON_OR_OFF:
         send_withdraw_data.apply_async(kwargs={
-            "user_id": user_id, "amount": amount, "order_id": order_id, "device_type":device_type,
+            "user_id": user_id, "amount": amount, "order_id": order_id, "device_type": device_type,
         }, queue='celery02')
 
 
