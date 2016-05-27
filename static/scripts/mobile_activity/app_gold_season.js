@@ -219,89 +219,89 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;(function(org) {
 
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-    org.ajax({
-		type : 'GET',
-		url : '/weixin/api/jsapi_config/',
-		dataType : 'json',
-		success : function(data) {
-			//请求成功，通过config注入配置信息,
-			wx.config({
-				debug: false,
-				appId: data.appId,
-				timestamp: data.timestamp,
-				nonceStr: data.nonceStr,
-				signature: data.signature,
-				jsApiList: jsApiList
-			});
-		}
-    });
-    wx.ready(function(){
-		var host = location.protocol+"//"+location.host,
-			shareName = '全民淘金',
-			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-			shareLink = host + '/activity/app_gold_season/',
-			shareMainTit = '全民淘金',
-			shareBody = '人脉即财脉';
-		//分享给微信好友
-		org.onMenuShareAppMessage({
-			title: shareMainTit,
-			desc: shareBody,
-			link: shareLink,
-			imgUrl: shareImg
-		});
-		//分享给微信朋友圈
-		org.onMenuShareTimeline({
-			title: '全民淘金',
-			link : shareLink,
-			imgUrl: shareImg
-		})
-		//分享给QQ
-		org.onMenuShareQQ({
-			title: shareMainTit,
-			desc: shareBody,
-			link : shareLink,
-			imgUrl: shareImg
-		})
-    })
-
-
-    var login = false;
-    wlb.ready({
-        app: function (mixins) {
-            $('.share-btns').show();
-            mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
-            function connect(data) {
-                org.ajax({
-                    url: '/accounts/token/login/ajax/',
-                    type: 'post',
-                    data: {
-                        token: data.tk,
-                        secret_key: data.secretToken,
-                        ts: data.ts
-                    },
-                    success: function (data) {
-                    }
-                })
-            }
-            mixins.sendUserInfo(function (data) {
-                if (data.ph == '') {
-                    $('.share-btns').on('click',function() {
-                        mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
-                    })
-                }else{
-                    connect(data)
-                    $('.share-btns').on('click',function(){
-                        mixins.touchShare();
-                    })
-                }
-            })
-
-        },
-        other: function(){
-            $('.share-btns').hide();
-        }
-    })
+    //var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+    //org.ajax({
+		//type : 'GET',
+		//url : '/weixin/api/jsapi_config/',
+		//dataType : 'json',
+		//success : function(data) {
+		//	//请求成功，通过config注入配置信息,
+		//	wx.config({
+		//		debug: false,
+		//		appId: data.appId,
+		//		timestamp: data.timestamp,
+		//		nonceStr: data.nonceStr,
+		//		signature: data.signature,
+		//		jsApiList: jsApiList
+		//	});
+		//}
+    //});
+    //wx.ready(function(){
+		//var host = location.protocol+"//"+location.host,
+		//	shareName = '全民淘金',
+		//	shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+		//	shareLink = host + '/activity/app_gold_season/',
+		//	shareMainTit = '全民淘金',
+		//	shareBody = '人脉即财脉';
+		////分享给微信好友
+		//org.onMenuShareAppMessage({
+		//	title: shareMainTit,
+		//	desc: shareBody,
+		//	link: shareLink,
+		//	imgUrl: shareImg
+		//});
+		////分享给微信朋友圈
+		//org.onMenuShareTimeline({
+		//	title: '全民淘金',
+		//	link : shareLink,
+		//	imgUrl: shareImg
+		//})
+		////分享给QQ
+		//org.onMenuShareQQ({
+		//	title: shareMainTit,
+		//	desc: shareBody,
+		//	link : shareLink,
+		//	imgUrl: shareImg
+		//})
+    //})
+    //
+    //
+    //var login = false;
+    //wlb.ready({
+    //    app: function (mixins) {
+    //        $('.share-btns').show();
+    //        mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
+    //        function connect(data) {
+    //            org.ajax({
+    //                url: '/accounts/token/login/ajax/',
+    //                type: 'post',
+    //                data: {
+    //                    token: data.tk,
+    //                    secret_key: data.secretToken,
+    //                    ts: data.ts
+    //                },
+    //                success: function (data) {
+    //                }
+    //            })
+    //        }
+    //        mixins.sendUserInfo(function (data) {
+    //            if (data.ph == '') {
+    //                $('.share-btns').on('click',function() {
+    //                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
+    //                })
+    //            }else{
+    //                connect(data)
+    //                $('.share-btns').on('click',function(){
+    //                    mixins.touchShare();
+    //                })
+    //            }
+    //        })
+    //
+    //    },
+    //    other: function(){
+    //        $('.share-btns').hide();
+    //    }
+    //})
 
 
       var is_animate = true;
