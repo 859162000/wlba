@@ -202,11 +202,13 @@
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     $('.share-btns').on('click',function(){
-                        mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
-                    })
+                        mixins.loginrApp({refresh:1, url:'/activity/app_gold_season/'});
+                    }
                 } else {
                     connect(data)
-
+                    //$('.share-btns').on('click',function(){
+                    //    mixins.shareData({title: '全民淘金！', content: '全民淘金！'});
+                    //})
                 }
             })
         },
