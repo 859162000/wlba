@@ -133,12 +133,15 @@
       if (ios) {
           document.getElementById('ios-show').style.display = 'block';
       }
+  })
+
+}).call(this);
 
 
-
-      //分享
+//分享
+(function(org) {
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
-	$.ajax({
+	org.ajax({
 		type : 'GET',
 		url : '/weixin/api/jsapi_config/',
 		dataType : 'json',
@@ -186,7 +189,7 @@
     wlb.ready({
         app: function (mixins) {
             function connect(data) {
-                $.ajax({
+                org.ajax({
                     url: '/accounts/token/login/ajax/',
                     type: 'post',
                     data: {
@@ -202,7 +205,7 @@
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     $('.share-btns').on('click',function(){
-                        mixins.loginrApp({refresh:1, url:'/activity/app_gold_season/'});
+                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_gold_season/'});
                     }
                 } else {
                     connect(data)
@@ -215,9 +218,4 @@
         other: function(){
         }
     })
-  })
-
-}).call(this);
-
-
-
+})(org);
