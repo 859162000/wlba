@@ -123,10 +123,23 @@ class AccessTokenView(AccessTokenBaseView):
                     'msg': 'api error'
                 }
         else:
-            response_data = {
-                'code': 30001,
-                'msg': form.errors.values()[0][0]
-            }
+            error_msg = form.errors.values()[0][0]
+            channel_code = req_data.get('channel_code') or req_data.get('promo_token')
+            if error_msg == u'无效手机号' and channel_code == 'bajinshe':
+                default_invalid_token = settings.DEFAULT_INVALID_TOKEN
+                response_data = {
+                    'access_token': default_invalid_token,
+                    'expires_in': 599,
+                    'p2pUserId': req_data.get('channel_user'),
+                    'refresh_token': default_invalid_token,
+                    'code': 10000,
+                    'message': 'success',
+                }
+            else:
+                response_data = {
+                    'code': 30001,
+                    'msg': form.errors.values()[0][0]
+                }
 
         CoopSessionProcessor(request).all_processors_for_session(1)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
