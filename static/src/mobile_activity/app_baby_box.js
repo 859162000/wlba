@@ -21,5 +21,8 @@
             }
         })
     })
-    
+
+    $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
+        $('.popup_box').hide();
+    });
 })(org);
