@@ -1175,8 +1175,8 @@ class KuaiShortPay:
             pay_info.save_error(error_code=error_code, error_message=error_message, is_inner_error=is_inner_error)
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
             if str(error_code) == str(self.ERR_CODE_WAITING):
-                error_code = '201181'
-                error_message = u'回复银行预留手机号所收短信,完成充值'
+                error_code = '22000'
+                error_message = u'充值申请已提交，请耐心等待充值完成'
             return {"ret_code": error_code, "message": error_message, 'order_id':order_id, 'pay_info_id':payinfo_id}
         else:
             # 若TR3已经完成该交易，直接返回结果
