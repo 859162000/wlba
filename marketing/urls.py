@@ -101,9 +101,6 @@ urlpatterns = patterns(
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
     # url(r'^xunlei_treasure/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei.jade")),
     url(r'^shield_plan/$', ShieldPlanView.as_view()),
-
-
-
 )
 
 # app URL
@@ -202,7 +199,7 @@ urlpatterns += patterns(
     url(r'^app_double_eggs/$', TemplateView.as_view(template_name="app_double_eggs.jade")),
     url(r'^app_praise_reward/$', TemplateView.as_view(template_name="app_praise_reward.jade")),
     #url(r'^app_xunlei/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunlei.jade")),
-    url(r'^app_xunlei/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='', template_name="app_xunlei_new.jade")),
+    url(r'^app_xunlei/$', TemplateView.as_view(template_name="app_xunleithree.jade")),
     url(r'^app_send_reward/$', TemplateView.as_view(template_name="app_send_reward.jade")),
     url(r'^app_january_reward/$', TemplateView.as_view(template_name="app_january_reward.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
@@ -214,7 +211,8 @@ urlpatterns += patterns(
 
     url(r'^weixin_lifestyle/$', TemplateView.as_view(template_name="h5_lifestyle.jade")),
     url(r'^app_xunleithree/$', TemplateView.as_view(template_name="app_xunleithree.jade")),
-    url(r'^app_xunleizhuce/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunleizhuce.jade")),
+    # url(r'^app_xunleizhuce/$', ThunderTenAcvitityTemplate.as_view(template_name="app_xunleizhuce.jade")),
+    url(r'^app_xunleizhuce/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='', template_name="app_xunlei_new.jade")),
     url(r'^h5_recruit/$', TemplateView.as_view(template_name="h5_recruit.jade")),
     url(r'^app_april_mobilization/$', TemplateView.as_view(template_name="app_april_mobilization.jade")),
     url(r'^new_user_gift/$', TemplateView.as_view(template_name="new_user_gift.jade")),
