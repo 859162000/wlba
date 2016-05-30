@@ -166,6 +166,11 @@ html
                             a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                           else
                             a.submit-bu-20150818.span12.button-primary.button-middle.invest(href='/accounts/login/?next=/p2p/detail/{{p2p.id}}') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                            .notes-fonts
+                                i
+                                | 理财非存款，投资需谨慎（
+                                a(href="/security/") 详情
+                                | ）
           if status != '抢购中'
             .sold-out
               p.align-center

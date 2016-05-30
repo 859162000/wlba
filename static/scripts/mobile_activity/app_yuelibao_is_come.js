@@ -170,7 +170,7 @@ weixin_share("月利宝正式上线");//微信分享
      app: function(mixins){
         var winHost = window.location.href;
         var host = winHost.substring(0,winHost.indexOf('/activity'));
-        mixins.shareData({title: "月利宝正式上线", content: "月利宝是网利宝平台推出的优选理财计划。当日计息，月月升息，转让灵活。", image: host + "/static/imgs/mobile/weChat_logo.png"})
+        mixins.shareData({title: "月利宝正式上线", content: "月利宝是网利宝平台推出的优选理财计划。当日计息，月月升息，转让灵活。", shareUrl: host + '/activity/app_yuelibao_is_come/', image: host + "/static/imgs/mobile/weChat_logo.png"})
      }
  })
 })();

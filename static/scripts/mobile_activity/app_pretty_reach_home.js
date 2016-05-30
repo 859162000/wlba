@@ -240,7 +240,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '网利宝携手小美到家0元请你做美容！',
-			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300x300.jpg',
+			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300*300.jpg',
 			shareLink = host + '/activity/app_pretty_reach_home/?promo_token=xmdj2',
 			shareMainTit = '网利宝携手小美到家0元请你做美容！',
 			shareBody = '召唤素颜美肌，赶紧来领！';

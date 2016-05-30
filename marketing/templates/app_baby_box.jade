@@ -73,7 +73,8 @@ html(style="background: #fff")
                     .textairport
                     .popup_button 知道了
                     img.close_popup(src="/static/imgs/mobile_activity/app_baby_box/close_popup.png")
-        script(src="/static/scripts/mobile_activity/app_baby_box.js?v=2015052402")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/mobile_activity/app_baby_box.js?v=2015053001")
         - csrf_token
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
