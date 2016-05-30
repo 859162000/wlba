@@ -1,0 +1,94 @@
+-load formatters
+-load mathfilters
+doctype html
+html.no-js(lang="en-gb")
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015051702")
+        - csrf_token
+    body(style="background:#fafafa")
+        include global/g_nav
+        .body_wrap.clear
+            .section.section_1
+                .sum_num 5,900,907,840.00
+            .section.section_2
+                .act_time 活动时间：2016年6月1日 0:00-23:59
+                .act_text 在网利宝破亿的大日子里，怎么能没有加息券送呢。千呼万唤的满额送加息来啦！
+                .brand_wrap
+                    .brand_box
+                        .title_text 1千<单笔投资额<1万
+                        .send_text 赠：
+                        .add_num!='1<span>%</span>'
+                        .goods_text 加息券
+                        .use_text_1 使用门槛
+                        .use_text_2 1万，限1月及以上标使用
+                    .brand_box
+                        .title_text 1万<单笔投资额<3万
+                        .send_text 赠：
+                        .add_num!='1.2<span>%</span>'
+                        .goods_text 加息券
+                        .use_text_1 使用门槛
+                        .use_text_2 3万，限1月及以上标使用
+                    .brand_box
+                        .title_text 3万<单笔投资额<5万
+                        .send_text 赠：
+                        .add_num!='1.4<span>%</span>'
+                        .goods_text 加息券
+                        .use_text_1 使用门槛
+                        .use_text_2 6万，限1月及以上标使用
+                    .brand_box
+                        .title_text 5万<单笔投资额<8万
+                        .send_text 赠：
+                        .add_num!='1.7<span>%</span>'
+                        .goods_text 加息券
+                        .use_text_1 使用门槛
+                        .use_text_2 10万，限1月及以上标使用
+                    .brand_box
+                        .title_text 8万≤单笔投资额
+                        .send_text 赠：
+                        .add_num!='2<span>%</span>'
+                        .goods_text 加息券
+                        .use_text_1 使用门槛
+                        .use_text_2 20万，限1月及以上标使用
+                .prompt_wrap 温馨提示：<br>1、活动期间投资一月及以上标，即可获得加息券。<br>2、投资完成后，加息券实时发放到用户账户，登录“我的账户”-理财券专区查看。<br>3、加息券有效期：6月4日－6月15日23:59。
+            .section.section_3
+                .act_text 秒杀7-13.5%年化率
+                .act_time 活动时间：2016年6月2日 10:00 开始
+                .brand_wrap
+                    .brand_box
+                        .title_text 庆60亿专享1月期项目
+                        .interest_rate 6 +
+                            .num_2 ?
+                                .increase_box
+                                    .increase_text 庆60亿专享
+                                        span
+                            span %
+
+                        .time_money
+                          .time_left
+                            .p_top 1个月
+                            .p_b 项目期限
+
+                          .border_left
+                          .money_right
+                            .p_top ？万元
+                            .p_b 总金额
+
+                        .progress_bar
+                          .progress_bar_box
+                            .progress_bar_left
+                              span
+
+                            .available_amount 可投金额 535,000元
+
+                          .progress_bar_right 2%
+                        .button_buy 马上抢购
+
+                    .brand_box
+                    .brand_box
+        include global/g_footer
+script.
+    require(['/static/js/six_billion.js?v=2015051307'])
+

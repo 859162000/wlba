@@ -96,6 +96,7 @@ urlpatterns = patterns(
     url(r'^april_mobilization/$', TemplateView.as_view(template_name="april_mobilization.jade")),
     url(r'^open_day_review/$', HMDP2PListView.as_view(template_name="open_day_review.jade", p2p_list_url_name="p2p_list")),
     url(r'^center_film_ticket/$', TemplateView.as_view(template_name="center_film_ticket.jade")),
+    url(r'^six_billion/$', TemplateView.as_view(template_name="six_billion.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
