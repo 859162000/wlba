@@ -219,7 +219,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;org.ui = (function(){
     var lib = {
-        _alert: function(txt, callback,difference){
+        _alert: function(txt, callback,difference, tag){
             var alertFram = '';
             if(document.getElementById("alert-cont")){
                 document.getElementById("alert-cont").innerHTML = '';
@@ -238,8 +238,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 strHtml = "<div id='alertTxt' class='popub-txt investWin'><p><img src='/static/imgs/mobile_activity/app_experience/right.png'/></p>";
                 strHtml+="<p class='successFonts'>恭喜您投资成功！</p><p>到期后体验金自动收回</p><p>收益自动发放</p></div>";
             }else if(difference == 4){
+                if(tag == 'goRecharge'){
+                    var btnTxt = '去充值',recharge = 'goRecharge';
+                }else{
+                    var btnTxt = '知道了',recharge = '';
+                }
                 strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p></div>";
             }
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
@@ -272,7 +277,11 @@ org.investment = (function (org) {
                     data: {},
                     success: function (data) {
                         if (data.ret_code > 0) {
-                            org.ui.alert(data.message, '', '4')
+                            if(data.ret_code == 30009){
+                                org.ui.alert(data.message, '', '4', 'goRecharge')
+                            }else{
+                                org.ui.alert(data.message, '', '4')
+                            }
                         } else {
                             org.ui.alert('', '', '2')
                             setTimeout(function () {
@@ -315,7 +324,7 @@ org.investment = (function (org) {
                 if (data.ph == '') {
                 } else {
                     connect(data)
-                    $('#recharge').on('click', function () {
+                    $('body').on('click','.goRecharge,#recharge',function(){
                         mixins.rechargeApp({
                             refresh: 1,
                             url: 'https://staging.wanglibao.com/activity/experience/app_detail'
@@ -326,7 +335,8 @@ org.investment = (function (org) {
         },
         other: function () {
             org.investment.init();
-            $('#recharge').on('click', function () {
+            $('body').on('click','.goRecharge,#recharge',function(){
+                console.log(1)
                 window.location.href = '/weixin/recharge/';
             })
         }
