@@ -262,6 +262,7 @@ org.xunlei = (function(org){
             lib._getRewardCount();
             //lib._listScroll();
             lib._luckDraw();
+            lib._goRegistFun();
         },
         _newUserReward : function(){
            $('#rewardDetail').on('click',function(){
@@ -377,6 +378,17 @@ org.xunlei = (function(org){
                     })
                 }
             })
+        },
+        _goRegistFun : function(){
+            var promo_token = org.getQueryStringByName('promo_token'),
+                xluserid = org.getQueryStringByName('xluserid'),
+                time = org.getQueryStringByName('time'),
+                sign = org.getQueryStringByName('sign'),
+                nickname = org.getQueryStringByName('nickname'),
+                referfrom = org.getQueryStringByName('referfrom'),
+                account = org.getQueryStringByName('account');
+            var hrefStr = '/activity/app_xunleizhuce/?promo_token='+promo_token+'&xluserid='+xluserid+'&time='+time+'&sign='+sign+'&nickname='+nickname+'&referfrom='+referfrom+'&account='+account
+            $('#goRegist').attr('href',hrefStr)
         }
     }
     return {
