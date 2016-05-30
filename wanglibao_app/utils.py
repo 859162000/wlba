@@ -160,9 +160,14 @@ class RecommendProduct(object):
         if p2p_result['soldout_time']:
             soldout_time = timezone.localtime(p2p_result['soldout_time']).strftime("%Y-%m-%d %H:%M:%S")
             p2p_result['soldout_time'] = soldout_time
+        else:
+            p2p_result['soldout_time'] = ""
+            
         if p2p_result['make_loans_time']:
             make_loans_time = timezone.localtime(p2p_result['make_loans_time']).strftime("%Y-%m-%d %H:%M:%S")
             p2p_result['make_loans_time'] = make_loans_time
+        else:
+            p2p_result['make_loans_time'] = ""
 
         del p2p_result['warrants']
         del p2p_result['warrant_company_name']
