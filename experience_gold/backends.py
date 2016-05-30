@@ -20,6 +20,7 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_account import message as inside_message
 from order.utils import OrderHelper
 from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_margin.models import MarginRecord
 
 logger = logging.getLogger(__name__)
 
@@ -71,11 +72,16 @@ class ExperienceBuyAPIView(APIView):
 
             records_ids = ''
             if experience_record:
+                catalog = u'购买体验标'
+
                 for i in experience_record:
                     total_amount_tmp += i.event.amount
 
-                if total_amount_tmp < 28888 and user.margin.margin < 1:
-                    return Response({'ret_code': 30003, 'message': u'账户余额不足,请先充值'})
+                # 如果查询到已经购买过至少 1 次体验标,则不再检测账户余额
+                buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
+                if buy_count == 0:
+                    if total_amount_tmp >= 28888 and user.margin.margin < 1:
+                        return Response({'ret_code': 30009, 'message': u'账户余额不足,请先充值'})
 
                 for record in experience_record:
                     event = record.event
@@ -107,10 +113,9 @@ class ExperienceBuyAPIView(APIView):
 
                     amortization.save()
 
-                # 从账户中扣除 1 元
-                if total_amount >= 28888:
+                # 从账户中扣除 1 元 (没有购买过体验标的情况)
+                if total_amount >= 28888 and buy_count == 0:
                     amount = 1.00
-                    catalog = u'购买体验标'
                     order_id = OrderHelper.place_order(user, order_type=catalog, status=u'新建').id
                     margin_keeper = MarginKeeper(user=user, order_id=order_id)
                     margin_keeper.reduce_margin_common(amount, catalog=catalog, description=catalog)

@@ -309,17 +309,7 @@ class YueLiBaoBuy(APIView):
 
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
-                                                  'device_type': device['device_type']}, queue='celery_ylb')
-
-            tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
-                                                   "device": device, "order_id": trade_id,
-                                                   "product_id": product.id, "is_full": False,
-                                                   "product_balance_after": 0, "ylb_period": period})
-            try:
-                logger.debug(u"=月利宝迅雷活动= CoopRegister.process_for_purchase : [%s], [%s]" % (user.id, product.id))
-                CoopRegister(self.request).process_for_purchase_yuelibao(user, product.id)
-            except Exception, e:
-                logger.debug(u"=月利宝迅雷活动= CoopRegister.process_for_purchase Except:{}".format(e.message))
+                                                  'device': device, 'period': period}, queue='celery_ylb')
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
