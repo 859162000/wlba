@@ -169,6 +169,8 @@ class RecommendProduct(object):
         else:
             p2p_result['make_loans_time'] = ""
 
+        p2p_result['pay_method'] = p2p_result['display_payback_method']
+
         del p2p_result['warrants']
         del p2p_result['warrant_company_name']
         del p2p_result['attachments']
