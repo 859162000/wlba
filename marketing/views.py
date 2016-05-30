@@ -2063,7 +2063,7 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
         if not self.template_name:
-            self.template_name = 'xunlei_three.jade'
+            self.template_name = 'xunlei.jade'
             device_list = ['android', 'iphone']
             user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
             for device in device_list:

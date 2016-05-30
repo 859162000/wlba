@@ -412,7 +412,7 @@ org.xunlei = (function (org) {
                             //
                             //$('.va').html(va.substring(0, 3) + "******" + va.substring(9, 11));
                             //$('.xunmeng2').show();
-                            window.location.href = '/weixin/list/'
+                            window.location.href = '/activity/xunlei_setp/'
                         } else {
                             //$('.get_ticket_wrap1').show();
                         }
