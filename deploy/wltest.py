@@ -14,9 +14,11 @@ env.roledefs = {
     'web': ["192.168.20.247"],
     'mq': ["192.168.20.247"],
 
+    'wltest': ["192.168.20.247"],
     'git_server': ["192.168.20.231"],
 }
 env.user = "wangli"
+env.password = '52e6FJOd'
 env.git_server_path = "~/wanglibao-backend"
 env.deploy_path = "/var/www/wanglibao/wanglibao-backend"
 env.deploy_virt_path = "/var/www/wanglibao/virt-wanglibao"
@@ -74,9 +76,9 @@ def deploy_web_action():
     if not exists(env.deploy_path):
         with cd("/var/www/wanglibao"):
             run(env.git_server_address)
-    print yellow("backup last code")
-    run("rm -rf %s-back" % env.deploy_path)
-    run("cp -r %s %s-back" % (env.deploy_path, env.deploy_path))
+    ##print yellow("backup last code")
+    ##run("rm -rf %s-back" % env.deploy_path)
+    ##run("cp -r %s %s-back" % (env.deploy_path, env.deploy_path))
     print yellow("update web code")
     with cd(env.deploy_path):
         run("git checkout wanglibao/settings.py")
