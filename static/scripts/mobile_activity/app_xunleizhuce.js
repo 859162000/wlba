@@ -394,17 +394,19 @@ org.xunlei = (function (org) {
                     sig = getQueryString('sign'),
                     namer = getQueryString('nickname'),
                     name = decodeURIComponent(namer),
+                    account = getQueryString('account'),
                     referq = getQueryString('referfrom');
                 var get_ticket_ajax = {};
                 get_ticket_ajax = {
                     url: '/activity/thunder/binding/',
                     type: 'POST',
                     data: {
-                        'promo_token': token,
-                        'xluserid': xid,
-                        'time': timer,
-                        'sign': sig,
-                        'nickname': name
+                        'promo_token' : token,
+                        'xluserid' : xid,
+                        'time' : timer,
+                        'sign' : sig,
+                        'nickname' : name,
+                        'account' : account
                     },
                     success: function (data) {
                         if (data.ret_code == 10002 || data.ret_code == 10000) {
@@ -412,7 +414,7 @@ org.xunlei = (function (org) {
                             //
                             //$('.va').html(va.substring(0, 3) + "******" + va.substring(9, 11));
                             //$('.xunmeng2').show();
-                            window.location.href = '/weixin/list/'
+                            window.location.href = '/activity/xunlei_setp/'
                         } else {
                             //$('.get_ticket_wrap1').show();
                         }
