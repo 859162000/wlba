@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 import re
+import datetime
+from marketing.utils import local_to_utc
 
 from wanglibao_p2p.models import P2PRecord
 
@@ -124,7 +126,10 @@ class ExperienceAppDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         user = self.request.user
-        now = timezone.now()
+        now = dt = timezone.now()
+        pm_17 = local_to_utc(datetime.datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
+        if now > pm_17:
+            dt = now + datetime.timedelta(days=1)
         experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
 
         experience_amount = 0
@@ -144,4 +149,5 @@ class ExperienceAppDetailView(TemplateView):
             'product': experience_product,
             'experience_amount': experience_amount,
             'margin': margin,
+            'dt': dt.strftime("%Y-%m-%d"),
         }

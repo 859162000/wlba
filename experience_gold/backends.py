@@ -81,7 +81,7 @@ class ExperienceBuyAPIView(APIView):
                 buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
                 if buy_count == 0:
                     if total_amount_tmp >= 28888 and user.margin.margin < 1:
-                        return Response({'ret_code': 30003, 'message': u'账户余额不足,请先充值'})
+                        return Response({'ret_code': 30009, 'message': u'账户余额不足,请先充值'})
 
                 for record in experience_record:
                     event = record.event

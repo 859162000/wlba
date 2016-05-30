@@ -36,7 +36,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
 # from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
-from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
+from wanglibao_rest.views import (SendValidationCodeView, SendSMSValidationCodeView, SendRegisterValidationCodeView,
                                   UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
                                   WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                                   SendVoiceCodeNewAPIView, YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
@@ -121,6 +121,7 @@ urlpatterns = patterns(
     url(r'^check_password/$', PasswordCheckView.as_view()),
     url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
+    url(r'^phone_sms_validation_code/(?P<phone>\d{11})/$', SendSMSValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
 
