@@ -105,26 +105,17 @@ org.investment = (function (org) {
                 if (data.ph == '') {
                 } else {
                     connect(data)
-                    //$('#recharge,.goRecharge').on('click', function () {
-                    //    mixins.rechargeApp({
-                    //        refresh: 1,
-                    //        url: 'https://staging.wanglibao.com/activity/experience/app_detail'
-                    //    })
-                    //})
                     $('body').on('click','.goRecharge,#recharge',function(){
                         mixins.rechargeApp({
                             refresh: 1,
                             url: 'https://staging.wanglibao.com/activity/experience/app_detail'
                         })
-                    }
+                    })
                 }
             })
         },
         other: function () {
             org.investment.init();
-            //$('#recharge').on('click', function () {
-            //    window.location.href = '/weixin/recharge/';
-            //})
             $('body').on('click','.goRecharge,#recharge',function(){
                 console.log(1)
                 window.location.href = '/weixin/recharge/';
