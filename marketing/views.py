@@ -2063,7 +2063,7 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
         if not self.template_name:
-            self.template_name = 'xunlei_three.jade'
+            self.template_name = 'xunlei.jade'
             device_list = ['android', 'iphone']
             user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
             for device in device_list:
@@ -3086,7 +3086,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        account = request.session.get('account', '').strip()
+        account = request.session.get('account', '').strip() or request.REQUEST.get('account', '').strip()
         if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name and account):
             user = self.request.user
@@ -3292,8 +3292,10 @@ class ShieldPlanH5View(TemplateView):
             'p2p': p2p_list
         }
 
+
 class HMDP2PListView(TemplateView):
     p2p_list_url_name = ""
+
     def get_context_data(self, **kwargs):
         p2p_products = []
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")
@@ -3307,5 +3309,19 @@ class HMDP2PListView(TemplateView):
         print p2p_list_url
         return {
             'p2p_products': p2p_products[0:1],
-            "p2p_list_url":p2p_list_url
+            "p2p_list_url": p2p_list_url
+        }
+
+
+class SixBillion(TemplateView):
+    template_name = ""
+
+    def get_context_data(self, **kwargs):
+        # 累计交易额
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        site_data_res = site_data[MiscRecommendProduction.KEY_PC_DATA]
+
+        return {
+            'site_data': site_data_res
         }
