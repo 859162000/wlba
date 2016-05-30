@@ -3313,15 +3313,28 @@ class HMDP2PListView(TemplateView):
         }
 
 
-class SixBillion(TemplateView):
-    template_name = ""
+class SixBillionView(TemplateView):
+
+    def get_template_names(self):
+        template = self.kwargs['template']
+        if template == 'app':
+            template_name = 'app_six_billion.jade'
+        else:
+            template_name = "six_billion.jade"
+
+        return template_name
 
     def get_context_data(self, **kwargs):
+        context = super(SixBillionView, self).get_context_data()
         # 累计交易额
         m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
         site_data = m.get_recommend_products()
         site_data_res = site_data[MiscRecommendProduction.KEY_PC_DATA]
 
-        return {
+        print site_data_res
+
+        context.update({
             'site_data': site_data_res
-        }
+        })
+
+        return context
