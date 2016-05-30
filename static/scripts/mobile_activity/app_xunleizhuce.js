@@ -394,17 +394,19 @@ org.xunlei = (function (org) {
                     sig = getQueryString('sign'),
                     namer = getQueryString('nickname'),
                     name = decodeURIComponent(namer),
+                    account = getQueryString('account'),
                     referq = getQueryString('referfrom');
                 var get_ticket_ajax = {};
                 get_ticket_ajax = {
                     url: '/activity/thunder/binding/',
                     type: 'POST',
                     data: {
-                        'promo_token': token,
-                        'xluserid': xid,
-                        'time': timer,
-                        'sign': sig,
-                        'nickname': name
+                        'promo_token' : token,
+                        'xluserid' : xid,
+                        'time' : timer,
+                        'sign' : sig,
+                        'nickname' : name,
+                        'account' : account
                     },
                     success: function (data) {
                         if (data.ret_code == 10002 || data.ret_code == 10000) {
