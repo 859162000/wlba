@@ -3341,6 +3341,10 @@ class SixBillionView(TemplateView):
         six_6 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=6, hide=False)\
             .order_by('-status_int').first()
 
+        six_1.name = u"庆60亿专享1月期项目"
+        six_3.name = u"庆60亿专享3月期项目"
+        six_6.name = u"庆60亿专享6月期项目"
+
         context.update({
             'site_data': site_data_res,
             'now': timezone.localtime(now).strftime('%Y-%m-%d %H:%M:%S'),
