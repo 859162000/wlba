@@ -7,15 +7,15 @@ html.no-js(lang="en-gb")
         include include/common_head
         - endwith
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015053106")
+        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015053107")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
         .body_wrap.clear
             .section.section_1
-                .sum_num {{site_data.p2p_amount | money_format}}
-                .act_time 活动时间:2016年6月1日～6月3日
-                .act_text 累计交易额：
+                .sum_num {{site_data.p2p_amount | money_format}}<br>
+                    .act_time 活动时间:2016年6月1日～6月3日
+                    .act_text 累计交易额：
             .section.section_2
                 .act_time 活动时间：2016年6月1日 0:00-23:59
                 .act_text 在网利宝破亿的大日子里，怎么能没有加息券送呢。千呼万唤的满额送加息来啦！
@@ -28,28 +28,28 @@ html.no-js(lang="en-gb")
                         .use_text_1 使用门槛
                         .use_text_2 1万，限1月及以上标使用
                     .brand_box
-                        .title_text 1万<单笔投资额<3万
+                        .title_text 1万≤单笔投资额<3万
                         .send_text 赠：
                         .add_num!='1.2<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 3万，限1月及以上标使用
                     .brand_box
-                        .title_text 3万<单笔投资额<5万
+                        .title_text 3万≤单笔投资额<5万
                         .send_text 赠：
                         .add_num!='1.4<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 6万，限1月及以上标使用
                     .brand_box
-                        .title_text 5万<单笔投资额<8万
+                        .title_text 5万≤单笔投资额<8万
                         .send_text 赠：
                         .add_num!='1.7<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 10万，限1月及以上标使用
                     .brand_box
-                        .title_text 8万≤单笔投资额
+                        .title_text 8万<单笔投资额
                         .send_text 赠：
                         .add_num!='2<span>%</span>'
                         .goods_text 加息券

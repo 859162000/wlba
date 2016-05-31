@@ -7,7 +7,7 @@ html(style="background: #fff")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053103", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053104", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -27,14 +27,14 @@ html(style="background: #fff")
                         .use_text_1 使用门槛
                         .use_text_2 1万，限1月及以上标使用
                     .brand_box.brand_box_2
-                        .title_text 1万<单笔投资额<3万
+                        .title_text 1万≤单笔投资额<3万
                         .send_text 赠：
                         .add_num!='1.2<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 3万，限1月及以上标使用
                     .brand_box.brand_box_3
-                        .title_text 3万<单笔投资额<5万
+                        .title_text 3万≤单笔投资额<5万
                         .send_text 赠：
                         .add_num!='1.4<span>%</span>'
                         .goods_text 加息券
@@ -42,14 +42,14 @@ html(style="background: #fff")
                         .use_text_2 6万，限1月及以上标使用
                     .clear
                     .brand_box.brand_box_4
-                        .title_text 5万<单笔投资额<8万
+                        .title_text 5万≤单笔投资额<8万
                         .send_text 赠：
                         .add_num!='1.7<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 10万，限1月及以上标使用
                     .brand_box.brand_box_5
-                        .title_text 8万≤单笔投资额
+                        .title_text 8万<单笔投资额
                         .send_text 赠：
                         .add_num!='2<span>%</span>'
                         .goods_text 加息券
@@ -59,7 +59,7 @@ html(style="background: #fff")
                 .prompt_wrap 温馨提示：<br>1、活动期间投资一月及以上标，即可获得加息券。<br>2、投资完成后，加息券实时发放到用户账户，登录“我的账户”-理财券专区查看。<br>3、加息券有效期：6月4日－6月15日23:59。
             .section.section_3
                 img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_3_img.png')
-                .act_time 活动时间：2016年6月2日 10:00 开始
+                .act_time 活动时间：2016年6月3日 10:00 开始
                 .swiper_waper
                     .swiper-container.swiper1
                         .swiper-wrapper
