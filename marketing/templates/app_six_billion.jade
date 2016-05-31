@@ -7,7 +7,7 @@ html(style="background: #fff")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053108", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053109", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -114,7 +114,7 @@ html(style="background: #fff")
                                         .button_buy.gray_button 已售罄
                                     else
                                       .button_buy.blue_button 敬请期待
-                            .swiper-slide.first_slide
+                            .swiper-slide.second_slide
                                 six_3_publish_time = str(six_3.publish_time)
                                 .swiper_main
                                     .title_text {{six_3.name}}
@@ -164,7 +164,7 @@ html(style="background: #fff")
                                         .button_buy.gray_button 已售罄
                                     else
                                       .button_buy.blue_button 敬请期待
-                            .swiper-slide.first_slide
+                            .swiper-slide.third_slide
                               six_6_publish_time = str(six_6.publish_time)
                               .swiper_main
                                 .title_text {{six_6.name}}
