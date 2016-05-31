@@ -238,11 +238,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '123一手解读',
-			shareImg = host + '/static/imgs/mobile_activity/app_open_day_review/300*300.png',
-			shareLink = host + '/activity/app_open_day_review/',
-			shareMainTit = '一手解读',
-			shareBody = '30秒看懂网利宝木材质押贷的前世今生';
+			shareName = '亿路旅程，亿同见证',
+			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+			shareLink = host + '/activity/app_six_billion/',
+			shareMainTit = '亿路旅程，亿同见证',
+			shareBody = '深情不及久伴，厚爱无需多言';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -252,7 +252,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '一手解读：木材质押贷的“前世今生”',
+			title: '亿路旅程，亿同见证',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -349,7 +349,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	var login = false;
     wlb.ready({
+
         app: function (mixins) {
+			mixins.shareData({title: '亿路旅程，亿同见证', content: '深情不及久伴，厚爱无需多言'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -368,9 +370,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         //    self.location.replace(url);
                         //}
 
-                        $('.app_link').on("click",function(){
-                        	mixins.jumpToManageMoney();
-                        })
+                        //$('.app_link').on("click",function(){
+                        //	mixins.jumpToManageMoney();
+                        //})
                     }
                 })
             }
