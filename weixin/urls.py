@@ -134,13 +134,15 @@ urlpatterns += patterns(
     url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
     url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
     url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
-    url(r'^fetch_xunlei_vipcard/$', activity_views.FetchXunleiCardAward.as_view()),
+    #Comment by hb on 2016-05-31
+    #url(r'^fetch_xunlei_vipcard/$', activity_views.FetchXunleiCardAward.as_view()),
 
 )
 #活动页面
 urlpatterns += patterns(
     '',
-    url(r'^app_xunlei_welfare/$', fwh_login_required(TemplateView.as_view(template_name="app_xunlei_welfare.jade"), login_url='/weixin/sub_login_redirect/')),
+    #Comment by hb on 2016-05-31
+    #url(r'^app_xunlei_welfare/$', fwh_login_required(TemplateView.as_view(template_name="app_xunlei_welfare.jade"), login_url='/weixin/sub_login_redirect/')),
 )
 #h5活动页面
 urlpatterns += patterns(
