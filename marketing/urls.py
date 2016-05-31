@@ -222,7 +222,8 @@ urlpatterns += patterns(
     url(r'^dyh_open_day_review/$', HMDP2PListView.as_view(template_name="app_open_day_review.jade", p2p_list_url_name="weixin_p2p_list")),
     url(r'^app_yuelibao_is_come/$', HMDP2PListView.as_view(template_name="app_yuelibao_is_come.jade", p2p_list_url_name="weixin_p2p_list")),
     url(r'^app_center_film_ticket/$', TemplateView.as_view(template_name="app_center_film_ticket.jade")),
-    url(r'^app_xunlei_welfare/$', TemplateView.as_view(template_name="app_xunlei_welfare.jade")),
+    #Comment by hb on 2016-05-31
+    #url(r'^app_xunlei_welfare/$', TemplateView.as_view(template_name="app_xunlei_welfare.jade")),
     url(r'^app_pretty_reach_home/$', TemplateView.as_view(template_name="app_pretty_reach_home.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
 
