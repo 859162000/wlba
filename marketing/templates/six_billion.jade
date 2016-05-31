@@ -62,7 +62,7 @@ html.no-js(lang="en-gb")
                 .brand_wrap
                     .brand_box
                         six_1_publish_time = str(six_1.publish_time)
-                        .title_text {{six_1.name}}
+                        .title_text(style="font-size: 18px") {{six_1.name}}
                         .interest_rate {{six_1.expected_earning_rate}}
                             if six_1.activity.rule.percent_text > 0
                                 .num_2 +
@@ -113,7 +113,7 @@ html.no-js(lang="en-gb")
 
                     .brand_box
                         six_3_publish_time = str(six_3.publish_time)
-                        .title_text {{six_3.name}}
+                        .title_text(style="font-size: 18px") {{six_3.name}}
                         .interest_rate {{six_3.expected_earning_rate}}
                             if six_3.activity.rule.percent_text > 0
                                 .num_2 +
@@ -163,7 +163,7 @@ html.no-js(lang="en-gb")
                             .button_buy.blue_button 敬请期待
                     .brand_box
                         six_6_publish_time = str(six_6.publish_time)
-                        .title_text {{six_6.name}}
+                        .title_text(style="font-size: 18px") {{six_6.name}}
                         .interest_rate {{six_6.expected_earning_rate}}
                             if six_6.activity.rule.percent_text > 0
                                 .num_2 +
