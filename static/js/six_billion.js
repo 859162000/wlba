@@ -57,10 +57,8 @@
             });
             /*轮播图结束*/
 
-
-
             /*指定范围倒计时*/
-
+            var abb;
             var curShowTimeSeconds = 0;
 			//现在倒计时需要有多少秒
             var endTime = new Date(2016,4,30,20,00,00);
