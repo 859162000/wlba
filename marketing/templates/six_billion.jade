@@ -7,7 +7,7 @@ html.no-js(lang="en-gb")
         include include/common_head
         - endwith
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015051702")
+        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015053103")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
@@ -55,7 +55,7 @@ html.no-js(lang="en-gb")
                         .use_text_2 20万，限1月及以上标使用
                 .prompt_wrap 温馨提示：<br>1、活动期间投资一月及以上标，即可获得加息券。<br>2、投资完成后，加息券实时发放到用户账户，登录“我的账户”-理财券专区查看。<br>3、加息券有效期：6月4日－6月15日23:59。
             .section.section_3
-                .act_text 秒杀7-13.5%年化率
+                //.act_text 秒杀7-13.5%年化率
                 .act_time 活动时间：2016年6月2日 10:00 开始
                 .brand_wrap
                     .brand_box
@@ -209,7 +209,7 @@ html.no-js(lang="en-gb")
                                 .button_buy.gray_button 已售罄
                         else
                             .button_buy.blue_button 敬请期待
-                .prompt_wrap 温馨提示：<br>1、6月1日10点开售，庆60亿专享标额不固定，售完即止。<br>2、购买“60亿专享”项目可以使用已获得的加息券、红包。
+                .prompt_wrap 温馨提示：<br>1、6月2日10点开售，庆60亿专享标额不固定，售完即止。<br>2、购买“60亿专享”项目可以使用已获得的加息券、红包。
             .section.section_4
                 .act_text 多投多加息
                 .act_time 活动时间：2016年6月3日 10:00-18:00
@@ -255,7 +255,9 @@ html.no-js(lang="en-gb")
                             .percentage_num 80%
                         .footer_b 可投资金额65万元
                         .button_buy.blue_button 敬请期待
-                .prompt_wrap 温馨提示：<br>1、多投多加息的年化率涨幅按活动时间内（6月2日 10:00-18:00）“亿路狂标—多投多加息“专属标售卖额度进行加息计算，每卖出100万即年化增加一次，以此类推，共2期，标满结束。<br>2、活动结束后，如未满标，继续购买，购买年化不再增加。<br>3、活动期间，大家可以通过PC/h5 活动专题页面查看到增加的实时年化率。活动结束以后，用户所有投资金额均可享受最终年化率，不受加入时间先后顺序影响。<br>4、购买“亿路狂标-多投多加息”项目，可以使用已获得的加息券、红包。
+                        .meng_layer
+                            span 即将开始  敬请期待
+                .prompt_wrap 温馨提示：<br>1、多投多加息的年化率涨幅按活动时间内（6月3日 10:00-18:00）“亿路狂标—多投多加息“专属标售卖额度进行加息计算，每卖出100万即年化增加一次，以此类推，共2期，标满结束。<br>2、活动结束后，如未满标，继续购买，购买年化不再增加。<br>3、活动期间，大家可以通过PC/h5 活动专题页面查看到增加的实时年化率。活动结束以后，用户所有投资金额均可享受最终年化率，不受加入时间先后顺序影响。<br>4、购买“亿路狂标-多投多加息”项目，可以使用已获得的加息券、红包。
             .section.section_5
                 .act_text 感恩有你
                 .act_time 成长历程：2014-2016
@@ -290,8 +292,8 @@ html.no-js(lang="en-gb")
 
                     .swiper-button-next
                     .swiper-button-prev
-
+                .prompt_wrap 以上故事为往期征集，欢迎大家关注网利宝官方订阅号（iwanglibao）并发给我们您自己的故事
         include global/g_footer
 script.
-    require(['/static/js/six_billion.js?v=2015053101'])
+    require(['/static/js/six_billion.js?v=2015053102'])
 
