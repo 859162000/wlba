@@ -255,7 +255,7 @@ class SendRegisterValidationCodeView(APIView):
 
 
 class SendSMSValidationCodeView(APIView):
-    permission_classes = ()
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request, phone):
         userprofile = WanglibaoUserProfile.objects.filter(user_id=request.user.id).first()
