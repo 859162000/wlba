@@ -171,4 +171,18 @@
         }
     })
 
+	/*轮播图*/
+	var swiper = new Swiper('.swiper1', {
+		pagination: '.swiper-pagination',
+        //effect: 'coverflow',
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+
+        onTouchEnd: function(swiper){
+      }
+
+	});
+	/*轮播图结束*/
+
 })(org);
