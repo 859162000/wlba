@@ -3309,3 +3309,39 @@ class HMDP2PListView(TemplateView):
             'p2p_products': p2p_products[0:1],
             "p2p_list_url":p2p_list_url
         }
+
+
+class SixBillionView(TemplateView):
+
+    def get_template_names(self):
+        template = self.kwargs['template']
+        if template == 'app':
+            template_name = 'app_six_billion.jade'
+        else:
+            template_name = "six_billion.jade"
+
+        return template_name
+
+    def get_context_data(self, **kwargs):
+        context = super(SixBillionView, self).get_context_data(**kwargs)
+        now = timezone.now()
+        # 累计交易额
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        site_data_res = site_data[MiscRecommendProduction.KEY_PC_DATA]
+
+        six_1 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=1, hide=False).first()
+
+        six_3 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=3, hide=False).first()
+
+        six_6 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=6, hide=False).first()
+
+        context.update({
+            'site_data': site_data_res,
+            'now': timezone.localtime(now).strftime('%Y-%m-%d %H:%M:%S'),
+            'six_1': six_1,
+            'six_3': six_3,
+            'six_6': six_6,
+        })
+
+        return context
