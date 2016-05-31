@@ -253,6 +253,21 @@ class SendRegisterValidationCodeView(APIView):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
 
 
+class SendSMSValidationCodeView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, phone):
+        userprofile = WanglibaoUserProfile.objects.filter(user_id=request.user.id).first()
+        phone_number = phone.strip()
+        if not (userprofile and userprofile.phone == phone_number):
+            return Response({'message': '请输入有效的手机号', "type":"error"}, status=400)
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        return Response({
+            'message': message
+        }, status=status)
+
+
 class WeixinSendRegisterValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
