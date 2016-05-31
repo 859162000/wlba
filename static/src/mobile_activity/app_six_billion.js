@@ -183,6 +183,30 @@
       }
 
 	});
+
+	var swiper = new Swiper('.swiper2', {
+		pagination: '.swiper-pagination2',
+        //effect: 'coverflow',
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+
+        onTouchEnd: function(swiper){
+      }
+
+	});
+
+	var swiper = new Swiper('.swiper3', {
+		pagination: '.pagination3',
+        //effect: 'coverflow',
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+
+        onTouchEnd: function(swiper){
+      }
+
+	});
 	/*轮播图结束*/
 
 })(org);
