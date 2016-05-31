@@ -19,7 +19,7 @@
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '一手解读',
+			shareName = '123一手解读',
 			shareImg = host + '/static/imgs/mobile_activity/app_open_day_review/300*300.png',
 			shareLink = host + '/activity/app_open_day_review/',
 			shareMainTit = '一手解读',
@@ -202,10 +202,8 @@
         grabCursor: true,
         centeredSlides: true,
         slidesPerView: 'auto',
-
         onTouchEnd: function(swiper){
       }
-
 	});
 	/*轮播图结束*/
 
