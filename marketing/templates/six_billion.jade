@@ -7,13 +7,15 @@ html.no-js(lang="en-gb")
         include include/common_head
         - endwith
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015053104")
+        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015053106")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
         .body_wrap.clear
             .section.section_1
                 .sum_num {{site_data.p2p_amount | money_format}}
+                .act_time 活动时间:2016年6月1日～6月3日
+                .act_text 累计交易额：
             .section.section_2
                 .act_time 活动时间：2016年6月1日 0:00-23:59
                 .act_text 在网利宝破亿的大日子里，怎么能没有加息券送呢。千呼万唤的满额送加息来啦！

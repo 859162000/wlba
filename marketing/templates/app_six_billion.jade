@@ -7,7 +7,7 @@ html(style="background: #fff")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053102", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053103", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -17,7 +17,7 @@ html(style="background: #fff")
                 .sum_num {{site_data.p2p_amount | money_format}}
             .section.section_2
                 img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_2_img.png')
-                .act_time 动时间：2016年6月1日 0:00-23:59<br>网利宝破亿的大日子里，怎么能没有加息送呢。<br>千呼万唤的满额送加息来啦！
+                .act_time 活动时间：2016年6月1日 0:00-23:59<br>网利宝破亿的大日子里，怎么能没有加息送呢。<br>千呼万唤的满额送加息来啦！
                 .brand_wrap
                     .brand_box
                         .title_text 1千<单笔投资额<1万
@@ -27,7 +27,7 @@ html(style="background: #fff")
                         .use_text_1 使用门槛
                         .use_text_2 1万，限1月及以上标使用
                     .brand_box.brand_box_2
-                        .title_text 1千<单笔投资额<3万
+                        .title_text 1万<单笔投资额<3万
                         .send_text 赠：
                         .add_num!='1.2<span>%</span>'
                         .goods_text 加息券
@@ -63,7 +63,7 @@ html(style="background: #fff")
                 .swiper_waper
                     .swiper-container.swiper1
                         .swiper-wrapper
-                            .swiper-slide
+                            .swiper-slide.first_slide
                                 six_1_publish_time = str(six_1.publish_time)
                                 .swiper_main
                                     .title_text {{six_1.name}}
@@ -233,7 +233,7 @@ html(style="background: #fff")
                 .swiper_waper
                     .swiper-container.swiper2
                         .swiper-wrapper
-                            .swiper-slide
+                            .swiper-slide.first_slide
                                 .swiper_main
                                     .meng_layer
                                     .title_text 庆60亿专享1月期项目
@@ -327,7 +327,7 @@ html(style="background: #fff")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_six_billion.js?v=2015053102")
+        script(src="/static/scripts/mobile_activity/app_six_billion.js?v=2015053104")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
