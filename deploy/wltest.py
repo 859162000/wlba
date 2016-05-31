@@ -15,16 +15,16 @@ env.roledefs = {
     'mq': ["192.168.20.247"],
 
     'wltest': ["192.168.20.247"],
-    #'git_server': ["192.168.20.231"],
-    'git_server': ["192.168.10.223"],
+    'git_server': ["192.168.20.231"],
+    #'git_server': ["192.168.10.223"],
 }
 env.user = "wangli"
 env.password = '52e6FJOd'
 env.git_server_path = "~/wanglibao-backend"
 env.deploy_path = "/var/www/wanglibao/wanglibao-backend"
 env.deploy_virt_path = "/var/www/wanglibao/virt-wanglibao"
-#env.git_server_address = "git clone wangli@192.168.20.231:~/wanglibao-backend"
-env.git_server_address = "git clone wangli@192.168.10.223:~/wanglibao-backend"
+env.git_server_address = "git clone wangli@192.168.20.231:~/wanglibao-backend"
+#env.git_server_address = "git clone wangli@192.168.10.223:~/wanglibao-backend"
 env.activate = "source %s/bin/activate" % env.deploy_virt_path
 env.pip_install = "pip install -r %s/requirements.txt" % env.deploy_path
 env.branch = "master"
