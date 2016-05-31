@@ -7,7 +7,7 @@ html(style="background: #fff")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053105", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053106", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -15,6 +15,7 @@ html(style="background: #fff")
             .section.section_1
                 img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_1.jpg')
                 .sum_num {{site_data.p2p_amount | money_format}}
+                    .act_text 累计交易额（元）
             .section.section_2
                 img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_2_img.png')
                 .act_time 活动时间：2016年6月1日 0:00-23:59<br>网利宝破亿的大日子里，怎么能没有加息送呢。<br>千呼万唤的满额送加息来啦！
@@ -59,7 +60,7 @@ html(style="background: #fff")
                 .prompt_wrap 温馨提示：<br>1、活动期间投资一月及以上标，即可获得加息券。<br>2、投资完成后，加息券实时发放到用户账户，登录“我的账户”-理财券专区查看。<br>3、加息券有效期：6月4日－6月15日23:59。
             .section.section_3
                 img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_3_img.png')
-                .act_time 活动时间：2016年6月3日 10:00 开始
+                .act_time 活动时间：2016年6月2日 10:00 开始
                 .swiper_waper
                     .swiper-container.swiper1
                         .swiper-wrapper
@@ -113,7 +114,7 @@ html(style="background: #fff")
                                         .button_buy.gray_button 已售罄
                                     else
                                       .button_buy.blue_button 敬请期待
-                            .swiper-slide
+                            .swiper-slide.second_slide
                                 six_3_publish_time = str(six_3.publish_time)
                                 .swiper_main
                                     .title_text {{six_3.name}}
@@ -229,7 +230,7 @@ html(style="background: #fff")
                         span.time_3
                         span.time_1 2
                         span.time_2 3
-                .act_text 卖出100万，年化率即再增加0.3%，<br>卖出500万，年化即再增加0.9%，以此类推增加年化。
+                .act_text 卖出100万，年化率即再增加0.3%，<br>卖出500万，年化即再增加1.5%，以此类推增加年化。
                 .swiper_waper
                     .swiper-container.swiper2
                         .swiper-wrapper
