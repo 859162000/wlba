@@ -152,6 +152,25 @@ class RecommendProduct(object):
         else:
             activity = {}
 
+        publish_time = timezone.localtime(p2p_result['publish_time']).strftime("%Y-%m-%d %H:%M:%S")
+        end_time = timezone.localtime(p2p_result['end_time']).strftime("%Y-%m-%d %H:%M:%S")
+        p2p_result['publish_time'] = publish_time
+        p2p_result['end_time'] = end_time
+
+        if p2p_result['soldout_time']:
+            soldout_time = timezone.localtime(p2p_result['soldout_time']).strftime("%Y-%m-%d %H:%M:%S")
+            p2p_result['soldout_time'] = soldout_time
+        else:
+            p2p_result['soldout_time'] = ""
+            
+        if p2p_result['make_loans_time']:
+            make_loans_time = timezone.localtime(p2p_result['make_loans_time']).strftime("%Y-%m-%d %H:%M:%S")
+            p2p_result['make_loans_time'] = make_loans_time
+        else:
+            p2p_result['make_loans_time'] = ""
+
+        p2p_result['pay_method'] = p2p_result['display_payback_method']
+
         del p2p_result['warrants']
         del p2p_result['warrant_company_name']
         del p2p_result['attachments']

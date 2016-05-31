@@ -2,14 +2,15 @@
     require.config({
         paths: {
             jquery: 'lib/jquery.min',
-            'underscore': 'lib/underscore-min'
+            'underscore': 'lib/underscore-min',
+            'Swiper':'lib/swiper_new_min'
         },
         shim: {
             'jquery.modal': ['jquery']
 
         }
     });
-    require(['jquery', 'lib/countdown'], function($, countdown) {
+    require(['jquery','lib/countdown','Swiper'], function($, countdown) {
 
             var csrfSafeMethod, getCookie, sameOrigin,
                 getCookie = function (name) {
@@ -48,134 +49,61 @@
                 }
             });
 
-            $('.advantage_wrap .box').hover(function(){
-                $(this).addClass('box_hover').siblings().removeClass('box_hover');
-            })
-
-            $('.section_box4 .box').hover(function(){
-                $(this).addClass('box_hover').siblings().removeClass('box_hover');
-            })
-
-            $('.section_box5 .box').hover(function(){
-                $(this).addClass('box_hover').siblings().removeClass('box_hover');
-            })
-
-            $('.section_box6 .box').hover(function(){
-                $(this).addClass('box_hover').siblings().removeClass('box_hover');
-            })
-
-            $('.section_box7 .box').hover(function(){
-                $(this).addClass('box_hover').siblings().removeClass('box_hover');
-            })
-
-            $('.body_wrap .slide_phone .small_box .img').click(function(){
-                var data_src = $(this).attr('data-src');
-                $(this).addClass('choose').siblings().removeClass('choose');
-                $(this).parent().parent().find('.big_photo_img').attr('src',data_src);
+            /*轮播图*/
+            var swiper = new Swiper('.swiper1', {
+                nextButton: '.swiper-button-next',
+                prevButton: '.swiper-button-prev',
+                slidesPerView: 1
             });
+            /*轮播图结束*/
 
-        function fmoney(s, type) {
-            if (/[^0-9\.]/.test(s))
-                return "0";
-            if (s == null || s == "")
-                return "0";
-            s = s.toString().replace(/^(\d*)$/, "$1.");
-            s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
-            s = s.replace(".", ",");
-            var re = /(\d)(\d{3},)/;
-            while (re.test(s))
-                s = s.replace(re, "$1,$2");
-            s = s.replace(/,(\d\d)$/, ".$1");
-            if (type == 0) {// 不带小数位(默认是有小数位)
-                var a = s.split(".");
-                if (a[1] == "00") {
-                    s = a[0];
-                }
+
+
+            /*指定范围倒计时*/
+
+            var curShowTimeSeconds = 0;
+			//现在倒计时需要有多少秒
+            var endTime = new Date(2016,4,30,20,00,00);
+            //回头这里改成 2016,5,3,20,00,00
+
+            var timestamp = Date.parse(new Date());
+            //获得当前时间戳
+
+            if(timestamp>='1464919200000'&&timestamp<='1464948000000'){
+            //2016年6月3日 10:00-18:00
+
+                setInterval(function(){
+                    curShowTimeSeconds = getCurrentShowTimeSeconds();
+                    var hours = parseInt(curShowTimeSeconds/3600);
+                    var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
+                    var seconds = curShowTimeSeconds % 60;
+
+                    $('.time_1').text(parseInt(hours/10));
+                    $('.time_2').text(parseInt(hours%10));
+
+                    $('.time_3').text(parseInt(minutes/10));
+                    $('.time_4').text(parseInt(minutes%10));
+
+                    $('.time_5').text(parseInt(seconds/10));
+                    $('.time_6').text(parseInt(seconds%10));
+                },1000);
             }
-            return s;
-        }
 
-            $.ajax({
-                url: '/api/activity/hmd_invest_ranks/',
-                type: 'get',
-                success: function (json) {
-                    var rankingList = [];
-                    var json_one;
-                    if(json.hmd_ranks.length>0){
-                        for(var i=0; i<json.hmd_ranks.length; i++) {
+            function getCurrentShowTimeSeconds(){
+				var curTime = new Date();
+				var ret = endTime.getTime() - curTime.getTime();
+				//结束的时间减去现在的时间
+				ret = Math.round(ret/1000);
+				//把毫秒转化成秒
 
-                            json_one = json.hmd_ranks[i];
-                            if (json_one != '') {
-                                var number = fmoney(json_one.amount__sum, 0);
-                                if (i < 3) {
-                                    if (i == 0) {
-                                        rankingList.push(['<li class="first">'].join(''));
-                                    } else if (i == 1) {
-                                        rankingList.push(['<li class="second">'].join(''));
-                                    } else if (i == 2) {
-                                        rankingList.push(['<li class="third">'].join(''));
-                                    }
-                                    rankingList.push(['<span class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</span><span class="num">'+number+'</span">'].join(''));
-
-                                } else {
-                                    var i_num = i + 1;
-                                    rankingList.push(['<li><span class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</span><span class="num">'+number+'</span"></li>'].join(''));
-                                }
-                            }
-                        }
-                        $('.ranking_list ul').html(rankingList.join(''));
-                        $('.ul_footer').show();
-                    }
-                },error: function(data1){
-
-                }
-            })
+				return ret>=0 ? ret : 0;
+				//ret大于等于0的话返回ret，如果不是返回0
+				//如果倒计时结束，返回的结果是0
+			}
+            /*指定范围倒计时结束*/
 
 
-            var fetchCookie, setCookie;
-            $('.container').on('click', '.panel-p2p-product', function() {
-              var url;
-              url = $('.panel-title-bar a', $(this)).attr('href');
-              return window.location.href = url;
-            });
-            $('.p2pinfo-list-box').on('mouseenter', function(e) {
-              var target;
-              target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
-              return $('#' + target).show();
-            }).on('mouseleave', function(e) {
-              var target;
-              target = e.currentTarget.lastChild.id || e.currentTarget.lastElementChild.id;
-              return $('#' + target).hide();
-            }).on('click', function() {
-              var url;
-              url = $('.p2pinfo-title-content>a', $(this)).attr('href');
-              return window.location.href = url;
-            });
-            fetchCookie = function(name) {
-              var arr, reg;
-              reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-              if (arr = document.cookie.match(reg)) {
-                return unescape(arr[2]);
-              } else {
-                return null;
-              }
-            };
-            setCookie = function(key, value, day) {
-              var date;
-              date = new Date();
-              date.setTime(date.getTime() + day * 24 * 60 * 60 * 1000);
-              document.cookie = key + "=" + value + ";expires=" + date.toGMTString();
-              return console.log(document.cookie);
-            };
-            $('.p2p-body-close').on('click', function() {
-              $('.p2p-mask-warp').hide();
-              return setCookie('p2p_mask', 'show', 15);
-            });
-            return (function(canShow) {
-              if (!canShow) {
-                return $('.p2p-mask-warp').show();
-              }
-            })(fetchCookie('p2p_mask'));
+
         })
 
 }).call(this);
