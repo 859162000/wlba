@@ -161,7 +161,8 @@
       max-height: 9999rem
   .section
     .swiper_main
-      width: 76%
+      width: 90%
+      position: relative
 
       box-shadow: 0 0.5rem 1.5rem #2c72d7
       border-radius: 0.3rem
@@ -169,19 +170,33 @@
       background: #fff
       margin: 0 auto
       padding-bottom: 0.75rem
+      overflow: hidden
+
+      .meng_layer
+        width: 100%
+        position: absolute
+        left: 0
+        top: 0
+        background-image: url("/static/imgs/mobile_activity/app_six_billion/meng_layer.png")
+        background-repeat: no-repeat
+        background-position: center center
+        background-color: #fff
 
 
+        z-index: 2
+        height: 100%
+        border-radius: 0.3rem
     .swiper_waper
       width: 100%
       display: inline-block
       position: relative
-
+      left: 2%
     .swiper-container
       width: 100%
       margin: 0 auto
 
     .swiper-slide
-      width: 76%
+      width: 85%
 
     .swiper-pagination
       display: block
@@ -509,6 +524,7 @@
       background: #ff0000
     .swiper_waper
       padding-bottom: 0.65rem
+      left: 0
     .prompt_wrap
       width: 90%
       margin: 0 auto
@@ -518,6 +534,7 @@
       color: #fff
       padding: 0.4rem 0 1.3rem
       max-height: 999rem
+      text-align: center
 
 
 
