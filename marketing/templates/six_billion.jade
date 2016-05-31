@@ -59,90 +59,153 @@ html.no-js(lang="en-gb")
                 .act_time 活动时间：2016年6月2日 10:00 开始
                 .brand_wrap
                     .brand_box
-                        .title_text 庆60亿专享1月期项目
-                        .interest_rate 6 +
-                            .num_2 ?
-                                .increase_box
-                                    .increase_text 庆60亿专享
-                                        span
-                            span %
+                        .title_text {{six_1.name}}
+                        .interest_rate {{six_1.expected_earning_rate}}
+                            if six_1.activity.rule.percent_text > 0
+                                .num_2 +
+                                    if now > six_1.publish_time
+                                        | {{six_1.activity.rule.percent_text}}
+                                    else
+                                        | ?
+                                    .increase_box
+                                        .increase_text {{six_1.activity.name}}
+                                            span
+                                span %
 
                         .time_money
                           .time_left
-                            .p_top 1个月
+                            .p_top {{six_1.period}}个月
                             .p_b 项目期限
 
                           .border_left
                           .money_right
-                            .p_top ？万元
+                            .p_top
+                                total_amount_1 = six_1.total_amount / 10000.0
+                                if now > six_1.publish_time
+                                    | {{total_amount_1}} 万元
+                                else
+                                    | ? 万元
                             .p_b 总金额
 
                         .progress_bar
                           .progress_bar_box
+                            percent_1 = float(six_1.ordered_amount) / six_1.total_amount * 100
                             .progress_bar_left
-                              span(style='width:20%')
-
-                            .available_amount 可投金额 535,000元
-
-                          .progress_bar_right 20%
-                        .button_buy.orange_button 马上抢购
+                              span(style='width:{{percent_1 | percentage}}')
+                            .available_amount 可投金额
+                                if now > six_1.publish_time
+                                    amount_1 = six_1.total_amount - six_1.ordered_amount
+                                    | {{amount_1 | money_format_int}}元
+                                else
+                                    | ? 元
+                          .progress_bar_right {{percent_1 | percentage}}
+                        if now > six_1.publish_time
+                            if six_1.status == '正在招标'
+                                .button_buy.orange_button
+                                    a(href="/p2p/detail/{{six_1.id}}/", style="color:white") 马上抢购
+                            else
+                                .button_buy.gray_button 已售罄
+                        else
+                            .button_buy.blue_button 敬请期待
 
                     .brand_box
-                        .title_text 庆60亿专享1月期项目
-                        .interest_rate 6 +
-                            .num_2 ?
-                                .increase_box
-                                    .increase_text 庆60亿专享
-                                        span
-                            span %
+                        .title_text {{six_3.name}}
+                        .interest_rate {{six_3.expected_earning_rate}}
+                            if six_3.activity.rule.percent_text > 0
+                                .num_2 +
+                                    if now > six_3.publish_time
+                                        | {{six_3.activity.rule.percent_text}}
+                                    else
+                                        | ?
+                                    .increase_box
+                                        .increase_text {{six_3.activity.name}}
+                                            span
+                                span %
 
                         .time_money
                           .time_left
-                            .p_top 1个月
+                            .p_top {{six_3.period}}个月
                             .p_b 项目期限
 
                           .border_left
                           .money_right
-                            .p_top ？万元
+                            .p_top
+                                total_amount_3 = six_3.total_amount / 10000.0
+                                if now > six_3.publish_time
+                                    | {{total_amount_1}} 万元
+                                else
+                                    | ? 万元
                             .p_b 总金额
 
                         .progress_bar
-                          .progress_bar_box
-                            .progress_bar_left
-                              span(style='width:20%')
-
-                            .available_amount 可投金额 535,000元
-
-                          .progress_bar_right 20%
-                        .button_buy.blue_button 敬请期待
+                            .progress_bar_box
+                                percent_3 = float(six_3.ordered_amount) / six_3.total_amount * 100
+                                .progress_bar_left
+                                    span(style='width:{{percent_3 | percentage}}')
+                                .available_amount 可投金额
+                                    if now > six_3.publish_time
+                                        amount_3 = six_3.total_amount - six_3.ordered_amount
+                                        | {{amount_3 | money_format_int}}元
+                                    else
+                                        | ? 元
+                            .progress_bar_right {{percent_3 | percentage}}
+                        if now > six_3.publish_time
+                            if six_3.status == '正在招标'
+                                .button_buy.orange_button
+                                    a(href="/p2p/detail/{{six_3.id}}/", style="color:white") 马上抢购
+                            else
+                                .button_buy.gray_button 已售罄
+                        else
+                            .button_buy.blue_button 敬请期待
                     .brand_box
-                        .title_text 庆60亿专享1月期项目
-                        .interest_rate 6 +
-                            .num_2 ?
-                                .increase_box
-                                    .increase_text 庆60亿专享
-                                        span
-                            span %
+                        .title_text {{six_6.name}}
+                        .interest_rate {{six_6.expected_earning_rate}}
+                            if six_6.activity.rule.percent_text > 0
+                                .num_2 +
+                                    if now > six_6.publish_time
+                                        | {{six_6.activity.rule.percent_text}}
+                                    else
+                                        | ?
+                                    .increase_box
+                                        .increase_text {{six_6.activity.name}}
+                                            span
+                                span %
 
                         .time_money
                           .time_left
-                            .p_top 1个月
+                            .p_top {{six_3.period}}个月
                             .p_b 项目期限
 
                           .border_left
                           .money_right
-                            .p_top ？万元
+                            .p_top
+                                total_amount_6 = six_6.total_amount / 10000.0
+                                if now > six_6.publish_time
+                                  | {{total_amount_1}} 万元
+                                else
+                                  | ? 万元
                             .p_b 总金额
 
                         .progress_bar
-                          .progress_bar_box
-                            .progress_bar_left
-                              span(style='width:100%')
-
-                            .available_amount 可投金额 535,000元
-
-                          .progress_bar_right 100%
-                        .button_buy.gray_button 已售罄
+                            .progress_bar_box
+                                percent_6 = float(six_6.ordered_amount) / six_6.total_amount * 100
+                                .progress_bar_left
+                                    span(style='width:{{percent_6 | percentage}}')
+                                .available_amount 可投金额
+                                    if now > six_6.publish_time
+                                        amount_6 = six_6.total_amount - six_6.ordered_amount
+                                        | {{amount_6 | money_format_int}}元
+                                    else
+                                        | ? 元
+                            .progress_bar_right {{percent_6 | percentage}}
+                        if now > six_6.publish_time
+                            if six_6.status == '正在招标'
+                                .button_buy.orange_button
+                                    a(href="/p2p/detail/{{six_6.id}}/", style="color:white") 马上抢购
+                            else
+                                .button_buy.gray_button 已售罄
+                        else
+                            .button_buy.blue_button 敬请期待
                 .prompt_wrap 温馨提示：<br>1、6月1日10点开售，庆60亿专享标额不固定，售完即止。<br>2、购买“60亿专享”项目可以使用已获得的加息券、红包。
             .section.section_4
                 .act_text 多投多加息
