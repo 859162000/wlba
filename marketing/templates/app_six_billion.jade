@@ -7,7 +7,7 @@ html(style="background: #fff")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053102", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053103", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -63,7 +63,7 @@ html(style="background: #fff")
                 .swiper_waper
                     .swiper-container.swiper1
                         .swiper-wrapper
-                            .swiper-slide
+                            .swiper-slide.first_slide
                                 .swiper_main
                                     .title_text 庆60亿专享1月期项目
                                     .interest_rate 6
@@ -167,7 +167,7 @@ html(style="background: #fff")
                 .swiper_waper
                     .swiper-container.swiper2
                         .swiper-wrapper
-                            .swiper-slide
+                            .swiper-slide.first_slide
                                 .swiper_main
                                     .meng_layer
                                     .title_text 庆60亿专享1月期项目
