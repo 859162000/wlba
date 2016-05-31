@@ -20,18 +20,18 @@ org.ui = (function(){
                 strHtml+="<p class='successFonts'>恭喜您投资成功！</p><p>到期后体验金自动收回</p><p>收益自动发放</p></div>";
             }else if(difference == 4){
                 if(tag == 'goRecharge'){
-                    var btnTxt = '去充值',recharge = 'goRecharge';
+                    var btnTxt = '去充值',recharge = 'goRecharge',closeBtns = '<div class="close-red"></div>';
                 }else{
-                    var btnTxt = '知道了',recharge = '';
+                    var btnTxt = '知道了',recharge = '',closeBtns = '';
                 }
                 strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p></div>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
             }
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
             document.body.appendChild(shield);
 
-            $('.close_btn').on('click',function(){
+            $('.close_btn,.close-red').on('click',function(){
                 alertFram.style.display = "none";
                 shield.style.display = "none";
                 callback && callback();
