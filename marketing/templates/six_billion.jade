@@ -6,13 +6,14 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
+        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
         link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015051702")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
         .body_wrap.clear
             .section.section_1
-                .sum_num 5,900,907,840.00
+                .sum_num {{site_data.p2p_amount | money_format}}
             .section.section_2
                 .act_time 活动时间：2016年6月1日 0:00-23:59
                 .act_text 在网利宝破亿的大日子里，怎么能没有加息券送呢。千呼万唤的满额送加息来啦！
@@ -79,15 +80,151 @@ html.no-js(lang="en-gb")
                         .progress_bar
                           .progress_bar_box
                             .progress_bar_left
-                              span
+                              span(style='width:20%')
 
                             .available_amount 可投金额 535,000元
 
-                          .progress_bar_right 2%
-                        .button_buy 马上抢购
+                          .progress_bar_right 20%
+                        .button_buy.orange_button 马上抢购
 
                     .brand_box
+                        .title_text 庆60亿专享1月期项目
+                        .interest_rate 6 +
+                            .num_2 ?
+                                .increase_box
+                                    .increase_text 庆60亿专享
+                                        span
+                            span %
+
+                        .time_money
+                          .time_left
+                            .p_top 1个月
+                            .p_b 项目期限
+
+                          .border_left
+                          .money_right
+                            .p_top ？万元
+                            .p_b 总金额
+
+                        .progress_bar
+                          .progress_bar_box
+                            .progress_bar_left
+                              span(style='width:20%')
+
+                            .available_amount 可投金额 535,000元
+
+                          .progress_bar_right 20%
+                        .button_buy.blue_button 敬请期待
                     .brand_box
+                        .title_text 庆60亿专享1月期项目
+                        .interest_rate 6 +
+                            .num_2 ?
+                                .increase_box
+                                    .increase_text 庆60亿专享
+                                        span
+                            span %
+
+                        .time_money
+                          .time_left
+                            .p_top 1个月
+                            .p_b 项目期限
+
+                          .border_left
+                          .money_right
+                            .p_top ？万元
+                            .p_b 总金额
+
+                        .progress_bar
+                          .progress_bar_box
+                            .progress_bar_left
+                              span(style='width:100%')
+
+                            .available_amount 可投金额 535,000元
+
+                          .progress_bar_right 100%
+                        .button_buy.gray_button 已售罄
+                .prompt_wrap 温馨提示：<br>1、6月1日10点开售，庆60亿专享标额不固定，售完即止。<br>2、购买“60亿专享”项目可以使用已获得的加息券、红包。
+            .section.section_4
+                .act_text 多投多加息
+                .act_time 活动时间：2016年6月3日 10:00-18:00
+                .countdown_wrap
+                    .num_title 倒计时：
+                    .countdown_time
+                        span.time_1 2
+                        span.time_2 3
+                        span.time_3 4
+                        span.time_4 5
+                        span.time_5 6
+                        span.time_6 7
+                .act_text_2!='每卖出100万，年化率即再增加<span>0.3%</span>，卖出500万，年化即再增加<span>0.9%</span>，以此类推增加年化。'
+                .project_wrap
+                    .project_box
+                        .title_text 庆60亿专享1月期项目
+                        .add_num 10 + 3.5%
+                        .project_data
+                            .data_1 本期额度
+                                span 500万
+                            .data_1 项目期限
+                                span 6个月
+                        .project_wrap_2
+                            .project_bar
+                                span(style='width:80%')
+                            .percentage_num 80%
+                        .footer_b 可投资金额65万元
+                        .button_buy.blue_button 敬请期待
+                        .meng_layer
+                            span 即将开始  敬请期待
+
+                    .project_box
+                        .title_text 庆60亿专享1月期项目
+                        .add_num 10 + 3.5%
+                        .project_data
+                            .data_1 本期额度
+                                span 500万
+                            .data_1 项目期限
+                                span 6个月
+                        .project_wrap_2
+                            .project_bar
+                                span(style='width:80%')
+                            .percentage_num 80%
+                        .footer_b 可投资金额65万元
+                        .button_buy.blue_button 敬请期待
+                .prompt_wrap 温馨提示：<br>1、多投多加息的年化率涨幅按活动时间内（6月2日 10:00-18:00）“亿路狂标—多投多加息“专属标售卖额度进行加息计算，每卖出100万即年化增加一次，以此类推，共2期，标满结束。<br>2、活动结束后，如未满标，继续购买，购买年化不再增加。<br>3、活动期间，大家可以通过PC/h5 活动专题页面查看到增加的实时年化率。活动结束以后，用户所有投资金额均可享受最终年化率，不受加入时间先后顺序影响。<br>4、购买“亿路狂标-多投多加息”项目，可以使用已获得的加息券、红包。
+            .section.section_5
+                .act_text 感恩有你
+                .act_time 成长历程：2014-2016
+                .act_text_2 与多位投资人一起说说与网利宝一起走过的故事。
+                p.section_p!='在网利冲60追忆的欢庆时刻，我们邀请了多位“特别”的投资人一同见证与网利宝走过的日子。是他们的陪伴让网利宝从零到今天的60亿，是他们用点滴信任成就了一个今天广受投资人喜欢的平台。在以后日子，网利宝会秉承安全、稳健、透明的运营理念继续为广大用户提供精准的理财服务，<span>唯有长情的陪伴，才是我们最真诚的告白。</span>'
+                .swiper_waper
+                    .swiper-container.swiper1
+                        .swiper-wrapper
+                            .swiper-slide
+                                .img
+                                    img(src='/static/imgs/pc_activity/six_billion/user_1.png')
+                                .title_text 理财是爱好，赚钱不忘身边人。
+                                .user_text &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我是江苏人，可能是受地域影响，很早就开始投资理财了，市面上能看到的投资形式，基本都尝试过。所以当P2P刚火起来的时候我就关注了。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我在能源行业工作，薪酬还算丰厚，支付家里的日常开销绰绰有余，所以拿出一部分资金专门做投资理财。2014年年底的时候，我偶然接触到了网利宝。从刚开始的小试牛刀，到网利宝B轮融资时加大投资，再到现在，投资额已超过百万。对网利宝的实地考察也让我踏实不少，我很期待它以后的发展。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;手里有钱做事不慌，其实有钱并不是最好的，能让钱动起来才是一个好的态度。我也把网利宝介绍给了身边的朋友，不光能帮他们赚钱还能获得一部分佣金，何乐而不为呢？
+
+                            .swiper-slide
+                                .img
+                                    img(src='/static/imgs/pc_activity/six_billion/user_2.png')
+                                .title_text 理财是爱好，赚钱不忘身边人。
+                                .user_text &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我是江苏人，可能是受地域影响，很早就开始投资理财了，市面上能看到的投资形式，基本都尝试过。所以当P2P刚火起来的时候我就关注了。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我在能源行业工作，薪酬还算丰厚，支付家里的日常开销绰绰有余，所以拿出一部分资金专门做投资理财。2014年年底的时候，我偶然接触到了网利宝。从刚开始的小试牛刀，到网利宝B轮融资时加大投资，再到现在，投资额已超过百万。对网利宝的实地考察也让我踏实不少，我很期待它以后的发展。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;手里有钱做事不慌，其实有钱并不是最好的，能让钱动起来才是一个好的态度。我也把网利宝介绍给了身边的朋友，不光能帮他们赚钱还能获得一部分佣金，何乐而不为呢？
+
+                            .swiper-slide
+                                .img
+                                    img(src='/static/imgs/pc_activity/six_billion/user_3.png')
+                                .title_text 理财是爱好，赚钱不忘身边人。
+                                .user_text &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我是江苏人，可能是受地域影响，很早就开始投资理财了，市面上能看到的投资形式，基本都尝试过。所以当P2P刚火起来的时候我就关注了。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我在能源行业工作，薪酬还算丰厚，支付家里的日常开销绰绰有余，所以拿出一部分资金专门做投资理财。2014年年底的时候，我偶然接触到了网利宝。从刚开始的小试牛刀，到网利宝B轮融资时加大投资，再到现在，投资额已超过百万。对网利宝的实地考察也让我踏实不少，我很期待它以后的发展。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;手里有钱做事不慌，其实有钱并不是最好的，能让钱动起来才是一个好的态度。我也把网利宝介绍给了身边的朋友，不光能帮他们赚钱还能获得一部分佣金，何乐而不为呢？
+
+                            .swiper-slide
+                                .img
+                                    img(src='/static/imgs/pc_activity/six_billion/user_4.png')
+                                .title_text 理财是爱好，赚钱不忘身边人。
+                                .user_text &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我是江苏人，可能是受地域影响，很早就开始投资理财了，市面上能看到的投资形式，基本都尝试过。所以当P2P刚火起来的时候我就关注了。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我在能源行业工作，薪酬还算丰厚，支付家里的日常开销绰绰有余，所以拿出一部分资金专门做投资理财。2014年年底的时候，我偶然接触到了网利宝。从刚开始的小试牛刀，到网利宝B轮融资时加大投资，再到现在，投资额已超过百万。对网利宝的实地考察也让我踏实不少，我很期待它以后的发展。<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;手里有钱做事不慌，其实有钱并不是最好的，能让钱动起来才是一个好的态度。我也把网利宝介绍给了身边的朋友，不光能帮他们赚钱还能获得一部分佣金，何乐而不为呢？
+
+                    .swiper-button-next
+                    .swiper-button-prev
+
         include global/g_footer
 script.
     require(['/static/js/six_billion.js?v=2015051307'])

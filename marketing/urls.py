@@ -2,7 +2,8 @@ from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
-                            OpenHouseApiView, MaiMaiView, ShieldPlanView, ShieldPlanH5View, HMDP2PListView
+                            OpenHouseApiView, MaiMaiView, ShieldPlanView, ShieldPlanH5View, HMDP2PListView, \
+                            SixBillionView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -96,7 +97,7 @@ urlpatterns = patterns(
     url(r'^april_mobilization/$', TemplateView.as_view(template_name="april_mobilization.jade")),
     url(r'^open_day_review/$', HMDP2PListView.as_view(template_name="open_day_review.jade", p2p_list_url_name="p2p_list")),
     url(r'^center_film_ticket/$', TemplateView.as_view(template_name="center_film_ticket.jade")),
-    url(r'^six_billion/$', TemplateView.as_view(template_name="six_billion.jade")),
+    url(r'^six_billion/(?P<template>\w+)/$', SixBillionView.as_view(), name="six_billion"),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
@@ -226,6 +227,7 @@ urlpatterns += patterns(
     url(r'^app_pretty_reach_home/$', TemplateView.as_view(template_name="app_pretty_reach_home.jade")),
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
     url(r'^app_baby_box/$', TemplateView.as_view(template_name="app_baby_box.jade")),
+    # url(r'^app_six_billion/$', TemplateView.as_view(template_name="app_six_billion.jade")),
 
     # url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
     url(r'^h5_shield_plan/$', ShieldPlanH5View.as_view()),
