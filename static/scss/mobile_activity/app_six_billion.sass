@@ -44,6 +44,7 @@
   .section_2
     background: url("/static/imgs/mobile_activity/app_six_billion/banner_bg_2.jpg") no-repeat center center
     background-size: 100% 100%
+
     .banner_img
       width: 100%
       display: block
@@ -147,6 +148,7 @@
   .section_3
     background: url("/static/imgs/mobile_activity/app_six_billion/banner_bg_3.jpg") no-repeat center center
     background-size: 100% 100%
+
     .banner_img
       width: 100%
       display: block
@@ -168,6 +170,9 @@
       padding: 0.625rem 0 1rem
 
       max-height: 9999rem
+    .swiper_main
+      box-shadow: 0 0.5rem 1.5rem #5824aa !important
+
   .section
     .swiper_main
       width: 80%
@@ -220,9 +225,12 @@
       -webkit-align-items: center
       align-items: center
     .first_slide
-      left: 2%
-    .second_slide
-      left: 2%
+      left: 1%
+      @media screen and (max-device-width: 370px)
+        left: 2%
+      @media screen and (max-width: 370px)
+        left: 2%
+
     .swiper-pagination
 
       display: block
