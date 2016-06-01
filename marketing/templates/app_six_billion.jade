@@ -7,17 +7,18 @@ html(style="background: #fff")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015051702", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_six_billion.css?v=2015053113", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
         .body_wrap.clear
             .section.section_1
-                img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_1.jpg')
+                img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_1_new.jpg')
                 .sum_num {{site_data.p2p_amount | money_format}}
+                    .act_text 累计交易额（元）
             .section.section_2
                 img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_2_img.png')
-                .act_time 动时间：2016年6月1日 0:00-23:59<br>网利宝破亿的大日子里，怎么能没有加息送呢。<br>千呼万唤的满额送加息来啦！
+                .act_time 活动时间：2016年6月1日 0:00-23:59<br>网利宝破亿的大日子里，怎么能没有加息送呢。<br>千呼万唤的满额送加息来啦！
                 .brand_wrap
                     .brand_box
                         .title_text 1千<单笔投资额<1万
@@ -27,14 +28,14 @@ html(style="background: #fff")
                         .use_text_1 使用门槛
                         .use_text_2 1万，限1月及以上标使用
                     .brand_box.brand_box_2
-                        .title_text 1千<单笔投资额<3万
+                        .title_text 1万≤单笔投资额<3万
                         .send_text 赠：
                         .add_num!='1.2<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 3万，限1月及以上标使用
                     .brand_box.brand_box_3
-                        .title_text 3万<单笔投资额<5万
+                        .title_text 3万≤单笔投资额<5万
                         .send_text 赠：
                         .add_num!='1.4<span>%</span>'
                         .goods_text 加息券
@@ -42,7 +43,7 @@ html(style="background: #fff")
                         .use_text_2 6万，限1月及以上标使用
                     .clear
                     .brand_box.brand_box_4
-                        .title_text 5万<单笔投资额<8万
+                        .title_text 5万≤单笔投资额<8万
                         .send_text 赠：
                         .add_num!='1.7<span>%</span>'
                         .goods_text 加息券
@@ -57,10 +58,277 @@ html(style="background: #fff")
                         .use_text_2 20万，限1月及以上标使用
                 .clear
                 .prompt_wrap 温馨提示：<br>1、活动期间投资一月及以上标，即可获得加息券。<br>2、投资完成后，加息券实时发放到用户账户，登录“我的账户”-理财券专区查看。<br>3、加息券有效期：6月4日－6月15日23:59。
+            .section.section_3
+                img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_3_img.png')
+                .act_time 活动时间：2016年6月2日 10:00 开始
+                .swiper_waper
+                    .swiper-container.swiper1
+                        .swiper-wrapper
+                            .swiper-slide.first_slide
+                                six_1_publish_time = str(six_1.publish_time)
+                                .swiper_main
+                                    .title_text {{six_1.name}}
+                                    .interest_rate {{six_1.expected_earning_rate}}
+                                      if six_1.activity.rule.percent_text > 0
+                                        span.small_text +
+                                        .num_2
+                                          if now > six_1_publish_time
+                                            | {{six_1.activity.rule.percent_text}}
+                                          else
+                                            | ?
+                                          .increase_box
+                                            .increase_text {{six_1.activity.name}}
+                                              span
+                                          span %
+                                    .time_money
+                                      .time_left
+                                        .p_top {{six_1.period}}个月
+                                        .p_b 项目期限
+
+                                      .border_left
+                                      .money_right
+                                        .p_top
+                                          total_amount_1 = six_1.total_amount / 10000.0
+                                          if now > six_1_publish_time
+                                            | {{total_amount_1}} 万元
+                                          else
+                                            | ? 万元
+                                        .p_b 总金额
+                                    .progress_bar
+                                      percent_1 = float(six_1.ordered_amount) / six_1.total_amount * 100
+                                      .progress_bar_box
+                                        .progress_bar_left
+                                          span(style='width:{{percent_1 | percentage}}')
+                                        .available_amount
+                                          if now > six_1_publish_time
+                                            amount_1 = six_1.total_amount - six_1.ordered_amount
+                                            | {{amount_1 | money_format_int}}元
+                                          else
+                                            | ? 元
+                                      .progress_bar_right {{percent_1 | percentage}}
+                                    if now > six_1_publish_time
+                                      if six_1.status == '正在招标'
+                                        .button_buy.orange_button
+                                          a(href="/weixin/view/detail/{{six_1.id}}/", style="color:white") 马上抢购
+                                      else
+                                        .button_buy.gray_button 已售罄
+                                    else
+                                      .button_buy.blue_button 敬请期待
+                            .swiper-slide.second_slide
+                                six_3_publish_time = str(six_3.publish_time)
+                                .swiper_main
+                                    .title_text {{six_3.name}}
+                                    .interest_rate {{six_3.expected_earning_rate}}
+                                      if six_3.activity.rule.percent_text > 0
+                                        span.small_text +
+                                        .num_2
+                                          if now > six_3_publish_time
+                                            | {{six_3.activity.rule.percent_text}}
+                                          else
+                                            | ?
+                                          .increase_box
+                                            .increase_text {{six_3.activity.name}}
+                                              span
+                                          span %
+                                    .time_money
+                                      .time_left
+                                        .p_top {{six_3.period}}个月
+                                        .p_b 项目期限
+
+                                      .border_left
+                                      .money_right
+                                        .p_top
+                                          total_amount_3 = six_3.total_amount / 10000.0
+                                          if now > six_3_publish_time
+                                            | {{total_amount_3}} 万元
+                                          else
+                                            | ? 万元
+                                        .p_b 总金额
+                                    .progress_bar
+                                      percent_3 = float(six_3.ordered_amount) / six_3.total_amount * 100
+                                      .progress_bar_box
+                                        .progress_bar_left
+                                          span(style='width:{{percent_3 | percentage}}')
+                                        .available_amount
+                                          if now > six_3_publish_time
+                                            amount_3 = six_3.total_amount - six_3.ordered_amount
+                                            | {{amount_3 | money_format_int}}元
+                                          else
+                                            | ? 元
+                                      .progress_bar_right {{percent_3 | percentage}}
+                                    if now > six_3_publish_time
+                                      if six_3.status == '正在招标'
+                                        .button_buy.orange_button
+                                          a(href="/weixin/view/detail/{{six_3.id}}/", style="color:white") 马上抢购
+                                      else
+                                        .button_buy.gray_button 已售罄
+                                    else
+                                      .button_buy.blue_button 敬请期待
+                            .swiper-slide.third_slide
+                              six_6_publish_time = str(six_6.publish_time)
+                              .swiper_main
+                                .title_text {{six_6.name}}
+                                .interest_rate {{six_6.expected_earning_rate}}
+                                  if six_6.activity.rule.percent_text > 0
+                                    span.small_text +
+                                    .num_2
+                                      if now > six_6_publish_time
+                                        | {{six_6.activity.rule.percent_text}}
+                                      else
+                                        | ?
+                                      .increase_box
+                                        .increase_text {{six_6.activity.name}}
+                                          span
+                                      span %
+                                .time_money
+                                  .time_left
+                                    .p_top {{six_6.period}}个月
+                                    .p_b 项目期限
+
+                                  .border_left
+                                  .money_right
+                                    .p_top
+                                      total_amount_6 = six_6.total_amount / 10000.0
+                                      if now > six_6_publish_time
+                                        | {{total_amount_6}} 万元
+                                      else
+                                        | ? 万元
+                                    .p_b 总金额
+                                .progress_bar
+                                  percent_6 = float(six_6.ordered_amount) / six_6.total_amount * 100
+                                  .progress_bar_box
+                                    .progress_bar_left
+                                      span(style='width:{{percent_6 | percentage}}')
+                                    .available_amount
+                                      if now > six_6_publish_time
+                                        amount_6 = six_6.total_amount - six_6.ordered_amount
+                                        | {{amount_6 | money_format_int}}元
+                                      else
+                                        | ? 元
+                                  .progress_bar_right {{percent_6 | percentage}}
+                                if now > six_6_publish_time
+                                  if six_6.status == '正在招标'
+                                    .button_buy.orange_button
+                                      a(href="/weixin/view/detail/{{six_6.id}}/", style="color:white") 马上抢购
+                                  else
+                                    .button_buy.gray_button 已售罄
+                                else
+                                  .button_buy.blue_button 敬请期待
+                        .pagination.pagination1
+                .prompt_wrap 温馨提示：<br>1、6月2日10点开售，庆60亿专享标额不固定，售完即止。<br>2、购买“60亿专享”项目可以使用已获得的加息券、红包。
+            .section.section_4
+                img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_4_img.png')
+                .act_time 活动时间：2016年6月3日 10:00 开始
+                .countdown_wrap
+                    .time_wrap
+                        span.title_text 倒计时：
+                        span.time_1 2
+                        span.time_2 3
+                        span.time_3
+                        span.time_1 2
+                        span.time_2 3
+                        span.time_3
+                        span.time_1 2
+                        span.time_2 3
+                .act_text 卖出100万，年化率即再增加0.3%，<br>卖出500万，年化即再增加1.5%，以此类推增加年化。
+                .swiper_waper
+                    .swiper-container.swiper2
+                        .swiper-wrapper
+                            .swiper-slide.first_slide
+                                .swiper_main
+                                    .meng_layer
+                                    .title_text 庆60亿专享1月期项目
+                                    .interest_rate 6
+                                        span.small_text +
+                                        .num_2 5
+                                            .increase_box
+                                                .increase_text 庆60亿专享
+                                                    span
+                                            span %
+                                    .time_money
+                                      .time_left
+                                        .p_top 1个月
+                                        .p_b 项目期限
+
+                                      .border_left
+                                      .money_right
+                                        .p_top 500万元
+                                        .p_b 总金额
+                                    .progress_bar
+                                      .progress_bar_box
+                                        .progress_bar_left
+                                          span(style='width:20%')
+
+                                        .available_amount 可投金额 535,000元
+
+                                      .progress_bar_right 20%
+                                    .button_buy.orange_button 马上抢购
+                            .swiper-slide
+                                .swiper_main
+                                    .meng_layer
+                                    .title_text 庆60亿专享1月期项目
+                                    .interest_rate 6
+                                        span.small_text +
+                                        .num_2 5
+                                            .increase_box
+                                                .increase_text 庆60亿专享
+                                                    span
+                                            span %
+                                    .time_money
+                                      .time_left
+                                        .p_top 1个月
+                                        .p_b 项目期限
+
+                                      .border_left
+                                      .money_right
+                                        .p_top 500万元
+                                        .p_b 总金额
+                                    .progress_bar
+                                      .progress_bar_box
+                                        .progress_bar_left
+                                          span(style='width:20%')
+
+                                        .available_amount 可投金额 535,000元
+
+                                      .progress_bar_right 20%
+                                    .button_buy.orange_button 马上抢购
+
+                        .pagination.pagination2
+                    .prompt_wrap 温馨提示：<br>1、多投多加息的年化率涨幅按活动时间内（6月3日10时-18时）“亿路狂标—多投多加息”专属标售卖额度进行加息计算，每卖出100万即年化增加一次，以此类推，共两期，标满结束。<br>2、活动结束后，如未满标，继续购买，购买年化不再增加。<br>3、活动期间，大家可以通过PC/h5 活动专题页面查看到增加的实时年化率。活动结束以后，用户所有投资金额均可享受最终年化率，不受加入时间先后顺序影响。<br>4、购买“亿路狂标-多投多加息”项目，可以使用已获得的加息券、红包。
+                .section.section_5
+                    img.banner_img(src='/static/imgs/mobile_activity/app_six_billion/banner_5_img.png')
+                    .act_time 成长历程：2014-2016
+                    .act_text_1 与多位投资人一起说说与网利宝一起走过的故事。
+                    .act_text_2!='在网利冲60追忆的欢庆时刻，我们邀请了多位“特别”的投资人一同见证与网利宝走过的日子。是他们的陪伴让网利宝从零到今天的60亿，是他们用点滴信任成就了一个今天广受投资人喜欢的平台。在以后日子，网利宝会秉承安全、稳健、透明的运营理念继续为广大用户提供精准的理财服务，<span>唯有长情的陪伴，才是我们最真诚的告白</span>'
+                    .swiper_waper
+                        .swiper-container.swiper3
+                            .swiper-wrapper
+                                .swiper-slide
+                                    .swiper_main
+                                        .title_main 理财是爱好，赚钱不忘身边人
+                                        img.user_img(src='/static/imgs/mobile_activity/app_six_billion/user_img_1.jpg')
+                                        .user_text 我是江苏人，可能是受地域影响，很早就开始投资理财了，市面上能看到的投资形式，基本都尝试过。所以当P2P刚火起来的时候我就关注了。<br><br>我在能源行业工作，薪酬还算丰厚，支付家里的日常开销绰绰有余，所以拿出一部分资金专门做投资理财。2014年年底的时候，我偶然接触到了网利宝。从刚开始的小试牛刀，到网利宝B轮融资时加大投资，再到现在，投资额已超过百万。对网利宝的实地考察也让我踏实不少，我很期待它以后的发展。<br><br>手里有钱做事不慌，其实有钱并不是最好的，能让钱动起来才是一个好的态度。我也把网利宝介绍给了身边的朋友，不光能帮他们赚钱还能获得一部分佣金，何乐而不为呢？
+                                .swiper-slide
+                                    .swiper_main
+                                        .title_main 创业和投资，都是为了更好的生活
+                                        img.user_img(src='/static/imgs/mobile_activity/app_six_billion/user_img_2.jpg')
+                                        .user_text 我是来自东北的天蝎男，已过而立之年。2008来到北京。几年的奋斗打拼，终于在去年实现创业，和朋友一起创立了一家生鲜O2O的公司。就在那时，我偶然接触到了网利宝。<br><br>一开始我没敢投资，而是先去上网查了资料。我了解到网利宝的管理团队以及IDG的A轮融资背景，作为创业者的我对IDG这种大的投资机构非常敏感。后来我还和朋友一起来参加了“初冬燕席”和“名人下午茶”，也算是来公司实地考察一下。我觉得网利宝是一个做踏踏实实做事的团队，这大大增加了我的投资信心！<br><br>创业和投资两条腿走路，才能让我的生活变得更惬意，让老婆能在我身上能看到一个她想要的未来。我们下一步打算要一个小宝宝，这样我们的小家庭才会更圆满，这也是我继续奋斗下去的理由。
+                                .swiper-slide
+                                    .swiper_main
+                                        .title_main 80后老师，努力给女儿一份保障
+                                        img.user_img(src='/static/imgs/mobile_activity/app_six_billion/user_img_3.jpg')
+                                        .user_text 我是郑州古荥镇一个农村的普通80后教师。毕业后，我没像其他人一样去大城市拼搏，而是选择回到农村做了一名老师。<br><br>虽然我有一份稳定的工作，但是结婚后，就有了压力。对于理财，我非常谨慎，在农村理财选择不多，刚开始把钱存农村信用社，后来慢慢买银行理财。再后来才开始尝试P2P。<br><br>2015年我接触到了网利宝，虽然之前投过其它平台，但是谨慎的我还是从最低额度100元开始尝试。现在我大部分的投资都放在网利宝，还号召朋友参加领佣金的活动，佣金虽不多，但也是一笔额外收益。<br><br>今年的投资收益，我准备全取出来，给女儿买一份保险，本金还是按照原计划继续投资网利宝，希望手中的钱像滚雪球一样滚起来，通过我的努力给我们这个小家庭一个更温暖的未来。
+                                .swiper-slide
+                                    .swiper_main
+                                        .title_main 人生需要责任，投资也不得马虎
+                                        img.user_img(src='/static/imgs/mobile_activity/app_six_billion/user_img_4.jpg')
+                                        .user_text 今年我三十岁，已经是两个孩子的爸爸。我的两个孩子相继出生的时候，那种为人父的责任感告诉我，我一定要给他们最好的生活。<br><br>在此之前我的理财方式基本是银行理财，收益5%左右，乍一下看到网利宝12%以上的项目，有点不太敢相信。后来我发现有一个项目是竟然自己信任的公司做担保的，于是决定试试，投了100块。我想有很多人都是从100开始投的吧。虽然刚开始投的少，但是每笔回款都有短信提醒，让我感觉比较靠谱。等本息到帐后我又逐渐加大了投资。<br><br>2015年过去了，我想对网利宝说一声谢谢，是投资理财让我的生活更体面；16年我的愿望是去上海创业，趁有精力为家人拼一把，让孩子和老婆过上舒坦的生活。
+                        .pagination.pagination3
+                    .prompt_wrap 以上故事为往期征集，欢迎大家关注网利宝官方订阅号（iwanglibao）并发给我们您自己的故事
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_six_billion.js?v=2015051307")
+        script(src="/static/scripts/mobile_activity/app_six_billion.js?v=20150601")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,

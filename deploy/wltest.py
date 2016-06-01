@@ -16,6 +16,7 @@ env.roledefs = {
 
     'wltest': ["192.168.20.247"],
     'git_server': ["192.168.20.231"],
+    #'git_server': ["192.168.10.223"],
 }
 env.user = "wangli"
 env.password = '52e6FJOd'
@@ -23,6 +24,7 @@ env.git_server_path = "~/wanglibao-backend"
 env.deploy_path = "/var/www/wanglibao/wanglibao-backend"
 env.deploy_virt_path = "/var/www/wanglibao/virt-wanglibao"
 env.git_server_address = "git clone wangli@192.168.20.231:~/wanglibao-backend"
+#env.git_server_address = "git clone wangli@192.168.10.223:~/wanglibao-backend"
 env.activate = "source %s/bin/activate" % env.deploy_virt_path
 env.pip_install = "pip install -r %s/requirements.txt" % env.deploy_path
 env.branch = "master"
@@ -100,7 +102,7 @@ def deploy_web_action():
         with cd(env.deploy_path):
             print yellow('Replacing wanglibao/settings.py ENV')
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
-            run("fab config:'wanglibao/settings.py','192.168.1.242','192.168.1.247'")
+            run("fab config:'wanglibao/settings.py','192.168.1.242','192.168.20.247'")
             if hostname == "UBT020247":
                 print yellow("syncdb")
                 run("python manage.py syncdb --noinput")

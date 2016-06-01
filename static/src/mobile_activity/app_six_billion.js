@@ -19,11 +19,11 @@
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '一手解读',
-			shareImg = host + '/static/imgs/mobile_activity/app_open_day_review/300*300.png',
-			shareLink = host + '/activity/app_open_day_review/',
-			shareMainTit = '一手解读',
-			shareBody = '30秒看懂网利宝木材质押贷的前世今生';
+			shareName = '亿路旅程，亿同见证',
+			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+			shareLink = host + '/activity/six_billion/app/',
+			shareMainTit = '亿路旅程，亿同见证',
+			shareBody = '深情不及久伴，厚爱无需多言';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -33,7 +33,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '一手解读：木材质押贷的“前世今生”',
+			title: '亿路旅程，亿同见证',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -130,7 +130,9 @@
 
 	var login = false;
     wlb.ready({
+
         app: function (mixins) {
+			mixins.shareData({title: '亿路旅程，亿同见证', content: '深情不及久伴，厚爱无需多言'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -149,9 +151,9 @@
                         //    self.location.replace(url);
                         //}
 
-                        $('.app_link').on("click",function(){
-                        	mixins.jumpToManageMoney();
-                        })
+                        //$('.app_link').on("click",function(){
+                        //	mixins.jumpToManageMoney();
+                        //})
                     }
                 })
             }
@@ -170,5 +172,80 @@
 
         }
     })
+
+	/*轮播图*/
+	var swiper = new Swiper('.swiper1', {
+		pagination: '.swiper-pagination',
+		slidesPerView: 1,
+        //effect: 'coverflow',
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto'
+
+	});
+
+	var swiper = new Swiper('.swiper2', {
+		pagination: '.swiper-pagination2',
+        slidesPerView: 1,
+        //effect: 'coverflow',
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 'auto'
+
+	});
+
+	var swiper = new Swiper('.swiper3', {
+		pagination: '.pagination3',
+		slidesPerView: 1,
+        centeredSlides: true,
+        paginationClickable: true
+
+	});
+	/*轮播图结束*/
+
+	/*指定范围倒计时*/
+            var abb;
+            var curShowTimeSeconds = 0;
+			//现在倒计时需要有多少秒
+            var endTime = new Date(2016,4,30,20,00,00);
+            //回头这里改成 2016,5,3,20,00,00
+
+            var timestamp = Date.parse(new Date());
+            //获得当前时间戳
+
+            if(timestamp>='1464919200000'&&timestamp<='1464948000000'){
+            //2016年6月3日 10:00-18:00
+
+                setInterval(function(){
+                    curShowTimeSeconds = getCurrentShowTimeSeconds();
+                    var hours = parseInt(curShowTimeSeconds/3600);
+                    var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
+                    var seconds = curShowTimeSeconds % 60;
+
+                    $('.countdown_wrap .time_1').text(parseInt(hours/10));
+                    $('.countdown_wrap .time_2').text(parseInt(hours%10));
+
+                    $('.countdown_wrap .time_3').text(parseInt(minutes/10));
+                    $('.countdown_wrap .time_4').text(parseInt(minutes%10));
+
+                    $('.countdown_wrap .time_5').text(parseInt(seconds/10));
+                    $('.countdown_wrap .time_6').text(parseInt(seconds%10));
+                },1000);
+            }else{
+				$('.countdown_wrap').hide();
+			}
+
+            function getCurrentShowTimeSeconds(){
+				var curTime = new Date();
+				var ret = endTime.getTime() - curTime.getTime();
+				//结束的时间减去现在的时间
+				ret = Math.round(ret/1000);
+				//把毫秒转化成秒
+
+				return ret>=0 ? ret : 0;
+				//ret大于等于0的话返回ret，如果不是返回0
+				//如果倒计时结束，返回的结果是0
+			}
+            /*指定范围倒计时结束*/
 
 })(org);

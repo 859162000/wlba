@@ -3325,16 +3325,32 @@ class SixBillionView(TemplateView):
         return template_name
 
     def get_context_data(self, **kwargs):
-        context = super(SixBillionView, self).get_context_data()
+        context = super(SixBillionView, self).get_context_data(**kwargs)
+        now = timezone.now()
         # 累计交易额
         m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
         site_data = m.get_recommend_products()
         site_data_res = site_data[MiscRecommendProduction.KEY_PC_DATA]
 
-        print site_data_res
+        six_1 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=1, hide=False)\
+            .order_by('-status_int').first()
+
+        six_3 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=3, hide=False)\
+            .order_by('-status_int').first()
+
+        six_6 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=6, hide=False)\
+            .order_by('-status_int').first()
+
+        six_1.name = u"庆60亿专享1月期项目"
+        six_3.name = u"庆60亿专享3月期项目"
+        six_6.name = u"庆60亿专享6月期项目"
 
         context.update({
-            'site_data': site_data_res
+            'site_data': site_data_res,
+            'now': timezone.localtime(now).strftime('%Y-%m-%d %H:%M:%S'),
+            'six_1': six_1,
+            'six_3': six_3,
+            'six_6': six_6,
         })
 
         return context

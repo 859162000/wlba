@@ -57,10 +57,8 @@
             });
             /*轮播图结束*/
 
-
-
             /*指定范围倒计时*/
-
+            var abb;
             var curShowTimeSeconds = 0;
 			//现在倒计时需要有多少秒
             var endTime = new Date(2016,4,30,20,00,00);
@@ -78,15 +76,17 @@
                     var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
                     var seconds = curShowTimeSeconds % 60;
 
-                    $('.time_1').text(parseInt(hours/10));
-                    $('.time_2').text(parseInt(hours%10));
+                    $('.countdown_time .time_1').text(parseInt(hours/10));
+                    $('.countdown_time .time_2').text(parseInt(hours%10));
 
-                    $('.time_3').text(parseInt(minutes/10));
-                    $('.time_4').text(parseInt(minutes%10));
+                    $('.countdown_time .time_3').text(parseInt(minutes/10));
+                    $('.countdown_time .time_4').text(parseInt(minutes%10));
 
-                    $('.time_5').text(parseInt(seconds/10));
-                    $('.time_6').text(parseInt(seconds%10));
+                    $('.countdown_time .time_5').text(parseInt(seconds/10));
+                    $('.countdown_time .time_6').text(parseInt(seconds%10));
                 },1000);
+            }else{
+                $('.countdown_wrap').hide();
             }
 
             function getCurrentShowTimeSeconds(){
