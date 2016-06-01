@@ -675,7 +675,7 @@ class KuaiShortPay:
         self.pem = settings.KUAI_PEM_PATH
         self.signature_pem = settings.KUAI_SIGNATURE_PEM_PATH
         self.auth = (self.MER_ID, self.MER_PASS)
-        self.ERR_CODE_WAITING = '222222'
+        self.ERR_CODE_WAITING = 222222
 
     def _check_signature(self, str_content, signature):
         """
