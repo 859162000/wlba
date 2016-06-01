@@ -7,15 +7,15 @@ html.no-js(lang="en-gb")
         include include/common_head
         - endwith
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015053106")
+        link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=2015053104")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
         .body_wrap.clear
             .section.section_1
-                .sum_num {{site_data.p2p_amount | money_format}}
-                .act_time 活动时间:2016年6月1日～6月3日
-                .act_text 累计交易额：
+                .sum_num {{site_data.p2p_amount | money_format}}<br>
+                    .act_time 活动时间:2016年6月1日～6月3日
+                    .act_text 累计交易额
             .section.section_2
                 .act_time 活动时间：2016年6月1日 0:00-23:59
                 .act_text 在网利宝破亿的大日子里，怎么能没有加息券送呢。千呼万唤的满额送加息来啦！
@@ -28,21 +28,21 @@ html.no-js(lang="en-gb")
                         .use_text_1 使用门槛
                         .use_text_2 1万，限1月及以上标使用
                     .brand_box
-                        .title_text 1万<单笔投资额<3万
+                        .title_text 1万≤单笔投资额<3万
                         .send_text 赠：
                         .add_num!='1.2<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 3万，限1月及以上标使用
                     .brand_box
-                        .title_text 3万<单笔投资额<5万
+                        .title_text 3万≤单笔投资额<5万
                         .send_text 赠：
                         .add_num!='1.4<span>%</span>'
                         .goods_text 加息券
                         .use_text_1 使用门槛
                         .use_text_2 6万，限1月及以上标使用
                     .brand_box
-                        .title_text 5万<单笔投资额<8万
+                        .title_text 5万≤单笔投资额<8万
                         .send_text 赠：
                         .add_num!='1.7<span>%</span>'
                         .goods_text 加息券
@@ -62,7 +62,7 @@ html.no-js(lang="en-gb")
                 .brand_wrap
                     .brand_box
                         six_1_publish_time = str(six_1.publish_time)
-                        .title_text {{six_1.name}}
+                        .title_text(style="font-size: 18px") {{six_1.name}}
                         .interest_rate {{six_1.expected_earning_rate}}
                             if six_1.activity.rule.percent_text > 0
                                 .num_2 +
@@ -113,7 +113,7 @@ html.no-js(lang="en-gb")
 
                     .brand_box
                         six_3_publish_time = str(six_3.publish_time)
-                        .title_text {{six_3.name}}
+                        .title_text(style="font-size: 18px") {{six_3.name}}
                         .interest_rate {{six_3.expected_earning_rate}}
                             if six_3.activity.rule.percent_text > 0
                                 .num_2 +
@@ -136,7 +136,7 @@ html.no-js(lang="en-gb")
                             .p_top
                                 total_amount_3 = six_3.total_amount / 10000.0
                                 if now > six_3_publish_time
-                                    | {{total_amount_1}} 万元
+                                    | {{total_amount_3}} 万元
                                 else
                                     | ? 万元
                             .p_b 总金额
@@ -163,7 +163,7 @@ html.no-js(lang="en-gb")
                             .button_buy.blue_button 敬请期待
                     .brand_box
                         six_6_publish_time = str(six_6.publish_time)
-                        .title_text {{six_6.name}}
+                        .title_text(style="font-size: 18px") {{six_6.name}}
                         .interest_rate {{six_6.expected_earning_rate}}
                             if six_6.activity.rule.percent_text > 0
                                 .num_2 +
@@ -178,7 +178,7 @@ html.no-js(lang="en-gb")
 
                         .time_money
                           .time_left
-                            .p_top {{six_3.period}}个月
+                            .p_top {{six_6.period}}个月
                             .p_b 项目期限
 
                           .border_left
@@ -186,7 +186,7 @@ html.no-js(lang="en-gb")
                             .p_top
                                 total_amount_6 = six_6.total_amount / 10000.0
                                 if now > six_6_publish_time
-                                  | {{total_amount_1}} 万元
+                                  | {{total_amount_6}} 万元
                                 else
                                   | ? 万元
                             .p_b 总金额
@@ -241,7 +241,6 @@ html.no-js(lang="en-gb")
                         .footer_b 可投资金额65万元
                         .button_buy.blue_button 敬请期待
                         .meng_layer
-                            span 即将开始  敬请期待
 
                     .project_box
                         .title_text 庆60亿专享1月期项目
@@ -258,7 +257,7 @@ html.no-js(lang="en-gb")
                         .footer_b 可投资金额65万元
                         .button_buy.blue_button 敬请期待
                         .meng_layer
-                            span 即将开始  敬请期待
+
                 .prompt_wrap 温馨提示：<br>1、多投多加息的年化率涨幅按活动时间内（6月3日 10:00-18:00）“亿路狂标—多投多加息“专属标售卖额度进行加息计算，每卖出100万即年化增加一次，以此类推，共2期，标满结束。<br>2、活动结束后，如未满标，继续购买，购买年化不再增加。<br>3、活动期间，大家可以通过PC/h5 活动专题页面查看到增加的实时年化率。活动结束以后，用户所有投资金额均可享受最终年化率，不受加入时间先后顺序影响。<br>4、购买“亿路狂标-多投多加息”项目，可以使用已获得的加息券、红包。
             .section.section_5
                 .act_text 感恩有你

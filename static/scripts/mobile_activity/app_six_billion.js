@@ -395,36 +395,30 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*轮播图*/
 	var swiper = new Swiper('.swiper1', {
 		pagination: '.swiper-pagination',
+		slidesPerView: 1,
         //effect: 'coverflow',
         grabCursor: true,
         centeredSlides: true,
-        slidesPerView: 'auto',
-
-        onTouchEnd: function(swiper){
-      }
+        slidesPerView: 'auto'
 
 	});
 
 	var swiper = new Swiper('.swiper2', {
 		pagination: '.swiper-pagination2',
+        slidesPerView: 1,
         //effect: 'coverflow',
         grabCursor: true,
         centeredSlides: true,
-        slidesPerView: 'auto',
-
-        onTouchEnd: function(swiper){
-      }
+        slidesPerView: 'auto'
 
 	});
 
 	var swiper = new Swiper('.swiper3', {
 		pagination: '.pagination3',
-        //effect: 'coverflow',
-        grabCursor: true,
+		slidesPerView: 1,
         centeredSlides: true,
-        slidesPerView: 'auto',
-        onTouchEnd: function(swiper){
-      }
+        paginationClickable: true
+
 	});
 	/*轮播图结束*/
 

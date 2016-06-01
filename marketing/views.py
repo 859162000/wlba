@@ -3332,17 +3332,18 @@ class SixBillionView(TemplateView):
         site_data = m.get_recommend_products()
         site_data_res = site_data[MiscRecommendProduction.KEY_PC_DATA]
 
-        six_1 = P2PProduct.objects.filter(name=u"庆60亿专享1月期项目", period=1, hide=False)\
-            .filter(status__in=[u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
+        six_1 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=1, hide=False)\
             .order_by('-status_int').first()
 
-        six_3 = P2PProduct.objects.filter(name=u"庆60亿专享3月期项目", period=3, hide=False)\
-            .filter(status__in=[u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
+        six_3 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=3, hide=False)\
             .order_by('-status_int').first()
 
-        six_6 = P2PProduct.objects.filter(name=u"庆60亿专享6月期项目", period=6, hide=False)\
-            .filter(status__in=[u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
+        six_6 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=6, hide=False)\
             .order_by('-status_int').first()
+
+        six_1.name = u"庆60亿专享1月期项目"
+        six_3.name = u"庆60亿专享3月期项目"
+        six_6.name = u"庆60亿专享6月期项目"
 
         context.update({
             'site_data': site_data_res,
