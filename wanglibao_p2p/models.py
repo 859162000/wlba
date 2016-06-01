@@ -116,7 +116,7 @@ class P2PProduct(models.Model):
         if pay_method_mapping.get(self.pay_method) == CALCULATE_METHOD_DAY:
             base_period = Decimal(360)
 
-        return Decimal(amount*self.activity_amount*(Decimal(self.period)/base_period)
+        return Decimal(amount*float(self.activity_amount)/100*(Decimal(self.period)/base_period)
                        ).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
 
     class Meta:
