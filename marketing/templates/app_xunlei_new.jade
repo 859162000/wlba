@@ -32,7 +32,7 @@ html
                             | 次挖宝机会
                         else
                             span 请先
-                            a(href='javascript:void(0)')#goRegist 登录
+                            a(href='javascript:void(0)').goRegist 登录
                     .win-user
                         .win-box(style='display:none')
                             .megaphone
@@ -60,7 +60,7 @@ html
                                     //    url = '/weixin/recharge/?rechargeNext=/weixin/account/'
                                     a(href=url)=f6
                                 else
-                                    a(href="/weixin/regist/?next=/activity/xunlei_setp/")=f6
+                                    a(href='javascript:void(0)').goRegist=f6
                         +welfare('welfare-img1', '注册送', '/weixin/list/', '28888元', '体验金+', '50元', '红包', '注册领取')
                         +welfare('welfare-img2', '首充送', '/weixin/account/', '7天', '迅雷会员', '', '', '充值领取')
                         +welfare('welfare-img3', '最高送', 'weixin/list/', '250元', '现金红包+', '1年', '迅雷会员', '投资领取')
@@ -132,7 +132,7 @@ html
                                 label 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
                         p
                             span 4.
-                            label 新用户首次充值不低于100元即可获得7天迅雷会员及5%加息券（领取之日起7天有效，限1月及以上标的使用），首次投资用户不低于1000元即可获赠一年迅雷会员；
+                            label 新用户首次充值不低于100元即可获得7天迅雷会员及5%加息券（领取之日起7天有效，限1月及以下标的使用），首次投资用户不低于1000元即可获赠一年迅雷会员；
                         p
                             span 5.
                             label 幸运宝藏中奖用户获赠随机金额体验金及加息券（加息券领取之日起15天有效），体验金专享1天10%年化收益，加息券自领取之日起7天有效；

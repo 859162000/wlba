@@ -169,7 +169,7 @@ org.xunlei = (function(org){
                 referfrom = org.getQueryStringByName('referfrom'),
                 account = org.getQueryStringByName('account');
             var hrefStr = '/activity/app_xunleizhuce/?promo_token='+promo_token+'&xluserid='+xluserid+'&time='+time+'&sign='+sign+'&nickname='+nickname+'&referfrom='+referfrom+'&account='+account
-            $('#goRegist').attr('href',hrefStr)
+            $('.goRegist').attr('href',hrefStr)
         }
     }
     return {
