@@ -51,10 +51,13 @@ def _deposit_record(user, pagesize, pagenum):
             select_related('user__margin').select_related('margin_record')\
             [(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
-        if x.status == PayInfo.SUCCESS:
-            balance = x.margin_record.margin_current
+        if x.margin_record:
+            if x.status == PayInfo.SUCCESS:
+                balance = x.margin_record.margin_current
+            else:
+                balance = x.margin_record.margin_current - x.margin_record.amount
         else:
-            balance = x.margin_record.margin_current - x.margin_record.amount
+            balance = None
         obj = {
             "id": x.id,
             "amount": x.amount,
