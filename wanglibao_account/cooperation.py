@@ -747,8 +747,8 @@ class BaJinSheCallback(CoopCallback):
             income_state = 2 if user_amo.settled else 1
             reward_data = {
                 'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
-                'income': float(user_amo.interest),
-                'principal': float(user_amo.principal) + float(product.get_activity_earning(equity.equity)),
+                'income': float(user_amo.interest) + float(product.get_activity_earning(equity.equity)),
+                'principal': float(user_amo.principal),
                 'incomeState': income_state,
             }
             reward_data_list.append(reward_data)
