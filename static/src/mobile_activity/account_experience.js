@@ -113,9 +113,9 @@ org.experience = (function (org) {
                 } else {
                     login = true;
                     connect(data);
-                    console.log('111111111')
+                     $('.abc').text('111111111')
                     $('body').on('click','.goRecharge',function(){
-                        console.log('222222222')
+                        $('.abc').text('2222222222')
                         mixins.rechargeApp({
                             refresh: 1,
                             url: 'https://staging.wanglibao.com/activity/experience/account/'
