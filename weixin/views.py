@@ -204,65 +204,71 @@ class WeixinJoinView(View):
         return HttpResponse(reply.render())
 
     def process_user_operate(self, operate):
-        try:
-            redis = redis_backend()
-            redis.redis.hset(self.msg._data['FromUserName'], "operate", operate)
-            redis.redis.hset(self.msg._data['FromUserName'], "time", int(time.time()))
+        if False:
+            try:
+                redis = redis_backend()
+                redis.redis.hset(self.msg._data['FromUserName'], "operate", operate)
+                redis.redis.hset(self.msg._data['FromUserName'], "time", int(time.time()))
 
-        except Exception,e:
-            logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
+            except Exception,e:
+                logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
+        else:
+            pass
 
 
     def process_customer_transfer(self, weixin_account, w_user, user):
-        try:
-            redis = redis_backend()
-            last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
-            last_time = redis.redis.hget(self.msg._data['FromUserName'], "time")
-            if last_time:
-                last_time = int(last_time)
-            # print "operate:%s; last_time:%s"%(last_operate, last_time)
-            reply = None
-            txt = None
-            is_customer_time = self.checkCsTime()
-            if last_operate:
-                if last_operate == SERVICE_SUBSCRIBE:
-                    reply = self.check_service_subscribe(w_user=w_user, user=user)
-                    self.process_user_operate(OTHER_TXT)
-                elif last_operate == Y_TXT:
-                    if time.time() - last_time <= 30*60*60:
-                        reply = TransferCustomerServiceReply(message=self.msg)
-                        self.process_user_operate(Y_TXT)
-                if last_operate == CUSTOMER_SERVICE:
-                    if is_customer_time:
-                        if self.msg.content.lower() == "y":
-                            txt = "想问什么放马过来吧，简单描述下你想说的问题。"
+        if False:
+            try:
+                redis = redis_backend()
+                last_operate = redis.redis.hget(self.msg._data['FromUserName'], "operate")
+                last_time = redis.redis.hget(self.msg._data['FromUserName'], "time")
+                if last_time:
+                    last_time = int(last_time)
+                # print "operate:%s; last_time:%s"%(last_operate, last_time)
+                reply = None
+                txt = None
+                is_customer_time = self.checkCsTime()
+                if last_operate:
+                    if last_operate == SERVICE_SUBSCRIBE:
+                        reply = self.check_service_subscribe(w_user=w_user, user=user)
+                        self.process_user_operate(OTHER_TXT)
+                    elif last_operate == Y_TXT:
+                        if time.time() - last_time <= 30*60*60:
+                            reply = TransferCustomerServiceReply(message=self.msg)
                             self.process_user_operate(Y_TXT)
+                    if last_operate == CUSTOMER_SERVICE:
+                        if is_customer_time:
+                            if self.msg.content.lower() == "y":
+                                txt = "想问什么放马过来吧，简单描述下你想说的问题。"
+                                self.process_user_operate(Y_TXT)
+                            else:
+                                txt = "如需联系人工客服请回复字母“Y”！聊什么听你的，但是网利君在线时间为工作日9：00~18：00。"
                         else:
-                            txt = "如需联系人工客服请回复字母“Y”！聊什么听你的，但是网利君在线时间为工作日9：00~18：00。"
-                    else:
-                        txt = self.getCSReply()
-            if not reply:
-                if not txt:
-                    self.process_user_operate(OTHER_TXT)
-                    if is_customer_time:
-                        txt = "客官，想和网利君天南海北的聊天还是正经的咨询？点击在线客服，与网利君联系吧！网利君在线时间为工作日9：00~18：00。"
-                    else:
-                        txt = self.getCSReply()
-                client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
-                client.message._send_custom_message({
-                                            "touser":self.msg._data['FromUserName'],
-                                            "msgtype":"text",
-                                            "text":
-                                            {
-                                                 "content":txt
-                                            }
-                                        }, account="007@wanglibao400")
-                reply = -1
-        except Exception,e:
+                            txt = self.getCSReply()
+                if not reply:
+                    if not txt:
+                        self.process_user_operate(OTHER_TXT)
+                        if is_customer_time:
+                            txt = "客官，想和网利君天南海北的聊天还是正经的咨询？点击在线客服，与网利君联系吧！网利君在线时间为工作日9：00~18：00。"
+                        else:
+                            txt = self.getCSReply()
+                    client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+                    client.message._send_custom_message({
+                                                "touser":self.msg._data['FromUserName'],
+                                                "msgtype":"text",
+                                                "text":
+                                                {
+                                                     "content":txt
+                                                }
+                                            }, account="007@wanglibao400")
+                    reply = -1
+            except Exception,e:
+                reply = self.check_service_subscribe(w_user=w_user, user=user)
+                if not reply:
+                    reply = TransferCustomerServiceReply(message=self.msg)
+                logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
+        else:
             reply = self.check_service_subscribe(w_user=w_user, user=user)
-            if not reply:
-                reply = TransferCustomerServiceReply(message=self.msg)
-            logger.debug("fromUserName:%s====%s"%(self.msg._data['FromUserName'], traceback.format_exc()))
         return reply
 
 
@@ -444,6 +450,8 @@ class WeixinJoinView(View):
         else:
             if content.isdigit():
                 txt = u'请回复正确的数字订阅项目'
+            else:
+                txt = u"请点击【在线客服】菜单，来与客服沟通。"
         if txt:
             reply = create_reply(txt, self.msg)
         return reply
