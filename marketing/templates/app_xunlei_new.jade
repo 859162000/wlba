@@ -23,7 +23,7 @@ html
                             if user.is_authenticated
                                 a.people-icon
                             else
-                                a(href="/weixin/regist/?next=/activity/app_xunlei_treasure/").people-icon
+                                a(href="/weixin/regist/?next=/activity/xunlei_setp/").people-icon
                             .mountain-icon
                     .user-count
                         if user.is_authenticated
@@ -32,7 +32,7 @@ html
                             | 次挖宝机会
                         else
                             span 请先
-                            a(href='/weixin/regist/?next=/activity/app_xunlei_treasure/') 登录
+                            a(href='javascript:void(0)')#goRegist 登录
                     .win-user
                         .win-box(style='display:none')
                             .megaphone
@@ -56,13 +56,13 @@ html
                                     span=f4
                                     label=f5
                                 if user.is_authenticated
-                                    if url == ''
-                                        url = '/weixin/recharge/?rechargeNext=/weixin/account/'
+                                    //if url == ''
+                                    //    url = '/weixin/recharge/?rechargeNext=/weixin/account/'
                                     a(href=url)=f6
                                 else
-                                    a(href="/weixin/regist/?next=/activity/app_xunlei_treasure/")=f6
+                                    a(href="/weixin/regist/?next=/activity/xunlei_setp/")=f6
                         +welfare('welfare-img1', '注册送', '/weixin/list/', '28888元', '体验金+', '50元', '红包', '注册领取')
-                        +welfare('welfare-img2', '首充送', '', '7天', '迅雷会员', '', '', '充值领取')
+                        +welfare('welfare-img2', '首充送', '/weixin/account/', '7天', '迅雷会员', '', '', '充值领取')
                         +welfare('welfare-img3', '最高送', 'weixin/list/', '250元', '现金红包+', '1年', '迅雷会员', '投资领取')
                 .app-xunlei-box3.clearfix
                     +titles('五步享', '收益', 'Five steps of sitting on earning')
@@ -106,7 +106,7 @@ html
                     .explain-list
                         p
                             span 1.
-                            label 活动时间：2016年5月26日开始；
+                            label 活动时间：2016年6月1日开始；
                         p
                             span 2.
                             label 手机号为网利宝唯一账户，本期迅雷活动新用户专享福利仅限于迅雷渠道新注册用户参与，幸运大翻牌网利宝新老用户均可参与；
@@ -132,10 +132,10 @@ html
                                 label 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
                         p
                             span 4.
-                            label 新用户首次充值不低于100元即可获得7天迅雷会员及2%加息券（加息券领取之日起7天有效），首次投资用户不低于1000元即可获赠一年迅雷会员；
+                            label 新用户首次充值不低于100元即可获得7天迅雷会员及5%加息券（领取之日起7天有效，限1月及以上标的使用），首次投资用户不低于1000元即可获赠一年迅雷会员；
                         p
                             span 5.
-                            label 幸运宝藏中奖用户获赠随机金额体验金及加息券，体验金专享1天10%年化收益，加息券自领取之日起7天有效；
+                            label 幸运宝藏中奖用户获赠随机金额体验金及加息券（加息券领取之日起15天有效），体验金专享1天10%年化收益，加息券自领取之日起7天有效；
                         p
                             span 6.
                             label 用户注册时建议根据注册提示登陆迅雷账号，以便迅雷会员奖励顺利发放；

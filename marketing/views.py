@@ -2063,13 +2063,13 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
         if not self.template_name:
-            self.template_name = 'xunlei_three.jade'
+            self.template_name = 'xunlei.jade'
             device_list = ['android', 'iphone']
             user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
             for device in device_list:
                 match = re.search(device, user_agent)
                 if match and match.group():
-                    self.template_name = 'app_xunleizhuce.jade'
+                    self.template_name = 'app_xunlei_new.jade'
 
         if not response_data:
             check_data = {
@@ -3086,7 +3086,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        account = request.session.get('account', '').strip()
+        account = request.session.get('account', '').strip() or request.REQUEST.get('account', '').strip()
         if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name and account):
             user = self.request.user
@@ -3307,7 +3307,7 @@ class HMDP2PListView(TemplateView):
         print p2p_list_url
         return {
             'p2p_products': p2p_products[0:1],
-            "p2p_list_url":p2p_list_url
+            "p2p_list_url": p2p_list_url
         }
 
 
