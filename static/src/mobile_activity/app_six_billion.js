@@ -21,7 +21,7 @@
 		var host = location.protocol+"//"+location.host,
 			shareName = '亿路旅程，亿同见证',
 			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-			shareLink = host + '/activity/app_six_billion/',
+			shareLink = host + '/activity/six_billion/app/',
 			shareMainTit = '亿路旅程，亿同见证',
 			shareBody = '深情不及久伴，厚爱无需多言';
 		//分享给微信好友
