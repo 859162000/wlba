@@ -1083,8 +1083,8 @@ class LoginAPIView(DecryptParmsAPIView):
         if not user:
             geetest_record.times += 1
             geetest_record_ip.times += 1
-            display_pic = 'true' if geetest_record.times>2 else 'false'
-            display_pic = display_pic if geetest_record_ip.times<=5 else 'true'
+            display_pic = 'true' if geetest_record.times>=2 else 'false'
+            display_pic = display_pic if geetest_record_ip.times<5 else 'true'
             geetest_record.save()
             geetest_record_ip.save()
             return Response({"token": "false", "message": u"用户名或密码错误", "display_pic":display_pic}, status=400)
