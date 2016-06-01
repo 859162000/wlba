@@ -3086,7 +3086,7 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        account = request.session.get('account', '').strip()
+        account = request.session.get('account', '').strip() or request.REQUEST.get('account', '').strip()
         if channel_code and (channel_code in channel_codes and channel_user
                              and channel_time and channel_sign and nick_name and account):
             user = self.request.user
@@ -3292,8 +3292,10 @@ class ShieldPlanH5View(TemplateView):
             'p2p': p2p_list
         }
 
+
 class HMDP2PListView(TemplateView):
     p2p_list_url_name = ""
+
     def get_context_data(self, **kwargs):
         p2p_products = []
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")
@@ -3307,5 +3309,48 @@ class HMDP2PListView(TemplateView):
         print p2p_list_url
         return {
             'p2p_products': p2p_products[0:1],
-            "p2p_list_url":p2p_list_url
+            "p2p_list_url": p2p_list_url
         }
+
+
+class SixBillionView(TemplateView):
+
+    def get_template_names(self):
+        template = self.kwargs['template']
+        if template == 'app':
+            template_name = 'app_six_billion.jade'
+        else:
+            template_name = "six_billion.jade"
+
+        return template_name
+
+    def get_context_data(self, **kwargs):
+        context = super(SixBillionView, self).get_context_data(**kwargs)
+        now = timezone.now()
+        # 累计交易额
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        site_data_res = site_data[MiscRecommendProduction.KEY_PC_DATA]
+
+        six_1 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=1, hide=False)\
+            .order_by('-status_int').first()
+
+        six_3 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=3, hide=False)\
+            .order_by('-status_int').first()
+
+        six_6 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=6, hide=False)\
+            .order_by('-status_int').first()
+
+        six_1.name = u"庆60亿专享1月期项目"
+        six_3.name = u"庆60亿专享3月期项目"
+        six_6.name = u"庆60亿专享6月期项目"
+
+        context.update({
+            'site_data': site_data_res,
+            'now': timezone.localtime(now).strftime('%Y-%m-%d %H:%M:%S'),
+            'six_1': six_1,
+            'six_3': six_3,
+            'six_6': six_6,
+        })
+
+        return context

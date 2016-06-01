@@ -258,6 +258,9 @@ class SendSMSValidationCodeView(APIView):
     permission_classes = ()
 
     def post(self, request, phone):
+        if not request.user.is_authenticated():
+            return Response({'message': '用户没有登录', "type":"error"}, status=400)
+
         userprofile = WanglibaoUserProfile.objects.filter(user_id=request.user.id).first()
         phone_number = phone.strip()
         if not (userprofile and userprofile.phone == phone_number):
