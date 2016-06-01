@@ -1626,7 +1626,7 @@ class JuChengRegister(CoopRegister):
 
 class BaoGeRegister(CoopRegister):
     def __init__(self, request):
-        super(XiaoMeiRegister, self).__init__(request)
+        super(BaoGeRegister, self).__init__(request)
         self.c_code = 'bg'
         self.invite_code = 'bg'
         self.token = 'bg'
