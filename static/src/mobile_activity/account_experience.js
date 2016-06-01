@@ -102,7 +102,13 @@ org.experience = (function (org) {
                             url += "?1";
                             self.location.replace(url);
                         }
-                        org.experience.init()
+                        org.experience.init();
+                        $('body').on('click','.goRecharge',function(){
+                            mixins.rechargeApp({
+                                refresh: 1,
+                                url: 'https://staging.wanglibao.com/activity/experience/account/'
+                            })
+                        })
                     }
                 })
             }
@@ -113,14 +119,6 @@ org.experience = (function (org) {
                 } else {
                     login = true;
                     connect(data);
-                     $('.abc').text('111111111')
-                    $('body').on('click','.goRecharge',function(){
-                        $('.abc').text('2222222222')
-                        mixins.rechargeApp({
-                            refresh: 1,
-                            url: 'https://staging.wanglibao.com/activity/experience/account/'
-                        })
-                    })
                 }
             })
 
