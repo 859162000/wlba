@@ -3341,9 +3341,27 @@ class SixBillionView(TemplateView):
         six_6 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=6, hide=False)\
             .order_by('-status_int').first()
 
-        six_1.name = u"庆60亿专享1月期项目"
-        six_3.name = u"庆60亿专享3月期项目"
-        six_6.name = u"庆60亿专享6月期项目"
+        multi_buy = P2PProduct.objects.filter(name__startswith=u"多投多加息", period=6, hide=False)\
+            .order_by('-status_int')
+
+        if six_1 and now < six_1.publish_time:
+            six_1.name = u"庆60亿专享1月期项目"
+
+        if six_3 and now < six_3.publish_time:
+            six_3.name = u"庆60亿专享3月期项目"
+
+        if six_6 and now < six_6.publish_time:
+            six_6.name = u"庆60亿专享6月期项目"
+
+        if multi_buy:
+            if len(multi_buy) <= 1:
+                multi_1 = multi_buy[0]
+                multi_2 = None
+            else:
+                multi_1 = multi_buy[0]
+                multi_2 = multi_buy[1]
+        else:
+            multi_1 = multi_2 = None
 
         context.update({
             'site_data': site_data_res,
@@ -3351,6 +3369,8 @@ class SixBillionView(TemplateView):
             'six_1': six_1,
             'six_3': six_3,
             'six_6': six_6,
+            'multi_1': multi_1,
+            'multi_2': multi_2
         })
 
         return context
