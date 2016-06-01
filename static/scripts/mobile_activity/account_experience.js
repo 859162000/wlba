@@ -331,13 +331,22 @@ org.experience = (function (org) {
                     mixins.loginApp({refresh:1, url:''});
                 } else {
                     login = true;
-                    connect(data)
+                    connect(data);
+                    $('body').on('click','.goRecharge',function(){
+                        mixins.rechargeApp({
+                            refresh: 1,
+                            url: 'https://staging.wanglibao.com/activity/experience/account/'
+                        })
+                    })
                 }
             })
 
         },
         other: function(){
-            org.experience.init()
+            org.experience.init();
+            $('body').on('click','.goRecharge',function(){
+                window.location.href = '/weixin/recharge/';
+            })
         }
     })
 })(org);
