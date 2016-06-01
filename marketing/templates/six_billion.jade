@@ -227,36 +227,70 @@ html.no-js(lang="en-gb")
                 .act_text_2!='每卖出100万，年化率即再增加<span>0.3%</span>，卖出500万，年化即再增加<span>0.9%</span>，以此类推增加年化。'
                 .project_wrap
                     .project_box
-                        .title_text 庆60亿专享1月期项目
-                        .add_num 10 + 3.5%
-                        .project_data
-                            .data_1 本期额度
-                                span 500万
-                            .data_1 项目期限
-                                span 6个月
-                        .project_wrap_2
-                            .project_bar
-                                span(style='width:80%')
-                            .percentage_num 80%
-                        .footer_b 可投资金额65万元
-                        .button_buy.blue_button 敬请期待
-                        .meng_layer
+                        if multi_1
+                            m1_publish_time = str(multi_1.publish_time)
+                        else
+                            m1_publish_time = ""
+                        if multi_1 and now > m1_publish_time
+                            .title_text {{multi_1.name}}
+                            .add_num {{multi_1.expected_earning_rate}} + {{multi_1.activity.rule.percent_text}}%
+                            .project_data
+                                .data_1 本期额度
+                                    total_amount_m1 = multi_1.total_amount / 10000.0
+                                    span {{total_amount_m1}}万
+                                .data_1 项目期限
+                                    span {{multi_1.period}}个月
+                            .project_wrap_2
+                                percent_m1 = float(multi_1.ordered_amount) / multi_1.total_amount * 100
+                                .project_bar
+                                    span(style='width:{{percent_m1 | percentage}}')
+                                .percentage_num {{percent_m1 | percentage}}
+                            .footer_b
+                                amount_m1 = multi_1.total_amount - multi_1.ordered_amount
+                                |可投资金额{{amount_m1 | money_format_int}}元
+                            if now > m1_publish_time
+                                if multi_1.status == '正在招标'
+                                    .button_buy.orange_button
+                                        a(href="/p2p/detail/{{multi_1.id}}/", style="color:white") 马上抢购
+                                else
+                                    .button_buy.gray_button 已售罄
+                            else
+                                .button_buy.blue_button  敬请期待
+                        else
+                            .meng_layer
 
                     .project_box
-                        .title_text 庆60亿专享1月期项目
-                        .add_num 10 + 3.5%
-                        .project_data
-                            .data_1 本期额度
-                                span 500万
-                            .data_1 项目期限
-                                span 6个月
-                        .project_wrap_2
-                            .project_bar
-                                span(style='width:80%')
-                            .percentage_num 80%
-                        .footer_b 可投资金额65万元
-                        .button_buy.blue_button 敬请期待
-                        .meng_layer
+                        if multi_2
+                            m2_publish_time = str(multi_2.publish_time)
+                        else
+                            m2_publish_time = ""
+                        if multi_2 and now > m2_publish_time
+                            .title_text {{multi_2.name}}
+                            .add_num {{multi_2.expected_earning_rate}} + {{multi_2.activity.rule.percent_text}}%
+                            .project_data
+                                .data_1 本期额度
+                                    total_amount_m1 = multi_2.total_amount / 10000.0
+                                    span {{total_amount_m1}}万
+                                .data_1 项目期限
+                                    span {{multi_2.period}}个月
+                            .project_wrap_2
+                                percent_m2 = float(multi_2.ordered_amount) / multi_2.total_amount * 100
+                                .project_bar
+                                    span(style='width:{{percent_m2 | percentage}}')
+                                .percentage_num {{percent_m2 | percentage}}
+                            .footer_b
+                                amount_m2 = multi_2.total_amount - multi_2.ordered_amount
+                                |可投资金额{{amount_m2 | money_format_int}}元
+                            if now > m2_publish_time
+                                if multi_2.status == '正在招标'
+                                    .button_buy.orange_button
+                                        a(href="/p2p/detail/{{multi_2.id}}/", style="color:white") 马上抢购
+                                else
+                                    .button_buy.gray_button 已售罄
+                            else
+                                .button_buy.blue_button  敬请期待
+                        else
+                            .meng_layer
 
                 .prompt_wrap 温馨提示：<br>1、多投多加息的年化率涨幅按活动时间内（6月3日 10:00-18:00）“亿路狂标—多投多加息“专属标售卖额度进行加息计算，每卖出100万即年化增加一次，以此类推，共2期，标满结束。<br>2、活动结束后，如未满标，继续购买，购买年化不再增加。<br>3、活动期间，大家可以通过PC/h5 活动专题页面查看到增加的实时年化率。活动结束以后，用户所有投资金额均可享受最终年化率，不受加入时间先后顺序影响。<br>4、购买“亿路狂标-多投多加息”项目，可以使用已获得的加息券、红包。
             .section.section_5
