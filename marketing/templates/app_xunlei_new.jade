@@ -32,7 +32,7 @@ html
                             | 次挖宝机会
                         else
                             span 请先
-                            a(href='javascript:void(0)')#goRegist 登录
+                            a(href='javascript:void(0)').goRegist 登录
                     .win-user
                         .win-box(style='display:none')
                             .megaphone
@@ -60,7 +60,7 @@ html
                                     //    url = '/weixin/recharge/?rechargeNext=/weixin/account/'
                                     a(href=url)=f6
                                 else
-                                    a(href="/weixin/regist/?next=/activity/xunlei_setp/")=f6
+                                    a(href='javascript:void(0)').goRegist=f6
                         +welfare('welfare-img1', '注册送', '/weixin/list/', '28888元', '体验金+', '50元', '红包', '注册领取')
                         +welfare('welfare-img2', '首充送', '/weixin/account/', '7天', '迅雷会员', '', '', '充值领取')
                         +welfare('welfare-img3', '最高送', 'weixin/list/', '250元', '现金红包+', '1年', '迅雷会员', '投资领取')
