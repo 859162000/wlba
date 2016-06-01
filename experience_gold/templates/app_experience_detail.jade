@@ -19,8 +19,9 @@ html(style="background:#5ab5f1")
                             label %
                         p 投资期限{{product.period}}天
                         .line.mt1
+                        experience_amounts = int(experience_amount)
                         .tyj
-                            span {{experience_amount}}
+                            span {{experience_amounts}}
                             label 元
                         .line
                         .account-info
@@ -31,10 +32,10 @@ html(style="background:#5ab5f1")
                                 span.fl 投资金额：
                                     i 1元
                                 span.fr 体验标金额：
-                                    i {{experience_amount}}元
+                                    i {{experience_amounts}}元
                             .end-times
                               | 回款时间：{{dt}}
-                            p.tyj-pop 投资1元即获{{experience_amount}}元体验金收益
+                            p.tyj-pop 投资1元即获{{experience_amounts}}元体验金收益
                         .investment-btn
                             a#rzTyj(href="javascript:void(0)") 立即投资
                     .boxs-bg
