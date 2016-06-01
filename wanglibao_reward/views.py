@@ -2106,7 +2106,7 @@ class XunleiTreasureAPIView(APIView):
             data = [{'phone': safe_phone_str(record.user.wanglibaouserprofile.phone), 'awards': str(float(record.p2p_amount)/1000)} for record in records]
             to_json_response = {
                 'ret_code': 1005,
-                'data': data,
+                'data': data[:50],
                 'message': u'获得抽奖成功用户',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
