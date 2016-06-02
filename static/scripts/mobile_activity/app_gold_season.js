@@ -287,7 +287,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     $('.share-btns').on('click',function() {
-                        mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
+                        mixins.loginApp({refresh: 1, url: 'https://www.wanglibao.com/activity/app_gold_season/'});
                     })
                     //mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
                 }else{
