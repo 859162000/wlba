@@ -66,12 +66,13 @@
 
             var timestamp = Date.parse(new Date());
             //获得当前时间戳
+            var timerFunction = function () {
+                timestamp = Date.parse(new Date());
+                if(timestamp>='1464919200000'){
+                //2016年6月3日 10:00-18:00
 
-            if(timestamp>='1464919200000'){
-            //2016年6月3日 10:00-18:00
 
 
-                var timerFunction = function () {
                     curShowTimeSeconds = getCurrentShowTimeSeconds();
                     var hours = parseInt(curShowTimeSeconds/3600);
                     var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
@@ -88,13 +89,19 @@
                     if(Date.parse(new Date())>'1464948000000'){
                         clearInterval(time_intervalId);
                     }
-                }
-                time_intervalId = setInterval(timerFunction, 1000);
-                $('.countdown_wrap').show();
 
-            }else{
-                $('.countdown_wrap').hide();
+
+                $('.countdown_wrap').show();
+                $('.project_wrap').show();
+                $('.project_wrap .project_box .meng_layer').hide();
+                }else{
+                    $('.countdown_wrap').hide();
+                    $('.project_wrap').show();
+                    $('.project_wrap .project_box').append('<div class="meng_layer"></div>');
+
+                }
             }
+            time_intervalId = setInterval(timerFunction, 1000);
 
             function getCurrentShowTimeSeconds(){
 				var curTime = new Date();
