@@ -94,8 +94,6 @@
 
                 }else{
                     $('.countdown_wrap').hide();
-
-
                 }
             }
             time_intervalId = setInterval(timerFunction, 1000);

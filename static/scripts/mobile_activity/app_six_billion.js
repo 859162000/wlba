@@ -462,7 +462,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	}
 
 	time_intervalId = setInterval(timerFunction, 1000);
-	
+
+
 	function getCurrentShowTimeSeconds(){
 		var curTime = new Date();
 		var ret = endTime.getTime() - curTime.getTime();
