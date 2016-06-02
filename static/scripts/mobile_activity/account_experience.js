@@ -277,11 +277,12 @@ org.experience = (function (org) {
                     data: {},
                     success: function (data) {
                         if (data.ret_code > 0) {
-                            if(data.ret_code == 30009){
-                                org.ui.alert(data.message, '', '4', 'goRecharge')
-                            }else{
-                                org.ui.alert(data.message, '', '4')
-                            }
+                            //if(data.ret_code == 30009){
+                            //    org.ui.alert(data.message, '', '4', 'goRecharge')
+                            //}else{
+                            //    org.ui.alert(data.message, '', '4')
+                            //}
+                            org.ui.alert(data.message, '', '4')
                         } else {
                             org.ui.alert('', '', '2')
                             setTimeout(function () {

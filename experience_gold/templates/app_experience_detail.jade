@@ -4,7 +4,7 @@ html(style="background:#5ab5f1")
     head
         title 体验标
         include include/app_header.jade
-        link(href="/static/styles/mobile_activity/app_experience_detail.css?v=2016041101", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_experience_detail.css?v=2016060201", rel="stylesheet")
         body
             - csrf_token
             .experience-detail-box
@@ -33,11 +33,11 @@ html(style="background:#5ab5f1")
                                     i 1元
                                 span.fr 体验标金额：
                                     i {{experience_amounts}}元
-                            .end-times
-                              | 回款时间：{{dt}}
                             p.tyj-pop 投资1元即获{{experience_amounts}}元体验金收益
                         .investment-btn
                             a#rzTyj(href="javascript:void(0)") 立即投资
+                            .end-times
+                              | 回款时间：{{dt}}
                     .boxs-bg
                         img(src='/static/imgs/mobile_activity/app_experience_detail/background_tyj_bottom.png')
                 .detail-boxs.rule-box
@@ -68,5 +68,5 @@ html(style="background:#5ab5f1")
                                 p 到期后，8.02元的收益自动回到您的 账户余额中，可以随时手动体现，一 到三个工作日内到账。
                     .boxs-bg
                         img(src='/static/imgs/mobile_activity/app_experience_detail/background_tyj_bottom.png')
-    script(src="/static/scripts/component/webview.js?v=20160520")
-    script(src="/static/scripts/mobile_activity/app_experience_new.js?v=2016053001")
+    script(src="/static/scripts/component/webview.js?v=20160502")
+    script(src="/static/scripts/mobile_activity/app_experience_new.js?v=20160502")
