@@ -434,7 +434,7 @@ class YueLiBaoCheck(APIView):
                 for product in month_products:
                     if product.settle_status:
                         logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
-                                    format(product.id), product_id)
+                                    format(product.id, product_id))
                         continue
                     product.settle_status = True
                     product.save()
