@@ -63,17 +63,24 @@
 
             },
             success: function (data) {
-                openUrl = data.url;
-                //弹出窗口的url
+                if(data.ret_code=='1000'||data.ret_code=='1001'){
+                    $('.popup_box .main .textairport').text(data.message);
+                    $('.popup_box').show();
+                }else if(data.ret_code=='0'){
+                    openUrl = data.url;
+                    //弹出窗口的url
 
-                window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+                    window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+                }
 
             },error: function(data){
 
             }
             })
         })
-
+        $('.popup_box .popup_button').click(function(){
+            $('.popup_box').hide();
+        });
 
     })
 }).call(this);
