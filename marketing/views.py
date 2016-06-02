@@ -3342,14 +3342,18 @@ class SixBillionView(TemplateView):
         multi_buy = P2PProduct.objects.filter(name__startswith=u"多投多加息", period=6, hide=False)\
             .order_by('-status_int')
 
+        six_1_display = six_3_display = six_6_display = True
         if six_1 and now < six_1.publish_time:
             six_1.name = u"庆60亿专享1月期项目"
+            six_1_display = False
 
         if six_3 and now < six_3.publish_time:
             six_3.name = u"庆60亿专享3月期项目"
+            six_3_display = False
 
         if six_6 and now < six_6.publish_time:
             six_6.name = u"庆60亿专享6月期项目"
+            six_6_display = False
 
         if multi_buy:
             if len(multi_buy) <= 1:
@@ -3367,6 +3371,9 @@ class SixBillionView(TemplateView):
             'six_1': six_1,
             'six_3': six_3,
             'six_6': six_6,
+            'six_1_display': six_1_display,
+            'six_3_display': six_3_display,
+            'six_6_display': six_6_display,
             'multi_1': multi_1,
             'multi_2': multi_2
         })
