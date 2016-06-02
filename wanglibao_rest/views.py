@@ -1988,7 +1988,6 @@ class UDeskLoginAPIView(APIView):
             'nonce': self.__create_nonce_str(),
             'timestamp': self.__create_timestamp(),
             'web_token': '',
-            'im_user_key': self.im_user_key
         }
     def __create_nonce_str(self):
         nonce = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(31))
@@ -2000,6 +1999,7 @@ class UDeskLoginAPIView(APIView):
 
     def __sign(self):
         string = '&'.join(['%s=%s' % (key.lower(), self.params[key]) for key in sorted(self.params)])
+        string = string+self.im_user_key
         self.params['signature'] = hashlib.sha1(string).hexdigest().upper()
         return self.params['signature']
 
@@ -2009,7 +2009,7 @@ class UDeskLoginAPIView(APIView):
             'nonce': self.__create_nonce_str(),
             'timestamp': self.__create_timestamp(),
             'web_token': phone,
-            'im_user_key': self.im_user_key,
+            #'im_user_key': self.im_user_key,
             'signature': signature,
             'c_phone': phone, }
         params_str = '&'.join(['%s=%s' % (key.lower(), self.params[key]) for key in sorted(self.params)])
