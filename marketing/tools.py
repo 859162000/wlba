@@ -70,10 +70,6 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         "ylb_period": ylb_period
     }, queue='celery02')
 
-    # 月利宝的标不进行除发奖励外的操作.
-    if ylb_period:
-        return
-
     # fix@chenweibi, add order_id
     try:
         utils.log_clientinfo(device, "buy", user_id, order_id, amount)
@@ -120,6 +116,10 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
                 queue='coop_celery', routing_key='coop_celery', exchange='coop_celery')
     except:
         pass
+    
+    # 月利宝的标不进行除发奖励外的操作.
+    if ylb_period:
+        return
 
 def checkUpdateHmdRanks(product_id):
     activity = Activity.objects.filter(code='hmd').first()
