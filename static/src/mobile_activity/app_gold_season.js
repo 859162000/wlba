@@ -50,7 +50,7 @@
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            $('.share-btns').show();
+            //$('.share-btns').show();
             mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
             function connect(data) {
                 org.ajax({
@@ -83,7 +83,7 @@
 
         },
         other: function(){
-            $('.share-btns').hide();
+            //$('.share-btns').hide();
         }
     })
 
