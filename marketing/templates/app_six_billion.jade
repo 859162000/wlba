@@ -232,7 +232,7 @@ html(style="background: #fff")
                     .swiper-container.swiper2
                         .swiper-wrapper
                             .swiper-slide.first_slide
-                                .swiper_main(style='opacity:0')
+                                .swiper_main
                                     if multi_1 and multi_1_display
                                         .title_text {{multi_1.name}}
                                         .interest_rate {{multi_1.expected_earning_rate}}
@@ -277,7 +277,7 @@ html(style="background: #fff")
                                         .meng_layer
                                         p(style="height:263px;")
                             .swiper-slide
-                                .swiper_main(style='opacity:0')
+                                .swiper_main
                                     if multi_2 and multi_2_display
                                         .title_text {{multi_2.name}}
                                         .interest_rate {{multi_2.expected_earning_rate}}
@@ -358,7 +358,7 @@ html(style="background: #fff")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_six_billion.js?v=2016060209")
+        script(src="/static/scripts/mobile_activity/app_six_billion.js?v=2016060211")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,

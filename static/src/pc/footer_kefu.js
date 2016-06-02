@@ -79,6 +79,9 @@
           $.ajax({
             url: '/api/udesk/url',
             type: 'post',
+            data:{
+
+            },
             success: function (data1) {
 
 
