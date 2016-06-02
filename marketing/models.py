@@ -155,7 +155,6 @@ class Channels(models.Model):
     end_at = models.DateTimeField(u'合作结束时间', blank=True, null=True, help_text=u'*可为空')
     is_abandoned = models.BooleanField(u'是否废弃', default=False)
     coop_callback = models.CharField(u'渠道回调', max_length=50, blank=True, null=True)
-    _coop_callback = MultiSelectField(u'渠道回调2', max_length=50, blank=True, null=True, choices=_CALLBACK)# , choices=_CALLBACK
 
     class Meta:
         verbose_name_plural = u"渠道"

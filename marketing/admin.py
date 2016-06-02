@@ -1,5 +1,6 @@
 # encoding:utf-8
 
+import json
 from django import forms
 from django.contrib import admin
 from marketing.models import Channels
@@ -8,8 +9,6 @@ from marketing.models import Channels
 class ChannelForm(forms.ModelForm):
     coop_callback = forms.MultipleChoiceField(label=u'渠道回调', choices=Channels._CALLBACK,
                                               widget=forms.CheckboxSelectMultiple(), required=False)
-    _coop_callback = forms.MultipleChoiceField(label=u'渠道回调2', choices=Channels._CALLBACK,
-                                               widget=forms.CheckboxSelectMultiple(), required=False)
 
     class Meta:
         model = Channels
@@ -24,5 +23,9 @@ class ChannelsAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def save_model(self, request, obj, form, change):
+        obj.coop_callback = json.dumps(obj.coop_callback)
+        obj.save()
 
 admin.site.register(Channels, ChannelsAdmin)
