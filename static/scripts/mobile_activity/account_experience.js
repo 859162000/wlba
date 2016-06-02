@@ -244,7 +244,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     var btnTxt = '知道了',recharge = '',closeBtns = '';
                 }
                 strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo_new.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
             }
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
@@ -277,7 +277,7 @@ org.experience = (function (org) {
                     data: {},
                     success: function (data) {
                         if (data.ret_code > 0) {
-                            if(data.ret_code == 30009){
+                            if(data.ret_code == '30009' || data.ret_code == 30009){
                                 org.ui.alert(data.message, '', '4', 'goRecharge')
                             }else{
                                 org.ui.alert(data.message, '', '4')
@@ -321,7 +321,13 @@ org.experience = (function (org) {
                             url += "?1";
                             self.location.replace(url);
                         }
-                        org.experience.init()
+                        org.experience.init();
+                        $('body').on('click','.goRecharge',function(){
+                            mixins.rechargeApp({
+                                refresh: 1,
+                                url: 'https://wltest.wanglibao.com/activity/experience/account/'
+                            })
+                        })
                     }
                 })
             }
@@ -332,14 +338,6 @@ org.experience = (function (org) {
                 } else {
                     login = true;
                     connect(data);
-                     $('.abc').text('111111111')
-                    $('body').on('click','.goRecharge',function(){
-                        $('.abc').text('2222222222')
-                        mixins.rechargeApp({
-                            refresh: 1,
-                            url: 'https://staging.wanglibao.com/activity/experience/account/'
-                        })
-                    })
                 }
             })
 

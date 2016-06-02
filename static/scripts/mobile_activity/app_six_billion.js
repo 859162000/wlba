@@ -423,48 +423,69 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*轮播图结束*/
 
 	/*指定范围倒计时*/
-            var abb;
-            var curShowTimeSeconds = 0;
-			//现在倒计时需要有多少秒
-            var endTime = new Date(2016,4,30,20,00,00);
-            //回头这里改成 2016,5,3,20,00,00
+	var time_intervalId;
+	var curShowTimeSeconds = 0;
+	//现在倒计时需要有多少秒
+	var endTime = new Date(2016,5,3,18,00,00);
+	//回头这里改成 2016,5,3,20,00,00
 
-            var timestamp = Date.parse(new Date());
-            //获得当前时间戳
+	var timestamp = Date.parse(new Date());
+	//获得当前时间戳
+	var append_num = '0';
+	var timerFunction = function () {
+		timestamp = Date.parse(new Date());
+		if(timestamp>='1464919200000'){
+		//2016年6月3日 10:00-18:00
 
-            if(timestamp>='1464919200000'&&timestamp<='1464948000000'){
-            //2016年6月3日 10:00-18:00
 
-                setInterval(function(){
-                    curShowTimeSeconds = getCurrentShowTimeSeconds();
-                    var hours = parseInt(curShowTimeSeconds/3600);
-                    var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
-                    var seconds = curShowTimeSeconds % 60;
+			curShowTimeSeconds = getCurrentShowTimeSeconds();
+			var hours = parseInt(curShowTimeSeconds/3600);
+			var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
+			var seconds = curShowTimeSeconds % 60;
 
-                    $('.countdown_wrap .time_1').text(parseInt(hours/10));
-                    $('.countdown_wrap .time_2').text(parseInt(hours%10));
+			$('.countdown_wrap .time_one_1').text(parseInt(hours/10));
+			$('.countdown_wrap .time_one_2').text(parseInt(hours%10));
 
-                    $('.countdown_wrap .time_3').text(parseInt(minutes/10));
-                    $('.countdown_wrap .time_4').text(parseInt(minutes%10));
+			$('.countdown_wrap .time_two_1').text(parseInt(minutes/10));
+			$('.countdown_wrap .time_two_2').text(parseInt(minutes%10));
 
-                    $('.countdown_wrap .time_5').text(parseInt(seconds/10));
-                    $('.countdown_wrap .time_6').text(parseInt(seconds%10));
-                },1000);
-            }else{
+			$('.countdown_wrap .time_three_1').text(parseInt(seconds/10));
+			$('.countdown_wrap .time_three_2').text(parseInt(seconds%10));
+			if(Date.parse(new Date())>'1464948000000'){
+				clearInterval(time_intervalId);
+			}
+
+
+		$('.countdown_wrap').show();
+		$('.section_4 .swiper_main').show();
+		$('.section_4 .swiper_main .meng_layer').hide();
+		$('.section_4 .swiper_main').css('opacity', '1');
+		append_num = '0';
+		}else{
+			if(append_num=='0'){
 				$('.countdown_wrap').hide();
-			}
 
-            function getCurrentShowTimeSeconds(){
-				var curTime = new Date();
-				var ret = endTime.getTime() - curTime.getTime();
-				//结束的时间减去现在的时间
-				ret = Math.round(ret/1000);
-				//把毫秒转化成秒
-
-				return ret>=0 ? ret : 0;
-				//ret大于等于0的话返回ret，如果不是返回0
-				//如果倒计时结束，返回的结果是0
+				$('.section_4 .swiper_main').append('<div class="meng_layer"></div>');
+				append_num = '1';
+				$('.section_4 .swiper_main').show();
+				$('.section_4 .swiper_main').css('opacity', '1');
 			}
-            /*指定范围倒计时结束*/
+		}
+	}
+
+	time_intervalId = setInterval(timerFunction, 1000);
+	
+	function getCurrentShowTimeSeconds(){
+		var curTime = new Date();
+		var ret = endTime.getTime() - curTime.getTime();
+		//结束的时间减去现在的时间
+		ret = Math.round(ret/1000);
+		//把毫秒转化成秒
+
+		return ret>=0 ? ret : 0;
+		//ret大于等于0的话返回ret，如果不是返回0
+		//如果倒计时结束，返回的结果是0
+	}
+	/*指定范围倒计时结束*/
 
 })(org);

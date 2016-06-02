@@ -244,7 +244,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     var btnTxt = '知道了',recharge = '',closeBtns = '';
                 }
                 strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo_new.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
             }
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
@@ -315,6 +315,12 @@ org.investment = (function (org) {
                         ts: data.ts
                     },
                     success: function (data) {
+                        var url = location.href;
+                        var times = url.split("?");
+                        if(times[1] != 1){
+                            url += "?1";
+                            self.location.replace(url);
+                        }
                         org.investment.init()
                     }
                 })
@@ -327,7 +333,7 @@ org.investment = (function (org) {
                     $('body').on('click','.goRecharge,#recharge',function(){
                         mixins.rechargeApp({
                             refresh: 1,
-                            url: 'https://staging.wanglibao.com/activity/experience/app_detail'
+                            url: 'https://wltest.wanglibao.com/activity/experience/app_detail'
                         })
                     })
                 }

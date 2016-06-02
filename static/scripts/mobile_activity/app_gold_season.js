@@ -269,7 +269,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            $('.share-btns').show();
+            //$('.share-btns').show();
             mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
             function connect(data) {
                 org.ajax({
@@ -302,7 +302,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
         },
         other: function(){
-            $('.share-btns').hide();
+            //$('.share-btns').hide();
         }
     })
 
