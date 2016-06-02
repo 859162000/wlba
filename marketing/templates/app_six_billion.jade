@@ -236,11 +236,14 @@ html(style="background: #fff")
                                     if multi_1 and multi_1_display
                                         .title_text {{multi_1.name}}
                                         .interest_rate {{multi_1.expected_earning_rate}}
-                                            span.small_text +
+                                            span.small_text
+                                                if multi_1.activity
+                                                    | +
                                             .num_2 {{multi_1.activity.rule.percent_text}}
-                                                .increase_box
-                                                    .increase_text {{multi_1.activity.name}}
-                                                        span
+                                                if multi_1.activity
+                                                    .increase_box
+                                                        .increase_text {{multi_1.activity.name}}
+                                                            span
                                                 span %
                                         .time_money
                                             .time_left
@@ -281,11 +284,14 @@ html(style="background: #fff")
                                     if multi_2 and multi_2_display
                                         .title_text {{multi_2.name}}
                                         .interest_rate {{multi_2.expected_earning_rate}}
-                                            span.small_text +
+                                            span.small_text
+                                                if multi_2.activity
+                                                    | +
                                             .num_2 {{multi_2.activity.rule.percent_text}}
-                                                .increase_box
-                                                    .increase_text {{multi_2.activity.name}}
-                                                        span
+                                                if multi_2.activity
+                                                    .increase_box
+                                                        .increase_text {{multi_2.activity.name}}
+                                                            span
                                                 span %
                                         .time_money
                                             .time_left
