@@ -243,7 +243,8 @@
 	}
 
 	time_intervalId = setInterval(timerFunction, 1000);
-	
+
+
 	function getCurrentShowTimeSeconds(){
 		var curTime = new Date();
 		var ret = endTime.getTime() - curTime.getTime();
