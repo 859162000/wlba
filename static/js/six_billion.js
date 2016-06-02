@@ -66,7 +66,6 @@
 
             var timestamp = Date.parse(new Date());
             //获得当前时间戳
-            var append_num = '0';
             var timerFunction = function () {
                 timestamp = Date.parse(new Date());
                 if(timestamp>='1464919200000'){
@@ -91,19 +90,12 @@
                         clearInterval(time_intervalId);
                     }
 
-
                     $('.countdown_wrap').show();
-                    $('.project_wrap').css('opacity','1');
-                    $('.project_wrap .project_box .meng_layer').hide();
-                    append_num = '0';
-                }else{
-                    if(append_num=='0') {
-                        $('.countdown_wrap').hide();
 
-                        $('.project_wrap .project_box').append('<div class="meng_layer"></div>');
-                        append_num = '1';
-                        $('.project_wrap').css('opacity', '1');
-                    }
+                }else{
+                    $('.countdown_wrap').hide();
+
+
                 }
             }
             time_intervalId = setInterval(timerFunction, 1000);
