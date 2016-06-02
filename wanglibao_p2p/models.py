@@ -189,6 +189,10 @@ class UserAmortization(models.Model):
     def get_total_amount(self):
         return float(self.principal + self.interest + self.penal_interest + self.coupon_interest)
 
+    @property
+    def get_total_income(self):
+        return float(self.interest + self.penal_interest + self.coupon_interest)
+
 
 class P2PEquity(models.Model):
     user = models.ForeignKey(User, related_name='equities')

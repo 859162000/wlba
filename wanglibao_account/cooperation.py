@@ -747,10 +747,15 @@ class BaJinSheCallback(CoopCallback):
             income_state = 2 if user_amo.settled else 1
             reward_data = {
                 'calendar': timezone.localtime(user_amo.term_date).strftime('%Y%m%d%H%M%S'),
-                'income': float(user_amo.interest) + float(product.get_activity_earning(equity.equity)),
+                # 'income': float(user_amo.interest) + float(product.get_activity_earning(equity.equity)),
                 'principal': float(user_amo.principal),
                 'incomeState': income_state,
             }
+            # 提前还款,注意此处逻辑
+            if user_amo.term == 1:
+                reward_data['income'] = float(user_amo.get_total_income) + float(product.get_activity_earning(equity.equity))
+            else:
+                reward_data['income'] = float(user_amo.get_total_income)
             reward_data_list.append(reward_data)
 
         act_data['reward'] = reward_data_list
@@ -1067,10 +1072,15 @@ class BiSouYiCallback(CoopCallback):
                         'ocode': product.id,
                         'yaccount': get_user_phone_for_coop(user_id),
                         'bdate': timezone.localtime(user_amo.settlement_time).strftime('%Y-%m-%d %H:%M:%S'),
-                        'bmoney': user_amo.get_total_amount + float(product.get_activity_earning(p2p_equity.equity)),
+                        # 'bmoney': user_amo.get_total_amount + float(product.get_activity_earning(p2p_equity.equity)),
                         'ostatus': 1,
                         'pstatus': 1,
                     }
+                    # 提前还款,注意此处逻辑
+                    if user_amo.term == 1:
+                        content_data['bmoney'] = float(user_amo.get_total_amount) + float(product.get_activity_earning(p2p_equity.equity))
+                    else:
+                        content_data['bmoney'] = float(user_amo.get_total_amount)
 
                     if user_amo.term == user_amo.terms:
                         content_data['bstatus'] = 4
