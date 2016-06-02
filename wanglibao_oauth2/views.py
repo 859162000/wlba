@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 import constants
 from common.tools import get_utc_timestamp, now
-from wanglibao_account.cooperation import CoopSessionProcessor
+from wanglibao_account.cooperation import CoopLandProcessor
 from .base_views import AccessTokenBaseView
 from .models import AccessToken, RefreshToken, CoopToken
 from .forms import RefreshTokenGrantForm, UserAndClientForm
@@ -141,7 +141,7 @@ class AccessTokenView(AccessTokenBaseView):
                     'msg': form.errors.values()[0][0]
                 }
 
-        CoopSessionProcessor(request).all_processors_for_session(1)
+        CoopLandProcessor(request).all_processors_for_session(1)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
