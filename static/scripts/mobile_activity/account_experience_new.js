@@ -325,7 +325,7 @@ org.experience = (function (org) {
                         $('body').on('click','.goRecharge',function(){
                             mixins.rechargeApp({
                                 refresh: 1,
-                                url: 'https://wltest.wanglibao.com/activity/experience/accounts/'
+                                url: 'https://www.wanglibao.com/activity/experience/accounts/'
                             })
                         })
                     }
