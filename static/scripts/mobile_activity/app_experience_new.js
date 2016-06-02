@@ -333,7 +333,7 @@ org.investment = (function (org) {
                     $('body').on('click','.goRecharge,#recharge',function(){
                         mixins.rechargeApp({
                             refresh: 1,
-                            url: 'https://staging.wanglibao.com/activity/experience/app_detail'
+                            url: 'https://wltest.wanglibao.com/activity/experience/app_detail'
                         })
                     })
                 }

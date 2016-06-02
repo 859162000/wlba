@@ -277,7 +277,7 @@ org.experience = (function (org) {
                     data: {},
                     success: function (data) {
                         if (data.ret_code > 0) {
-                            if(data.ret_code == 30009){
+                            if(data.ret_code == '30009' || data.ret_code == 30009){
                                 org.ui.alert(data.message, '', '4', 'goRecharge')
                             }else{
                                 org.ui.alert(data.message, '', '4')
