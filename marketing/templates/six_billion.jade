@@ -223,7 +223,11 @@ html.no-js(lang="en-gb")
                     .project_box
                         if multi_1 and multi_1_display
                             .title_text {{multi_1.name}}
-                            .add_num {{multi_1.expected_earning_rate}} + {{multi_1.activity.rule.percent_text}}%
+                            .add_num
+                                | {{multi_1.expected_earning_rate}}
+                                if multi_1.activity
+                                    | + {{multi_1.activity.rule.percent_text}}
+                                | %
                             .project_data
                                 .data_1 本期额度
                                     total_amount_m1 = multi_1.total_amount / 10000.0
@@ -256,7 +260,11 @@ html.no-js(lang="en-gb")
                     .project_box
                         if multi_2 and multi_2_display
                             .title_text {{multi_2.name}}
-                            .add_num {{multi_2.expected_earning_rate}} + {{multi_2.activity.rule.percent_text}}%
+                            .add_num
+                                | {{multi_2.expected_earning_rate}}
+                                if multi_2.activity
+                                   | + {{multi_2.activity.rule.percent_text}}
+                                | %
                             .project_data
                                 .data_1 本期额度
                                     total_amount_m1 = multi_2.total_amount / 10000.0
