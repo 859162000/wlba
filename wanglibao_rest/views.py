@@ -1999,7 +1999,7 @@ class UDeskLoginAPIView(APIView):
 
     def __sign(self):
         string = '&'.join(['%s=%s' % (key.lower(), self.params[key]) for key in sorted(self.params)])
-        string = string+self.im_user_key
+        string = string+'&'+self.im_user_key
         self.params['signature'] = hashlib.sha1(string).hexdigest().upper()
         return self.params['signature']
 
