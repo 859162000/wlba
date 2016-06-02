@@ -25,7 +25,7 @@ org.ui = (function(){
                     var btnTxt = '知道了',recharge = '',closeBtns = '';
                 }
                 strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo_new.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
             }
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
