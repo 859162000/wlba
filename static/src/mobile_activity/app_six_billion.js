@@ -212,6 +212,7 @@
 
 	var timestamp = Date.parse(new Date());
 	//获得当前时间戳
+	var append_num = '0';
 	var timerFunction = function () {
 		timestamp = Date.parse(new Date());
 		if(timestamp>='1464919200000'){
@@ -239,13 +240,18 @@
 		$('.countdown_wrap').show();
 		$('.section_4 .swiper_main').show();
 		$('.section_4 .swiper_main .meng_layer').hide();
+		$('.section_4 .swiper_main').css('opacity', '1');
+		append_num = '0';
 		}else{
-			$('.countdown_wrap').hide();
-			$('.section_4 .swiper_main').show();
-			$('.section_4 .swiper_main').append('<div class="meng_layer"></div>');
+			if(append_num=='0'){
+				$('.countdown_wrap').hide();
+
+				$('.section_4 .swiper_main').append('<div class="meng_layer"></div>');
+				append_num = '1';
+				$('.section_4 .swiper_main').show();
+				$('.section_4 .swiper_main').css('opacity', '1');
+			}
 		}
-
-
 	}
 
 	time_intervalId = setInterval(timerFunction, 1000);
