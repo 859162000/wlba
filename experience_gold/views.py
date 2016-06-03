@@ -18,9 +18,9 @@ class ExperienceGoldView(TemplateView):
     def get_template_names(self):
         template = self.kwargs['template']
         if template not in ('mobile', 'gold', 'account', 'nologin', 'redirect', 'accounts'):
-            template_name = "experience_gold.jade"
+            template_name = "experience_detail.jade"
         elif template == 'mobile':
-            template_name = 'app_experience.jade'
+            template_name = 'app_experience_detail.jade'
         elif template == 'account' or template == 'nologin':
             template_name = 'experience_account.jade'
         elif template == 'accounts' or template == 'nologin':
@@ -28,9 +28,9 @@ class ExperienceGoldView(TemplateView):
         elif template == 'redirect':
             template_name = 'experience_redirect.jade'
         else:
-            template_name = "experience_gold.jade"
+            template_name = "experience_detail.jade"
 
-        if template_name == 'experience_gold.jade':
+        if template_name == 'experience_detail.jade':
             device_list = ['android', 'iphone']
             try:
                 user_agent = self.request.META['HTTP_USER_AGENT']
@@ -39,7 +39,7 @@ class ExperienceGoldView(TemplateView):
             for device in device_list:
                 match = re.search(device, user_agent.lower())
                 if match and match.group():
-                    template_name = 'app_experience.jade'
+                    template_name = 'app_experience_detail.jade'
                     break
 
         return template_name
