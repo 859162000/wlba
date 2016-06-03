@@ -336,7 +336,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         if(data.ret_code=='1000'){
                             window.location.href = '/weixin/regist/?promo_token=zypwt&next=/activity/app_center_film_ticket/?promo_token=zypwt'
                         }else if(data.ret_code=='1002'){
-                            window.location.href = '/p2p/list/?promo_token=zypwt'
+                            window.location.href = '/weixin/list/?promo_token=zypwt'
                         }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
