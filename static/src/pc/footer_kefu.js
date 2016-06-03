@@ -55,7 +55,21 @@
         var iTop = 225; //获得窗口的垂直位置;
         var iLeft = 400; //获得窗口的水平位置;
 
+        var user_login_status = false;
+        $.ajax({
+            url: '/api/user_login/',
+            type: 'post',
+            success: function(data1) {
+                user_login_status = data1.login;
+            }
+        });
+
+
         $('#kefu_link').click(function(){
+            if(user_login_status){
+                var newWin = window.open('',"_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+            }
+
           $.ajax({
             url: '/api/udesk/url/',
             type: 'post',
@@ -69,18 +83,17 @@
                 }else if(data.ret_code=='0'){
                     openUrl = data.url;
                     //弹出窗口的url
-
-                    window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+                    newWin.location.href = openUrl;
                 }
 
             },error: function(data){
-
+                $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                $('.popup_box').show();
             }
-            })
+          })
         })
         $('.popup_box .popup_button').click(function(){
             $('.popup_box').hide();
         });
-
     })
 }).call(this);

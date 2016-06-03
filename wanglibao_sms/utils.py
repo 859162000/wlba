@@ -61,6 +61,7 @@ def check_rate(ip):
     if not ip:
         return True
     rate = RateThrottle.objects.filter(ip=ip).first()
+    logger.debug('check_rate ip:%s' % ip)
     if not rate:
         rate = RateThrottle()
         rate.ip = ip
