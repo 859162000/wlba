@@ -2006,8 +2006,8 @@ class UDeskLoginAPIView(APIView):
     def __combine_url(self, phone, signature):
         base_url = 'http://wltest.udesk.cn/im_client?'
         self.get_params = {
-            'nonce': self.__create_nonce_str(),
-            'timestamp': self.__create_timestamp(),
+            'nonce': self.params['nonce'],
+            'timestamp': self.params['timestamp'],
             'web_token': phone,
             #'im_user_key': self.im_user_key,
             'signature': signature,
