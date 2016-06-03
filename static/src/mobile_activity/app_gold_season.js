@@ -50,7 +50,7 @@
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            //$('.share-btns').show();
+            $('.share-btns').show();
             mixins.shareData({title: '全民淘金', content: '人脉即财脉'});
             function connect(data) {
                 org.ajax({
@@ -67,21 +67,23 @@
             }
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
-                    //$('.share-btns').on('click',function() {
-                    //    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
-                    //})
-                    mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
+                    $('.share-btns').on('click',function() {
+                        mixins.loginApp({refresh: 1, url: 'https://www.wanglibao.com/activity/app_gold_season/'});
+                    })
+                    //mixins.loginApp({refresh: 1, url: 'https://staging.wanglibao.com/activity/app_gold_season/'});
                 }else{
                     connect(data)
-                    //$('.share-btns').on('click',function(){
-                    //    mixins.touchShare();
-                    //})
+                    $('.share-btns').on('click',function(){
+                        mixins.touchShare({
+                            type : 'gold'
+                        });
+                    })
                 }
             })
 
         },
         other: function(){
-            //$('.share-btns').hide();
+            $('.share-btns').hide();
         }
     })
 
