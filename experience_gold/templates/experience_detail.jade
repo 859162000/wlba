@@ -14,6 +14,7 @@ html
             .detail-box-one.clearfix
                 .new-user-icon
                 .detail-one-left.clearfix
+                    experience_amount = int(experience_amount)
                     h3 新手体验标
                     ul.clearfix
                         li.one
@@ -31,10 +32,10 @@ html
                                 span {{product.expected_earning_rate}}
                                 label %
                             p.info-s 年化收益
-                    p.project-dec 项目描述：新用户投资1元，产品到期后享有{{experience_amount|money_format_int}}元的投资收益。体验安全、高效的投资服务。
+                    p.project-dec 项目描述：新用户投资1元，产品到期后享有{{experience_amount}}元的投资收益。体验安全、高效的投资服务。
                 .detail-one-right.clearfix
                     p.profit 投资1元享
-                        span {{experience_amount|money_format_int}}
+                        span {{experience_amount}}
                         | 超高收益
                     p.down-fonts 本标仅限网利宝APP可投，请扫码下载
                     .ex-download-app.mg-t-sm
