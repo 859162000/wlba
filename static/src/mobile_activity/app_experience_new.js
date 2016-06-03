@@ -114,7 +114,7 @@ org.investment = (function (org) {
                     $('body').on('click','.goRecharge,#recharge',function(){
                         mixins.rechargeApp({
                             refresh: 1,
-                            url: 'https://www.wanglibao.com/activity/experience/app_detail/'
+                            url: 'https://www.wanglibao.com/activity/experience/mobile/'
                         })
                     })
                 }
