@@ -56,6 +56,8 @@
         var iLeft = 400; //获得窗口的水平位置;
 
         $('#kefu_link').click(function(){
+            //openUrl = 'http://wanglibao.udesk.cn/im_client?nonce=zbuuijprmhhhrreihjifd20qo6mwxeb&signature=486F27651F4902BED1C102803FE3D72E8F9FAB4A&timestamp=1464922179000&web_token=18501370816';
+            //window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
           $.ajax({
             url: '/api/udesk/url/',
             type: 'post',
@@ -67,10 +69,11 @@
                     $('.popup_box .main .textairport').text(data.message);
                     $('.popup_box').show();
                 }else if(data.ret_code=='0'){
-                    openUrl = data.url;
+                    //openUrl = data.url;
                     //弹出窗口的url
 
-                    window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+                    //window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+                    open_window(data.url);
                 }
 
             },error: function(data){
@@ -81,6 +84,10 @@
         $('.popup_box .popup_button').click(function(){
             $('.popup_box').hide();
         });
+
+        function open_window(openUrl){
+            window.open(openUrl, "_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+        }
 
     })
 }).call(this);
