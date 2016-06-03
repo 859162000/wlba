@@ -1983,7 +1983,8 @@ class UDeskLoginAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
+        #self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
+        self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'
         self.params={
             'nonce': self.__create_nonce_str(),
             'timestamp': self.__create_timestamp(),
