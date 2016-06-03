@@ -2012,7 +2012,7 @@ class UDeskLoginAPIView(APIView):
             #'im_user_key': self.im_user_key,
             'signature': signature,
             'c_phone': phone, }
-        params_str = '&'.join(['%s=%s' % (key.lower(), self.params[key]) for key in sorted(self.params)])
+        params_str = '&'.join(['%s=%s' % (key.lower(), self.get_params[key]) for key in sorted(self.get_params)])
 
         return base_url+params_str
 
