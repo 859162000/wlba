@@ -70,30 +70,30 @@
                 var newWin = window.open('',"_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
             }
 
-              $.ajax({
-                url: '/api/udesk/url/',
-                type: 'post',
-                data:{
+          $.ajax({
+            url: '/api/udesk/url/',
+            type: 'post',
+            data:{
 
-                },
-                success: function (data) {
-                    if(data.ret_code=='1000'||data.ret_code=='1001'){
-                        $('.popup_box .main .textairport').text(data.message);
-                        $('.popup_box').show();
-                    }else if(data.ret_code=='0'){
-                        openUrl = data.url;
-                        //弹出窗口的url
-                        newWin.location.href = openUrl;
-                    }
-
-                },error: function(data){
-                    $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+            },
+            success: function (data) {
+                if(data.ret_code=='1000'||data.ret_code=='1001'){
+                    $('.popup_box .main .textairport').text(data.message);
                     $('.popup_box').show();
+                }else if(data.ret_code=='0'){
+                    openUrl = data.url;
+                    //弹出窗口的url
+                    newWin.location.href = openUrl;
                 }
-                })
-            })
-            $('.popup_box .popup_button').click(function(){
-                $('.popup_box').hide();
-            });
+
+            },error: function(data){
+                $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                $('.popup_box').show();
+            }
+          })
         })
+        $('.popup_box .popup_button').click(function(){
+            $('.popup_box').hide();
+        });
+    })
 }).call(this);
