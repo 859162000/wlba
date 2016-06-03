@@ -1979,9 +1979,7 @@ class AccessUserExistsApi(APIView):
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
-class UDeskLoginAPIView(APIView):
-    permission_classes = ()
-
+class UdeskGenerator(object):
     def __init__(self):
         #self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
         self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'
@@ -2016,6 +2014,15 @@ class UDeskLoginAPIView(APIView):
         params_str = '&'.join(['%s=%s' % (key.lower(), self.get_params[key]) for key in sorted(self.get_params)])
 
         return base_url+params_str
+
+    def get_udesk_url(self, phone_num):
+        self.params['web_token'] = phone_num
+        signature = self.__sign()
+        url = self.__combine_url(phone_num, signature)
+        return url
+
+class UDeskLoginAPIView(APIView, UdeskGenerator):
+    permission_classes = ()
 
     def post(self, request):
         if not request.user.is_authenticated():
