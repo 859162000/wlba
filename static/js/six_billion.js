@@ -58,19 +58,20 @@
             /*轮播图结束*/
 
             /*指定范围倒计时*/
-            var abb;
+            var time_intervalId;
             var curShowTimeSeconds = 0;
 			//现在倒计时需要有多少秒
-            var endTime = new Date(2016,4,30,20,00,00);
+            var endTime = new Date(2016,5,3,18,00,00);
             //回头这里改成 2016,5,3,20,00,00
 
             var timestamp = Date.parse(new Date());
             //获得当前时间戳
 
-            if(timestamp>='1464919200000'&&timestamp<='1464948000000'){
+            if(timestamp>='1464919200000'){
             //2016年6月3日 10:00-18:00
 
-                setInterval(function(){
+
+                var timerFunction = function () {
                     curShowTimeSeconds = getCurrentShowTimeSeconds();
                     var hours = parseInt(curShowTimeSeconds/3600);
                     var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
@@ -84,7 +85,13 @@
 
                     $('.countdown_time .time_5').text(parseInt(seconds/10));
                     $('.countdown_time .time_6').text(parseInt(seconds%10));
-                },1000);
+                    if(Date.parse(new Date())>'1464948000000'){
+                        clearInterval(time_intervalId);
+                    }
+                }
+                time_intervalId = setInterval(timerFunction, 1000);
+                $('.countdown_wrap').show();
+
             }else{
                 $('.countdown_wrap').hide();
             }

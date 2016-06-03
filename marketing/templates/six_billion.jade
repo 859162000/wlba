@@ -104,8 +104,7 @@ html.no-js(lang="en-gb")
                           .progress_bar_right {{percent_1 | percentage}}
                         if now > six_1_publish_time
                             if six_1.status == '正在招标'
-                                .button_buy.orange_button
-                                    a(href="/p2p/detail/{{six_1.id}}/", style="color:white") 马上抢购
+                                a.button_buy.orange_button(href="/p2p/detail/{{six_1.id}}/", style="color:white") 马上抢购
                             else
                                 .button_buy.gray_button 已售罄
                         else
@@ -155,8 +154,7 @@ html.no-js(lang="en-gb")
                             .progress_bar_right {{percent_3 | percentage}}
                         if now > six_3_publish_time
                             if six_3.status == '正在招标'
-                                .button_buy.orange_button
-                                    a(href="/p2p/detail/{{six_3.id}}/", style="color:white") 马上抢购
+                                a.button_buy.orange_button(href="/p2p/detail/{{six_3.id}}/", style="color:white") 马上抢购
                             else
                                 .button_buy.gray_button 已售罄
                         else
@@ -205,8 +203,7 @@ html.no-js(lang="en-gb")
                             .progress_bar_right {{percent_6 | percentage}}
                         if now > six_6_publish_time
                             if six_6.status == '正在招标'
-                                .button_buy.orange_button
-                                    a(href="/p2p/detail/{{six_6.id}}/", style="color:white") 马上抢购
+                                a.button_buy.orange_button(href="/p2p/detail/{{six_6.id}}/", style="color:white") 马上抢购
                             else
                                 .button_buy.gray_button 已售罄
                         else
@@ -215,7 +212,7 @@ html.no-js(lang="en-gb")
             .section.section_4
                 .act_text 多投多加息
                 .act_time 活动时间：2016年6月3日 10:00-18:00
-                .countdown_wrap
+                .countdown_wrap(style='display:none')
                     .num_title 倒计时：
                     .countdown_time
                         span.time_1
@@ -250,8 +247,8 @@ html.no-js(lang="en-gb")
                                 |可投资金额{{amount_m1 | money_format_int}}元
                             if now > m1_publish_time
                                 if multi_1.status == '正在招标'
-                                    .button_buy.orange_button
-                                        a(href="/p2p/detail/{{multi_1.id}}/", style="color:white") 马上抢购
+                                    a.button_buy.orange_button(href="/p2p/detail/{{multi_1.id}}/", style="color:white") 马上抢购
+
                                 else
                                     .button_buy.gray_button 已售罄
                             else
@@ -283,8 +280,7 @@ html.no-js(lang="en-gb")
                                 |可投资金额{{amount_m2 | money_format_int}}元
                             if now > m2_publish_time
                                 if multi_2.status == '正在招标'
-                                    .button_buy.orange_button
-                                        a(href="/p2p/detail/{{multi_2.id}}/", style="color:white") 马上抢购
+                                    a.button_buy.orange_button(href="/p2p/detail/{{multi_2.id}}/", style="color:white") 马上抢购
                                 else
                                     .button_buy.gray_button 已售罄
                             else
@@ -330,5 +326,5 @@ html.no-js(lang="en-gb")
                 .prompt_wrap 以上故事为往期征集，欢迎大家关注网利宝官方订阅号（iwanglibao）并发给我们您自己的故事
         include global/g_footer
 script.
-    require(['/static/js/six_billion.js?v=2015053103'])
+    require(['/static/js/six_billion.js?v=2016060201'])
 
