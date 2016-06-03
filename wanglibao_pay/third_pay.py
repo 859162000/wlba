@@ -291,6 +291,12 @@ def _need_validation_for_qpay(card):
         need_validation_for_qpay = False
     return need_validation_for_qpay
 
+def _need_rebind(card):
+    if (card.is_bind_kuai and not card.is_bind_yee and card.bank.channel == 'yeepay') \
+        or (card.is_bind_yee and not card.is_bind_kuai and card.bank.channel == 'kuaipay'):
+        return True
+    return False
+
 def card_bind_list(request):
     # 查询已经绑定支付渠道的银行卡列表
     user = request.user
@@ -314,34 +320,32 @@ def card_bind_list(request):
 
             need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
             for card in cards:
-                if need_sms and need_sms.value == '1' and card.is_bind_kuai:
-                    need_validation_for_qpay = True
-                else:
-                    need_validation_for_qpay = False
                 base_dict = {
                     "card_id": card.id,
                     'bank_id': card.bank.code,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
                     'storable_no': card.no[:6] + card.no[-4:],
+                    'no': card.no,
                     'is_the_one_card': card.is_the_one_card,
-                    'need_validation_for_qpay': _need_validation_for_qpay(card)
+                    'need_validation_for_qpay': _need_validation_for_qpay(card),
+                    'need_rebind': _need_rebind(card)
                 }
 
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
                 tmp = dict()
                 channel = card.bank.channel
-                if channel == 'huifu' and card.is_bind_huifu:
+                if channel == 'huifu' :
                     tmp.update(base_dict)
                     if card.bank.huifu_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.huifu_bind_limit))
 
-                elif channel == 'yeepay' and card.is_bind_yee:
+                elif channel == 'yeepay' :
                     tmp.update(base_dict)
                     if card.bank.yee_bind_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.yee_bind_limit))
 
-                elif channel == 'kuaipay' and card.is_bind_kuai:
+                elif channel == 'kuaipay':
                     tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
@@ -706,7 +710,8 @@ class TheOneCardAPIView(APIView):
         card = TheOneCard(request.user).get()
         serializer = CardSerializer(card)
         serializer.data.update(
-            {'need_validation_for_qpay': _need_validation_for_qpay(card)})
+            {'need_validation_for_qpay': _need_validation_for_qpay(card),
+              'need_rebind': _need_rebind(card)})
         return Response(serializer.data)
 
     def put(self, request):
