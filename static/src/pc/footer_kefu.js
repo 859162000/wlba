@@ -80,7 +80,7 @@
         });
 
         //alert(openKefu);
-
+        var system_error = 0;
         $('#kefu_link').click(function(){
             if(user_login_status){
                 var newWin = window.open('',"_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
@@ -93,8 +93,10 @@
 
             },
             success: function (data) {
+                system_error = 1;
                 if(data.ret_code=='1000'||data.ret_code=='1001'){
                     $('.popup_box .main .textairport').text(data.message);
+                    $('.popup_button').text('请先登录');
                     $('.popup_box').show();
 
                 }else if(data.ret_code=='0'){
@@ -104,7 +106,9 @@
                 }
 
             },error: function(data){
+                system_error = 0;
                 $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                $('.popup_button').text('我知道了');
                 $('.popup_box').show();
             }
           })
@@ -117,7 +121,7 @@
             var this_link_1 = this_link.indexOf("/accounts/login/");
             var this_link_2 = this_link.indexOf("/accounts/register/");
             var this_link_indexof = window.location.href.indexOf("?");
-            if(this_link_1==-1&&this_link_2==-1){
+            if(this_link_1==-1&&this_link_2==-1&&system_error){
 
                 if(openKefu!=1&&user_login_status==false){
                     if(this_link_indexof!=-1){
