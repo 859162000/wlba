@@ -390,14 +390,14 @@ def _user_amortization_list(user_amortizations):
             'product_name': amo.product_amortization.product.name,
             'term': amo.term,
             'term_total': amo.product_amortization.product.amortization_count,
-            'term_date': timezone.localtime(amo.term_date).strftime('%Y-%m-%d %H:%M:%S'),
+            'term_date': timezone.localtime(amo.term_date).strftime('%Y-%m-%d'),
             'principal': amo.principal,
             'interest': amo.interest,
             'penal_interest': amo.penal_interest,
             'coupon_interest': amo.coupon_interest,
             'total_interest': amo.interest + amo.penal_interest + amo.coupon_interest,  # 总利息
             'settled': amo.settled,
-            'settlement_time': timezone.localtime(amo.settlement_time).strftime('%Y-%m-%d %H:%M:%S'),
+            'settlement_time': timezone.localtime(amo.settlement_time).strftime('%Y-%m-%d'),
             'settlement_status': status
         })
     return amo_list
