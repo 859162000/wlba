@@ -3,7 +3,7 @@
 from django.views.generic import TemplateView
 from django.utils import timezone
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
+# from django.http import HttpResponseRedirect
 import re
 import datetime
 from marketing.utils import local_to_utc
@@ -17,12 +17,14 @@ class ExperienceGoldView(TemplateView):
 
     def get_template_names(self):
         template = self.kwargs['template']
-        if template not in ('mobile', 'gold', 'account', 'nologin', 'redirect'):
+        if template not in ('mobile', 'gold', 'account', 'nologin', 'redirect', 'accounts'):
             template_name = "experience_gold.jade"
         elif template == 'mobile':
             template_name = 'app_experience.jade'
         elif template == 'account' or template == 'nologin':
             template_name = 'experience_account.jade'
+        elif template == 'accounts' or template == 'nologin':
+            template_name = 'experience_account_new.jade'
         elif template == 'redirect':
             template_name = 'experience_redirect.jade'
         else:
