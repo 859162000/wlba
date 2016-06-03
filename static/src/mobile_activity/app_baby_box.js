@@ -131,4 +131,23 @@
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
     });
+    $('.slideDown_button').on('click',function(){
+        var ele = $('.slideDown_box');
+        var curHeight = ele.height();
+        var autoHeight = ele.css('height', 'auto').height();
+        if (!ele.hasClass('down')){
+            $('.slideDown_button').addClass('open');
+            ele.height(curHeight).animate({height: autoHeight},500,function(){
+                ele.addClass('down');
+
+            });
+        }else{
+            $('.slideDown_button').removeClass('open');
+            ele.height(curHeight).animate({height: 0},500,function(){
+                ele.removeClass('down');
+
+            });
+
+        }
+    });
 })(org);
