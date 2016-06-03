@@ -65,14 +65,13 @@ html(style="background: #fff")
                     .swiper-container.swiper1
                         .swiper-wrapper
                             .swiper-slide.first_slide
-                                six_1_publish_time = str(six_1.publish_time)
                                 .swiper_main
                                     .title_text {{six_1.name}}
                                     .interest_rate {{six_1.expected_earning_rate}}
                                       if six_1.activity.rule.percent_text > 0
                                         span.small_text +
                                         .num_2
-                                          if now > six_1_publish_time
+                                          if six_1_display
                                             | {{six_1.activity.rule.percent_text}}
                                           else
                                             | ?
@@ -89,7 +88,7 @@ html(style="background: #fff")
                                       .money_right
                                         .p_top
                                           total_amount_1 = six_1.total_amount / 10000.0
-                                          if now > six_1_publish_time
+                                          if six_1_display
                                             | {{total_amount_1}} 万元
                                           else
                                             | ? 万元
@@ -100,13 +99,13 @@ html(style="background: #fff")
                                         .progress_bar_left
                                           span(style='width:{{percent_1 | percentage}}')
                                         .available_amount
-                                          if now > six_1_publish_time
+                                          if six_1_display
                                             amount_1 = six_1.total_amount - six_1.ordered_amount
                                             | {{amount_1 | money_format_int}}元
                                           else
                                             | ? 元
                                       .progress_bar_right {{percent_1 | percentage}}
-                                    if now > six_1_publish_time
+                                    if six_1_display
                                       if six_1.status == '正在招标'
                                         .button_buy.orange_button
                                           a(href="/weixin/view/detail/{{six_1.id}}/", style="color:white") 马上抢购
@@ -115,14 +114,13 @@ html(style="background: #fff")
                                     else
                                       .button_buy.blue_button 敬请期待
                             .swiper-slide.second_slide
-                                six_3_publish_time = str(six_3.publish_time)
                                 .swiper_main
                                     .title_text {{six_3.name}}
                                     .interest_rate {{six_3.expected_earning_rate}}
                                       if six_3.activity.rule.percent_text > 0
                                         span.small_text +
                                         .num_2
-                                          if now > six_3_publish_time
+                                          if six_3_display
                                             | {{six_3.activity.rule.percent_text}}
                                           else
                                             | ?
@@ -139,7 +137,7 @@ html(style="background: #fff")
                                       .money_right
                                         .p_top
                                           total_amount_3 = six_3.total_amount / 10000.0
-                                          if now > six_3_publish_time
+                                          if six_3_display
                                             | {{total_amount_3}} 万元
                                           else
                                             | ? 万元
@@ -150,13 +148,13 @@ html(style="background: #fff")
                                         .progress_bar_left
                                           span(style='width:{{percent_3 | percentage}}')
                                         .available_amount
-                                          if now > six_3_publish_time
+                                          if six_3_display
                                             amount_3 = six_3.total_amount - six_3.ordered_amount
                                             | {{amount_3 | money_format_int}}元
                                           else
                                             | ? 元
                                       .progress_bar_right {{percent_3 | percentage}}
-                                    if now > six_3_publish_time
+                                    if six_3_display
                                       if six_3.status == '正在招标'
                                         .button_buy.orange_button
                                           a(href="/weixin/view/detail/{{six_3.id}}/", style="color:white") 马上抢购
@@ -165,14 +163,13 @@ html(style="background: #fff")
                                     else
                                       .button_buy.blue_button 敬请期待
                             .swiper-slide.third_slide
-                              six_6_publish_time = str(six_6.publish_time)
                               .swiper_main
                                 .title_text {{six_6.name}}
                                 .interest_rate {{six_6.expected_earning_rate}}
                                   if six_6.activity.rule.percent_text > 0
                                     span.small_text +
                                     .num_2
-                                      if now > six_6_publish_time
+                                      if six_6_display
                                         | {{six_6.activity.rule.percent_text}}
                                       else
                                         | ?
@@ -189,7 +186,7 @@ html(style="background: #fff")
                                   .money_right
                                     .p_top
                                       total_amount_6 = six_6.total_amount / 10000.0
-                                      if now > six_6_publish_time
+                                      if six_6_display
                                         | {{total_amount_6}} 万元
                                       else
                                         | ? 万元
@@ -200,13 +197,13 @@ html(style="background: #fff")
                                     .progress_bar_left
                                       span(style='width:{{percent_6 | percentage}}')
                                     .available_amount
-                                      if now > six_6_publish_time
+                                      if six_6_display
                                         amount_6 = six_6.total_amount - six_6.ordered_amount
                                         | {{amount_6 | money_format_int}}元
                                       else
                                         | ? 元
                                   .progress_bar_right {{percent_6 | percentage}}
-                                if now > six_6_publish_time
+                                if six_6_display
                                   if six_6.status == '正在招标'
                                     .button_buy.orange_button
                                       a(href="/weixin/view/detail/{{six_6.id}}/", style="color:white") 马上抢购
@@ -236,11 +233,7 @@ html(style="background: #fff")
                         .swiper-wrapper
                             .swiper-slide.first_slide
                                 .swiper_main
-                                    if multi_1
-                                        m1_publish_time = str(multi_1.publish_time)
-                                    else
-                                        m1_publish_time = ""
-                                    if multi_1 and now > m1_publish_time
+                                    if multi_1 and multi_1_display
                                         .title_text {{multi_1.name}}
                                         .interest_rate {{multi_1.expected_earning_rate}}
                                             span.small_text +
@@ -267,24 +260,25 @@ html(style="background: #fff")
                                                 amount_m1 = multi_1.total_amount - multi_1.ordered_amount
                                                 .available_amount 可投金额{{amount_m1 | money_format_int}}元
                                             .progress_bar_right {{percent_m1 | percentage}}
-                                        if now > m1_publish_time
-                                            if multi_1.status == '正在招标'
-                                                .button_buy.orange_button
-                                                    a(href="/weixin/view/detail/{{multi_1.id}}/", style="color:white") 马上抢购
-                                            else
-                                                .button_buy.gray_button 已售罄
+                                        if is_stop
+                                            .button_buy.gray_button  已结束
                                         else
-                                            .button_buy.blue_button  敬请期待
+                                            if multi_1_display
+                                                if multi_1.status == '正在招标'
+                                                    .button_buy.orange_button
+                                                        a(href="/weixin/view/detail/{{multi_1.id}}/", style="color:white") 马上抢购
+                                                elif multi_1.status == '待审核'
+                                                    .button_buy.blue_button  敬请期待
+                                                else
+                                                    .button_buy.gray_button 已售罄
+                                            else
+                                                .button_buy.blue_button  敬请期待
                                     else
                                         .meng_layer
                                         p(style="height:263px;")
                             .swiper-slide
                                 .swiper_main
-                                    if multi_2
-                                        m2_publish_time = str(multi_2.publish_time)
-                                    else
-                                        m2_publish_time = ""
-                                    if multi_2 and now > m2_publish_time
+                                    if multi_2 and multi_2_display
                                         .title_text {{multi_2.name}}
                                         .interest_rate {{multi_2.expected_earning_rate}}
                                             span.small_text +
@@ -312,14 +306,19 @@ html(style="background: #fff")
                                                 .available_amount 可投金额{{amount_m2 | money_format_int}}元
 
                                             .progress_bar_right {{percent_m2 | percentage}}
-                                        if now > m2_publish_time
-                                            if multi_2.status == '正在招标'
-                                                .button_buy.orange_button
-                                                    a(href="/weixin/view/detail/{{multi_2.id}}/", style="color:white") 马上抢购
-                                            else
-                                                .button_buy.gray_button 已售罄
+                                        if is_stop
+                                            .button_buy.gray_button  已结束
                                         else
-                                            .button_buy.blue_button  敬请期待
+                                            if multi_2_display
+                                                if multi_2.status == '正在招标'
+                                                    .button_buy.orange_button
+                                                        a(href="/weixin/view/detail/{{multi_2.id}}/", style="color:white") 马上抢购
+                                                elif multi_2.status == '待审核'
+                                                    .button_buy.blue_button  敬请期待
+                                                else
+                                                    .button_buy.gray_button 已售罄
+                                            else
+                                                .button_buy.blue_button  敬请期待
                                     else
                                         .meng_layer
                                         p(style="height:263px;")

@@ -3344,33 +3344,58 @@ class SixBillionView(TemplateView):
         multi_buy = P2PProduct.objects.filter(name__startswith=u"多投多加息", period=6, hide=False)\
             .order_by('-status_int')
 
+        six_1_display = six_3_display = six_6_display = True
         if six_1 and now < six_1.publish_time:
             six_1.name = u"庆60亿专享1月期项目"
+            six_1_display = False
 
         if six_3 and now < six_3.publish_time:
             six_3.name = u"庆60亿专享3月期项目"
+            six_3_display = False
 
         if six_6 and now < six_6.publish_time:
             six_6.name = u"庆60亿专享6月期项目"
+            six_6_display = False
+
+        multi_1_display = multi_2_display = True
 
         if multi_buy:
             if len(multi_buy) <= 1:
                 multi_1 = multi_buy[0]
                 multi_2 = None
+
+                if now < multi_1.publish_time:
+                    multi_1_display = False
             else:
                 multi_1 = multi_buy[0]
                 multi_2 = multi_buy[1]
+
+                if now < multi_1.publish_time:
+                    multi_1_display = False
+
+                if now < multi_2.publish_time:
+                    multi_2_display = False
         else:
             multi_1 = multi_2 = None
 
+        is_stop = False
+        stop_time = local_to_utc(datetime(2016, 6, 3, 18, 0, 0), 'normal')
+        if now > stop_time:
+            is_stop = True
+
         context.update({
             'site_data': site_data_res,
-            'now': timezone.localtime(now).strftime('%Y-%m-%d %H:%M:%S'),
             'six_1': six_1,
             'six_3': six_3,
             'six_6': six_6,
+            'six_1_display': six_1_display,
+            'six_3_display': six_3_display,
+            'six_6_display': six_6_display,
             'multi_1': multi_1,
-            'multi_2': multi_2
+            'multi_2': multi_2,
+            'multi_1_display': multi_1_display,
+            'multi_2_display': multi_2_display,
+            'is_stop': is_stop,
         })
 
         return context

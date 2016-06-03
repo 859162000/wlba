@@ -92,11 +92,11 @@
 
 
                 $('.countdown_wrap').show();
-                $('.project_wrap').show();
+                $('.project_wrap').css('opacity','1');
                 $('.project_wrap .project_box .meng_layer').hide();
                 }else{
                     $('.countdown_wrap').hide();
-                    $('.project_wrap').show();
+                    $('.project_wrap').css('opacity','1');
                     $('.project_wrap .project_box').append('<div class="meng_layer"></div>');
 
                 }

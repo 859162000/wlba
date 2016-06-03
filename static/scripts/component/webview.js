@@ -179,7 +179,7 @@ var wlb = (function () {
         rechargeApp: function (data, callback) {
 
             var options = this._setData(data, callback);
-            alert(JSON.stringify(options)+'dddddddddd')
+            //alert(JSON.stringify(options)+'dddddddddd')
             this.bridge.callHandler('rechargeApp', options.post, function (response) {
                 options.callback && options.callback(response);
             });

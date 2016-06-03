@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050503", rel="stylesheet")
         link(rel="stylesheet",href="/static/styles/pc_activity/six_billion.css?v=20150601")
         - csrf_token
     body(style="background:#fafafa")
@@ -61,12 +61,11 @@ html.no-js(lang="en-gb")
                 .act_time 活动时间：2016年6月2日 10:00 开始
                 .brand_wrap
                     .brand_box
-                        six_1_publish_time = str(six_1.publish_time)
                         .title_text(style="font-size: 18px") {{six_1.name}}
                         .interest_rate {{six_1.expected_earning_rate}}
                             if six_1.activity.rule.percent_text > 0
                                 .num_2 +
-                                    if now > six_1_publish_time
+                                    if six_1_display
                                         | {{six_1.activity.rule.percent_text}}
                                     else
                                         | ?
@@ -84,7 +83,7 @@ html.no-js(lang="en-gb")
                           .money_right
                             .p_top
                                 total_amount_1 = six_1.total_amount / 10000.0
-                                if now > six_1_publish_time
+                                if six_1_display
                                     | {{total_amount_1}} 万元
                                 else
                                     | ? 万元
@@ -96,13 +95,13 @@ html.no-js(lang="en-gb")
                             .progress_bar_left
                               span(style='width:{{percent_1 | percentage}}')
                             .available_amount 可投金额
-                                if now > six_1_publish_time
+                                if six_1_display
                                     amount_1 = six_1.total_amount - six_1.ordered_amount
                                     | {{amount_1 | money_format_int}}元
                                 else
                                     | ? 元
                           .progress_bar_right {{percent_1 | percentage}}
-                        if now > six_1_publish_time
+                        if six_1_display
                             if six_1.status == '正在招标'
                                 a.button_buy.orange_button(href="/p2p/detail/{{six_1.id}}/", style="color:white") 马上抢购
                             else
@@ -111,12 +110,11 @@ html.no-js(lang="en-gb")
                             .button_buy.blue_button 敬请期待
 
                     .brand_box
-                        six_3_publish_time = str(six_3.publish_time)
                         .title_text(style="font-size: 18px") {{six_3.name}}
                         .interest_rate {{six_3.expected_earning_rate}}
                             if six_3.activity.rule.percent_text > 0
                                 .num_2 +
-                                    if now > six_3_publish_time
+                                    if six_3_display
                                         | {{six_3.activity.rule.percent_text}}
                                     else
                                         | ?
@@ -134,7 +132,7 @@ html.no-js(lang="en-gb")
                           .money_right
                             .p_top
                                 total_amount_3 = six_3.total_amount / 10000.0
-                                if now > six_3_publish_time
+                                if six_3_display
                                     | {{total_amount_3}} 万元
                                 else
                                     | ? 万元
@@ -146,13 +144,13 @@ html.no-js(lang="en-gb")
                                 .progress_bar_left
                                     span(style='width:{{percent_3 | percentage}}')
                                 .available_amount 可投金额
-                                    if now > six_3_publish_time
+                                    if six_3_display
                                         amount_3 = six_3.total_amount - six_3.ordered_amount
                                         | {{amount_3 | money_format_int}}元
                                     else
                                         | ? 元
                             .progress_bar_right {{percent_3 | percentage}}
-                        if now > six_3_publish_time
+                        if six_3_display
                             if six_3.status == '正在招标'
                                 a.button_buy.orange_button(href="/p2p/detail/{{six_3.id}}/", style="color:white") 马上抢购
                             else
@@ -160,12 +158,11 @@ html.no-js(lang="en-gb")
                         else
                             .button_buy.blue_button 敬请期待
                     .brand_box
-                        six_6_publish_time = str(six_6.publish_time)
                         .title_text(style="font-size: 18px") {{six_6.name}}
                         .interest_rate {{six_6.expected_earning_rate}}
                             if six_6.activity.rule.percent_text > 0
                                 .num_2 +
-                                    if now > six_6_publish_time
+                                    if six_6_display
                                         | {{six_6.activity.rule.percent_text}}
                                     else
                                         | ?
@@ -183,7 +180,7 @@ html.no-js(lang="en-gb")
                           .money_right
                             .p_top
                                 total_amount_6 = six_6.total_amount / 10000.0
-                                if now > six_6_publish_time
+                                if six_6_display
                                   | {{total_amount_6}} 万元
                                 else
                                   | ? 万元
@@ -195,13 +192,13 @@ html.no-js(lang="en-gb")
                                 .progress_bar_left
                                     span(style='width:{{percent_6 | percentage}}')
                                 .available_amount 可投金额
-                                    if now > six_6_publish_time
+                                    if six_6_display
                                         amount_6 = six_6.total_amount - six_6.ordered_amount
                                         | {{amount_6 | money_format_int}}元
                                     else
                                         | ? 元
                             .progress_bar_right {{percent_6 | percentage}}
-                        if now > six_6_publish_time
+                        if six_6_display
                             if six_6.status == '正在招标'
                                 a.button_buy.orange_button(href="/p2p/detail/{{six_6.id}}/", style="color:white") 马上抢购
                             else
@@ -222,14 +219,10 @@ html.no-js(lang="en-gb")
                         span.time_5
                         span.time_6
                 .act_text_2!='每卖出100万，年化率即再增加<span>0.3%</span>，卖出500万，年化即再增加<span>0.9%</span>，以此类推增加年化。'
-                .project_wrap(style='display:none')
+                .project_wrap(style='opaicty:0')
                     .project_box
 
-                        if multi_1
-                            m1_publish_time = str(multi_1.publish_time)
-                        else
-                            m1_publish_time = ""
-                        if multi_1 and now > m1_publish_time
+                        if multi_1 and multi_1_display
                             .title_text {{multi_1.name}}
                             .add_num {{multi_1.expected_earning_rate}} + {{multi_1.activity.rule.percent_text}}%
                             .project_data
@@ -246,22 +239,23 @@ html.no-js(lang="en-gb")
                             .footer_b
                                 amount_m1 = multi_1.total_amount - multi_1.ordered_amount
                                 |可投资金额{{amount_m1 | money_format_int}}元
-                            if now > m1_publish_time
-                                if multi_1.status == '正在招标'
-                                    a.button_buy.orange_button(href="/p2p/detail/{{multi_1.id}}/", style="color:white") 马上抢购
-
-                                else
-                                    .button_buy.gray_button 已售罄
+                            if is_stop
+                                .button_buy.gray_button  已结束
                             else
-                                .button_buy.blue_button  敬请期待
+
+                                if multi_1_display
+                                    if multi_1.status == '正在招标'
+                                        a.button_buy.orange_button(href="/p2p/detail/{{multi_1.id}}/", style="color:white") 马上抢购
+                                    elif multi_1.status == '待审核'
+                                        .button_buy.blue_button  敬请期待
+                                    else
+                                        .button_buy.gray_button 已售罄
+                                else
+                                    .button_buy.blue_button  敬请期待
 
 
                     .project_box
-                        if multi_2
-                            m2_publish_time = str(multi_2.publish_time)
-                        else
-                            m2_publish_time = ""
-                        if multi_2 and now > m2_publish_time
+                        if multi_2 and multi_2_display
                             .title_text {{multi_2.name}}
                             .add_num {{multi_2.expected_earning_rate}} + {{multi_2.activity.rule.percent_text}}%
                             .project_data
@@ -278,13 +272,19 @@ html.no-js(lang="en-gb")
                             .footer_b
                                 amount_m2 = multi_2.total_amount - multi_2.ordered_amount
                                 |可投资金额{{amount_m2 | money_format_int}}元
-                            if now > m2_publish_time
-                                if multi_2.status == '正在招标'
-                                    a.button_buy.orange_button(href="/p2p/detail/{{multi_2.id}}/", style="color:white") 马上抢购
-                                else
-                                    .button_buy.gray_button 已售罄
+                            if is_stop
+                                .button_buy.gray_button  已结束
                             else
-                                .button_buy.blue_button  敬请期待
+
+                                if multi_2_display
+                                    if multi_2.status == '正在招标'
+                                        a.button_buy.orange_button(href="/p2p/detail/{{multi_2.id}}/", style="color:white") 马上抢购
+                                    elif multi_2.status == '待审核'
+                                        .button_buy.blue_button  敬请期待
+                                    else
+                                        .button_buy.gray_button 已售罄
+                                else
+                                    .button_buy.blue_button  敬请期待
 
                 .prompt_wrap 温馨提示：<br>1、多投多加息的年化率涨幅按活动时间内（6月3日 10:00-18:00）“亿路狂标—多投多加息“专属标售卖额度进行加息计算，每卖出100万即年化增加一次，以此类推，共2期，标满结束。<br>2、活动结束后，如未满标，继续购买，购买年化不再增加。<br>3、活动期间，大家可以通过PC/h5 活动专题页面查看到增加的实时年化率。活动结束以后，用户所有投资金额均可享受最终年化率，不受加入时间先后顺序影响。<br>4、购买“亿路狂标-多投多加息”项目，可以使用已获得的加息券、红包。
             .section.section_5
@@ -324,5 +324,5 @@ html.no-js(lang="en-gb")
                 .prompt_wrap 以上故事为往期征集，欢迎大家关注网利宝官方订阅号（iwanglibao）并发给我们您自己的故事
         include global/g_footer
 script.
-    require(['/static/js/six_billion.js?v=2016060206'])
+    require(['/static/js/six_billion.js?v=2016060207'])
 
