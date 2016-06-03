@@ -33,12 +33,10 @@ html
                                 label %
                             p.info-s 年化收益
                     p.project-dec
-                        | 项目描述：新用户投资1元，产品到期后享有
                         if experience_amount > 0
-                            | {{experience_amount}}元的
+                            | 项目描述：新用户投资1元，产品到期后享有{{experience_amount}}元的投资收益。体验安全、高效的投资服务。
                         else
-                            | 体验金的
-                        | 投资收益。体验安全、高效的投资服务。
+                            | 项目描述：新用户投资1元，产品到期后享有体验金的投资收益。体验安全、高效的投资服务。
                 .detail-one-right.clearfix
                     p.profit 投资1元享
                         if experience_amount > 0
