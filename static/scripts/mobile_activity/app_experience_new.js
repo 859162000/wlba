@@ -263,21 +263,25 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         alert : lib._alert
     }
 })();
-org.experience = (function (org) {
+
+org.investment = (function (org) {
     var lib = {
         init: function () {
-            lib._goInvest()
+            lib._investmentFun();
         },
-        _goInvest: function () {
-            /*投资*/
-            $('.accountInvestBtn').on('click', function () {
+        _investmentFun: function () {
+            $('#rzTyj').on('click',function(){
                 org.ajax({
                     url: '/api/experience/buy/',
                     type: 'POST',
                     data: {},
                     success: function (data) {
                         if (data.ret_code > 0) {
-                            org.ui.alert(data.message, '', '4')
+                            if(data.ret_code == 30009){
+                                org.ui.alert(data.message, '', '4', 'goRecharge')
+                            }else{
+                                org.ui.alert(data.message, '', '4')
+                            }
                         } else {
                             org.ui.alert('', '', '2')
                             setTimeout(function () {
@@ -289,7 +293,7 @@ org.experience = (function (org) {
                     error: function (data) {
                         org.ui.alert(data.message, '', '4')
                     }
-                });
+                })
             })
         }
     }
@@ -297,8 +301,8 @@ org.experience = (function (org) {
         init: lib.init
     }
 })(org);
-;(function(org){
-    var login = false;
+
+;(function(org) {
     wlb.ready({
         app: function (mixins) {
             function connect(data) {
@@ -317,23 +321,30 @@ org.experience = (function (org) {
                             url += "?1";
                             self.location.replace(url);
                         }
-                        org.experience.init();
+                        org.investment.init()
                     }
                 })
             }
+
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
-                    login = false;
-                    mixins.loginApp({refresh:1, url:''});
                 } else {
-                    login = true;
-                    connect(data);
+                    connect(data)
+                    $('body').on('click','.goRecharge,#recharge',function(){
+                        mixins.rechargeApp({
+                            refresh: 1,
+                            url: 'https://www.wanglibao.com/activity/experience/app_detail/'
+                        })
+                    })
                 }
             })
-
         },
-        other: function(){
-            org.experience.init();
+        other: function () {
+            org.investment.init();
+            $('body').on('click','.goRecharge,#recharge',function(){
+                console.log(1)
+                window.location.href = '/weixin/recharge/';
+            })
         }
     })
 })(org);

@@ -277,7 +277,11 @@ org.experience = (function (org) {
                     data: {},
                     success: function (data) {
                         if (data.ret_code > 0) {
-                            org.ui.alert(data.message, '', '4')
+                            if(data.ret_code == '30009' || data.ret_code == 30009){
+                                org.ui.alert(data.message, '', '4', 'goRecharge')
+                            }else{
+                                org.ui.alert(data.message, '', '4')
+                            }
                         } else {
                             org.ui.alert('', '', '2')
                             setTimeout(function () {
@@ -318,6 +322,12 @@ org.experience = (function (org) {
                             self.location.replace(url);
                         }
                         org.experience.init();
+                        $('body').on('click','.goRecharge',function(){
+                            mixins.rechargeApp({
+                                refresh: 1,
+                                url: 'https://www.wanglibao.com/activity/experience/accounts/'
+                            })
+                        })
                     }
                 })
             }
@@ -334,6 +344,9 @@ org.experience = (function (org) {
         },
         other: function(){
             org.experience.init();
+            $('body').on('click','.goRecharge',function(){
+                window.location.href = '/weixin/recharge/';
+            })
         }
     })
 })(org);
