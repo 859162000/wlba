@@ -77,10 +77,9 @@
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
                                         mixins.registerApp({refresh:1, url:'/activity/app_center_film_ticket/?promo_token=zypwt'});
-                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'){
-                                        $('.popup_box .main .textairport').text(''+data.message+'');
-                                        $('.popup_box').show();
-                                    }else if(data.ret_code=='1002'||data.ret_code=='1004'){
+                                    }else if(data.ret_code=='1002'){
+                                        mixins.jumpToManageMoney();
+                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
                                     }else{
@@ -117,10 +116,9 @@
                     success: function (data) {
                         if(data.ret_code=='1000'){
                             window.location.href = '/weixin/regist/?promo_token=zypwt&next=/activity/app_center_film_ticket/?promo_token=zypwt'
-                        }else if(data.ret_code=='1001'||data.ret_code=='1002'){
-                            $('.popup_box .main .textairport').text(''+data.message+'');
-                            $('.popup_box').show();
-                        }else if(data.ret_code=='1002'||data.ret_code=='1004'){
+                        }else if(data.ret_code=='1002'){
+                            window.location.href = '/p2p/list/?promo_token=zypwt'
+                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else{
