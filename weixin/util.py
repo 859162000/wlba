@@ -24,13 +24,15 @@ import re
 import random
 
 
-
 logger = logging.getLogger("weixin")
 
-BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
+BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&" \
+                  "state={state}#wechat_redirect"
 FWH_LOGIN_URL = ""
 FWH_REGISTER_URL = ""
 FWH_UNBIND_URL = ""
+
 
 def get_fwh_login_url(next=None):
     m = Misc.objects.filter(key='weixin_qrcode_info').first()
@@ -48,12 +50,12 @@ def get_fwh_login_url(next=None):
             FWH_LOGIN_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
             global FWH_UNBIND_URL
             FWH_UNBIND_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_unbind_url, state=original_id)
+
             return FWH_LOGIN_URL
 
 
 if not FWH_LOGIN_URL:
     get_fwh_login_url()
-
 
 
 def get_weixin_code_url(url):
