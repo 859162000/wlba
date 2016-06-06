@@ -1988,6 +1988,7 @@ class UdeskGenerator(object):
             'timestamp': self.__create_timestamp(),
             'web_token': '',
         }
+
     def __create_nonce_str(self):
         nonce = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(31))
         return nonce.lower()
@@ -2023,6 +2024,9 @@ class UdeskGenerator(object):
 
 class UDeskLoginAPIView(APIView, UdeskGenerator):
     permission_classes = ()
+
+    def __init__(self):
+        super(UDeskLoginAPIView, self).__init__()
 
     def post(self, request):
         if not request.user.is_authenticated():
