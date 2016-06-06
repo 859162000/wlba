@@ -44,6 +44,7 @@ org.xunlei = (function(org){
             //lib._listScroll();
             lib._luckDraw();
             lib._goRegistFun();
+            lib._coopPv();
         },
         _newUserReward : function(){
            $('#rewardDetail').on('click',function(){
@@ -170,6 +171,15 @@ org.xunlei = (function(org){
                 account = org.getQueryStringByName('account');
             var hrefStr = '/activity/app_xunleizhuce/?promo_token='+promo_token+'&xluserid='+xluserid+'&time='+time+'&sign='+sign+'&nickname='+nickname+'&referfrom='+referfrom+'&account='+account
             $('.goRegist').attr('href',hrefStr)
+        },
+        _coopPv : function(){
+            var token = getQueryString('promo_token'),
+                xluserid = getQueryString('xluserid'),
+                referfrom = getQueryString('referfrom')
+            org.ajax({
+                url: '/api/coop_pv/'+token+'/?source=pv_wanglibao&ext=' + xluserid + '&ext2=' + referfrom,
+                type: "GET"
+            })
         }
     }
     return {
