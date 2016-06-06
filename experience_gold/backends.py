@@ -40,7 +40,7 @@ class ExperienceBuyAPIView(APIView):
     def post(self, request):
         user = request.user
         now = timezone.now()
-        start_dt = local_to_utc(datetime(2016, 6, 5), 'min')
+        start_dt = local_to_utc(datetime(2016, 6, 7), 'min')
         user_joined = user.date_joined  # 用户注册时间
         device = split_ua(request)
         device_type = decide_device(device['device_type'])
