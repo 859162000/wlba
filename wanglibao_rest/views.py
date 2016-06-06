@@ -1984,26 +1984,26 @@ class UdeskGenerator(object):
         #self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
         self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'
         self.params={
-            'nonce': self.__create_nonce_str(),
-            'timestamp': self.__create_timestamp(),
+            'nonce': self.create_nonce_str(),
+            'timestamp': self.create_timestamp(),
             'web_token': '',
         }
 
-    def __create_nonce_str(self):
+    def create_nonce_str(self):
         nonce = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(31))
         return nonce.lower()
 
-    def __create_timestamp(self):
+    def create_timestamp(self):
         import time
         return int(time.time())*1000  #毫秒级别
 
-    def __sign(self):
+    def sign(self):
         string = '&'.join(['%s=%s' % (key.lower(), self.params[key]) for key in sorted(self.params)])
         string = string+'&'+self.im_user_key
         self.params['signature'] = hashlib.sha1(string).hexdigest().upper()
         return self.params['signature']
 
-    def __combine_url(self, phone, signature):
+    def combine_url(self, phone, signature):
         base_url = 'http://wltest.udesk.cn/im_client?'
         self.get_params = {
             'nonce': self.params['nonce'],
@@ -2018,8 +2018,8 @@ class UdeskGenerator(object):
 
     def get_udesk_url(self, phone_num):
         self.params['web_token'] = phone_num
-        signature = self.__sign()
-        url = self.__combine_url(phone_num, signature)
+        signature = self.sign()
+        url = self.combine_url(phone_num, signature)
         return url
 
 class UDeskLoginAPIView(APIView, UdeskGenerator):
@@ -2046,8 +2046,8 @@ class UDeskLoginAPIView(APIView, UdeskGenerator):
 
         phone = user_profile.phone
         self.params['web_token'] = phone
-        signature = self.__sign()
-        url = self.__combine_url(phone, signature)
+        signature = self.sign()
+        url = self.combine_url(phone, signature)
 
         response_data = {
             'ret_code': 0,
