@@ -49,11 +49,23 @@
             }
         });
 
+        function footer_js(){
+
+
         var openUrl = "http://wanglibao.udesk.cn/im_client/";//弹出窗口的url
         var iWidth = 780; //弹出窗口的宽度;
         var iHeight = 615; //弹出窗口的高度;
         var iTop = 225; //获得窗口的垂直位置;
         var iLeft = 400; //获得窗口的水平位置;
+
+        var url_search = window.location.search,openKefu='';
+        var searchArray = url_search.substring(1).split("?");
+        for(var i = 0;i < searchArray.length; i++){
+            var temp = searchArray[i].split('=');
+            if(temp[0] == 'openKefu'){
+                openKefu = temp[1] ? temp[1] : '';
+            }
+        }
 
         var user_login_status = false;
         $.ajax({
@@ -61,10 +73,14 @@
             type: 'post',
             success: function(data1) {
                 user_login_status = data1.login;
+                if(openKefu==1&&user_login_status==true){
+                    location.hash="#kefu_link";
+                }
             }
         });
 
-
+        //alert(openKefu);
+        var system_error = 0;
         $('#kefu_link').click(function(){
             if(user_login_status){
                 var newWin = window.open('',"_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
@@ -77,9 +93,12 @@
 
             },
             success: function (data) {
+                system_error = 1;
                 if(data.ret_code=='1000'||data.ret_code=='1001'){
                     $('.popup_box .main .textairport').text(data.message);
+                    $('.popup_button').text('请先登录');
                     $('.popup_box').show();
+
                 }else if(data.ret_code=='0'){
                     openUrl = data.url;
                     //弹出窗口的url
@@ -87,13 +106,39 @@
                 }
 
             },error: function(data){
+                system_error = 0;
                 $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                $('.popup_button').text('我知道了');
                 $('.popup_box').show();
             }
           })
         })
+
+
         $('.popup_box .popup_button').click(function(){
-            $('.popup_box').hide();
+
+            var this_link = window.location.href;
+            var this_link_1 = this_link.indexOf("/accounts/login/");
+            var this_link_2 = this_link.indexOf("/accounts/register/");
+            var this_link_indexof = window.location.href.indexOf("?");
+            if(this_link_1==-1&&this_link_2==-1&&system_error){
+
+                if(openKefu!=1&&user_login_status==false){
+                    if(this_link_indexof!=-1){
+                        var go_link = window.location.href+'&openKefu=1';
+                    }else{
+                        var go_link = window.location.href+'?openKefu=1';
+                    }
+
+                    window.location.href = '/accounts/login/?next='+go_link+'';
+                }
+            }else{
+                $('.popup_box').hide();
+            }
+
         });
+    }
+    footer_js();
+
     })
 }).call(this);

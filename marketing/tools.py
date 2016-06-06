@@ -464,10 +464,10 @@ def send_commission_income_message_sms():
 
     python_incomes = incomes.values('user').annotate(Count('invite', distinct=True)).annotate(Sum('earning'))
 
-    phones_list = []
-    messages_list = []
     # 这个在老平台的基础上去处理php的用户佣金的计算方法, 肯定会慢好多, 看情况是否要进行紧急优化
     if python_incomes:
+        phones_list = []
+        messages_list = []
         for income in python_incomes:
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
@@ -502,7 +502,10 @@ def send_commission_income_message_sms():
             "phones": phones_list,
             "messages": messages_list
         })
+
     if php_only_users:
+        phones_list = []
+        messages_list = []
         php_incomes_only = php_incomes.filter(user__in=php_only_users).\
             values('user').annotate(Count('invite', distinct=True)).annotate(Sum('earning'))
         for income in php_incomes_only:
