@@ -40,6 +40,7 @@ class ExperienceBuyAPIView(APIView):
         user = request.user
         now = timezone.now()
         start_dt = local_to_utc(datetime(2016, 6, 5), 'min')
+        user_joined = user.date_joined  # 用户注册时间
         device = split_ua(request)
         device_type = decide_device(device['device_type'])
         purchase_code = 'experience_purchase'
@@ -81,7 +82,7 @@ class ExperienceBuyAPIView(APIView):
                 buy_p2p = P2PRecord.objects.filter(user_id=user.id).exists()
                 buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
                 if not buy_p2p:
-                    if now > start_dt:
+                    if user_joined > start_dt:
                         # 如果查询到已经购买过至少 1 次体验标,则不再检测账户余额
                         if buy_count == 0:
                             if total_amount_tmp >= 28888 and user.margin.margin < 1:
@@ -119,7 +120,7 @@ class ExperienceBuyAPIView(APIView):
 
                 # 从账户中扣除 1 元 (没有购买过体验标的情况)
                 if not buy_p2p:
-                    if now > start_dt:
+                    if user_joined > start_dt:
                         if total_amount >= 28888 and buy_count == 0:
                             amount = 1.00
                             order_id = OrderHelper.place_order(user, order_type=catalog, status=u'新建').id
