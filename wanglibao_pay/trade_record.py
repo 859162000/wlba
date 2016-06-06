@@ -54,7 +54,7 @@ def _deposit_record(user, pagesize, pagenum):
         if x.margin_record and x.status == PayInfo.SUCCESS:
                 balance = x.margin_record.margin_current
         else:
-            balance = None
+            balance = ''
         obj = {
             "id": x.id,
             "amount": x.amount,
