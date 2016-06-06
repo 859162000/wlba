@@ -1574,7 +1574,7 @@ class AuthorizeCode(APIView):
             count += 1
         print redirect_uri
         # print redirect_uri
-        if auth and auth=='1':
+        if auth and auth == '1':
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
         else:
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
@@ -1821,10 +1821,11 @@ class GenerateQRLimitSceneTicket(APIView):
             qrcode.ticket = rs.get('ticket')
             qrcode.url = rs.get('url')
             qrcode.save()
-        except Exception,e:
+        except Exception, e:
             print e
-            return Response({'code':-1, 'message':'error'})
+            return Response({'code': -1, 'message': 'error'})
         return Response(rs)
+
 
 class WeixinCouponList(TemplateView):
     template_name = 'weixin_reward.jade'

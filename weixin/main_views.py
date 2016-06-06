@@ -2,6 +2,8 @@
 from django.views.generic import TemplateView
 import urllib
 from django.contrib.auth import login as auth_login
+
+from wanglibao_rest.views import UdeskGenerator
 from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -306,3 +308,17 @@ class FWHIdValidate(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         return super(FWHIdValidate, self).dispatch(request, *args, **kwargs)
+
+
+class CustomerService(TemplateView):
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        udesk_obj = UdeskGenerator()
+        try:
+            phone = user.wanglibaouserprofile.phone
+            udesk_url = udesk_obj.get_udesk_url(str(phone))
+            return HttpResponseRedirect(udesk_url)
+        except Exception, e:
+            logger.exception(u'联系客服失败: {}'.format(e.message))
+            return redirectToJumpPage(u'客服忙ing...', next=None)

@@ -120,6 +120,9 @@ urlpatterns = patterns(
                                           ),name='new_user_gift'),
     url(r'^app_airport_operation/$', fwh_login_required(TemplateView.as_view(template_name="app_airport_operation.jade"),login_url='/weixin/sub_login_redirect/')),
     url(r'^app_august_phone/$', fwh_login_required(TemplateView.as_view(template_name="app_august_phone.jade"), login_url='/weixin/sub_login_redirect/')),
+
+    url(r'^customer_service/$', fwh_login_required(main_views.CustomerService.as_view(),
+                                                   login_url='/weixin/sub_login_redirect/')),
 )
 
 
