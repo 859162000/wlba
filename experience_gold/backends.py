@@ -16,11 +16,12 @@ from wanglibao_rest.utils import split_ua, decide_device
 from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortization, ExperienceEvent, \
     ExperiencePurchaseLockRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-# from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
 from order.utils import OrderHelper
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_margin.models import MarginRecord
+from marketing.utils import local_to_utc
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class ExperienceBuyAPIView(APIView):
     def post(self, request):
         user = request.user
         now = timezone.now()
+        start_dt = local_to_utc(datetime(2016, 6, 7), 'min')
         device = split_ua(request)
         device_type = decide_device(device['device_type'])
         purchase_code = 'experience_purchase'
@@ -77,11 +79,13 @@ class ExperienceBuyAPIView(APIView):
                 for i in experience_record:
                     total_amount_tmp += i.event.amount
 
-                # 如果查询到已经购买过至少 1 次体验标,则不再检测账户余额
-                buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
-                if buy_count == 0:
-                    if total_amount_tmp >= 28888 and user.margin.margin < 1:
-                        return Response({'ret_code': 30009, 'message': u'账户余额不足,请先充值'})
+                if not P2PRecord.objects.filter(user_id=user.id).exists():
+                    if now > start_dt:
+                        # 如果查询到已经购买过至少 1 次体验标,则不再检测账户余额
+                        buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
+                        if buy_count == 0:
+                            if total_amount_tmp >= 28888 and user.margin.margin < 1:
+                                return Response({'ret_code': 30009, 'message': u'账户余额不足,请先充值'})
 
                 for record in experience_record:
                     event = record.event
