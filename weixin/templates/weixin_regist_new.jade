@@ -51,11 +51,15 @@ html(style="background: #f5f5f5")
           .password
         input(type='password', name='password', placeholder= '请设置密码',data-icon='wx-input-icon',  autocomplete='off').wx-input-main
         .wx-operation-icon.wx-hide-password.wx-password-operation
-      .wx-input-public
-        .wx-input-icon
-          .token
-        input(type='text', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', data-icon='wx-input-icon',  autocomplete='off').wx-input-main
-        input(type="hidden", name="token", id="token", value="{{token}}")
+      ptoken = request.session.get('promo_token')
+      if ptoken == 'xmdj2' or ptoken == 'fwh' or ptoken == 'Lespark' or ptoken == 'zypwt' or ptoken == 'blued' or ptoken == 'qmm1'
+          input(type="hidden", name="invite_code")
+      else
+          .wx-input-public
+            .wx-input-icon
+              .token
+            input(type='text', name='invite_code', placeholder= '请填写邀请码，若无，请忽略', data-icon='wx-input-icon',  autocomplete='off').wx-input-main
+            input(type="hidden", name="token", id="token", value="{{token}}")
 
 
       //账户安全
