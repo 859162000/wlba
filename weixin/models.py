@@ -19,8 +19,8 @@ from wechatpy.client.api.qrcode import WeChatQRCode
 from wanglibao_p2p.models import FINANCES
 
 
-
 logger = logging.getLogger("weixin")
+
 
 class Account(models.Model):
     """
@@ -148,6 +148,7 @@ class Account(models.Model):
         self.oauth_refresh_token = ''
         self.save()
 
+
 class WeiXinChannel(models.Model):
     """
         微信关注渠道表
@@ -196,17 +197,21 @@ class QrCode(models.Model):
     # scene_str = models.CharField('scene_str', max_length=128, null=False)
     weiXinChannel = models.ForeignKey(WeiXinChannel, null=True)
     create_at = models.DateTimeField('生成时间', auto_now_add=True, blank=True, null=True)
+
     def ticket_generate(self):
         return u'<a href="/weixin/api/generate/qr_limit_scene_ticket/?id=%s" target="_blank">生成ticket</a>' % (self.id,)
     ticket_generate.short_description = u'生成ticket'
     ticket_generate.allow_tags = True
+
     def qrcode_link(self):
         return u'<a href="%s" target="_blank">查看二维码</a>' % (WeChatQRCode.get_url(self.ticket))
     qrcode_link.short_description = u'查看二维码'
     qrcode_link.allow_tags = True
+
     class Meta:
         verbose_name_plural = '微信二维码'
         ordering = ['-account_original_id', '-create_at']
+
 
 # 公众号类型
 class WeixinAccounts(object):
@@ -268,6 +273,15 @@ class WeixinAccounts(object):
         'token': '7RvywP6u',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_9e8ff84237cd_258.jpg'
     }
+    account_test_wlpy = {
+        'id': 'gh_3fd5d7a7fbe8',
+        'name': 'wlpy测试号',
+        'app_id': 'wx47c5f00c1809ff8a',
+        'app_secret': '8879805f217abaad079c38b64e6e16fa',
+        'classify': '微信公众平台测试号',
+        'token': 'callmebaby',
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_3fd5d7a7fbe8_258.jpg'
+    }
 
     id = None
     name = None
@@ -299,9 +313,10 @@ class WeixinAccounts(object):
             cls.data['sub_1'] = cls.account_sub_1
         else:
             cls.data['test'] = cls.account_test
-            cls.data['account_test_hmm']=cls.account_test_hmm
-            cls.data['account_test_yj']=cls.account_test_yj
-            cls.data['account_test_wxq']=cls.account_test_wxq
+            cls.data['account_test_hmm'] = cls.account_test_hmm
+            cls.data['account_test_yj'] = cls.account_test_yj
+            cls.data['account_test_wxq'] = cls.account_test_wxq
+            cls.data['account_test_wlpy'] = cls.account_test_wlpy
 
     @classmethod
     def account_classify(cls):
@@ -386,13 +401,11 @@ class AuthorizeInfo(models.Model):
     access_token_expires_at = models.DateTimeField('access token过期时间', auto_now_add=True, blank=True)
     refresh_token = models.CharField('refresh token', max_length=512, blank=True)
 
-
     def check_access_token(self):
         now = Account._now()
         if now > self.access_token_expires_at:
             return False
         return True
-
 
 
 class WeixinUser(models.Model):
@@ -444,6 +457,7 @@ class SubscribeService(models.Model):
         verbose_name_plural = '订阅服务'
         ordering = ['key']
 
+
 class SubscribeRecord(models.Model):
     w_user = models.ForeignKey(WeixinUser, null=True)
     status = models.BooleanField(u'订阅状态, 0:退订,1:订阅', default=False)
@@ -451,7 +465,6 @@ class SubscribeRecord(models.Model):
     subscribe_time = models.IntegerField('用户订阅时间', default=0)
     unsubscribe_time = models.IntegerField('用户取消订阅时间', default=0)
     # update_at = models.DateTimeField('更新时间', auto_now_add=True)
-
 
 
 class Material(models.Model):
@@ -556,12 +569,13 @@ class WeiXinUserActionRecord(models.Model):
         ('unbind', u'解除绑定'),
         ('sign_in', u'用户签到'),
     )
-    w_user_id = models.IntegerField(default=0, db_index=True)#models.ForeignKey(WeixinUser, null=True)
-    user_id = models.IntegerField(default=0, db_index=True)#models.ForeignKey(User, null=True)
+    w_user_id = models.IntegerField(default=0, db_index=True)   # models.ForeignKey(WeixinUser, null=True)
+    user_id = models.IntegerField(default=0, db_index=True)     # models.ForeignKey(User, null=True)
     action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
     action_describe = models.CharField(u'动作描述', max_length=64)
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
     create_time = models.IntegerField('创建时间', default=0)
+
 
 class SeriesActionActivity(models.Model):
     ACTION_TYPES = (
@@ -585,8 +599,10 @@ class SeriesActionActivity(models.Model):
         verbose_name_plural = u'连续操作活动'
         unique_together = (("action_type", "days"),)
         ordering = 'days',
+
     def __unicode__(self):
         return '(%s)%s' % (self.id, self.name)
+
 
 class SeriesActionActivityRule(models.Model):
     GIFT_TYPE = (
@@ -629,11 +645,13 @@ class SeriesActionActivityRule(models.Model):
     is_used = models.BooleanField(u'是否启用', default=False)
     addition_gift_type = models.CharField(u'备用赠送类型', default="", max_length=20, choices=ADDITION_GIFT_TYPE)
     addition_redpack = models.CharField(u'对应活动ID', default="", max_length=200, blank=True,
-                                   help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，否则会导致无法发放<br/>\
-                                   如需要多个ID则用英文逗号隔开,如:1,2,3')
+                                        help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，'
+                                                  u'否则会导致无法发放<br/>如需要多个ID则用英文逗号隔开,如:1,2,3')
+
     class Meta:
         verbose_name = u'连续操作活动奖励规则'
         verbose_name_plural = u'连续操作活动奖励规则'
+
 
 class UserDailyActionRecord(models.Model):
     ACTION_TYPES = (
@@ -659,7 +677,6 @@ class UserDailyActionRecord(models.Model):
         unique_together = (("user", "action_type", "create_date"), )
 
 
-
 class SceneRecord(models.Model):
     openid = models.CharField('用户标识', max_length=128, db_index=True)
     scene_str = models.CharField('渠道', max_length=64, blank=True, null=True)
@@ -677,4 +694,3 @@ class ReplyKeyword(models.Model):
     pattern = models.IntegerField('匹配模式', choices=PATTERN_CHOICES)
     rule_reply = models.ForeignKey(ReplyRule)
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
-

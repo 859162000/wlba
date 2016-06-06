@@ -66,6 +66,7 @@ class WXLogin(TemplateView):
                     user_info = oauth.fetch_access_token(code)
                     self.openid = user_info.get('openid')
                     request.session['openid'] = self.openid
+
                     w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
                     # w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
                     # if is_first:
@@ -86,12 +87,12 @@ class WXLogin(TemplateView):
             return super(WXLogin, self).dispatch(request, *args, **kwargs)
 
 
-
 class WXLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 
     def _form(self, request):
+
         return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
@@ -117,11 +118,11 @@ class WXLoginAPI(APIView):
                         auth_login(request, user)
                         request.session['openid'] = openid
                         request.session.set_expiry(1800)
-                        data = {'re_code':0,'nickname': user.wanglibaouserprofile.nick_name}
+                        data = {'re_code': 0, 'nickname': user.wanglibaouserprofile.nick_name}
                     else:
-                        data = {'re_code':rs, 'errmessage':txt}
+                        data = {'re_code': rs, 'errmessage': txt}
             except WeixinUser.DoesNotExist, e:
-                data = {'re_code':-1, 'errmessage':'wx_user does not exist'}
+                data = {'re_code': -1, 'errmessage': 'wx_user does not exist'}
                 logger.debug(e.message)
 
             return Response(data)
