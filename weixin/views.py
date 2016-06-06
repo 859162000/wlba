@@ -345,8 +345,9 @@ class WeixinJoinView(View):
                 txt = self.getBindTxt(fromUserName)
                 reply = create_reply(txt, self.msg)
                 return reply
+            reply = u"尊敬的用户您好, 确认联系客服, 请点击链接: <a href='%s'>【联系客服】</a>" % (udesk_url)
 
-            reply = create_reply(udesk_url, self.msg)
+            reply = create_reply(reply, self.msg)
 
             # txt = self.getCSReply()
             # try:
