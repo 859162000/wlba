@@ -3,7 +3,6 @@
 from django.views.generic import TemplateView
 from django.utils import timezone
 from django.db.models import Sum
-# from django.http import HttpResponseRedirect
 import re
 import datetime
 from marketing.utils import local_to_utc
