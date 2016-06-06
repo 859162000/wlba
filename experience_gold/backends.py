@@ -78,10 +78,11 @@ class ExperienceBuyAPIView(APIView):
                 for i in experience_record:
                     total_amount_tmp += i.event.amount
 
-                if not P2PRecord.objects.filter(user_id=user.id).exists():
+                buy_p2p = P2PRecord.objects.filter(user_id=user.id).exists()
+                buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
+                if not buy_p2p:
                     if now > start_dt:
                         # 如果查询到已经购买过至少 1 次体验标,则不再检测账户余额
-                        buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
                         if buy_count == 0:
                             if total_amount_tmp >= 28888 and user.margin.margin < 1:
                                 return Response({'ret_code': 30009, 'message': u'账户余额不足,请先充值'})
@@ -117,11 +118,13 @@ class ExperienceBuyAPIView(APIView):
                     amortization.save()
 
                 # 从账户中扣除 1 元 (没有购买过体验标的情况)
-                if total_amount >= 28888 and buy_count == 0:
-                    amount = 1.00
-                    order_id = OrderHelper.place_order(user, order_type=catalog, status=u'新建').id
-                    margin_keeper = MarginKeeper(user=user, order_id=order_id)
-                    margin_keeper.reduce_margin_common(amount, catalog=catalog, description=catalog)
+                if not buy_p2p:
+                    if now > start_dt:
+                        if total_amount >= 28888 and buy_count == 0:
+                            amount = 1.00
+                            order_id = OrderHelper.place_order(user, order_type=catalog, status=u'新建').id
+                            margin_keeper = MarginKeeper(user=user, order_id=order_id)
+                            margin_keeper.reduce_margin_common(amount, catalog=catalog, description=catalog)
 
                 # 更新当前的一组流水id
                 purchase_lock_record.purchase_times += 1
