@@ -500,21 +500,20 @@ def get_margin_info(user_id, url=None):
 
 
 def php_commission_exist(product_id):
-    record = PhpIncome.objects.filter(product_id=product_id).first()
-    return record
+    return PhpIncome.objects.filter(product_id=product_id).exists()
+    # return record
 
 
-def php_commission(user, product_id, start, end):
+def php_commission(user, product_id, start):
     """
     月利宝的表存的是php那边的流水.直接从这获取
     :param user:
     :param product_id:
     :param start:
-    :param end:
     :return:
     """
     _amount = MonthProduct.objects.filter(user=user, product_id=product_id, created_at__gt=start,
-                                          created_at__lt=end).aggregate(Sum('amount'))
+                                          cancel_status=False).aggregate(Sum('amount'))
     if _amount['amount__sum']:
         commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
         commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
@@ -528,15 +527,15 @@ def php_commission(user, product_id, start, end):
                                earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
             income.save()
 
-            sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
-            if sec_intro and sec_intro.introduced_by:
-                second = MarginKeeper(sec_intro.introduced_by)
-                second.deposit(commission, description=u'月利宝二级淘金', catalog=u"全民淘金")
-
-                income = PhpIncome(user=sec_intro.introduced_by, invite=user, level=2,
-                                   product_id=product_id, amount=_amount['amount__sum'],
-                                   earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
-                income.save()
+            # sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+            # if sec_intro and sec_intro.introduced_by:
+            #     second = MarginKeeper(sec_intro.introduced_by)
+            #     second.deposit(commission, description=u'月利宝二级淘金', catalog=u"全民淘金")
+            #
+            #     income = PhpIncome(user=sec_intro.introduced_by, invite=user, level=2,
+            #                        product_id=product_id, amount=_amount['amount__sum'],
+            #                        earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
+            #     income.save()
 
 
 def calc_php_commission(product_id):
@@ -549,16 +548,17 @@ def calc_php_commission(product_id):
     if not product_id:
         return
 
-    month_products = MonthProduct.objects.filter(product_id=product_id)
-    users = set([product.user for product in month_products])
     if php_commission_exist(product_id):
         return
 
+    month_products = MonthProduct.objects.filter(product_id=product_id)
+    users = set([product.user for product in month_products])
+
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
+    # end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
     with transaction.atomic():
         for user in users:
-            php_commission(user, product_id, start, end)
+            php_commission(user, product_id, start)
 
 
 def get_php_redis_principle(user_id, url=None):
