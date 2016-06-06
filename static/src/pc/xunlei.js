@@ -25,6 +25,15 @@ require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
             }
         }
     });
+    var token = getQueryString('promo_token'),
+        xluserid = getQueryString('xluserid'),
+        referfrom = getQueryString('referfrom')
+    $.ajax({
+        url: '/api/coop_pv/'+token+'/?source=pv_wanglibao&ext=' + xluserid + '&ext2=' + referfrom,
+        type: "GET"
+    })
+
+
     if(($('#userStatus').val() == 'True') && ($('#ret_code').val() == '10000')){
         var token = getQueryString('promo_token'),xid = getQueryString('xluserid'),timer = getQueryString('time'),sig = getQueryString('sign'),name = getQueryString('nickname');
         $.ajax({
