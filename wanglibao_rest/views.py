@@ -2026,7 +2026,7 @@ class UDeskLoginAPIView(APIView, UdeskGenerator):
     permission_classes = ()
 
     def __init__(self):
-        UdeskGenerator.__init()
+        UdeskGenerator.__init__()
 
     def post(self, request):
         if not request.user.is_authenticated():
