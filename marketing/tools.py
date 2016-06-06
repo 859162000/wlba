@@ -366,6 +366,11 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id, de
 
 @app.task
 def calc_broker_commission(product_id):
+    """
+    计算全民佣金
+    :param product_id:
+    :return:
+    """
     if not product_id:
         return
 
@@ -378,10 +383,10 @@ def calc_broker_commission(product_id):
         return
 
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
+    # end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
     with transaction.atomic():
         for equity in product.equities.all():
-            redpack_backends.commission(equity.user, product, equity.equity, start, end)
+            redpack_backends.commission(equity.user, product, equity.equity, start)
 
 
 @app.task
