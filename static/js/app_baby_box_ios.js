@@ -58,6 +58,6 @@ $(function(){
 
     //点击分享事件
     $('#share_btn').on('click',function(){
-        location.href = 'https://wltest.wanglibao.com/activity/app_baby_box_ios/?promo_token=bg';
+        window.location.href = 'bbgz://bbgz.com?share';
     })
 });
