@@ -229,6 +229,7 @@ urlpatterns += patterns(
     # url(r'^app_xunleizhuce/$', TemplateView.as_view(template_name="app_xunleizhuce.jade")),
     url(r'^app_baby_box/$', TemplateView.as_view(template_name="app_baby_box.jade")),
     url(r'^app_baby_box_ios/$', TemplateView.as_view(template_name="app_baby_box_ios.jade")),
+    url(r'^app_baby_box_android/$', TemplateView.as_view(template_name="app_baby_box_android.jade")),
     # url(r'^app_six_billion/$', TemplateView.as_view(template_name="app_six_billion.jade")),
 
     # url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),

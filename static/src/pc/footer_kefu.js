@@ -83,7 +83,7 @@
         var system_error = 0;
         $('#kefu_link').click(function(){
             if(user_login_status){
-                var newWin = window.open('',"_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft);
+                var newWin = window.open('',"_blank", "height=" + iHeight + ", width=" + iWidth + ", top=" + iTop + ", left=" + iLeft, 'location=no');
             }
 
           $.ajax({
