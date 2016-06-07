@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
                             OpenHouseApiView, MaiMaiView, ShieldPlanView, ShieldPlanH5View, HMDP2PListView, \
-                            SixBillionView
+                            SixBillionView, ThunderBindingQueryApi
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -270,4 +270,5 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^thunder/binding/$', ThunderBindingApi.as_view()),
+    url(r'^thunder/binding_query/$', ThunderBindingQueryApi.as_view()),
 )
