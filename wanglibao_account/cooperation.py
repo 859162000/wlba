@@ -1624,6 +1624,34 @@ class JuChengRegister(CoopRegister):
                     "mtype": "activity"
                 })
 
+class BaoGeRegister(CoopRegister):
+    def __init__(self, request):
+        super(BaoGeRegister, self).__init__(request)
+        self.c_code = 'bg'
+        self.invite_code = 'bg'
+        self.token = 'bg'
+        self.request = request
+
+    def purchase_call_back(self, user, order_id):
+        # 判断是否首次投资
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
+        if p2p_record and not is_ylb_frist_p2p and p2p_record.amount >= 3000:
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='宝贝格子兑换码', is_used=False).first()
+                if not reward:
+                    return
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'【网利科技】尊敬的用户，恭喜您在宝贝格子活动中获得100元通兑券，您的礼品编码及卡密分别为：%s, 请至宝贝格子官网进行兑换使用。感谢您的参与！' % (reward.content,), ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"宝贝格子兑换码赠送",
+                    "content": u'【网利科技】尊敬的用户，恭喜您在宝贝格子活动中获得100元通兑券，您的礼品编码及卡密分别为：%s, 请至宝贝格子官网进行兑换使用。感谢您的参与！' % (reward.content,),
+                    "mtype": "activity"
+                })
+                reward.is_used = True
+                reward.save()
 
 class XiaoMeiRegister(CoopRegister):
     def __init__(self, request):
@@ -2665,7 +2693,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister]
+                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister]
 
 
 # ######################第三方用户查询#####################

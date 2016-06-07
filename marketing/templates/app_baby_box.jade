@@ -1,0 +1,87 @@
+- load formatters
+doctype html
+html(style="background: #fff")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_baby_box.css?v=2015060302", rel="stylesheet")
+    body
+        .body_wrap.clear
+
+            img.banner_img(src="/static/imgs/mobile_activity/app_baby_box/banner.jpg")
+            .section_1
+                img.banner_text(src="/static/imgs/mobile_activity/app_baby_box/text.png")
+                img.title_1(src="/static/imgs/mobile_activity/app_baby_box/title_1.png")
+                img.section_img(src="/static/imgs/mobile_activity/app_baby_box/section_img.png")
+                img.button#take_prize(src="/static/imgs/mobile_activity/app_baby_box/button.png")
+                img.decorate_1(src="/static/imgs/mobile_activity/app_baby_box/decorate_1.png")
+            .section_2
+                img.title_2(src="/static/imgs/mobile_activity/app_baby_box/title_2.png")
+                .regular_cash
+                    .title_p 定期理财
+                    .regular_cash_main
+                        .left_box
+                            img(src="/static/imgs/mobile_activity/app_baby_box/Drawing.png")
+                        dl.right_box
+                            dt 6%一13%
+                            dd 年化收益率
+                        p.bottom_text 短期灵活  中期方便  长期优选
+
+                .rule_wrap
+                    dl.rule
+                        dt 1.
+                        dd 活动时间：6月8日开始；
+                    dl.rule
+                        dt 2.
+                        dd 用户通过此页面注册为网利宝用户且单笔首次投资3000元及以上即可获得宝贝格子100元全场通用代金券，帐号及卡密以站内信以及短信形式发放，请在下单支付时兑换使用；
+                    dl.rule
+                        dt 3.
+                        dd 手机号为网利宝唯一账户，本期新用户专享福利仅限于宝贝格子渠道新注册用户参与，免费体验名额有限，送完即止；
+                    dl.rule
+                        dt 4.
+                        dd 活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益
+
+                    p.slideDown_button 新用户更多福利
+
+                    .slideDown_box
+
+                        dl.rule
+                            dt ①
+                            dd 活动期间新用户注册即送50元红包（满5000元可用，限1月及以上标期，领取之日起7天有效）
+                        dl.rule
+                            dt ②
+                            dd 用户首次投资满额送以下红包，红包3月标及以上使用，领取之日15天有效；
+                        dl.rule
+                            dt a.
+                            dd 1000元≤首次投资＜5000元，送100元直抵红包（满15000元可直抵使用）
+                        dl.rule
+                            dt b.
+                            dd 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
+                        dl.rule
+                            dt c.
+                            dd 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
+                    dl.rule
+                        dt 5.
+                        dd 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                    dl.rule(style="display:none")#ios-show
+                        dt 6.
+                        dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。网利宝对此活动享有最终解释权。
+                .decorate_2_wrap
+                    img.decorate_2(src="/static/imgs/mobile_activity/app_baby_box/decorate_2.png")
+                    img.button#take_prize_2(src="/static/imgs/mobile_activity/app_baby_box/button.png")
+            .popup_box
+                .main
+                    .textairport
+                    .popup_button 知道了
+                    img.close_popup(src="/static/imgs/mobile_activity/app_baby_box/close_popup.png")
+
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/mobile_activity/app_baby_box_h5.js?v=2015060305")
+        - csrf_token
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
