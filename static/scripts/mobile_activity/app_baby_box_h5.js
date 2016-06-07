@@ -240,7 +240,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = location.protocol+"//"+location.host,
 			shareName = '网利宝免费萌娃礼 只为爱升温！',
 			shareImg = host + '/static/imgs/mobile_activity/app_baby_box/300*300.jpg',
-			shareLink = host + '/activity/app_baby_box/',
+			shareLink = host + '/activity/app_baby_box/?promo_token=bg',
 			shareMainTit = '网利宝免费萌娃礼 只为爱升温！',
 			shareBody = '最好的爱 只为予你';
 		//分享给微信好友
