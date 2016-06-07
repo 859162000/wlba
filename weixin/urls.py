@@ -84,7 +84,7 @@ urlpatterns = patterns(
     url(r'^award_index/$', fwh_login_required(TemplateView.as_view(template_name="sub_award.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='award_index'),
     # url(r'^award_reatcoin/$', fwh_login_required(RedirectView.as_view(url='/weixin/award_eatcoin/'),login_url='/weixin/sub_login_redirect/')),
-    url(r'^award_eatcoin/$', TemplateView.as_view(template_name="sub_eatcoin.jade")),
+    ##url(r'^award_eatcoin/$', TemplateView.as_view(template_name="sub_eatcoin.jade")),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
 
     url(r'^sub_regist_first/$', fwh_login_required(TemplateView.as_view(template_name="service_registProcess_first.jade"), login_url="/weixin/sub_login_redirect/")),
@@ -108,8 +108,8 @@ urlpatterns = patterns(
     url(r'api/fwh/p2p_ajax_list/$', main_views.P2PListFWH.as_view(), name='fwh_p2p_ajax_list'),
 
     #刮刮乐
-    url(r'^activity_ggl/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
-                                          ),name='activity_ggl'),
+    #url(r'^activity_ggl/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
+    #                                      ),name='activity_ggl'),
     url(r'^sub_checkIn/$', fwh_login_required(TemplateView.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='sub_checkIn'),
     url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),

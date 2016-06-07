@@ -6,10 +6,10 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
 from marketing import tools
-#from marketing.models import IntroducedBy, Reward, RewardRecord
+# from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 from django.conf import settings
-#from wanglibao.templatetags.formatters import safe_phone_str
+# from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_reward.views import RewardDistributer
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -192,8 +192,9 @@ class P2PTrader(object):
                                                 "keyword1": self.product.name,
                                                 "keyword2": "%s 元"%str(amount),
                                                 "keyword3": now,
-                                                "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % (self.order_id),
-                                                "remark": u'恭喜您获得3次刮奖机会，速来戳"详情"拼运气!'
+                                                "url":settings.CALLBACK_HOST + '/weixin/sub_detail/detail/%s/' % (self.product.id),
+                                                # "url":settings.CALLBACK_HOST + '/weixin/activity_ggl/?order_id=%s' % (self.order_id),
+                                                # "remark": u'恭喜您获得3次刮奖机会，速来戳"详情"拼运气!'
                                                     })},
                                                 queue='celery02')
 

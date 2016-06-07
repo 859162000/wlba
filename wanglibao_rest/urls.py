@@ -283,13 +283,13 @@ urlpatterns += patterns(
     url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
     url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
-    url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
+    #url(r'^weixin/guaguaka/$', WeixinActivityAPIView.as_view()),  # 微信刮刮卡
     url(r'^wlb_reward/qm_banque/$', QMBanquetRewardAPI.as_view()),  # 全民盛宴
     url(r'^wlb_reward/hm_banque/$', HMBanquetRewardAPI.as_view()),  # 豪门盛宴
     url(r'^lantern/fetch_reward/$', Lantern_FetchRewardAPI.as_view()),  # 豪门盛宴
     url(r'^march_reward/fetch/$', FetchMarchAwardAPI.as_view()),
     url(r'^april_reward/fetch/$', AprilAwardApi.as_view()),  #四月活动
-    url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
+    #url(r'^activity/happy_monkey/$', HappyMonkeyAPIView.as_view()),
     url(r'^geetest/$', GeetestAPIView.as_view()),
     url(r'^activity/konggang/$', KongGangAPIView.as_view()),
     url(r'^xunlei/treasure/$', XunleiTreasureAPIView.as_view()),
