@@ -62,7 +62,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         if p2p_ids:
             p2p_ids_value = p2p_ids.value
             no_coupons_p2p_ids = [int(p2pid) for p2pid in p2p_ids_value.split(',') if p2pid != '']
-            if product_id in no_coupons_p2p_ids:
+            if int(product_id) in no_coupons_p2p_ids:
                 return {"ret_code": 0, "packages": packages}
 
         try:
