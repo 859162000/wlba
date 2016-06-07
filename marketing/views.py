@@ -3133,6 +3133,57 @@ class ThunderBindingApi(APIView):
         return HttpResponse(json.dumps(response_data), content_type='application/json')
 
 
+class ThunderBindingQueryApi(APIView):
+    """
+    迅雷用户绑定接口
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = self.request.user
+        user_channel = get_user_channel_record(user)
+        channel_codes = ('xunlei9', 'mxunlei')
+        if not user_channel or user_channel.code not in channel_codes:
+            response_data = {
+                'ret_code': '10004',
+                'message': u'非迅雷渠道用户',
+                'nickname': '',
+                'xl_account': '',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+        channel_code = user_channel.code
+        if channel_code and channel_code in channel_codes:
+            binding = Binding.objects.filter(user_id=user.id).first()
+            if binding:
+                baccount = binding.baccount or ''
+                if len(baccount) > 3:
+                    baccount = baccount[:3]+'...'
+                response_data = {
+                    'ret_code': '10000',
+                    'message': u'该用户已绑定',
+                    'nickname': baccount,
+                    'xl_account': baccount,
+                }
+            else:
+                response_data = {
+                    'ret_code': '10001',
+                    'message': u'该用户未绑定',
+                    'nickname': '',
+                    'xl_account': '',
+                }
+        else:
+            response_data = {
+                'ret_code': '50001',
+                'message': u'非法请求',
+                'nickname': '',
+                'xl_account': '',
+            }
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
 import math
 class CustomerAccount2015ApiView(APIView):
     permission_classes = (IsAuthenticated,)
