@@ -436,7 +436,7 @@
   left: 50%
   margin: -300.5px 0 0 -381.5px
   z-index: 100000
-  background: url("/static/imgs/pc/home_mask/home_wdty.png") no-repeat
+  background: url("/static/imgs/pc/home_mask/home_wdty_new_v2.png") no-repeat
   .close
     @include home-sprite(close)
     width: 41px
@@ -475,6 +475,7 @@
   filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80)
 
 //cooperation end
+
 
 .project-title-box
   margin: 40px 0 0
@@ -649,7 +650,7 @@
             text-overflow: ellipsis
             display: inline-block
             text-align: left
-            text-indent: 5px    
+            text-indent: 5px
           em
             width: 31px
             height: 16px
@@ -738,6 +739,29 @@
             font-size: 26px
         .mt40
           margin-top: 40px
+          position: relative
+          .interest-more
+            position: absolute
+            left: 123px
+            top: -20px
+            label
+              width: auto
+              height: 20px
+              line-height: 20px
+              color: #fff
+              border-radius: 10px
+              background: #4479f0
+              padding: 3px 8px
+              font-size: 12px
+              span
+                width: 0
+                height: 0
+                border: 6px solid transparent
+                border-top: 6px solid #4479f0
+                position: absolute
+                bottom: -11px
+                left: 50%
+                margin-left: -3px
           .project-introduction
             overflow: hidden
             text-overflow: ellipsis
@@ -868,7 +892,12 @@
     span.active
       @include home-sprite(dot_active)
 
-
-
-
-
+.experience-index
+  padding: 0 24px 41px 50px
+  .tg-pro-tit
+    margin: 25px 0 4px 0
+  .buy-btn-x
+    width: 140px
+    height: 40px
+    line-height: 40px
+    margin-top: 17px

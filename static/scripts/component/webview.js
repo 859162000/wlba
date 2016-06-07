@@ -170,6 +170,18 @@ var wlb = (function () {
                 var responseData  = Mixin.filterJSON(response);
                 options.callback && options.callback(responseData);
             });
+        },
+        /**
+         * 充值
+         * @param data {refresh: 1||0, url: url||''}
+         * @param callback
+         */
+        rechargeApp: function (data, callback) {
+
+            var options = this._setData(data, callback);
+            this.bridge.callHandler('rechargeApp', options.post, function (response) {
+                options.callback && options.callback(response);
+            });
         }
     }
 
@@ -235,8 +247,3 @@ var wlb = (function () {
  //       console.log('其他场景的业务逻辑')
  //    }
  //})
-
-
-
-
-

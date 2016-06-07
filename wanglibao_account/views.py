@@ -95,7 +95,6 @@ import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
-logger_yuelibao = logging.getLogger('wanglibao_margin')
 
 
 class RegisterView(RegistrationView):
@@ -467,7 +466,7 @@ class ResetPassword(TemplateView):
         if (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds() - last_validated_time < 10 * 60:
             user.set_password(password1)
             user.save()
-            
+
             # 清除session
             try:
                 del request.session['phone_validated_time']
@@ -522,7 +521,7 @@ class AccountHome(TemplateView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         unpayed_principle += php_principle
@@ -643,7 +642,7 @@ class AccountHomeAPIView(APIView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         p2p_unpayed_principle += php_principle
@@ -654,28 +653,27 @@ class AccountHomeAPIView(APIView):
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         try:
             index_data = get_php_index_data(url, user.id)
         except Exception, e:
             index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
-            logger_yuelibao.debug(u'月利宝地址请求失败!!! exception = {}'.format(e.message))
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
-        fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
-        fund_total_asset = 0
-        if fund_hold_info.exists():
-            for hold_info in fund_hold_info:
-                fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
+        # fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        # fund_total_asset = 0
+        # if fund_hold_info.exists():
+        #     for hold_info in fund_hold_info:
+        #         fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
         today = timezone.datetime.today()
-        total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(
-                user=user, date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(
-                user=user, date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
+        # total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
+        # fund_income_week = DailyIncome.objects.filter(user=user,
+        #                     date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        # fund_income_month = DailyIncome.objects.filter(user=user,
+        #                     date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         # 当月免费提现次数
         fee_config = WithdrawFee().get_withdraw_fee_config()
@@ -687,7 +685,7 @@ class AccountHomeAPIView(APIView):
             withdraw_free_count = 0
 
         res = {
-            'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
+            'total_asset': float(p2p_total_asset),  # 总资产
             'p2p_total_asset': float(p2p_total_asset),  # p2p总资产
             'p2p_margin': float(p2p_margin),  # P2P余额
             'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
@@ -700,10 +698,10 @@ class AccountHomeAPIView(APIView):
                                        float(index_data['paidIncome']),  # P2P总累积收益
             'p2p_total_interest': float(p2p_total_interest + p2p_total_coupon_interest),  # P2P总收益
 
-            'fund_total_asset': float(fund_total_asset),  # 基金总资产
-            'fund_total_income': float(total_income),  # 基金累积收益
-            'fund_income_week': float(fund_income_week),  # 基金近一周收益(元)
-            'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
+            'fund_total_asset': float(0.00),  # 基金总资产
+            'fund_total_income': float(0.00),  # 基金累积收益
+            'fund_income_week': float(0.00),  # 基金近一周收益(元)
+            'fund_income_month': float(0.00),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
             'p2p_income_yesterday': float(p2p_income_yesterday) + float(index_data['yesterdayIncome']),  # 昨日到账收益
@@ -964,7 +962,7 @@ class AccountP2PAssetAPI(APIView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         p2p_unpayed_principle += php_principle
@@ -1741,9 +1739,7 @@ def login_for_redirect(request, template_name='registration/login.html',
     """
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if redirect_to.startswith('base64'):
-        logger_yuelibao.info('yuelibao!!!!!!!!!!!!!!!')
         redirect_to = base64.b64decode(redirect_to[6:])
-        logger_yuelibao.info('redirect to {}'.format(redirect_to))
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)

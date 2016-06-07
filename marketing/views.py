@@ -2010,10 +2010,10 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
-    template_name = 'xunlei_three.jade'
+    template_name = ''
     wx_code = ''
 
-    def check_params(self, channel_code, sign, _time, nickname, user_id):
+    def check_params(self, channel_code, sign, _time, nickname, user_id, account):
         response_data = {}
         channel_codes = ('xunlei9', 'mxunlei')
         if not channel_code or channel_code not in channel_codes:
@@ -2041,6 +2041,11 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
                 'ret_code': '10007',
                 'message': u'用户ID不存在',
             }
+        elif not account:
+            response_data = {
+                'ret_code': '10008',
+                'message': u'迅雷用户账号参数不存在',
+            }
 
         return response_data
 
@@ -2049,19 +2054,22 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
         sign = params.get('sign', '').strip()
         _time = params.get('time', '').strip()
         nickname = params.get('nickname', '').strip()
+        account = params.get('account', '').strip()
         user_id = params.get('xluserid', '').strip()
         channel_code = params.get('promo_token', '').strip()
-        response_data = self.check_params(channel_code, sign, _time, nickname, user_id)
+        response_data = self.check_params(channel_code, sign, _time, nickname, user_id, account)
 
         self.wx_code = channel_code
         context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
 
-        device_list = ['android', 'iphone']
-        user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
-        for device in device_list:
-            match = re.search(device, user_agent)
-            if match and match.group():
-                self.template_name = 'app_xunleizhuce.jade'
+        if not self.template_name:
+            self.template_name = 'xunlei.jade'
+            device_list = ['android', 'iphone']
+            user_agent = self.request.META.get('HTTP_USER_AGENT', "").lower()
+            for device in device_list:
+                match = re.search(device, user_agent)
+                if match and match.group():
+                    self.template_name = 'app_xunlei_new.jade'
 
         if not response_data:
             check_data = {
@@ -2069,14 +2077,14 @@ class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
                 'xluserid': user_id,
             }
 
-            if len(nickname) > 3:
-                nickname = nickname[:3]+'...'
+            if len(account) > 3:
+                account = account[:3]+'...'
 
             if xunleivip_generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
-                    'nickname': nickname,
+                    'nickname': account,
                 }
             else:
                 response_data = {
@@ -3078,18 +3086,23 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
+        account = request.session.get('account', '').strip() or request.REQUEST.get('account', '').strip()
         if channel_code and (channel_code in channel_codes and channel_user
-                             and channel_time and channel_sign and nick_name):
+                             and channel_time and channel_sign and nick_name and account):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
             if not binding:
                 CoopRegister(request).process_after_binding(user)
                 binding = Binding.objects.filter(user_id=user.id).first()
                 if binding:
+                    baccount = binding.baccount or ''
+                    if len(baccount) > 3:
+                        baccount = baccount[:3]+'...'
                     response_data = {
                         'ret_code': '10000',
                         'message': u'绑定成功',
-                        'nickname': nick_name,
+                        'nickname': baccount,
+                        'xl_account': baccount,
                     }
                 else:
                     response_data = {
@@ -3097,10 +3110,14 @@ class ThunderBindingApi(APIView):
                         'message': u'绑定失败',
                     }
             else:
+                baccount = binding.baccount or ''
+                if len(baccount) > 3:
+                    baccount = baccount[:3]+'...'
                 response_data = {
                     'ret_code': '10002',
                     'message': u'该用户已绑定过',
-                    'nickname': nick_name,
+                    'nickname': baccount,
+                    'xl_account': baccount,
                 }
         else:
             response_data = {
@@ -3108,8 +3125,61 @@ class ThunderBindingApi(APIView):
                 'message': u'非法请求',
             }
 
-        logger.info("%s binding user_id[%s], promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
-                    % (user_channel.code, user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
+        logger.info("%s binding user_id[%s] promo_token[%s] xluserid[%s] time[%s] "
+                    "sign[%s] nickname[%s] account[%s] result[%s]"
+                    % (user_channel.code, user.id, channel_code, channel_user,
+                       channel_time, channel_sign, nick_name, account, response_data))
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
+class ThunderBindingQueryApi(APIView):
+    """
+    迅雷用户绑定接口
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = self.request.user
+        user_channel = get_user_channel_record(user)
+        channel_codes = ('xunlei9', 'mxunlei')
+        if not user_channel or user_channel.code not in channel_codes:
+            response_data = {
+                'ret_code': '10004',
+                'message': u'非迅雷渠道用户',
+                'nickname': '',
+                'xl_account': '',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+        channel_code = user_channel.code
+        if channel_code and channel_code in channel_codes:
+            binding = Binding.objects.filter(user_id=user.id).first()
+            if binding:
+                baccount = binding.baccount or ''
+                if len(baccount) > 3:
+                    baccount = baccount[:3]+'...'
+                response_data = {
+                    'ret_code': '10000',
+                    'message': u'该用户已绑定',
+                    'nickname': baccount,
+                    'xl_account': baccount,
+                }
+            else:
+                response_data = {
+                    'ret_code': '10001',
+                    'message': u'该用户未绑定',
+                    'nickname': '',
+                    'xl_account': '',
+                }
+        else:
+            response_data = {
+                'ret_code': '50001',
+                'message': u'非法请求',
+                'nickname': '',
+                'xl_account': '',
+            }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
 
@@ -3273,8 +3343,10 @@ class ShieldPlanH5View(TemplateView):
             'p2p': p2p_list
         }
 
+
 class HMDP2PListView(TemplateView):
     p2p_list_url_name = ""
+
     def get_context_data(self, **kwargs):
         p2p_products = []
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")
@@ -3288,5 +3360,93 @@ class HMDP2PListView(TemplateView):
         print p2p_list_url
         return {
             'p2p_products': p2p_products[0:1],
-            "p2p_list_url":p2p_list_url
+            "p2p_list_url": p2p_list_url
         }
+
+
+class SixBillionView(TemplateView):
+
+    def get_template_names(self):
+        template = self.kwargs['template']
+        if template == 'app':
+            template_name = 'app_six_billion.jade'
+        else:
+            template_name = "six_billion.jade"
+
+        return template_name
+
+    def get_context_data(self, **kwargs):
+        context = super(SixBillionView, self).get_context_data(**kwargs)
+        now = timezone.now()
+        # 累计交易额
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        site_data_res = site_data[MiscRecommendProduction.KEY_PC_DATA]
+
+        six_1 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=1, hide=False)\
+            .order_by('-status_int').first()
+
+        six_3 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=3, hide=False)\
+            .order_by('-status_int').first()
+
+        six_6 = P2PProduct.objects.filter(name__startswith=u"庆60亿专享", period=6, hide=False)\
+            .order_by('-status_int').first()
+
+        multi_buy = P2PProduct.objects.filter(name__startswith=u"多投多加息", period=6, hide=False)\
+            .order_by('-status_int')
+
+        six_1_display = six_3_display = six_6_display = True
+        if six_1 and now < six_1.publish_time:
+            six_1.name = u"庆60亿专享1月期项目"
+            six_1_display = False
+
+        if six_3 and now < six_3.publish_time:
+            six_3.name = u"庆60亿专享3月期项目"
+            six_3_display = False
+
+        if six_6 and now < six_6.publish_time:
+            six_6.name = u"庆60亿专享6月期项目"
+            six_6_display = False
+
+        multi_1_display = multi_2_display = True
+
+        if multi_buy:
+            if len(multi_buy) <= 1:
+                multi_1 = multi_buy[0]
+                multi_2 = None
+
+                if now < multi_1.publish_time:
+                    multi_1_display = False
+            else:
+                multi_1 = multi_buy[0]
+                multi_2 = multi_buy[1]
+
+                if now < multi_1.publish_time:
+                    multi_1_display = False
+
+                if now < multi_2.publish_time:
+                    multi_2_display = False
+        else:
+            multi_1 = multi_2 = None
+
+        is_stop = False
+        stop_time = local_to_utc(datetime(2016, 6, 3, 18, 0, 0), 'normal')
+        if now > stop_time:
+            is_stop = True
+
+        context.update({
+            'site_data': site_data_res,
+            'six_1': six_1,
+            'six_3': six_3,
+            'six_6': six_6,
+            'six_1_display': six_1_display,
+            'six_3_display': six_3_display,
+            'six_6_display': six_6_display,
+            'multi_1': multi_1,
+            'multi_2': multi_2,
+            'multi_1_display': multi_1_display,
+            'multi_2_display': multi_2_display,
+            'is_stop': is_stop,
+        })
+
+        return context

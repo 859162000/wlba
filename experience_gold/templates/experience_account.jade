@@ -2,6 +2,7 @@
 doctype html
 html(style="background:#efeff4")
     head
+        title 体验金
         include include/app_header.jade
         body
             .aa
@@ -9,6 +10,7 @@ html(style="background:#efeff4")
                 .account_top
                     .asset_content
                         .asset
+                            p.abc
                             p.asset_title 体验金总资产(元)
                             p.asset_count {{total_experience_amount | money_format}}
                         .asset
@@ -90,5 +92,5 @@ html(style="background:#efeff4")
                                 p 体验金获取及使用说明
                 //p 如果您通过注册或活动领取体验金
                 //p 赶快点击右上角投资赚取收益吧
-        script(src="/static/scripts/component/webview.js?v=20160120")
-        script(src="/static/scripts/mobile_activity/account_experience.js?v=1234569871111")
+        script(src="/static/scripts/component/webview.js?v=2016060202003")
+        script(src="/static/scripts/mobile_activity/account_experience.js?v=20160602002")

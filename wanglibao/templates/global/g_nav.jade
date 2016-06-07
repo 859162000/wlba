@@ -48,8 +48,8 @@
 .g-nav-warp
   .g-nav.g-year-layout
     a(href="/").g-logo-box
-      img(src="/static/imgs/pc/logo/logo_4_23_79.jpg?v=423", alt='网利宝', class='logo_l')
-      img(src="/static/imgs/pc/logo/logo_4_23_59.jpg?v=423", alt='网利宝', class='logo_s')
+      img(src="/static/imgs/pc/logo/logo_4_23_79.jpg?v=527", alt='网利宝', class='logo_l')
+      img(src="/static/imgs/pc/logo/logo_4_23_59.jpg?v=527", alt='网利宝', class='logo_s')
     .g-user-warp
       .g-user
         if activeItem == "我的账户"
@@ -71,13 +71,13 @@
           +liItem('/accounts/transaction/p2p/', '交易记录')
 
     .g-nav-box
-      mixin nav-item(className, name, link, smallNav, news)
+      mixin nav-item(className, name, link, smallNav, news_tmp)
         if smallNav == 'list'
             link = 'javascript:void(0)'
         if activeItem == name
           .g-nav-list(class=className)
             a.highlight(href=link, class='nav-a')= name
-              if news
+              if news_tmp
                 img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
               if smallNav == 'list'
                   i.icon.iconfont.icon-down-new
@@ -93,7 +93,7 @@
         else
             .g-nav-list(class=className)
               a(href=link, class='nav-a')= name
-                if news
+                if news_tmp
                   img(src='/static/imgs/pc/nav/new_gif.gif').nav-news
                 if smallNav == 'list'
                   i.icon.iconfont.icon-down-new
@@ -109,8 +109,8 @@
 
       +nav-item('nav-index', '首页', '/')
       +nav-item('nav-p2p', '理财专区', '', 'list')
+      +nav-item('nav-dai', '贷款专区', '/finance/')
       +nav-item('nav-dai', '风险控制', '/security')
-      +nav-item('nav-area', '平台数据', '/data_cube/')
       +nav-item('nav-security', '关于我们', '/about/')
 
 

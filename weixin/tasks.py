@@ -16,23 +16,35 @@ from weixin.util import sendTemplate, getMiscValue
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
+
 @app.task
-def bind_ok(openid, is_first_bind):
+def bind_ok(openid, is_first_bind, new_registed=False):
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+    user = weixin_user.user
     if is_first_bind:
-        from wanglibao_activity.backends import check_activity
-        check_activity(weixin_user.user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
+        from wanglibao_activity.tasks import check_activity_task
+        check_activity_task.apply_async(kwargs={
+                "user_id": user.id,
+                "trigger_node": 'first_bind_weixin',
+                "device_type": 'weixin',
+                "is_first_bind": is_first_bind,
+            }, queue='celery02')
+        # check_activity(user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
     else:
-        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                    "openid":weixin_user.openid,
-                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                    "name1":"",
-                                    "name2":weixin_user.user.wanglibaouserprofile.phone,
-                                    "time":now_str,
-                                        })},
-                                    queue='celery02'
-                                    )
+        sentTemplate.apply_async(kwargs={
+            "kwargs": json.dumps({
+                "openid": weixin_user.openid,
+                "template_id": BIND_SUCCESS_TEMPLATE_ID,
+                "name1": "",
+                "name2": user.wanglibaouserprofile.phone,
+                "time": now_str,
+            })
+        }, queue='celery02')
+    from wanglibao_invite.tasks import processShareInviteDailyReward
+    processShareInviteDailyReward.apply_async(
+            kwargs={'openid': openid, 'user_id': user.id, "new_registed": new_registed})
+
 
 @app.task
 def detect_product_biding(product_id):
@@ -46,8 +58,7 @@ def detect_product_biding(product_id):
                     "rate_desc": rate_desc,
                     "period_desc": period_desc,
                     "pay_method": pay_method,
-                },
-                                              queue='celery02')
+                }, queue='celery02')
 
     product = P2PProduct.objects.get(pk=product_id)
     utc_now = timezone.now()
@@ -88,10 +99,6 @@ def detect_product_biding(product_id):
                     _sendProductToUser(sub_record.w_user.openid, finance_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
 
 
-
-
-
-
 @app.task
 def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):
     w_user = WeixinUser.objects.filter(openid=openid).first()
@@ -102,6 +109,7 @@ def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_d
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)
         sendTemplate(w_user, template)
+
 
 @app.task
 def sentTemplate(kwargs):

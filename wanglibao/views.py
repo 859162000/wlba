@@ -128,13 +128,11 @@ class IndexView(TemplateView):
         month_data, assignment_data = [], []
         url = 'https://' + request.get_host() + settings.PHP_INDEX_MONTH
         # 开发环境 端口起 7000 以上用 wltest 数据
-        logger_yuelibao.info('host = {}'.format(request.get_host()))
         try:
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_INDEX_MONTH_DEV
         except Exception, e:
-            logger_yuelibao.debug('not local host = {}'.format(e))
-        logger_yuelibao.info('url = {}'.format(url))
+            pass
         try:
             month_response = requests.post(url, data={}, timeout=3)
             if month_response.status_code == 200:
@@ -150,8 +148,7 @@ class IndexView(TemplateView):
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_INDEX_ASSIGNMENT_DEV
         except Exception, e:
-            logger_yuelibao.debug('not local host = {}'.format(e))
-        logger_yuelibao.info('url = {}'.format(url))
+            pass
         try:
             assignment_response = requests.post(url, data={}, timeout=3)
             if assignment_response.status_code == 200:
@@ -168,32 +165,12 @@ class IndexView(TemplateView):
         # 需要过滤的标id
         exclude_pid = list()
 
-        # 主推标
-        recommend_product_id = None
-        if self.request.user and self.request.user.is_authenticated():
-            user = self.request.user
-            product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
-                                                    status=u'正在招标', category=u'新手标')
-            if product_new.exists():
-                if not P2PRecord.objects.filter(user=user).exists():
-                    # 不存在购买记录
-                    id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
-                    id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
-                    recommend_product_id = id_rate[0]['id']
-                else:
-                    # 存在购买记录
-                    misc = MiscRecommendProduction()
-                    recommend_product_id = misc.get_recommend_product_except_new()
-                    # 将所有新手表过滤
-                    exclude_pid += [p.id for p in product_new]
+        from wanglibao_app.utils import RecommendProduct
+        recommend_product, recommend_product_id = RecommendProduct(self.request.user).get_recommend_product()
 
-        if not recommend_product_id:
-            misc = MiscRecommendProduction()
-            recommend_product_id = misc.get_recommend_product_id()
+        if recommend_product_id:
+            exclude_pid.append(recommend_product_id)
 
-        recommend_product = P2PProduct.objects.filter(id=recommend_product_id)
-
-        exclude_pid.append(recommend_product_id)
         exclude_pid = list(set(exclude_pid))
 
         # p2p_products = []
@@ -270,7 +247,7 @@ class IndexView(TemplateView):
                 if int(self.request.get_host().split(':')[1]) > 7000:
                     url = settings.PHP_APP_INDEX_DATA_DEV
             except Exception, e:
-                logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+                pass
 
             php_principle = get_php_redis_principle(user.pk, url)
             unpayed_principle += php_principle

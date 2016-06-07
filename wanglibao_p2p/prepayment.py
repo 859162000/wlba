@@ -21,7 +21,8 @@ from exceptions import PrepaymentException
 import pytz
 import json
 from datetime import datetime
-from wanglibao_activity import backends as activity_backends
+# from wanglibao_activity import backends as activity_backends
+from wanglibao_activity.tasks import check_activity_task
 import traceback
 
 REPAYMENT_MONTHLY = 'monthly'
@@ -129,7 +130,14 @@ class PrepaymentHistory(object):
                 # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
                 try:
                     if user_record.principal > 0:
-                        activity_backends.check_activity(user, 'repaid', 'pc', user_record.principal, product.id)
+                        # activity_backends.check_activity(user, 'repaid', 'pc', user_record.principal, product.id)
+                        check_activity_task.apply_async(kwargs={
+                            "user_id": user.id,
+                            "trigger_node": 'repaid',
+                            "device_type": 'pc',
+                            "amount": user_record.principal,
+                            "product_id": product.id
+                        }, queue='celery02')
                 except Exception:
                     logger.exception("==提前还款==活动检测==")
                     logger.debug("提前还款, user: {}, principal: {}, product_id: {}".format(

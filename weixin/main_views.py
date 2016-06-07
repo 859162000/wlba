@@ -2,6 +2,8 @@
 from django.views.generic import TemplateView
 import urllib
 from django.contrib.auth import login as auth_login
+
+from wanglibao_rest.views import UdeskGenerator
 from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +13,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import is_check_id_verify
@@ -22,7 +25,7 @@ from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
 from wanglibao_p2p.common import get_p2p_list
-from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser, getMiscValue
+from .util import _generate_ajax_template, FWH_LOGIN_URL, getOrCreateWeixinUser, getMiscValue, get_weixin_code_url
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_redpack.backends import list_redpack
@@ -65,6 +68,7 @@ class WXLogin(TemplateView):
                     user_info = oauth.fetch_access_token(code)
                     self.openid = user_info.get('openid')
                     request.session['openid'] = self.openid
+
                     w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
                     # w_user, is_first = WeixinUser.objects.get_or_create(openid=self.openid)
                     # if is_first:
@@ -85,12 +89,12 @@ class WXLogin(TemplateView):
             return super(WXLogin, self).dispatch(request, *args, **kwargs)
 
 
-
 class WXLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 
     def _form(self, request):
+
         return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
@@ -114,12 +118,13 @@ class WXLoginAPI(APIView):
                     rs, txt = bindUser(weixin_user, user)
                     if rs == 0:
                         auth_login(request, user)
+                        request.session['openid'] = openid
                         request.session.set_expiry(1800)
-                        data = {'re_code':0,'nickname': user.wanglibaouserprofile.nick_name}
+                        data = {'re_code': 0, 'nickname': user.wanglibaouserprofile.nick_name}
                     else:
-                        data = {'re_code':rs, 'errmessage':txt}
+                        data = {'re_code': rs, 'errmessage': txt}
             except WeixinUser.DoesNotExist, e:
-                data = {'re_code':-1, 'errmessage':'wx_user does not exist'}
+                data = {'re_code': -1, 'errmessage': 'wx_user does not exist'}
                 logger.debug(e.message)
 
             return Response(data)
@@ -161,6 +166,7 @@ class AccountTemplate(TemplateView):
         info = getMiscValue("fwh_cfg_info")
         fetch_experience_url = info.get('fetch_experience_url', "").strip()
         fetch_coupon_url = info.get("fetch_coupon_url", "").strip()
+        share_invite_url = info.get("share_invite_url", "").strip()
         if not fetch_coupon_url.startswith("http"):
             if not fetch_coupon_url.startswith("/"):
                 fetch_coupon_url=settings.CALLBACK_HOST + "/" + fetch_coupon_url
@@ -171,6 +177,13 @@ class AccountTemplate(TemplateView):
                 fetch_experience_url=settings.CALLBACK_HOST + "/" + fetch_experience_url
             else:
                 fetch_experience_url=settings.CALLBACK_HOST + fetch_experience_url
+        if not share_invite_url.startswith("http"):
+            if not share_invite_url.startswith("/"):
+                share_invite_url=settings.CALLBACK_HOST + "/" + share_invite_url
+            else:
+                share_invite_url = settings.CALLBACK_HOST + share_invite_url
+            share_invite_url = get_weixin_code_url(share_invite_url)
+
         result = list_redpack(self.request.user, 'all', 'all', 0, 'all')
         seg = SendExperienceGold(self.request.user)
         experience_amount = seg.get_amount()
@@ -182,6 +195,7 @@ class AccountTemplate(TemplateView):
             'margin': account_info['p2p_margin'],
             'fetch_experience_url':fetch_experience_url,
             'fetch_coupon_url':fetch_coupon_url,
+            "share_invite_url":share_invite_url,
             'coupon_num':len(result["packages"]['unused']),
             'experience_amount':experience_amount
         }
@@ -294,3 +308,17 @@ class FWHIdValidate(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         return super(FWHIdValidate, self).dispatch(request, *args, **kwargs)
+
+
+class CustomerService(TemplateView):
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        udesk_obj = UdeskGenerator()
+        try:
+            phone = user.wanglibaouserprofile.phone
+            udesk_url = udesk_obj.get_udesk_url(str(phone))
+            return HttpResponseRedirect(udesk_url)
+        except Exception, e:
+            logger.exception(u'联系客服失败: {}'.format(e.message))
+            return redirectToJumpPage(u'客服忙ing...', next=None)

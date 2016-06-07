@@ -20,6 +20,7 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^coop_login/$', views.WeixinCoopLogin.as_view(), name='weixin_coop_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
+    #url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^coop_regist/$', views.WeixinCoopRegister.as_view(), name="weixin_coop_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
@@ -65,6 +66,7 @@ urlpatterns = patterns(
     url(r'api/account/wx_getinfo/$', views.GetUserInfo.as_view(), name='weixin_get_account_user_info'),
     url(r'api/generate/qr_limit_scene_ticket/$', views.GenerateQRLimitSceneTicket.as_view(), name='generate_qr_limit_scene_ticket'),#生成永久二维码
     url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),#生成临时二维码
+    url(r'api/generate/qr_invite_scene_ticket/$', views.GenerateInviteQRSceneTicket.as_view(), name='qr_invite_scene_ticket'),#生成邀请二维码
 
     #
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
@@ -83,8 +85,8 @@ urlpatterns = patterns(
                                                                                             name='sub_invite'),
     url(r'^award_index/$', fwh_login_required(TemplateView.as_view(template_name="sub_award.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='award_index'),
-    url(r'^award_reatcoin/$', fwh_login_required(RedirectView.as_view(url='/weixin/award_eatcoin/'),login_url='/weixin/sub_login_redirect/')),
-    url(r'^award_eatcoin/$', TemplateView.as_view(template_name="sub_eatcoin.jade")),
+    # url(r'^award_reatcoin/$', fwh_login_required(RedirectView.as_view(url='/weixin/award_eatcoin/'),login_url='/weixin/sub_login_redirect/')),
+    ##url(r'^award_eatcoin/$', TemplateView.as_view(template_name="sub_eatcoin.jade")),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
 
     url(r'^sub_regist_first/$', fwh_login_required(TemplateView.as_view(template_name="service_registProcess_first.jade"), login_url="/weixin/sub_login_redirect/")),
@@ -96,7 +98,7 @@ urlpatterns = patterns(
     url(r'^sub_recharge/$', fwh_login_required(main_views.RechargeTemplate.as_view(template_name="service_recharge.jade"), login_url="/weixin/sub_login_redirect/"), name="sub_recharge"),
     url(r'^sub_list/$', fwh_login_required(main_views.FwhP2PlistTemplate.as_view(template_name="service_list.jade"), login_url="/weixin/sub_login_redirect/"), name='fwh_p2p_list'),
     url(r'^sub_detail/(?P<template>\w+)/(?P<id>\w+)/$', fwh_login_required(views.P2PDetailView.as_view(source='fwh'), login_url="/weixin/sub_login_redirect/")),
-    url(r'^sub_experience/(?P<template>(account))/$', fwh_login_required(ExperienceGoldView.as_view(), login_url='/weixin/sub_login_redirect/')),
+    url(r'^sub_experience/(?P<template>(accounts))/$', fwh_login_required(ExperienceGoldView.as_view(), login_url='/weixin/sub_login_redirect/')),
     url(r'^sub_transaction/(?P<status>\w+)/$', fwh_login_required(views.WeixinTransaction.as_view(template_name="service_transaction_repay.jade", source='fwh'), login_url="/weixin/sub_login_redirect/")),
 
     url(r'^sub_reward/(?P<status>\w+)/$', fwh_login_required(views.WeixinCouponList.as_view(template_name="service_reward.jade"), login_url="/weixin/sub_login_redirect/")),
@@ -108,8 +110,8 @@ urlpatterns = patterns(
     url(r'api/fwh/p2p_ajax_list/$', main_views.P2PListFWH.as_view(), name='fwh_p2p_ajax_list'),
 
     #刮刮乐
-    url(r'^activity_ggl/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
-                                          ),name='activity_ggl'),
+    #url(r'^activity_ggl/$', fwh_login_required(WeixinGGLTemplate.as_view(template_name="service_scratch.jade"),login_url='/weixin/sub_login_redirect/'
+    #                                      ),name='activity_ggl'),
     url(r'^sub_checkIn/$', fwh_login_required(TemplateView.as_view(template_name="service_checkIn.jade"),login_url='/weixin/sub_login_redirect/'
                                           ),name='sub_checkIn'),
     url(r'^sub_checkIn_share/$', TemplateView.as_view(template_name="service_checkIn_share.jade")),
@@ -118,6 +120,9 @@ urlpatterns = patterns(
                                           ),name='new_user_gift'),
     url(r'^app_airport_operation/$', fwh_login_required(TemplateView.as_view(template_name="app_airport_operation.jade"),login_url='/weixin/sub_login_redirect/')),
     url(r'^app_august_phone/$', fwh_login_required(TemplateView.as_view(template_name="app_august_phone.jade"), login_url='/weixin/sub_login_redirect/')),
+
+    url(r'^customer_service/$', fwh_login_required(main_views.CustomerService.as_view(),
+                                                   login_url='/weixin/sub_login_redirect/')),
 )
 
 
@@ -134,17 +139,24 @@ urlpatterns += patterns(
     url(r'^sign_info/$', activity_views.GetSignShareInfo.as_view()),
     url(r'^daily_action/$', activity_views.DailyActionAPIView.as_view()),
     url(r'^continue_action_reward/$', activity_views.GetContinueActionReward.as_view()),
-    url(r'^fetch_xunlei_vipcard/$', activity_views.FetchXunleiCardAward.as_view()),
+    url(r'^fetch_hby_reward/$', activity_views.FetchWechatHBYReward.as_view()),
+    #Comment by hb on 2016-05-31
+    #url(r'^fetch_xunlei_vipcard/$', activity_views.FetchXunleiCardAward.as_view()),
 
 )
 #活动页面
 urlpatterns += patterns(
     '',
-    url(r'^app_xunlei_welfare/$', fwh_login_required(TemplateView.as_view(template_name="app_xunlei_welfare.jade"), login_url='/weixin/sub_login_redirect/')),
+    url(r'activity/si_bind_login/$', activity_views.WechatShareInviteBindTemplate.as_view(template_name="invite_redpacket_bind.jade"), name="si_bind_login"),
+    # url(r'^activity/invite/$', fwh_login_required(activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),login_url='/weixin/activity/si_bind_login/'),name='hby_weixin_invite'),
+    url(r'^activity/invite/$', activity_views.WechatInviteTemplate.as_view(template_name="invite_redpacket_index.jade"),name='hby_weixin_invite'),
+    #Comment by hb on 2016-05-31
+    #url(r'^app_xunlei_welfare/$', fwh_login_required(TemplateView.as_view(template_name="app_xunlei_welfare.jade"), login_url='/weixin/sub_login_redirect/')),
 )
 #h5活动页面
 urlpatterns += patterns(
     '',
+    url(r'^activity/share/$', activity_views.WechatShareTemplate.as_view(template_name="invite_redpacket_index.jade"), name='hby_weixin_share'),
     url(r'^fwh_open_day_review/$', HMDP2PListView.as_view(template_name="app_open_day_review.jade", p2p_list_url_name="fwh_p2p_list")),
 )
 # 微信管理后台

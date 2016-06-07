@@ -379,8 +379,12 @@ def period_unit(value):
 def period_format(value):
     if value == 'month_gte':
         return u'个月以上'
+    elif value == 'month_lte':
+        return u'个月以下'
     elif value == 'day_gte':
         return u'天以上'
+    elif value == 'day_lte':
+        return u'天以下'
     elif value == 'day':
         return u'天'
     else:

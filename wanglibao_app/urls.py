@@ -12,7 +12,8 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
                                  AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppAreaView,
                                  AppAreaApiView, AppMemorabiliaView, AppDataModuleView, AppActivateScoreImageAPIView,
-                                 AppFinanceView, AppPraiseAwardView, AppCheckInView, AppMemorabiliaDetailView)
+                                 AppFinanceView, AppPraiseAwardView, AppCheckInView, AppMemorabiliaDetailView,
+                                 AppRecommendAPIView)
 from wanglibao_account.views import MarginRecordsAPIView
 router = DefaultRouter()
 
@@ -24,6 +25,7 @@ router.register(r'recommend', AppRecommendViewSet)
 urlpatterns = patterns(
     '',
     url(r'', include(router.urls)),
+    url(r'^recommend_new/$', AppRecommendAPIView.as_view()),
     url(r'^preload/$', AppActivateImageAPIView.as_view()),
     url(r'^preload_score/$', AppActivateScoreImageAPIView.as_view()),
     url(r'^repayment/$', AppRepaymentAPIView.as_view()),

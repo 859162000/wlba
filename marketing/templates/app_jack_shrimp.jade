@@ -1,0 +1,39 @@
+- load formatters
+doctype html
+html(style="background: #000")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/jquery.fullpage.min.css?v=2015060302", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_jack_shrimp.css?v=2015060302", rel="stylesheet")
+    body
+        .body_wrap
+            .music
+
+            #fullpage
+                .section.section_1
+                    img.img_1(src="/static/imgs/mobile_activity/app_jack_shrimp/section_img1.png")
+                    .text_wrap
+                        p 火热欧洲杯，好礼转转转<br>激情对决谁是最后王者
+                        img.line(src="/static/imgs/mobile_activity/app_jack_shrimp/section_line.png")
+                        p!='夹克的虾携手网利宝<br>龙虾+啤酒+花生<span>免费送</span><br>与你激情无昼夜，快享欧洲杯'
+                    img.down(src="/static/imgs/mobile_activity/app_jack_shrimp/down.png")
+
+
+
+                .section.section_2
+                .section.section_3
+                .section.section_4
+
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/js/lib/jquery.min.js?v=2015060305")
+        script(src="/static/js/lib/jquery.fullpage.min.js?v=2015060305")
+        script(src="/static/scripts/mobile_activity/app_jack_shrimp.js?v=2015060305")
+        - csrf_token
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
