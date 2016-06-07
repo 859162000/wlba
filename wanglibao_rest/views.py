@@ -1061,6 +1061,9 @@ class LoginAPIView(DecryptParmsAPIView):
 
         geetest_record_ip = GeetestModifiedTimes.objects.filter(identified=client_ip).first()
         if not geetest_record_ip:
+            if not client_ip:
+                return Response({"token":"false", "message":u"获得用户数据失败"}, status=400)
+
             geetest_record_ip = GeetestModifiedTimes.objects.create(
                     identified=client_ip,
                     times=0)
