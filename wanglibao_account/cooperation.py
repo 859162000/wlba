@@ -1642,12 +1642,12 @@ class BaoGeRegister(CoopRegister):
                     return
                 send_messages.apply_async(kwargs={
                     "phones": [user.wanglibaouserprofile.phone, ],
-                    "messages": [u'【网利科技】尊敬的用户，恭喜您在宝贝格子活动中获得100元通兑券，您的兑换码为：%s, 请至宝贝格子官网进行兑换使用。感谢您的参与！' % (reward.content,), ]
+                    "messages": [u'【网利科技】尊敬的用户，恭喜您在宝贝格子活动中获得100元通兑券，您的礼品编码及卡密分别为：%s, 请至宝贝格子官网进行兑换使用。感谢您的参与！' % (reward.content,), ]
                 })
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
                     "title": u"宝贝格子兑换码赠送",
-                    "content": u'【网利科技】尊敬的用户，恭喜您在宝贝格子活动中获得100元通兑券，您的兑换码为：%s, 请至宝贝格子官网进行兑换使用。感谢您的参与！' % (reward.content,),
+                    "content": u'【网利科技】尊敬的用户，恭喜您在宝贝格子活动中获得100元通兑券，您的礼品编码及卡密分别为：%s, 请至宝贝格子官网进行兑换使用。感谢您的参与！' % (reward.content,),
                     "mtype": "activity"
                 })
                 reward.is_used = True
