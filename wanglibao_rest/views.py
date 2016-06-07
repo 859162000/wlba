@@ -64,7 +64,6 @@ from common import DecryptParmsAPIView
 import requests
 from weixin.models import WeixinUser
 from weixin.util import bindUser
-from wanglibao.views import landpage_view
 import urllib
 from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
@@ -1757,17 +1756,6 @@ class BidHasBindingForChannel(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
-
-
-class LandOpenApi(APIView):
-    """
-    渠道跳转页
-    """
-
-    permission_classes = ()
-
-    def post(self, request):
-        return landpage_view(request)
 
 
 class CoopPvApi(APIView):

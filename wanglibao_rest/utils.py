@@ -133,36 +133,6 @@ def decide_device(device_type):
         return 'all'
 
 
-# def process_for_fuba_landpage(request, channel_code):
-#     response = {}
-#     request_data = request.GET
-#
-#     # period 为结算周期，必须以天为单位
-#     period = getattr(settings, '%s_PERIOD' % channel_code.upper())
-#
-#     # 设置tid默认值
-#     default_tid = getattr(settings, '%s_DEFAULT_TID' % channel_code.upper(), '')
-#     tid = request_data.get('tid', default_tid)
-#     if not tid and default_tid:
-#         tid = default_tid
-#
-#     sign = request_data.get('sign', None)
-#     wlb_for_channel_key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
-#     # 确定渠道来源
-#     if tid and sign == hashlib.md5(channel_code+str(wlb_for_channel_key)).hexdigest():
-#         redis = redis_backend()
-#         redis_channel_key = '%s_%s' % (channel_code, tid)
-#         land_time_lately = redis._get(redis_channel_key)
-#         current_time = datetime.datetime.now()
-#         # 如果上次访问的时间是在30天前则不更新访问时间
-#         if land_time_lately and tid != default_tid:
-#             land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
-#             if land_time_lately + datetime.timedelta(days=int(period)) <= current_time:
-#                 return
-#         else:
-#             redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
-
-
 def generate_oauth2_sign(user_id, client_id, key):
     sign = hashlib.md5(str(user_id) + client_id + key).hexdigest()
     return sign
@@ -198,52 +168,6 @@ def generate_bajinshe_sign(client_id, phone, key):
 def generate_coop_access_token_sign(client_id, phone, key):
     sign = hashlib.md5('-'.join([str(client_id), str(phone), str(key)])).hexdigest()
     return sign
-
-
-def process_for_bajinshe_landpage(request, channel_code):
-    sign = request.session.get('sign', None)
-    phone = request.session.get('phone', None)
-    client_id = request.session.get('client_id', None)
-    access_token = request.session.get('access_token', None)
-
-    key = settings.BAJINSHE_COOP_KEY
-    if generate_bajinshe_sign(client_id, phone, key) == sign:
-        coop_token_login(request, phone, client_id, access_token)
-    else:
-        logger.info("process_for_bajinshe_landpage invalid signature with sign[%s] phone[%s] key[%s]" %
-                    (sign, phone, key))
-
-
-def process_for_renrenli_landpage(request, channel_code):
-    phone = request.GET.get('phone', None)
-    client_id = request.GET.get('client_id', None)
-    access_token = request.GET.get('access_token', None)
-    if not phone:
-        phone = request.session.get('phone', None)
-    if not client_id:
-        client_id = request.session.get('client_id', None)
-    if not access_token:
-        access_token = request.session.get('access_token', None)
-
-    coop_token_login(request, phone, client_id, access_token)
-
-
-def process_for_bisouyi_landpage(request, channel_code):
-    from wanglibao_account.forms import BiSouYiRegisterForm
-    form = BiSouYiRegisterForm(request.session, action='login')
-    if form.is_valid():
-        if form.check_sign():
-            phone = form.get_phone()
-            access_token = form.get_token()
-            client_id = form.cleaned_data['client_id']
-            coop_token_login(request, phone, client_id, access_token)
-            error_msg = 'success'
-        else:
-            error_msg = u'无效签名'
-    else:
-        error_msg = form.errors.values()[0][0]
-
-    logger.info("process_for_bisouyi_landpage process result: %s" % error_msg)
 
 
 def has_binding_for_bid(channel_code, bid):

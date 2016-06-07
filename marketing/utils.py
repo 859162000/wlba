@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
+from django.contrib.auth import authenticate, login as auth_login
 from django.db import connection
 from django.db.models import Sum
 from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels, ChannelsNew
@@ -217,3 +218,11 @@ def utype_is_mobile(request):
 
     return is_mobile
 
+
+def sign_login(request, sign, user_id, timestamp):
+    try:
+        user = authenticate(sign=sign, user_id=user_id, timestamp=timestamp)
+        if user:
+            auth_login(request, user)
+    except Exception, e:
+        logger.info('sign_login internal request oauth failed with error %s' % e)

@@ -31,7 +31,6 @@ from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDate
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser, DuoZhuanByDateAPI
 from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
     AppShareViewSuccess, AppShareViewError, RockFinanceQRCodeView
-from wanglibao.views import landpage_view
 from wanglibao_sms.views import ArriveRate
 
 admin.site = AdminSitePlus()
@@ -107,7 +106,6 @@ urlpatterns = patterns(
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
     url(r'^lottery/', include('wanglibao_lottery.urls')),
-    url(r'^landpage/', landpage_view),
 
     url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
     url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),

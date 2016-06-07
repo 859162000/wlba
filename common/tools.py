@@ -2,6 +2,8 @@
 
 import re
 import ssl
+import time
+from datetime import datetime as dt
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 
@@ -112,6 +114,20 @@ class StrQuote(object):
         return self.quote(s, safe)
 
 
+try:
+    from django.utils import timezone
+except ImportError:
+    timezone = None
+
+
+def now():
+    if timezone:
+        return timezone.now()
+    else:
+        # Django 1.3 compatibility
+        return dt.now()
+
+
 class FileObject(object):
     """构造文件对象（file, size云存储所需）"""
 
@@ -128,3 +144,10 @@ class MyHttpsAdapter(HTTPAdapter):
                                        maxsize=maxsize,
                                        block=block,
                                        ssl_version=ssl.PROTOCOL_TLSv1)
+
+
+def get_utc_timestamp(time_obj=now()):
+    time_format = '%Y-%m-%d %H:%M:%S'
+    utc_time = time_obj.strftime(time_format)
+    utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
+    return utc_timestamp

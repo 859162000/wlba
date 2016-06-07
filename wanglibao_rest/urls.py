@@ -49,7 +49,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                                   GestureIsEnabledView, LoginAPIView, GuestCheckView, CaptchaValidationCodeView,
                                   TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
                                   InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside,
-                                  BidHasBindingForChannel, LandOpenApi, CoopPvApi, OauthUserRegisterApi,
+                                  BidHasBindingForChannel, CoopPvApi, OauthUserRegisterApi,
                                   ActivityUserInfoUploadApi, GeetestAPIView, AccessUserExistsApi, BiSouYiUserExistsApi)
 
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
@@ -334,12 +334,6 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^has_binding/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<bid>[a-z0-9A-Z_]*)/$', BidHasBindingForChannel.as_view()),
-)
-
-# 渠道着陆页中间跳转接口
-urlpatterns += patterns(
-    '',
-    url(r'^landpage/$', LandOpenApi.as_view()),
 )
 
 #

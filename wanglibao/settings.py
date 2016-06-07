@@ -235,7 +235,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
     'weixin.auth_backend.OpenidAuthBackend',
-    'wanglibao_account.auth_backends.CoopAccessTokenBackend'
+    'wanglibao_account.auth_backends.CoopSignAuthBackend'
 )
 import django.contrib.auth.backends
 

@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import hashlib
 import logging
 import requests
 import StringIO
@@ -8,6 +9,7 @@ from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.contrib.auth.backends import ModelBackend
+from common.tools import get_utc_timestamp
 from utils import detect_identifier_type
 from wanglibao_rest.utils import generate_oauth2_sign
 
@@ -100,53 +102,35 @@ class TokenSecretSignAuthBackend(object):
             return None
 
 
-class CoopAccessTokenBackend(ModelBackend):
+class CoopSignAuthBackend(ModelBackend):
+    def generate_oauth_login_sign(self, user_id, ts):
+        key = settings.BASE_OAUTH_KEY
+        sign = hashlib.md5(str(user_id) + str(ts) + key).hexdigest()
+        return sign
+
     def authenticate(self, **kwargs):
         active_user = None
-        phone = kwargs.get('phone')
-        client_id = kwargs.get('client_id')
-        token = kwargs.get('token')
-        if phone and client_id and token:
-            logger.info("user[%s] enter oauth_token_login with client_id[%s] token[%s]" % (phone, client_id, token))
-            user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-            if user:
-                sign = generate_oauth2_sign(user.id, client_id, settings.CHANNEL_CENTER_OAUTH_KEY)
-                data = {
-                    'user_id': user.id,
-                    'client_id': client_id,
-                    'access_token': token,
-                    'sign': sign,
-                    'channel': 'base'
-                }
-                try:
-                    res = requests.post(url=settings.OAUTH2_URL, data=data)
-                    if res.status_code == 200:
-                        result = res.json()
-                        logger.info("oauth_token_login connected return [%s]" % result)
-                        res_code = result["ret_code"]
-                        message = result["message"]
-                        if res_code == 10000:
-                            sign = result["sign"]
-                            user_id = result["user_id"]
-                            client_id = result["client_id"]
-                            local_sign = generate_oauth2_sign(user_id, client_id,
-                                                              settings.CHANNEL_CENTER_OAUTH_KEY)
-                            if local_sign == sign:
-                                active_user = user
-                                message = 'success'
-                            else:
-                                message = u'无效签名'
+        sign = kwargs.get('sign', None)
+        user_id = kwargs.get('uid', None)
+        ts = kwargs.get('timestamp', None)
+        logger.info("Enter oauth_token_login with sign[%s] user_id[%s] ts[%s]" % (sign, user_id, ts))
+        if sign and user_id and ts:
+            try:
+                if int(ts) > int(get_utc_timestamp()):
+                    local_sign = self.generate_oauth_login_sign(user_id, ts)
+                    if local_sign == sign:
+                        try:
+                            active_user = User.objects.get(pk=user_id)
+                            message = 'success'
+                        except User.DoesNotExist:
+                            message = 'invalid uid[%s]' % user_id
                     else:
-                        logger.info("oauth_token_login connected status code[%s]" % res.status_code)
-                        message = res.text
-                except:
-                    # 创建内存文件对象
-                    fp = StringIO.StringIO()
-                    traceback.print_exc(file=fp)
-                    message = fp.getvalue()
-            else:
-                message = 'invalid phone number'
+                        message = 'invalid sign'
+                else:
+                    message = 'invalid timestamp'
 
-            logger.info("CoopAccessTokenBackend process result: %s" % message)
+                logger.info("CoopAccessTokenBackend process result: %s" % message)
+            except:
+                logger.exception('CoopAccessTokenBackend raise error: ')
 
         return active_user
