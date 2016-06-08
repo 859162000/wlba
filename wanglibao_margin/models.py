@@ -204,15 +204,9 @@ def save_margin_to_redis(sender, **kwargs):
                 unpayed_principle += equity.unpaid_principal  # 待收本金
 
         # 增加从PHP项目来的月利宝待收本金
-        # TODO 根据host 确定 url
+        # TODO 根据host 确定 url, 怎么获取 request?
         from wanglibao_margin.php_utils import get_php_redis_principle
-        url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
-        try:
-            if int(self.request.get_host().split(':')[1]) > 7000:
-                url = settings.PHP_APP_INDEX_DATA_DEV
-        except Exception, e:
-            pass
-        php_principle = get_php_redis_principle(user.pk, url)
+        php_principle = get_php_redis_principle(user.pk)
         unpayed_principle += php_principle
 
         total_amount = unpayed_principle + margin.margin + margin.withdrawing + margin.freeze
