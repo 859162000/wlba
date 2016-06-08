@@ -190,8 +190,10 @@ def save_margin_to_redis(sender, **kwargs):
 
     try:
         from wanglibao_p2p.models import P2PEquity
-
-        data = simplejson.loads(redis_obj.get(redis_keys[0]))
+        if redis_keys:
+            data = simplejson.loads(redis_obj.get(redis_keys[0]))
+        else:
+            return
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
                 ]).select_related('product')
@@ -227,7 +229,7 @@ def save_margin_to_redis(sender, **kwargs):
             redis_obj.set(redis_key, simplejson.dumps(data))
 
     except Exception, e:
-        yuelibao_logger.info(u'更新用户 margin 失败: {}, user_id = {}!!!'.format(e.message, user.id))
+        yuelibao_logger.exception(u'更新用户 margin 失败: {}, user_id = {}!!!'.format(e.message, user.id))
         for key in redis_keys:
             redis_obj.delete(key)
 
