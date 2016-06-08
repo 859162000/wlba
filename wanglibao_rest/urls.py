@@ -62,7 +62,7 @@ from weixin.views import P2PListWeixin
 from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, BiSouYiRegisterApi, BiSouYiLoginApi,
                                      BiSouYiRegisterView)
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
-from wanglibao_reward.views import (BaoGeAPIView, XiaoMeiAPIView,ZhongYingAPIView, WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
+from wanglibao_reward.views import (JiaKeAPIView, BaoGeAPIView, XiaoMeiAPIView,ZhongYingAPIView, WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
                                     WeixinActivityAPIView, QMBanquetRewardAPI, HMBanquetRewardAPI,
                                     Lantern_FetchRewardAPI, FetchMarchAwardAPI, XunleiTreasureAPIView,
                                     AprilAwardApi, KongGangAPIView, FetchNewUserReward, ZhaoXiangGuanAPIView,HmdInvestTopRanks)
@@ -300,6 +300,7 @@ urlpatterns += patterns(
     url(r'^activity/xiaomei/$', XiaoMeiAPIView.as_view()),
     url(r'^activity/baobeigezi/$', BaoGeAPIView.as_view()),
     url(r'^activity/hmd_invest_ranks/$', HmdInvestTopRanks.as_view()),
+    url(r'^activity/jiake/$', JiaKeAPIView.as_view()),
 )
 
 # app端改版新接口
