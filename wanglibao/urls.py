@@ -9,12 +9,12 @@ from django.conf import settings
 from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
-    ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView, \
-    Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
+    ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, \
+    MidaiNewView, Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
     YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
     AssignmentBuyFail, GetUnreadMgsNum, YueLiBaoBuyStatus, AssignmentBuyStatus, GetUserUnreadMgsNum, GetRedPacks, \
-    SendRedPacks, GetAPPUser, CheckAppTradePassword, GetAjaxRedPacks, GetIOSRedPacks
+    SendRedPacks, GetAPPUser, CheckAppTradePassword, GetAjaxRedPacks, GetIOSRedPacks, MallProductBuy, GetUserAddress
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
 from wanglibao_banner.views import (HiringView, AboutView, CompanyView, TeamView, MilestoneView,
@@ -197,6 +197,7 @@ urlpatterns += patterns(
     url(r'^php/send_message/inside/$', SendInsideMessage.as_view(), name='php_send_inside_message'),
     url(r'^php/unread_messages/$', GetUnreadMgsNum.as_view(), name='php_unread_messages'),
     url(r'^api/php/unread_messages/$', GetUserUnreadMgsNum.as_view(), name='php_self_unread_messages'),
+    url(r'^api/php/addresses/$', GetUserAddress.as_view(), name='php_self_addresses'),
     # 发送短信, 是否是营销类传参数 ext 分开.
     url(r'^php/send_messages/$', SendMessages.as_view(), name='php_send_messages'),
 
@@ -207,6 +208,7 @@ urlpatterns += patterns(
     url(r'^php/redpacks/ajax/list/$', GetAjaxRedPacks.as_view(), name='php_unused_redpacks_ajax'),
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
+    url(r'^php/mall/buy/$', MallProductBuy.as_view(), name='php_buy_mall_product'),
     url(r'^php/yue/fail/$', YueLiBaoBuyFail.as_view(), name='php_buy_yuelibao_fail'),
     url(r'^php/yue/status/$', YueLiBaoBuyStatus.as_view(), name='php_buy_yuelibao_status'),
     url(r'^php/yue/check/$', YueLiBaoCheck.as_view(), name='php_check_yuelibao'),
