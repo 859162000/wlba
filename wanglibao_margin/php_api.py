@@ -638,10 +638,12 @@ class YueLiBaoRefund(APIView):
 
         args = request.POST.get('args')
         logger.info('in YueLiBaoRefund, args = '.format(args))
+        logger.info('YueLiBaoRefund request data = {}'.format(request.DATA))
 
         try:
             with transaction.atomic(savepoint=True):
                 for arg in eval(args):
+                    logger.info('!@#$%^&* arg = {}'.format(arg))
                     user = User.objects.get(pk=arg['userId'])
 
                     margin_record = MarginRecord.objects.filter(

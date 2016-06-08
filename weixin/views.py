@@ -1282,7 +1282,7 @@ class WeixinAccountHome(TemplateView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger_yuelibao.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         try:
             index_data = get_php_index_data(url, user.id)
