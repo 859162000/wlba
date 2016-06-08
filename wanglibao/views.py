@@ -396,7 +396,8 @@ def landpage_view(request):
 
                     # 如果手机号还未被注册，则引导用户注册，否则，引导用户登录
                     if phone_has_register:
-                        url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
+                        action_uri = 'weixin_login' if is_mobile else 'auth_login'
+                        url = reverse(action_uri) + "?promo_token=" + channel_code + '&next=' + url
                     else:
                         action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
                         url = reverse(action_uri) + "?promo_token=" + channel_code + '&next=' + url

@@ -3,6 +3,7 @@ from decimal import Decimal
 
 import redis
 import simplejson
+import logging
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
@@ -10,6 +11,8 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 from wanglibao import settings
+
+yuelibao_logger = logging.getLogger('wanglibao_margin')
 
 
 class Margin(models.Model):
@@ -197,10 +200,18 @@ def save_margin_to_redis(sender, **kwargs):
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
 
+        unpayed_principle += p2p_equities.aggregate(Sum('unpaid_principal'))['unpaid_principal__sum'] or 0
+
         # 增加从PHP项目来的月利宝待收本金
         # TODO 根据host 确定 url
         from wanglibao_margin.php_utils import get_php_redis_principle
-        php_principle = get_php_redis_principle(user.pk)
+        url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        try:
+            if int(self.request.get_host().split(':')[1]) > 7000:
+                url = settings.PHP_APP_INDEX_DATA_DEV
+        except Exception, e:
+            pass
+        php_principle = get_php_redis_principle(user.pk, url)
         unpayed_principle += php_principle
 
         total_amount = unpayed_principle + margin.margin + margin.withdrawing + margin.freeze
@@ -217,7 +228,7 @@ def save_margin_to_redis(sender, **kwargs):
             redis_obj.set(redis_key, simplejson.dumps(data))
 
     except Exception, e:
-        print e
+        yuelibao_logger.info(u'更新用户 margin 失败: {}, user_id = {}!!!'.format(e.message, user.id))
         for key in redis_keys:
             redis_obj.delete(key)
 

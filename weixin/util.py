@@ -241,7 +241,7 @@ def getAccountInfo(user):
         'p2p_margin': float(p2p_margin),  # P2P余额
         'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest),  # p2p总待收益
         'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
-        'equity_total':equity_total #投资金额
+        'equity_total':equity_total, #投资金额
     }
     return res
 

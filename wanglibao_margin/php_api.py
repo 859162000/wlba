@@ -18,9 +18,10 @@ from wanglibao import settings
 from wanglibao_account.auth_backends import User
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
-from wanglibao_margin.tasks import buy_month_product, assignment_buy
+from wanglibao_margin.tasks import buy_month_product, assignment_buy, buy_mall_product
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
-    calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore, CsrfExemptSessionAuthentication
+    calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore, CsrfExemptSessionAuthentication, \
+    get_addresses, get_mall_locked_amount
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -146,6 +147,37 @@ class GetUserUnreadMgsNum(APIView):
 
         user_id = self.request.user.pk
         ret = get_unread_msgs(user_id)
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class GetUserMallAmount(APIView):
+    """
+    http请求方式: GET  获取到用户在商城的已消费总额。
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        user = self.request.user
+        ret = get_mall_locked_amount(user)
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class GetUserAddress(APIView):
+    """
+    http请求方式: GET  给商城的用户地址。
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        user_id = self.request.user.pk
+        ret = get_addresses(user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -289,9 +321,9 @@ class YueLiBaoBuy(APIView):
         amount_source = request.POST.get('sourceAmount')
         red_packet = request.POST.get('redPacketAmount')
         red_packet_type = request.POST.get('isRedPacket')
-        period = request.POST.get('period') or 0
+        period = request.POST.get('period', 1)
         # 使用的红包id
-        red_packet_id = request.POST.get('RedPacketId') or 0
+        red_packet_id = request.POST.get('RedPacketId', 0)
 
         try:
             user = User.objects.get(pk=user_id)
@@ -315,6 +347,60 @@ class YueLiBaoBuy(APIView):
 
         except Exception, e:
             logger.debug('buy month product failed with {}!\n'.format(e.message))
+            return HttpResponse(renderers.JSONRenderer().render(
+                {'status': '0', 'msg': 'args error! ' + e.message}, 'application/json'))
+
+
+class MallProductBuy(APIView):
+    """
+    http请求方式: POST  保存 商城流水
+    http://xxxxxx.com/php/mall/buy/
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+
+        trade_id = request.POST.get('tradeId')
+        user_id = request.POST.get('userId')
+        product_id = request.POST.get('productId')
+        token = request.POST.get('token', None)
+        amount = request.POST.get('amount', 0)
+        amount_source = request.POST.get('sourceAmount', 0)
+
+        # 给用户的返现金额
+        payback_source = request.POST.get('payBackAmount', 0)
+
+        # 红包金额为-1  用于统计已花本金, 还款忽略, 只改状态.
+        red_packet = -1
+        # 类型, -1 表示未使用红包
+        red_packet_type = -1
+
+        try:
+            user = User.objects.filter(pk=user_id).first()
+            product, status = MonthProduct.objects.get_or_create(
+                user=user,
+                product_id=product_id,
+                trade_id=trade_id,
+                token=token,
+                amount=amount,
+                amount_source=amount_source,
+                red_packet=red_packet,
+                red_packet_type=red_packet_type,
+            )
+            device = utils.split_ua(self.request)
+            logger.info('going to buy_mall_product !!!')
+
+            buy_mall_product.apply_async(kwargs={'token': token, 'amount_source': amount_source,
+                                                 'payback_source': payback_source, 'user': user_id,
+                                                 'device_type': device['device_type']})
+
+            return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
+
+        except Exception, e:
+            logger.debug('buy mall product failed with {}!\n'.format(e.message))
             return HttpResponse(renderers.JSONRenderer().render(
                 {'status': '0', 'msg': 'args error! ' + e.message}, 'application/json'))
 
@@ -421,6 +507,8 @@ class YueLiBaoCheck(APIView):
     @csrf_exempt
     def post(self, request):
 
+        logger.info('in YueLiBaoCheck!!!!!!')
+
         ret = dict()
 
         product_id = request.POST.get('productId')
@@ -432,6 +520,10 @@ class YueLiBaoCheck(APIView):
                     product_id=product_id, cancel_status=False, trade_status='PAID')
 
                 for product in month_products:
+                    if product.red_packet == -1:
+                        product.red_packet = 0
+                        product.save()
+                        continue
                     if product.settle_status:
                         logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
                                     format(product.id), product_id)
