@@ -3,7 +3,6 @@
 
       $('#fullpage').fullpage({
             verticalCentered:false
-
       })
 
 

@@ -280,12 +280,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 }else{
                     $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
                     $('.popup_box').show();
+					$('.popup_box_123').show();
+					
                 }
             }
         })
     })
-
-
 
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
