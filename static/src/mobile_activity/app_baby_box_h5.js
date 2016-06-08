@@ -46,7 +46,6 @@
 		})
 	})
 
-	var this_link = window.location.href;
 	var url_search = window.location.search,promo_token_name='';
 	var searchArray = url_search.substring(1).split("?");
 	for(var i = 0;i < searchArray.length; i++){
@@ -56,10 +55,11 @@
 		}
 	}
 
-
-	alert(promo_token_name);
 	if(!promo_token_name){
-		window.location.href = ''+window.location.href+'?promo_token=bg+'
+		$('.body_wrap').hide();
+		window.location.href = ''+window.location.href+'?promo_token=bg'
+	}else{
+		$('.body_wrap').show();
 	}
 
     $('#take_prize,#take_prize_2').click(function() {
