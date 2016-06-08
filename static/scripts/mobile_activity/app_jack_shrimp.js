@@ -221,6 +221,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 (function(org) {
 
       $('#fullpage').fullpage({
+            verticalCentered:false
 
       })
 
