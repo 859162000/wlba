@@ -240,7 +240,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var host = location.protocol+"//"+location.host,
 			shareName = '网利宝免费萌娃礼 只为爱升温！',
 			shareImg = host + '/static/imgs/mobile_activity/app_baby_box/300*300.jpg',
-			shareLink = host + '/activity/app_baby_box/?promo_token=bg',
+			shareLink = host + '/activity/app_baby_box/h5/?promo_token=bg',
 			shareMainTit = '网利宝免费萌娃礼 只为爱升温！',
 			shareBody = '最好的爱 只为予你';
 		//分享给微信好友
@@ -271,7 +271,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             type: 'post',
             success: function (data) {
                 if(data.ret_code=='1000'){
-                    window.location.href = '/weixin/regist/?promo_token=bg&next=/activity/app_baby_box/?promo_token=bg'
+                    window.location.href = '/weixin/regist/?promo_token=bg&next=/activity/app_baby_box/h5/?promo_token=bg'
                 }else if(data.ret_code=='1002'){
                     window.location.href = '/weixin/list/?promo_token=bg'
                 }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
@@ -284,6 +284,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
         })
     })
+
 
 
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
