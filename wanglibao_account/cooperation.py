@@ -1703,6 +1703,56 @@ class XiaoMeiRegister(CoopRegister):
                 reward.is_used = True
                 reward.save()
 
+class JiaKeRegister(CoopRegister):
+    def __init__(self, request):
+        super(XiaoMeiRegister, self).__init__(request)
+        self.c_code = 'jkdx'
+        self.invite_code = 'jkdx'
+        self.token = 'jkdx'
+        self.request = request
+
+    def purchase_call_back(self, user, order_id):
+        # 判断是否首次投资
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
+        if p2p_record and not is_ylb_frist_p2p and p2p_record.amount >= 5000:
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='夹克的虾兑换码', is_used=False).first()
+                if not reward:
+                    return
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'【网利科技】夹克的虾兑换码:%s' % (reward.content,), ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"夹克的虾兑换码赠送",
+                    "content": u'【网利科技】夹克的虾兑换码:%s' % (reward.content,),
+                    "mtype": "activity"
+                })
+                reward.is_used = True
+                reward.save()
+
+    def purchase_call_back_yuelibao(self, user, order_id):
+        # 判断是否首次投资
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True, is_ylb=True)
+        if p2p_record and is_ylb_frist_p2p and p2p_record.amount >= 5000:
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(type='夹克的虾兑换码', is_used=False).first()
+                if not reward:
+                    return
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'【网利科技】夹克的虾兑换码:%s' % (reward.content,), ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"夹克的虾兑换码赠送",
+                    "content": u'【网利科技】夹克的虾兑换码:%s' % (reward.content,),
+                    "mtype": "activity"
+                })
+                reward.is_used = True
+                reward.save()
+
 
 class ZhongYingRegister(CoopRegister):
 

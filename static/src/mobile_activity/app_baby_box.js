@@ -1,6 +1,24 @@
 
 (function(org) {
 
+
+    var url_search = window.location.search,promo_token_name='';
+	var searchArray = url_search.substring(1).split("?");
+	for(var i = 0;i < searchArray.length; i++){
+		var temp = searchArray[i].split('=');
+		if(temp[0] == 'promo_token'){
+			promo_token_name = temp[1] ? temp[1] : '';
+		}
+	}
+
+	if(!promo_token_name){
+		$('.body_wrap').hide();
+		window.location.href = ''+window.location.href+'?promo_token=bg'
+	}else{
+		$('.body_wrap').show();
+	}
+
+
     $('#take_prize,#take_prize_2').click(function() {
         org.ajax({
             url: '/api/activity/baobeigezi/',
@@ -20,6 +38,7 @@
             }
         })
     })
+
 
 
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
