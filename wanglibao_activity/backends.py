@@ -302,7 +302,6 @@ def _check_rules_trigger_for_ylb(user, rule, trigger_node, device_type, amount, 
     # 首次购买
     if trigger_node == 'first_buy':
         # WanglibaoRewardJoinRecord, 并判断散标和月利宝是不是 已经有了首投.
-        yuelibao_logger.info(u'首次购买 trigger_node == "first_buy"!!!, period = {}'.format(ylb_period))
 
         if rule.is_in_date:
             first_buy, is_ylb_first_p2p = is_first_purchase(
@@ -315,8 +314,6 @@ def _check_rules_trigger_for_ylb(user, rule, trigger_node, device_type, amount, 
             if rule.activity.product_cats == 'all' and not rule.activity.product_ids and _ylb_gift_period(rule, ylb_period):
                 # 符合首投, 而且月利宝的周期符合
                 _check_trade_amount(user, rule, device_type, amount, is_full)
-                if settings.ENV == settings.ENV_DEV:
-                    yuelibao_logger.info(u'月利宝首次购买 trigger_node == "first_buy"!!!, period = {}'.format(ylb_period))
 
     # 购买
     elif trigger_node == 'buy':

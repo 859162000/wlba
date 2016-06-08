@@ -6,6 +6,7 @@ import simplejson
 import logging
 from django.db import models
 from django.db.models.signals import post_save
+from django.db.models import Sum
 from django.contrib.auth.models import User
 
 
@@ -199,8 +200,6 @@ def save_margin_to_redis(sender, **kwargs):
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
-
-        unpayed_principle += p2p_equities.aggregate(Sum('unpaid_principal'))['unpaid_principal__sum'] or 0
 
         # 增加从PHP项目来的月利宝待收本金
         # TODO 根据host 确定 url
