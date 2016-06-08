@@ -10,6 +10,7 @@ import redis
 import requests
 import simplejson
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Sum, Q
 from django.utils import timezone
@@ -373,7 +374,7 @@ class PhpMarginKeeper(MarginKeeper):
                     self.tracer(u"加息券收益", coupon_interest, margin.margin,    # u'月利宝加息存入' ---> u'加息券收益'
                                 description, refund_id, margin_before=margin_before)
 
-            if str(category) == '1':
+            elif str(category) == '1':
                 margin_before = margin.margin
                 margin.margin += principal
                 self.tracer(u'回款本金', principal, margin.margin,
@@ -399,6 +400,8 @@ class PhpMarginKeeper(MarginKeeper):
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
                     self.tracer(u"加息券收益", coupon_interest, margin.margin,
                                 description, refund_id, margin_before=margin_before)
+            else:
+                raise ValidationError(u'请输入正常状态的并入渠道代码')
             margin.save()
 
 
