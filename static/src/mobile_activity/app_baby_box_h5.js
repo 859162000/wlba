@@ -46,6 +46,22 @@
 		})
 	})
 
+	var this_link = window.location.href;
+	var url_search = window.location.search,promo_token_name='';
+	var searchArray = url_search.substring(1).split("?");
+	for(var i = 0;i < searchArray.length; i++){
+		var temp = searchArray[i].split('=');
+		if(temp[0] == 'promo_token'){
+			promo_token_name = temp[1] ? temp[1] : '';
+		}
+	}
+
+
+	alert(promo_token_name);
+	if(!promo_token_name){
+		window.location.href = ''+window.location.href+'?promo_token=bg+'
+	}
+
     $('#take_prize,#take_prize_2').click(function() {
         org.ajax({
             url: '/api/activity/baobeigezi/',
@@ -62,7 +78,7 @@
                     $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
                     $('.popup_box').show();
 					$('.popup_box_123').show();
-					
+
                 }
             }
         })
