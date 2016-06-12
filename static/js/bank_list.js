@@ -89,8 +89,10 @@
                                      +'</dl></div><div data-card="'+ o.card_id +'" class="binding-card">绑定该卡</div></div>';
                             })
                         }
-                        strHtml+='<div id="add-card-button" class="add-bank-card">'
-                               +'<div class="add-icon-large"></div><p class="add-card-text">添加一张银行卡</p></div>';
+                        if(data.cards.length === 0){
+                            strHtml+='<div id="add-card-button" class="add-bank-card">'
+                                   +'<div class="add-icon-large"></div><p class="add-card-text">添加一张银行卡</p></div>';
+                        }
                         $('#bank-List').append(strHtml)
                     }
                 });

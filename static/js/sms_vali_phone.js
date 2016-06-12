@@ -75,7 +75,7 @@
 			time_intervalId;
 
             $.ajax({
-                url: '/api/phone_validation_code/' + phone + '/',
+                url: '/api/phone_sms_validation_code/' + phone + '/',
                 type: 'POST',
                 success: function (xhr) {
 

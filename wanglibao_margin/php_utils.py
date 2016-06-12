@@ -4,10 +4,13 @@ import logging
 from decimal import Decimal
 
 import datetime
+from itertools import product
+
 import redis
 import requests
 import simplejson
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Sum, Q
 from django.utils import timezone
@@ -17,7 +20,7 @@ from user_agents import parse
 
 from marketing.models import IntroducedBy
 from wanglibao import settings
-from wanglibao_account.models import Message
+from wanglibao_account.models import Message, UserAddress
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper, check_amount
 from wanglibao_margin.models import Margin, MarginRecord, MonthProduct, PhpRefundRecord
@@ -25,6 +28,7 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_pay.util import fmt_two_amount
 from wanglibao_redpack.backends import _decide_device, get_start_end_time, REDPACK_RULE, stamp, _calc_deduct
 from wanglibao_redpack.models import PhpIncome, RedPackRecord, RedPackEvent, RedPack
+from wanglibao_activity import backends as activity_backends
 
 logger = logging.getLogger('wanglibao_margin')
 
@@ -271,6 +275,10 @@ class PhpMarginKeeper(MarginKeeper):
             catalog = u'投资'       # u'月利宝交易成功扣款' ----> u'投资'
             record = self.tracer(catalog, amount, margin.margin, description,
                                  freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
+
+            # 满标审核时检测活动规则
+            activity_backends.check_activity(self.user, 'p2p_audit', 'all', 0, 0)
+
             return record
 
     def php_amortize(self, refund_id, user, catalog, amount, description,
@@ -303,6 +311,14 @@ class PhpMarginKeeper(MarginKeeper):
                     return 1
                 except Exception, e:
                     print e
+
+            # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
+            try:
+                activity_backends.check_activity(user, 'repaid', 'pc', amount)
+            except Exception, e:
+                logger.debug("check activity on repaid, user: {}, principal: {}, e = {}".format(
+                    user, amount, e.message
+                ))
 
     def php_amortize_detail(self, category, principal, interest, t0_interest, coupon_interest, platform_interest,
                             refund_id, savepoint=True):
@@ -358,7 +374,7 @@ class PhpMarginKeeper(MarginKeeper):
                     self.tracer(u"加息券收益", coupon_interest, margin.margin,    # u'月利宝加息存入' ---> u'加息券收益'
                                 description, refund_id, margin_before=margin_before)
 
-            if str(category) == '1':
+            elif str(category) == '1':
                 margin_before = margin.margin
                 margin.margin += principal
                 self.tracer(u'回款本金', principal, margin.margin,
@@ -384,6 +400,8 @@ class PhpMarginKeeper(MarginKeeper):
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
                     self.tracer(u"加息券收益", coupon_interest, margin.margin,
                                 description, refund_id, margin_before=margin_before)
+            else:
+                raise ValidationError(u'请输入正常状态的并入渠道代码')
             margin.save()
 
 
@@ -427,7 +445,7 @@ def get_user_info(request, session_id=None, token=None):
             if int(request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         margin_info = get_margin_info(user.id, url)
 
@@ -497,21 +515,20 @@ def get_margin_info(user_id, url=None):
 
 
 def php_commission_exist(product_id):
-    record = PhpIncome.objects.filter(product_id=product_id).first()
-    return record
+    return PhpIncome.objects.filter(product_id=product_id).exists()
+    # return record
 
 
-def php_commission(user, product_id, start, end):
+def php_commission(user, product_id, start):
     """
     月利宝的表存的是php那边的流水.直接从这获取
     :param user:
     :param product_id:
     :param start:
-    :param end:
     :return:
     """
     _amount = MonthProduct.objects.filter(user=user, product_id=product_id, created_at__gt=start,
-                                          created_at__lt=end).aggregate(Sum('amount'))
+                                          cancel_status=False).aggregate(Sum('amount'))
     if _amount['amount__sum']:
         commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
         commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
@@ -525,15 +542,15 @@ def php_commission(user, product_id, start, end):
                                earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
             income.save()
 
-            sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
-            if sec_intro and sec_intro.introduced_by:
-                second = MarginKeeper(sec_intro.introduced_by)
-                second.deposit(commission, description=u'月利宝二级淘金', catalog=u"全民淘金")
-
-                income = PhpIncome(user=sec_intro.introduced_by, invite=user, level=2,
-                                   product_id=product_id, amount=_amount['amount__sum'],
-                                   earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
-                income.save()
+            # sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+            # if sec_intro and sec_intro.introduced_by:
+            #     second = MarginKeeper(sec_intro.introduced_by)
+            #     second.deposit(commission, description=u'月利宝二级淘金', catalog=u"全民淘金")
+            #
+            #     income = PhpIncome(user=sec_intro.introduced_by, invite=user, level=2,
+            #                        product_id=product_id, amount=_amount['amount__sum'],
+            #                        earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
+            #     income.save()
 
 
 def calc_php_commission(product_id):
@@ -546,16 +563,17 @@ def calc_php_commission(product_id):
     if not product_id:
         return
 
-    month_products = MonthProduct.objects.filter(product_id=product_id)
-    users = set([product.user for product in month_products])
     if php_commission_exist(product_id):
         return
 
+    month_products = MonthProduct.objects.filter(product_id=product_id)
+    users = set([product.user for product in month_products])
+
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
+    # end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
     with transaction.atomic():
         for user in users:
-            php_commission(user, product_id, start, end)
+            php_commission(user, product_id, start)
 
 
 def get_php_redis_principle(user_id, url=None):
@@ -606,6 +624,30 @@ def get_php_index_data(url, user_id):
         return {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
 
 
+def get_php_index_data_logout(url):
+    """
+    未登录时候的首页展示信息
+    :param url:       = 'https://' + request.get_host() + settings.PHP_APP_INDEX_DATA
+    :param user_id:
+    :return: {u'code': 1,
+              u'data': [{u'paidIncome': 3607.42, u'unPaidIncome': 3616.43, u'yesterdayIncome': 0}]}
+    """
+    try:
+        response = requests.post(url, data={}, timeout=3).json()
+        try:
+            if response.get('code') == 1:
+                return response.get('data')
+            else:
+                logger.debug('in get_php_index_data, code != 1')
+                return {"repaymentInfoCurrentMonth": 0, "getPaidProject": 0}
+        except Exception, e:
+            logger.debug('in get_php_index_data, error with : {}'.format(e.message))
+            return {"repaymentInfoCurrentMonth": 0, "getPaidProject": 0}
+    except Exception, e:
+        logger.debug('in get_php_index_data, error with : {}'.format(e.message))
+        return {"repaymentInfoCurrentMonth": 0, "getPaidProject": 0}
+
+
 def get_unread_msgs(user_id):
     """
         获取用户的未读站内信数量
@@ -615,7 +657,7 @@ def get_unread_msgs(user_id):
     ret = dict()
     if not user_id:
         return {}
-    if settings.PHP_INSIDE_MESSAGE_SWITCH == 1:
+    if settings.PHP_INSIDE_MESSAGE_LIST_SWITCH == 1:
         try:
             unread_num = Message.objects.filter(target_user=user_id, read_status=False, notice=True).count()
             ret.update(status=1, unread_num=unread_num)
@@ -626,6 +668,53 @@ def get_unread_msgs(user_id):
         res = response.json()
         if res['code'] == 'success':
             ret.update(status=1, unread_num=res['data'])
+
+    return ret
+
+
+def get_addresses(user_id):
+    """
+        获取用户的收货地址
+    :param user_id:
+    :return:
+    """
+    ret = dict()
+    address_list = []
+    if not user_id:
+        ret.update(status=0, msg=u'Unauthorized')
+        return ret
+    try:
+        addresses = UserAddress.objects.filter(user=user_id).order_by('-id')
+        for address in addresses:
+            address_info = {}
+            address_info.update(name=address.name, phone_number=address.phone_number, address=address.address,
+                                is_default=address.is_default, postcode=address.postcode, id=address.id,
+                                province=address.province, city=address.city, area=address.area)
+            address_list.append(address_info)
+
+        ret.update(status=1, addresses=address_list)
+    except Exception, e:
+        ret.update(status=0, msg=str(e))
+
+    return ret
+
+
+def get_mall_locked_amount(user):
+    """
+    获取用户购买商品锁定的金额
+    :param user_id:
+    :return:
+    """
+    ret = dict()
+    if not user:
+        ret.update(status=0, msg=u'Unauthorized')
+        return ret
+    try:
+        amount = MonthProduct.objects.filter(user=user, red_packet=-1).aggregate(Sum('amount'))['amount__sum'] or 0
+
+        ret.update(status=1, amount=amount)
+    except Exception, e:
+        ret.update(status=0, msg=e.message)
 
     return ret
 
@@ -852,4 +941,3 @@ def send_redpacks(event_id, user_ids):
         return {'status': 1, 'msg': 'success!'}
     except Exception, e:
         return {'status': 0, 'msg': 'send red_packs error: {}'.format(str(e))}
-    logger.debug("{} ".format(timezone.now()))

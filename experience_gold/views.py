@@ -3,8 +3,9 @@
 from django.views.generic import TemplateView
 from django.utils import timezone
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
 import re
+import datetime
+from marketing.utils import local_to_utc
 
 from wanglibao_p2p.models import P2PRecord
 
@@ -15,18 +16,20 @@ class ExperienceGoldView(TemplateView):
 
     def get_template_names(self):
         template = self.kwargs['template']
-        if template not in ('mobile', 'gold', 'account', 'nologin', 'redirect'):
-            template_name = "experience_gold.jade"
+        if template not in ('mobile', 'gold', 'account', 'nologin', 'redirect', 'accounts'):
+            template_name = "experience_detail.jade"
         elif template == 'mobile':
-            template_name = 'app_experience.jade'
+            template_name = 'app_experience_detail.jade'
         elif template == 'account' or template == 'nologin':
             template_name = 'experience_account.jade'
+        elif template == 'accounts' or template == 'nologin':
+            template_name = 'experience_account_new.jade'
         elif template == 'redirect':
             template_name = 'experience_redirect.jade'
         else:
-            template_name = "experience_gold.jade"
+            template_name = "experience_detail.jade"
 
-        if template_name == 'experience_gold.jade':
+        if template_name == 'experience_detail.jade':
             device_list = ['android', 'iphone']
             try:
                 user_agent = self.request.META['HTTP_USER_AGENT']
@@ -35,7 +38,7 @@ class ExperienceGoldView(TemplateView):
             for device in device_list:
                 match = re.search(device, user_agent.lower())
                 if match and match.group():
-                    template_name = 'app_experience.jade'
+                    template_name = 'app_experience_detail.jade'
                     break
 
         return template_name
@@ -94,8 +97,58 @@ class ExperienceGoldView(TemplateView):
         return super(ExperienceGoldView, self).dispatch(request, *args, **kwargs)
 
 
-# class ExperienceAccountsView(TemplateView):
-#     template_name = 'experience_account.jade'
-#
-#     def get_context_data(self, **kwargs):
-#         return {}
+class ExperienceDetailView(TemplateView):
+    template_name = 'experience_detail.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        now = timezone.now()
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
+
+        experience_amount = 0
+        experience_amount_default = 28888.00
+        # 体验金可用余额
+        if user.is_authenticated():
+            experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+                .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
+            if experience_record.get('event__amount__sum'):
+                experience_amount = experience_record.get('event__amount__sum')
+        else:
+            experience_amount = experience_amount_default
+
+        return {
+            'product': experience_product,
+            'experience_amount': experience_amount,
+        }
+
+
+class ExperienceAppDetailView(TemplateView):
+    template_name = 'app_experience_detail.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        now = dt = timezone.now()
+        pm_17 = local_to_utc(datetime.datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
+        if now > pm_17:
+            dt = now + datetime.timedelta(days=1)
+        experience_product = ExperienceProduct.objects.filter(isvalid=True).first()
+
+        experience_amount = 0
+        experience_amount_default = 28888.00
+        margin = 0
+        # 体验金可用余额
+        if user.is_authenticated():
+            margin = user.margin.margin
+            experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+                .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
+            if experience_record.get('event__amount__sum'):
+                experience_amount = experience_record.get('event__amount__sum')
+        else:
+            experience_amount = experience_amount_default
+
+        return {
+            'product': experience_product,
+            'experience_amount': experience_amount,
+            'margin': margin,
+            'dt': dt.strftime("%Y-%m-%d"),
+        }

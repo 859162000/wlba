@@ -24,13 +24,15 @@ import re
 import random
 
 
-
 logger = logging.getLogger("weixin")
 
-BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
+BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&" \
+                  "state={state}#wechat_redirect"
 FWH_LOGIN_URL = ""
 FWH_REGISTER_URL = ""
 FWH_UNBIND_URL = ""
+
 
 def get_fwh_login_url(next=None):
     m = Misc.objects.filter(key='weixin_qrcode_info').first()
@@ -48,11 +50,22 @@ def get_fwh_login_url(next=None):
             FWH_LOGIN_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
             global FWH_UNBIND_URL
             FWH_UNBIND_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_unbind_url, state=original_id)
+
             return FWH_LOGIN_URL
 
 
 if not FWH_LOGIN_URL:
     get_fwh_login_url()
+
+
+def get_weixin_code_url(url):
+    m = Misc.objects.filter(key='weixin_qrcode_info').first()
+    if m and m.value:
+        info = json.loads(m.value)
+        if isinstance(info, dict) and info.get("fwh"):
+            original_id = info.get("fwh")
+            account = WeixinAccounts.getByOriginalId(original_id)
+            return BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=urllib.quote(url), state=original_id)
 
 
 def redirectToJumpPage(message, next=None):
@@ -133,7 +146,7 @@ def _process_scene_record(w_user, scene_str):
     sr.create_time = int(time.time())
     sr.save()
 
-def bindUser(w_user, user):
+def bindUser(w_user, user, new_registed=False):
     is_first_bind = False
     if w_user.user:
         if w_user.user.id==user.id:
@@ -156,6 +169,7 @@ def bindUser(w_user, user):
     bind_ok.apply_async(kwargs={
         "openid": w_user.openid,
         "is_first_bind":is_first_bind,
+        "new_registed":new_registed,
     },
                         queue='celery01'
                         )
@@ -166,6 +180,13 @@ def unbindUser(w_user, user):
     w_user.unbind_time=int(time.time())
     w_user.save()
     _process_record(w_user, user, 'unbind', "解除绑定")
+
+from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_invite.models import InviteRelation
+def createInvite(friend_phone, user):
+    profile = WanglibaoUserProfile.objects.filter(phone=friend_phone).first()
+    if profile.user != user:
+        InviteRelation.objects.get_or_create(user=user, inviter=profile.user)
 
 def getAccountInfo(user):
 
@@ -201,7 +222,7 @@ def getAccountInfo(user):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         php_principle = get_php_redis_principle(user.pk, url)
         p2p_unpayed_principle += php_principle
@@ -220,7 +241,7 @@ def getAccountInfo(user):
         'p2p_margin': float(p2p_margin),  # P2P余额
         'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest),  # p2p总待收益
         'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
-        'equity_total':equity_total #投资金额
+        'equity_total':equity_total, #投资金额
     }
     return res
 

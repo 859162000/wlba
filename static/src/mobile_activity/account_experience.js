@@ -1,6 +1,6 @@
 org.ui = (function(){
     var lib = {
-        _alert: function(txt, callback,difference){
+        _alert: function(txt, callback,difference, tag){
             var alertFram = '';
             if(document.getElementById("alert-cont")){
                 document.getElementById("alert-cont").innerHTML = '';
@@ -19,14 +19,19 @@ org.ui = (function(){
                 strHtml = "<div id='alertTxt' class='popub-txt investWin'><p><img src='/static/imgs/mobile_activity/app_experience/right.png'/></p>";
                 strHtml+="<p class='successFonts'>恭喜您投资成功！</p><p>到期后体验金自动收回</p><p>收益自动发放</p></div>";
             }else if(difference == 4){
+                if(tag == 'goRecharge'){
+                    var btnTxt = '去充值',recharge = 'goRecharge',closeBtns = '<div class="close-red"></div>';
+                }else{
+                    var btnTxt = '知道了',recharge = '',closeBtns = '';
+                }
                 strHtml ="<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_center'>"+ txt +"</p>";
-                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo_new.png'/></p><p class='popub-footer'><div class='close_btn "+ recharge +"'>"+ btnTxt +"！</div></p>"+ closeBtns +"</div>";
             }
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
             document.body.appendChild(shield);
 
-            $('.close_btn').on('click',function(){
+            $('.close_btn,.close-red').on('click',function(){
                 alertFram.style.display = "none";
                 shield.style.display = "none";
                 callback && callback();
@@ -93,7 +98,7 @@ org.experience = (function (org) {
                             url += "?1";
                             self.location.replace(url);
                         }
-                        org.experience.init()
+                        org.experience.init();
                     }
                 })
             }
@@ -103,13 +108,13 @@ org.experience = (function (org) {
                     mixins.loginApp({refresh:1, url:''});
                 } else {
                     login = true;
-                    connect(data)
+                    connect(data);
                 }
             })
 
         },
         other: function(){
-            org.experience.init()
+            org.experience.init();
         }
     })
 })(org);

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 import logging
+import urllib2
 
 import requests
 import simplejson
 from django.contrib.auth.models import User
 from django.db import transaction
 
+from marketing import tools
 from order.utils import OrderHelper
 from wanglibao import settings
 from wanglibao.celery import app
+from wanglibao_account.cooperation import CoopRegister, XiaoMeiRegister, ZhongYingRegister
 
 from wanglibao_margin.models import MonthProduct, AssignmentOfClaims
 from wanglibao_margin.php_utils import PhpMarginKeeper, php_redpack_consume
@@ -26,7 +29,7 @@ def save_to_sqs(url, data):
 
 
 @app.task
-def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=None, device_type=None):
+def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=None, device=None, period=0):
     """
     对这个购买的月利宝记录进行扣款冻结操作.
     :param token: month_product's unique token.
@@ -60,22 +63,44 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                                token=token,
                                msg='success')
 
+                    user = User.objects.filter(pk=user).first()
+
                     # 如果使用红包的话, 增加红包使用记录
                     if red_packet_id and int(red_packet_id) > 0:
-                        logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
+                        logger.info('buy_month_product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
                         redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
-                        user = User.objects.filter(pk=user).first()
                         redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
                                                                    product_id=product.product_id, status=u'新建').id
-                        result = php_redpack_consume(red_packet_id, amount_source, user, product.id, device_type, product.product_id)
+                        result = php_redpack_consume(red_packet_id, amount_source, user, product.id,
+                                                     device['device_type'], product.product_id)
                         if result['ret_code'] != 0:
                             raise Exception, result['message']
                         if result['rtype'] != 'interest_coupon':
-                            red_record = buyer_keeper.redpack_deposit(result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
-                                                                      order_id=redpack_order_id, savepoint=False)
+                            red_record = buyer_keeper.redpack_deposit(
+                                    result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
+                                    order_id=redpack_order_id, savepoint=False)
+
+                    try:
+                        tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
+                                                               "device": device, "order_id": product.id,
+                                                               "product_id": product.id, "is_full": False,
+                                                               "product_balance_after": 0, "ylb_period": int(period)},
+                                                       queue='celery_ylb')
+
+                    except Exception, e:
+                        logger.debug('tools.decide_first.apply_async failed with = {} !!!'.format(e.message))
+
+                    # 模拟一个request
+                    request = urllib2.Request("")
+                    try:
+                        logger.info(u"=遍历渠道= CoopRegister.process_for_purchase : {}, {}".
+                                     format(user, product.id))
+                        CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
+                    except Exception, e:
+                        logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
 
             except Exception, e:
-                logger.debug('buy month product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
+                logger.debug('buy_month_product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
                 product.trade_status = 'FAILED'
                 product.save()
                 ret.update(status=0,
@@ -91,10 +116,75 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
     request_url = settings.PHP_SQS_HOST
     res = save_to_sqs(request_url, args)
 
-    logger.info('in buy month product, token = {}, freeze = {}'.format(token, product.amount_source))
+    logger.info('in buy_month_product, token = {}, freeze = {}'.format(token, product.amount_source))
     logger.info('save to sqs! args = {}, return = {}'.format(args, res))
 
-    print res.text
+
+@app.task
+def buy_mall_product(token=None, amount_source=None, payback_source=None, user=None, device_type=None):
+    """
+    购买商品, 扣除商品价格,然后返现.
+    (是否对账, 返回给他之后)
+    :param token: month_product's unique token.
+    ###  :param product: pass a month_product object error!
+    amount_source: 购买的总金额
+    ###### 以下  如果是 amount 是 优惠后的金额
+    :return:
+    """
+    product = MonthProduct.objects.filter(token=token).first()
+    logger.debug('in buy_mall_product, token = {}'.format(token))
+
+    if not product:
+        return
+
+    ret = dict()
+
+    if product.trade_status != 'NEW':
+        ret.update(status=1,
+                   token=product.token,
+                   msg='already saved!')
+    else:
+        # 未被取消的订单才可以扣款
+        if not product.cancel_status:
+            # 状态成功, 对买家扣款, 加入冻结资金
+            try:
+                with transaction.atomic(savepoint=True):
+                    buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
+                    # 直接扣款
+                    # margin_process(self, user, status, amount, description=u'', catalog=u'', savepoint=True)
+                    buyer_keeper.margin_process(product.user, -1, amount_source,
+                                                description=u'商城购买直接扣款', catalog=u'商城扣款')
+                    # 扣完返现
+                    buyer_keeper.margin_process(product.user, 0, payback_source,
+                                                description=u'商城购买返现', catalog=u'商城返现')
+
+                    # 更新交易状态
+                    product.trade_status = 'PAID'
+                    product.save()
+                    ret.update(status=1,
+                               token=token,
+                               msg='success')
+
+            except Exception, e:
+                logger.debug('buy_mall_product failed with exception: {}'.format(e.message))
+                product.trade_status = 'FAILED'
+                product.save()
+                ret.update(status=0,
+                           token=product.token,
+                           msg='pay failed!' + e.message)
+
+    # 写入 sqs
+    args_data = dict()
+    args_data.update(tag='purchaseYueLiBao')
+    args_data.update(data=ret)
+
+    args = simplejson.dumps(args_data)
+    request_url = settings.PHP_SQS_HOST
+    res = save_to_sqs(request_url, args)
+
+    logger.info('in buy_mall_product, token = {}, amount = {}, payback = '
+                .format(token, product.amount_source, payback_source))
+    logger.info('save to sqs! args = {}, return = {}'.format(args, res))
 
 
 @app.task

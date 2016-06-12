@@ -4,7 +4,9 @@ import logging
 import urlparse
 from django.conf import settings
 from wanglibao_account.cooperation import CoopRegister
+
 from .utils import sign_login
+from wanglibao_invite.invite_common import ShareInviteRegister
 
 logger = logging.getLogger("marketing")
 
@@ -19,6 +21,7 @@ class PromotionTokenMiddleWare(object):
             sign_login(request)
 
         CoopRegister(request).all_processors_for_session()
+        ShareInviteRegister(request).save_to_session()
 
 
 class StatsKeyWordMiddleWare(object):

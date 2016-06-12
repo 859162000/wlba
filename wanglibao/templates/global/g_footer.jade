@@ -38,7 +38,8 @@
         .footer-ex-warp
           .footer-ex
             .footer-kefu
-              a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", target='_blank').ft-kefu-text 在线客服
+              a.ft-kefu-text#kefu_link 在线客服
+              //a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", target='_blank').ft-kefu-text#kefu_link_old 在线客服
             .ft-kefu-worktime 工作时间 9:00 - 20:00（法定节假日除外）
             .ft-kefu-phone-txt 客服服务热线：
             .ft-kefu-phone 4008-588-066
@@ -60,9 +61,19 @@
         span.kx-verify-warp
           span#kx-mask
           span#kx_verify
-          script.
+  .popup_box
+    .main
+        .textairport
+        .popup_button 请先登录
+    .popup_bg
 
+          script.
             (function (){var _kxs = document.createElement('script');_kxs.id = 'kx_script';_kxs.async = true;_kxs.setAttribute('cid', 'kx_verify');_kxs.src = ('https:' == document.location.protocol ? 'https://ss.knet.cn' : 'http://rr.knet.cn')+'/static/js/icon3.js?sn=e151125110108615827egl000000&tp=icon3';_kxs.setAttribute('size', 0);var _kx = document.getElementById('kx_verify');_kx.parentNode.insertBefore(_kxs, _kx);})();
             document.getElementById('kx-mask').onclick = function(){
               document.getElementById("kx_verify_link").click()
             };
+          script(src='/static/src/pc/lib/require.js')
+          script.
+            require(['/static/src/pc/footer_kefu.js?v=2015060303'])
+          //在线客服启动
+

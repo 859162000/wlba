@@ -45,10 +45,12 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
 
 
     //倒计时
-    var
-        time = $('.recommend_time').attr('data-update'),
-        endTime = new Date(time.replace(/-/g, "/"));
-    $('.recommend_time').countdown(endTime);
+    if($('.recommend_time').lenght > 0) {
+        var
+            time = $('.recommend_time').attr('data-update'),
+            endTime = new Date(time.replace(/-/g, "/"));
+        $('.recommend_time').countdown(endTime);
+    }
 
     //nav fixed
     var $nav = $('.g-nav-warp');
@@ -119,30 +121,14 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
         }, 200);
     });
 
-    //
+
     //$('.bonus-icon').on('click', function () {
     //    $('.bonus-img,.page').show();
     //});
     //$('.close').on('click', function () {
-    //    $('.bonus-img,.page').hide();
+    //    $('.bonus-img,.page,.wdty').hide();
     //});
-    //
-    //function wxShareIcon() {
-    //    var docleft = document.body.clientWidth;
-    //    var left = (docleft - $('.bonus-icon').width());
-    //    $('.bonus-icon').css({'left': left});
-    //}
-    //
-    ////wxShareIcon()
-    //window.onresize = function () {
-    //    wxShareIcon();
-    //};
-
-
-    //$('.bonus-icon').on('click', function () {
-    //    $('.bonus-img,.page').show();
-    //});
-    //
+    ////
     //function wxShareIcon() {
     //    var docleft = document.body.clientWidth;
     //    var left = (docleft - $('.bonus-icon').width());
@@ -153,6 +139,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function ($) {
     //window.onresize = function () {
     //    wxShareIcon();
     //};
+
     //page
     var leftV = 60, index0 = 0, index1 = 0, index2 = 0, index = 0;
     $.each($('.project-box-c'),function(i,o){

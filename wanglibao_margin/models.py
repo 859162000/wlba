@@ -3,13 +3,17 @@ from decimal import Decimal
 
 import redis
 import simplejson
+import logging
 from django.db import models
 from django.db.models.signals import post_save
+from django.db.models import Sum
 from django.contrib.auth.models import User
 
 
 # Create your models here.
 from wanglibao import settings
+
+yuelibao_logger = logging.getLogger('wanglibao_margin')
 
 
 class Margin(models.Model):
@@ -186,8 +190,10 @@ def save_margin_to_redis(sender, **kwargs):
 
     try:
         from wanglibao_p2p.models import P2PEquity
-
-        data = simplejson.loads(redis_obj.get(redis_keys[0]))
+        if redis_keys:
+            data = simplejson.loads(redis_obj.get(redis_keys[0]))
+        else:
+            return
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
                 ]).select_related('product')
@@ -198,7 +204,7 @@ def save_margin_to_redis(sender, **kwargs):
                 unpayed_principle += equity.unpaid_principal  # 待收本金
 
         # 增加从PHP项目来的月利宝待收本金
-        # TODO 根据host 确定 url
+        # TODO 根据host 确定 url, 怎么获取 request?
         from wanglibao_margin.php_utils import get_php_redis_principle
         php_principle = get_php_redis_principle(user.pk)
         unpayed_principle += php_principle
@@ -217,7 +223,7 @@ def save_margin_to_redis(sender, **kwargs):
             redis_obj.set(redis_key, simplejson.dumps(data))
 
     except Exception, e:
-        print e
+        yuelibao_logger.exception(u'更新用户 margin 失败: {}, user_id = {}!!!'.format(e.message, user.id))
         for key in redis_keys:
             redis_obj.delete(key)
 

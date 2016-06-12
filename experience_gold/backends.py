@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # encoding:utf-8
-
 import time
 import logging
 import decimal
@@ -16,8 +15,12 @@ from wanglibao_rest.utils import split_ua, decide_device
 from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortization, ExperienceEvent, \
     ExperiencePurchaseLockRecord
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-# from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
+from order.utils import OrderHelper
+from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_margin.models import MarginRecord
+from marketing.utils import local_to_utc
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +39,8 @@ class ExperienceBuyAPIView(APIView):
     def post(self, request):
         user = request.user
         now = timezone.now()
+        start_dt = local_to_utc(datetime(2016, 6, 7), 'min')
+        user_joined = user.date_joined  # 用户注册时间
         device = split_ua(request)
         device_type = decide_device(device['device_type'])
         purchase_code = 'experience_purchase'
@@ -45,6 +50,7 @@ class ExperienceBuyAPIView(APIView):
             return Response({'ret_code': 30001, 'message': u'体验标有误,请重试'})
 
         total_amount = 0
+        total_amount_tmp = 0
 
         # 查询用户符合条件的理财金记录
         with transaction.atomic(savepoint=True):
@@ -68,6 +74,20 @@ class ExperienceBuyAPIView(APIView):
 
             records_ids = ''
             if experience_record:
+                catalog = u'购买体验标'
+
+                for i in experience_record:
+                    total_amount_tmp += i.event.amount
+
+                buy_p2p = P2PRecord.objects.filter(user_id=user.id).exists()
+                buy_count = MarginRecord.objects.filter(user_id=user.id, catalog=catalog).count()
+                if not buy_p2p:
+                    if user_joined > start_dt:
+                        # 如果查询到已经购买过至少 1 次体验标,则不再检测账户余额
+                        if buy_count == 0:
+                            if total_amount_tmp >= 28888 and user.margin.margin < 1:
+                                return Response({'ret_code': 30009, 'message': u'账户余额不足,请先充值'})
+
                 for record in experience_record:
                     event = record.event
                     total_amount += event.amount
@@ -97,6 +117,15 @@ class ExperienceBuyAPIView(APIView):
                     amortization.term_date = term[6] - timedelta(days=1)
 
                     amortization.save()
+
+                # 从账户中扣除 1 元 (没有购买过体验标的情况)
+                if not buy_p2p:
+                    if user_joined > start_dt:
+                        if total_amount >= 28888 and buy_count == 0:
+                            amount = 1.00
+                            order_id = OrderHelper.place_order(user, order_type=catalog, status=u'新建').id
+                            margin_keeper = MarginKeeper(user=user, order_id=order_id)
+                            margin_keeper.reduce_margin_common(amount, catalog=catalog, description=catalog)
 
                 # 更新当前的一组流水id
                 purchase_lock_record.purchase_times += 1

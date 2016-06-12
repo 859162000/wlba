@@ -1,0 +1,128 @@
+//-load formatters
+doctype html
+html.service-redpacket-bg1
+  head
+    title 红包花雨季
+    meta(charset="utf-8")
+    meta(name="format-detection" content="telephone=no,email=no")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    script.
+      (function () {
+        var b = navigator.userAgent;
+        ipad = b.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
+        iphone = !ipad && b.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
+        uc = navigator.userAgent.indexOf("UCBrowser") > -1 ? true : false;
+        ios = ipad || iphone;
+        var d = 1, a = 1, c;
+        if (ios) {
+          if (window.devicePixelRatio >= 2) {
+            d *= 1;
+            a *= 1
+          }
+        } else {
+          if (uc) {
+            if (window.devicePixelRatio >= 2) {
+              d *= 1;
+              a *= 1
+            }
+          }
+        }
+        c = '<meta name="viewport" content="initial-scale=' + d + ", maximum-scale=" + d + ", minimum-scale=" + d + ', width=device-width, user-scalable=no" />';
+        document.write(c);
+        document.documentElement.style.fontSize = 20 * a + "px"
+      })();
+    link(href="/static/styles/sub_weixin/sub_weixin.css?v=20160402902", rel="stylesheet")
+
+    - csrf_token
+  body.service-redpack-activity
+    input(type="hidden", name='is_bind', class='is_bind', value='{{ is_bind }}')
+    input(type="hidden", name='fphone', class='fphone', value='{{ fphone|safe }}')
+    input(type="hidden", name='original_id', class='original_id', value='{{ original_id }}')
+    input(type="hidden", name='weixin_channel_code', class='weixin_channel_code', value='{{ weixin_channel_code }}')
+    input(type="hidden", name='share_url', class="share_url", value="{{ share_url }}")
+    .top-tit
+      .top-photo
+        if inviter_head_url
+          imgUrl = inviter_head_url
+        else
+          imgUrl = "/static/imgs/sub_weixin/redpack_activity/iconfont_popup.png"
+        img(src="{{ imgUrl }}")
+      .top-tit 红包雨天天下 接多少看自己
+    if fetched
+      if is_bind
+        .redpacket-money
+          .redpacket.redpacket-get
+            .cloud-top
+            .cloud-btm
+            .main-box
+              //（您于x月x日获得）
+              .price-b-tit 恭喜您获得
+              .price-box.js-reward-price {{ reward_text }}
+              .price-tit 现金红包
+              .share-promote 分享给好友，可以获得更多奖励
+              .price-btn.js-share-btn.mt70 分享给好友
+          .redpacket-get-list
+            .list-box
+              .list-box-item
+                .list-item
+                  span.l-tit 注册邀请：
+                  span.b-tit <span class="bb-tit">{{ friend_num }}<span>人
+                .list-item
+                  span.l-tit 获得体验金：
+                  span.b-tit.y-color <span class="bb-tit">{{ invite_experience_amount }}<span>元
+          section.redpacket-share-alt
+            img(src="/static/imgs/sub_weixin/redpack_activity/share_sign.png",style="width: 8rem;").share-sign
+      else
+        .redpacket.redpacket-code
+          .cloud-top
+          .cloud-btm
+          .main-box
+            //（您于x月x日获得）
+            if fetched_date
+              .price-b-tit 您于{{ fetched_date }}获得
+            else
+              .price-b-tit 恭喜您获得
+            .price-box.js-reward-price {{ reward_text }}
+            .price-tit 现金红包
+            .share-promote 长按二维码，每天领取现金红包
+            .price-code.mt20
+              img(src="/static/imgs/sub_weixin/redpack_activity/loader.gif").js-share-sign
+    else
+      if fetched_date
+        .redpacket.redpacket-code
+          .cloud-top
+          .cloud-btm
+          .main-box
+            //（您于x月x日获得）
+            .price-b-tit 您于{{ fetched_date }}获得
+            .price-box.js-reward-price {{ reward_text }}
+            .price-tit 现金红包
+            .share-promote 长按二维码，每天领取现金红包
+            .price-code.mt20
+              img(src="/static/imgs/sub_weixin/redpack_activity/loader.gif").js-share-sign
+      else
+        .redpacket.redpacket-index
+          .cloud-top
+          .cloud-btm
+          .main-box
+            .price-box 1~10000元
+            .price-tit 现金红包
+            .price-btn.js-open-redpacket 打开红包雨
+
+    .activity-rule
+      .rule-tit 活动规则
+      .rule-list
+        p 1.参与网利红包花雨季活动，即可每日领取奖励，奖励内容随机；
+        p 2.每个微信号、每个手机号每天只能领取一次奖励；
+        p 3.微信号开奖时：
+        p.txt-indent (1).若已绑定网利宝服务号，则奖励发放到对应手机号；
+        p.txt-indent (2).若对应的绑定手机号当日已领奖，则该微信号当日所开奖励无效。
+        p 4.邀请好友参与活动，还能获得额外奖励：
+        p.txt-indent (1).邀请注册奖励：成功邀请一名注册用户，邀请人即可获得体验金奖励，每人可获邀请体验金奖励封顶20万；
+        p.txt-indent (2).邀请投资奖励：邀请用户成功投资后，邀请人即可获得现金红包奖励。
+        p 5.建议通过网利宝服务号内的分享链接才能获得邀请奖励，在网利宝服务号外进行分享可能无法得到邀请奖励；
+        p 6.参与本活动，则不共享全民淘金对应奖励；
+        p 7.活动最终解释权，归网利宝所有。
+    script(src='/static/src/subMobile/lib/weixin/jweixin-1.0.0.js')
+    script(data-init='redpacket', src="/static/scripts/subMobile/mobile.js?20160429")

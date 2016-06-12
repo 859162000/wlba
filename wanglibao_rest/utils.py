@@ -19,7 +19,10 @@ from django.contrib.auth import authenticate
 from marketing.models import IntroducedBy
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao.const import ErrorNumber
+from wanglibao_account.models import VerifyCounter
 
+from django.db.models import F
 
 logger = logging.getLogger(__name__)
 
@@ -334,3 +337,37 @@ def process_bajinshe_user_exists(user, introduce_by, phone, sign_is_ok):
     response_data['usn'] = phone
 
     return response_data
+
+
+def id_validate(user, name, id_number):
+    profile = WanglibaoUserProfile.objects.filter(user=user).first()
+    if profile.id_is_valid:
+        return {"ret_code": 30055, "error_number": ErrorNumber.try_too_many_times, "message": u"您已认证通过，无需再认证，请重新登录查看最新状态"}
+
+    verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
+
+    if verify_counter.count >= 3:
+        return {"ret_code": 30052, "error_number": ErrorNumber.try_too_many_times, "message": u"验证错误次数频繁，请联系客服 4008-588-066"}
+
+    id_verify_count = WanglibaoUserProfile.objects.filter(id_number=id_number).count()
+    if id_verify_count >= 1:
+        return {"ret_code": 30053, "error_number": ErrorNumber.id_verify_times_error, "message": u"该身份证已在网利宝实名认证，请尝试其他身份证或联系客服 4008-588-066"}
+    try:
+        from wanglibao_account.utils import verify_id
+        verify_record, error = verify_id(name, id_number, user=user)
+    except:
+        logger.exception("id_validate raise error: %s"%traceback.format_exc())
+        return {"ret_code": 30054, "error_number": ErrorNumber.unknown_error, "message": u"验证失败，请重试或联系客服 4008-588-066"}
+
+    verify_counter.count = F('count') + 1
+    verify_counter.save()
+
+    if error or not verify_record or not verify_record.is_valid:
+        return {"ret_code": 30054, "error_number": ErrorNumber.unknown_error, "message": u"验证失败，请重试或联系客服 4008-588-066"}
+
+    user.wanglibaouserprofile.id_number = id_number
+    user.wanglibaouserprofile.name = name
+    user.wanglibaouserprofile.id_is_valid = True
+    user.wanglibaouserprofile.id_valid_time = timezone.now()
+    user.wanglibaouserprofile.save()
+    return {"ret_code": 0, "message": u"验证成功"}

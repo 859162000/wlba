@@ -47,16 +47,22 @@ def detect(request):
 
 def _deposit_record(user, pagesize, pagenum):
     res = []
-    records = PayInfo.objects.filter(user=user, type="D").select_related('user__margin')\
-                     .exclude(status=PayInfo.PROCESSING)[(pagenum-1)*pagesize:pagenum*pagesize]
+    records = PayInfo.objects.filter(user=user, type="D").\
+            select_related('user__margin').select_related('margin_record')\
+            [(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
+        if x.margin_record and x.status == PayInfo.SUCCESS:
+                balance = x.margin_record.margin_current
+        else:
+            balance = ''
         obj = {
             "id": x.id,
             "amount": x.amount,
             "created_at": util.fmt_dt_normal(util.local_datetime(x.create_time)),
             "status": x.status,
             "channel": "APP",
-            "balance": x.user.margin.margin
+            "balance": balance,
+            "error_message": x.error_message,
         }
         if x.channel and x.channel == "huifu":
             obj['channel'] = "PC"
@@ -77,6 +83,7 @@ def _withdraw_record(user, pagesize, pagenum, app_version):
             "amount": x.total_amount,
             "created_at": util.fmt_dt_normal(util.local_datetime(x.create_time)),
             "status": x.status,
+            "error_message": x.error_message,
             "confirm_time": util.fmt_dt_normal(x.confirm_time),
             "card_no": x.card_no,
             "fee": fee,

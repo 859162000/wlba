@@ -5,22 +5,16 @@ from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
-# from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
-    # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
-    ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView, \
-    Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
-from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
-from wanglibao_cash.views import CashHomeView, CashDetailView
-from wanglibao_fund.views import FundDetailView, FundProductsView
+    ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, \
+    MidaiNewView, Rong360P2PListView, Rong360TokenView, XiguaP2PListView, XiguaP2PQueryView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
     YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
     AssignmentBuyFail, GetUnreadMgsNum, YueLiBaoBuyStatus, AssignmentBuyStatus, GetUserUnreadMgsNum, GetRedPacks, \
-    SendRedPacks, GetAPPUser, CheckAppTradePassword, GetAjaxRedPacks, GetIOSRedPacks
-from wanglibao_portfolio.views import PortfolioHomeView
+    SendRedPacks, GetAPPUser, CheckAppTradePassword, GetAjaxRedPacks, GetIOSRedPacks, MallProductBuy, GetUserAddress
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
 from wanglibao_banner.views import (HiringView, AboutView, CompanyView, TeamView, MilestoneView,
@@ -43,12 +37,12 @@ urlpatterns = patterns(
     url(r'^pc_guide/', TemplateView.as_view(template_name="pc_guide.jade")),
     url(r'^favicon.ico', RedirectView.as_view(url="/static/favicon.ico")),
 
-    url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
+    # url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
 
-    url(r'^trust/', include('trust.urls')),
-    url(r'^financing/home/', FinancingHomeView.as_view(), name="financing_home"),
-    url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
-    url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
+    # url(r'^trust/', include('trust.urls')),
+    # url(r'^financing/home/', FinancingHomeView.as_view(), name="financing_home"),
+    # url(r'^financing/products/', FinancingProductsView.as_view(), name="financing_products"),
+    # url(r'^financing/detail/(?P<id>\w+)', FinancingDetailView.as_view(), name="financing_detail"),
 
     # Comment by hb on 2016-04-25
     #url(r'^fund/products/', FundProductsView.as_view(), name="fund_home"),
@@ -62,7 +56,7 @@ urlpatterns = patterns(
 
     url(r'^products/', TemplateView.as_view(template_name="products_search.jade"), name="products_search"),
 
-    url(r'^docs/', include('rest_framework_swagger.urls')),
+    # url(r'^docs/', include('rest_framework_swagger.urls')),
     url(r'^api/', include('wanglibao_rest.urls')),
     url(r'^help/', include('wanglibao_help.urls')),
     url(r'^mobile/', include('wanglibao_mobile.urls')),
@@ -71,9 +65,9 @@ urlpatterns = patterns(
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
-    url(r'^shumi/', include('shumi_backend.urls')),
+    # url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
-    url(r'app/', include('wanglibao_app.urls')),
+    url(r'^app/', include('wanglibao_app.urls')),
 
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', HiringView.as_view(), name="hiring"),
@@ -86,7 +80,7 @@ urlpatterns = patterns(
     url(r'^milestone/', MilestoneView.as_view(), name="milestone"),
     url(r'^responsibility/', ResponsibilityView.as_view(), name="responsibility"),
     url(r'^contact_us/', ContactView.as_view(), name="contact_us"),
-    url(r'^directorate/', DirectorateView.as_view(), name="directorate"),
+    # url(r'^directorate/', DirectorateView.as_view(), name="directorate"),
     url(r'^news/list', NewsListView.as_view(), name="news_list"),
     url(r'^news/detail/(?P<id>\d+)', NewsDetailView.as_view(), name="news_detail"),
     # url(r'^newbie/', TemplateView.as_view(template_name="newbie.jade")),
@@ -201,6 +195,7 @@ urlpatterns += patterns(
     url(r'^php/send_message/inside/$', SendInsideMessage.as_view(), name='php_send_inside_message'),
     url(r'^php/unread_messages/$', GetUnreadMgsNum.as_view(), name='php_unread_messages'),
     url(r'^api/php/unread_messages/$', GetUserUnreadMgsNum.as_view(), name='php_self_unread_messages'),
+    url(r'^api/php/addresses/$', GetUserAddress.as_view(), name='php_self_addresses'),
     # 发送短信, 是否是营销类传参数 ext 分开.
     url(r'^php/send_messages/$', SendMessages.as_view(), name='php_send_messages'),
 
@@ -211,6 +206,7 @@ urlpatterns += patterns(
     url(r'^php/redpacks/ajax/list/$', GetAjaxRedPacks.as_view(), name='php_unused_redpacks_ajax'),
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
+    url(r'^php/mall/buy/$', MallProductBuy.as_view(), name='php_buy_mall_product'),
     url(r'^php/yue/fail/$', YueLiBaoBuyFail.as_view(), name='php_buy_yuelibao_fail'),
     url(r'^php/yue/status/$', YueLiBaoBuyStatus.as_view(), name='php_buy_yuelibao_status'),
     url(r'^php/yue/check/$', YueLiBaoCheck.as_view(), name='php_check_yuelibao'),

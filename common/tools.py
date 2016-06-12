@@ -151,3 +151,11 @@ def get_utc_timestamp(time_obj=now()):
     utc_time = time_obj.strftime(time_format)
     utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
     return utc_timestamp
+
+
+def atr_to_atr_for_obj(atr_map, obj):
+    for src_atr_key, dst_atr_key in atr_map:
+        src_atr = getattr(obj, src_atr_key)
+        setattr(obj, dst_atr_key, src_atr)
+
+    return obj

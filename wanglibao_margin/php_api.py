@@ -13,12 +13,15 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from marketing import tools
 from wanglibao import settings
 from wanglibao_account.auth_backends import User
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
-from wanglibao_margin.tasks import buy_month_product, assignment_buy
+from wanglibao_margin.tasks import buy_month_product, assignment_buy, buy_mall_product
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
-    calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore, CsrfExemptSessionAuthentication
+    calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore, CsrfExemptSessionAuthentication, \
+    get_addresses, get_mall_locked_amount
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -108,7 +111,7 @@ class GetMarginInfo(APIView):
             if int(self.request.get_host().split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
-            logger.info(u'不是开发环境 = {}'.format(e.message))
+            pass
 
         margin = get_margin_info(user_id, url)
 
@@ -144,6 +147,37 @@ class GetUserUnreadMgsNum(APIView):
 
         user_id = self.request.user.pk
         ret = get_unread_msgs(user_id)
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class GetUserMallAmount(APIView):
+    """
+    http请求方式: GET  获取到用户在商城的已消费总额。
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        user = self.request.user
+        ret = get_mall_locked_amount(user)
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class GetUserAddress(APIView):
+    """
+    http请求方式: GET  给商城的用户地址。
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        user_id = self.request.user.pk
+        ret = get_addresses(user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
@@ -258,9 +292,6 @@ class CheckAppTradePassword(PHPDecryptParmsAPIView):
     def post(self, request):
         trade_password = self.params.get('trade_pwd', "").strip()
         user_id = self.request.POST.get('user_id', "").strip()
-        logger.info('post uid = {}, password = {}'.format(user_id, self.request.POST.get('password')))
-        logger.info("in class CheckAppTradePassword, self.params = {}, trade_password = {}\n"
-                    .format(self.params, trade_password))
         try:
             ret = trade_pwd_check(int(user_id), trade_password)
         except Exception, e:
@@ -290,8 +321,9 @@ class YueLiBaoBuy(APIView):
         amount_source = request.POST.get('sourceAmount')
         red_packet = request.POST.get('redPacketAmount')
         red_packet_type = request.POST.get('isRedPacket')
+        period = request.POST.get('period', 1)
         # 使用的红包id
-        red_packet_id = request.POST.get('RedPacketId') or 0
+        red_packet_id = request.POST.get('RedPacketId', 0)
 
         try:
             user = User.objects.get(pk=user_id)
@@ -309,12 +341,66 @@ class YueLiBaoBuy(APIView):
 
             buy_month_product.apply_async(kwargs={'token': token, 'red_packet_id': red_packet_id,
                                                   'amount_source': amount_source, 'user': user_id,
-                                                  'device_type': device['device_type']})
+                                                  'device': device, 'period': period}, queue='celery_ylb')
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
         except Exception, e:
             logger.debug('buy month product failed with {}!\n'.format(e.message))
+            return HttpResponse(renderers.JSONRenderer().render(
+                {'status': '0', 'msg': 'args error! ' + e.message}, 'application/json'))
+
+
+class MallProductBuy(APIView):
+    """
+    http请求方式: POST  保存 商城流水
+    http://xxxxxx.com/php/mall/buy/
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+
+        trade_id = request.POST.get('tradeId')
+        user_id = request.POST.get('userId')
+        product_id = request.POST.get('productId')
+        token = request.POST.get('token', None)
+        amount = request.POST.get('amount', 0)
+        amount_source = request.POST.get('sourceAmount', 0)
+
+        # 给用户的返现金额
+        payback_source = request.POST.get('payBackAmount', 0)
+
+        # 红包金额为-1  用于统计已花本金, 还款忽略, 只改状态.
+        red_packet = -1
+        # 类型, -1 表示未使用红包
+        red_packet_type = -1
+
+        try:
+            user = User.objects.filter(pk=user_id).first()
+            product, status = MonthProduct.objects.get_or_create(
+                user=user,
+                product_id=product_id,
+                trade_id=trade_id,
+                token=token,
+                amount=amount,
+                amount_source=amount_source,
+                red_packet=red_packet,
+                red_packet_type=red_packet_type,
+            )
+            device = utils.split_ua(self.request)
+            logger.info('going to buy_mall_product !!!')
+
+            buy_mall_product.apply_async(kwargs={'token': token, 'amount_source': amount_source,
+                                                 'payback_source': payback_source, 'user': user_id,
+                                                 'device_type': device['device_type']})
+
+            return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
+
+        except Exception, e:
+            logger.debug('buy mall product failed with {}!\n'.format(e.message))
             return HttpResponse(renderers.JSONRenderer().render(
                 {'status': '0', 'msg': 'args error! ' + e.message}, 'application/json'))
 
@@ -374,7 +460,7 @@ class YueLiBaoBuyFail(APIView):
             ret.update(status=1,
                        msg='success')
         except Exception, e:
-            logger.debug('call fail API failed with : {}\n'.format(e.message))
+            logger.debug('in YueLiBaoBuyFail, failed with : {}\n'.format(e.message))
             ret.update(status=0,
                        msg=e.message)
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
@@ -406,7 +492,6 @@ class YueLiBaoBuyStatus(APIView):
         else:
             ret.update(status=0,
                        msg='pay failed!')
-        logger.info('check yuelibao bought status: {}\n'.format(ret['msg']))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -422,11 +507,12 @@ class YueLiBaoCheck(APIView):
     @csrf_exempt
     def post(self, request):
 
+        logger.info('in YueLiBaoCheck!!!!!!')
+
         ret = dict()
 
         product_id = request.POST.get('productId')
         period = int(request.POST.get('period'))
-        logger.info('in YueLiBaoCheck, product_id = {}, period = {}'.format(product_id, period))
 
         try:
             with transaction.atomic(savepoint=True):
@@ -434,6 +520,10 @@ class YueLiBaoCheck(APIView):
                     product_id=product_id, cancel_status=False, trade_status='PAID')
 
                 for product in month_products:
+                    if product.red_packet == -1:
+                        product.red_packet = 0
+                        product.save()
+                        continue
                     if product.settle_status:
                         logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
                                     format(product.id), product_id)
@@ -457,7 +547,6 @@ class YueLiBaoCheck(APIView):
             logger.debug(u'月利宝id: {} 满标审核失败: {}\n'.format(product_id, e.message))
             ret.update(status=0,
                        msg=e.message)
-        logger.info('ret = {}'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -548,7 +637,7 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
-        logger.info('in refund, args = '.format(args))
+        logger.info('in YueLiBaoRefund request data = {}'.format(request.DATA))
 
         try:
             with transaction.atomic(savepoint=True):
@@ -643,7 +732,7 @@ class AssignmentOfClaimsBuy(APIView):
             )
 
             assignment_buy.apply_async(
-                kwargs={'buyer_token': buyer_token, 'seller_token': seller_token})
+                kwargs={'buyer_token': buyer_token, 'seller_token': seller_token}, queue='celery_ylb')
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
@@ -755,8 +844,6 @@ class GetRedPacks(APIView):
         if request.user.id:
             uid = request.user.id
 
-        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
-
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
         if period and uid:
@@ -796,8 +883,6 @@ class GetIOSRedPacks(APIView):
 
         if request.user.id:
             uid = request.user.id
-
-        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
@@ -839,8 +924,6 @@ class GetAjaxRedPacks(APIView):
 
         if request.user.id:
             uid = request.user.id
-
-        logger.info('get user redpacks, with args: period = {}, uid = {}'.format(period, uid))
 
         # if self.request.user.pk and int(self.request.user.pk) == int(uid):
         # 去掉登录验证, 方便PHP
