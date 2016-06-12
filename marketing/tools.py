@@ -377,15 +377,24 @@ def calc_broker_commission(product_id):
     _period = product.period
     if _method.startswith(u"日计息") and _period <= 61 or _period <=2:
         return
-    if redpack_backends.commission_exist(product):
-        return
+
+    # Modify by hb on 2016-06-12
+    #if redpack_backends.commission_exist(product):
+    #    return
 
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    # end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
-    with transaction.atomic():
-        for equity in product.equities.all():
-            redpack_backends.commission(equity.user, product, equity.equity, start)
+    end = timezone.datetime(2016, 7, 31, 15, 59, 59, tzinfo=timezone.utc)
 
+    # Modify by hb on 2016-06-12
+    #with transaction.atomic():
+    #    for equity in product.equities.all():
+    #        redpack_backends.commission(equity.user, product, equity.equity, start)
+    for equity in product.equities.all():
+        first_msg, sec_msg = redpack_backends.commission_one(equity.user, product, equity.equity, start, end)
+        if first_msg:
+           logger.info('=calc_broker_commission= : [%s]' % (first_msg))
+        if sec_msg:
+           logger.info('=calc_broker_commission= : [%s]' % (sec_msg))
 
 @app.task
 def send_income_message_sms():
