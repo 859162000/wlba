@@ -154,6 +154,9 @@ class Income(models.Model):
     paid = models.BooleanField(verbose_name=u'已打款', default=False)
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
 
+    # Add by hb on 20-16-06-12
+    class Meta:
+        unique_together = (("user", "invite", "product"),)  # 联合唯一索引
 
 # 新平台佣金单独处理
 class PhpIncome(models.Model):
