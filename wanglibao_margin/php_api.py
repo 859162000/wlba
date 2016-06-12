@@ -637,7 +637,7 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
-        logger.info('in YueLiBaoRefund, args = '.format(args))
+        logger.info('in YueLiBaoRefund request data = {}'.format(request.DATA))
 
         try:
             with transaction.atomic(savepoint=True):

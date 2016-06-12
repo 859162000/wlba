@@ -135,6 +135,7 @@ class AppActivate(models.Model):
     img_four = models.ImageField(u'小图片2', upload_to='activity', blank=True,  default='',
                                  help_text=u'IOS：3.5，图片名称只允许字母数字下划线组成，ios使用')
     last_updated = models.DateTimeField(u'更新时间', auto_now=True, help_text=u'上次更新时间')
+    priority = models.IntegerField(u'优先级', blank=True, default=0, help_text=u'越大越优先')
     is_long_used = models.BooleanField(u'长期生效', default=True,
                                        help_text=u'默认纪录长期有效，如果【不勾选】此项，则需要配置生效时间和失效时间')
     start_at = models.DateTimeField(u"banner生效时间", null=True, blank=True)

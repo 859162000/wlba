@@ -10,6 +10,7 @@ import redis
 import requests
 import simplejson
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Sum, Q
 from django.utils import timezone
@@ -373,7 +374,7 @@ class PhpMarginKeeper(MarginKeeper):
                     self.tracer(u"加息券收益", coupon_interest, margin.margin,    # u'月利宝加息存入' ---> u'加息券收益'
                                 description, refund_id, margin_before=margin_before)
 
-            if str(category) == '1':
+            elif str(category) == '1':
                 margin_before = margin.margin
                 margin.margin += principal
                 self.tracer(u'回款本金', principal, margin.margin,
@@ -399,6 +400,8 @@ class PhpMarginKeeper(MarginKeeper):
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
                     self.tracer(u"加息券收益", coupon_interest, margin.margin,
                                 description, refund_id, margin_before=margin_before)
+            else:
+                raise ValidationError(u'请输入正常状态的并入渠道代码')
             margin.save()
 
 
@@ -549,6 +552,61 @@ def php_commission(user, product_id, start):
             #                        earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
             #     income.save()
 
+# Add by hb on 2016-06-12
+def php_commission_one(user, product_id, start, end):
+    """
+    计算全民佣金,千三,取消第二级
+    :param user:
+    :param product:
+    :param equity:
+    :param start:
+    """
+    first_msg = u''
+    sec_msg = u''
+
+    _amount = MonthProduct.objects.filter(user=user, product_id=product_id, created_at__gt=start, created_at__lt=end, cancel_status=False).aggregate(Sum('amount'))
+    if _amount['amount__sum'] and _amount['amount__sum'] > 0:
+        commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
+        commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+        first_intro = IntroducedBy.objects.filter(user=user).first()
+        if first_intro and first_intro.introduced_by:
+            first_msg = php_commission_one_pay_one(first_intro.introduced_by, user, product_id, 1, _amount['amount__sum'], commission)
+
+            # 二级关系佣金计算中止时间：
+            sec_intro_end_time = timezone.datetime(2016, 6, 7, 15, 59, 59, tzinfo=timezone.utc)
+            if first_intro.created_at >= sec_intro_end_time :
+                sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by, user, first_intro.created_at)
+            else:
+                sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+                if sec_intro and sec_intro.introduced_by:
+                    sec_msg = php_commission_one_pay_one(sec_intro.introduced_by, user, product_id, 2, _amount['amount__sum'], commission)
+
+    return first_msg, sec_msg
+
+# Add by hb on 2016-06-12
+def php_commission_one_pay_one(user, invite, product_id, level, amount, earning):
+    try:
+        with transaction.atomic():
+            income, create_flag = PhpIncome.objects.get_or_create(user=user, invite=invite, product_id=product_id,
+                defaluts={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
+            income = PhpIncome.objects.select_for_update().get(income.id)
+            if not income.paid :
+                margin = MarginKeeper(user)
+                if level==1:
+                    desc = u'月利宝一级淘金'
+                elif level==2:
+                    desc = u'月利宝二级淘金'
+                else:
+                    desc = u'月利宝淘金'
+                margin.deposit(earning, description=desc, catalog=u"全民淘金")
+
+                income.order_id = margin.order_id
+                income.paid = True
+                income.save()
+        return u'[%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s, Success' % (user, invite, product_id, level, amount, earning)
+    except Exception, ex:
+        return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user, invite, product_id, ex.message)
+
 
 def calc_php_commission(product_id):
     """
@@ -560,18 +618,26 @@ def calc_php_commission(product_id):
     if not product_id:
         return
 
-    if php_commission_exist(product_id):
-        return
+    # Modify by hb on 2016-06-12
+    # if php_commission_exist(product_id):
+    #     return
 
     month_products = MonthProduct.objects.filter(product_id=product_id)
     users = set([product.user for product in month_products])
 
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    # end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
-    with transaction.atomic():
-        for user in users:
-            php_commission(user, product_id, start)
+    end = timezone.datetime(2016, 7, 31, 15, 59, 59, tzinfo=timezone.utc)
 
+    # Modify by hb on 2016-06-12
+    # with transaction.atomic():
+    #     for user in users:
+    #         php_commission(user, product_id, start)
+    for user in users:
+        first_msg, sec_msg = php_commission_one(user, product_id, start, end)
+    if first_msg:
+        logger.info('=calc_broker_commission= : [%s]' % (first_msg))
+    if sec_msg:
+        logger.info('=calc_broker_commission= : [%s]' % (sec_msg))
 
 def get_php_redis_principle(user_id, url=None):
     """

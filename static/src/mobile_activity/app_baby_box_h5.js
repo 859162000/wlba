@@ -33,7 +33,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝免费萌娃礼 只为爱升温！”',
+			title: '网利宝免费萌娃礼 只为爱升温！',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -54,6 +54,7 @@
 			promo_token_name = temp[1] ? temp[1] : '';
 		}
 	}
+
 
 	if(!promo_token_name){
 		$('.body_wrap').hide();
@@ -87,6 +88,9 @@
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
     });
+	$('.popup_box .popup_button,.popup_box .close_popup').click(function(){
+        $('.popup_box').hide();
+    });js
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
         var curHeight = ele.height();

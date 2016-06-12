@@ -1,12 +1,32 @@
 .clear
   clear: both
   width: 100%
+@-webkit-keyframes rotation_music
+  0%
+    -webkit-transfrom: rotate(0deg)
+
+
+  50%
+    -webkit-transform: rotate(180deg)
+
+
+  100%
+    -webkit-transform: rotate(360deg)
+@keyframes rotation_music
+  0%
+    transfrom: rotate(0deg)
+  50%
+    transform: rotate(180deg)
+
+  100%
+    transform: rotate(360deg)
+
 .body_wrap
   font-size: 0
   width: 100%
   overflow: hidden
   position: relative
-  .music
+  .play_music
     position: fixed
     width: 0.875rem
     height: 0.875rem
@@ -18,6 +38,30 @@
     z-index: 2
     background: url("/static/imgs/mobile_activity/app_jack_shrimp/music.png") no-repeat
     background-size: 100% 100%
+    -webkit-animation-name: rotation_music
+    animation-name: rotation_music
+    -webkit-animation-duration: 3s
+    animation-duration: 3s
+    -webkit-animation-timing-function: linear
+    animation-timing-function: linear
+    -webkit-animation-fill-mode: both
+    animation-fill-mode: both
+    -webkit-animation-iteration-count: infinite
+    animation-iteration-count: infinite
+
+  .close_music
+    position: fixed
+    width: 0.875rem
+    height: 0.875rem
+
+    display: block
+    right: 4.4%
+    top: 4.1%
+
+    z-index: 2
+    background: url("/static/imgs/mobile_activity/app_jack_shrimp/music_close.png") no-repeat
+    background-size: 100% 100%
+
   .down
     width: 6.6%
     display: block
@@ -54,13 +98,10 @@
         font-weight: 100
         span
           color: #E80000
-
       .line
         width: 50%
         margin: 0.2rem auto
-
         display: block
-
 
   .section_2
     width: 100%
@@ -137,10 +178,15 @@
     .dl_wrap
       display: block
       margin-left: 17.7%
-      padding-top: 1.2rem
+      padding-top: 1.7rem
 
       width: 82.3%
       font-size: 0
+      @media screen and (max-device-height: 600px)
+        padding-top: 1.2rem
+      @media screen and (max-height: 600px)
+        padding-top: 1.2rem
+
       @media screen and (max-device-height: 490px)
         padding-top: 0.7rem
       @media screen and (max-height: 490px)
@@ -261,9 +307,9 @@
       width: 86.6%
       margin: 0 auto
       display: block
-      @media screen and (max-device-height: 490px)
+      @media screen and (max-device-height: 600px)
         padding: 1.15rem 0 0.7rem
-      @media screen and (max-height: 490px)
+      @media screen and (max-height: 600px)
         padding: 1.15rem 0 0.7rem
 
 
@@ -272,10 +318,10 @@
         font-size: 0.7rem
         line-height: 1.15rem
         max-height: 9999rem
-        @media screen and (max-device-height: 490px)
+        @media screen and (max-device-height: 600px)
           font-size: 0.55rem
           line-height: 0.85rem
-        @media screen and (max-height: 490px)
+        @media screen and (max-height: 600px)
           font-size: 0.55rem
           line-height: 0.85rem
         span
@@ -290,18 +336,16 @@
           border-radius: 0.35rem
           margin-left: 0.3rem
           height: 1.15rem
-          @media screen and (max-device-height: 490px)
+          @media screen and (max-device-height: 600px)
             font-size: 0.55rem
             line-height: 0.85rem
             height: 0.85rem
             background-position: 4.5rem center
-          @media screen and (max-height: 490px)
+          @media screen and (max-height: 600px)
             font-size: 0.55rem
             line-height: 0.85rem
             height: 0.85rem
             background-position: 4.5rem center
-
-
     .get_now
       border: 2px #fff solid
       border-radius: 0.35rem
@@ -312,20 +356,136 @@
       margin: 0 auto
       color: #fff
       text-align: center
-  .popup_wrap
-    width: 86.6%
-    margin: 0 auto
-    display: block
-    padding: 2.25rem 0.875rem 1.75rem
-    border: 1px #fff solid
-    border-radius: 0.5rem
+  .popup_wrap,.popup_box
     position: fixed
+    width: 86.6%
     left: 6.7%
     top: 3.5rem
     z-index: 9
-    height: 30rem
-    background: #000
+    display: none
 
+    .main
+      width: 100%
+      margin: 0 auto
+      display: block
+      padding: 2.25rem 0.875rem 1.75rem
+      border: 1px #fff solid
+      border-radius: 0.5rem
+      position: relative
+      left: 0
+      top: 0
+
+      z-index: 9
+      background: #000
+      @media screen and (max-device-height: 490px)
+        padding: 1.25rem 0.475rem 0.75rem
+      @media screen and (max-height: 490px)
+        padding: 1.25rem 0.475rem 0.75rem
+      .close_popup
+        position: absolute
+        right: -0.775rem
+        top: 0
+        z-index: 10
+        margin: -0.775rem 0 0 0
+        @media screen and (max-device-height: 490px)
+          margin: -0.6rem 0 0 0
+          right: -0.6rem
+          width: 1.2rem
+          height: 1.2rem
+        @media screen and (max-height: 490px)
+          margin: -0.6rem 0 0 0
+          right: -0.6rem
+          width: 1.2rem
+          height: 1.2rem
+
+
+      .title_red
+        color: #fff
+        background: #EA2F31
+        border-radius: 0.35rem
+        height: 1.2rem
+        line-height: 1.2rem
+        display: block
+        margin: 0 auto
+        font-size: 0.75rem
+        width: 53%
+        text-align: center
+
+
+      .rule_wrap
+        width: 100%
+        display: block
+        padding-top: 1.75rem
+        @media screen and (max-device-height: 490px)
+          padding-top: 0.75rem
+        @media screen and (max-height: 490px)
+          padding-top: 0.75rem
+        p
+          width: 100%
+          font-size: 0.7rem
+          line-height: 1.25rem
+          color: #fff
+          @media screen and (max-device-height: 490px)
+            font-size: 0.65rem
+            line-height: 1.15rem
+          @media screen and (max-height: 490px)
+            font-size: 0.65rem
+            line-height: 1.15rem
+      .textairport
+        width: 100%
+        display: block
+        font-size: 0.7rem
+        line-height: 1.25rem
+        color: #fff
+        padding-bottom: 1rem
+        text-align: center
+
+        @media screen and (max-device-height: 490px)
+          font-size: 0.65rem
+          line-height: 1.15rem
+        @media screen and (max-height: 490px)
+          font-size: 0.65rem
+          line-height: 1.15rem
+
+      .popup_button
+        margin: 0 auto
+        width: 53%
+        height: 1.25rem
+        line-height: 1.25rem
+        text-align: center
+        display: block
+        background: #e80000
+        border-radius: 0.5rem
+        color: #fff
+        font-size: 0.6rem
+  .popup_box
+    position: fixed
+    width: 100%
+    left: 0
+    top: 0
+    z-index: 9
+    display: none
+    background: rgba(0,0,0,0.8)
+    height: 100%
+    .main
+      width: 86.6%
+      margin: -5.4rem auto 0
+
+      display: block
+      padding: 2.25rem 0.875rem 1.75rem
+      border: 1px #fff solid
+      border-radius: 0.5rem
+      position: absolute
+
+      left: 6.7%
+      top: 50%
+
+      z-index: 9
+      background: #000
+      @media screen and (max-device-height: 490px)
+        padding: 1.25rem 0.475rem 0.75rem
+      @media screen and (max-height: 490px)
+        padding: 1.25rem 0.475rem 0.75rem
 
 
 
