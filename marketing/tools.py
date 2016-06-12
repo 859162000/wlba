@@ -390,7 +390,11 @@ def calc_broker_commission(product_id):
     #    for equity in product.equities.all():
     #        redpack_backends.commission(equity.user, product, equity.equity, start)
     for equity in product.equities.all():
-        redpack_backends.commission_one(equity.user, product, equity.equity, start, end)
+        first_msg, sec_msg = redpack_backends.commission_one(equity.user, product, equity.equity, start, end)
+        if first_msg:
+           logger.info('=calc_broker_commission= : [%s]' % (first_msg))
+        if sec_msg:
+           logger.info('=calc_broker_commission= : [%s]' % (sec_msg))
 
 @app.task
 def send_income_message_sms():
