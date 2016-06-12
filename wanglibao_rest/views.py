@@ -21,7 +21,7 @@ from wanglibao_account.cooperation import CoopRegister, RenRenLiCallback, CoopLa
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_oauth2.models import Client
 from wanglibao_oauth2.utils import get_access_token_for_phone, generate_oauth_login_sign
-from .forms import CoopDataDispatchForm
+from .forms import CoopDataDispatchForm, AccessUserExistsForm
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -394,7 +394,7 @@ class CoopLandpageApi(APIView):
             if access_token:
                 user_id = access_token.user.id
                 timestamp = get_utc_timestamp(access_token.expires)
-                login_sign = generate_oauth_login_sign(user_id, timestamp)
+                login_sign = generate_oauth_login_sign(timestamp)
                 redirect_params['uid'] = user_id
                 redirect_params['timestamp'] = timestamp
                 redirect_params['sign'] = login_sign
@@ -407,7 +407,7 @@ class CoopLandpageApi(APIView):
         channel_code = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
         if channel_code:
             redirect_params[settings.PROMO_TOKEN_QUERY_STRING] = channel_code
-            internal_params_data = CoopLandProcessor(request).process_for_request_params_map()
+            internal_params_data, _ = CoopLandProcessor(request).process_for_request_params_map()
             request_action = request.GET.get('action', None)
             if request_action:
                 action_land_processor = getattr(self, 'process_%s_land' % request_action.lower(), None)
@@ -427,3 +427,23 @@ class CoopLandpageApi(APIView):
 
     def get(self, request):
         return self.get_response(request)
+
+
+class AccessUserExistsApi(APIView):
+    """第三方手机号注册及绑定状态检测接口"""
+
+    permission_classes = ()
+
+    def post(self, request):
+        internal_params_data, joined_sign_params = CoopLandProcessor(request).process_for_request_params_map()
+        form = AccessUserExistsForm(internal_params_data)
+        if form.is_valid():
+            if form.check_sign(joined_sign_params):
+                pass
+
+# class CoopRegisterApi(APIView):
+#     """渠道用户注册接口"""
+#     permission_classes = ()
+#
+#     def post(self, request):
+

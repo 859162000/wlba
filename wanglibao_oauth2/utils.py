@@ -54,7 +54,7 @@ def get_access_token_for_phone(token, phone):
     return access_token
 
 
-def generate_oauth_login_sign(user_id, timestamp):
+def generate_oauth_login_sign(timestamp):
     key = settings.BASE_OAUTH_KEY
-    sign = hashlib.md5(str(user_id) + str(timestamp) + key).hexdigest()
+    sign = hashlib.md5(str(timestamp) + key).hexdigest()
     return sign

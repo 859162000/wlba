@@ -1,6 +1,5 @@
 # coding=utf-8
 
-from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -19,7 +18,6 @@ class Channels(models.Model):
     )
 
     _CLASS = (
-        ('----', '----'),
         ('CPC', u'CPC-按点击计费'),
         ('CPD', u'CPD-按天计费'),
         ('CPT', u'CPT-按时间计费'),
@@ -52,7 +50,7 @@ class Channels(models.Model):
     platform = models.CharField(u'渠道平台', max_length=20, default="full", choices=_FROM)
 
     coop_status = models.IntegerField(u'合作状态', max_length=2, default=0, choices=_STATUS)
-    classification = models.CharField(u'渠道结算分类', max_length=20, default="----", choices=_CLASS)
+    classification = models.CharField(u'渠道结算分类', max_length=20,  default=None, null=True, blank=True, choices=_CLASS)
     merge_code = models.CharField(u'并入渠道代码', blank=True, null=True, max_length=12)
     start_at = models.DateTimeField(u'合作开始时间', blank=True, null=True, help_text=u'*可为空')
     end_at = models.DateTimeField(u'合作结束时间', blank=True, null=True, help_text=u'*可为空')

@@ -1,15 +1,14 @@
 # encoding:utf-8
 
-import json
 import hashlib
-from django import forms
-from common.tools import Aes, detect_identifier_type
-from wanglibao import settings
+from common import forms
+from common.utils import check_sign_for_coop
+from common.forms import Form, ValidationError
 from marketing.utils import get_channel_record
 from wanglibao_oauth2.models import Client
 
 
-class CoopDataDispatchForm(forms.Form):
+class CoopDataDispatchForm(Form):
     channel = forms.CharField(error_messages={
         'required': u'数据来源是必须的',
     })
@@ -29,7 +28,7 @@ class CoopDataDispatchForm(forms.Form):
         if channel in ('base', 'yuelibao'):
             return channel
         else:
-            raise forms.ValidationError(
+            raise ValidationError(
                 message=u'无效数据来源',
                 code=10005,
             )
@@ -54,7 +53,7 @@ class CoopDataDispatchForm(forms.Form):
             return False
 
 
-class AccessUserExistsForm(forms.Form):
+class AccessUserExistsForm(Form):
     channel_code = forms.CharField(error_messages={'required': u'渠道码是必须的'})
     sign = forms.CharField(error_messages={'required': u'签名是必须的'})
     client_id = forms.CharField(error_messages={'required': u'客户端id是必须的'})
@@ -62,10 +61,11 @@ class AccessUserExistsForm(forms.Form):
 
     def clean_channel_code(self):
         channel_code = self.cleaned_data['channel_code']
-        if get_channel_record(channel_code):
-            return channel_code
+        channel = get_channel_record(channel_code)
+        if channel:
+            return channel
         else:
-            raise forms.ValidationError(
+            raise ValidationError(
                 message=u'无效渠道码',
                 code=10021,
             )
@@ -75,7 +75,7 @@ class AccessUserExistsForm(forms.Form):
         try:
             client = Client.objects.get(client_id=client_id)
         except Client.DoesNotExist:
-            raise forms.ValidationError(
+            raise ValidationError(
                 code=10022,
                 message=u'无效客户端id'
             )
@@ -85,24 +85,71 @@ class AccessUserExistsForm(forms.Form):
     def clean_phone(self):
         phone = self.cleaned_data['phone']
         if len(phone) != 11:
-            raise forms.ValidationError(
+            raise ValidationError(
                 code=10023,
                 message=u'无效手机号'
             )
         else:
             return phone
 
-    def bajinshe_sign_check(self):
+    def check_sign(self, joined_sign_params):
         sign = self.cleaned_data['sign']
-        phone = self.cleaned_data['phone']
-        client = self.cleaned_data['client_id']
-        client_id = client.client_id
-        client_secret = client.client_secret
+        channel = self.cleaned_data.get('channel', None)
+        if channel and channel.sign_format:
+            if check_sign_for_coop(sign, channel.sign_format, joined_sign_params):
+                return True
 
-        local_sign = hashlib.md5('-'.join([str(client_id), str(phone), client_secret])).hexdigest()
-        if local_sign == sign:
-            sign_is_ok = True
-        else:
-            sign_is_ok = False
+        return False
 
-        return sign_is_ok
+
+# class CoopRegisterForm(Form):
+#     channel_code = forms.CharField(max_length=30, error_messages={'required': u'promo_token参数是必须的'})
+#     client_id = forms.CharField(max_length=50, error_messages={'required': u'client参数是必须的'})
+#     sign = forms.CharField(max_length=50, error_messages={'required': u'sign参数是必须的'})
+#     phone = forms.CharField(max_length=11, error_messages={'required': u'phone参数是必须的'})
+#
+#     def clean_channel_code(self):
+#         channel_code = self.cleaned_data['channel_code']
+#         if not get_channel_record(channel_code):
+#             raise ValidationError(
+#                 message=u'无效渠道码',
+#                 code=10002,
+#             )
+#
+#         return channel_code
+#
+#     def clean_phone(self):
+#         phone = self.cleaned_data.get('phone', '').strip()
+#         if detect_identifier_type(phone) == 'phone':
+#             if User.objects.filter(wanglibaouserprofile__phone=phone).exists():
+#                 raise ValidationError(
+#                     message=(u'该手机号已经注册'),
+#                     code=10004,
+#                 )
+#         else:
+#             raise forms.ValidationError(
+#                 message=u'无效手机号',
+#                 code=10005,
+#             )
+#
+#         return phone
+#
+#     def renrenli_sign_check(self, coop_key):
+#         client_id = self.cleaned_data['client_id']
+#         phone = self.cleaned_data['phone']
+#         sign = self.cleaned_data['sign']
+#         local_sign = hashlib.md5(str(client_id)+str(phone)+str(coop_key)).hexdigest()
+#         if sign == local_sign:
+#             return True
+#         else:
+#             return False
+#
+#     def bajinshe_sign_check(self, coop_key):
+#         client_id = self.cleaned_data['client_id']
+#         phone = self.cleaned_data['phone']
+#         sign = self.cleaned_data['sign']
+#         local_sign = generate_bajinshe_sign(client_id, phone, coop_key)
+#         if sign == local_sign:
+#             return True
+#         else:
+#             return False

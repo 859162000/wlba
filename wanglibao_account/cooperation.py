@@ -1132,6 +1132,7 @@ class CoopLandProcessor(CoopProcessorBase):
         """
         处理所有第三方着陆，注册页跳转
         """
+        self.internal_params_data[self.internal_channel_key] = self.c_code
         channel_params = self.channel.all_params.filter(is_abandoned=False).order_by('level', 'get_from')
         for params in channel_params:
             params_value = self.get_params_value(params)
@@ -1153,7 +1154,7 @@ class CoopLandProcessor(CoopProcessorBase):
         else:
             logger.info("process_for_land not found channel matched for channel_code[%s]" % self.c_code)
 
-        return self.internal_params_data
+        return self.internal_params_data, self.joined_sign_params
 
 
 # class BaJinSheLand(CoopLandProcessor):
