@@ -89,8 +89,13 @@ class AppActivateScoreImageAPIView(APIView):
             device_type = 'act_score_iso'
 
         size = self.SIZE_MAP[size]
+        activate_query = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]))
+        activate = activate_query.filter(Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())).order_by('-priority').first()
+        if not activate:
+            activate = activate_query.filter(Q(is_long_used=True)).order_by('-priority').first()
 
-        activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
+        # activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
+
         if activate:
             if size == 'img_one':
                 img_url = activate.img_one
@@ -139,8 +144,12 @@ class AppActivateImageAPIView(APIView):
             if device_type == 'android': device_type = 'act_android'
 
         size = self.SIZE_MAP[size]
+        activate_query = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]))
+        activate = activate_query.filter(Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())).order_by('-priority').first()
+        if not activate:
+            activate = activate_query.filter(Q(is_long_used=True)).order_by('-priority').first()
 
-        activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
+        # activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
         if activate:
             if size == 'img_one':
                 img_url = activate.img_one
