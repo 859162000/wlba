@@ -14,6 +14,10 @@ class PromotionTokenMiddleWare(object):
         token = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
         if token:
             request.session[settings.PROMO_TOKEN_QUERY_STRING] = token
+
+            # add by chenweibin@20160608
+            sign_login(request)
+
         CoopRegister(request).all_processors_for_session()
 
 
@@ -83,15 +87,3 @@ class StatsKeyWordMiddleWare(object):
                         request.session['promo_source_website'] = self.statics[website]['website']
             except Exception, reason:
                 logger.debug(u"SEM关键词统计，中间件报异常, reason:%s" % reason)
-
-
-class CoopLoginForSignMiddleWare(object):
-    def process_request(self, request):
-        token = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
-        if token:
-            sign = request.GET.get('sign', None)
-            user_id = request.GET.get('uid', None)
-            timestamp = request.GET.get('timestamp', None)
-
-            if sign and user_id and timestamp:
-                sign_login(request, sign, user_id, timestamp)

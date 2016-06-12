@@ -6,7 +6,7 @@ from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, TimelySiteData
-from marketing.utils import pc_data_generator, utype_is_mobile
+from marketing.utils import pc_data_generator
 from misc.views import MiscRecommendProduction
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_margin.php_utils import get_php_redis_principle
@@ -18,10 +18,8 @@ from wanglibao_p2p.models import P2PEquity
 from django.core.urlresolvers import reverse
 import re
 from wanglibao import settings
-from wanglibao_rest import utils as rest_utils
 import logging
 from weixin.base import ChannelBaseTemplate
-from wanglibao_rest.utils import has_register_for_phone
 
 logger = logging.getLogger(__name__)
 logger_yuelibao = logging.getLogger('wanglibao_margin')
@@ -353,83 +351,6 @@ def server_error(request):
     #新的500页面
     template = loader.get_template('html/wanglibao_maintain.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=500)
-
-
-def landpage_view(request):
-    """
-    渠道跳转页，
-    确定渠道来源，记录访问时间到redis中，
-    跳转活动页
-    :param request:
-    :return:
-    """
-
-    request_data = request.REQUEST
-    channel_code = request_data.get('promo_token', None)
-    action = request_data.get('action', None)
-    url = reverse('index')
-    if channel_code:
-        activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
-        if channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
-            coop_landpage_fun = getattr(rest_utils, 'process_for_%s_landpage' % channel_code.lower(), None)
-            if coop_landpage_fun:
-                try:
-                    coop_landpage_fun(request, channel_code)
-                except Exception, e:
-                    logger.exception('process for %s landpage error' % channel_code)
-                    logger.info(e)
-
-        # 判断是否属于交易操作
-        if action:
-            is_mobile = utype_is_mobile(request)
-            if action in ['purchase', 'deposit', 'withdraw', 'account_home', 'equity']:
-                if action == 'purchase':
-                    product_id = request.session.get('product_id', '')
-                    if product_id:
-                        if is_mobile:
-                            url = reverse('weixin_p2p_detail', kwargs={'id': product_id, 'template': 'buy'})
-                        else:
-                            url = reverse('p2p detail', kwargs={'id': product_id})
-                    else:
-                        action_uri = 'weixin_p2p_list_coop' if is_mobile else 'p2p_list'
-                        url = reverse(action_uri)
-                elif action == 'deposit':
-                    action_uri = 'weixin_recharge_first' if is_mobile else 'pay-banks'
-                    url = reverse(action_uri)
-                elif action == 'withdraw':
-                    action_uri = 'weixin_recharge_first' if is_mobile else 'withdraw'
-                    url = reverse(action_uri)
-                elif action == 'equity':
-                    if is_mobile:
-                        url = reverse('weixin_transaction', kwargs={'status': 'buying'})
-                    else:
-                        url = reverse('account_home')
-                else:
-                    action_uri = 'weixin_account' if is_mobile else 'account_home'
-                    url = reverse(action_uri)
-
-                # 判断用户是否为登录状态
-                if not request.user.is_authenticated():
-                    # 判断手机号是否已经注册
-                    phone = request.session.get('phone', None)
-                    if phone:
-                        phone_has_register = has_register_for_phone(phone)
-                    else:
-                        phone_has_register = False
-
-                    # 如果手机号还未被注册，则引导用户注册，否则，引导用户登录
-                    if phone_has_register:
-                        url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
-                    else:
-                        action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
-                        url = reverse(action_uri) + "?promo_token=" + channel_code + '&next=' + url
-            elif action == 'register':
-                action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
-                url = reverse(action_uri) + "?promo_token=" + channel_code
-        else:
-            url = reverse(activity_page) + "?promo_token=" + channel_code
-
-    return HttpResponseRedirect(url)
 
 
 class BaiduFinanceView(ChannelBaseTemplate):

@@ -219,10 +219,17 @@ def utype_is_mobile(request):
     return is_mobile
 
 
-def sign_login(request, sign, user_id, timestamp):
+def sign_login(request):
     try:
-        user = authenticate(sign=sign, user_id=user_id, timestamp=timestamp)
-        if user:
-            auth_login(request, user)
+        sign = request.GET.get('sign', None)
+        user_id = request.GET.get('uid', None)
+        timestamp = request.GET.get('timestamp', None)
+        channel_code = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+        if sign and user_id and timestamp and channel_code:
+            channel = get_channel_record(channel_code)
+            if channel:
+                user = authenticate(sign=sign, user_id=user_id, timestamp=timestamp)
+                if user:
+                    auth_login(request, user)
     except Exception, e:
         logger.info('sign_login internal request oauth failed with error %s' % e)
