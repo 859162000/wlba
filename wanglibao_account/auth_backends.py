@@ -10,8 +10,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.contrib.auth.backends import ModelBackend
 from common.tools import get_utc_timestamp
+from common.utils import generate_channel_center_sign
 from utils import detect_identifier_type
-from wanglibao_rest.utils import generate_oauth2_sign
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -103,11 +103,6 @@ class TokenSecretSignAuthBackend(object):
 
 
 class CoopSignAuthBackend(ModelBackend):
-    def generate_oauth_login_sign(self, user_id, ts):
-        key = settings.BASE_OAUTH_KEY
-        sign = hashlib.md5(str(user_id) + str(ts) + key).hexdigest()
-        return sign
-
     def authenticate(self, **kwargs):
         active_user = None
         sign = kwargs.get('sign', None)
@@ -117,7 +112,7 @@ class CoopSignAuthBackend(ModelBackend):
         if sign and user_id and ts:
             try:
                 if int(ts) > int(get_utc_timestamp()):
-                    local_sign = self.generate_oauth_login_sign(user_id, ts)
+                    local_sign = generate_channel_center_sign(ts)
                     if local_sign == sign:
                         try:
                             active_user = User.objects.get(pk=user_id)

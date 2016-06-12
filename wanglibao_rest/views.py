@@ -48,14 +48,14 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha, BiSouYiRegisterForm
 # from marketing.helper import RewardStrategy, which_channel, Channel
-from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid, get_introduce_by_for_phone)
+from wanglibao_rest.utils import (split_ua, get_client_ip, has_binding_for_bid)
 from wanglibao_rest import utils as rest_utils
 from django.http import HttpResponseRedirect, Http404
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
-from marketing.utils import local_to_utc, get_channel_record
+from marketing.utils import local_to_utc, get_channel_record, get_user_channel_record
 from django.conf import settings
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
@@ -1942,30 +1942,39 @@ class AccessUserExistsApi(APIView):
     permission_classes = ()
 
     def post(self, request):
-        logger.info("enter AccessUserExistsApi with data [%s], [%s]" % (request.REQUEST, request.body))
-
-        form = AccessUserExistsForm(request.session)
-        channel_code = request.GET.get('promo_token')
+        logger.info("enter AccessUserExistsApi with data [%s]" % request.REQUEST)
+        form = AccessUserExistsForm(request.POST)
 
         if form.is_valid():
-            phone = form.cleaned_data['phone']
-            user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-            introduce_by = get_introduce_by_for_phone(phone, channel_code)
-            coop_sign_check = getattr(form, '%s_sign_check' % channel_code.lower(), None)
-            sign_is_ok = coop_sign_check()
-            coop_exists_processor = getattr(rest_utils, 'process_%s_user_exists' % channel_code.lower(), None)
-            response_data = coop_exists_processor(user, introduce_by, phone, sign_is_ok)
+            if form.check_sign:
+                phone = form.cleaned_data['phone']
+                user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                if user:
+                    response_data = {
+                        'ret_code': 10000,
+                        'message': u'该号已注册',
+                    }
+                    channel = get_user_channel_record(user.id)
+                    if channel:
+                        response_data['channel_code'] = channel.code
+                else:
+                    response_data = {
+                        'ret_code': 10001,
+                        'message': u'该号未注册',
+                    }
+            else:
+                response_data = {
+                    'ret_code': 10021,
+                    'message': u'签名错误',
+                }
         else:
             response_data = {
                 'ret_code': 10020,
                 'message': form.errors.values()[0][0],
             }
 
-        if channel_code == 'bajinshe':
-            response_data['code'] = response_data['ret_code']
-            response_data.pop('ret_code')
-            response_data['msg'] = response_data['message']
-            response_data.pop('message')
+        if 'channel_code' not in response_data:
+            response_data['channel_code'] = ''
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 

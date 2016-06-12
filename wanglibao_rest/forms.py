@@ -6,6 +6,7 @@ import hashlib
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
+from common.utils import generate_channel_center_sign
 from marketing.utils import get_channel_record
 from wanglibao_account.utils import detect_identifier_type
 from wanglibao_rest.utils import generate_bajinshe_sign
@@ -67,33 +68,9 @@ class OauthUserRegisterForm(forms.Form):
 
 
 class AccessUserExistsForm(forms.Form):
-    channel_code = forms.CharField(error_messages={'required': u'渠道码是必须的'})
     sign = forms.CharField(error_messages={'required': u'签名是必须的'})
-    client_id = forms.CharField(error_messages={'required': u'客户端id是必须的'})
+    timestamp = forms.CharField(error_messages={'required': u'时间戳是必须的'})
     phone = forms.CharField(error_messages={'required': u'手机号是必须的'})
-
-    def clean_channel_code(self):
-        channel_code = self.cleaned_data['channel_code']
-        if get_channel_record(channel_code):
-            return channel_code
-        else:
-            raise forms.ValidationError(
-                message=u'无效渠道码',
-                code=10021,
-            )
-
-    def clean_client_id(self):
-        channel_code = self.cleaned_data.get('channel_code', None)
-        client_id = self.cleaned_data['client_id']
-        if channel_code:
-            local_client_id = getattr(settings, '%s_CLIENT_ID' % channel_code.upper(), None)
-            if client_id != local_client_id:
-                raise forms.ValidationError(
-                    code=10022,
-                    message=u'无效客户端id'
-                )
-
-        return client_id
 
     def clean_phone(self):
         phone = self.cleaned_data['phone']
@@ -105,13 +82,11 @@ class AccessUserExistsForm(forms.Form):
         else:
             return phone
 
-    def bajinshe_sign_check(self):
+    def check_sign(self):
         sign = self.cleaned_data['sign']
-        phone = self.cleaned_data['phone']
-        client_id = self.cleaned_data['client_id']
-        client_secret = settings.BAJINSHE_COOP_KEY
+        timestamp = self.cleaned_data['timestamp']
 
-        local_sign = hashlib.md5('-'.join([str(client_id), str(phone), client_secret])).hexdigest()
+        local_sign = generate_channel_center_sign(timestamp)
         if local_sign == sign:
             sign_is_ok = True
         else:
