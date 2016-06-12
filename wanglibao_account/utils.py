@@ -14,7 +14,7 @@ from django.template import add_to_builtins
 from django.template.loader import render_to_string
 from registration.models import RegistrationProfile
 from common.tasks import common_callback
-from common.tools import detect_identifier_type
+from common.tools import detect_identifier_type, Aes
 from common.utils import get_bajinshe_access_token, save_to_callback_record
 from wanglibao import settings
 from wanglibao_rest.utils import generate_bisouyi_sign, generate_bisouyi_content
@@ -130,6 +130,18 @@ def get_renrenli_base_data(channel_code):
         }
 
     return data
+
+
+def parse_bisouyi_content(encrypt_str):
+    try:
+        ase = Aes()
+        decrypt_text = ase.decrypt(settings.BISOUYI_AES_KEY, encrypt_str, mode_tag='ECB')
+        content_data = json.loads(decrypt_text)
+    except:
+        logger.exception('parse_bisouyi_content with data[%s] raise error: ' % encrypt_str)
+        content_data = {}
+
+    return content_data
 
 
 def bisouyi_callback(url, content_data, channel_code, callback_data=None, async_callback=True, order_id=None, ret_parser=''):

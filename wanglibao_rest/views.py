@@ -8,17 +8,19 @@ import traceback
 import StringIO
 from rest_framework.views import APIView
 from datetime import datetime as dt
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
-from common.tools import utc_to_local_timestamp
+from common.tools import (utc_to_local_timestamp, get_utc_timestamp, utype_is_mobile,
+                          dict_encode_to_url_str)
 from marketing.models import Channels
 from marketing.forms import ChannelForm
 from wanglibao_account.models import Binding
 from wanglibao_account.utils import create_user, has_binding_for_bid
 from wanglibao_account.forms import UserRegisterForm
-from wanglibao_account.cooperation import CoopRegister, RenRenLiCallback
+from wanglibao_account.cooperation import CoopRegister, RenRenLiCallback, CoopLandProcessor
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_oauth2.models import Client
+from wanglibao_oauth2.utils import get_access_token_for_phone, generate_oauth_login_sign
 from .forms import CoopDataDispatchForm
 
 
@@ -321,76 +323,107 @@ class RenRenLiQueryApi(APIView):
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
-def landpage_view(request):
+class CoopLandpageApi(APIView):
     """
     渠道着陆页
     :param request:
     :return:
     """
 
-    request_data = request.REQUEST
-    channel_code = request_data.get('promo_token', None)
-    action = request_data.get('action', None)
-    url = reverse('index')
-    if channel_code:
-        activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
-        if channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
-            coop_landpage_fun = getattr(rest_utils, 'process_for_%s_landpage' % channel_code.lower(), None)
-            if coop_landpage_fun:
-                try:
-                    coop_landpage_fun(request, channel_code)
-                except Exception, e:
-                    logger.exception('process for %s landpage error' % channel_code)
-                    logger.info(e)
+    permission_classes = ()
 
-        # 判断是否属于交易操作
-        if action:
-            is_mobile = utype_is_mobile(request)
-            if action in ['purchase', 'deposit', 'withdraw', 'account_home', 'equity']:
-                if action == 'purchase':
-                    product_id = request.session.get('product_id', '')
-                    if product_id:
-                        if is_mobile:
-                            url = reverse('weixin_p2p_detail', kwargs={'id': product_id, 'template': 'buy'})
-                        else:
-                            url = reverse('p2p detail', kwargs={'id': product_id})
-                    else:
-                        action_uri = 'weixin_p2p_list_coop' if is_mobile else 'p2p_list'
-                        url = reverse(action_uri)
-                elif action == 'deposit':
-                    action_uri = 'weixin_recharge_first' if is_mobile else 'pay-banks'
-                    url = reverse(action_uri)
-                elif action == 'withdraw':
-                    action_uri = 'weixin_recharge_first' if is_mobile else 'withdraw'
-                    url = reverse(action_uri)
-                elif action == 'equity':
-                    if is_mobile:
-                        url = reverse('weixin_transaction', kwargs={'status': 'buying'})
-                    else:
-                        url = reverse('account_home')
-                else:
-                    action_uri = 'weixin_account' if is_mobile else 'account_home'
-                    url = reverse(action_uri)
-
-                # 判断用户是否为登录状态
-                if not request.user.is_authenticated():
-                    # 判断手机号是否已经注册
-                    phone = request.session.get('phone', None)
-                    if phone:
-                        phone_has_register = has_register_for_phone(phone)
-                    else:
-                        phone_has_register = False
-
-                    # 如果手机号还未被注册，则引导用户注册，否则，引导用户登录
-                    if phone_has_register:
-                        url = reverse('auth_login') + "?promo_token=" + channel_code + '&next=' + url
-                    else:
-                        action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
-                        url = reverse(action_uri) + "?promo_token=" + channel_code + '&next=' + url
-            elif action == 'register':
-                action_uri = 'weixin_coop_register' if is_mobile else 'auth_register'
-                url = reverse(action_uri) + "?promo_token=" + channel_code
+    def process_purchase_land(self, is_mobile, internal_params_data):
+        """
+        处理第三方着陆，投资页跳转
+        """
+        product_id = internal_params_data.get('product_id', None)
+        if product_id:
+            if is_mobile:
+                action_uri = '/weixin/view/buy/{0}/'.format(product_id)
+            else:
+                action_uri = '/p2p/detail/{0}/'.format(product_id)
         else:
-            url = reverse(activity_page) + "?promo_token=" + channel_code
+            action_uri = '/weixin/p2p_list/coop/' if is_mobile else '/p2p/list/'
 
-    return HttpResponseRedirect(url)
+        return action_uri
+
+    def process_deposit_land(self, is_mobile, internal_params_data):
+        """
+        处理第三方着陆，充值页跳转
+        """
+        action_uri = '/weixin/recharge/' if is_mobile else '/pay/banks/'
+        return action_uri
+
+    def process_withdraw_land(self, is_mobile, internal_params_data):
+        """
+        处理第三方着陆，还款页跳转
+        """
+        action_uri = '' if is_mobile else '/pay/withdraw/'
+        return action_uri
+
+    def process_account_home_land(self, is_mobile, internal_params_data):
+        """
+        处理第三方着陆，账户页跳转
+        """
+        action_uri = '/weixin/account/' if is_mobile else '/accounts/home/'
+        return action_uri
+
+    def process_equity_land(self, is_mobile, internal_params_data):
+        """
+        处理第三方着陆，持仓页跳转
+        """
+        action_uri = '/weixin/transaction/buying/' if is_mobile else '/accounts/home/'
+        return action_uri
+
+
+    def process_register_land(self, is_mobile, internal_params_data):
+        """
+        处理第三方着陆，注册页跳转
+        """
+        action_uri = '/weixin/coop_regist/' if is_mobile else '/accounts/register/'
+        return action_uri
+
+    def process_one_key_login(self, redirect_params, internal_params_data):
+        """
+        处理第三方着陆，一键登录
+        """
+        token = internal_params_data.get('access_token', None)
+        phone = internal_params_data.get('phone', None)
+        if token and phone:
+            access_token = get_access_token_for_phone(token, phone)
+            if access_token:
+                user_id = access_token.user.id
+                timestamp = get_utc_timestamp(access_token.expires)
+                login_sign = generate_oauth_login_sign(user_id, timestamp)
+                redirect_params['uid'] = user_id
+                redirect_params['timestamp'] = timestamp
+                redirect_params['sign'] = login_sign
+
+        return redirect_params
+
+    def get_response(self, request):
+        redirect_url = settings.WLB_URL
+        redirect_params = dict()
+        channel_code = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+        if channel_code:
+            redirect_params[settings.PROMO_TOKEN_QUERY_STRING] = channel_code
+            internal_params_data = CoopLandProcessor(request).process_for_request_params_map()
+            request_action = request.GET.get('action', None)
+            if request_action:
+                action_land_processor = getattr(self, 'process_%s_land' % request_action.lower(), None)
+                if action_land_processor:
+                    is_mobile = utype_is_mobile(self.request)
+                    action_uri = action_land_processor(is_mobile, internal_params_data)
+                    redirect_url = settings.WLB_URL + action_uri
+
+            self.process_one_key_login(redirect_params, internal_params_data)
+
+            redirect_url = redirect_url + '?' + dict_encode_to_url_str(redirect_params)
+
+        return HttpResponseRedirect(redirect_url)
+
+    def post(self, request):
+        return self.get_response(request)
+
+    def get(self, request):
+        return self.get_response(request)

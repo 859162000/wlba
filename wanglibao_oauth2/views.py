@@ -12,8 +12,7 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework.views import APIView
 
 import constants
-from common.tools import get_utc_timestamp, now
-from wanglibao_account.cooperation import CoopLandProcessor
+from common.tools import now
 from .base_views import AccessTokenBaseView
 from .models import AccessToken, RefreshToken, CoopToken
 from .forms import RefreshTokenGrantForm, UserAndClientForm
@@ -141,7 +140,6 @@ class AccessTokenView(AccessTokenBaseView):
                     'msg': form.errors.values()[0][0]
                 }
 
-        CoopLandProcessor(request).all_processors_for_session(1)
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 

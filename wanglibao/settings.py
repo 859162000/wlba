@@ -558,3 +558,7 @@ if ENV in (ENV_PRODUCTION, ENV_PREPRODUCTION):
     PUSH_PRODUCT_CHANNELS = ['bajinshe', 'bisouyi']
 else:
     PUSH_PRODUCT_CHANNELS = ['bajinshe', 'bisouyi', ]
+
+
+# 渠道着陆处理，重定向基础URL
+LAND_URI_FOR_CHANNEL = '/api/landpage/'

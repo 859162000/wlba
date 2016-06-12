@@ -11,6 +11,11 @@ def get_channel_record(channel_code):
     return record
 
 
+def get_channel_record_related(channel_code):
+    record = Channels.objects.filter(code=channel_code).select_related('all_params').first()
+    return record
+
+
 def get_user_channel_record(user_id):
     channel = Channels.objects.filter(binding__user_id=user_id).first()
     return channel

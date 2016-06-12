@@ -106,7 +106,7 @@ class AccessToken(models.Model):
         expiry
     """
     user = models.ForeignKey(AUTH_USER_MODEL)
-    token = models.CharField(max_length=255, default=long_token, db_index=True)
+    token = models.CharField(max_length=255, default=long_token, unique=True, db_index=True)
     client = models.ForeignKey(Client)
     expires = models.DateTimeField()
     created_time = models.DateTimeField(u'创建时间', auto_now=True)

@@ -3,7 +3,8 @@
 
 from django.conf.urls import patterns, url
 
-from wanglibao_rest.views import (BidHasBindingForChannel, CoopDataDispatchApi, RenRenLiQueryApi)
+from wanglibao_rest.views import (BidHasBindingForChannel, CoopDataDispatchApi, RenRenLiQueryApi,
+                                  CoopLandpageApi)
 
 
 urlpatterns = patterns(
@@ -16,4 +17,7 @@ urlpatterns = patterns(
 
     # 人人利查询接口
     url(r'^renrenli/query/$', RenRenLiQueryApi.as_view()),
+
+    # 渠道落地页
+    url(r'^landpage/$', CoopLandpageApi.as_view()),
 )

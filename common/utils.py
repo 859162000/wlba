@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import re
 import json
+import hashlib
 import logging
 import requests
 from dateutil.relativedelta import relativedelta
@@ -82,3 +84,28 @@ def save_to_callback_record(data, channel):
         setattr(call_back_record, k, v)
 
     call_back_record.save()
+
+
+def set_dont_enforce_csrf_checks(request):
+    if not hasattr(request, '_dont_enforce_csrf_checks'):
+        setattr(request, '_dont_enforce_csrf_checks', True)
+
+
+def check_sign(content, sign):
+    local_sign = hashlib.md5(content).hexdigest()
+    if local_sign == sign:
+        return True
+    else:
+        return False
+
+
+def sign_format_str_padding(sign_format, joined_sign_params):
+    key_list = re.findall(r'{(.*?)}', sign_format)
+    sign_params_data = dict([(key, joined_sign_params.get(key, '')) for key in key_list])
+    sign_format = sign_format.format(**sign_params_data)
+    return sign_format
+
+
+def check_sign_for_coop(sign, sign_format, joined_sign_params):
+    sign_format = sign_format_str_padding(sign_format, joined_sign_params)
+    return check_sign(sign_format, sign)

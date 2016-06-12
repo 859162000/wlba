@@ -9,18 +9,18 @@ import StringIO
 import traceback
 from django.utils import timezone
 from django.db.models import Sum
+from django.conf import settings
 from django.contrib.auth.models import User
-from common.utils import save_to_callback_record, singleton
-from common.tools import utc_to_local_timestamp, now
+from common.utils import save_to_callback_record, set_dont_enforce_csrf_checks, check_sign_for_coop
+from common.tools import utc_to_local_timestamp, now, Aes, StrQuote
 from common.tasks import common_callback
-from marketing.utils import get_channel_record, get_user_channel_record
+from marketing.utils import get_channel_record, get_user_channel_record, get_channel_record_related
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_oauth2.models import OauthUser, Client, AccessToken
 from wanglibao_margin.models import MarginRecord
 from wanglibao_p2p.models import P2PRecord, UserAmortization, P2PEquity
 from wanglibao_p2p.utils import get_user_p2p_total_asset
-from wanglibao import settings
 from .utils import get_bajinshe_base_data, get_renrenli_base_data, bisouyi_callback
 
 
@@ -91,6 +91,7 @@ class CoopProcessorBase(object):
     第三方处理器基类
     """
     def __init__(self, *args, **kwargs):
+        self.channel = None
         self.c_code = None
         self.coop_processors = None
 
@@ -967,227 +968,322 @@ class CoopLandProcessor(CoopProcessorBase):
     def __init__(self, request):
         super(CoopLandProcessor, self).__init__(request)
         self.request = request
-        self.coop_processors = coop_land_processor
+        self.c_code = self.get_channel_code_from_request()
 
         # 传递渠道邀请码时使用的变量名
         self.external_channel_key = settings.PROMO_TOKEN_QUERY_STRING
         self.internal_channel_key = 'channel_code'
-        # 传递渠道用户时使用的变量名
-        self.external_channel_user_key = settings.PROMO_TOKEN_USER_KEY
-        self.internal_channel_user_key = 'channel_user'
-        # 传递渠道oauth客户端ID时使用的变量名
-        self.external_channel_client_id_key = settings.CLIENT_ID_QUERY_STRING
-        self.internal_channel_client_id_key = 'client_id'
-        self.internal_channel_refresh_token_key = 'refresh_token'
 
-    def process_one_key_login_on_land(self):
-        """
-        处理第三方着陆，一键登录
-        """
-        pass
-
-    def process_purchase_land(self):
-        """
-        处理第三方着陆，投资页跳转
-        """
-        pass
-
-    def process_deposit_land(self):
-        """
-        处理第三方着陆，充值页跳转
-        """
-        pass
-
-    def process_withdraw_land(self):
-        """
-        处理第三方着陆，还款页跳转
-        """
-        pass
-
-    def process_account_home_land(self):
-        """
-        处理第三方着陆，账户页跳转
-        """
-        pass
-
-    def process_equity_land(self):
-        """
-        处理第三方着陆，持仓页跳转
-        """
-        pass
-
-    def process_register_land(self):
-        """
-        处理第三方着陆，注册页跳转
-        """
-        pass
-
-    def process_all_land(self):
-        """
-        处理第三方着陆，注册页跳转
-        """
-        pass
+        self.get_from_data = dict()
+        self.session_key_list = list()
+        self.joined_sign_params = dict()
+        self.internal_params_data = dict()
 
     def get_channel_code_from_request(self):
         return self.request.GET.get(self.external_channel_key, '')
 
-    def save_to_session(self):
-        channel_code = self.get_channel_code_from_request()
-        channel_user = self.request.REQUEST.get(self.external_channel_user_key, None)
-
-        if channel_code:
-            self.request.session[self.internal_channel_key] = channel_code
-
-        if channel_user:
-            self.request.session[self.internal_channel_user_key] = channel_user
-
-    def clear_session(self):
-        self.request.session.pop(self.internal_channel_key, None)
-        self.request.session.pop(self.internal_channel_user_key, None)
-
-    def all_processor_for_land(self, channel_code):
-        """
-        处理第三方着陆，注册页跳转
-        """
-        channel_processor = self.get_channel_processor(channel_code)
-        if channel_processor:
-            try:
-                channel_processor(self.request).process_all_land()
-            except:
-                logger.exception("%s raise error: " % channel_processor.__name__)
+    def get_appoint_data_from_request(self, get_from):
+        if get_from == 'POST':
+            appoint_data = self.request.POST
+        elif get_from == 'GET':
+            appoint_data = self.request.GET
+        elif get_from == 'REQUEST':
+            appoint_data = self.request.REQUEST
+        elif get_from == 'BODY':
+            appoint_data = json.loads(self.request.body.strip())
         else:
-            logger.info("all_processor_for_land not found processor matched for channel_code[%s]" % channel_code)
+            appoint_data = self.request.META
 
-    def all_processors_for_session(self, session_act):
+        return appoint_data
+
+    def get_params_value(self, params):
+        if params.level == 2:
+            params_parent = params.parent
+            if params_parent in self.get_from_data:
+                params_value = self.get_from_data[params_parent].get(params.external_name, None)
+                if params_value:
+                    return params_value
+        else:
+            get_from_list = params.get_from
+            for get_from in get_from_list:
+                if get_from in self.get_from_data:
+                    params_value = self.get_from_data[get_from].get(params.external_name, None)
+                    if params_value:
+                        return params_value
+                else:
+                    appoint_data = self.get_appoint_data_from_request(get_from)
+                    self.get_from_data[get_from] = appoint_data
+                    if get_from == 'HEAD':
+                        params_value = appoint_data.get('HTTP_%s' % params.external_name.upper(), None)
+                    else:
+                        params_value = appoint_data.get(params.external_name, None)
+
+                    if params_value:
+                        return params_value
+
+        return params.default_value
+
+    def process_params_decrypt(self, name, encrypt_str, encrypt_method):
+        params_data = None
+        try:
+            if encrypt_method == 'json':
+                params_data = json.loads(encrypt_str)
+            elif encrypt_method == 'aes-128-ecb':
+                ase = Aes()
+                decrypt_text = ase.decrypt(settings.BISOUYI_AES_KEY, encrypt_str, mode_tag='ECB')
+                params_data = json.loads(decrypt_text)
+        except:
+            logger.exception('channel[%s] params[%s] process_params_decrypt raise error: ' % (self.c_code, name))
+
+        params_data_type = type(params_data)
+        if params_data and params_data_type != 'dict':
+            logger.info('channel[%s] params[%s] process_params_decrypt result: value[%s] type[%s]' %
+                        (self.c_code, name, params_data, params_data_type))
+            params_data = None
+
+        return params_data
+
+    def init_joined_sign_data(self, params, params_value):
+        # 初始化签名数据
+        if params.is_join_sign:
+            # FixMe,此处只是顺应大部分渠道处理逻辑，如有特殊处理请重构
+            if params.quote_url_decrypt and self.request.method == 'GET':
+                quote = StrQuote()
+                params_value = quote.quote_plus(params_value)
+
+            internal_name = params.internal_name
+            if internal_name == 'sign':
+                self.joined_sign_params[internal_name] = params_value
+            else:
+                self.joined_sign_params[params.external_name] = params_value
+
+    def process_level_one_params(self, params, params_value):
+        if params.level == 1 and params.is_decrypt:
+            params_name = params.name
+            params_data = self.process_params_decrypt(params_name,
+                                                      params_value,
+                                                      params.decrypt_method)
+            if params_data:
+                self.get_from_data[params_name] = params_data
+
+    def process_save_to_session(self):
+        self.save_to_session(self.internal_channel_key, self.c_code)
+        channel_params = self.channel.all_params.filter(is_abandoned=False).order_by('level', 'get_from')
+        for params in channel_params:
+            if params.is_save_session or params.level == 1 or params.is_join_sign:
+                params_value = self.get_params_value(params)
+                if params_value:
+                    self.process_level_one_params(params, params_value)
+                    self.init_joined_sign_data(params, params_value)
+
+                    internal_name = params.internal_name
+                    if params.is_save_session and internal_name:
+                        self.save_to_session(internal_name, params_value)
+
+    def process_csrf_checked(self):
+        if self.channel.disable_csrf:
+            sign_format = self.channel.sign_format
+            sign = self.joined_sign_params.get('sign', None)
+            if sign_format and sign:
+                if check_sign_for_coop(sign, sign_format, self.joined_sign_params):
+                    set_dont_enforce_csrf_checks(self.request)
+
+    def save_to_session(self, key, value):
+        self.request.session[key] = value
+        self.session_key_list.append(key)
+
+    def clear_session(self, session_key_list=None):
+        session_key_list = session_key_list or self.session_key_list or self.request.session.keys()
+        for session_key in session_key_list:
+            self.request.session.pop(session_key, None)
+
+    def process_for_session(self, session_act):
         """
         session_act ==> 0 保存参数到session
         session_act ==> 1 清除session参数
         """
 
-        channel_code = self.get_channel_code_from_request()
-        channel_processor = self.get_channel_processor(channel_code)
-        if channel_processor:
-            try:
+        try:
+            if self.c_code:
                 if session_act == 0:
-                    channel_processor(self.request).save_to_session()
+                    channel = get_channel_record_related(self.c_code)
+                    if channel:
+                        self.channel = channel
+                        self.process_save_to_session()
+                        self.process_csrf_checked()
+                    else:
+                        logger.info("process_for_session not found channel matched for channel_code[%s]" % self.c_code)
                 elif session_act == 1:
-                    channel_processor(self.request).clear_session()
+                    self.clear_session()
+        except:
+            logger.exception("process_for_session raise error: ")
+
+    def process_params_map(self):
+        """
+        处理所有第三方着陆，注册页跳转
+        """
+        channel_params = self.channel.all_params.filter(is_abandoned=False).order_by('level', 'get_from')
+        for params in channel_params:
+            params_value = self.get_params_value(params)
+            if params_value:
+                self.process_level_one_params(params, params_value)
+                self.internal_params_data[params.internal_name] = params_value
+
+    def process_for_request_params_map(self):
+        """
+        处理第三方着陆，注册页跳转
+        """
+        channel = get_channel_record_related(self.c_code)
+        if channel:
+            self.channel = channel
+            try:
+                self.process_params_map()
             except:
-                logger.exception("%s raise error: " % channel_processor.__name__)
+                logger.exception("channel[%s] process_for_land raise error: " % self.c_code)
         else:
-            logger.info("all_processors_for_user_register not found processor matched for channel_code[%s]" % channel_code)
+            logger.info("process_for_land not found channel matched for channel_code[%s]" % self.c_code)
+
+        return self.internal_params_data
 
 
-class BaJinSheLand(CoopLandProcessor):
-    def __init__(self, request):
-        super(BaJinSheLand, self).__init__(request)
-        self.external_channel_client_id_key = 'appid'
-        self.external_channel_phone_key = 'usn'
-        self.internal_channel_phone_key = 'phone'
-        self.external_channel_sign_key = 'signature'
-        self.internal_channel_sign_key = 'sign'
-        self.external_channel_user_key = 'p_user_id'
-        self.external_channel_refresh_token_key = 'refresh_token'
-
-    def save_to_session(self):
-        super(BaJinSheLand, self).save_to_session()
-
-        if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
-            req_data = json.loads(self.request.body.strip())
-        else:
-            req_data = self.request.REQUEST
-
-        channel_phone = req_data.get(self.external_channel_phone_key, None)
-        sign = req_data.get(self.external_channel_sign_key, None)
-        client_id = req_data.get(self.external_channel_client_id_key, None)
-        channel_user = req_data.get(self.external_channel_user_key, None)
-        refresh_token = req_data.get(self.external_channel_refresh_token_key, None)
-
-        if channel_user:
-            self.request.session[self.internal_channel_user_key] = channel_user
-
-        if channel_phone:
-            self.request.session[self.internal_channel_phone_key] = channel_phone
-
-        if sign:
-            self.request.session[self.internal_channel_sign_key] = sign
-
-        if client_id:
-            self.request.session[self.internal_channel_client_id_key] = client_id
-
-        if refresh_token:
-            self.request.session[self.internal_channel_refresh_token_key] = refresh_token
-
-    def clear_session(self):
-        super(BaJinSheLand, self).clear_session()
-        self.request.session.pop(self.internal_channel_phone_key, None)
-        self.request.session.pop(self.internal_channel_sign_key, None)
-        self.request.session.pop(self.internal_channel_refresh_token_key, None)
-        self.request.session.pop(self.internal_channel_client_id_key, None)
-
-
-class BiSouYiLand(CoopLandProcessor):
-    def __init__(self, request):
-        super(BiSouYiLand, self).__init__(request)
-        self.external_channel_client_id_key = 'cid'
-        self.external_channel_phone_key = 'mobile'
-        self.internal_channel_phone_key = 'phone'
-        self.external_channel_sign_key = 'sign'
-        self.internal_channel_sign_key = 'sign'
-        self.channel_content_key = 'content'
-
-    def save_to_session(self):
-        super(BiSouYiLand, self).save_to_session()
-
-        if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
-            req_data = json.loads(self.request.body.strip())
-        else:
-            req_data = self.request.REQUEST
-
-        channel_phone = req_data.get(self.external_channel_phone_key, None)
-        sign = req_data.get(self.external_channel_sign_key, None)
-        client_id = req_data.get(self.external_channel_client_id_key, None)
-        channel_user = req_data.get(self.external_channel_user_key, None)
-        content = req_data.get(self.channel_content_key, None)
-
-        if not client_id:
-            client_id = self.request.META.get(self.external_channel_client_id_key.upper(), None)
-
-        if not client_id:
-            client_id = self.request.META.get('HTTP_%s' % self.external_channel_client_id_key.upper(), None)
-
-        if not sign:
-            sign = self.request.META.get(self.external_channel_sign_key.upper(), None)
-
-        if not sign:
-            sign = self.request.META.get('HTTP_%s' % self.external_channel_sign_key.upper(), None)
-
-        if channel_user:
-            self.request.session[self.internal_channel_user_key] = channel_user
-
-        if channel_phone:
-            self.request.session[self.internal_channel_phone_key] = channel_phone
-
-        if sign:
-            self.request.session[self.internal_channel_sign_key] = sign
-
-        if client_id:
-            self.request.session[self.internal_channel_client_id_key] = client_id
-
-        if content:
-            self.request.session[self.channel_content_key] = content
-
-    def clear_session(self):
-        super(BiSouYiLand, self).clear_session()
-        self.request.session.pop(self.internal_channel_phone_key, None)
-        self.request.session.pop(self.internal_channel_sign_key, None)
-        self.request.session.pop(self.internal_channel_client_id_key, None)
-        self.request.session.pop(self.channel_content_key, None)
-
-
-# 第三方着陆处理器
-coop_land_processor = {
-    'bajinshe': 'BaJinSheLand',
-    # 'renrenli': 'RenRenLiLand',
-    'bisouyi': 'BiSouYiLand',
-}
+# class BaJinSheLand(CoopLandProcessor):
+#     def __init__(self, request):
+#         super(BaJinSheLand, self).__init__(request)
+#         self.external_channel_client_id_key = 'appid'
+#         self.external_channel_phone_key = 'usn'
+#         self.external_channel_sign_key = 'signature'
+#         self.internal_channel_sign_key = 'sign'
+#         self.external_channel_user_key = 'p_user_id'
+#         self.external_channel_refresh_token_key = 'refresh_token'
+#         self.external_channel_access_token_key = 'access_token'
+#
+#     def save_to_session(self):
+#         super(BaJinSheLand, self).save_to_session()
+#
+#         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+#             req_data = json.loads(self.request.body.strip())
+#         else:
+#             req_data = self.request.REQUEST
+#
+#         channel_phone = req_data.get(self.external_channel_phone_key, None)
+#         sign = req_data.get(self.external_channel_sign_key, None)
+#         client_id = req_data.get(self.external_channel_client_id_key, None)
+#         channel_user = req_data.get(self.external_channel_user_key, None)
+#         refresh_token = req_data.get(self.external_channel_refresh_token_key, None)
+#
+#         if channel_user:
+#             self.request.session[self.internal_channel_user_key] = channel_user
+#
+#         if channel_phone:
+#             self.request.session[self.internal_channel_phone_key] = channel_phone
+#
+#         if sign:
+#             self.request.session[self.internal_channel_sign_key] = sign
+#
+#         if client_id:
+#             self.request.session[self.internal_channel_client_id_key] = client_id
+#
+#         if refresh_token:
+#             self.request.session[self.internal_channel_refresh_token_key] = refresh_token
+#
+#     def clear_session(self):
+#         super(BaJinSheLand, self).clear_session()
+#         self.request.session.pop(self.internal_channel_phone_key, None)
+#         self.request.session.pop(self.internal_channel_sign_key, None)
+#         self.request.session.pop(self.internal_channel_refresh_token_key, None)
+#         self.request.session.pop(self.internal_channel_client_id_key, None)
+#
+#
+# class BiSouYiLand(CoopLandProcessor):
+#     def __init__(self, request):
+#         super(BiSouYiLand, self).__init__(request)
+#         self.external_channel_client_id_key = 'cid'
+#         self.external_channel_phone_key = 'mobile'
+#         self.external_channel_sign_key = 'sign'
+#         self.internal_channel_sign_key = 'sign'
+#         self.channel_content_key = 'content'
+#         self.external_channel_access_token_key = 'token'
+#         self.external_channel_next_url_key = 'other'
+#         self.external_channel_account_key = 'account'
+#
+#     @property
+#     def channel_phone(self):
+#         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+#             req_data = json.loads(self.request.body.strip())
+#         else:
+#             req_data = self.request.REQUEST
+#
+#         content = req_data.get(self.channel_content_key, None)
+#         content = parse_bisouyi_content(content) if content else {}
+#         return content.get(self.external_channel_phone_key, None)
+#
+#     @property
+#     def channel_access_token(self):
+#         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+#             req_data = json.loads(self.request.body.strip())
+#         else:
+#             req_data = self.request.REQUEST
+#
+#         content = req_data.get(self.channel_content_key, None)
+#         content = parse_bisouyi_content(content) if content else {}
+#         return content.get(self.external_channel_access_token_key, None)
+#
+#     def save_to_session(self):
+#         super(BiSouYiLand, self).save_to_session()
+#
+#         if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+#             req_data = json.loads(self.request.body.strip())
+#         else:
+#             req_data = self.request.REQUEST
+#
+#         content = req_data.get(self.channel_content_key, None)
+#
+#         if self.request.method == 'GET':
+#             sign = req_data.get(self.external_channel_sign_key, None)
+#             client_id = req_data.get(self.external_channel_client_id_key, None)
+#         else:
+#             sign = self.request.META.get('HTTP_%s' % self.external_channel_sign_key.upper(), None)
+#             client_id = self.request.META.get('HTTP_%s' % self.external_channel_client_id_key.upper(), None)
+#
+#         if sign:
+#             self.request.session[self.internal_channel_sign_key] = sign
+#
+#         if client_id:
+#             self.request.session[self.internal_channel_client_id_key] = client_id
+#
+#         if content:
+#             content = parse_bisouyi_content(content)
+#             if content:
+#                 phone = content.get(self.external_channel_phone_key, None)
+#                 other = content.get(self.external_channel_next_url_key, None)
+#                 account = content.get(self.external_channel_account_key, None)
+#                 token = content.get(self.external_channel_access_token_key, None)
+#
+#                 if phone:
+#                     self.request.session[self.internal_channel_phone_key] = phone
+#
+#                 if other:
+#                     self.request.session[self.internal_channel_next_url_key] = other
+#
+#                 if account:
+#                     self.request.session[self.internal_channel_account_key] = account
+#
+#                 if token:
+#                     self.request.session[self.internal_channel_access_token_key] = token
+#
+#     def clear_session(self):
+#         super(BiSouYiLand, self).clear_session()
+#         self.request.session.pop(self.internal_channel_sign_key, None)
+#         self.request.session.pop(self.internal_channel_client_id_key, None)
+#         self.request.session.pop(self.internal_channel_phone_key, None)
+#         self.request.session.pop(self.internal_channel_next_url_key, None)
+#         self.request.session.pop(self.internal_channel_account_key, None)
+#         self.request.session.pop(self.internal_channel_access_token_key, None)
+#
+#
+# # 第三方着陆处理器
+# coop_land_processor = {
+#     'bajinshe': 'BaJinSheLand',
+#     # 'renrenli': 'RenRenLiLand',
+#     'bisouyi': 'BiSouYiLand',
+# }
