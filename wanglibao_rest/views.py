@@ -72,6 +72,7 @@ from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
 from wanglibao.settings import GEETEST_ID, GEETEST_KEY
 from utils import id_validate
+from wanglibao_account.models import Binding
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -1949,6 +1950,7 @@ class AccessUserExistsApi(APIView):
             if form.check_sign:
                 phone = form.cleaned_data['phone']
                 user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+                
                 if user:
                     response_data = {
                         'ret_code': 10000,
@@ -1957,6 +1959,11 @@ class AccessUserExistsApi(APIView):
                     channel = get_user_channel_record(user.id)
                     if channel:
                         response_data['channel_code'] = channel.code
+                    binding = Binding.objects.filter(user=user).first()
+                    if binding:
+                        response_data['binding_bid'] = binding.bid
+                        response_data['binding_bname'] = binding.bname
+                        response_data['binding_baccount'] = binding.bid
                 else:
                     response_data = {
                         'ret_code': 10001,
