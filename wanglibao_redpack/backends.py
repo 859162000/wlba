@@ -901,14 +901,18 @@ def commission_one_pay_one(user, invite, product, level, amount, earning):
             income, create_flag = Income.objects.get_or_create(user=user, invite=invite, product=product,
                 defaluts={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
             income = Income.objects.select_for_update().get(income.id)
-            if not income.paid :
+            if income and not income.paid :
                 margin = MarginKeeper(user)
                 margin.deposit(earning, catalog=u"全民淘金")
 
                 income.order_id = margin.order_id
                 income.paid = True
                 income.save()
-        return u'[%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s, Success' % (user, invite, product, level, amount, earning)
+                return u'[%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s, Success' % (user, invite, product, level, amount, earning)
+            if income and income.paid:
+                return u'[%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s, Ignore' % (user, invite, product, level, amount, earning)
+            if not income:
+                return u'[%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s, NotFound' % (user, invite, product, level, amount, earning)
     except Exception, ex:
         return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user, invite, product, ex.message)
 
