@@ -148,8 +148,7 @@
       })
       $('.close_popup,.popup_button').click(function(){
         $('.popup_wrap,.popup_box').hide();
-
-
+        $('.popup_wrap,.popup_box').hide();
       });
 
       $('.rule_span').click(function(){
