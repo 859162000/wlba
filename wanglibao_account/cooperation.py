@@ -1705,7 +1705,7 @@ class XiaoMeiRegister(CoopRegister):
 
 class JiaKeRegister(CoopRegister):
     def __init__(self, request):
-        super(XiaoMeiRegister, self).__init__(request)
+        super(JiaKeRegister, self).__init__(request)
         self.c_code = 'jkdx'
         self.invite_code = 'jkdx'
         self.token = 'jkdx'
@@ -2743,7 +2743,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister]
+                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister, JiaKeRegister]
 
 
 # ######################第三方用户查询#####################

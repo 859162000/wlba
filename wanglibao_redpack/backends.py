@@ -886,7 +886,7 @@ def commission_one(user, product, equity, start, end):
             # 二级关系佣金计算中止时间：
             sec_intro_end_time = timezone.datetime(2016, 6, 7, 15, 59, 59, tzinfo=timezone.utc)
             if first_intro.created_at >= sec_intro_end_time :
-                sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by, user, first_intro.created_at)
+                sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by.id, user.id, first_intro.created_at)
             else:
                 sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
                 if sec_intro and sec_intro.introduced_by:
@@ -899,18 +899,23 @@ def commission_one_pay_one(user, invite, product, level, amount, earning):
     try:
         with transaction.atomic():
             income, create_flag = Income.objects.get_or_create(user=user, invite=invite, product=product,
-                defaluts={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
-            income = Income.objects.select_for_update().get(income.id)
-            if not income.paid :
+                defaults={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
+            income = Income.objects.select_for_update().get(id=income.id)
+            if income and not income.paid :
                 margin = MarginKeeper(user)
                 margin.deposit(earning, catalog=u"全民淘金")
 
                 income.order_id = margin.order_id
                 income.paid = True
                 income.save()
-        return u'[%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s, Success' % (user, invite, product, level, amount, earning)
+                return u'Success: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product, level, amount, earning)
+            # Only for debug by hb on 2016-06-13
+            if income and income.paid:
+                return u'Ignore: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product, level, amount, earning)
+            if not income:
+                return u'NotFound: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product, level, amount, earning)
     except Exception, ex:
-        return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user, invite, product, ex.message)
+        return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user.id, invite.id, product, ex)
 
 def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at):
     if auto and auto_days > 0:

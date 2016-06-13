@@ -367,8 +367,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       })
       $('.close_popup,.popup_button').click(function(){
         $('.popup_wrap,.popup_box').hide();
-
-
+        $('.popup_wrap,.popup_box').hide();
       });
 
       $('.rule_span').click(function(){
