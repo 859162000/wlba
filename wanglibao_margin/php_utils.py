@@ -613,13 +613,17 @@ def php_commission_one_pay_one(user, invite, product_id, level, amount, earning)
         return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user.id, invite.id, product_id, ex)
 
 
-def calc_php_commission(product_id):
+def calc_php_commission(product_id, period):
     """
     这里每次处理一个满标审核后的标, 只写入记录. 短信发送的时候去统计 散标和月利宝的佣金
     参考:　/wanglibao_redpack/backends.py    function calc_broker_commission
     :param product_id:
     :return:
     """
+    if not period or period<3:
+        logger.info('=calc_php_commission= product_id=[%s] period=[%s] not be commission' % (product_id, period))
+        return
+
     if not product_id:
         logger.info('=calc_php_commission= product_id=[%s] parameter not gived' % (product_id))
         return
