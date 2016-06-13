@@ -55,6 +55,8 @@ def check_out():
         run("git clone git@github.com:wanglibao/wanglibao-backend.git")
     else:
         with cd("wanglibao-backend"):
+            # Add by hb on 2016-06-13
+            run('git reset --hard HEAD')
             run('git clean -f -d')
             with settings(warn_only=True):
                 result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)

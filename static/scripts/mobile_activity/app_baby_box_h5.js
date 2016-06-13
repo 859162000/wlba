@@ -309,7 +309,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     });
 	$('.popup_box .popup_button,.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
-    });js
+    });
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
         var curHeight = ele.height();
@@ -318,7 +318,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $('.slideDown_button').addClass('open');
             ele.height(curHeight).animate({height: autoHeight},500,function(){
                 ele.addClass('down');
-
             });
         }else{
             $('.slideDown_button').removeClass('open');

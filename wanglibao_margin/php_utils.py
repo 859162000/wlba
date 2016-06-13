@@ -575,7 +575,7 @@ def php_commission_one(user, product_id, start, end):
             # 二级关系佣金计算中止时间：
             sec_intro_end_time = timezone.datetime(2016, 6, 7, 15, 59, 59, tzinfo=timezone.utc)
             if first_intro.created_at >= sec_intro_end_time :
-                sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by, user, first_intro.created_at)
+                sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by.id, user.id, first_intro.created_at)
             else:
                 sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
                 if sec_intro and sec_intro.introduced_by:
@@ -588,9 +588,9 @@ def php_commission_one_pay_one(user, invite, product_id, level, amount, earning)
     try:
         with transaction.atomic():
             income, create_flag = PhpIncome.objects.get_or_create(user=user, invite=invite, product_id=product_id,
-                defaluts={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
-            income = PhpIncome.objects.select_for_update().get(income.id)
-            if not income.paid :
+                defaults={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
+            income = PhpIncome.objects.select_for_update().get(id=income.id)
+            if income and not income.paid :
                 margin = MarginKeeper(user)
                 if level==1:
                     desc = u'月利宝一级淘金'
@@ -603,19 +603,29 @@ def php_commission_one_pay_one(user, invite, product_id, level, amount, earning)
                 income.order_id = margin.order_id
                 income.paid = True
                 income.save()
-        return u'[%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s, Success' % (user, invite, product_id, level, amount, earning)
+                return u'Success: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product_id, level, amount, earning)
+            # Only for debug by hb on 2016-06-13
+            if income and income.paid:
+                return u'Ignore: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product_id, level, amount, earning)
+            if not income:
+                return u'NotFound: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product_id, level, amount, earning)
     except Exception, ex:
-        return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user, invite, product_id, ex.message)
+        return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user.id, invite.id, product_id, ex)
 
 
-def calc_php_commission(product_id):
+def calc_php_commission(product_id, period):
     """
     这里每次处理一个满标审核后的标, 只写入记录. 短信发送的时候去统计 散标和月利宝的佣金
     参考:　/wanglibao_redpack/backends.py    function calc_broker_commission
     :param product_id:
     :return:
     """
+    if not period or period<3:
+        logger.info('=calc_php_commission= product_id=[%s] period=[%s] not be commission' % (product_id, period))
+        return
+
     if not product_id:
+        logger.info('=calc_php_commission= product_id=[%s] parameter not gived' % (product_id))
         return
 
     # Modify by hb on 2016-06-12
@@ -623,6 +633,9 @@ def calc_php_commission(product_id):
     #     return
 
     month_products = MonthProduct.objects.filter(product_id=product_id)
+    if not month_products:
+        logger.info('=calc_php_commission= product_id=[%s] record not fouond' % (product_id))
+        return
     users = set([product.user for product in month_products])
 
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
@@ -634,10 +647,10 @@ def calc_php_commission(product_id):
     #         php_commission(user, product_id, start)
     for user in users:
         first_msg, sec_msg = php_commission_one(user, product_id, start, end)
-    if first_msg:
-        logger.info('=calc_broker_commission= : [%s]' % (first_msg))
-    if sec_msg:
-        logger.info('=calc_broker_commission= : [%s]' % (sec_msg))
+        if first_msg:
+            logger.info('=calc_php_commission= : %s' % (first_msg))
+        if sec_msg:
+            logger.info('=calc_php_commission= : %s' % (sec_msg))
 
 def get_php_redis_principle(user_id, url=None):
     """
