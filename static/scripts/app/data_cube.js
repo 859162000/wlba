@@ -580,11 +580,11 @@ function allFun(){
             contDom = '<li class="cont-item'+ aClass +'">'+
                 '<div class="tab-cont-bg"></div><div class="line-unit">单位：千万元</div>'+
                 '<div class="line-y">'+
-                  '<div class="line-money">50</div>'+
-                  '<div class="line-money">40</div>'+
-                  '<div class="line-money">30</div>'+
-                  '<div class="line-money">20</div>'+
-                  '<div class="line-money">10</div>'+
+                  '<div class="line-money">500</div>'+
+                  '<div class="line-money">400</div>'+
+                  '<div class="line-money">300</div>'+
+                  '<div class="line-money">200</div>'+
+                  '<div class="line-money">100</div>'+
                 '</div>'+
                 '<div class="line-bar">';
             for(var m=0; m<tmpYearDate.length; m++){
@@ -597,7 +597,7 @@ function allFun(){
                 }else{
                    liActive = '';
                 }
-                liHeight = parseFloat(percentNum(liData.invest.replace(/,/g,''),50*10000000));
+                liHeight = parseFloat(percentNum(liData.invest.replace(/,/g,''),50*100000000));
 
                 contLiHtml += '<div class="bar-item'+ liActive +'" data-num='+ liData.invest +' data-month='+ liMonth +'>'+
                                 '<div style="bottom: '+ (liHeight+3) +'%" class="bar-top">'+
