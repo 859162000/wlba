@@ -1956,6 +1956,7 @@ class AccessUserExistsApi(APIView):
                         'ret_code': 10000,
                         'message': u'该号已注册',
                     }
+                    response_data['user_id'] = user.id
                     channel = get_user_channel_record(user.id)
                     if channel:
                         response_data['channel_code'] = channel.code
