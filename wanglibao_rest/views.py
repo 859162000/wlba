@@ -2068,6 +2068,84 @@ class AccessUserExistsApi(APIView):
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
 
 
+class UdeskGenerator(object):
+    def __init__(self):
+        self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
+        #self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'  #测试用
+        self.params={
+            'nonce': self.create_nonce_str(),
+            'timestamp': self.create_timestamp(),
+            'web_token': '',
+        }
+
+    def create_nonce_str(self):
+        nonce = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(31))
+        return nonce.lower()
+
+    def create_timestamp(self):
+        import time
+        return int(time.time())*1000  #毫秒级别
+
+    def sign(self):
+        string = '&'.join(['%s=%s' % (key.lower(), self.params[key]) for key in sorted(self.params)])
+        string = string+'&'+self.im_user_key
+        self.params['signature'] = hashlib.sha1(string).hexdigest().upper()
+        return self.params['signature']
+
+    def combine_url(self, phone, signature):
+        base_url = 'http://wanglibao.udesk.cn/im_client?'
+        #base_url = 'http://wltest.udesk.cn/im_client?'    #测试用
+        self.get_params = {
+            'nonce': self.params['nonce'],
+            'timestamp': self.params['timestamp'],
+            'web_token': phone,
+            #'im_user_key': self.im_user_key,
+            'signature': signature,
+            'c_phone': phone, }
+        params_str = '&'.join(['%s=%s' % (key.lower(), self.get_params[key]) for key in sorted(self.get_params)])
+
+        return base_url+params_str
+
+    def get_udesk_url(self, phone_num):
+        self.params['web_token'] = phone_num
+        signature = self.sign()
+        url = self.combine_url(phone_num, signature)
+        return url
+
+class UDeskLoginAPIView(APIView, UdeskGenerator):
+    permission_classes = ()
+
+    def __init__(self):
+        UdeskGenerator.__init__(self)
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            response_data = {
+                'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+        user_profile = WanglibaoUserProfile.objects.filter(user_id=request.user.id).first()
+        if not user_profile:
+            response_data = {
+                'ret_code': 1001,
+                'message': u'用户不存在'
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+        phone = user_profile.phone
+        self.params['web_token'] = phone
+        signature = self.sign()
+        url = self.combine_url(phone, signature)
+
+        response_data = {
+            'ret_code': 0,
+            'message': u'URL信息',
+            'url': url
+        }
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
+
 class BiSouYiUserExistsApi(APIView):
     """第三方手机号注册及绑定状态检测接口"""
 
