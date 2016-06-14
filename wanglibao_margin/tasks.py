@@ -56,15 +56,9 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
             try:
                 with transaction.atomic(savepoint=True):
                     buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
-                    buyer_keeper.php_freeze(amount_source, description=u'月利宝购买冻结')
-                    product.trade_status = 'PAID'
-                    product.save()
-                    ret.update(status=1,
-                               token=token,
-                               msg='success')
 
-                    user = User.objects.filter(pk=user).first()
-
+                    # update by lili 2016-06-14
+                    # 如果使用红包的话,需要先将红包的钱判断正确后存入用户账户,然后再去检测购买金额和余额
                     # 如果使用红包的话, 增加红包使用记录
                     if red_packet_id and int(red_packet_id) > 0:
                         logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
@@ -77,8 +71,18 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                             raise Exception, result['message']
                         if result['rtype'] != 'interest_coupon':
                             red_record = buyer_keeper.redpack_deposit(
-                                    result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
-                                    order_id=redpack_order_id, savepoint=False)
+                                result['deduct'], u"购买月利宝抵扣%s元" % result['deduct'],
+                                order_id=redpack_order_id, savepoint=False)
+
+                    buyer_keeper.php_freeze(amount_source, description=u'月利宝购买冻结')
+                    product.trade_status = 'PAID'
+                    product.save()
+                    ret.update(status=1,
+                               token=token,
+                               msg='success')
+
+                    user = User.objects.filter(pk=user).first()
+
 
                     try:
                         tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
