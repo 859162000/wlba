@@ -102,7 +102,8 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                         logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
 
             except Exception, e:
-                logger.debug('buy month product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
+                logger.exception("buy_month_product failed:")
+                logger.debug('buy_month_product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
                 product.trade_status = 'FAILED'
                 product.save()
                 ret.update(status=0,
