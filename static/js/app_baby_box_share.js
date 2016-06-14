@@ -56,6 +56,7 @@ $(function(){
     $.cookie('share_text_wb', title);
     $.cookie('share_copy_text', url);
 
+
     //点击分享事件
     $('#share_btn').on('click',function(){
         window.location.href = 'bbgz://bbgz_open_owenr_sharedialog.com/'
