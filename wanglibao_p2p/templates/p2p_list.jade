@@ -172,11 +172,6 @@ html
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            if p2p.category == '证大速贷'
-                              .span6-omega(title="本息保障：{{ p2p.warrant_company_name }}") 本息保障：{{ p2p.warrant_company_name }}
-                            else
-                              .span6-omega(title="担保公司：{{ p2p.warrant_company_name }}") 担保公司：{{ p2p.warrant_company_name }}
-
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：
@@ -238,10 +233,6 @@ html
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            if p2p.category == '证大速贷'
-                              .span6-omega(title="本息保障：{{ p2p.warrant_company_name }}") 本息保障：{{ p2p.warrant_company_name }}
-                            else
-                              .span6-omega(title="担保公司：{{ p2p.warrant_company_name }}") 担保公司：{{ p2p.warrant_company_name }}
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：
@@ -303,10 +294,6 @@ html
                             .span6
                               span.font-weight {{ p2p.total_amount | money_format_int }}
                               | 元总金额
-                            if p2p.category == '证大速贷'
-                              .span6-omega(title="本息保障：{{ p2p.warrant_company_name }}") 本息保障：{{ p2p.warrant_company_name }}
-                            else
-                              .span6-omega(title="担保公司：{{ p2p.warrant_company_name }}") 担保公司：{{ p2p.warrant_company_name }}
                           .row.p2pinfo-flow-foot
                             .span6
                               span 进度：

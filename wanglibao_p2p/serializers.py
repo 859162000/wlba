@@ -101,9 +101,14 @@ class P2PProductSerializer(ModelSerializerExtended):
                     # else:
                     #     if not is_login:
                     #         extra_data[section_key][item_key] = u'请登录后查看'
+                    print section_key, '===', item_key
+
                     if not item_key:
                         extra_data[section_key][section_key] = extra_data[section_key][item_key]
                         del extra_data[section_key][item_key]
+                    else:
+                        if item_key == u'第三方担保机构':
+                            del extra_data[section_key][item_key]
         except:
             logger.error('parse extra data failed:' + str(value))
 
