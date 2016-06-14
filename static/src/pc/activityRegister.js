@@ -63,7 +63,7 @@
                         });
                         captchaObj.onRefresh(function(){
                             $('#captcha-status').val('');
-                            activityRegister.heckCodeIsNoFun()
+                            activityRegister.checkCodeIsNoFun()
                         })
                         captchaObj.getValidate();
                     }
@@ -266,7 +266,9 @@
                             return tool.modalAlert({
                                 title: '温馨提示',
                                 msg: result.message,
-                                callback_ok: _showModal
+                                callback_ok: function(){
+                                    $('.gt_refresh_tips').click();
+                                }
                             });
                         }
                     }
