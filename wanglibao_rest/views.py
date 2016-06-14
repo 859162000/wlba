@@ -1609,7 +1609,7 @@ class GuestCheckView(APIView):
 
 class InnerSysHandler(object):
     def ip_valid(self, request):
-        INNER_IP = ("182.92.179.24", "10.171.37.235")
+        INNER_IP = ("182.92.179.24", "10.171.37.235", '123.57.139.145', '10.172.161.122')
         client_ip = get_client_ip(request)
         return True if client_ip in INNER_IP else False
 
@@ -1675,6 +1675,7 @@ class InnerSysValidateID(APIView, InnerSysHandler):
             verify_record, error = verify_id(name, id)
             logger.debug('name:%s, id:%s, verifiy_record:%s, error:%s' % (name, id, verify_record, error))
         except:
+            logger.exception("InnerSysValidateID raise error: ")
             return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
         else:
             if error or not verify_record.is_valid:
