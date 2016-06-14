@@ -156,6 +156,10 @@
           $('.popup_wrap').show();
       })
 
+    alert($(window).width());
+    alert($(window).height());
+
+
 
 
 
