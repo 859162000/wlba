@@ -1984,8 +1984,8 @@ class AccessUserExistsApi(APIView):
 
 class UdeskGenerator(object):
     def __init__(self):
-        #self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
-        self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'
+        self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
+        self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'  #测试用
         self.params={
             'nonce': self.create_nonce_str(),
             'timestamp': self.create_timestamp(),
