@@ -57,6 +57,8 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                 with transaction.atomic(savepoint=True):
                     buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
 
+                    user = User.objects.filter(pk=user).first()
+
                     # update by lili 2016-06-14
                     # 如果使用红包的话,需要先将红包的钱判断正确后存入用户账户,然后再去检测购买金额和余额
                     # 如果使用红包的话, 增加红包使用记录
@@ -80,9 +82,6 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                     ret.update(status=1,
                                token=token,
                                msg='success')
-
-                    user = User.objects.filter(pk=user).first()
-
 
                     try:
                         tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
